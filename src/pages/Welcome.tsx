@@ -77,7 +77,7 @@ const Welcome = () => {
             </div>
             <Button
               onClick={() => navigate('/preferences')}
-              className="w-full bg-white text-purple-600 hover:bg-white/90 font-semibold"
+              className="w-full bg-white text-datespot-blue hover:bg-white/90 font-semibold"
             >
               Start Discovery
               <ArrowRight className="w-4 h-4 ml-2" />

@@ -36,7 +36,7 @@ const Friends = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-500 to-pink-500">
+    <div className="min-h-screen bg-datespot-gradient">
       {/* Header */}
       <div className="flex items-center justify-between p-4 pt-12 text-white">
         <Button
@@ -97,7 +97,7 @@ const Friends = () => {
                 <div className="flex items-center gap-4">
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={friend.avatar} alt={friend.name} />
-                    <AvatarFallback className="bg-purple-200 text-purple-700">
+                    <AvatarFallback className="bg-datespot-light-blue text-datespot-dark-blue">
                       {friend.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
@@ -109,7 +109,7 @@ const Friends = () => {
                     onClick={() => inviteFriend(friend.id)}
                     variant={friend.isInvited ? "default" : "outline"}
                     className={friend.isInvited 
-                      ? "bg-white text-purple-600 hover:bg-white/90" 
+                      ? "bg-white text-datespot-blue hover:bg-white/90" 
                       : "border-white text-white hover:bg-white/20"
                     }
                   >
@@ -154,7 +154,7 @@ const Friends = () => {
         {/* Next Button */}
         <Button
           onClick={handleNext}
-          className="w-full h-12 bg-white text-purple-600 hover:bg-white/90 font-semibold"
+          className="w-full h-12 bg-white text-datespot-blue hover:bg-white/90 font-semibold"
         >
           Next: Choose Area
           <ArrowRight className="w-4 h-4 ml-2" />

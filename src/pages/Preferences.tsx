@@ -56,7 +56,7 @@ const Preferences = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-500 to-pink-500">
+    <div className="min-h-screen bg-datespot-gradient">
       {/* Header */}
       <div className="flex items-center justify-between p-4 pt-12 text-white">
         <Button
@@ -94,7 +94,7 @@ const Preferences = () => {
                 onClick={() => toggleCuisine(cuisine.id)}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   selectedCuisines.includes(cuisine.id)
-                    ? 'bg-white border-white text-purple-600'
+                    ? 'bg-white border-white text-datespot-blue'
                     : 'bg-white/10 border-white/30 text-white hover:bg-white/20'
                 }`}
               >
@@ -120,7 +120,7 @@ const Preferences = () => {
                 onClick={() => toggleVibe(vibe.id)}
                 className={`w-full p-4 rounded-xl border-2 transition-all ${
                   selectedVibes.includes(vibe.id)
-                    ? 'bg-white border-white text-purple-600'
+                    ? 'bg-white border-white text-datespot-blue'
                     : 'bg-white/10 border-white/30 text-white hover:bg-white/20'
                 }`}
               >
@@ -128,7 +128,7 @@ const Preferences = () => {
                   <div className="text-2xl">{vibe.emoji}</div>
                   <div className="flex-1 text-left">
                     <div className="font-semibold">{vibe.name}</div>
-                    <div className={`text-sm ${selectedVibes.includes(vibe.id) ? 'text-purple-400' : 'text-white/70'}`}>
+                    <div className={`text-sm ${selectedVibes.includes(vibe.id) ? 'text-datespot-dark-blue' : 'text-white/70'}`}>
                       {vibe.desc}
                     </div>
                   </div>
@@ -145,7 +145,7 @@ const Preferences = () => {
         <Button
           onClick={handleNext}
           disabled={selectedCuisines.length === 0 || selectedVibes.length === 0}
-          className="w-full h-12 bg-white text-purple-600 hover:bg-white/90 font-semibold disabled:opacity-50"
+          className="w-full h-12 bg-white text-datespot-blue hover:bg-white/90 font-semibold disabled:opacity-50"
         >
           Next: Invite Friends
           <ArrowRight className="w-4 h-4 ml-2" />

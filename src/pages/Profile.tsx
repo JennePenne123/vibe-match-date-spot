@@ -90,7 +90,7 @@ const Profile = () => {
               <div className="flex gap-2 justify-center">
                 <Button
                   onClick={handleSave}
-                  className="bg-white text-purple-600 hover:bg-white/90"
+                  className="bg-white text-datespot-blue hover:bg-white/90"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save
@@ -120,7 +120,7 @@ const Profile = () => {
           {stats.map((stat) => (
             <Card key={stat.label} className="text-center">
               <CardContent className="p-4">
-                <stat.icon className="w-6 h-6 mx-auto mb-2 text-purple-600" />
+                <stat.icon className="w-6 h-6 mx-auto mb-2 text-datespot-blue" />
                 <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
                 <div className="text-xs text-gray-600">{stat.label}</div>
               </CardContent>
@@ -143,7 +143,7 @@ const Profile = () => {
                   <div key={friend.id} className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
                       <AvatarImage src={friend.avatar} alt={friend.name} />
-                      <AvatarFallback className="bg-purple-100 text-purple-700 text-sm">
+                      <AvatarFallback className="bg-datespot-light-blue text-datespot-dark-blue text-sm">
                         {friend.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
@@ -189,7 +189,7 @@ const Profile = () => {
                     {user.preferences.cuisines?.map((cuisine) => (
                       <span
                         key={cuisine}
-                        className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm"
+                        className="bg-datespot-light-blue text-datespot-dark-blue px-3 py-1 rounded-full text-sm"
                       >
                         {cuisine}
                       </span>
@@ -202,7 +202,7 @@ const Profile = () => {
                     {user.preferences.vibes?.map((vibe) => (
                       <span
                         key={vibe}
-                        className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm"
+                        className="bg-datespot-sky-blue text-datespot-blue px-3 py-1 rounded-full text-sm"
                       >
                         {vibe}
                       </span>

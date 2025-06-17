@@ -62,7 +62,7 @@ const Area = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-500 to-pink-500">
+    <div className="min-h-screen bg-datespot-gradient">
       {/* Header */}
       <div className="flex items-center justify-between p-4 pt-12 text-white">
         <Button
@@ -129,7 +129,7 @@ const Area = () => {
                 </div>
                 {selectedArea === area.id && (
                   <div className="absolute top-2 right-2 bg-white rounded-full p-1">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
+                    <Sparkles className="w-4 h-4 text-datespot-blue" />
                   </div>
                 )}
               </div>
@@ -141,7 +141,7 @@ const Area = () => {
         <Button
           onClick={handleNext}
           disabled={!selectedArea}
-          className="w-full h-12 bg-white text-purple-600 hover:bg-white/90 font-semibold disabled:opacity-50"
+          className="w-full h-12 bg-white text-datespot-blue hover:bg-white/90 font-semibold disabled:opacity-50"
         >
           <Sparkles className="w-4 h-4 mr-2" />
           Find Perfect Spots
