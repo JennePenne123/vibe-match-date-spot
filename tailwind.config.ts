@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,22 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// DateSpot brand colors
+				datespot: {
+					pink: '#E91E63',
+					purple: '#9C27B0',
+					'light-pink': '#F8BBD9',
+					'light-purple': '#E1BEE7',
+					gradient: {
+						from: '#E91E63',
+						to: '#9C27B0'
+					}
 				}
+			},
+			backgroundImage: {
+				'datespot-gradient': 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)',
+				'datespot-gradient-light': 'linear-gradient(135deg, #F8BBD9 0%, #E1BEE7 100%)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +100,33 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'scale-in': {
+					'0%': {
+						transform: 'scale(0.95)',
+						opacity: '0'
+					},
+					'100%': {
+						transform: 'scale(1)',
+						opacity: '1'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'scale-in': 'scale-in 0.2s ease-out'
 			}
 		}
 	},
