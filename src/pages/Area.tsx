@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
@@ -62,36 +61,36 @@ const Area = () => {
   };
 
   return (
-    <div className="min-h-screen bg-datespot-gradient">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 pt-12 text-white">
+      <div className="flex items-center justify-between p-4 pt-12 bg-white shadow-sm">
         <Button
           onClick={() => navigate('/friends')}
           variant="ghost"
           size="icon"
-          className="text-white hover:bg-white/20"
+          className="text-gray-600 hover:bg-gray-100"
         >
           <ArrowLeft className="w-6 h-6" />
         </Button>
         <div className="text-center">
-          <h1 className="text-xl font-semibold">Choose Area</h1>
-          <p className="text-sm text-white/80">Step 3 of 3</p>
+          <h1 className="text-xl font-semibold text-gray-900">Choose Area</h1>
+          <p className="text-sm text-gray-600">Step 3 of 3</p>
         </div>
         <div className="w-10" />
       </div>
 
       {/* Progress Bar */}
-      <div className="px-6 mb-8">
-        <div className="bg-white/20 rounded-full h-2">
-          <div className="bg-white rounded-full h-2 w-full transition-all duration-300" />
+      <div className="px-6 mb-8 pt-4">
+        <div className="bg-gray-200 rounded-full h-2">
+          <div className="bg-datespot-gradient rounded-full h-2 w-full transition-all duration-300" />
         </div>
       </div>
 
       <div className="px-6 pb-8">
         {/* Header Text */}
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Where would you like to go?</h2>
-          <p className="text-white/80">Pick your preferred neighborhood for the perfect date</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Where would you like to go?</h2>
+          <p className="text-gray-600">Pick your preferred neighborhood for the perfect date</p>
         </div>
 
         {/* Area Selection */}
@@ -102,7 +101,7 @@ const Area = () => {
               onClick={() => setSelectedArea(area.id)}
               className={`w-full rounded-xl overflow-hidden transition-all ${
                 selectedArea === area.id
-                  ? 'ring-4 ring-white transform scale-[1.02]'
+                  ? 'ring-4 ring-datespot-pink transform scale-[1.02]'
                   : 'hover:transform hover:scale-[1.01]'
               }`}
             >
@@ -129,7 +128,7 @@ const Area = () => {
                 </div>
                 {selectedArea === area.id && (
                   <div className="absolute top-2 right-2 bg-white rounded-full p-1">
-                    <Sparkles className="w-4 h-4 text-datespot-blue" />
+                    <Sparkles className="w-4 h-4 text-datespot-pink" />
                   </div>
                 )}
               </div>
@@ -141,7 +140,7 @@ const Area = () => {
         <Button
           onClick={handleNext}
           disabled={!selectedArea}
-          className="w-full h-12 bg-white text-datespot-blue hover:bg-white/90 font-semibold disabled:opacity-50"
+          className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold disabled:opacity-50"
         >
           <Sparkles className="w-4 h-4 mr-2" />
           Find Perfect Spots

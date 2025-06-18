@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,42 +35,42 @@ const Friends = () => {
   };
 
   return (
-    <div className="min-h-screen bg-datespot-gradient">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 pt-12 text-white">
+      <div className="flex items-center justify-between p-4 pt-12 bg-white shadow-sm">
         <Button
           onClick={() => navigate('/preferences')}
           variant="ghost"
           size="icon"
-          className="text-white hover:bg-white/20"
+          className="text-gray-600 hover:bg-gray-100"
         >
           <ArrowLeft className="w-6 h-6" />
         </Button>
         <div className="text-center">
-          <h1 className="text-xl font-semibold">Invite Friends</h1>
-          <p className="text-sm text-white/80">Step 2 of 3</p>
+          <h1 className="text-xl font-semibold text-gray-900">Invite Friends</h1>
+          <p className="text-sm text-gray-600">Step 2 of 3</p>
         </div>
         <Button
           onClick={handleSkip}
           variant="ghost"
-          className="text-white hover:bg-white/20 text-sm"
+          className="text-gray-600 hover:bg-gray-100 text-sm"
         >
           Skip
         </Button>
       </div>
 
       {/* Progress Bar */}
-      <div className="px-6 mb-8">
-        <div className="bg-white/20 rounded-full h-2">
-          <div className="bg-white rounded-full h-2 w-2/3 transition-all duration-300" />
+      <div className="px-6 mb-8 pt-4">
+        <div className="bg-gray-200 rounded-full h-2">
+          <div className="bg-datespot-gradient rounded-full h-2 w-2/3 transition-all duration-300" />
         </div>
       </div>
 
       <div className="px-6 pb-8">
         {/* Header Text */}
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Who's joining you?</h2>
-          <p className="text-white/80">Invite friends to join your date adventure</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Who's joining you?</h2>
+          <p className="text-gray-600">Invite friends to join your date adventure</p>
         </div>
 
         {/* Search */}
@@ -82,7 +81,7 @@ const Friends = () => {
             placeholder="Search friends..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-12 bg-white/90 border-0"
+            className="pl-10 h-12 bg-white border-gray-200"
           />
         </div>
 
@@ -92,25 +91,25 @@ const Friends = () => {
             filteredFriends.map((friend) => (
               <div
                 key={friend.id}
-                className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20"
+                className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
               >
                 <div className="flex items-center gap-4">
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={friend.avatar} alt={friend.name} />
-                    <AvatarFallback className="bg-datespot-light-blue text-datespot-dark-blue">
+                    <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink">
                       {friend.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-white">{friend.name}</h3>
-                    <p className="text-sm text-white/70">Available for dates</p>
+                    <h3 className="font-semibold text-gray-900">{friend.name}</h3>
+                    <p className="text-sm text-gray-500">Available for dates</p>
                   </div>
                   <Button
                     onClick={() => inviteFriend(friend.id)}
                     variant={friend.isInvited ? "default" : "outline"}
                     className={friend.isInvited 
-                      ? "bg-white text-datespot-blue hover:bg-white/90" 
-                      : "border-white text-white hover:bg-white/20"
+                      ? "bg-datespot-gradient text-white hover:opacity-90" 
+                      : "border-gray-200 text-gray-700 hover:bg-gray-50"
                     }
                   >
                     {friend.isInvited ? (
@@ -131,20 +130,20 @@ const Friends = () => {
           ) : (
             <div className="text-center py-8">
               <div className="text-4xl mb-4">👥</div>
-              <h3 className="text-white font-semibold mb-2">No friends found</h3>
-              <p className="text-white/70">Try a different search term</p>
+              <h3 className="text-gray-900 font-semibold mb-2">No friends found</h3>
+              <p className="text-gray-600">Try a different search term</p>
             </div>
           )}
         </div>
 
         {/* Invited Count */}
         {invitedFriendIds.length > 0 && (
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 mb-6">
-            <div className="text-center text-white">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
+            <div className="text-center text-gray-700">
               <h3 className="font-semibold mb-1">
                 {invitedFriendIds.length} friend{invitedFriendIds.length !== 1 ? 's' : ''} invited
               </h3>
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-gray-500">
                 They'll get recommendations that work for the group
               </p>
             </div>
@@ -154,7 +153,7 @@ const Friends = () => {
         {/* Next Button */}
         <Button
           onClick={handleNext}
-          className="w-full h-12 bg-white text-datespot-blue hover:bg-white/90 font-semibold"
+          className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold"
         >
           Next: Choose Area
           <ArrowRight className="w-4 h-4 ml-2" />

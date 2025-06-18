@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -43,22 +42,22 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-datespot-gradient p-4 pt-12 text-white">
+      <div className="bg-white p-4 pt-12 shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <Button
             onClick={() => navigate('/welcome')}
             variant="ghost"
             size="icon"
-            className="text-white hover:bg-white/20"
+            className="text-gray-600 hover:bg-gray-100"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
-          <h1 className="text-xl font-semibold">Profile</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Profile</h1>
           <Button
             onClick={() => setIsEditing(!isEditing)}
             variant="ghost"
             size="icon"
-            className="text-white hover:bg-white/20"
+            className="text-gray-600 hover:bg-gray-100"
           >
             {isEditing ? <X className="w-6 h-6" /> : <Edit className="w-6 h-6" />}
           </Button>
@@ -66,9 +65,9 @@ const Profile = () => {
 
         {/* Profile Header */}
         <div className="text-center">
-          <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-white/30">
+          <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-datespot-light-pink">
             <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback className="bg-white/20 text-white text-2xl">
+            <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
               {user.name.split(' ').map(n => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
@@ -78,19 +77,19 @@ const Profile = () => {
               <Input
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
-                className="bg-white/90 text-gray-900 text-center font-semibold"
+                className="bg-white text-gray-900 text-center font-semibold border-gray-200"
                 placeholder="Your name"
               />
               <Input
                 value={editedEmail}
                 onChange={(e) => setEditedEmail(e.target.value)}
-                className="bg-white/90 text-gray-900 text-center"
+                className="bg-white text-gray-900 text-center border-gray-200"
                 placeholder="Your email"
               />
               <div className="flex gap-2 justify-center">
                 <Button
                   onClick={handleSave}
-                  className="bg-white text-datespot-blue hover:bg-white/90"
+                  className="bg-datespot-gradient text-white hover:opacity-90"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save
@@ -98,7 +97,7 @@ const Profile = () => {
                 <Button
                   onClick={handleCancel}
                   variant="outline"
-                  className="border-white text-white hover:bg-white/20"
+                  className="border-gray-200 text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
                 </Button>
@@ -106,8 +105,8 @@ const Profile = () => {
             </div>
           ) : (
             <>
-              <h2 className="text-2xl font-bold mb-1">{user.name}</h2>
-              <p className="text-white/80">{user.email}</p>
+              <h2 className="text-2xl font-bold mb-1 text-gray-900">{user.name}</h2>
+              <p className="text-gray-600">{user.email}</p>
             </>
           )}
         </div>
@@ -118,9 +117,9 @@ const Profile = () => {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {stats.map((stat) => (
-            <Card key={stat.label} className="text-center">
+            <Card key={stat.label} className="text-center bg-white shadow-sm border-gray-100">
               <CardContent className="p-4">
-                <stat.icon className="w-6 h-6 mx-auto mb-2 text-datespot-blue" />
+                <stat.icon className="w-6 h-6 mx-auto mb-2 text-datespot-pink" />
                 <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
                 <div className="text-xs text-gray-600">{stat.label}</div>
               </CardContent>
@@ -129,9 +128,9 @@ const Profile = () => {
         </div>
 
         {/* Friends List */}
-        <Card className="mb-6">
+        <Card className="mb-6 bg-white shadow-sm border-gray-100">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-gray-900">
               <Users className="w-5 h-5" />
               Friends ({user.friends.length})
             </CardTitle>
@@ -143,7 +142,7 @@ const Profile = () => {
                   <div key={friend.id} className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
                       <AvatarImage src={friend.avatar} alt={friend.name} />
-                      <AvatarFallback className="bg-datespot-light-blue text-datespot-dark-blue text-sm">
+                      <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-sm">
                         {friend.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
@@ -163,7 +162,7 @@ const Profile = () => {
                 <Button
                   onClick={() => navigate('/friends')}
                   variant="outline"
-                  className="mt-3"
+                  className="mt-3 border-gray-200 text-gray-700 hover:bg-gray-50"
                 >
                   Add Friends
                 </Button>
@@ -174,9 +173,9 @@ const Profile = () => {
 
         {/* Preferences */}
         {user.preferences && (
-          <Card className="mb-6">
+          <Card className="mb-6 bg-white shadow-sm border-gray-100">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-gray-900">
                 <Settings className="w-5 h-5" />
                 Preferences
               </CardTitle>
@@ -189,7 +188,7 @@ const Profile = () => {
                     {user.preferences.cuisines?.map((cuisine) => (
                       <span
                         key={cuisine}
-                        className="bg-datespot-light-blue text-datespot-dark-blue px-3 py-1 rounded-full text-sm"
+                        className="bg-datespot-light-pink text-datespot-dark-pink px-3 py-1 rounded-full text-sm"
                       >
                         {cuisine}
                       </span>
@@ -202,7 +201,7 @@ const Profile = () => {
                     {user.preferences.vibes?.map((vibe) => (
                       <span
                         key={vibe}
-                        className="bg-datespot-sky-blue text-datespot-blue px-3 py-1 rounded-full text-sm"
+                        className="bg-datespot-soft-pink text-datespot-pink px-3 py-1 rounded-full text-sm"
                       >
                         {vibe}
                       </span>
@@ -219,7 +218,7 @@ const Profile = () => {
           <Button
             onClick={() => navigate('/preferences')}
             variant="outline"
-            className="w-full"
+            className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
           >
             Update Preferences
           </Button>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
@@ -42,24 +41,24 @@ const Results = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-datespot-gradient p-4 pt-12 text-white">
+      <div className="bg-white p-4 pt-12 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <Button
             onClick={() => navigate('/area')}
             variant="ghost"
             size="icon"
-            className="text-white hover:bg-white/20"
+            className="text-gray-600 hover:bg-gray-100"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="text-center">
-            <h1 className="text-xl font-semibold">Perfect Matches</h1>
-            <p className="text-sm text-white/80">{filteredVenues.length} spots found</p>
+            <h1 className="text-xl font-semibold text-gray-900">Perfect Matches</h1>
+            <p className="text-sm text-gray-600">{filteredVenues.length} spots found</p>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="text-white hover:bg-white/20"
+            className="text-gray-600 hover:bg-gray-100"
           >
             <Filter className="w-6 h-6" />
           </Button>
@@ -73,8 +72,8 @@ const Results = () => {
               onClick={() => setFilter(filterOption.id)}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 filter === filterOption.id
-                  ? 'bg-white text-purple-600'
-                  : 'bg-white/20 text-white hover:bg-white/30'
+                  ? 'bg-datespot-gradient text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               <span className="mr-2">{filterOption.icon}</span>
@@ -180,7 +179,7 @@ const Results = () => {
           <Button
             onClick={() => navigate('/preferences')}
             variant="outline"
-            className="w-full"
+            className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
           >
             Refine Preferences
           </Button>
