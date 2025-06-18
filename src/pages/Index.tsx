@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Sparkles, AlertCircle } from 'lucide-react';
+import { Heart, Sparkles, AlertCircle, User } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -52,6 +52,23 @@ const Index = () => {
     setLoading(false);
   };
 
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const result = await login('demo@datespot.com', 'demo123');
+      if (result.error) {
+        setError(result.error.message || 'Demo account not available');
+      }
+    } catch (error) {
+      console.error('Demo login error:', error);
+      setError('Demo account not available');
+    }
+    
+    setLoading(false);
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -85,6 +102,39 @@ const Index = () => {
             Join thousands of couples discovering their perfect date spots with AI-powered recommendations
           </p>
         </div>
+
+        {/* Demo Account Button */}
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 shadow-md border border-blue-200">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-3">
+              <div className="flex justify-center">
+                <div className="bg-blue-100 rounded-full p-2">
+                  <User className="w-5 h-5 text-blue-600" />
+                </div>
+              </div>
+              <h3 className="font-semibold text-gray-900">Try Demo Account</h3>
+              <p className="text-sm text-gray-600">Experience DateSpot without creating an account</p>
+              <Button
+                onClick={handleDemoLogin}
+                variant="outline"
+                className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 animate-spin" />
+                    Signing In...
+                  </div>
+                ) : (
+                  <>
+                    <User className="w-4 h-4 mr-2" />
+                    Continue with Demo
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Auth Form */}
         <Card className="bg-white shadow-xl border-0">
