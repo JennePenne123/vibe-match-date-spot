@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,18 +10,37 @@ import { ArrowLeft, Edit, Save, X, Settings, Heart, Users, MapPin } from 'lucide
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, updateUser, logout } = useAuth();
+  const { user, updateUser, logout, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [editedName, setEditedName] = useState(user?.name || '');
-  const [editedEmail, setEditedEmail] = useState(user?.email || '');
+  const [editedName, setEditedName] = useState('');
+  const [editedEmail, setEditedEmail] = useState('');
+
+  React.useEffect(() => {
+    if (!loading && !user) {
+      navigate('/');
+      return;
+    }
+    
+    if (user?.profile) {
+      setEditedName(user.profile.name || '');
+      setEditedEmail(user.profile.email || '');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
 
   if (!user) {
-    navigate('/');
     return null;
   }
 
-  const handleSave = () => {
-    updateUser({
+  const handleSave = async () => {
+    await updateUser({
       name: editedName,
       email: editedEmail
     });
@@ -28,15 +48,18 @@ const Profile = () => {
   };
 
   const handleCancel = () => {
-    setEditedName(user.name);
-    setEditedEmail(user.email);
+    setEditedName(user.profile?.name || '');
+    setEditedEmail(user.profile?.email || '');
     setIsEditing(false);
   };
 
+  const displayName = user.profile?.name || user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+  const displayEmail = user.profile?.email || user.email || '';
+
   const stats = [
-    { label: 'Dates Planned', value: '12', icon: Heart },
-    { label: 'Friends Connected', value: user.friends.length.toString(), icon: Users },
-    { label: 'Areas Explored', value: '5', icon: MapPin }
+    { label: 'Dates Planned', value: '0', icon: Heart },
+    { label: 'Friends Connected', value: '0', icon: Users },
+    { label: 'Areas Explored', value: '0', icon: MapPin }
   ];
 
   return (
@@ -66,9 +89,9 @@ const Profile = () => {
         {/* Profile Header */}
         <div className="text-center">
           <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-datespot-light-pink">
-            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarImage src={user.profile?.avatar_url} alt={displayName} />
             <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
-              {user.name.split(' ').map(n => n[0]).join('')}
+              {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
             </AvatarFallback>
           </Avatar>
           
@@ -85,6 +108,7 @@ const Profile = () => {
                 onChange={(e) => setEditedEmail(e.target.value)}
                 className="bg-white text-gray-900 text-center border-gray-200"
                 placeholder="Your email"
+                type="email"
               />
               <div className="flex gap-2 justify-center">
                 <Button
@@ -105,8 +129,8 @@ const Profile = () => {
             </div>
           ) : (
             <>
-              <h2 className="text-2xl font-bold mb-1 text-gray-900">{user.name}</h2>
-              <p className="text-gray-600">{user.email}</p>
+              <h2 className="text-2xl font-bold mb-1 text-gray-900">{displayName}</h2>
+              <p className="text-gray-600">{displayEmail}</p>
             </>
           )}
         </div>
@@ -127,91 +151,28 @@ const Profile = () => {
           ))}
         </div>
 
-        {/* Friends List */}
+        {/* Friends List Placeholder */}
         <Card className="mb-6 bg-white shadow-sm border-gray-100">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-gray-900">
               <Users className="w-5 h-5" />
-              Friends ({user.friends.length})
+              Friends (0)
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {user.friends.length > 0 ? (
-              <div className="space-y-3">
-                {user.friends.map((friend) => (
-                  <div key={friend.id} className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={friend.avatar} alt={friend.name} />
-                      <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-sm">
-                        {friend.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{friend.name}</div>
-                      <div className="text-sm text-gray-500">
-                        {friend.isInvited ? 'Recently invited' : 'Available'}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6 text-gray-500">
-                <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>No friends added yet</p>
-                <Button
-                  onClick={() => navigate('/friends')}
-                  variant="outline"
-                  className="mt-3 border-gray-200 text-gray-700 hover:bg-gray-50"
-                >
-                  Add Friends
-                </Button>
-              </div>
-            )}
+            <div className="text-center py-6 text-gray-500">
+              <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+              <p>No friends added yet</p>
+              <Button
+                onClick={() => navigate('/friends')}
+                variant="outline"
+                className="mt-3 border-gray-200 text-gray-700 hover:bg-gray-50"
+              >
+                Add Friends
+              </Button>
+            </div>
           </CardContent>
         </Card>
-
-        {/* Preferences */}
-        {user.preferences && (
-          <Card className="mb-6 bg-white shadow-sm border-gray-100">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
-                <Settings className="w-5 h-5" />
-                Preferences
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Favorite Cuisines</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {user.preferences.cuisines?.map((cuisine) => (
-                      <span
-                        key={cuisine}
-                        className="bg-datespot-light-pink text-datespot-dark-pink px-3 py-1 rounded-full text-sm"
-                      >
-                        {cuisine}
-                      </span>
-                    )) || <span className="text-gray-500">Not set</span>}
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Preferred Vibes</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {user.preferences.vibes?.map((vibe) => (
-                      <span
-                        key={vibe}
-                        className="bg-datespot-soft-pink text-datespot-pink px-3 py-1 rounded-full text-sm"
-                      >
-                        {vibe}
-                      </span>
-                    )) || <span className="text-gray-500">Not set</span>}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Actions */}
         <div className="space-y-3">

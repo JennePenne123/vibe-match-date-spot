@@ -8,10 +8,23 @@ import { Heart, ArrowRight, Settings } from 'lucide-react';
 
 const Welcome = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
+
+  React.useEffect(() => {
+    if (!loading && !user) {
+      navigate('/');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
 
   if (!user) {
-    navigate('/');
     return null;
   }
 
@@ -21,6 +34,9 @@ const Welcome = () => {
     if (hour < 17) return 'Good Afternoon!';
     return 'Good Evening!';
   };
+
+  const displayName = user.profile?.name || user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+  const firstName = displayName.split(' ')[0];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,14 +65,14 @@ const Welcome = () => {
         <div className="text-center text-gray-900 mb-12 animate-fade-in pt-8">
           <div className="flex justify-center mb-4">
             <Avatar className="w-24 h-24 border-4 border-datespot-light-pink">
-              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarImage src={user.profile?.avatar_url} alt={displayName} />
               <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
-                {user.name.split(' ').map(n => n[0]).join('')}
+                {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
               </AvatarFallback>
             </Avatar>
           </div>
           <h2 className="text-2xl font-bold mb-2 text-gray-800">{getTimeGreeting()} ☀️</h2>
-          <h1 className="text-4xl font-bold mb-4 text-gray-900">{user.name.split(' ')[0]}</h1>
+          <h1 className="text-4xl font-bold mb-4 text-gray-900">{firstName}</h1>
           <p className="text-xl text-gray-700 mb-2">Ready for your perfect date?</p>
           <p className="text-gray-600">
             Let's find the ideal spot that matches your vibe and creates unforgettable memories

@@ -5,16 +5,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Sparkles } from 'lucide-react';
+import { Heart, Sparkles, AlertCircle } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, login, signup } = useAuth();
+  const { user, login, signup, loading: authLoading } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   React.useEffect(() => {
     if (user) {
@@ -25,19 +26,42 @@ const Index = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     
     try {
+      let result;
       if (isLogin) {
-        await login(email, password);
+        result = await login(email, password);
       } else {
-        await signup(name, email, password);
+        if (!name.trim()) {
+          setError('Name is required');
+          setLoading(false);
+          return;
+        }
+        result = await signup(name, email, password);
+      }
+      
+      if (result.error) {
+        setError(result.error.message || 'An error occurred');
       }
     } catch (error) {
       console.error('Authentication error:', error);
+      setError('An unexpected error occurred');
     }
     
     setLoading(false);
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-gray-600">
+          <Sparkles className="w-5 h-5 animate-spin" />
+          Loading...
+        </div>
+      </div>
+    );
+  }
 
   if (user) {
     return null; // Will redirect to welcome
@@ -77,6 +101,13 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+                  <AlertCircle className="w-4 h-4" />
+                  {error}
+                </div>
+              )}
+              
               {!isLogin && (
                 <div>
                   <Input
@@ -107,6 +138,7 @@ const Index = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="h-12"
+                  minLength={6}
                 />
               </div>
               <Button 
@@ -127,7 +159,10 @@ const Index = () => {
 
             <div className="mt-6 text-center">
               <button
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError('');
+                }}
                 className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
               >
                 {isLogin 
@@ -138,15 +173,6 @@ const Index = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Quick Demo Button */}
-        <Button
-          onClick={() => login('demo@datespot.app', 'demo')}
-          variant="outline"
-          className="w-full bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-        >
-          Try Demo Account
-        </Button>
       </div>
     </div>
   );
