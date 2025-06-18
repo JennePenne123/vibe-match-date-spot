@@ -44,31 +44,31 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-datespot-gradient flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         {/* Logo and Header */}
-        <div className="text-center text-white space-y-4">
+        <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
+            <div className="bg-gradient-to-r from-pink-400 to-rose-500 rounded-full p-4 shadow-lg">
               <Heart className="w-12 h-12 text-white" fill="currentColor" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold">DateSpot</h1>
-          <p className="text-lg text-white/90">
+          <h1 className="text-4xl font-bold text-gray-900">DateSpot</h1>
+          <p className="text-lg text-gray-700">
             Ready to Create Unforgettable Memories?
           </p>
-          <p className="text-white/80">
+          <p className="text-gray-600">
             Join thousands of couples discovering their perfect date spots with AI-powered recommendations
           </p>
         </div>
 
         {/* Auth Form */}
-        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
+        <Card className="bg-white shadow-xl border-0">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl text-gray-900">
               {isLogin ? 'Welcome Back' : 'Create Account'}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-600">
               {isLogin 
                 ? 'Sign in to discover amazing date spots' 
                 : 'Start your journey to perfect dates'
@@ -111,7 +111,7 @@ const Index = () => {
               </div>
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-datespot-gradient hover:opacity-90 text-white font-semibold"
+                className="w-full h-12 bg-gradient-to-r from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white font-semibold border-0"
                 disabled={loading}
               >
                 {loading ? (
@@ -143,7 +143,7 @@ const Index = () => {
         <Button
           onClick={() => login('demo@datespot.app', 'demo')}
           variant="outline"
-          className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30"
+          className="w-full bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
         >
           Try Demo Account
         </Button>
