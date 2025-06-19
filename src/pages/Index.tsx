@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -51,21 +52,9 @@ const Index = () => {
     setLoading(false);
   };
 
-  const handleDemoLogin = async () => {
-    setLoading(true);
-    setError('');
-    
-    try {
-      const result = await login('demo@datespot.com', 'demo123');
-      if (result.error) {
-        setError(result.error.message || 'Demo account not available');
-      }
-    } catch (error) {
-      console.error('Demo login error:', error);
-      setError('Demo account not available');
-    }
-    
-    setLoading(false);
+  const handleDemoMode = () => {
+    // Skip authentication entirely and go directly to welcome page
+    navigate('/welcome?demo=true');
   };
 
   if (authLoading) {
@@ -190,25 +179,15 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Demo Account Button - Moved to bottom */}
+        {/* Demo Mode Button - No authentication required */}
         <div className="text-center">
           <Button
-            onClick={handleDemoLogin}
+            onClick={handleDemoMode}
             variant="ghost"
             className="text-gray-600 hover:text-gray-800 text-sm"
-            disabled={loading}
           >
-            {loading ? (
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 animate-spin" />
-                Signing In...
-              </div>
-            ) : (
-              <>
-                <User className="w-4 h-4 mr-2" />
-                Try Demo Account
-              </>
-            )}
+            <User className="w-4 h-4 mr-2" />
+            Try Demo Mode
           </Button>
         </div>
       </div>

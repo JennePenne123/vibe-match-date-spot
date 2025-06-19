@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -9,14 +9,16 @@ import { Heart, ArrowRight, Settings } from 'lucide-react';
 const Welcome = () => {
   const navigate = useNavigate();
   const { user, logout, loading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const isDemoMode = searchParams.get('demo') === 'true';
 
   React.useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !user && !isDemoMode) {
       navigate('/');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, isDemoMode]);
 
-  if (loading) {
+  if (loading && !isDemoMode) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-gray-600">Loading...</div>
@@ -24,7 +26,7 @@ const Welcome = () => {
     );
   }
 
-  if (!user) {
+  if (!user && !isDemoMode) {
     return null;
   }
 
@@ -35,15 +37,26 @@ const Welcome = () => {
     return 'Good Evening!';
   };
 
-  const displayName = user.profile?.name || user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+  // Demo mode data
+  const displayName = isDemoMode 
+    ? 'Demo User' 
+    : (user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User');
   const firstName = displayName.split(' ')[0];
+
+  const handleLogout = () => {
+    if (isDemoMode) {
+      navigate('/');
+    } else {
+      logout();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="flex justify-between items-center p-4 pt-12 bg-white shadow-sm">
         <Button
-          onClick={() => navigate('/profile')}
+          onClick={() => navigate(isDemoMode ? '/profile?demo=true' : '/profile')}
           variant="ghost"
           size="icon"
           className="text-gray-600 hover:bg-gray-100"
@@ -51,11 +64,11 @@ const Welcome = () => {
           <Settings className="w-6 h-6" />
         </Button>
         <Button
-          onClick={logout}
+          onClick={handleLogout}
           variant="ghost"
           className="text-gray-600 hover:bg-gray-100"
         >
-          Logout
+          {isDemoMode ? 'Exit Demo' : 'Logout'}
         </Button>
       </div>
 
@@ -65,12 +78,17 @@ const Welcome = () => {
         <div className="text-center text-gray-900 mb-12 animate-fade-in pt-8">
           <div className="flex justify-center mb-4">
             <Avatar className="w-24 h-24 border-4 border-datespot-light-pink">
-              <AvatarImage src={user.profile?.avatar_url} alt={displayName} />
+              <AvatarImage src={isDemoMode ? undefined : user?.profile?.avatar_url} alt={displayName} />
               <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
                 {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
               </AvatarFallback>
             </Avatar>
           </div>
+          {isDemoMode && (
+            <div className="mb-4 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm">
+              🎯 Demo Mode - Exploring DateSpot features
+            </div>
+          )}
           <h2 className="text-2xl font-bold mb-2 text-gray-800">{getTimeGreeting()} ☀️</h2>
           <h1 className="text-4xl font-bold mb-4 text-gray-900">{firstName}</h1>
           <p className="text-xl text-gray-700 mb-2">Ready for your perfect date?</p>
@@ -92,7 +110,7 @@ const Welcome = () => {
               </div>
             </div>
             <Button
-              onClick={() => navigate('/preferences')}
+              onClick={() => navigate(isDemoMode ? '/preferences?demo=true' : '/preferences')}
               className="w-full bg-datespot-gradient text-white hover:opacity-90 font-semibold"
             >
               Start Discovery
@@ -103,14 +121,14 @@ const Welcome = () => {
           {/* Quick Actions */}
           <div className="grid grid-cols-2 gap-4">
             <button
-              onClick={() => navigate('/friends')}
+              onClick={() => navigate(isDemoMode ? '/friends?demo=true' : '/friends')}
               className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center text-gray-700 hover:shadow-md transition-all"
             >
               <div className="text-2xl mb-2">👥</div>
               <div className="text-sm font-medium">Invite Friends</div>
             </button>
             <button
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate(isDemoMode ? '/profile?demo=true' : '/profile')}
               className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center text-gray-700 hover:shadow-md transition-all"
             >
               <div className="text-2xl mb-2">⚙️</div>
