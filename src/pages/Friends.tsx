@@ -1,37 +1,72 @@
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, ArrowRight, Search, UserPlus, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Friends = () => {
   const navigate = useNavigate();
   const { user, inviteFriend } = useAuth();
   const { updateInvitedFriends } = useApp();
+  const [searchParams] = useSearchParams();
+  const isDemoMode = searchParams.get('demo') === 'true';
   const [searchTerm, setSearchTerm] = useState('');
+  const { toast } = useToast();
 
-  if (!user) {
+  if (!isDemoMode && !user) {
     navigate('/');
     return null;
   }
 
-  const filteredFriends = user.friends.filter(friend =>
+  // Demo friends data for demo mode
+  const demoFriends = [
+    { id: '1', name: 'Sarah Johnson', avatar: '', isInvited: false },
+    { id: '2', name: 'Mike Chen', avatar: '', isInvited: false },
+    { id: '3', name: 'Emma Wilson', avatar: '', isInvited: false },
+  ];
+
+  const friends = isDemoMode ? demoFriends : (user?.friends || []);
+  const filteredFriends = friends.filter(friend =>
     friend.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const invitedFriendIds = user.friends.filter(f => f.isInvited).map(f => f.id);
+  const invitedFriendIds = friends.filter(f => f.isInvited).map(f => f.id);
 
   const handleNext = () => {
     updateInvitedFriends(invitedFriendIds);
-    navigate('/area');
+    navigate(isDemoMode ? '/area?demo=true' : '/area');
   };
 
   const handleSkip = () => {
     updateInvitedFriends([]);
-    navigate('/area');
+    navigate(isDemoMode ? '/area?demo=true' : '/area');
+  };
+
+  const generateReferralLink = () => {
+    const baseUrl = window.location.origin;
+    const userId = isDemoMode ? 'demo-user' : (user?.id || 'user');
+    return `${baseUrl}/?ref=${userId}`;
+  };
+
+  const copyReferralLink = () => {
+    const link = generateReferralLink();
+    navigator.clipboard.writeText(link);
+    toast({
+      title: "Link copied!",
+      description: "Your referral link has been copied to clipboard.",
+    });
+  };
+
+  const shareViaEmail = () => {
+    const link = generateReferralLink();
+    const subject = "Join me on DateSpot - Find Amazing Date Ideas!";
+    const body = `Hey! I've been using DateSpot to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
+    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 
   return (
@@ -39,7 +74,7 @@ const Friends = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 pt-12 bg-white shadow-sm">
         <Button
-          onClick={() => navigate('/preferences')}
+          onClick={() => navigate(isDemoMode ? '/preferences?demo=true' : '/preferences')}
           variant="ghost"
           size="icon"
           className="text-gray-600 hover:bg-gray-100"
@@ -105,7 +140,7 @@ const Friends = () => {
                     <p className="text-sm text-gray-500">Available for dates</p>
                   </div>
                   <Button
-                    onClick={() => inviteFriend(friend.id)}
+                    onClick={() => isDemoMode ? console.log('Demo invite') : inviteFriend(friend.id)}
                     variant={friend.isInvited ? "default" : "outline"}
                     className={friend.isInvited 
                       ? "bg-datespot-gradient text-white hover:opacity-90" 
@@ -128,10 +163,63 @@ const Friends = () => {
               </div>
             ))
           ) : (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-4">👥</div>
-              <h3 className="text-gray-900 font-semibold mb-2">No friends found</h3>
-              <p className="text-gray-600">Try a different search term</p>
+            <div className="space-y-6">
+              {/* No Friends Found Message */}
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">👥</div>
+                <h3 className="text-gray-900 font-semibold mb-2">No friends found</h3>
+                <p className="text-gray-600">Invite your friends to join DateSpot!</p>
+              </div>
+
+              {/* Referral Link Section */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="text-center mb-4">
+                  <div className="bg-datespot-light-pink rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                    <Share2 className="w-8 h-8 text-datespot-pink" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Invite Friends to DateSpot</h3>
+                  <p className="text-sm text-gray-600">Share your referral link and discover amazing dates together</p>
+                </div>
+
+                {/* Referral Link Display */}
+                <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={generateReferralLink()}
+                      readOnly
+                      className="flex-1 bg-transparent border-none text-sm text-gray-700"
+                    />
+                    <Button
+                      onClick={copyReferralLink}
+                      variant="outline"
+                      size="sm"
+                      className="shrink-0"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Share Options */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={copyReferralLink}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy Link
+                  </Button>
+                  <Button
+                    onClick={shareViaEmail}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    Email
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </div>
