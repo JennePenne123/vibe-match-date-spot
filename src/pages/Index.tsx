@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -103,39 +102,6 @@ const Index = () => {
           </p>
         </div>
 
-        {/* Demo Account Button */}
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 shadow-md border border-blue-200">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-3">
-              <div className="flex justify-center">
-                <div className="bg-blue-100 rounded-full p-2">
-                  <User className="w-5 h-5 text-blue-600" />
-                </div>
-              </div>
-              <h3 className="font-semibold text-gray-900">Try Demo Account</h3>
-              <p className="text-sm text-gray-600">Experience DateSpot without creating an account</p>
-              <Button
-                onClick={handleDemoLogin}
-                variant="outline"
-                className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
-                disabled={loading}
-              >
-                {loading ? (
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 animate-spin" />
-                    Signing In...
-                  </div>
-                ) : (
-                  <>
-                    <User className="w-4 h-4 mr-2" />
-                    Continue with Demo
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Auth Form */}
         <Card className="bg-white shadow-xl border-0">
           <CardHeader className="text-center">
@@ -223,6 +189,28 @@ const Index = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Demo Account Button - Moved to bottom */}
+        <div className="text-center">
+          <Button
+            onClick={handleDemoLogin}
+            variant="ghost"
+            className="text-gray-600 hover:text-gray-800 text-sm"
+            disabled={loading}
+          >
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 animate-spin" />
+                Signing In...
+              </div>
+            ) : (
+              <>
+                <User className="w-4 h-4 mr-2" />
+                Try Demo Account
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
