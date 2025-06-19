@@ -13,12 +13,14 @@ const Welcome = () => {
   const isDemoMode = searchParams.get('demo') === 'true';
 
   React.useEffect(() => {
-    if (!loading && !user && !isDemoMode) {
+    // Only redirect if not in demo mode and not loading and no user
+    if (!isDemoMode && !loading && !user) {
       navigate('/');
     }
   }, [user, loading, navigate, isDemoMode]);
 
-  if (loading && !isDemoMode) {
+  // In demo mode, skip loading check entirely
+  if (!isDemoMode && loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-gray-600">Loading...</div>
@@ -26,7 +28,8 @@ const Welcome = () => {
     );
   }
 
-  if (!user && !isDemoMode) {
+  // Only check for user if not in demo mode
+  if (!isDemoMode && !user) {
     return null;
   }
 
