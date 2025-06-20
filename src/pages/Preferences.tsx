@@ -1,9 +1,7 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
 const Preferences = () => {
@@ -11,8 +9,6 @@ const Preferences = () => {
   const { updateCuisines, updateVibes } = useApp();
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [groupSize, setGroupSize] = useState<string>('alone');
 
   const cuisines = [
     { id: 'italian', name: 'Italian', emoji: '🍝' },
@@ -36,31 +32,6 @@ const Preferences = () => {
     { id: 'adventurous', name: 'Adventurous', emoji: '🗺️', desc: 'Something new and exciting' }
   ];
 
-  const categories = [
-    { id: 'lounge', name: 'Lounge' },
-    { id: 'sushi', name: 'Sushi' },
-    { id: 'bars', name: 'Bars' },
-    { id: 'clubs', name: 'Clubs' },
-    { id: 'coffee', name: 'Coffee' },
-    { id: 'cinema', name: 'Cinema' },
-    { id: 'restaurant', name: 'Restaurant' },
-    { id: 'vegan', name: 'Vegan' },
-    { id: 'brunch', name: 'Brunch' },
-    { id: 'breakfast', name: 'Breakfast' },
-    { id: 'theatre', name: 'Theatre' },
-    { id: 'pizzeria', name: 'Pizzeria' },
-    { id: 'museum', name: 'Museum' },
-    { id: 'seafood', name: 'Seafood' },
-    { id: 'ice-cream', name: 'Ice-Cream' },
-    { id: 'minigolf', name: 'Minigolf' }
-  ];
-
-  const groupSizeOptions = [
-    { id: 'alone', label: "I'm alone" },
-    { id: 'two', label: 'There are two of us' },
-    { id: 'group', label: 'We are a group (+3 person)' }
-  ];
-
   const toggleCuisine = (cuisine: string) => {
     setSelectedCuisines(prev =>
       prev.includes(cuisine)
@@ -75,18 +46,6 @@ const Preferences = () => {
         ? prev.filter(v => v !== vibe)
         : [...prev, vibe]
     );
-  };
-
-  const toggleCategory = (category: string) => {
-    setSelectedCategories(prev =>
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
-
-  const clearAllCategories = () => {
-    setSelectedCategories([]);
   };
 
   const handleNext = () => {
@@ -148,65 +107,6 @@ const Preferences = () => {
           </div>
         </div>
 
-        {/* Date Spot Categories */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">What is your favorite date spot?</h2>
-            <Button 
-              onClick={clearAllCategories}
-              variant="ghost"
-              className="text-orange-500 hover:text-orange-600 text-sm font-medium"
-            >
-              Clear all
-            </Button>
-          </div>
-          <p className="text-gray-600 mb-6">In order to get best results choose from the options</p>
-          
-          <div className="grid grid-cols-3 gap-3">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => toggleCategory(category.id)}
-                className={`p-3 rounded-lg border transition-all text-sm font-medium ${
-                  selectedCategories.includes(category.id)
-                    ? 'bg-orange-400 text-white border-orange-400'
-                    : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Group Size Selection */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Who is with you today?</h2>
-          <p className="text-gray-600 mb-6">Let us know if you are solo or with company</p>
-          
-          <RadioGroup value={groupSize} onValueChange={setGroupSize} className="space-y-4">
-            {groupSizeOptions.map((option) => (
-              <div key={option.id} className="flex items-center space-x-3 p-4 rounded-lg border border-gray-200 hover:bg-gray-50">
-                <RadioGroupItem 
-                  value={option.id} 
-                  id={option.id}
-                  className="border-2 border-gray-300 text-orange-500 focus:ring-orange-500"
-                />
-                <label htmlFor={option.id} className="text-gray-900 font-medium cursor-pointer flex-1">
-                  {option.label}
-                </label>
-              </div>
-            ))}
-          </RadioGroup>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-500 text-sm mb-2">Are you with a bigger group?</p>
-            <Button variant="link" className="text-orange-500 hover:text-orange-600 font-medium">
-              Invite here
-            </Button>
-          </div>
-        </div>
-
         {/* Vibe Selection */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">What vibe are you going for?</h2>
@@ -240,20 +140,13 @@ const Preferences = () => {
           </div>
         </div>
 
-        {/* Bottom Note */}
-        <div className="mb-8 text-center">
-          <p className="text-gray-400 text-xs">
-            *You can always customize and adjust your preferences in the account setting
-          </p>
-        </div>
-
         {/* Next Button */}
         <Button
           onClick={handleNext}
           disabled={selectedCuisines.length === 0 || selectedVibes.length === 0}
-          className="w-full h-12 bg-orange-400 hover:bg-orange-500 text-white font-semibold disabled:opacity-50"
+          className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold disabled:opacity-50"
         >
-          Confirm & Continue
+          Next: Invite Friends
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
