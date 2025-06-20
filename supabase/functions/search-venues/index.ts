@@ -1,0 +1,262 @@
+
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface SearchRequest {
+  location: string;
+  cuisines: string[];
+  vibes: string[];
+  radius?: number;
+}
+
+interface GooglePlace {
+  id: string;
+  displayName: { text: string };
+  types: string[];
+  rating?: number;
+  userRatingCount?: number;
+  priceLevel?: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  formattedAddress: string;
+  photos?: Array<{
+    name: string;
+    widthPx: number;
+    heightPx: number;
+  }>;
+  currentOpeningHours?: {
+    openNow: boolean;
+    weekdayDescriptions: string[];
+  };
+  nationalPhoneNumber?: string;
+  websiteUri?: string;
+  editorialSummary?: { text: string };
+}
+
+const handler = async (req: Request): Promise<Response> => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { location, cuisines, vibes, radius = 5000 }: SearchRequest = await req.json();
+    const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
+
+    if (!apiKey) {
+      throw new Error('Google Places API key not configured');
+    }
+
+    console.log('Searching venues for:', { location, cuisines, vibes });
+
+    // Map cuisines to Google Places types
+    const cuisineTypeMap: Record<string, string[]> = {
+      'italian': ['italian_restaurant'],
+      'japanese': ['japanese_restaurant', 'sushi_restaurant'],
+      'mexican': ['mexican_restaurant'],
+      'french': ['french_restaurant'],
+      'indian': ['indian_restaurant'],
+      'mediterranean': ['mediterranean_restaurant', 'greek_restaurant'],
+      'american': ['american_restaurant', 'hamburger_restaurant'],
+      'thai': ['thai_restaurant'],
+      'chinese': ['chinese_restaurant'],
+      'korean': ['korean_restaurant']
+    };
+
+    // Map vibes to place types
+    const vibeTypeMap: Record<string, string[]> = {
+      'romantic': ['fine_dining_restaurant', 'wine_bar'],
+      'casual': ['restaurant', 'cafe'],
+      'outdoor': ['restaurant', 'bar'],
+      'nightlife': ['bar', 'night_club', 'cocktail_lounge'],
+      'cultural': ['restaurant', 'cafe'],
+      'adventurous': ['restaurant', 'bar']
+    };
+
+    // Combine cuisine and vibe types
+    const allTypes = new Set<string>();
+    cuisines.forEach(cuisine => {
+      const types = cuisineTypeMap[cuisine] || ['restaurant'];
+      types.forEach(type => allTypes.add(type));
+    });
+    vibes.forEach(vibe => {
+      const types = vibeTypeMap[vibe] || ['restaurant'];
+      types.forEach(type => allTypes.add(type));
+    });
+
+    // Search for places
+    const searchUrl = 'https://places.googleapis.com/v1/places:searchText';
+    const searchBody = {
+      textQuery: `restaurants in ${location}`,
+      includedTypes: Array.from(allTypes).slice(0, 10), // Limit to avoid API limits
+      maxResultCount: 20,
+      locationBias: {
+        circle: {
+          center: { latitude: 0, longitude: 0 }, // Will be updated with geocoding
+          radius: radius
+        }
+      }
+    };
+
+    const response = await fetch(searchUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.types,places.rating,places.userRatingCount,places.priceLevel,places.location,places.formattedAddress,places.photos,places.currentOpeningHours,places.nationalPhoneNumber,places.websiteUri,places.editorialSummary'
+      },
+      body: JSON.stringify(searchBody)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Google Places API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Google Places API response:', data);
+
+    // Transform Google Places data to our venue format
+    const venues = (data.places || []).map((place: GooglePlace, index: number) => {
+      const cuisineType = getCuisineFromTypes(place.types, cuisines);
+      const vibe = getVibeFromTypes(place.types, vibes);
+      const matchScore = calculateMatchScore(place, cuisines, vibes);
+      
+      return {
+        id: place.id || `venue-${index}`,
+        name: place.displayName?.text || 'Unknown Venue',
+        description: place.editorialSummary?.text || `${cuisineType} restaurant with great atmosphere`,
+        image: getPhotoUrl(place.photos?.[0], apiKey),
+        rating: place.rating || 4.0,
+        distance: '0.5 mi', // Would need geocoding to calculate actual distance
+        priceRange: mapPriceLevel(place.priceLevel),
+        location: place.formattedAddress || location,
+        cuisineType,
+        vibe,
+        matchScore,
+        tags: getTagsFromPlace(place, cuisines, vibes),
+        placeId: place.id,
+        phone: place.nationalPhoneNumber,
+        website: place.websiteUri,
+        openingHours: place.currentOpeningHours?.weekdayDescriptions || [],
+        isOpen: place.currentOpeningHours?.openNow
+      };
+    });
+
+    // Sort by match score
+    venues.sort((a, b) => b.matchScore - a.matchScore);
+
+    return new Response(JSON.stringify({ venues }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders,
+      },
+    });
+
+  } catch (error: any) {
+    console.error('Error in search-venues function:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      }
+    );
+  }
+};
+
+// Helper functions
+function getCuisineFromTypes(types: string[], userCuisines: string[]): string {
+  const typeMap: Record<string, string> = {
+    'italian_restaurant': 'Italian',
+    'japanese_restaurant': 'Japanese',
+    'sushi_restaurant': 'Japanese',
+    'mexican_restaurant': 'Mexican',
+    'french_restaurant': 'French',
+    'indian_restaurant': 'Indian',
+    'mediterranean_restaurant': 'Mediterranean',
+    'greek_restaurant': 'Mediterranean',
+    'american_restaurant': 'American',
+    'hamburger_restaurant': 'American',
+    'thai_restaurant': 'Thai',
+    'chinese_restaurant': 'Chinese',
+    'korean_restaurant': 'Korean'
+  };
+
+  for (const type of types) {
+    if (typeMap[type]) {
+      return typeMap[type];
+    }
+  }
+
+  return userCuisines[0] ? userCuisines[0].charAt(0).toUpperCase() + userCuisines[0].slice(1) : 'International';
+}
+
+function getVibeFromTypes(types: string[], userVibes: string[]): string {
+  if (types.includes('fine_dining_restaurant') || types.includes('wine_bar')) return 'romantic';
+  if (types.includes('bar') || types.includes('night_club')) return 'nightlife';
+  if (types.includes('cafe')) return 'casual';
+  
+  return userVibes[0] || 'casual';
+}
+
+function calculateMatchScore(place: GooglePlace, cuisines: string[], vibes: string[]): number {
+  let score = 60; // Base score
+  
+  // Rating boost
+  if (place.rating) {
+    score += (place.rating - 3) * 10; // 4.0 rating = +10, 5.0 rating = +20
+  }
+  
+  // Review count boost
+  if (place.userRatingCount && place.userRatingCount > 100) {
+    score += 5;
+  }
+  
+  // Type matching
+  const cuisineMatch = getCuisineFromTypes(place.types, cuisines);
+  if (cuisines.some(c => c.toLowerCase() === cuisineMatch.toLowerCase())) {
+    score += 15;
+  }
+  
+  return Math.min(score, 98); // Cap at 98%
+}
+
+function mapPriceLevel(priceLevel?: string): string {
+  switch (priceLevel) {
+    case 'PRICE_LEVEL_INEXPENSIVE': return '$';
+    case 'PRICE_LEVEL_MODERATE': return '$$';
+    case 'PRICE_LEVEL_EXPENSIVE': return '$$$';
+    case 'PRICE_LEVEL_VERY_EXPENSIVE': return '$$$$';
+    default: return '$$';
+  }
+}
+
+function getPhotoUrl(photo: any, apiKey: string): string {
+  if (!photo) {
+    return 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop';
+  }
+  
+  return `https://places.googleapis.com/v1/${photo.name}/media?maxWidthPx=400&maxHeightPx=300&key=${apiKey}`;
+}
+
+function getTagsFromPlace(place: GooglePlace, cuisines: string[], vibes: string[]): string[] {
+  const tags: string[] = [];
+  
+  if (place.types.includes('fine_dining_restaurant')) tags.push('fine dining');
+  if (place.types.includes('bar')) tags.push('bar');
+  if (place.types.includes('wine_bar')) tags.push('wine');
+  if (place.currentOpeningHours?.openNow) tags.push('open now');
+  if (place.rating && place.rating >= 4.5) tags.push('highly rated');
+  
+  return tags;
+}
+
+serve(handler);

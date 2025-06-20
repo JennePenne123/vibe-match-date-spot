@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Star, MapPin, DollarSign, Clock, Phone, Share, Heart, Sparkles } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, DollarSign, Clock, Phone, Share, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
 
 const VenueDetail = () => {
   const { id } = useParams();
@@ -18,26 +18,24 @@ const VenueDetail = () => {
     return null;
   }
 
-  const mockDetails = {
-    address: '123 Downtown Ave, City Center',
-    phone: '+1 (555) 123-4567',
-    hours: 'Mon-Thu: 5PM-11PM, Fri-Sun: 5PM-12AM',
-    website: 'www.moonlightrooftop.com',
-    features: ['Outdoor Seating', 'Live Music', 'Private Dining', 'Full Bar', 'Vegan Options'],
-    reviews: [
-      {
-        user: 'Sarah M.',
-        rating: 5,
-        text: 'Perfect romantic spot! The rooftop views are incredible and the service was excellent.',
-        date: '2 days ago'
-      },
-      {
-        user: 'Mike R.',
-        rating: 5,
-        text: 'Great atmosphere for date night. The acoustic music created the perfect ambiance.',
-        date: '1 week ago'
-      }
-    ]
+  const openDirections = () => {
+    if (venue.placeId) {
+      window.open(`https://www.google.com/maps/place/?q=place_id:${venue.placeId}`, '_blank');
+    } else {
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue.name + ' ' + venue.location)}`, '_blank');
+    }
+  };
+
+  const callVenue = () => {
+    if (venue.phone) {
+      window.open(`tel:${venue.phone}`);
+    }
+  };
+
+  const visitWebsite = () => {
+    if (venue.website) {
+      window.open(venue.website, '_blank');
+    }
   };
 
   return (
@@ -86,6 +84,15 @@ const VenueDetail = () => {
             {venue.matchScore}% Perfect Match
           </Badge>
         </div>
+
+        {/* Open Status */}
+        {venue.isOpen !== undefined && (
+          <div className="absolute bottom-4 right-4">
+            <Badge className={venue.isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"}>
+              {venue.isOpen ? "Open Now" : "Closed"}
+            </Badge>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -135,56 +142,48 @@ const VenueDetail = () => {
           </div>
         </div>
 
-        {/* Contact Info */}
+        {/* Contact Info & Hours */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4">
           <h3 className="font-semibold text-gray-900 mb-4">Contact & Hours</h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-gray-400" />
-              <span className="text-gray-600">{mockDetails.address}</span>
+              <span className="text-gray-600">{venue.location}</span>
             </div>
-            <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-gray-400" />
-              <span className="text-gray-600">{mockDetails.phone}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-gray-400" />
-              <span className="text-gray-600">{mockDetails.hours}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Features */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4">
-          <h3 className="font-semibold text-gray-900 mb-4">Features</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {mockDetails.features.map((feature) => (
-              <div key={feature} className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full" />
-                <span className="text-sm text-gray-600">{feature}</span>
+            {venue.phone && (
+              <div className="flex items-center gap-3">
+                <Phone className="w-5 h-5 text-gray-400" />
+                <span className="text-gray-600">{venue.phone}</span>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Reviews */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Recent Reviews</h3>
-          <div className="space-y-4">
-            {mockDetails.reviews.map((review, index) => (
-              <div key={index} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-medium text-gray-900">{review.user}</span>
-                  <div className="flex items-center gap-1">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} className="w-3 h-3 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <span className="text-xs text-gray-500">{review.date}</span>
+            )}
+            {venue.website && (
+              <div className="flex items-center gap-3">
+                <Globe className="w-5 h-5 text-gray-400" />
+                <a 
+                  href={venue.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-datespot-pink hover:underline flex items-center gap-1"
+                >
+                  Visit Website
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            )}
+            {venue.openingHours && venue.openingHours.length > 0 && (
+              <div className="flex items-start gap-3">
+                <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
+                <div className="text-gray-600">
+                  <div className="font-medium mb-1">Hours:</div>
+                  {venue.openingHours.slice(0, 3).map((hours, index) => (
+                    <div key={index} className="text-sm">{hours}</div>
+                  ))}
+                  {venue.openingHours.length > 3 && (
+                    <div className="text-sm text-gray-500">+ {venue.openingHours.length - 3} more</div>
+                  )}
                 </div>
-                <p className="text-sm text-gray-600">{review.text}</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -194,11 +193,19 @@ const VenueDetail = () => {
             Make Reservation
           </Button>
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-12">
+            <Button 
+              variant="outline" 
+              className="h-12"
+              onClick={openDirections}
+            >
               Get Directions
             </Button>
-            <Button variant="outline" className="h-12">
-              Call Now
+            <Button 
+              variant="outline" 
+              className="h-12"
+              onClick={venue.phone ? callVenue : visitWebsite}
+            >
+              {venue.phone ? 'Call Now' : 'Visit Website'}
             </Button>
           </div>
         </div>

@@ -1,12 +1,13 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MapPin, Clock, Sparkles } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Sparkles, Loader2 } from 'lucide-react';
 
 const Area = () => {
   const navigate = useNavigate();
-  const { updateArea, generateRecommendations } = useApp();
+  const { updateArea, generateRecommendations, appState } = useApp();
   const [selectedArea, setSelectedArea] = useState('');
 
   const areas = [
@@ -52,10 +53,12 @@ const Area = () => {
     }
   ];
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (selectedArea) {
-      updateArea(selectedArea);
-      generateRecommendations();
+      const selectedAreaData = areas.find(area => area.id === selectedArea);
+      updateArea(selectedAreaData?.name || selectedArea);
+      
+      await generateRecommendations();
       navigate('/results');
     }
   };
@@ -69,6 +72,7 @@ const Area = () => {
           variant="ghost"
           size="icon"
           className="text-gray-600 hover:bg-gray-100"
+          disabled={appState.isLoading}
         >
           <ArrowLeft className="w-6 h-6" />
         </Button>
@@ -99,11 +103,12 @@ const Area = () => {
             <button
               key={area.id}
               onClick={() => setSelectedArea(area.id)}
+              disabled={appState.isLoading}
               className={`w-full rounded-xl overflow-hidden transition-all ${
                 selectedArea === area.id
                   ? 'ring-4 ring-datespot-pink transform scale-[1.02]'
                   : 'hover:transform hover:scale-[1.01]'
-              }`}
+              } ${appState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className="relative">
                 <img
@@ -139,11 +144,20 @@ const Area = () => {
         {/* Find Spots Button */}
         <Button
           onClick={handleNext}
-          disabled={!selectedArea}
+          disabled={!selectedArea || appState.isLoading}
           className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold disabled:opacity-50"
         >
-          <Sparkles className="w-4 h-4 mr-2" />
-          Find Perfect Spots
+          {appState.isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Finding Perfect Spots...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 mr-2" />
+              Find Perfect Spots
+            </>
+          )}
         </Button>
       </div>
     </div>
