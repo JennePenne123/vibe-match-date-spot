@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,138 +63,140 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white p-4 pt-12 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <Button
-            onClick={() => navigate('/welcome')}
-            variant="ghost"
-            size="icon"
-            className="text-gray-600 hover:bg-gray-100"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <h1 className="text-xl font-semibold text-gray-900">Profile</h1>
-          <Button
-            onClick={() => setIsEditing(!isEditing)}
-            variant="ghost"
-            size="icon"
-            className="text-gray-600 hover:bg-gray-100"
-          >
-            {isEditing ? <X className="w-6 h-6" /> : <Edit className="w-6 h-6" />}
-          </Button>
+      <div className="max-w-md mx-auto">
+        {/* Header */}
+        <div className="bg-white p-4 pt-12 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <Button
+              onClick={() => navigate('/welcome')}
+              variant="ghost"
+              size="icon"
+              className="text-gray-600 hover:bg-gray-100"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </Button>
+            <h1 className="text-xl font-semibold text-gray-900">Profile</h1>
+            <Button
+              onClick={() => setIsEditing(!isEditing)}
+              variant="ghost"
+              size="icon"
+              className="text-gray-600 hover:bg-gray-100"
+            >
+              {isEditing ? <X className="w-6 h-6" /> : <Edit className="w-6 h-6" />}
+            </Button>
+          </div>
+
+          {/* Profile Header */}
+          <div className="text-center">
+            <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-datespot-light-pink">
+              <AvatarImage src={user.profile?.avatar_url} alt={displayName} />
+              <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
+                {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            
+            {isEditing ? (
+              <div className="space-y-3 max-w-xs mx-auto">
+                <Input
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  className="bg-white text-gray-900 text-center font-semibold border-gray-200"
+                  placeholder="Your name"
+                />
+                <Input
+                  value={editedEmail}
+                  onChange={(e) => setEditedEmail(e.target.value)}
+                  className="bg-white text-gray-900 text-center border-gray-200"
+                  placeholder="Your email"
+                  type="email"
+                />
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    onClick={handleSave}
+                    className="bg-datespot-gradient text-white hover:opacity-90"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Save
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    variant="outline"
+                    className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold mb-1 text-gray-900">{displayName}</h2>
+                <p className="text-gray-600">{displayEmail}</p>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Profile Header */}
-        <div className="text-center">
-          <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-datespot-light-pink">
-            <AvatarImage src={user.profile?.avatar_url} alt={displayName} />
-            <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
-              {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          
-          {isEditing ? (
-            <div className="space-y-3 max-w-xs mx-auto">
-              <Input
-                value={editedName}
-                onChange={(e) => setEditedName(e.target.value)}
-                className="bg-white text-gray-900 text-center font-semibold border-gray-200"
-                placeholder="Your name"
-              />
-              <Input
-                value={editedEmail}
-                onChange={(e) => setEditedEmail(e.target.value)}
-                className="bg-white text-gray-900 text-center border-gray-200"
-                placeholder="Your email"
-                type="email"
-              />
-              <div className="flex gap-2 justify-center">
+        {/* Content */}
+        <div className="p-4 -mt-8">
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {stats.map((stat) => (
+              <Card key={stat.label} className="text-center bg-white shadow-sm border-gray-100">
+                <CardContent className="p-4">
+                  <stat.icon className="w-6 h-6 mx-auto mb-2 text-datespot-pink" />
+                  <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                  <div className="text-xs text-gray-600">{stat.label}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Friends List Placeholder */}
+          <Card className="mb-6 bg-white shadow-sm border-gray-100">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-gray-900">
+                <Users className="w-5 h-5" />
+                Friends (0)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-6 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                <p>No friends added yet</p>
                 <Button
-                  onClick={handleSave}
-                  className="bg-datespot-gradient text-white hover:opacity-90"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save
-                </Button>
-                <Button
-                  onClick={handleCancel}
+                  onClick={() => navigate('/friends')}
                   variant="outline"
-                  className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                  className="mt-3 border-gray-200 text-gray-700 hover:bg-gray-50"
                 >
-                  Cancel
+                  Add Friends
                 </Button>
               </div>
-            </div>
-          ) : (
-            <>
-              <h2 className="text-2xl font-bold mb-1 text-gray-900">{displayName}</h2>
-              <p className="text-gray-600">{displayEmail}</p>
-            </>
-          )}
-        </div>
-      </div>
+            </CardContent>
+          </Card>
 
-      {/* Content */}
-      <div className="p-4 -mt-8">
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {stats.map((stat) => (
-            <Card key={stat.label} className="text-center bg-white shadow-sm border-gray-100">
-              <CardContent className="p-4">
-                <stat.icon className="w-6 h-6 mx-auto mb-2 text-datespot-pink" />
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-xs text-gray-600">{stat.label}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Friends List Placeholder */}
-        <Card className="mb-6 bg-white shadow-sm border-gray-100">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-gray-900">
-              <Users className="w-5 h-5" />
-              Friends (0)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-6 text-gray-500">
-              <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>No friends added yet</p>
-              <Button
-                onClick={() => navigate('/friends')}
-                variant="outline"
-                className="mt-3 border-gray-200 text-gray-700 hover:bg-gray-50"
-              >
-                Add Friends
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Actions */}
-        <div className="space-y-3">
-          <Button
-            onClick={() => navigate('/preferences')}
-            variant="outline"
-            className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
-          >
-            Update Preferences
-          </Button>
-          <Button
-            onClick={() => navigate('/welcome')}
-            className="w-full bg-datespot-gradient text-white hover:opacity-90"
-          >
-            Find New Date Spots
-          </Button>
-          <Button
-            onClick={logout}
-            variant="outline"
-            className="w-full text-red-600 border-red-200 hover:bg-red-50"
-          >
-            Sign Out
-          </Button>
+          {/* Actions */}
+          <div className="space-y-3">
+            <Button
+              onClick={() => navigate('/preferences')}
+              variant="outline"
+              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
+            >
+              Update Preferences
+            </Button>
+            <Button
+              onClick={() => navigate('/welcome')}
+              className="w-full bg-datespot-gradient text-white hover:opacity-90"
+            >
+              Find New Date Spots
+            </Button>
+            <Button
+              onClick={logout}
+              variant="outline"
+              className="w-full text-red-600 border-red-200 hover:bg-red-50"
+            >
+              Sign Out
+            </Button>
+          </div>
         </div>
       </div>
     </div>
