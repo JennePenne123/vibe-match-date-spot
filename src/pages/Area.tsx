@@ -1,13 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MapPin, Clock, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Sparkles, Loader2, AlertCircle, Navigation } from 'lucide-react';
 
 const Area = () => {
   const navigate = useNavigate();
-  const { updateArea, generateRecommendations, appState } = useApp();
+  const { updateArea, generateRecommendations, appState, requestLocation } = useApp();
   const [selectedArea, setSelectedArea] = useState('');
 
   const areas = [
@@ -53,6 +53,13 @@ const Area = () => {
     }
   ];
 
+  // Request location when component mounts
+  useEffect(() => {
+    if (!appState.userLocation && !appState.locationError) {
+      requestLocation();
+    }
+  }, []);
+
   const handleNext = async () => {
     if (selectedArea) {
       const selectedAreaData = areas.find(area => area.id === selectedArea);
@@ -61,6 +68,10 @@ const Area = () => {
       await generateRecommendations();
       navigate('/results');
     }
+  };
+
+  const handleRequestLocation = async () => {
+    await requestLocation();
   };
 
   return (
@@ -91,6 +102,39 @@ const Area = () => {
       </div>
 
       <div className="px-6 pb-8">
+        {/* Location Status */}
+        <div className="mb-6">
+          {appState.userLocation ? (
+            <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <Navigation className="w-4 h-4 text-green-600" />
+              <span className="text-sm text-green-700">Location enabled - finding venues near you</span>
+            </div>
+          ) : appState.locationError ? (
+            <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="flex items-start gap-2 mb-2">
+                <AlertCircle className="w-4 h-4 text-orange-600 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-orange-700 font-medium">Location Access Needed</p>
+                  <p className="text-xs text-orange-600 mt-1">{appState.locationError}</p>
+                </div>
+              </div>
+              <Button
+                onClick={handleRequestLocation}
+                size="sm"
+                className="bg-orange-500 text-white hover:bg-orange-600"
+              >
+                <Navigation className="w-3 h-3 mr-1" />
+                Enable Location
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
+              <span className="text-sm text-blue-700">Getting your location...</span>
+            </div>
+          )}
+        </div>
+
         {/* Header Text */}
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Where would you like to go?</h2>

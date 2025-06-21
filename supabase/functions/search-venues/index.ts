@@ -1,6 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +10,8 @@ interface SearchRequest {
   location: string;
   cuisines: string[];
   vibes: string[];
+  latitude?: number;
+  longitude?: number;
   radius?: number;
 }
 
@@ -47,14 +48,18 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { location, cuisines, vibes, radius = 5000 }: SearchRequest = await req.json();
+    const { location, cuisines, vibes, latitude, longitude, radius = 5000 }: SearchRequest = await req.json();
     const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
 
     if (!apiKey) {
       throw new Error('Google Places API key not configured');
     }
 
-    console.log('Searching venues for:', { location, cuisines, vibes });
+    if (!latitude || !longitude) {
+      throw new Error('User location (latitude/longitude) is required');
+    }
+
+    console.log('Searching venues for:', { location, cuisines, vibes, latitude, longitude });
 
     // Map cuisines to Google Places types
     const cuisineTypeMap: Record<string, string[]> = {
@@ -91,19 +96,28 @@ const handler = async (req: Request): Promise<Response> => {
       types.forEach(type => allTypes.add(type));
     });
 
-    // Search for places
-    const searchUrl = 'https://places.googleapis.com/v1/places:searchText';
+    // If no specific types, default to restaurant
+    if (allTypes.size === 0) {
+      allTypes.add('restaurant');
+    }
+
+    // Search for places using the new Places API
+    const searchUrl = 'https://places.googleapis.com/v1/places:searchNearby';
     const searchBody = {
-      textQuery: `restaurants in ${location}`,
       includedTypes: Array.from(allTypes).slice(0, 10), // Limit to avoid API limits
       maxResultCount: 20,
-      locationBias: {
+      locationRestriction: {
         circle: {
-          center: { latitude: 0, longitude: 0 }, // Will be updated with geocoding
+          center: { 
+            latitude: latitude, 
+            longitude: longitude 
+          },
           radius: radius
         }
       }
     };
+
+    console.log('Making request to Places API with:', searchBody);
 
     const response = await fetch(searchUrl, {
       method: 'POST',
@@ -116,17 +130,20 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Google Places API error: ${response.status} - ${errorText}`);
       throw new Error(`Google Places API error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Google Places API response:', data);
+    console.log('Google Places API response:', JSON.stringify(data, null, 2));
 
     // Transform Google Places data to our venue format
     const venues = (data.places || []).map((place: GooglePlace, index: number) => {
       const cuisineType = getCuisineFromTypes(place.types, cuisines);
       const vibe = getVibeFromTypes(place.types, vibes);
       const matchScore = calculateMatchScore(place, cuisines, vibes);
+      const distance = calculateDistance(latitude, longitude, place.location.latitude, place.location.longitude);
       
       return {
         id: place.id || `venue-${index}`,
@@ -134,7 +151,7 @@ const handler = async (req: Request): Promise<Response> => {
         description: place.editorialSummary?.text || `${cuisineType} restaurant with great atmosphere`,
         image: getPhotoUrl(place.photos?.[0], apiKey),
         rating: place.rating || 4.0,
-        distance: '0.5 mi', // Would need geocoding to calculate actual distance
+        distance: `${distance.toFixed(1)} mi`,
         priceRange: mapPriceLevel(place.priceLevel),
         location: place.formattedAddress || location,
         cuisineType,
@@ -149,8 +166,16 @@ const handler = async (req: Request): Promise<Response> => {
       };
     });
 
-    // Sort by match score
-    venues.sort((a, b) => b.matchScore - a.matchScore);
+    // Sort by match score and distance
+    venues.sort((a, b) => {
+      const scoreA = b.matchScore - a.matchScore;
+      if (Math.abs(scoreA) < 5) { // If scores are close, prefer closer venues
+        return parseFloat(a.distance) - parseFloat(b.distance);
+      }
+      return scoreA;
+    });
+
+    console.log(`Returning ${venues.length} venues`);
 
     return new Response(JSON.stringify({ venues }), {
       status: 200,
@@ -227,6 +252,18 @@ function calculateMatchScore(place: GooglePlace, cuisines: string[], vibes: stri
   }
   
   return Math.min(score, 98); // Cap at 98%
+}
+
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 3959; // Earth's radius in miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
 }
 
 function mapPriceLevel(priceLevel?: string): string {

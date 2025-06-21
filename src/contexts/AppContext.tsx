@@ -23,6 +23,12 @@ interface Venue {
   isOpen?: boolean;
 }
 
+interface UserLocation {
+  latitude: number;
+  longitude: number;
+  address?: string;
+}
+
 interface AppState {
   selectedCuisines: string[];
   selectedVibes: string[];
@@ -30,6 +36,8 @@ interface AppState {
   invitedFriends: string[];
   venues: Venue[];
   isLoading: boolean;
+  userLocation: UserLocation | null;
+  locationError: string | null;
 }
 
 interface AppContextType {
@@ -40,6 +48,7 @@ interface AppContextType {
   updateInvitedFriends: (friends: string[]) => void;
   generateRecommendations: () => Promise<void>;
   resetState: () => void;
+  requestLocation: () => Promise<void>;
 }
 
 const initialState: AppState = {
@@ -48,7 +57,9 @@ const initialState: AppState = {
   selectedArea: '',
   invitedFriends: [],
   venues: [],
-  isLoading: false
+  isLoading: false,
+  userLocation: null,
+  locationError: null
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -72,21 +83,83 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAppState(prev => ({ ...prev, invitedFriends: friends }));
   };
 
+  const requestLocation = async () => {
+    console.log('Requesting user location...');
+    setAppState(prev => ({ ...prev, locationError: null }));
+
+    if (!navigator.geolocation) {
+      const error = 'Geolocation is not supported by this browser';
+      console.error(error);
+      setAppState(prev => ({ ...prev, locationError: error }));
+      return;
+    }
+
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          reject,
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000 // 5 minutes
+          }
+        );
+      });
+
+      const userLocation = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      };
+
+      console.log('Location obtained:', userLocation);
+      setAppState(prev => ({ ...prev, userLocation, locationError: null }));
+    } catch (error: any) {
+      let errorMessage = 'Unable to get your location';
+      
+      if (error.code === 1) {
+        errorMessage = 'Location access denied. Please enable location services.';
+      } else if (error.code === 2) {
+        errorMessage = 'Location unavailable. Please try again.';
+      } else if (error.code === 3) {
+        errorMessage = 'Location request timed out. Please try again.';
+      }
+
+      console.error('Location error:', error);
+      setAppState(prev => ({ ...prev, locationError: errorMessage }));
+    }
+  };
+
   const generateRecommendations = async () => {
     setAppState(prev => ({ ...prev, isLoading: true }));
     
     try {
+      // Check if we have user location
+      if (!appState.userLocation) {
+        console.log('No user location available, requesting location first...');
+        await requestLocation();
+        
+        // Wait a moment for the location to be set
+        const currentState = appState;
+        if (!currentState.userLocation) {
+          throw new Error('Location is required to find nearby venues');
+        }
+      }
+
       console.log('Generating recommendations with:', {
         cuisines: appState.selectedCuisines,
         vibes: appState.selectedVibes,
-        area: appState.selectedArea
+        area: appState.selectedArea,
+        location: appState.userLocation
       });
 
       const { data, error } = await supabase.functions.invoke('search-venues', {
         body: {
-          location: appState.selectedArea || 'Downtown',
+          location: appState.selectedArea || 'restaurants',
           cuisines: appState.selectedCuisines,
           vibes: appState.selectedVibes,
+          latitude: appState.userLocation?.latitude,
+          longitude: appState.userLocation?.longitude,
           radius: 5000
         }
       });
@@ -116,7 +189,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             rating: 4.5,
             distance: '0.5 mi',
             priceRange: '$$',
-            location: appState.selectedArea || 'Downtown',
+            location: appState.selectedArea || 'Nearby',
             cuisineType: appState.selectedCuisines[0] || 'International',
             vibe: appState.selectedVibes[0] || 'casual',
             matchScore: 85,
@@ -143,7 +216,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           rating: 4.3,
           distance: '1.2 mi',
           priceRange: '$$',
-          location: appState.selectedArea || 'Downtown',
+          location: appState.selectedArea || 'Nearby',
           cuisineType: appState.selectedCuisines[0] || 'International',
           vibe: appState.selectedVibes[0] || 'casual',
           matchScore: 80,
@@ -171,7 +244,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateArea,
       updateInvitedFriends,
       generateRecommendations,
-      resetState
+      resetState,
+      requestLocation
     }}>
       {children}
     </AppContext.Provider>
