@@ -9,7 +9,7 @@ import { Heart, Sparkles, AlertCircle, User } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, login, signup, loading: authLoading } = useAuth();
+  const { user, logout, loading: authLoading } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,21 +29,22 @@ const Index = () => {
     setError('');
     
     try {
-      let result;
+      // Mock authentication - always succeed
       if (isLogin) {
-        result = await login(email, password);
+        // Mock login success
+        console.log('Mock login successful');
       } else {
         if (!name.trim()) {
           setError('Name is required');
           setLoading(false);
           return;
         }
-        result = await signup(name, email, password);
+        // Mock signup success
+        console.log('Mock signup successful');
       }
       
-      if (result.error) {
-        setError(result.error.message || 'An error occurred');
-      }
+      // Navigate to welcome page after successful auth
+      navigate('/welcome');
     } catch (error) {
       console.error('Authentication error:', error);
       setError('An unexpected error occurred');
@@ -74,7 +75,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
+      <div className="w-full max-w-md mx-auto space-y-6 animate-fade-in">
         {/* Logo and Header */}
         <div className="text-center space-y-4">
           <div className="flex justify-center">
