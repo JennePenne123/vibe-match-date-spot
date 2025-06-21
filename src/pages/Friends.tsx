@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +15,7 @@ const Friends = () => {
   const [searchParams] = useSearchParams();
   const isDemoMode = searchParams.get('demo') === 'true';
   const [searchTerm, setSearchTerm] = useState('');
+  const [invitedIds, setInvitedIds] = useState<string[]>([]);
   const { toast } = useToast();
 
   if (!isDemoMode && !user) {
@@ -23,11 +23,16 @@ const Friends = () => {
     return null;
   }
 
-  // Demo friends data for demo mode
+  // Enhanced demo friends data for testing
   const demoFriends = [
-    { id: '1', name: 'Sarah Johnson', avatar: '', isInvited: false },
-    { id: '2', name: 'Mike Chen', avatar: '', isInvited: false },
-    { id: '3', name: 'Emma Wilson', avatar: '', isInvited: false },
+    { id: '1', name: 'Sarah Johnson', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '2', name: 'Mike Chen', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '3', name: 'Emma Wilson', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '4', name: 'David Rodriguez', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '5', name: 'Jessica Lee', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '6', name: 'Alex Thompson', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '7', name: 'Maya Patel', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '8', name: 'Ryan Kim', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f52?w=150&h=150&fit=crop&crop=face', isInvited: false },
   ];
 
   const friends = isDemoMode ? demoFriends : (user?.friends || []);
@@ -35,10 +40,27 @@ const Friends = () => {
     friend.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const invitedFriendIds = friends.filter(f => f.isInvited).map(f => f.id);
+  const handleInviteFriend = (friendId: string) => {
+    if (isDemoMode) {
+      setInvitedIds(prev => 
+        prev.includes(friendId) 
+          ? prev.filter(id => id !== friendId)
+          : [...prev, friendId]
+      );
+      toast({
+        title: invitedIds.includes(friendId) ? "Friend uninvited" : "Friend invited!",
+        description: invitedIds.includes(friendId) 
+          ? "Friend removed from your date plans" 
+          : "Friend will receive your date recommendations",
+      });
+    } else {
+      inviteFriend(friendId);
+    }
+  };
 
   const handleNext = () => {
-    updateInvitedFriends(invitedFriendIds);
+    const finalInvitedIds = isDemoMode ? invitedIds : friends.filter(f => f.isInvited).map(f => f.id);
+    updateInvitedFriends(finalInvitedIds);
     navigate(isDemoMode ? '/area?demo=true' : '/area');
   };
 
@@ -123,45 +145,48 @@ const Friends = () => {
         {/* Friends List */}
         <div className="space-y-3 mb-8">
           {filteredFriends.length > 0 ? (
-            filteredFriends.map((friend) => (
-              <div
-                key={friend.id}
-                className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
-              >
-                <div className="flex items-center gap-4">
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={friend.avatar} alt={friend.name} />
-                    <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink">
-                      {friend.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{friend.name}</h3>
-                    <p className="text-sm text-gray-500">Available for dates</p>
+            filteredFriends.map((friend) => {
+              const isInvited = isDemoMode ? invitedIds.includes(friend.id) : friend.isInvited;
+              return (
+                <div
+                  key={friend.id}
+                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
+                >
+                  <div className="flex items-center gap-4">
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={friend.avatar} alt={friend.name} />
+                      <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink">
+                        {friend.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{friend.name}</h3>
+                      <p className="text-sm text-gray-500">Available for dates</p>
+                    </div>
+                    <Button
+                      onClick={() => handleInviteFriend(friend.id)}
+                      variant={isInvited ? "default" : "outline"}
+                      className={isInvited 
+                        ? "bg-datespot-gradient text-white hover:opacity-90" 
+                        : "border-gray-200 text-gray-700 hover:bg-gray-50"
+                      }
+                    >
+                      {isInvited ? (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          Invited
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Invite
+                        </>
+                      )}
+                    </Button>
                   </div>
-                  <Button
-                    onClick={() => isDemoMode ? console.log('Demo invite') : inviteFriend(friend.id)}
-                    variant={friend.isInvited ? "default" : "outline"}
-                    className={friend.isInvited 
-                      ? "bg-datespot-gradient text-white hover:opacity-90" 
-                      : "border-gray-200 text-gray-700 hover:bg-gray-50"
-                    }
-                  >
-                    {friend.isInvited ? (
-                      <>
-                        <Check className="w-4 h-4 mr-2" />
-                        Invited
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="w-4 h-4 mr-2" />
-                        Invite
-                      </>
-                    )}
-                  </Button>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="space-y-6">
               {/* No Friends Found Message */}
@@ -225,11 +250,11 @@ const Friends = () => {
         </div>
 
         {/* Invited Count */}
-        {invitedFriendIds.length > 0 && (
+        {(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length) > 0 && (
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
             <div className="text-center text-gray-700">
               <h3 className="font-semibold mb-1">
-                {invitedFriendIds.length} friend{invitedFriendIds.length !== 1 ? 's' : ''} invited
+                {(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length)} friend{(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length) !== 1 ? 's' : ''} invited
               </h3>
               <p className="text-sm text-gray-500">
                 They'll get recommendations that work for the group
