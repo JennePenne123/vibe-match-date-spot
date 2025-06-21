@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface Venue {
   id: string;
@@ -61,6 +60,64 @@ const initialState: AppState = {
   userLocation: null,
   locationError: null
 };
+
+// Mock venues for local testing
+const mockVenues: Venue[] = [
+  {
+    id: 'venue-1',
+    name: 'Bella Notte',
+    description: 'Authentic Italian restaurant with romantic ambiance and handmade pasta',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
+    rating: 4.8,
+    distance: '0.3 mi',
+    priceRange: '$$$',
+    location: '123 Main St, Downtown',
+    cuisineType: 'Italian',
+    vibe: 'romantic',
+    matchScore: 95,
+    tags: ['romantic', 'pasta', 'wine', 'date night'],
+    phone: '+1 (555) 123-4567',
+    website: 'https://bellanotte.example.com',
+    openingHours: ['Mon-Thu: 5:00 PM - 10:00 PM', 'Fri-Sat: 5:00 PM - 11:00 PM', 'Sun: 4:00 PM - 9:00 PM'],
+    isOpen: true
+  },
+  {
+    id: 'venue-2',
+    name: 'Sakura Sushi',
+    description: 'Fresh sushi and sashimi in a modern Japanese setting',
+    image: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop',
+    rating: 4.6,
+    distance: '0.7 mi',
+    priceRange: '$$',
+    location: '456 Oak Ave, Arts District',
+    cuisineType: 'Japanese',
+    vibe: 'casual',
+    matchScore: 88,
+    tags: ['sushi', 'fresh', 'modern', 'healthy'],
+    phone: '+1 (555) 987-6543',
+    openingHours: ['Tue-Sun: 11:30 AM - 9:00 PM', 'Mon: Closed'],
+    isOpen: false
+  },
+  {
+    id: 'venue-3',
+    name: 'Taco Libre',
+    description: 'Vibrant Mexican cantina with craft cocktails and street tacos',
+    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop',
+    rating: 4.4,
+    distance: '1.2 mi',
+    priceRange: '$$',
+    location: '789 Pine St, Mission District',
+    cuisineType: 'Mexican',
+    vibe: 'nightlife',
+    matchScore: 82,
+    tags: ['tacos', 'cocktails', 'lively', 'outdoor seating'],
+    discount: '20% off appetizers',
+    phone: '+1 (555) 456-7890',
+    website: 'https://tacolibre.example.com',
+    openingHours: ['Daily: 11:00 AM - 12:00 AM'],
+    isOpen: true
+  }
+];
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -134,18 +191,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAppState(prev => ({ ...prev, isLoading: true }));
     
     try {
-      // Check if we have user location
-      if (!appState.userLocation) {
-        console.log('No user location available, requesting location first...');
-        await requestLocation();
-        
-        // Wait a moment for the location to be set
-        const currentState = appState;
-        if (!currentState.userLocation) {
-          throw new Error('Location is required to find nearby venues');
-        }
-      }
-
       console.log('Generating recommendations with:', {
         cuisines: appState.selectedCuisines,
         vibes: appState.selectedVibes,
@@ -153,77 +198,46 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         location: appState.userLocation
       });
 
-      const { data, error } = await supabase.functions.invoke('search-venues', {
-        body: {
-          location: appState.selectedArea || 'restaurants',
-          cuisines: appState.selectedCuisines,
-          vibes: appState.selectedVibes,
-          latitude: appState.userLocation?.latitude,
-          longitude: appState.userLocation?.longitude,
-          radius: 5000
-        }
-      });
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-      if (error) {
-        console.error('Error calling search-venues function:', error);
-        throw error;
+      // Filter mock venues based on preferences
+      let filteredVenues = [...mockVenues];
+
+      if (appState.selectedCuisines.length > 0) {
+        filteredVenues = filteredVenues.filter(venue =>
+          appState.selectedCuisines.some(cuisine =>
+            venue.cuisineType.toLowerCase().includes(cuisine.toLowerCase())
+          )
+        );
       }
 
-      console.log('API response:', data);
-
-      if (data?.venues && data.venues.length > 0) {
-        setAppState(prev => ({ 
-          ...prev, 
-          venues: data.venues,
-          isLoading: false 
-        }));
-      } else {
-        // Fallback to mock data if no venues found
-        console.log('No venues found, using fallback data');
-        const mockVenues: Venue[] = [
-          {
-            id: 'fallback-1',
-            name: 'Local Favorite',
-            description: 'Popular local spot with great atmosphere',
-            image: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop',
-            rating: 4.5,
-            distance: '0.5 mi',
-            priceRange: '$$',
-            location: appState.selectedArea || 'Nearby',
-            cuisineType: appState.selectedCuisines[0] || 'International',
-            vibe: appState.selectedVibes[0] || 'casual',
-            matchScore: 85,
-            tags: ['popular', 'local favorite']
-          }
-        ];
-        
-        setAppState(prev => ({ 
-          ...prev, 
-          venues: mockVenues,
-          isLoading: false 
-        }));
+      if (appState.selectedVibes.length > 0) {
+        filteredVenues = filteredVenues.filter(venue =>
+          appState.selectedVibes.some(vibe =>
+            venue.vibe.toLowerCase().includes(vibe.toLowerCase()) ||
+            venue.tags.some(tag => tag.toLowerCase().includes(vibe.toLowerCase()))
+          )
+        );
       }
+
+      // If no matches, return all venues
+      if (filteredVenues.length === 0) {
+        filteredVenues = mockVenues;
+      }
+
+      console.log(`Returning ${filteredVenues.length} venues`);
+
+      setAppState(prev => ({ 
+        ...prev, 
+        venues: filteredVenues,
+        isLoading: false 
+      }));
+
     } catch (error) {
       console.error('Error generating recommendations:', error);
       
-      // Fallback to mock data on error
-      const mockVenues: Venue[] = [
-        {
-          id: 'error-fallback-1',
-          name: 'Recommended Spot',
-          description: 'Great place for your preferences',
-          image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop',
-          rating: 4.3,
-          distance: '1.2 mi',
-          priceRange: '$$',
-          location: appState.selectedArea || 'Nearby',
-          cuisineType: appState.selectedCuisines[0] || 'International',
-          vibe: appState.selectedVibes[0] || 'casual',
-          matchScore: 80,
-          tags: ['recommended']
-        }
-      ];
-      
+      // Fallback to all mock venues on error
       setAppState(prev => ({ 
         ...prev, 
         venues: mockVenues,

@@ -1,233 +1,145 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
-interface Profile {
+interface User {
   id: string;
-  name: string;
   email: string;
-  avatar_url?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Friend {
-  id: string;
-  name: string;
-  avatar?: string;
-  isInvited?: boolean;
-}
-
-interface AuthUser extends User {
-  profile?: Profile;
-  friends?: Friend[];
-  preferences?: {
-    cuisines: string[];
-    vibes: string[];
+  user_metadata?: {
+    name?: string;
+    avatar_url?: string;
   };
+  profile?: {
+    name?: string;
+    email?: string;
+    avatar_url?: string;
+  };
+  friends?: Array<{
+    id: string;
+    name: string;
+    avatar: string;
+    isInvited: boolean;
+  }>;
 }
 
 interface AuthContextType {
-  user: AuthUser | null;
-  session: Session | null;
+  user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ error: any }>;
-  signup: (name: string, email: string, password: string) => Promise<{ error: any }>;
-  logout: () => Promise<void>;
-  updateUser: (updates: Partial<Profile>) => Promise<void>;
-  addFriend: (friend: Friend) => void;
+  signUp: (email: string, password: string, userData?: any) => Promise<{ user: User | null; error: any }>;
+  signIn: (email: string, password: string) => Promise<{ user: User | null; error: any }>;
+  signOut: () => Promise<void>;
+  updateUser: (userData: any) => Promise<void>;
   inviteFriend: (friendId: string) => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
-  useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session);
-        setSession(session);
-        
-        if (session?.user) {
-          // Fetch user profile
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-          
-          setUser({
-            ...session.user,
-            profile,
-            friends: [], // Will be loaded separately when needed
-            preferences: undefined // Will be loaded when preferences are implemented
-          });
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setSession(session);
-      } else {
-        setLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const login = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        toast({
-          title: "Login Failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        return { error };
-      }
-
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully signed in.",
-      });
-
-      return { error: null };
-    } catch (error) {
-      console.error('Login error:', error);
-      return { error };
-    }
+  // Mock user data for local testing
+  const mockUser: User = {
+    id: 'local-user-123',
+    email: 'test@example.com',
+    user_metadata: {
+      name: 'Test User',
+      avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+    },
+    profile: {
+      name: 'Test User',
+      email: 'test@example.com',
+      avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+    },
+    friends: [
+      { id: '1', name: 'Sarah Johnson', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face', isInvited: false },
+      { id: '2', name: 'Mike Chen', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', isInvited: false },
+      { id: '3', name: 'Emma Wilson', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', isInvited: false }
+    ]
   };
 
-  const signup = async (name: string, email: string, password: string) => {
-    try {
-      const redirectUrl = `${window.location.origin}/welcome`;
-      
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            name: name,
-            full_name: name,
-          }
-        }
-      });
+  useEffect(() => {
+    // Simulate loading and auto-login for local testing
+    const timer = setTimeout(() => {
+      setUser(mockUser);
+      setLoading(false);
+    }, 1000);
 
-      if (error) {
-        toast({
-          title: "Signup Failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        return { error };
-      }
+    return () => clearTimeout(timer);
+  }, []);
 
-      if (data.user && !data.session) {
-        toast({
-          title: "Check your email",
-          description: "We sent you a confirmation link to complete your registration.",
-        });
-      } else {
-        toast({
-          title: "Welcome to DateSpot!",
-          description: "Your account has been created successfully.",
-        });
-      }
+  const signUp = async (email: string, password: string, userData?: any) => {
+    setLoading(true);
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newUser = {
+      ...mockUser,
+      email,
+      user_metadata: { name: userData?.name || 'New User' },
+      profile: { name: userData?.name || 'New User', email }
+    };
+    
+    setUser(newUser);
+    setLoading(false);
+    return { user: newUser, error: null };
+  };
 
-      return { error: null };
-    } catch (error) {
-      console.error('Signup error:', error);
-      return { error };
-    }
+  const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const loginUser = { ...mockUser, email };
+    setUser(loginUser);
+    setLoading(false);
+    return { user: loginUser, error: null };
+  };
+
+  const signOut = async () => {
+    setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setUser(null);
+    setLoading(false);
   };
 
   const logout = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
-      toast({
-        title: "Signed out",
-        description: "You've been signed out successfully.",
-      });
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+    await signOut();
   };
 
-  const updateUser = async (updates: Partial<Profile>) => {
-    if (!user?.id) return;
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
-
-      if (error) {
-        toast({
-          title: "Update Failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Update local user state
-      setUser(prev => prev ? {
-        ...prev,
-        profile: prev.profile ? { ...prev.profile, ...updates } : undefined
-      } : null);
-
-      toast({
-        title: "Profile Updated",
-        description: "Your profile has been updated successfully.",
+  const updateUser = async (userData: any) => {
+    if (user) {
+      setUser({
+        ...user,
+        profile: {
+          ...user.profile,
+          ...userData
+        }
       });
-    } catch (error) {
-      console.error('Update user error:', error);
     }
-  };
-
-  // Mock functions for friends - will be implemented with proper tables later
-  const addFriend = (friend: Friend) => {
-    console.log('Add friend functionality will be implemented with proper database tables');
   };
 
   const inviteFriend = (friendId: string) => {
-    console.log('Invite friend functionality will be implemented with proper database tables');
+    if (user?.friends) {
+      const updatedFriends = user.friends.map(friend =>
+        friend.id === friendId
+          ? { ...friend, isInvited: !friend.isInvited }
+          : friend
+      );
+      setUser({ ...user, friends: updatedFriends });
+    }
   };
 
   return (
     <AuthContext.Provider value={{
       user,
-      session,
       loading,
-      login,
-      signup,
-      logout,
+      signUp,
+      signIn,
+      signOut,
       updateUser,
-      addFriend,
-      inviteFriend
+      inviteFriend,
+      logout
     }}>
       {children}
     </AuthContext.Provider>
