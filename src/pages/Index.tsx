@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -60,7 +59,7 @@ const Index = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-vyy-soft to-vyy-glow flex items-center justify-center">
         <div className="flex items-center gap-2 text-gray-600">
           <Sparkles className="w-5 h-5 animate-spin" />
           Loading...
@@ -74,41 +73,43 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md mx-auto space-y-6 animate-fade-in">
+    <div className="min-h-screen bg-gradient-to-br from-vyy-soft via-vyy-glow to-vyy-warm flex items-center justify-center p-4">
+      <div className="w-full max-w-md mx-auto space-y-8 animate-fade-in">
         {/* Logo and Header */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-6">
           <div className="flex justify-center">
-            <div className="bg-gradient-to-r from-pink-400 to-rose-500 rounded-full p-4 shadow-lg">
-              <Heart className="w-12 h-12 text-white" fill="currentColor" />
+            <div className="organic-blob p-6 shadow-2xl animate-float animate-pulse-glow">
+              <Heart className="w-16 h-16 text-white animate-pulse" fill="currentColor" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900">DateSpot</h1>
-          <p className="text-lg text-gray-700">
-            Ready to Create Unforgettable Memories?
-          </p>
-          <p className="text-gray-600">
-            Join thousands of couples discovering their perfect date spots with AI-powered recommendations
-          </p>
+          <div className="space-y-3">
+            <h1 className="text-5xl font-bold text-expressive text-organic">vyybmtch</h1>
+            <p className="text-xl text-gray-800 font-medium">
+              Where Hearts Connect ✨
+            </p>
+            <p className="text-gray-700 leading-relaxed">
+              Discover magical moments with AI-powered connections that understand your vibe
+            </p>
+          </div>
         </div>
 
         {/* Auth Form */}
-        <Card className="bg-white shadow-xl border-0">
+        <Card className="organic-card bg-white/80 backdrop-blur-sm shadow-2xl border-0">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-gray-900">
-              {isLogin ? 'Welcome Back' : 'Create Account'}
+            <CardTitle className="text-2xl text-gray-900 text-organic">
+              {isLogin ? 'Welcome Back' : 'Join the Magic'}
             </CardTitle>
-            <CardDescription className="text-gray-600">
+            <CardDescription className="text-gray-700">
               {isLogin 
-                ? 'Sign in to discover amazing date spots' 
-                : 'Start your journey to perfect dates'
+                ? 'Ready to create more beautiful memories?' 
+                : 'Start your journey to perfect connections'
               }
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+                <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm">
                   <AlertCircle className="w-4 h-4" />
                   {error}
                 </div>
@@ -118,22 +119,22 @@ const Index = () => {
                 <div>
                   <Input
                     type="text"
-                    placeholder="Full Name"
+                    placeholder="Your beautiful name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="h-12"
+                    className="h-14 rounded-2xl border-gray-200 focus:border-vyy-coral transition-all"
                   />
                 </div>
               )}
               <div>
                 <Input
                   type="email"
-                  placeholder="Email"
+                  placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-12"
+                  className="h-14 rounded-2xl border-gray-200 focus:border-vyy-coral transition-all"
                 />
               </div>
               <div>
@@ -143,19 +144,19 @@ const Index = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-12"
+                  className="h-14 rounded-2xl border-gray-200 focus:border-vyy-coral transition-all"
                   minLength={6}
                 />
               </div>
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-gradient-to-r from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white font-semibold border-0"
+                className="w-full h-14 bg-vyy-primary hover:opacity-90 text-white font-semibold border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all text-lg"
                 disabled={loading}
               >
                 {loading ? (
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 animate-spin" />
-                    {isLogin ? 'Signing In...' : 'Creating Account...'}
+                    <Sparkles className="w-5 h-5 animate-spin" />
+                    {isLogin ? 'Signing In...' : 'Creating Magic...'}
                   </div>
                 ) : (
                   isLogin ? 'Sign In' : 'Create Account'
@@ -163,32 +164,32 @@ const Index = () => {
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="mt-8 text-center">
               <button
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setError('');
                 }}
-                className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                className="text-sm text-gray-600 hover:text-vyy-coral transition-colors font-medium"
               >
                 {isLogin 
-                  ? "Don't have an account? Sign up" 
-                  : 'Already have an account? Sign in'
+                  ? "New here? Join the magic" 
+                  : 'Already part of vyybmtch? Sign in'
                 }
               </button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Demo Mode Button - No authentication required */}
+        {/* Demo Mode Button */}
         <div className="text-center">
           <Button
             onClick={handleDemoMode}
             variant="ghost"
-            className="text-gray-600 hover:text-gray-800 text-sm"
+            className="text-gray-700 hover:text-vyy-coral hover:bg-white/50 text-sm rounded-2xl"
           >
             <User className="w-4 h-4 mr-2" />
-            Try Demo Mode
+            Explore Demo
           </Button>
         </div>
       </div>
