@@ -5,7 +5,7 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Friends = () => {
@@ -86,32 +86,32 @@ const Friends = () => {
 
   const shareViaEmail = () => {
     const link = generateReferralLink();
-    const subject = "Join me on vyybmtch - Find Amazing Date Ideas!";
-    const body = `Hey! I've been using vyybmtch to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
+    const subject = "Join me on DateSpot - Find Amazing Date Ideas!";
+    const body = `Hey! I've been using DateSpot to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-vyy-soft via-vyy-glow to-vyy-warm">
-      <div className="w-full max-w-md mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 pt-12 bg-white/70 backdrop-blur-sm shadow-sm">
+        <div className="flex items-center justify-between p-4 pt-12 bg-white shadow-sm">
           <Button
             onClick={() => navigate(isDemoMode ? '/preferences?demo=true' : '/preferences')}
             variant="ghost"
             size="icon"
-            className="text-gray-600 hover:bg-white/50 rounded-2xl"
+            className="text-gray-600 hover:bg-gray-100"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-gray-900 text-organic">Invite Friends</h1>
+            <h1 className="text-xl font-semibold text-gray-900">Invite Friends</h1>
             <p className="text-sm text-gray-600">Step 2 of 3</p>
           </div>
           <Button
             onClick={handleSkip}
             variant="ghost"
-            className="text-gray-600 hover:bg-white/50 text-sm rounded-2xl"
+            className="text-gray-600 hover:bg-gray-100 text-sm"
           >
             Skip
           </Button>
@@ -119,57 +119,57 @@ const Friends = () => {
 
         {/* Progress Bar */}
         <div className="px-6 mb-8 pt-4">
-          <div className="bg-white/50 rounded-full h-3 backdrop-blur-sm">
-            <div className="bg-vyy-primary rounded-full h-3 w-2/3 transition-all duration-300 animate-pulse-glow" />
+          <div className="bg-gray-200 rounded-full h-2">
+            <div className="bg-datespot-gradient rounded-full h-2 w-2/3 transition-all duration-300" />
           </div>
         </div>
 
         <div className="px-6 pb-8">
           {/* Header Text */}
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2 text-expressive text-organic">Who's joining you?</h2>
-            <p className="text-gray-700 text-lg">Invite friends to join your date adventure ✨</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Who's joining you?</h2>
+            <p className="text-gray-600">Invite friends to join your date adventure</p>
           </div>
 
           {/* Search */}
           <div className="relative mb-6">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               type="text"
               placeholder="Search friends..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-14 bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg focus:shadow-xl transition-all"
+              className="pl-10 h-12 bg-white border-gray-200"
             />
           </div>
 
           {/* Friends List */}
-          <div className="space-y-4 mb-8">
+          <div className="space-y-3 mb-8">
             {filteredFriends.length > 0 ? (
               filteredFriends.map((friend) => {
                 const isInvited = isDemoMode ? invitedIds.includes(friend.id) : friend.isInvited;
                 return (
                   <div
                     key={friend.id}
-                    className="organic-card bg-white/80 backdrop-blur-sm p-6 shadow-lg hover:shadow-xl transition-all"
+                    className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
                   >
                     <div className="flex items-center gap-4">
-                      <Avatar className="w-14 h-14 border-2 border-white shadow-lg">
+                      <Avatar className="w-12 h-12">
                         <AvatarImage src={friend.avatar} alt={friend.name} />
-                        <AvatarFallback className="bg-vyy-soft text-vyy-coral text-lg font-bold">
+                        <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink">
                           {friend.name.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 text-lg text-organic">{friend.name}</h3>
-                        <p className="text-sm text-gray-600">Available for magical dates ✨</p>
+                        <h3 className="font-semibold text-gray-900">{friend.name}</h3>
+                        <p className="text-sm text-gray-500">Available for dates</p>
                       </div>
                       <Button
                         onClick={() => handleInviteFriend(friend.id)}
                         variant={isInvited ? "default" : "outline"}
                         className={isInvited 
-                          ? "bg-vyy-primary text-white hover:opacity-90 rounded-2xl animate-pulse-glow" 
-                          : "border-gray-200 text-gray-700 hover:bg-white/50 rounded-2xl"
+                          ? "bg-datespot-gradient text-white hover:opacity-90" 
+                          : "border-gray-200 text-gray-700 hover:bg-gray-50"
                         }
                       >
                         {isInvited ? (
@@ -192,24 +192,24 @@ const Friends = () => {
               <div className="space-y-6">
                 {/* No Friends Found Message */}
                 <div className="text-center py-8">
-                  <div className="text-6xl mb-4 animate-float">✨</div>
-                  <h3 className="text-gray-900 font-bold mb-2 text-2xl text-organic">No friends found</h3>
-                  <p className="text-gray-600 text-lg">Invite your friends to join vyybmtch!</p>
+                  <div className="text-4xl mb-4">👥</div>
+                  <h3 className="text-gray-900 font-semibold mb-2">No friends found</h3>
+                  <p className="text-gray-600">Invite your friends to join DateSpot!</p>
                 </div>
 
                 {/* Referral Link Section */}
-                <div className="organic-card bg-white/80 backdrop-blur-sm p-8 shadow-2xl">
-                  <div className="text-center mb-6">
-                    <div className="organic-blob p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center animate-float">
-                      <Share2 className="w-10 h-10 text-white" />
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                  <div className="text-center mb-4">
+                    <div className="bg-datespot-light-pink rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                      <Share2 className="w-8 h-8 text-datespot-pink" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3 text-expressive text-organic">Invite Friends to vyybmtch</h3>
-                    <p className="text-gray-700">Share your referral link and discover amazing dates together ✨</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Invite Friends to DateSpot</h3>
+                    <p className="text-sm text-gray-600">Share your referral link and discover amazing dates together</p>
                   </div>
 
                   {/* Referral Link Display */}
-                  <div className="bg-vyy-glow/50 rounded-2xl p-4 mb-6">
-                    <div className="flex items-center gap-3">
+                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                    <div className="flex items-center gap-2">
                       <Input
                         value={generateReferralLink()}
                         readOnly
@@ -219,7 +219,7 @@ const Friends = () => {
                         onClick={copyReferralLink}
                         variant="outline"
                         size="sm"
-                        className="shrink-0 rounded-xl"
+                        className="shrink-0"
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
@@ -227,11 +227,11 @@ const Friends = () => {
                   </div>
 
                   {/* Share Options */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <Button
                       onClick={copyReferralLink}
                       variant="outline"
-                      className="w-full rounded-2xl border-gray-200 hover:bg-white/50"
+                      className="w-full"
                     >
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Link
@@ -239,7 +239,7 @@ const Friends = () => {
                     <Button
                       onClick={shareViaEmail}
                       variant="outline"
-                      className="w-full rounded-2xl border-gray-200 hover:bg-white/50"
+                      className="w-full"
                     >
                       <Mail className="w-4 h-4 mr-2" />
                       Email
@@ -252,12 +252,12 @@ const Friends = () => {
 
           {/* Invited Count */}
           {(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length) > 0 && (
-            <div className="organic-card bg-white/80 backdrop-blur-sm p-6 shadow-lg mb-6">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
               <div className="text-center text-gray-700">
-                <h3 className="font-bold mb-2 text-lg text-organic">
-                  {(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length)} friend{(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length) !== 1 ? 's' : ''} invited ✨
+                <h3 className="font-semibold mb-1">
+                  {(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length)} friend{(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length) !== 1 ? 's' : ''} invited
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-500">
                   They'll get recommendations that work for the group
                 </p>
               </div>
@@ -267,11 +267,10 @@ const Friends = () => {
           {/* Next Button */}
           <Button
             onClick={handleNext}
-            className="w-full h-14 bg-vyy-primary hover:opacity-90 text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all animate-organic-morph"
+            className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold"
           >
-            <Sparkles className="w-5 h-5 mr-2" />
             Next: Choose Area
-            <ArrowRight className="w-5 h-5 ml-2" />
+            <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </div>
