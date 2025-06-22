@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, MapPin, Clock, Sparkles, Loader2, AlertCircle, Navigation } from 'lucide-react';
@@ -7,6 +8,8 @@ import { ArrowLeft, MapPin, Clock, Sparkles, Loader2, AlertCircle, Navigation } 
 const Area = () => {
   const navigate = useNavigate();
   const { updateArea, generateRecommendations, appState, requestLocation } = useApp();
+  const [searchParams] = useSearchParams();
+  const isDemoMode = searchParams.get('demo') === 'true';
   const [selectedArea, setSelectedArea] = useState('');
 
   const areas = [
@@ -65,7 +68,7 @@ const Area = () => {
       updateArea(selectedAreaData?.name || selectedArea);
       
       await generateRecommendations();
-      navigate('/results');
+      navigate(isDemoMode ? '/results?demo=true' : '/results');
     }
   };
 
@@ -74,21 +77,21 @@ const Area = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-vyy-soft via-vyy-glow to-vyy-warm">
+      <div className="w-full max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 pt-12 bg-white shadow-sm">
+        <div className="flex items-center justify-between p-4 pt-12 bg-white/70 backdrop-blur-sm shadow-sm">
           <Button
-            onClick={() => navigate('/friends')}
+            onClick={() => navigate(isDemoMode ? '/friends?demo=true' : '/friends')}
             variant="ghost"
             size="icon"
-            className="text-gray-600 hover:bg-gray-100"
+            className="text-gray-600 hover:bg-white/50 rounded-2xl"
             disabled={appState.isLoading}
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-gray-900">Choose Area</h1>
+            <h1 className="text-xl font-semibold text-gray-900 text-organic">Choose Area</h1>
             <p className="text-sm text-gray-600">Step 3 of 3</p>
           </div>
           <div className="w-10" />
@@ -96,8 +99,8 @@ const Area = () => {
 
         {/* Progress Bar */}
         <div className="px-6 mb-8 pt-4">
-          <div className="bg-gray-200 rounded-full h-2">
-            <div className="bg-datespot-gradient rounded-full h-2 w-full transition-all duration-300" />
+          <div className="bg-white/50 rounded-full h-3 backdrop-blur-sm">
+            <div className="bg-vyy-primary rounded-full h-3 w-full transition-all duration-300 animate-pulse-glow" />
           </div>
         </div>
 
@@ -105,40 +108,44 @@ const Area = () => {
           {/* Location Status */}
           <div className="mb-6">
             {appState.userLocation ? (
-              <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <Navigation className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-green-700">Location enabled - finding venues near you</span>
+              <div className="organic-card bg-green-50/80 backdrop-blur-sm border-2 border-green-200 p-4">
+                <div className="flex items-center gap-3">
+                  <Navigation className="w-5 h-5 text-green-600 animate-pulse" />
+                  <span className="text-sm text-green-700 font-medium">Location enabled - finding venues near you ✨</span>
+                </div>
               </div>
             ) : appState.locationError ? (
-              <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                <div className="flex items-start gap-2 mb-2">
-                  <AlertCircle className="w-4 h-4 text-orange-600 mt-0.5" />
+              <div className="organic-card bg-orange-50/80 backdrop-blur-sm border-2 border-orange-200 p-4">
+                <div className="flex items-start gap-3 mb-3">
+                  <AlertCircle className="w-5 h-5 text-orange-600 mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-sm text-orange-700 font-medium">Location Access Needed</p>
+                    <p className="text-sm text-orange-700 font-bold">Location Access Needed</p>
                     <p className="text-xs text-orange-600 mt-1">{appState.locationError}</p>
                   </div>
                 </div>
                 <Button
                   onClick={handleRequestLocation}
                   size="sm"
-                  className="bg-orange-500 text-white hover:bg-orange-600"
+                  className="bg-orange-500 text-white hover:bg-orange-600 rounded-xl"
                 >
                   <Navigation className="w-3 h-3 mr-1" />
                   Enable Location
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
-                <span className="text-sm text-blue-700">Getting your location...</span>
+              <div className="organic-card bg-blue-50/80 backdrop-blur-sm border-2 border-blue-200 p-4">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
+                  <span className="text-sm text-blue-700 font-medium">Getting your location...</span>
+                </div>
               </div>
             )}
           </div>
 
           {/* Header Text */}
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Where would you like to go?</h2>
-            <p className="text-gray-600">Pick your preferred neighborhood for the perfect date</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2 text-expressive text-organic">Where would you like to go?</h2>
+            <p className="text-gray-700 text-lg">Pick your preferred neighborhood for the perfect date ✨</p>
           </div>
 
           {/* Area Selection */}
@@ -148,22 +155,22 @@ const Area = () => {
                 key={area.id}
                 onClick={() => setSelectedArea(area.id)}
                 disabled={appState.isLoading}
-                className={`w-full rounded-xl overflow-hidden transition-all ${
+                className={`w-full organic-card overflow-hidden transition-all duration-300 ${
                   selectedArea === area.id
-                    ? 'ring-4 ring-datespot-pink transform scale-[1.02]'
-                    : 'hover:transform hover:scale-[1.01]'
+                    ? 'ring-4 ring-vyy-coral transform scale-105 shadow-2xl animate-pulse-glow'
+                    : 'hover:transform hover:scale-102 shadow-lg hover:shadow-xl'
                 } ${appState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <div className="relative">
                   <img
                     src={area.image}
                     alt={area.name}
-                    className="w-full h-32 object-cover"
+                    className="w-full h-36 object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4 text-left">
-                    <h3 className="text-white font-bold text-lg">{area.name}</h3>
-                    <p className="text-white/90 text-sm mb-2">{area.description}</p>
+                    <h3 className="text-white font-bold text-xl text-organic mb-1">{area.name}</h3>
+                    <p className="text-white/90 text-sm mb-3">{area.description}</p>
                     <div className="flex items-center gap-4 text-white/80 text-xs">
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
@@ -176,8 +183,8 @@ const Area = () => {
                     </div>
                   </div>
                   {selectedArea === area.id && (
-                    <div className="absolute top-2 right-2 bg-white rounded-full p-1">
-                      <Sparkles className="w-4 h-4 text-datespot-pink" />
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 animate-scale-in">
+                      <Sparkles className="w-5 h-5 text-vyy-coral animate-pulse" />
                     </div>
                   )}
                 </div>
@@ -189,16 +196,16 @@ const Area = () => {
           <Button
             onClick={handleNext}
             disabled={!selectedArea || appState.isLoading}
-            className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold disabled:opacity-50"
+            className="w-full h-14 bg-vyy-primary hover:opacity-90 text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 animate-organic-morph"
           >
             {appState.isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Finding Perfect Spots...
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 mr-2" />
+                <Sparkles className="w-5 h-5 mr-2" />
                 Find Perfect Spots
               </>
             )}
