@@ -3,153 +3,167 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ArrowLeft, ArrowRight, Check, Calendar } from 'lucide-react';
 
 const Preferences = () => {
   const navigate = useNavigate();
   const { updateCuisines, updateVibes } = useApp();
-  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
-  const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedGroupSize, setSelectedGroupSize] = useState<string>('alone');
 
-  const cuisines = [
-    { id: 'italian', name: 'Italian', emoji: '🍝' },
-    { id: 'japanese', name: 'Japanese', emoji: '🍣' },
-    { id: 'mexican', name: 'Mexican', emoji: '🌮' },
-    { id: 'french', name: 'French', emoji: '🥐' },
-    { id: 'indian', name: 'Indian', emoji: '🍛' },
-    { id: 'mediterranean', name: 'Mediterranean', emoji: '🫒' },
-    { id: 'american', name: 'American', emoji: '🍔' },
-    { id: 'thai', name: 'Thai', emoji: '🍜' },
-    { id: 'chinese', name: 'Chinese', emoji: '🥢' },
-    { id: 'korean', name: 'Korean', emoji: '🍲' }
+  const categories = [
+    { id: 'lounge', name: 'Lounge', emoji: '🍸' },
+    { id: 'sushi', name: 'Sushi', emoji: '🍣' },
+    { id: 'bars', name: 'Bars', emoji: '🍻' },
+    { id: 'clubs', name: 'Clubs', emoji: '🎵' },
+    { id: 'coffee', name: 'Coffee', emoji: '☕' },
+    { id: 'cinema', name: 'Cinema', emoji: '🎬' },
+    { id: 'restaurant', name: 'Restaurant', emoji: '🍽️' },
+    { id: 'vegan', name: 'Vegan', emoji: '🥗' },
+    { id: 'brunch', name: 'Brunch', emoji: '🥐' },
+    { id: 'breakfast', name: 'Breakfast', emoji: '🍳' },
+    { id: 'theatre', name: 'Theatre', emoji: '🎭' },
+    { id: 'pizzeria', name: 'Pizzeria', emoji: '🍕' },
+    { id: 'museum', name: 'Museum', emoji: '🏛️' },
+    { id: 'seafood', name: 'Seafood', emoji: '🦐' },
+    { id: 'ice-cream', name: 'Ice-Cream', emoji: '🍦' },
+    { id: 'minigolf', name: 'Minigolf', emoji: '⛳' }
   ];
 
-  const vibes = [
-    { id: 'romantic', name: 'Romantic', emoji: '💕', desc: 'Intimate and cozy' },
-    { id: 'casual', name: 'Casual', emoji: '😊', desc: 'Relaxed and comfortable' },
-    { id: 'outdoor', name: 'Outdoor', emoji: '🌳', desc: 'Fresh air and nature' },
-    { id: 'nightlife', name: 'Nightlife', emoji: '🌃', desc: 'Vibrant and energetic' },
-    { id: 'cultural', name: 'Cultural', emoji: '🎭', desc: 'Arts and history' },
-    { id: 'adventurous', name: 'Adventurous', emoji: '🗺️', desc: 'Something new and exciting' }
+  const groupSizes = [
+    { id: 'alone', label: "I'm alone", desc: 'Solo experience' },
+    { id: 'couple', label: 'There are two of us', desc: 'Couple or pair' },
+    { id: 'group', label: 'We are a group (+3 person)', desc: 'Group activity' }
   ];
 
-  const toggleCuisine = (cuisine: string) => {
-    setSelectedCuisines(prev =>
-      prev.includes(cuisine)
-        ? prev.filter(c => c !== cuisine)
-        : [...prev, cuisine]
-    );
-  };
-
-  const toggleVibe = (vibe: string) => {
-    setSelectedVibes(prev =>
-      prev.includes(vibe)
-        ? prev.filter(v => v !== vibe)
-        : [...prev, vibe]
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
     );
   };
 
   const handleNext = () => {
-    updateCuisines(selectedCuisines);
-    updateVibes(selectedVibes);
+    updateCuisines(selectedCategories);
+    updateVibes([selectedGroupSize]);
     navigate('/friends');
   };
 
+  const clearAll = () => {
+    setSelectedCategories([]);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-vyybmtch-soft-purple via-vyybmtch-light-purple to-white">
       <div className="max-w-md mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 pt-12 bg-white shadow-sm">
-          <Button
-            onClick={() => navigate('/welcome')}
-            variant="ghost"
-            size="icon"
-            className="text-gray-600 hover:bg-gray-100"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <div className="text-center">
-            <h1 className="text-xl font-semibold text-gray-900">Preferences</h1>
-            <p className="text-sm text-gray-600">Step 1 of 3</p>
+        {/* Header with gradient background */}
+        <div className="bg-gradient-to-r from-vyybmtch-deep-purple to-vyybmtch-purple px-6 pt-12 pb-8 rounded-b-[2rem] shadow-xl">
+          <div className="flex items-center justify-between mb-6">
+            <Button
+              onClick={() => navigate('/welcome')}
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/20 rounded-full"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </Button>
+            <div className="w-10" />
           </div>
-          <div className="w-10" />
+
+          <div className="text-center text-white mb-6">
+            <h1 className="text-3xl font-bold mb-2">What is your favorite date Spot?</h1>
+            <p className="text-white/80 text-lg">In order to get best results chose from the options</p>
+          </div>
+
+          {/* Progress indicators */}
+          <div className="flex justify-center gap-2">
+            <div className="h-1 w-16 bg-vyybmtch-sunrise rounded-full" />
+            <div className="h-1 w-16 bg-white/30 rounded-full" />
+            <div className="h-1 w-16 bg-white/30 rounded-full" />
+          </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="px-6 mb-8 pt-4">
-          <div className="bg-gray-200 rounded-full h-2">
-            <div className="bg-datespot-gradient rounded-full h-2 w-1/3 transition-all duration-300" />
-          </div>
-        </div>
-
-        <div className="px-6 pb-8">
-          {/* Cuisine Selection */}
+        <div className="px-6 py-8">
+          {/* Categories Section */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">What are you craving?</h2>
-            <p className="text-gray-600 mb-6">Choose your favorite cuisines</p>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-vyybmtch-deep-purple">Categories</h2>
+              <Button
+                onClick={clearAll}
+                variant="ghost"
+                className="text-vyybmtch-sunrise hover:bg-vyybmtch-light-purple/50 font-semibold"
+              >
+                Clear all
+              </Button>
+            </div>
             
-            <div className="grid grid-cols-2 gap-3">
-              {cuisines.map((cuisine) => (
+            <div className="grid grid-cols-3 gap-3">
+              {categories.map((category) => (
                 <button
-                  key={cuisine.id}
-                  onClick={() => toggleCuisine(cuisine.id)}
-                  className={`p-4 rounded-xl border-2 transition-all ${
-                    selectedCuisines.includes(cuisine.id)
-                      ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
-                      : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                  key={category.id}
+                  onClick={() => toggleCategory(category.id)}
+                  className={`p-4 rounded-2xl border-2 transition-all duration-300 animate-scale-in ${
+                    selectedCategories.includes(category.id)
+                      ? 'bg-gradient-to-br from-vyybmtch-sunrise to-vyybmtch-coral border-vyybmtch-coral text-white shadow-lg scale-105'
+                      : 'bg-white/80 border-gray-200 text-vyybmtch-deep-purple hover:bg-vyybmtch-light-purple/30 hover:border-vyybmtch-purple/30'
                   }`}
                 >
-                  <div className="text-2xl mb-1">{cuisine.emoji}</div>
-                  <div className="font-medium text-sm">{cuisine.name}</div>
-                  {selectedCuisines.includes(cuisine.id) && (
-                    <Check className="w-4 h-4 mx-auto mt-1" />
-                  )}
+                  <div className="text-xl mb-2">{category.emoji}</div>
+                  <div className="font-medium text-sm">{category.name}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Vibe Selection */}
+          {/* Group Size Selection */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">What vibe are you going for?</h2>
-            <p className="text-gray-600 mb-6">Choose the perfect atmosphere for your date</p>
+            <div className="flex items-center gap-3 mb-6">
+              <Calendar className="w-6 h-6 text-vyybmtch-purple" />
+              <h2 className="text-2xl font-bold text-vyybmtch-deep-purple">Who is with you today?</h2>
+            </div>
+            <p className="text-vyybmtch-purple/70 mb-6">Let us know if you are solo or with company</p>
             
-            <div className="space-y-3">
-              {vibes.map((vibe) => (
-                <button
-                  key={vibe.id}
-                  onClick={() => toggleVibe(vibe.id)}
-                  className={`w-full p-4 rounded-xl border-2 transition-all ${
-                    selectedVibes.includes(vibe.id)
-                      ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
-                      : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="text-2xl">{vibe.emoji}</div>
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold">{vibe.name}</div>
-                      <div className={`text-sm ${selectedVibes.includes(vibe.id) ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
-                        {vibe.desc}
-                      </div>
-                    </div>
-                    {selectedVibes.includes(vibe.id) && (
-                      <Check className="w-5 h-5" />
-                    )}
-                  </div>
-                </button>
+            <RadioGroup value={selectedGroupSize} onValueChange={setSelectedGroupSize} className="space-y-4">
+              {groupSizes.map((size) => (
+                <div key={size.id} className="flex items-center space-x-4">
+                  <RadioGroupItem 
+                    value={size.id} 
+                    id={size.id}
+                    className="border-2 border-vyybmtch-purple data-[state=checked]:bg-vyybmtch-sunrise data-[state=checked]:border-vyybmtch-sunrise"
+                  />
+                  <label 
+                    htmlFor={size.id} 
+                    className="flex-1 cursor-pointer p-4 rounded-xl bg-white/60 hover:bg-vyybmtch-light-purple/30 transition-all"
+                  >
+                    <div className="font-semibold text-vyybmtch-deep-purple">{size.label}</div>
+                    <div className="text-sm text-vyybmtch-purple/70">{size.desc}</div>
+                  </label>
+                </div>
               ))}
+            </RadioGroup>
+
+            <div className="mt-6 text-center">
+              <p className="text-vyybmtch-purple/60 text-sm mb-2">Are you with a bigger group?</p>
+              <Button variant="ghost" className="text-vyybmtch-sunrise hover:bg-vyybmtch-light-purple/50 font-semibold">
+                Invite here
+              </Button>
             </div>
           </div>
 
-          {/* Next Button */}
+          <div className="text-center text-sm text-vyybmtch-purple/60 mb-8">
+            *You can always customize and adjust your preferences in the account setting
+          </div>
+
+          {/* Continue Button */}
           <Button
             onClick={handleNext}
-            disabled={selectedCuisines.length === 0 || selectedVibes.length === 0}
-            className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold disabled:opacity-50"
+            disabled={selectedCategories.length === 0}
+            className="w-full h-14 bg-gradient-to-r from-vyybmtch-sunrise to-vyybmtch-coral text-white hover:opacity-90 font-bold text-lg rounded-2xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
           >
-            Next: Invite Friends
-            <ArrowRight className="w-4 h-4 ml-2" />
+            Confirm & Continue
+            <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
         </div>
       </div>
