@@ -114,10 +114,10 @@ const Welcome = () => {
                 </div>
               </div>
               <Button
-                onClick={() => navigate(isDemoMode ? '/preferences?demo=true' : '/preferences')}
+                onClick={() => navigate(isDemoMode ? '/landing?demo=true' : '/landing')}
                 className="w-full bg-datespot-gradient text-white hover:opacity-90 font-semibold"
               >
-                Start Discovery
+                Go to Dashboard
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>

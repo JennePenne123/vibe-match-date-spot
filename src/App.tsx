@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import Index from "./pages/Index";
+import Landing from "./pages/Landing";
 import Welcome from "./pages/Welcome";
 import Preferences from "./pages/Preferences";
 import Friends from "./pages/Friends";
@@ -28,6 +29,7 @@ const App = () => (
           <AppProvider>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/landing" element={<Landing />} />
               <Route path="/welcome" element={<Welcome />} />
               <Route path="/preferences" element={<Preferences />} />
               <Route path="/friends" element={<Friends />} />
