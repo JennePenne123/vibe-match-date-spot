@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MapPin, Clock, Sparkles, Loader2, AlertCircle, Navigation } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Sparkles, Loader2, AlertCircle, Navigation, Check } from 'lucide-react';
 
 const Area = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const Area = () => {
       id: 'downtown',
       name: 'Downtown',
       description: 'Urban vibes with trendy restaurants and rooftop bars',
-      image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&h=200&fit=crop',
+      emoji: '🏙️',
       time: '10-15 min drive',
       venues: 24
     },
@@ -22,7 +23,7 @@ const Area = () => {
       id: 'waterfront',
       name: 'Waterfront',
       description: 'Scenic views with seafood and sunset spots',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop',
+      emoji: '🌊',
       time: '15-20 min drive',
       venues: 18
     },
@@ -30,7 +31,7 @@ const Area = () => {
       id: 'arts-district',
       name: 'Arts District',
       description: 'Creative atmosphere with galleries and jazz clubs',
-      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=200&fit=crop',
+      emoji: '🎨',
       time: '8-12 min drive',
       venues: 16
     },
@@ -38,7 +39,7 @@ const Area = () => {
       id: 'oldtown',
       name: 'Old Town',
       description: 'Historic charm with cozy cafes and wine bars',
-      image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=200&fit=crop',
+      emoji: '🏛️',
       time: '12-18 min drive',
       venues: 22
     },
@@ -46,7 +47,7 @@ const Area = () => {
       id: 'uptown',
       name: 'Uptown',
       description: 'Upscale dining and sophisticated cocktail lounges',
-      image: 'https://images.unsplash.com/photo-1516156008625-3a9d6067fab5?w=400&h=200&fit=crop',
+      emoji: '✨',
       time: '5-10 min drive',
       venues: 19
     }
@@ -142,29 +143,26 @@ const Area = () => {
           </div>
 
           {/* Area Selection */}
-          <div className="space-y-4 mb-8">
+          <div className="space-y-3 mb-8">
             {areas.map((area) => (
               <button
                 key={area.id}
                 onClick={() => setSelectedArea(area.id)}
                 disabled={appState.isLoading}
-                className={`w-full rounded-xl overflow-hidden transition-all ${
+                className={`w-full p-4 rounded-xl border-2 transition-all ${
                   selectedArea === area.id
-                    ? 'ring-4 ring-datespot-pink transform scale-[1.02]'
-                    : 'hover:transform hover:scale-[1.01]'
+                    ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
+                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                 } ${appState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <div className="relative">
-                  <img
-                    src={area.image}
-                    alt={area.name}
-                    className="w-full h-32 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4 text-left">
-                    <h3 className="text-white font-bold text-lg">{area.name}</h3>
-                    <p className="text-white/90 text-sm mb-2">{area.description}</p>
-                    <div className="flex items-center gap-4 text-white/80 text-xs">
+                <div className="flex items-center gap-4">
+                  <div className="text-2xl">{area.emoji}</div>
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold">{area.name}</div>
+                    <div className={`text-sm ${selectedArea === area.id ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
+                      {area.description}
+                    </div>
+                    <div className={`flex items-center gap-4 text-xs mt-1 ${selectedArea === area.id ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {area.time}
@@ -176,9 +174,7 @@ const Area = () => {
                     </div>
                   </div>
                   {selectedArea === area.id && (
-                    <div className="absolute top-2 right-2 bg-white rounded-full p-1">
-                      <Sparkles className="w-4 h-4 text-datespot-pink" />
-                    </div>
+                    <Check className="w-5 h-5" />
                   )}
                 </div>
               </button>
