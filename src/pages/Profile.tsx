@@ -1,21 +1,25 @@
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Edit, Save, X, Settings, Heart, Users, MapPin } from 'lucide-react';
+import NavigationBar from '@/components/NavigationBar';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, updateUser, logout, loading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const isDemoMode = searchParams.get('demo') === 'true';
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
 
   React.useEffect(() => {
-    if (!loading && !user) {
+    if (!isDemoMode && !loading && !user) {
       navigate('/');
       return;
     }
@@ -24,9 +28,9 @@ const Profile = () => {
       setEditedName(user.profile.name || '');
       setEditedEmail(user.profile.email || '');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, isDemoMode]);
 
-  if (loading) {
+  if (!isDemoMode && loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-gray-600">Loading...</div>
@@ -34,26 +38,42 @@ const Profile = () => {
     );
   }
 
-  if (!user) {
+  if (!isDemoMode && !user) {
     return null;
   }
 
   const handleSave = async () => {
-    await updateUser({
-      name: editedName,
-      email: editedEmail
-    });
+    if (!isDemoMode && updateUser) {
+      await updateUser({
+        name: editedName,
+        email: editedEmail
+      });
+    }
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setEditedName(user.profile?.name || '');
-    setEditedEmail(user.profile?.email || '');
+    const profileName = isDemoMode ? 'Demo User' : (user?.profile?.name || '');
+    const profileEmail = isDemoMode ? 'demo@example.com' : (user?.profile?.email || user?.email || '');
+    setEditedName(profileName);
+    setEditedEmail(profileEmail);
     setIsEditing(false);
   };
 
-  const displayName = user.profile?.name || user.user_metadata?.name || user.email?.split('@')[0] || 'User';
-  const displayEmail = user.profile?.email || user.email || '';
+  const handleLogout = () => {
+    if (isDemoMode) {
+      navigate('/');
+    } else {
+      logout();
+    }
+  };
+
+  const displayName = isDemoMode 
+    ? 'Demo User' 
+    : (user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User');
+  const displayEmail = isDemoMode 
+    ? 'demo@example.com' 
+    : (user?.profile?.email || user?.email || '');
 
   const stats = [
     { label: 'Dates Planned', value: '0', icon: Heart },
@@ -62,13 +82,13 @@ const Profile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="bg-white p-4 pt-12 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <Button
-              onClick={() => navigate('/welcome')}
+              onClick={() => navigate(isDemoMode ? '/welcome?demo=true' : '/welcome')}
               variant="ghost"
               size="icon"
               className="text-gray-600 hover:bg-gray-100"
@@ -89,7 +109,7 @@ const Profile = () => {
           {/* Profile Header */}
           <div className="text-center">
             <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-datespot-light-pink">
-              <AvatarImage src={user.profile?.avatar_url} alt={displayName} />
+              <AvatarImage src={isDemoMode ? undefined : user?.profile?.avatar_url} alt={displayName} />
               <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
                 {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
               </AvatarFallback>
@@ -164,7 +184,7 @@ const Profile = () => {
                 <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p>No friends added yet</p>
                 <Button
-                  onClick={() => navigate('/friends')}
+                  onClick={() => navigate(isDemoMode ? '/friends?demo=true' : '/friends')}
                   variant="outline"
                   className="mt-3 border-gray-200 text-gray-700 hover:bg-gray-50"
                 >
@@ -177,28 +197,30 @@ const Profile = () => {
           {/* Actions */}
           <div className="space-y-3">
             <Button
-              onClick={() => navigate('/preferences')}
+              onClick={() => navigate(isDemoMode ? '/preferences?demo=true' : '/preferences')}
               variant="outline"
               className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
             >
               Update Preferences
             </Button>
             <Button
-              onClick={() => navigate('/welcome')}
+              onClick={() => navigate(isDemoMode ? '/welcome?demo=true' : '/welcome')}
               className="w-full bg-datespot-gradient text-white hover:opacity-90"
             >
               Find New Date Spots
             </Button>
             <Button
-              onClick={logout}
+              onClick={handleLogout}
               variant="outline"
               className="w-full text-red-600 border-red-200 hover:bg-red-50"
             >
-              Sign Out
+              {isDemoMode ? 'Exit Demo' : 'Sign Out'}
             </Button>
           </div>
         </div>
       </div>
+
+      <NavigationBar />
     </div>
   );
 };

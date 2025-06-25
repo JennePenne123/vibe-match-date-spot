@@ -1,18 +1,22 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Plus, Clock, MapPin, Check, X, Settings, User } from 'lucide-react';
+import { toast } from 'sonner';
+import NavigationBar from '@/components/NavigationBar';
 
 const Landing = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [searchParams] = useSearchParams();
+  const isDemoMode = searchParams.get('demo') === 'true';
 
-  // Mock data for friend invitations
-  const friendInvitations = [
+  // Mock data for friend invitations with state management
+  const [friendInvitations, setFriendInvitations] = useState([
     {
       id: 1,
       friendName: 'Sarah Chen',
@@ -43,33 +47,53 @@ const Landing = () => {
       message: 'There\'s a new exhibition opening this weekend!',
       status: 'pending'
     }
-  ];
+  ]);
 
   const handleAcceptInvitation = (id: number) => {
-    console.log('Accepted invitation:', id);
-    // Here you would typically update the invitation status
+    const invitation = friendInvitations.find(inv => inv.id === id);
+    if (invitation) {
+      setFriendInvitations(prev => prev.filter(inv => inv.id !== id));
+      toast.success(`Accepted invitation from ${invitation.friendName}! 🎉`);
+      // Here you would typically make an API call to accept the invitation
+      console.log('Accepted invitation:', id);
+    }
   };
 
   const handleDeclineInvitation = (id: number) => {
-    console.log('Declined invitation:', id);
-    // Here you would typically update the invitation status
+    const invitation = friendInvitations.find(inv => inv.id === id);
+    if (invitation) {
+      setFriendInvitations(prev => prev.filter(inv => inv.id !== id));
+      toast(`Declined invitation from ${invitation.friendName}`);
+      // Here you would typically make an API call to decline the invitation
+      console.log('Declined invitation:', id);
+    }
   };
 
   const handleStartNewDate = () => {
-    navigate('/preferences');
+    navigate(isDemoMode ? '/preferences?demo=true' : '/preferences');
   };
 
-  const displayName = user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+  const handleLogout = () => {
+    if (isDemoMode) {
+      navigate('/');
+    } else {
+      logout();
+    }
+  };
+
+  const displayName = isDemoMode 
+    ? 'Demo User' 
+    : (user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User');
   const firstName = displayName.split(' ')[0];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center p-4 pt-12 bg-white shadow-sm">
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10 border-2 border-datespot-light-pink">
-              <AvatarImage src={user?.profile?.avatar_url} alt={displayName} />
+              <AvatarImage src={isDemoMode ? undefined : user?.profile?.avatar_url} alt={displayName} />
               <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-sm">
                 {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
               </AvatarFallback>
@@ -81,7 +105,7 @@ const Landing = () => {
           </div>
           <div className="flex gap-2">
             <Button
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate(isDemoMode ? '/profile?demo=true' : '/profile')}
               variant="ghost"
               size="icon"
               className="text-gray-600 hover:bg-gray-100"
@@ -89,7 +113,7 @@ const Landing = () => {
               <Settings className="w-5 h-5" />
             </Button>
             <Button
-              onClick={logout}
+              onClick={handleLogout}
               variant="ghost"
               size="icon"
               className="text-gray-600 hover:bg-gray-100"
@@ -199,7 +223,10 @@ const Landing = () => {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <Card 
+              className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => navigate(isDemoMode ? '/friends?demo=true' : '/friends')}
+            >
               <CardContent className="p-4 text-center">
                 <div className="text-2xl mb-2">👥</div>
                 <h3 className="font-medium text-gray-900 text-sm">Invite Friends</h3>
@@ -207,7 +234,10 @@ const Landing = () => {
               </CardContent>
             </Card>
             
-            <Card className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <Card 
+              className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => navigate(isDemoMode ? '/results?demo=true' : '/results')}
+            >
               <CardContent className="p-4 text-center">
                 <div className="text-2xl mb-2">📍</div>
                 <h3 className="font-medium text-gray-900 text-sm">Saved Places</h3>
@@ -217,6 +247,8 @@ const Landing = () => {
           </div>
         </div>
       </div>
+
+      <NavigationBar />
     </div>
   );
 };

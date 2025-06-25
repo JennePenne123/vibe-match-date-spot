@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, ArrowRight, Settings } from 'lucide-react';
+import NavigationBar from '@/components/NavigationBar';
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ const Welcome = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center p-4 pt-12 bg-white shadow-sm">
@@ -153,6 +154,8 @@ const Welcome = () => {
           </div>
         </div>
       </div>
+
+      <NavigationBar />
     </div>
   );
 };
