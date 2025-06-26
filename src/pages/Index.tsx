@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -31,20 +30,19 @@ const Index = () => {
     try {
       // Mock authentication - always succeed
       if (isLogin) {
-        // Mock login success
+        // Mock login success - go directly to welcome
         console.log('Mock login successful');
+        navigate('/welcome');
       } else {
         if (!name.trim()) {
           setError('Name is required');
           setLoading(false);
           return;
         }
-        // Mock signup success
+        // Mock signup success - go to onboarding for new users
         console.log('Mock signup successful');
+        navigate('/onboarding');
       }
-      
-      // Navigate to welcome page after successful auth
-      navigate('/welcome');
     } catch (error) {
       console.error('Authentication error:', error);
       setError('An unexpected error occurred');
@@ -54,8 +52,8 @@ const Index = () => {
   };
 
   const handleDemoMode = () => {
-    // Skip authentication entirely and go directly to welcome page
-    navigate('/welcome?demo=true');
+    // Skip authentication entirely and go directly to onboarding
+    navigate('/onboarding');
   };
 
   if (authLoading) {

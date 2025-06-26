@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import Index from "./pages/Index";
+import Onboarding from "./pages/Onboarding";
 import Landing from "./pages/Landing";
 import Welcome from "./pages/Welcome";
 import Preferences from "./pages/Preferences";
@@ -29,6 +30,7 @@ const App = () => (
           <AppProvider>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/landing" element={<Landing />} />
               <Route path="/welcome" element={<Welcome />} />
               <Route path="/preferences" element={<Preferences />} />
