@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -5,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Edit, Save, X, Settings, Heart, Users, MapPin } from 'lucide-react';
+import { ArrowLeft, Edit, Save, X, Heart, Users, MapPin } from 'lucide-react';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ const Profile = () => {
         <div className="bg-white p-4 pt-12 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <Button
-              onClick={() => navigate('/welcome')}
+              onClick={() => navigate('/home')}
               variant="ghost"
               size="icon"
               className="text-gray-600 hover:bg-gray-100"
@@ -164,7 +165,7 @@ const Profile = () => {
                 <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p>No friends added yet</p>
                 <Button
-                  onClick={() => navigate('/friends')}
+                  onClick={() => navigate('/my-friends')}
                   variant="outline"
                   className="mt-3 border-gray-200 text-gray-700 hover:bg-gray-50"
                 >
@@ -184,7 +185,7 @@ const Profile = () => {
               Update Preferences
             </Button>
             <Button
-              onClick={() => navigate('/welcome')}
+              onClick={() => navigate('/home')}
               className="w-full bg-datespot-gradient text-white hover:opacity-90"
             >
               Find New Date Spots
