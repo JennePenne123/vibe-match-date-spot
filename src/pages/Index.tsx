@@ -9,7 +9,7 @@ import { Heart, Sparkles, AlertCircle } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signUp, signIn } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,20 +30,28 @@ const Index = () => {
     
     try {
       if (isLogin) {
-        console.log('Mock login successful');
-        navigate('/landing');
+        const { error } = await signIn(email, password);
+        if (error) {
+          setError(error.message || 'Login failed');
+        } else {
+          navigate('/landing');
+        }
       } else {
         if (!name.trim()) {
           setError('Name is required');
           setLoading(false);
           return;
         }
-        console.log('Mock signup successful');
-        navigate('/landing');
+        const { error } = await signUp(email, password, { name });
+        if (error) {
+          setError(error.message || 'Signup failed');
+        } else {
+          navigate('/landing');
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Authentication error:', error);
-      setError('An unexpected error occurred');
+      setError(error?.message || 'An unexpected error occurred');
     }
     
     setLoading(false);
