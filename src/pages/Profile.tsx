@@ -69,7 +69,7 @@ const Profile = () => {
         <div className="bg-white p-4 pt-12 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <Button
-              onClick={() => navigate('/home')}
+              onClick={() => navigate(-1)}
               variant="ghost"
               size="icon"
               className="text-gray-600 hover:bg-gray-100"

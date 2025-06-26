@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -119,7 +120,7 @@ const MyVenues = () => {
         {/* Header */}
         <div className="flex items-center gap-4 p-4 pt-12 bg-white shadow-sm">
           <Button
-            onClick={() => navigate('/home')}
+            onClick={() => navigate(-1)}
             variant="ghost"
             size="icon"
             className="text-gray-600 hover:bg-gray-100"
