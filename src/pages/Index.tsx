@@ -1,14 +1,15 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Sparkles, AlertCircle, User } from 'lucide-react';
+import { Heart, Sparkles, AlertCircle } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, logout, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +19,7 @@ const Index = () => {
 
   React.useEffect(() => {
     if (user) {
-      navigate('/welcome');
+      navigate('/landing');
     }
   }, [user, navigate]);
 
@@ -28,20 +29,17 @@ const Index = () => {
     setError('');
     
     try {
-      // Mock authentication - always succeed
       if (isLogin) {
-        // Mock login success - go directly to welcome
         console.log('Mock login successful');
-        navigate('/welcome');
+        navigate('/landing');
       } else {
         if (!name.trim()) {
           setError('Name is required');
           setLoading(false);
           return;
         }
-        // Mock signup success - go to onboarding for new users
         console.log('Mock signup successful');
-        navigate('/onboarding');
+        navigate('/landing');
       }
     } catch (error) {
       console.error('Authentication error:', error);
@@ -49,11 +47,6 @@ const Index = () => {
     }
     
     setLoading(false);
-  };
-
-  const handleDemoMode = () => {
-    // Skip authentication entirely and go directly to onboarding
-    navigate('/onboarding');
   };
 
   if (authLoading) {
@@ -68,7 +61,7 @@ const Index = () => {
   }
 
   if (user) {
-    return null; // Will redirect to welcome
+    return null;
   }
 
   return (
@@ -84,9 +77,6 @@ const Index = () => {
           <h1 className="text-4xl font-bold text-gray-900">DateSpot</h1>
           <p className="text-lg text-gray-700">
             Ready to Create Unforgettable Memories?
-          </p>
-          <p className="text-gray-600">
-            Join thousands of couples discovering their perfect date spots with AI-powered recommendations
           </p>
         </div>
 
@@ -177,18 +167,6 @@ const Index = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Demo Mode Button - No authentication required */}
-        <div className="text-center">
-          <Button
-            onClick={handleDemoMode}
-            variant="ghost"
-            className="text-gray-600 hover:text-gray-800 text-sm"
-          >
-            <User className="w-4 h-4 mr-2" />
-            Try Demo Mode
-          </Button>
-        </div>
       </div>
     </div>
   );

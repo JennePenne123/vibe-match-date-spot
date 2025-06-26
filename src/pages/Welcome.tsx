@@ -1,26 +1,22 @@
 
 import React from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, ArrowRight, Settings } from 'lucide-react';
+import { Heart, ArrowRight } from 'lucide-react';
 
 const Welcome = () => {
   const navigate = useNavigate();
   const { user, logout, loading } = useAuth();
-  const [searchParams] = useSearchParams();
-  const isDemoMode = searchParams.get('demo') === 'true';
 
   React.useEffect(() => {
-    // Only redirect if not in demo mode and not loading and no user
-    if (!isDemoMode && !loading && !user) {
+    if (!loading && !user) {
       navigate('/');
     }
-  }, [user, loading, navigate, isDemoMode]);
+  }, [user, loading, navigate]);
 
-  // In demo mode, skip loading check entirely
-  if (!isDemoMode && loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-gray-600">Loading...</div>
@@ -28,10 +24,12 @@ const Welcome = () => {
     );
   }
 
-  // Only check for user if not in demo mode
-  if (!isDemoMode && !user) {
+  if (!user) {
     return null;
   }
+
+  const displayName = user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+  const firstName = displayName.split(' ')[0];
 
   const getTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -40,39 +38,17 @@ const Welcome = () => {
     return 'Good Evening!';
   };
 
-  // Demo mode data
-  const displayName = isDemoMode 
-    ? 'Demo User' 
-    : (user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User');
-  const firstName = displayName.split(' ')[0];
-
-  const handleLogout = () => {
-    if (isDemoMode) {
-      navigate('/');
-    } else {
-      logout();
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center p-4 pt-12 bg-white shadow-sm">
           <Button
-            onClick={() => navigate(isDemoMode ? '/profile?demo=true' : '/profile')}
-            variant="ghost"
-            size="icon"
-            className="text-gray-600 hover:bg-gray-100"
-          >
-            <Settings className="w-6 h-6" />
-          </Button>
-          <Button
-            onClick={handleLogout}
+            onClick={logout}
             variant="ghost"
             className="text-gray-600 hover:bg-gray-100"
           >
-            {isDemoMode ? 'Exit Demo' : 'Logout'}
+            Logout
           </Button>
         </div>
 
@@ -81,18 +57,13 @@ const Welcome = () => {
           {/* User Greeting */}
           <div className="text-center text-gray-900 mb-12 animate-fade-in pt-8">
             <div className="flex justify-center mb-4">
-              <Avatar className="w-24 h-24 border-4 border-datespot-light-pink">
-                <AvatarImage src={isDemoMode ? undefined : user?.profile?.avatar_url} alt={displayName} />
-                <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
+              <Avatar className="w-24 h-24 border-4 border-pink-200">
+                <AvatarImage src={user?.profile?.avatar_url} alt={displayName} />
+                <AvatarFallback className="bg-pink-100 text-pink-600 text-2xl">
                   {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             </div>
-            {isDemoMode && (
-              <div className="mb-4 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm">
-                🎯 Demo Mode - Exploring DateSpot features
-              </div>
-            )}
             <h2 className="text-2xl font-bold mb-2 text-gray-800">{getTimeGreeting()} ☀️</h2>
             <h1 className="text-4xl font-bold mb-4 text-gray-900">{firstName}</h1>
             <p className="text-xl text-gray-700 mb-2">Ready for your perfect date?</p>
@@ -101,12 +72,12 @@ const Welcome = () => {
             </p>
           </div>
 
-          {/* Action Cards */}
+          {/* Action Card */}
           <div className="space-y-4">
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
               <div className="flex items-center gap-4 mb-4">
-                <div className="bg-datespot-light-pink rounded-full p-3">
-                  <Heart className="w-6 h-6 text-datespot-pink" fill="currentColor" />
+                <div className="bg-pink-100 rounded-full p-3">
+                  <Heart className="w-6 h-6 text-pink-500" fill="currentColor" />
                 </div>
                 <div>
                   <h3 className="text-gray-900 font-semibold text-lg">Find Your Perfect Date Spot</h3>
@@ -114,42 +85,13 @@ const Welcome = () => {
                 </div>
               </div>
               <Button
-                onClick={() => navigate(isDemoMode ? '/landing?demo=true' : '/landing')}
-                className="w-full bg-datespot-gradient text-white hover:opacity-90 font-semibold"
+                onClick={() => navigate('/landing')}
+                className="w-full bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600 font-semibold"
               >
                 Go to Dashboard
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => navigate(isDemoMode ? '/friends?demo=true' : '/friends')}
-                className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center text-gray-700 hover:shadow-md transition-all"
-              >
-                <div className="text-2xl mb-2">👥</div>
-                <div className="text-sm font-medium">Invite Friends</div>
-              </button>
-              <button
-                onClick={() => navigate(isDemoMode ? '/profile?demo=true' : '/profile')}
-                className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center text-gray-700 hover:shadow-md transition-all"
-              >
-                <div className="text-2xl mb-2">⚙️</div>
-                <div className="text-sm font-medium">Settings</div>
-              </button>
-            </div>
-          </div>
-
-          {/* Bottom Wave */}
-          <div className="mt-16">
-            <svg
-              viewBox="0 0 1200 120"
-              className="w-full h-20 text-gray-100"
-              fill="currentColor"
-            >
-              <path d="M0,96L48,80C96,64,192,32,288,37.3C384,43,480,85,576,112C672,139,768,149,864,133.3C960,117,1056,75,1152,69.3C1248,64,1344,96,1392,112L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
-            </svg>
           </div>
         </div>
       </div>
