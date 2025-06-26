@@ -23,14 +23,14 @@ const BurgerMenu = () => {
     },
     {
       icon: Users,
-      label: 'Friends',
-      path: '/friends',
+      label: 'My Friends',
+      path: '/my-friends',
       description: 'Your connections'
     },
     {
       icon: MapPin,
-      label: 'Venues',
-      path: '/venues',
+      label: 'My Venues',
+      path: '/my-venues',
       description: 'Favorite places'
     },
     {

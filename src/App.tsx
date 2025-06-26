@@ -16,6 +16,8 @@ import Results from "./pages/Results";
 import VenueDetail from "./pages/VenueDetail";
 import Profile from "./pages/Profile";
 import Venues from "./pages/Venues";
+import MyFriends from "./pages/MyFriends";
+import MyVenues from "./pages/MyVenues";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +41,8 @@ const App = () => (
               <Route path="/venue/:id" element={<VenueDetail />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/venues" element={<Venues />} />
+              <Route path="/my-friends" element={<MyFriends />} />
+              <Route path="/my-venues" element={<MyVenues />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppProvider>
