@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Plus, Clock, MapPin, Check, X } from 'lucide-react';
 import BurgerMenu from '@/components/BurgerMenu';
 
-const Landing = () => {
+const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [acceptedInvitations, setAcceptedInvitations] = useState<number[]>([]);
@@ -201,4 +202,4 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+export default Home;

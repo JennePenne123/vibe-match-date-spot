@@ -56,7 +56,7 @@ const Venues = () => {
         {/* Header */}
         <div className="flex items-center gap-4 p-4 pt-12 bg-white shadow-sm">
           <Button
-            onClick={() => navigate('/landing')}
+            onClick={() => navigate('/home')}
             variant="ghost"
             size="icon"
             className="text-gray-600 hover:bg-gray-100"

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Sparkles, AlertCircle } from 'lucide-react';
 
-const Index = () => {
+const RegisterLogin = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signUp, signIn } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
@@ -19,7 +19,7 @@ const Index = () => {
 
   React.useEffect(() => {
     if (user) {
-      navigate('/landing');
+      navigate('/home');
     }
   }, [user, navigate]);
 
@@ -34,7 +34,7 @@ const Index = () => {
         if (error) {
           setError(error.message || 'Login failed');
         } else {
-          navigate('/landing');
+          navigate('/home');
         }
       } else {
         if (!name.trim()) {
@@ -46,7 +46,7 @@ const Index = () => {
         if (error) {
           setError(error.message || 'Signup failed');
         } else {
-          navigate('/landing');
+          navigate('/home');
         }
       }
     } catch (error: any) {
@@ -180,4 +180,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default RegisterLogin;

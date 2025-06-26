@@ -6,10 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
-import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
-import Landing from "./pages/Landing";
-import Welcome from "./pages/Welcome";
+import RegisterLogin from "./pages/RegisterLogin";
+import Home from "./pages/Home";
 import Preferences from "./pages/Preferences";
 import Friends from "./pages/Friends";
 import Area from "./pages/Area";
@@ -30,10 +29,9 @@ const App = () => (
         <AuthProvider>
           <AppProvider>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/landing" element={<Landing />} />
-              <Route path="/welcome" element={<Welcome />} />
+              <Route path="/" element={<Onboarding />} />
+              <Route path="/register-login" element={<RegisterLogin />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/preferences" element={<Preferences />} />
               <Route path="/friends" element={<Friends />} />
               <Route path="/area" element={<Area />} />
