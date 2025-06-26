@@ -5,14 +5,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, Plus, Clock, MapPin, Check, X } from 'lucide-react';
+import { Heart, Plus, Clock, MapPin, Check, X, Calendar, Users } from 'lucide-react';
 import BurgerMenu from '@/components/BurgerMenu';
+import DateInviteCard from '@/components/DateInviteCard';
 
 const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [acceptedInvitations, setAcceptedInvitations] = useState<number[]>([]);
   const [declinedInvitations, setDeclinedInvitations] = useState<number[]>([]);
+  const [showEmptyState, setShowEmptyState] = useState(false);
 
   // Redirect to register-login if no user is authenticated
   React.useEffect(() => {
@@ -33,7 +35,13 @@ const Home = () => {
       location: 'Downtown',
       time: '2:00 PM Today',
       message: 'Want to try that new cafe we talked about?',
-      status: 'pending'
+      status: 'pending',
+      venueName: 'Sunset Rooftop Cafe',
+      venueAddress: '123 Main St, Downtown',
+      estimatedCost: '$25-35 per person',
+      duration: '2-3 hours',
+      specialNotes: 'They have the best avocado toast in the city! Perfect spot for catching up.',
+      venueImage: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&h=300&fit=crop'
     },
     {
       id: 2,
@@ -43,7 +51,13 @@ const Home = () => {
       location: 'Uptown',
       time: '7:30 PM Tomorrow',
       message: 'New restaurant just opened! Should be amazing 🍽️',
-      status: 'pending'
+      status: 'pending',
+      venueName: 'The Garden Bistro',
+      venueAddress: '456 Oak Ave, Uptown',
+      estimatedCost: '$45-60 per person',
+      duration: '3-4 hours',
+      specialNotes: 'Award-winning chef, romantic atmosphere. Movie theater is just 2 blocks away!',
+      venueImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop'
     },
     {
       id: 3,
@@ -53,7 +67,13 @@ const Home = () => {
       location: 'Arts District',
       time: '3:00 PM Saturday',
       message: 'There\'s a new exhibition opening this weekend!',
-      status: 'pending'
+      status: 'pending',
+      venueName: 'Modern Art Gallery',
+      venueAddress: '789 Creative Blvd, Arts District',
+      estimatedCost: '$15-20 per person',
+      duration: '2-3 hours',
+      specialNotes: 'Contemporary art exhibition featuring local artists. Wine tasting included!',
+      venueImage: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop'
     }
   ];
 
@@ -77,7 +97,7 @@ const Home = () => {
   const displayName = user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
   const firstName = displayName.split(' ')[0];
 
-  const availableInvitations = friendInvitations.filter(
+  const availableInvitations = showEmptyState ? [] : friendInvitations.filter(
     inv => !acceptedInvitations.includes(inv.id) && !declinedInvitations.includes(inv.id)
   );
 
@@ -102,6 +122,18 @@ const Home = () => {
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Test Empty State Toggle */}
+          <div className="flex justify-center">
+            <Button
+              onClick={() => setShowEmptyState(!showEmptyState)}
+              variant="outline"
+              size="sm"
+              className="text-xs text-gray-500"
+            >
+              {showEmptyState ? 'Show Invites' : 'Test Empty State'}
+            </Button>
+          </div>
+
           {/* Start New Date Card */}
           <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-lg">
             <CardHeader className="text-center pb-4">
@@ -129,7 +161,7 @@ const Home = () => {
           </Card>
 
           {/* Friend Invitations */}
-          {availableInvitations.length > 0 && (
+          {availableInvitations.length > 0 ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">Date Invitations</h2>
@@ -139,64 +171,44 @@ const Home = () => {
               </div>
 
               {availableInvitations.map((invitation) => (
-                <Card key={invitation.id} className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-pink-400">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="w-12 h-12 border-2 border-pink-200">
-                        <AvatarImage src={invitation.friendAvatar} alt={invitation.friendName} />
-                        <AvatarFallback className="bg-pink-100 text-pink-600">
-                          {invitation.friendName.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900 truncate">
-                            {invitation.friendName}
-                          </h3>
-                          <span className="text-xs text-pink-600 font-medium bg-pink-100 px-2 py-0.5 rounded-full">
-                            {invitation.dateType}
-                          </span>
-                        </div>
-                        
-                        <p className="text-sm text-gray-600 mb-2">{invitation.message}</p>
-                        
-                        <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {invitation.time}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            {invitation.location}
-                          </div>
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => handleAcceptInvitation(invitation.id)}
-                            size="sm"
-                            className="flex-1 bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600 font-medium"
-                          >
-                            <Check className="w-4 h-4 mr-1" />
-                            Accept
-                          </Button>
-                          <Button
-                            onClick={() => handleDeclineInvitation(invitation.id)}
-                            size="sm"
-                            variant="outline"
-                            className="flex-1 border-gray-300 text-gray-600 hover:bg-gray-50"
-                          >
-                            <X className="w-4 h-4 mr-1" />
-                            Decline
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <DateInviteCard
+                  key={invitation.id}
+                  invitation={invitation}
+                  onAccept={handleAcceptInvitation}
+                  onDecline={handleDeclineInvitation}
+                />
               ))}
             </div>
+          ) : (
+            /* Empty State */
+            <Card className="bg-white shadow-sm border-gray-200">
+              <CardContent className="p-8 text-center">
+                <div className="text-gray-300 mb-4">
+                  <Calendar className="w-16 h-16 mx-auto" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Date Invitations</h3>
+                <p className="text-gray-600 mb-4">
+                  You don't have any pending date invitations right now. Start planning your own date or invite friends!
+                </p>
+                <div className="space-y-2">
+                  <Button
+                    onClick={() => navigate('/preferences')}
+                    className="w-full bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Plan a New Date
+                  </Button>
+                  <Button
+                    onClick={() => navigate('/my-friends')}
+                    variant="outline"
+                    className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Invite Friends
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Accepted/Declined Status */}
