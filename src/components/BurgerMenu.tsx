@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { Menu, User, Users, MapPin, Settings, LogOut, X } from 'lucide-react';
+import { Menu, User, Users, MapPin, LogOut, X } from 'lucide-react';
 
 const BurgerMenu = () => {
   const navigate = useNavigate();
@@ -32,12 +31,6 @@ const BurgerMenu = () => {
       label: 'My Venues',
       path: '/my-venues',
       description: 'Favorite places'
-    },
-    {
-      icon: Settings,
-      label: 'Settings',
-      path: '/settings',
-      description: 'App preferences'
     }
   ];
 
