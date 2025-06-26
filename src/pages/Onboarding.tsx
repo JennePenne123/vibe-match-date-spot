@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -36,7 +35,7 @@ const Onboarding = () => {
     if (currentScreen < screens.length - 1) {
       setCurrentScreen(currentScreen + 1);
     } else {
-      navigate('/welcome');
+      navigate('/');
     }
   };
 
@@ -47,7 +46,7 @@ const Onboarding = () => {
   };
 
   const handleSkip = () => {
-    navigate('/welcome');
+    navigate('/');
   };
 
   const currentScreenData = screens[currentScreen];
