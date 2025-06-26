@@ -78,7 +78,7 @@ const apiClient = {
 export const authApi = {
   async signUp(email: string, password: string, userData?: any) {
     console.log('Signing up user:', email);
-    const { data, error } = await supabase.auth.signUp({
+    const result = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -87,31 +87,31 @@ export const authApi = {
       },
     });
     
-    if (error) throw new ApiError(error.message);
-    return { user: data.user, error: null };
+    if (result.error) throw new ApiError(result.error.message);
+    return { user: result.data.user, error: null };
   },
 
   async signIn(email: string, password: string) {
     console.log('Signing in user:', email);
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const result = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     
-    if (error) throw new ApiError(error.message);
-    return { user: data.user, error: null };
+    if (result.error) throw new ApiError(result.error.message);
+    return { user: result.data.user, error: null };
   },
 
   async signOut() {
     console.log('Signing out user');
-    const { error } = await supabase.auth.signOut();
-    if (error) throw new ApiError(error.message);
+    const result = await supabase.auth.signOut();
+    if (result.error) throw new ApiError(result.error.message);
   },
 
   async getCurrentUser() {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) throw new ApiError(error.message);
-    return user;
+    const result = await supabase.auth.getUser();
+    if (result.error) throw new ApiError(result.error.message);
+    return result.data.user;
   },
 };
 
@@ -123,15 +123,15 @@ export const friendsApi = {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     try {
-      const { data, error } = await supabase
+      const result = await supabase
         .from('profiles')
         .select('*')
         .limit(10);
       
-      if (error) throw new ApiError(error.message);
+      if (result.error) throw new ApiError(result.error.message);
       
       // Transform profiles to friends format
-      return data?.map(profile => ({
+      return result.data?.map((profile: any) => ({
         id: profile.id,
         name: profile.name,
         avatar: profile.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
@@ -166,12 +166,12 @@ export const venuesApi = {
     
     try {
       // Use Supabase edge function for venue search
-      const { data, error } = await supabase.functions.invoke('search-venues', {
+      const result = await supabase.functions.invoke('search-venues', {
         body: { preferences },
       });
       
-      if (error) throw new ApiError(error.message);
-      return data?.venues || [];
+      if (result.error) throw new ApiError(result.error.message);
+      return result.data?.venues || [];
     } catch (error) {
       console.error('Failed to fetch venues:', error);
       // Fallback to empty array
@@ -183,12 +183,12 @@ export const venuesApi = {
     console.log('Fetching venue by ID:', id);
     
     try {
-      const { data, error } = await supabase.functions.invoke('search-venues', {
+      const result = await supabase.functions.invoke('search-venues', {
         body: { venueId: id },
       });
       
-      if (error) throw new ApiError(error.message);
-      return data?.venue || null;
+      if (result.error) throw new ApiError(result.error.message);
+      return result.data?.venue || null;
     } catch (error) {
       console.error('Failed to fetch venue:', error);
       return null;
@@ -227,25 +227,25 @@ export const profileApi = {
     const user = await authApi.getCurrentUser();
     if (!user) throw new ApiError('User not authenticated');
     
-    const { error } = await supabase
+    const result = await supabase
       .from('profiles')
       .update(profileData)
       .eq('id', user.id);
     
-    if (error) throw new ApiError(error.message);
+    if (result.error) throw new ApiError(result.error.message);
   },
 
   async getProfile(userId: string) {
     console.log('Fetching profile for user:', userId);
     
-    const { data, error } = await supabase
+    const result = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
     
-    if (error) throw new ApiError(error.message);
-    return data;
+    if (result.error) throw new ApiError(result.error.message);
+    return result.data;
   },
 };
 

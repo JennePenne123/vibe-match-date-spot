@@ -28,13 +28,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         logger.debug('Auth state changed:', event, session?.user?.email);
         
         if (session?.user) {
           // Get user profile from profiles table
           try {
-            const { data: profile } = await supabase
+            const profileData = await supabase
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               id: session.user.id,
               email: session.user.email || '',
               user_metadata: session.user.user_metadata,
-              profile: profile || {
+              profile: profileData.data || {
                 name: session.user.user_metadata?.name || 'User',
                 email: session.user.email || '',
               },
@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: any) => {
       if (session?.user) {
         logger.debug('Initial session found for user:', session.user.email);
       } else {
@@ -142,12 +142,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         logger.debug('Updating user profile:', userData);
         
-        const { error } = await supabase
+        const result = await supabase
           .from('profiles')
           .update(userData)
           .eq('id', user.id);
         
-        if (error) throw error;
+        if (result.error) throw result.error;
         
         setUser({
           ...user,
