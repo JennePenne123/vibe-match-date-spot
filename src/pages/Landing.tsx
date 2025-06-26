@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, Plus, Clock, MapPin, Check, X, User, Users } from 'lucide-react';
+import { Heart, Plus, Clock, MapPin, Check, X } from 'lucide-react';
 import BurgerMenu from '@/components/BurgerMenu';
 
 const Landing = () => {
@@ -83,25 +83,7 @@ const Landing = () => {
               <p className="text-sm text-gray-600">Ready for your next adventure?</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => navigate('/profile')}
-              variant="ghost"
-              size="icon"
-              className="text-gray-600 hover:bg-gray-100"
-            >
-              <User className="w-5 h-5" />
-            </Button>
-            <Button
-              onClick={() => navigate('/friends')}
-              variant="ghost"
-              size="icon"
-              className="text-gray-600 hover:bg-gray-100"
-            >
-              <Users className="w-5 h-5" />
-            </Button>
-            <BurgerMenu />
-          </div>
+          <BurgerMenu />
         </div>
 
         <div className="p-6 space-y-6">
