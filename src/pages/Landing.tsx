@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -208,31 +207,6 @@ const Landing = () => {
               ))}
             </div>
           )}
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-4">
-            <Card 
-              className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => navigate('/friends')}
-            >
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">👥</div>
-                <h3 className="font-medium text-gray-900 text-sm">Friends</h3>
-                <p className="text-xs text-gray-600 mt-1">Manage connections</p>
-              </CardContent>
-            </Card>
-            
-            <Card 
-              className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => navigate('/profile')}
-            >
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">⚙️</div>
-                <h3 className="font-medium text-gray-900 text-sm">Profile</h3>
-                <p className="text-xs text-gray-600 mt-1">Settings & preferences</p>
-              </CardContent>
-            </Card>
-          </div>
 
           {/* Accepted/Declined Status */}
           {(acceptedInvitations.length > 0 || declinedInvitations.length > 0) && (
