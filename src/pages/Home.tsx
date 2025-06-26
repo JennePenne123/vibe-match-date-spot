@@ -14,6 +14,15 @@ const Home = () => {
   const [acceptedInvitations, setAcceptedInvitations] = useState<number[]>([]);
   const [declinedInvitations, setDeclinedInvitations] = useState<number[]>([]);
 
+  // Redirect to register-login if no user is authenticated
+  React.useEffect(() => {
+    console.log('Home component - user:', user);
+    if (!user) {
+      console.log('No user found, redirecting to register-login');
+      navigate('/register-login');
+    }
+  }, [user, navigate]);
+
   // Mock data for friend invitations
   const friendInvitations = [
     {
@@ -59,6 +68,11 @@ const Home = () => {
     setAcceptedInvitations(prev => prev.filter(invId => invId !== id));
     console.log('Declined invitation:', id);
   };
+
+  // Don't render anything while checking authentication
+  if (!user) {
+    return null;
+  }
 
   const displayName = user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
   const firstName = displayName.split(' ')[0];
