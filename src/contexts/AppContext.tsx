@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
+import { mockVenues, type MockVenue } from '@/data/mockVenues';
 
 interface Venue {
   id: string;
@@ -60,64 +61,6 @@ const initialState: AppState = {
   userLocation: null,
   locationError: null
 };
-
-// Mock venues for local testing
-const mockVenues: Venue[] = [
-  {
-    id: 'venue-1',
-    name: 'Bella Notte',
-    description: 'Authentic Italian restaurant with romantic ambiance and handmade pasta',
-    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
-    rating: 4.8,
-    distance: '0.3 mi',
-    priceRange: '$$$',
-    location: '123 Main St, Downtown',
-    cuisineType: 'Italian',
-    vibe: 'romantic',
-    matchScore: 95,
-    tags: ['romantic', 'pasta', 'wine', 'date night'],
-    phone: '+1 (555) 123-4567',
-    website: 'https://bellanotte.example.com',
-    openingHours: ['Mon-Thu: 5:00 PM - 10:00 PM', 'Fri-Sat: 5:00 PM - 11:00 PM', 'Sun: 4:00 PM - 9:00 PM'],
-    isOpen: true
-  },
-  {
-    id: 'venue-2',
-    name: 'Sakura Sushi',
-    description: 'Fresh sushi and sashimi in a modern Japanese setting',
-    image: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop',
-    rating: 4.6,
-    distance: '0.7 mi',
-    priceRange: '$$',
-    location: '456 Oak Ave, Arts District',
-    cuisineType: 'Japanese',
-    vibe: 'casual',
-    matchScore: 88,
-    tags: ['sushi', 'fresh', 'modern', 'healthy'],
-    phone: '+1 (555) 987-6543',
-    openingHours: ['Tue-Sun: 11:30 AM - 9:00 PM', 'Mon: Closed'],
-    isOpen: false
-  },
-  {
-    id: 'venue-3',
-    name: 'Taco Libre',
-    description: 'Vibrant Mexican cantina with craft cocktails and street tacos',
-    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop',
-    rating: 4.4,
-    distance: '1.2 mi',
-    priceRange: '$$',
-    location: '789 Pine St, Mission District',
-    cuisineType: 'Mexican',
-    vibe: 'nightlife',
-    matchScore: 82,
-    tags: ['tacos', 'cocktails', 'lively', 'outdoor seating'],
-    discount: '20% off appetizers',
-    phone: '+1 (555) 456-7890',
-    website: 'https://tacolibre.example.com',
-    openingHours: ['Daily: 11:00 AM - 12:00 AM'],
-    isOpen: true
-  }
-];
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
