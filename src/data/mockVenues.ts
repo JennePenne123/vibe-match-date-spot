@@ -1,26 +1,7 @@
 
-export interface MockVenue {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  rating: number;
-  distance: string;
-  priceRange: string;
-  location: string;
-  cuisineType: string;
-  vibe: string;
-  matchScore: number;
-  tags: string[];
-  discount?: string;
-  placeId?: string;
-  phone?: string;
-  website?: string;
-  openingHours?: string[];
-  isOpen?: boolean;
-}
+import { Venue } from '@/types';
 
-export const mockVenues: MockVenue[] = [
+export const mockVenues: Venue[] = [
   {
     id: 'venue-1',
     name: 'Bella Notte',

@@ -1,26 +1,6 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockUser } from '@/data/mockUsers';
-
-interface User {
-  id: string;
-  email: string;
-  user_metadata?: {
-    name?: string;
-    avatar_url?: string;
-  };
-  profile?: {
-    name?: string;
-    email?: string;
-    avatar_url?: string;
-  };
-  friends?: Array<{
-    id: string;
-    name: string;
-    avatar: string;
-    isInvited: boolean;
-  }>;
-}
+import { User } from '@/types';
 
 interface AuthContextType {
   user: User | null;

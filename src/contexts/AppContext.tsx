@@ -1,27 +1,6 @@
-
 import React, { createContext, useContext, useState } from 'react';
-import { mockVenues, type MockVenue } from '@/data/mockVenues';
-
-interface Venue {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  rating: number;
-  distance: string;
-  priceRange: string;
-  location: string;
-  cuisineType: string;
-  vibe: string;
-  matchScore: number;
-  tags: string[];
-  discount?: string;
-  placeId?: string;
-  phone?: string;
-  website?: string;
-  openingHours?: string[];
-  isOpen?: boolean;
-}
+import { mockVenues } from '@/data/mockVenues';
+import { Venue } from '@/types';
 
 interface UserLocation {
   latitude: number;
