@@ -1,9 +1,6 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { mockVenues } from '@/data/mockVenues';
 import { Venue } from '@/types';
-import { venuesApi } from '@/services/api';
-import { logger, isFeatureEnabled } from '@/lib/environment';
 
 interface UserLocation {
   latitude: number;
@@ -50,38 +47,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [appState, setAppState] = useState<AppState>(initialState);
 
   const updateCuisines = (cuisines: string[]) => {
-    logger.debug('Updating cuisines:', cuisines);
     setAppState(prev => ({ ...prev, selectedCuisines: cuisines }));
   };
 
   const updateVibes = (vibes: string[]) => {
-    logger.debug('Updating vibes:', vibes);
     setAppState(prev => ({ ...prev, selectedVibes: vibes }));
   };
 
   const updateArea = (area: string) => {
-    logger.debug('Updating area:', area);
     setAppState(prev => ({ ...prev, selectedArea: area }));
   };
 
   const updateInvitedFriends = (friends: string[]) => {
-    logger.debug('Updating invited friends:', friends);
     setAppState(prev => ({ ...prev, invitedFriends: friends }));
   };
 
   const requestLocation = async () => {
-    if (!isFeatureEnabled('geolocation')) {
-      logger.warn('Geolocation feature is disabled');
-      setAppState(prev => ({ ...prev, locationError: 'Geolocation is disabled' }));
-      return;
-    }
-
-    logger.info('Requesting user location');
+    console.log('Requesting user location...');
     setAppState(prev => ({ ...prev, locationError: null }));
 
     if (!navigator.geolocation) {
       const error = 'Geolocation is not supported by this browser';
-      logger.error(error);
+      console.error(error);
       setAppState(prev => ({ ...prev, locationError: error }));
       return;
     }
@@ -104,7 +91,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         longitude: position.coords.longitude
       };
 
-      logger.info('Location obtained:', userLocation);
+      console.log('Location obtained:', userLocation);
       setAppState(prev => ({ ...prev, userLocation, locationError: null }));
     } catch (error: any) {
       let errorMessage = 'Unable to get your location';
@@ -117,7 +104,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         errorMessage = 'Location request timed out. Please try again.';
       }
 
-      logger.error('Location error:', error);
+      console.error('Location error:', error);
       setAppState(prev => ({ ...prev, locationError: errorMessage }));
     }
   };
@@ -126,64 +113,51 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAppState(prev => ({ ...prev, isLoading: true }));
     
     try {
-      logger.info('Generating recommendations with preferences:', {
+      console.log('Generating recommendations with:', {
         cuisines: appState.selectedCuisines,
         vibes: appState.selectedVibes,
         area: appState.selectedArea,
         location: appState.userLocation
       });
 
-      // Try to fetch venues from API
-      const venues = await venuesApi.getVenues({
-        cuisines: appState.selectedCuisines,
-        vibes: appState.selectedVibes,
-        area: appState.selectedArea,
-      });
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-      if (venues.length > 0) {
-        logger.info(`API returned ${venues.length} venues`);
-        setAppState(prev => ({ 
-          ...prev, 
-          venues,
-          isLoading: false 
-        }));
-      } else {
-        // Fallback to mock data with filtering
-        logger.info('Using fallback mock data');
-        let filteredVenues = [...mockVenues];
+      // Filter mock venues based on preferences
+      let filteredVenues = [...mockVenues];
 
-        if (appState.selectedCuisines.length > 0) {
-          filteredVenues = filteredVenues.filter(venue =>
-            appState.selectedCuisines.some(cuisine =>
-              venue.cuisineType.toLowerCase().includes(cuisine.toLowerCase())
-            )
-          );
-        }
-
-        if (appState.selectedVibes.length > 0) {
-          filteredVenues = filteredVenues.filter(venue =>
-            appState.selectedVibes.some(vibe =>
-              venue.vibe.toLowerCase().includes(vibe.toLowerCase()) ||
-              venue.tags.some(tag => tag.toLowerCase().includes(vibe.toLowerCase()))
-            )
-          );
-        }
-
-        // If no matches, return all venues
-        if (filteredVenues.length === 0) {
-          filteredVenues = mockVenues;
-        }
-
-        logger.info(`Returning ${filteredVenues.length} filtered venues`);
-
-        setAppState(prev => ({ 
-          ...prev, 
-          venues: filteredVenues,
-          isLoading: false 
-        }));
+      if (appState.selectedCuisines.length > 0) {
+        filteredVenues = filteredVenues.filter(venue =>
+          appState.selectedCuisines.some(cuisine =>
+            venue.cuisineType.toLowerCase().includes(cuisine.toLowerCase())
+          )
+        );
       }
+
+      if (appState.selectedVibes.length > 0) {
+        filteredVenues = filteredVenues.filter(venue =>
+          appState.selectedVibes.some(vibe =>
+            venue.vibe.toLowerCase().includes(vibe.toLowerCase()) ||
+            venue.tags.some(tag => tag.toLowerCase().includes(vibe.toLowerCase()))
+          )
+        );
+      }
+
+      // If no matches, return all venues
+      if (filteredVenues.length === 0) {
+        filteredVenues = mockVenues;
+      }
+
+      console.log(`Returning ${filteredVenues.length} venues`);
+
+      setAppState(prev => ({ 
+        ...prev, 
+        venues: filteredVenues,
+        isLoading: false 
+      }));
+
     } catch (error) {
-      logger.error('Error generating recommendations:', error);
+      console.error('Error generating recommendations:', error);
       
       // Fallback to all mock venues on error
       setAppState(prev => ({ 
@@ -195,7 +169,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const resetState = () => {
-    logger.debug('Resetting app state');
     setAppState(initialState);
   };
 
