@@ -6,23 +6,36 @@ import { Button } from '@/components/ui/button';
 import HomeHeader from '@/components/HomeHeader';
 import StartNewDateCard from '@/components/StartNewDateCard';
 import DateInvitationsSection from '@/components/DateInvitationsSection';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { mockFriendInvitations } from '@/data/mockData';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [acceptedInvitations, setAcceptedInvitations] = useState<number[]>([]);
   const [declinedInvitations, setDeclinedInvitations] = useState<number[]>([]);
   const [showEmptyState, setShowEmptyState] = useState(false);
+  const [invitationsLoading, setInvitationsLoading] = useState(false);
 
   // Redirect to register-login if no user is authenticated
   React.useEffect(() => {
-    console.log('Home component - user:', user);
-    if (!user) {
+    console.log('Home component - user:', user, 'loading:', authLoading);
+    if (!authLoading && !user) {
       console.log('No user found, redirecting to register-login');
       navigate('/register-login');
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
+
+  // Simulate loading invitations
+  React.useEffect(() => {
+    if (user && !showEmptyState) {
+      setInvitationsLoading(true);
+      const timer = setTimeout(() => {
+        setInvitationsLoading(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [user, showEmptyState]);
 
   const handleAcceptInvitation = (id: number) => {
     setAcceptedInvitations(prev => [...prev, id]);
@@ -36,7 +49,16 @@ const Home = () => {
     console.log('Declined invitation:', id);
   };
 
-  // Don't render anything while checking authentication
+  // Show loading spinner while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Loading your dashboard..." />
+      </div>
+    );
+  }
+
+  // Don't render anything if no user
   if (!user) {
     return null;
   }
@@ -74,6 +96,7 @@ const Home = () => {
             invitations={availableInvitations}
             onAccept={handleAcceptInvitation}
             onDecline={handleDeclineInvitation}
+            isLoading={invitationsLoading}
           />
 
           {/* Accepted/Declined Status */}

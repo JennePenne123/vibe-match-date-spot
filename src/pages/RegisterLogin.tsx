@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Sparkles, AlertCircle } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const RegisterLogin = () => {
   const navigate = useNavigate();
@@ -60,10 +61,7 @@ const RegisterLogin = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex items-center gap-2 text-gray-600">
-          <Sparkles className="w-5 h-5 animate-spin" />
-          Loading...
-        </div>
+        <LoadingSpinner size="lg" text="Checking authentication..." />
       </div>
     );
   }
@@ -119,6 +117,7 @@ const RegisterLogin = () => {
                     onChange={(e) => setName(e.target.value)}
                     required
                     className="h-12"
+                    disabled={loading}
                   />
                 </div>
               )}
@@ -130,6 +129,7 @@ const RegisterLogin = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="h-12"
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -141,6 +141,7 @@ const RegisterLogin = () => {
                   required
                   className="h-12"
                   minLength={6}
+                  disabled={loading}
                 />
               </div>
               <Button 
@@ -149,10 +150,7 @@ const RegisterLogin = () => {
                 disabled={loading}
               >
                 {loading ? (
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 animate-spin" />
-                    {isLogin ? 'Signing In...' : 'Creating Account...'}
-                  </div>
+                  <LoadingSpinner size="sm" text={isLogin ? 'Signing In...' : 'Creating Account...'} />
                 ) : (
                   isLogin ? 'Sign In' : 'Create Account'
                 )}
@@ -166,6 +164,7 @@ const RegisterLogin = () => {
                   setError('');
                 }}
                 className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                disabled={loading}
               >
                 {isLogin 
                   ? "Don't have an account? Sign up" 

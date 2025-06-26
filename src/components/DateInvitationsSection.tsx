@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Plus, Users } from 'lucide-react';
 import DateInviteCard from '@/components/DateInviteCard';
+import SkeletonLoader from '@/components/SkeletonLoader';
 
 interface DateInvite {
   id: number;
@@ -27,10 +28,22 @@ interface DateInvitationsSectionProps {
   invitations: DateInvite[];
   onAccept: (id: number) => void;
   onDecline: (id: number) => void;
+  isLoading?: boolean;
 }
 
-const DateInvitationsSection = ({ invitations, onAccept, onDecline }: DateInvitationsSectionProps) => {
+const DateInvitationsSection = ({ invitations, onAccept, onDecline, isLoading = false }: DateInvitationsSectionProps) => {
   const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-900">Date Invitations</h2>
+        </div>
+        <SkeletonLoader variant="date-invite" count={3} />
+      </div>
+    );
+  }
 
   if (invitations.length === 0) {
     return (
