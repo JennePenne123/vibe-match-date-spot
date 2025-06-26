@@ -36,9 +36,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  // Mock user data for local testing
+  // Mock user data for when user signs in/up
   const mockUser: User = {
     id: 'local-user-123',
     email: 'test@example.com',
@@ -58,14 +58,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ]
   };
 
+  // Start with no user and no loading - user must go through auth flow
   useEffect(() => {
-    // Simulate loading and auto-login for local testing
-    const timer = setTimeout(() => {
-      setUser(mockUser);
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    setLoading(false);
   }, []);
 
   const signUp = async (email: string, password: string, userData?: any) => {
