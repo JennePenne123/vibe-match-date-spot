@@ -4,11 +4,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, Plus, Clock, MapPin, Check, X, Settings, User, Users } from 'lucide-react';
+import { Heart, Plus, Clock, MapPin, Check, X, User, Users } from 'lucide-react';
+import BurgerMenu from '@/components/BurgerMenu';
 
 const Landing = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [acceptedInvitations, setAcceptedInvitations] = useState<number[]>([]);
   const [declinedInvitations, setDeclinedInvitations] = useState<number[]>([]);
 
@@ -99,14 +100,7 @@ const Landing = () => {
             >
               <Users className="w-5 h-5" />
             </Button>
-            <Button
-              onClick={logout}
-              variant="ghost"
-              size="icon"
-              className="text-gray-600 hover:bg-gray-100"
-            >
-              <Settings className="w-5 h-5" />
-            </Button>
+            <BurgerMenu />
           </div>
         </div>
 
