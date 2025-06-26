@@ -6,7 +6,7 @@ import StartNewDateCard from '@/components/StartNewDateCard';
 import DateInvitationsSection from '@/components/DateInvitationsSection';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { mockFriendInvitations } from '@/data/mockData';
-import { Menu, X, User, Settings, Heart, Calendar, LogOut, Bell } from 'lucide-react';
+import { Menu, X, User, Settings, Heart, Calendar, LogOut, Bell, Home as HomeIcon } from 'lucide-react';
 
 // Types for better type safety
 interface InvitationState {
@@ -119,20 +119,23 @@ const Home: React.FC = () => {
     closeMenu();
     
     switch (action) {
+      case 'home':
+        // Already on home, just close menu
+        break;
       case 'profile':
         navigate('/profile');
         break;
-      case 'settings':
-        navigate('/settings');
+      case 'preferences':
+        navigate('/preferences');
         break;
-      case 'favorites':
-        navigate('/favorites');
-        break;
-      case 'calendar':
-        navigate('/calendar');
+      case 'events':
+        navigate('/events');
         break;
       case 'notifications':
         navigate('/notifications');
+        break;
+      case 'settings':
+        navigate('/settings');
         break;
       case 'logout':
         signOut();
@@ -308,19 +311,25 @@ const Home: React.FC = () => {
             <nav className="py-4">
               <div className="space-y-1">
                 <MenuItem 
+                  icon={<HomeIcon className="w-5 h-5" />}
+                  label="Dashboard"
+                  onClick={() => handleMenuItemClick('home')}
+                  isActive={true}
+                />
+                <MenuItem 
                   icon={<User className="w-5 h-5" />}
-                  label="Mein Profil"
+                  label="Profil"
                   onClick={() => handleMenuItemClick('profile')}
                 />
                 <MenuItem 
                   icon={<Heart className="w-5 h-5" />}
-                  label="Favoriten"
-                  onClick={() => handleMenuItemClick('favorites')}
+                  label="Präferenzen"
+                  onClick={() => handleMenuItemClick('preferences')}
                 />
                 <MenuItem 
                   icon={<Calendar className="w-5 h-5" />}
-                  label="Meine Dates"
-                  onClick={() => handleMenuItemClick('calendar')}
+                  label="Events"
+                  onClick={() => handleMenuItemClick('events')}
                 />
                 <MenuItem 
                   icon={<Bell className="w-5 h-5" />}
@@ -389,23 +398,43 @@ interface MenuItemProps {
   label: string;
   onClick: () => void;
   variant?: 'default' | 'danger';
+  isActive?: boolean;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ icon, label, onClick, variant = 'default' }) => {
+const MenuItem: React.FC<MenuItemProps> = ({ 
+  icon, 
+  label, 
+  onClick, 
+  variant = 'default',
+  isActive = false 
+}) => {
   const baseClasses = "flex items-center space-x-3 px-6 py-3 transition-all duration-200 hover:bg-gray-50 active:bg-gray-100";
-  const variantClasses = variant === 'danger' 
-    ? "text-red-600 hover:bg-red-50 active:bg-red-100" 
-    : "text-gray-700";
+  
+  let variantClasses = "";
+  if (variant === 'danger') {
+    variantClasses = "text-red-600 hover:bg-red-50 active:bg-red-100";
+  } else if (isActive) {
+    variantClasses = "text-blue-600 bg-blue-50 hover:bg-blue-100";
+  } else {
+    variantClasses = "text-gray-700";
+  }
 
   return (
     <button
       onClick={onClick}
       className={`${baseClasses} ${variantClasses} w-full text-left`}
     >
-      <span className={variant === 'danger' ? 'text-red-500' : 'text-gray-500'}>
+      <span className={
+        variant === 'danger' ? 'text-red-500' : 
+        isActive ? 'text-blue-500' : 
+        'text-gray-500'
+      }>
         {icon}
       </span>
       <span className="font-medium">{label}</span>
+      {isActive && (
+        <div className="ml-auto w-2 h-2 bg-blue-500 rounded-full"></div>
+      )}
     </button>
   );
 };
@@ -441,4 +470,4 @@ const InvitationStatus: React.FC<{ invitationState: InvitationState }> = ({
   );
 };
 
-export default Home;
+export default Home
