@@ -1,22 +1,33 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Heart, Sparkles, AlertCircle } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useToastActions } from '@/hooks/useToastActions';
+import { authSchema, type AuthFormData } from '@/lib/validations';
 
 const RegisterLogin = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signUp, signIn } = useAuth();
+  const { showError, showSuccess } = useToastActions();
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+
+  const form = useForm<AuthFormData>({
+    resolver: zodResolver(authSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      name: '',
+    },
+  });
 
   React.useEffect(() => {
     if (user) {
@@ -24,35 +35,35 @@ const RegisterLogin = () => {
     }
   }, [user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: AuthFormData) => {
     setLoading(true);
-    setError('');
     
     try {
       if (isLogin) {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(data.email, data.password);
         if (error) {
-          setError(error.message || 'Login failed');
+          showError('Login Failed', error.message || 'Unable to sign in. Please try again.');
         } else {
+          showSuccess('Welcome back!', 'You have successfully signed in.');
           navigate('/home');
         }
       } else {
-        if (!name.trim()) {
-          setError('Name is required');
+        if (!data.name?.trim()) {
+          showError('Name Required', 'Please enter your name to create an account.');
           setLoading(false);
           return;
         }
-        const { error } = await signUp(email, password, { name });
+        const { error } = await signUp(data.email, data.password, { name: data.name });
         if (error) {
-          setError(error.message || 'Signup failed');
+          showError('Signup Failed', error.message || 'Unable to create account. Please try again.');
         } else {
+          showSuccess('Account Created!', 'Welcome to DateSpot! You can now start discovering amazing dates.');
           navigate('/home');
         }
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
-      setError(error?.message || 'An unexpected error occurred');
+      showError('Authentication Error', error?.message || 'An unexpected error occurred. Please try again.');
     }
     
     setLoading(false);
@@ -100,71 +111,93 @@ const RegisterLogin = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
-                  <AlertCircle className="w-4 h-4" />
-                  {error}
-                </div>
-              )}
-              
-              {!isLogin && (
-                <div>
-                  <Input
-                    type="text"
-                    placeholder="Full Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    className="h-12"
-                    disabled={loading}
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                {!isLogin && (
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            placeholder="Full Name"
+                            className="h-12"
+                            disabled={loading}
+                            aria-label="Full Name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-              )}
-              <div>
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="h-12"
-                  disabled={loading}
-                />
-              </div>
-              <div>
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="h-12"
-                  minLength={6}
-                  disabled={loading}
-                />
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full h-12 bg-gradient-to-r from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white font-semibold border-0"
-                disabled={loading}
-              >
-                {loading ? (
-                  <LoadingSpinner size="sm" text={isLogin ? 'Signing In...' : 'Creating Account...'} />
-                ) : (
-                  isLogin ? 'Sign In' : 'Create Account'
                 )}
-              </Button>
-            </form>
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="Email"
+                          className="h-12"
+                          disabled={loading}
+                          aria-label="Email Address"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Password"
+                          className="h-12"
+                          disabled={loading}
+                          aria-label="Password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 bg-gradient-to-r from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white font-semibold border-0"
+                  disabled={loading}
+                  aria-label={isLogin ? 'Sign In' : 'Create Account'}
+                >
+                  {loading ? (
+                    <LoadingSpinner size="sm" text={isLogin ? 'Signing In...' : 'Creating Account...'} />
+                  ) : (
+                    isLogin ? 'Sign In' : 'Create Account'
+                  )}
+                </Button>
+              </form>
+            </Form>
 
             <div className="mt-6 text-center">
               <button
                 onClick={() => {
                   setIsLogin(!isLogin);
-                  setError('');
+                  form.reset();
                 }}
-                className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                className="text-sm text-gray-600 hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 rounded"
                 disabled={loading}
+                aria-label={isLogin ? "Switch to sign up" : "Switch to sign in"}
               >
                 {isLogin 
                   ? "Don't have an account? Sign up" 

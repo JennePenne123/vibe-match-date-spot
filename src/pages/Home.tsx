@@ -7,11 +7,13 @@ import HomeHeader from '@/components/HomeHeader';
 import StartNewDateCard from '@/components/StartNewDateCard';
 import DateInvitationsSection from '@/components/DateInvitationsSection';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useToastActions } from '@/hooks/useToastActions';
 import { mockFriendInvitations } from '@/data/mockData';
 
 const Home = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { showInvitationAccepted, showInvitationDeclined } = useToastActions();
   const [acceptedInvitations, setAcceptedInvitations] = useState<number[]>([]);
   const [declinedInvitations, setDeclinedInvitations] = useState<number[]>([]);
   const [showEmptyState, setShowEmptyState] = useState(false);
@@ -38,15 +40,23 @@ const Home = () => {
   }, [user, showEmptyState]);
 
   const handleAcceptInvitation = (id: number) => {
-    setAcceptedInvitations(prev => [...prev, id]);
-    setDeclinedInvitations(prev => prev.filter(invId => invId !== id));
-    console.log('Accepted invitation:', id);
+    const invitation = mockFriendInvitations.find(inv => inv.id === id);
+    if (invitation) {
+      setAcceptedInvitations(prev => [...prev, id]);
+      setDeclinedInvitations(prev => prev.filter(invId => invId !== id));
+      showInvitationAccepted(invitation.friendName);
+      console.log('Accepted invitation:', id);
+    }
   };
 
   const handleDeclineInvitation = (id: number) => {
-    setDeclinedInvitations(prev => [...prev, id]);
-    setAcceptedInvitations(prev => prev.filter(invId => invId !== id));
-    console.log('Declined invitation:', id);
+    const invitation = mockFriendInvitations.find(inv => inv.id === id);
+    if (invitation) {
+      setDeclinedInvitations(prev => [...prev, id]);
+      setAcceptedInvitations(prev => prev.filter(invId => invId !== id));
+      showInvitationDeclined(invitation.friendName);
+      console.log('Declined invitation:', id);
+    }
   };
 
   // Show loading spinner while checking authentication
@@ -75,7 +85,7 @@ const Home = () => {
       <div className="max-w-md mx-auto">
         <HomeHeader user={user} displayName={displayName} firstName={firstName} />
 
-        <div className="p-6 space-y-6">
+        <main className="p-6 space-y-6" role="main">
           {/* Test Empty State Toggle */}
           <div className="flex justify-center">
             <Button
@@ -83,6 +93,7 @@ const Home = () => {
               variant="outline"
               size="sm"
               className="text-xs text-gray-500"
+              aria-label={showEmptyState ? 'Show invitations' : 'Test empty state'}
             >
               {showEmptyState ? 'Show Invites' : 'Test Empty State'}
             </Button>
@@ -101,7 +112,7 @@ const Home = () => {
 
           {/* Accepted/Declined Status */}
           {(acceptedInvitations.length > 0 || declinedInvitations.length > 0) && (
-            <div className="text-center text-sm text-gray-500 pt-4">
+            <div className="text-center text-sm text-gray-500 pt-4" role="status" aria-live="polite">
               {acceptedInvitations.length > 0 && (
                 <p className="text-green-600">✓ {acceptedInvitations.length} invitation(s) accepted</p>
               )}
@@ -110,7 +121,7 @@ const Home = () => {
               )}
             </div>
           )}
-        </div>
+        </main>
       </div>
     </div>
   );
