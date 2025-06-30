@@ -2,19 +2,20 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useInvitations } from '@/hooks/useInvitations';
 import { useAIRecommendations } from '@/hooks/useAIRecommendations';
+import { useFriends } from '@/hooks/useFriends';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import StartNewDateCard from '@/components/StartNewDateCard';
 import DateInvitationsSection from '@/components/DateInvitationsSection';
 import InvitationStatus from '@/components/InvitationStatus';
 import AIVenueCard from '@/components/AIVenueCard';
 import SafeComponent from '@/components/SafeComponent';
 import { useInvitationState } from '@/hooks/useInvitationState';
-import { Sparkles, ArrowRight, Zap, Users } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap, Users, UserPlus, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HomeContent: React.FC = () => {
   const navigate = useNavigate();
+  const { friends } = useFriends();
   const { invitations, loading: invitationsLoading, acceptInvitation, declineInvitation } = useInvitations();
   const { invitationState, handleAcceptInvitation, handleDeclineInvitation } = useInvitationState();
   const { recommendations, loading: aiLoading } = useAIRecommendations();
@@ -76,6 +77,9 @@ const HomeContent: React.FC = () => {
       }));
   }, [showEmptyState, invitationState, invitations]);
 
+  // Check if user has friends
+  const hasFriends = friends.length > 0;
+
   return (
     <main className="p-6 space-y-6">
       {/* Development/Testing Controls */}
@@ -103,135 +107,178 @@ const HomeContent: React.FC = () => {
         </div>
       )}
 
-      {/* Smart Date Planning CTA */}
-      <SafeComponent componentName="SmartDatePlanningCTA">
-        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-indigo-500" />
-              Smart Date Planning
-            </CardTitle>
-            <p className="text-sm text-gray-600">
-              Let AI help you plan the perfect date with collaborative preferences and smart matching
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2 text-sm text-indigo-700">
-                  <Users className="h-4 w-4" />
-                  <span>Collaborative preference setting</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-indigo-700">
-                  <Sparkles className="h-4 w-4" />
-                  <span>Real-time compatibility scoring</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-indigo-700">
-                  <ArrowRight className="h-4 w-4" />
-                  <span>AI-curated venue recommendations</span>
-                </div>
-              </div>
-              
-              <div className="flex-shrink-0">
-                <Button 
-                  onClick={() => navigate('/plan-date')}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                  size="lg"
-                >
-                  Plan Smart Date
-                  <Zap className="h-4 w-4 ml-2" />
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </SafeComponent>
-
-      {/* AI Recommendations Section */}
-      <SafeComponent componentName="AIRecommendationsSection">
-        <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-purple-500" />
-              AI-Powered Recommendations
-            </CardTitle>
-            <p className="text-sm text-gray-600">
-              Discover perfect venues matched to your preferences
-            </p>
-          </CardHeader>
-          <CardContent>
-            {aiLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="flex items-center gap-2 text-purple-600">
-                  <Sparkles className="h-4 w-4 animate-pulse" />
-                  <span className="text-sm">AI is analyzing your preferences...</span>
-                </div>
-              </div>
-            ) : recommendations.length > 0 ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {recommendations.slice(0, 2).map((recommendation) => (
-                    <AIVenueCard
-                      key={recommendation.venue_id}
-                      recommendation={recommendation}
-                      onSelect={(venueId) => {
-                        console.log('Selected venue for date:', venueId);
-                        // Could navigate to venue details or start invitation flow
-                      }}
-                      showAIInsights={true}
-                    />
-                  ))}
+      {/* Main Smart Date Planning CTA or Empty State */}
+      {hasFriends ? (
+        <SafeComponent componentName="SmartDatePlanningCTA">
+          <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-indigo-500" />
+                Smart Date Planning
+              </CardTitle>
+              <p className="text-sm text-gray-600">
+                Let AI help you plan the perfect date with collaborative preferences and smart matching
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-indigo-700">
+                    <Users className="h-4 w-4" />
+                    <span>Collaborative preference setting</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-indigo-700">
+                    <Sparkles className="h-4 w-4" />
+                    <span>Real-time compatibility scoring</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-indigo-700">
+                    <ArrowRight className="h-4 w-4" />
+                    <span>AI-curated venue recommendations</span>
+                  </div>
                 </div>
                 
-                <div className="text-center pt-4">
+                <div className="flex-shrink-0">
                   <Button 
-                    onClick={() => navigate('/ai-recommendations')}
-                    className="bg-purple-600 hover:bg-purple-700"
+                    onClick={() => navigate('/plan-date')}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    size="lg"
                   >
-                    View All AI Recommendations
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    Plan Smart Date
+                    <Zap className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <Sparkles className="h-12 w-12 text-purple-300 mx-auto mb-4" />
-                <p className="text-gray-600 mb-4">
-                  Complete your preferences to get AI-powered venue recommendations
-                </p>
-                <Button 
-                  onClick={() => navigate('/preferences')}
-                  variant="outline"
-                  className="border-purple-200 text-purple-600 hover:bg-purple-50"
-                >
-                  Set Preferences
-                </Button>
+            </CardContent>
+          </Card>
+        </SafeComponent>
+      ) : (
+        <SafeComponent componentName="NoFriendsEmptyState">
+          <Card className="bg-gradient-to-r from-pink-50 to-rose-50 border-pink-200">
+            <CardHeader className="text-center pb-4">
+              <div className="flex justify-center mb-4">
+                <div className="bg-gradient-to-r from-pink-400 to-rose-500 rounded-full p-4 shadow-md">
+                  <Heart className="w-12 h-12 text-white" fill="currentColor" />
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </SafeComponent>
+              <CardTitle className="text-2xl font-bold text-gray-800">
+                Start Your Dating Journey
+              </CardTitle>
+              <p className="text-gray-600">
+                Add friends to start planning amazing dates with AI-powered recommendations
+              </p>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-white rounded-lg border border-pink-100">
+                  <Users className="h-8 w-8 text-pink-500 mx-auto mb-2" />
+                  <h3 className="font-medium text-gray-800 mb-1">Connect with Friends</h3>
+                  <p className="text-sm text-gray-600">Add friends to start planning dates together</p>
+                </div>
+                <div className="p-4 bg-white rounded-lg border border-pink-100">
+                  <Sparkles className="h-8 w-8 text-purple-500 mx-auto mb-2" />
+                  <h3 className="font-medium text-gray-800 mb-1">AI-Powered Matching</h3>
+                  <p className="text-sm text-gray-600">Get personalized venue recommendations</p>
+                </div>
+              </div>
+              
+              <Button 
+                onClick={() => navigate('/my-friends')}
+                className="bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
+                size="lg"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add Friends to Get Started
+              </Button>
+            </CardContent>
+          </Card>
+        </SafeComponent>
+      )}
 
-      {/* Main Content */}
-      <SafeComponent componentName="StartNewDateCard">
-        {!showEmptyState && (
-          <StartNewDateCard />
-        )}
-      </SafeComponent>
+      {/* AI Recommendations Section - Only show if user has friends */}
+      {hasFriends && (
+        <SafeComponent componentName="AIRecommendationsSection">
+          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-purple-500" />
+                AI-Powered Recommendations
+              </CardTitle>
+              <p className="text-sm text-gray-600">
+                Discover perfect venues matched to your preferences
+              </p>
+            </CardHeader>
+            <CardContent>
+              {aiLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="flex items-center gap-2 text-purple-600">
+                    <Sparkles className="h-4 w-4 animate-pulse" />
+                    <span className="text-sm">AI is analyzing your preferences...</span>
+                  </div>
+                </div>
+              ) : recommendations.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {recommendations.slice(0, 2).map((recommendation) => (
+                      <AIVenueCard
+                        key={recommendation.venue_id}
+                        recommendation={recommendation}
+                        onSelect={(venueId) => {
+                          console.log('Selected venue for date:', venueId);
+                          // Could navigate to venue details or start invitation flow
+                        }}
+                        showAIInsights={true}
+                      />
+                    ))}
+                  </div>
+                  
+                  <div className="text-center pt-4">
+                    <Button 
+                      onClick={() => navigate('/ai-recommendations')}
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      View All AI Recommendations
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Sparkles className="h-12 w-12 text-purple-300 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-4">
+                    Complete your preferences to get AI-powered venue recommendations
+                  </p>
+                  <Button 
+                    onClick={() => navigate('/preferences')}
+                    variant="outline"
+                    className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                  >
+                    Set Preferences
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </SafeComponent>
+      )}
 
-      <SafeComponent componentName="DateInvitationsSection">
-        <DateInvitationsSection
-          invitations={availableInvitations}
-          onAccept={handleAcceptWrapper}
-          onDecline={handleDeclineWrapper}
-          isLoading={invitationsLoading}
-        />
-      </SafeComponent>
+      {/* Date Invitations Section - Only show if user has friends */}
+      {hasFriends && (
+        <SafeComponent componentName="DateInvitationsSection">
+          <DateInvitationsSection
+            invitations={availableInvitations}
+            onAccept={handleAcceptWrapper}
+            onDecline={handleDeclineWrapper}
+            isLoading={invitationsLoading}
+          />
+        </SafeComponent>
+      )}
 
-      {/* Status Summary */}
-      <SafeComponent componentName="InvitationStatus">
-        <InvitationStatus invitationState={invitationState} />
-      </SafeComponent>
+      {/* Status Summary - Only show if user has friends */}
+      {hasFriends && (
+        <SafeComponent componentName="InvitationStatus">
+          <InvitationStatus invitationState={invitationState} />
+        </SafeComponent>
+      )}
     </main>
   );
 };
