@@ -1,11 +1,27 @@
+
 import React, { createContext, useContext, useState } from 'react';
-import { mockVenues } from '@/data/mockVenues';
-import { Venue } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserLocation {
   latitude: number;
   longitude: number;
   address?: string;
+}
+
+interface Venue {
+  id: string;
+  name: string;
+  description: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
+  phone?: string;
+  website?: string;
+  cuisine_type?: string;
+  price_range?: string;
+  rating?: number;
+  image_url?: string;
+  tags?: string[];
 }
 
 interface AppState {
@@ -120,32 +136,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         location: appState.userLocation
       });
 
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Query venues from Supabase
+      let query = supabase
+        .from('venues')
+        .select('*')
+        .eq('is_active', true);
 
-      // Filter mock venues based on preferences
-      let filteredVenues = [...mockVenues];
-
+      // Filter by cuisine if specified
       if (appState.selectedCuisines.length > 0) {
-        filteredVenues = filteredVenues.filter(venue =>
-          appState.selectedCuisines.some(cuisine =>
-            venue.cuisineType.toLowerCase().includes(cuisine.toLowerCase())
-          )
-        );
+        query = query.in('cuisine_type', appState.selectedCuisines);
       }
 
+      const { data: venues, error } = await query;
+
+      if (error) {
+        console.error('Error fetching venues:', error);
+        setAppState(prev => ({ 
+          ...prev, 
+          venues: [],
+          isLoading: false 
+        }));
+        return;
+      }
+
+      // Filter by vibes/tags if specified
+      let filteredVenues = venues || [];
       if (appState.selectedVibes.length > 0) {
         filteredVenues = filteredVenues.filter(venue =>
           appState.selectedVibes.some(vibe =>
-            venue.vibe.toLowerCase().includes(vibe.toLowerCase()) ||
-            venue.tags.some(tag => tag.toLowerCase().includes(vibe.toLowerCase()))
+            venue.tags?.some(tag => tag.toLowerCase().includes(vibe.toLowerCase()))
           )
         );
-      }
-
-      // If no matches, return all venues
-      if (filteredVenues.length === 0) {
-        filteredVenues = mockVenues;
       }
 
       console.log(`Returning ${filteredVenues.length} venues`);
@@ -159,10 +180,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (error) {
       console.error('Error generating recommendations:', error);
       
-      // Fallback to all mock venues on error
       setAppState(prev => ({ 
         ...prev, 
-        venues: mockVenues,
+        venues: [],
         isLoading: false 
       }));
     }

@@ -1,17 +1,18 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useInvitations } from '@/hooks/useInvitations';
 import { Button } from '@/components/ui/button';
 import HomeHeader from '@/components/HomeHeader';
 import StartNewDateCard from '@/components/StartNewDateCard';
 import DateInvitationsSection from '@/components/DateInvitationsSection';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { mockFriendInvitations } from '@/data/mockData';
 
 // Types for better type safety
 interface InvitationState {
-  accepted: number[];
-  declined: number[];
+  accepted: string[];
+  declined: string[];
 }
 
 interface User {
@@ -28,6 +29,7 @@ interface User {
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { invitations, loading: invitationsLoading, acceptInvitation, declineInvitation } = useInvitations();
   
   // Consolidate invitation state into single object
   const [invitationState, setInvitationState] = useState<InvitationState>({
@@ -36,14 +38,12 @@ const Home: React.FC = () => {
   });
   
   const [showEmptyState, setShowEmptyState] = useState(false);
-  const [invitationsLoading, setInvitationsLoading] = useState(false);
 
   // Memoize user display logic
   const userInfo = React.useMemo(() => {
     if (!user) return null;
     
-    const displayName = user?.profile?.name || 
-                       user?.user_metadata?.name || 
+    const displayName = user?.user_metadata?.name || 
                        user?.email?.split('@')[0] || 
                        'User';
     const firstName = displayName.split(' ')[0];
@@ -53,7 +53,6 @@ const Home: React.FC = () => {
 
   // Handle authentication redirect with proper cleanup
   useEffect(() => {
-    // Add a small delay to prevent flashing
     const redirectTimer = setTimeout(() => {
       if (!authLoading && !user) {
         console.log('No authenticated user found, redirecting to login');
@@ -64,38 +63,26 @@ const Home: React.FC = () => {
     return () => clearTimeout(redirectTimer);
   }, [user, authLoading, navigate]);
 
-  // Simulate loading invitations with proper cleanup
-  useEffect(() => {
-    if (!user || showEmptyState) return;
-
-    setInvitationsLoading(true);
-    const loadingTimer = setTimeout(() => {
-      setInvitationsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(loadingTimer);
-  }, [user, showEmptyState]);
-
   // Optimized invitation handlers using useCallback
-  const handleAcceptInvitation = useCallback((id: number) => {
+  const handleAcceptInvitation = useCallback(async (id: string) => {
+    await acceptInvitation(id);
     setInvitationState(prev => ({
       accepted: [...prev.accepted, id],
       declined: prev.declined.filter(invId => invId !== id)
     }));
     
-    // Optional: Add analytics or API call here
     console.log('Accepted invitation:', id);
-  }, []);
+  }, [acceptInvitation]);
 
-  const handleDeclineInvitation = useCallback((id: number) => {
+  const handleDeclineInvitation = useCallback(async (id: string) => {
+    await declineInvitation(id);
     setInvitationState(prev => ({
       declined: [...prev.declined, id],
       accepted: prev.accepted.filter(invId => invId !== id)
     }));
     
-    // Optional: Add analytics or API call here
     console.log('Declined invitation:', id);
-  }, []);
+  }, [declineInvitation]);
 
   // Toggle empty state for testing
   const toggleEmptyState = useCallback(() => {
@@ -106,11 +93,12 @@ const Home: React.FC = () => {
   const availableInvitations = React.useMemo(() => {
     if (showEmptyState) return [];
     
-    return mockFriendInvitations.filter(
+    return invitations.filter(
       inv => !invitationState.accepted.includes(inv.id) && 
-             !invitationState.declined.includes(inv.id)
+             !invitationState.declined.includes(inv.id) &&
+             inv.status === 'pending'
     );
-  }, [showEmptyState, invitationState, mockFriendInvitations]);
+  }, [showEmptyState, invitationState, invitations]);
 
   // Early returns for loading and unauthenticated states
   if (authLoading) {

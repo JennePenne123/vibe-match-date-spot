@@ -2,13 +2,12 @@
 export interface User {
   id: string;
   email: string;
-  user_metadata?: {
+  profile?: {
     name?: string;
     avatar_url?: string;
   };
-  profile?: {
+  user_metadata?: {
     name?: string;
-    email?: string;
     avatar_url?: string;
   };
   friends?: Friend[];
@@ -17,48 +16,70 @@ export interface User {
 export interface Friend {
   id: string;
   name: string;
-  avatar: string;
+  email: string;
+  avatar_url?: string;
+  friendship_status?: 'pending' | 'accepted' | 'declined' | 'blocked';
+  friendship_id?: string;
   isInvited?: boolean;
-  status?: 'online' | 'offline';
-  lastSeen?: string;
-  mutualFriends?: number;
-  joinedDate?: string;
 }
 
 export interface Venue {
   id: string;
   name: string;
   description: string;
-  image: string;
-  rating: number;
-  distance: string;
-  priceRange: string;
-  location: string;
-  cuisineType: string;
-  vibe: string;
-  matchScore: number;
-  tags: string[];
-  discount?: string;
-  placeId?: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
   phone?: string;
   website?: string;
-  openingHours?: string[];
+  cuisineType?: string;
+  cuisine_type?: string;
+  price_range?: string;
+  rating?: number;
+  image_url?: string;
+  tags?: string[];
+  vibe?: string;
+  distance?: string;
+  priceLevel?: number;
   isOpen?: boolean;
+  openingHours?: string[];
+  features?: string[];
 }
 
-export interface DateInvite {
-  id: number;
-  friendName: string;
-  friendAvatar: string;
-  dateType: string;
-  location: string;
-  time: string;
-  message: string;
-  status: string;
-  venueName: string;
-  venueAddress: string;
-  estimatedCost: string;
-  duration: string;
-  specialNotes: string;
-  venueImage: string;
+export interface DateInvitation {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  venue_id?: string;
+  title: string;
+  message?: string;
+  proposed_date?: string;
+  status: 'pending' | 'accepted' | 'declined' | 'cancelled';
+  created_at: string;
+  sender?: {
+    name: string;
+    email: string;
+    avatar_url?: string;
+  };
+  venue?: Venue;
+}
+
+export interface UserPreferences {
+  id: string;
+  user_id: string;
+  preferred_cuisines?: string[];
+  preferred_vibes?: string[];
+  preferred_price_range?: string[];
+  max_distance?: number;
+  preferred_times?: string[];
+  dietary_restrictions?: string[];
+}
+
+export interface Friendship {
+  id: string;
+  user_id: string;
+  friend_id: string;
+  status: 'pending' | 'accepted' | 'declined' | 'blocked';
+  created_at: string;
+  updated_at: string;
 }

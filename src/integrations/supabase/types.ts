@@ -9,6 +9,109 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      date_invitations: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          proposed_date: string | null
+          recipient_id: string
+          sender_id: string
+          status: string
+          title: string
+          updated_at: string
+          venue_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          proposed_date?: string | null
+          recipient_id: string
+          sender_id: string
+          status?: string
+          title: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          proposed_date?: string | null
+          recipient_id?: string
+          sender_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "date_invitations_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "date_invitations_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "date_invitations_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      friendships: {
+        Row: {
+          created_at: string
+          friend_id: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friendships_friend_id_fkey"
+            columns: ["friend_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friendships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -33,6 +136,116 @@ export type Database = {
           id?: string
           name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          dietary_restrictions: string[] | null
+          id: string
+          max_distance: number | null
+          preferred_cuisines: string[] | null
+          preferred_price_range: string[] | null
+          preferred_times: string[] | null
+          preferred_vibes: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          id?: string
+          max_distance?: number | null
+          preferred_cuisines?: string[] | null
+          preferred_price_range?: string[] | null
+          preferred_times?: string[] | null
+          preferred_vibes?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          id?: string
+          max_distance?: number | null
+          preferred_cuisines?: string[] | null
+          preferred_price_range?: string[] | null
+          preferred_times?: string[] | null
+          preferred_vibes?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venues: {
+        Row: {
+          address: string
+          created_at: string
+          cuisine_type: string | null
+          description: string | null
+          google_place_id: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          latitude: number | null
+          longitude: number | null
+          name: string
+          opening_hours: Json | null
+          phone: string | null
+          price_range: string | null
+          rating: number | null
+          tags: string[] | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          cuisine_type?: string | null
+          description?: string | null
+          google_place_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          opening_hours?: Json | null
+          phone?: string | null
+          price_range?: string | null
+          rating?: number | null
+          tags?: string[] | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          cuisine_type?: string | null
+          description?: string | null
+          google_place_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          opening_hours?: Json | null
+          phone?: string | null
+          price_range?: string | null
+          rating?: number | null
+          tags?: string[] | null
+          updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }

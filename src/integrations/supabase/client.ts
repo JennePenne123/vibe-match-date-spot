@@ -1,22 +1,13 @@
 
-// Mock Supabase client for local testing
-const mockSupabaseClient = {
-  auth: {
-    signUp: () => Promise.resolve({ data: null, error: null }),
-    signInWithPassword: () => Promise.resolve({ data: null, error: null }),
-    signOut: () => Promise.resolve({ error: null }),
-    getUser: () => Promise.resolve({ data: null, error: null }),
-    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
-  },
-  from: () => ({
-    select: () => Promise.resolve({ data: [], error: null }),
-    insert: () => Promise.resolve({ data: null, error: null }),
-    update: () => Promise.resolve({ data: null, error: null }),
-    delete: () => Promise.resolve({ data: null, error: null })
-  }),
-  functions: {
-    invoke: () => Promise.resolve({ data: null, error: null })
-  }
-};
+import { createClient } from '@supabase/supabase-js'
 
-export const supabase = mockSupabaseClient;
+const supabaseUrl = 'https://dfjwubatslzblagthbdw.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmand1YmF0c2x6YmxhZ3RoYmR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxNjIzMTQsImV4cCI6MjA2NTczODMxNH0.OxA8Wt4JZPagCJW2DKxjnFJqPJFebzAkRXwleUvH0iE'
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+})

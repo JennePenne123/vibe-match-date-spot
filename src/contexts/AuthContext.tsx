@@ -1,9 +1,11 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockUser } from '@/data/mockUsers';
-import { User } from '@/types';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, userData?: any) => Promise<{ user: User | null; error: any }>;
   signIn: (email: string, password: string) => Promise<{ user: User | null; error: any }>;
@@ -17,46 +19,83 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Start with no user and no loading - user must go through auth flow
   useEffect(() => {
-    setLoading(false);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signUp = async (email: string, password: string, userData?: any) => {
-    setLoading(true);
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const newUser = {
-      ...mockUser,
-      email,
-      user_metadata: { name: userData?.name || 'New User' },
-      profile: { name: userData?.name || 'New User', email }
-    };
-    
-    setUser(newUser);
-    setLoading(false);
-    return { user: newUser, error: null };
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/home`,
+          data: {
+            name: userData?.name || 'New User'
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Sign up error:', error);
+        return { user: null, error };
+      }
+
+      return { user: data.user, error: null };
+    } catch (error) {
+      console.error('Sign up error:', error);
+      return { user: null, error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    setLoading(true);
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const loginUser = { ...mockUser, email };
-    setUser(loginUser);
-    setLoading(false);
-    return { user: loginUser, error: null };
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        console.error('Sign in error:', error);
+        return { user: null, error };
+      }
+
+      return { user: data.user, error: null };
+    } catch (error) {
+      console.error('Sign in error:', error);
+      return { user: null, error };
+    }
   };
 
   const signOut = async () => {
-    setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setUser(null);
-    setLoading(false);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   };
 
   const logout = async () => {
@@ -64,31 +103,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateUser = async (userData: any) => {
-    if (user) {
-      setUser({
-        ...user,
-        profile: {
-          ...user.profile,
-          ...userData
-        }
-      });
+    if (!user) return;
+
+    try {
+      // Update user profile in profiles table
+      const { error } = await supabase
+        .from('profiles')
+        .update(userData)
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Update user error:', error);
+      }
+    } catch (error) {
+      console.error('Update user error:', error);
     }
   };
 
-  const inviteFriend = (friendId: string) => {
-    if (user?.friends) {
-      const updatedFriends = user.friends.map(friend =>
-        friend.id === friendId
-          ? { ...friend, isInvited: !friend.isInvited }
-          : friend
-      );
-      setUser({ ...user, friends: updatedFriends });
+  const inviteFriend = async (friendId: string) => {
+    if (!user) return;
+
+    try {
+      // Create friendship invitation
+      const { error } = await supabase
+        .from('friendships')
+        .insert({
+          user_id: user.id,
+          friend_id: friendId,
+          status: 'pending'
+        });
+
+      if (error) {
+        console.error('Invite friend error:', error);
+      }
+    } catch (error) {
+      console.error('Invite friend error:', error);
     }
   };
 
   return (
     <AuthContext.Provider value={{
       user,
+      session,
       loading,
       signUp,
       signIn,
