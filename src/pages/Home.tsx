@@ -89,6 +89,8 @@ const Home: React.FC = () => {
       )
       .map(inv => ({
         ...inv,
+        // Convert string id to number for DateInvite compatibility
+        id: parseInt(inv.id) || Math.floor(Math.random() * 1000),
         // Add compatibility properties for DateInvitationsSection
         friendName: inv.sender?.name || 'Unknown',
         friendAvatar: inv.sender?.avatar_url,
@@ -105,7 +107,11 @@ const Home: React.FC = () => {
         estimatedCost: '$50-100',
         duration: '2 hours',
         hasMultipleOptions: false,
-        specialRequests: inv.message || ''
+        specialRequests: inv.message || '',
+        specialNotes: inv.message || '',
+        venueImage: inv.venue?.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop',
+        message: inv.message || inv.title,
+        status: inv.status
       }));
   }, [showEmptyState, invitationState, invitations]);
 

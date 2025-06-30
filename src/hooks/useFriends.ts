@@ -38,11 +38,14 @@ export const useFriends = () => {
         const isCurrentUserSender = friendship.user_id === user.id;
         const friendProfile = isCurrentUserSender ? friendship.friend : friendship.user;
         
+        // Handle the case where friendProfile might be an array
+        const profile = Array.isArray(friendProfile) ? friendProfile[0] : friendProfile;
+        
         return {
-          id: friendProfile.id,
-          name: friendProfile.name,
-          email: friendProfile.email,
-          avatar_url: friendProfile.avatar_url,
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          avatar_url: profile.avatar_url,
           friendship_status: friendship.status as 'pending' | 'accepted' | 'declined' | 'blocked',
           friendship_id: friendship.id,
           // Add some default UI properties
