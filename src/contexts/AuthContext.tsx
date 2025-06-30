@@ -1,15 +1,15 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { User } from '@/types';
+import { AppUser } from '@/types/app';
+import { supabaseUserToAppUser } from '@/utils/typeHelpers';
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, userData?: any) => Promise<{ user: User | null; error: any }>;
-  signIn: (email: string, password: string) => Promise<{ user: User | null; error: any }>;
+  signUp: (email: string, password: string, userData?: any) => Promise<{ user: AppUser | null; error: any }>;
+  signIn: (email: string, password: string) => Promise<{ user: AppUser | null; error: any }>;
   signOut: () => Promise<void>;
   updateUser: (userData: any) => Promise<void>;
   inviteFriend: (friendId: string) => void;
@@ -19,11 +19,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserProfile = async (supabaseUser: SupabaseUser): Promise<User> => {
+  const fetchUserProfile = async (supabaseUser: SupabaseUser): Promise<AppUser> => {
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -33,25 +33,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Error fetching user profile:', error);
-        return {
-          ...supabaseUser,
-          name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
-          avatar_url: supabaseUser.user_metadata?.avatar_url
-        };
+        return supabaseUserToAppUser(supabaseUser)!;
       }
 
       return {
-        ...supabaseUser,
-        name: profile.name,
-        avatar_url: profile.avatar_url
+        id: supabaseUser.id,
+        email: supabaseUser.email || '',
+        name: profile.name || supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
+        avatar_url: profile.avatar_url || supabaseUser.user_metadata?.avatar_url
       };
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      return {
-        ...supabaseUser,
-        name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
-        avatar_url: supabaseUser.user_metadata?.avatar_url
-      };
+      return supabaseUserToAppUser(supabaseUser)!;
     }
   };
 
@@ -173,8 +166,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Update user error:', error);
       } else {
         // Update local user state
-        const enrichedUser = await fetchUserProfile(user);
-        setUser(enrichedUser);
+        setUser(prev => prev ? { ...prev, ...userData } : null);
       }
     } catch (error) {
       console.error('Update user error:', error);

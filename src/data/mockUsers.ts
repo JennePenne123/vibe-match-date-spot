@@ -1,5 +1,5 @@
-
-import { User, Friend } from '@/types';
+import { Friend } from '@/types';
+import { AppUser } from '@/types/app';
 
 export const mockFriends: Friend[] = [
   { 
@@ -59,7 +59,7 @@ export const mockFriends: Friend[] = [
   }
 ];
 
-export const mockUser: User = {
+export const mockUser: AppUser = {
   id: 'local-user-123',
   email: 'test@example.com',
   name: 'Test User',
