@@ -3,12 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
-import { Users, Clock, DollarSign, Utensils, Sparkles, MapPin } from 'lucide-react';
+import { Users, Clock, DollarSign, Utensils, Sparkles } from 'lucide-react';
+import PreferenceSection from './preferences/PreferenceSection';
+import DistanceSlider from './preferences/DistanceSlider';
+import CompatibilitySummary from './preferences/CompatibilitySummary';
+import {
+  CUISINE_OPTIONS,
+  PRICE_OPTIONS,
+  TIME_OPTIONS,
+  VIBE_OPTIONS,
+  DIETARY_OPTIONS
+} from './preferences/PreferenceConstants';
 
 interface CollaborativePreferencesProps {
   sessionId: string;
@@ -24,25 +31,6 @@ interface UserPreferences {
   max_distance: number;
   dietary_restrictions: string[];
 }
-
-const CUISINE_OPTIONS = [
-  'Italian', 'Mexican', 'Asian', 'American', 'Mediterranean', 'Indian', 'French', 'Japanese', 'Thai', 'Chinese'
-];
-
-const PRICE_OPTIONS = ['$', '$$', '$$$', '$$$$'];
-
-const TIME_OPTIONS = [
-  'Morning (8-11 AM)', 'Lunch (11 AM-2 PM)', 'Afternoon (2-5 PM)', 
-  'Dinner (5-8 PM)', 'Evening (8-11 PM)', 'Late Night (11 PM+)'
-];
-
-const VIBE_OPTIONS = [
-  'Romantic', 'Casual', 'Upscale', 'Cozy', 'Lively', 'Quiet', 'Outdoor', 'Modern', 'Traditional', 'Trendy'
-];
-
-const DIETARY_OPTIONS = [
-  'Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Halal', 'Kosher'
-];
 
 const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
   sessionId,
@@ -190,84 +178,6 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
     }
   };
 
-  const getMatchingItems = (myItems: string[], partnerItems: string[]) => {
-    return myItems.filter(item => partnerItems.includes(item));
-  };
-
-  const renderPreferenceSection = (
-    title: string,
-    icon: React.ReactNode,
-    options: string[],
-    key: keyof UserPreferences,
-    isArray: boolean = true
-  ) => (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        {icon}
-        <h3 className="font-medium text-gray-900">{title}</h3>
-      </div>
-      
-      {isArray ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {options.map((option) => {
-            const myItems = myPreferences[key] as string[];
-            const partnerItems = partnerPreferences?.[key] as string[] || [];
-            const isSelected = myItems.includes(option);
-            const isPartnerSelected = partnerItems.includes(option);
-            const isMatching = isSelected && isPartnerSelected;
-
-            return (
-              <div key={option} className="relative">
-                <div
-                  className={`p-2 rounded-lg border cursor-pointer transition-all ${
-                    isSelected
-                      ? isMatching
-                        ? 'bg-green-50 border-green-300 text-green-800'
-                        : 'bg-blue-50 border-blue-300 text-blue-800'
-                      : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                  }`}
-                  onClick={() => toggleArrayPreference(key, option)}
-                >
-                  <div className="flex items-center space-x-2">
-                    <Checkbox checked={isSelected} />
-                    <span className="text-sm">{option}</span>
-                  </div>
-                </div>
-                
-                {isMatching && (
-                  <Badge className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-1 py-0">
-                    Match!
-                  </Badge>
-                )}
-                {isPartnerSelected && !isSelected && (
-                  <Badge className="absolute -top-1 -right-1 bg-purple-100 text-purple-600 text-xs px-1 py-0">
-                    Partner ♥
-                  </Badge>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="space-y-2">
-          <Slider
-            value={[myPreferences[key] as number]}
-            onValueChange={(value) => updatePreference(key, value[0])}
-            max={50}
-            min={1}
-            step={1}
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>1 mile</span>
-            <span className="font-medium">{myPreferences[key]} miles</span>
-            <span>50 miles</span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
   if (!user) return null;
 
   return (
@@ -284,58 +194,65 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {renderPreferenceSection(
-            'Cuisine Preferences',
-            <Utensils className="h-4 w-4 text-orange-500" />,
-            CUISINE_OPTIONS,
-            'preferred_cuisines'
-          )}
+          <PreferenceSection
+            title="Cuisine Preferences"
+            icon={<Utensils className="h-4 w-4 text-orange-500" />}
+            options={CUISINE_OPTIONS}
+            selectedItems={myPreferences.preferred_cuisines}
+            partnerItems={partnerPreferences?.preferred_cuisines || []}
+            onToggle={(option) => toggleArrayPreference('preferred_cuisines', option)}
+          />
 
           <Separator />
 
-          {renderPreferenceSection(
-            'Price Range',
-            <DollarSign className="h-4 w-4 text-green-500" />,
-            PRICE_OPTIONS,
-            'preferred_price_range'
-          )}
+          <PreferenceSection
+            title="Price Range"
+            icon={<DollarSign className="h-4 w-4 text-green-500" />}
+            options={PRICE_OPTIONS}
+            selectedItems={myPreferences.preferred_price_range}
+            partnerItems={partnerPreferences?.preferred_price_range || []}
+            onToggle={(option) => toggleArrayPreference('preferred_price_range', option)}
+          />
 
           <Separator />
 
-          {renderPreferenceSection(
-            'Preferred Times',
-            <Clock className="h-4 w-4 text-blue-500" />,
-            TIME_OPTIONS,
-            'preferred_times'
-          )}
+          <PreferenceSection
+            title="Preferred Times"
+            icon={<Clock className="h-4 w-4 text-blue-500" />}
+            options={TIME_OPTIONS}
+            selectedItems={myPreferences.preferred_times}
+            partnerItems={partnerPreferences?.preferred_times || []}
+            onToggle={(option) => toggleArrayPreference('preferred_times', option)}
+          />
 
           <Separator />
 
-          {renderPreferenceSection(
-            'Atmosphere & Vibe',
-            <Sparkles className="h-4 w-4 text-purple-500" />,
-            VIBE_OPTIONS,
-            'preferred_vibes'
-          )}
+          <PreferenceSection
+            title="Atmosphere & Vibe"
+            icon={<Sparkles className="h-4 w-4 text-purple-500" />}
+            options={VIBE_OPTIONS}
+            selectedItems={myPreferences.preferred_vibes}
+            partnerItems={partnerPreferences?.preferred_vibes || []}
+            onToggle={(option) => toggleArrayPreference('preferred_vibes', option)}
+          />
 
           <Separator />
 
-          {renderPreferenceSection(
-            'Maximum Distance',
-            <MapPin className="h-4 w-4 text-red-500" />,
-            [],
-            'max_distance',
-            false
-          )}
+          <DistanceSlider
+            value={myPreferences.max_distance}
+            onChange={(value) => updatePreference('max_distance', value)}
+          />
 
           <Separator />
 
-          {renderPreferenceSection(
-            'Dietary Restrictions',
-            <Utensils className="h-4 w-4 text-yellow-500" />,
-            DIETARY_OPTIONS,
-            'dietary_restrictions'
-          )}
+          <PreferenceSection
+            title="Dietary Restrictions"
+            icon={<Utensils className="h-4 w-4 text-yellow-500" />}
+            options={DIETARY_OPTIONS}
+            selectedItems={myPreferences.dietary_restrictions}
+            partnerItems={partnerPreferences?.dietary_restrictions || []}
+            onToggle={(option) => toggleArrayPreference('dietary_restrictions', option)}
+          />
 
           <div className="pt-4">
             <Button
@@ -352,39 +269,10 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
       </Card>
 
       {partnerPreferences && (
-        <Card className="bg-green-50 border-green-200">
-          <CardHeader>
-            <CardTitle className="text-green-800">Compatibility Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div>
-                <div className="text-lg font-bold text-green-600">
-                  {getMatchingItems(myPreferences.preferred_cuisines, partnerPreferences.preferred_cuisines).length}
-                </div>
-                <div className="text-xs text-green-700">Cuisine Matches</div>
-              </div>
-              <div>
-                <div className="text-lg font-bold text-green-600">
-                  {getMatchingItems(myPreferences.preferred_vibes, partnerPreferences.preferred_vibes).length}
-                </div>
-                <div className="text-xs text-green-700">Vibe Matches</div>
-              </div>
-              <div>
-                <div className="text-lg font-bold text-green-600">
-                  {getMatchingItems(myPreferences.preferred_times, partnerPreferences.preferred_times).length}
-                </div>
-                <div className="text-xs text-green-700">Time Matches</div>
-              </div>
-              <div>
-                <div className="text-lg font-bold text-green-600">
-                  {getMatchingItems(myPreferences.preferred_price_range, partnerPreferences.preferred_price_range).length}
-                </div>
-                <div className="text-xs text-green-700">Price Matches</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <CompatibilitySummary
+          myPreferences={myPreferences}
+          partnerPreferences={partnerPreferences}
+        />
       )}
     </div>
   );
