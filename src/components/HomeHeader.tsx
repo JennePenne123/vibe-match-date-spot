@@ -14,7 +14,7 @@ const HomeHeader = ({ user, displayName, firstName }: HomeHeaderProps) => {
     <div className="flex justify-between items-center p-4 pt-12 bg-white shadow-sm">
       <div className="flex items-center gap-3">
         <Avatar className="w-10 h-10 border-2 border-pink-200">
-          <AvatarImage src={user?.profile?.avatar_url} alt={displayName} />
+          <AvatarImage src={user?.avatar_url} alt={displayName} />
           <AvatarFallback className="bg-pink-100 text-pink-600 text-sm">
             {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
           </AvatarFallback>

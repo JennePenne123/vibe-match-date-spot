@@ -99,9 +99,24 @@ const Home: React.FC = () => {
         image: inv.venue?.image_url,
         venueCount: 1,
         isGroupDate: false,
-        participants: []
+        participants: [],
+        venueName: inv.venue?.name || 'Venue TBD',
+        venueAddress: inv.venue?.address || 'Address TBD',
+        estimatedCost: '$50-100',
+        duration: '2 hours',
+        hasMultipleOptions: false,
+        specialRequests: inv.message || ''
       }));
   }, [showEmptyState, invitationState, invitations]);
+
+  // Wrapper functions to handle id type conversion
+  const handleAcceptWrapper = useCallback((id: string | number) => {
+    handleAcceptInvitation(String(id));
+  }, [handleAcceptInvitation]);
+
+  const handleDeclineWrapper = useCallback((id: string | number) => {
+    handleDeclineInvitation(String(id));
+  }, [handleDeclineInvitation]);
 
   // Early returns for loading and unauthenticated states
   if (authLoading) {
@@ -157,8 +172,8 @@ const Home: React.FC = () => {
 
           <DateInvitationsSection
             invitations={availableInvitations}
-            onAccept={handleAcceptInvitation}
-            onDecline={handleDeclineInvitation}
+            onAccept={handleAcceptWrapper}
+            onDecline={handleDeclineWrapper}
             isLoading={invitationsLoading}
           />
 

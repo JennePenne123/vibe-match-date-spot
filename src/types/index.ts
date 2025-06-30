@@ -4,7 +4,6 @@ export interface User {
   email: string;
   name?: string;
   avatar_url?: string;
-  // Remove profile and user_metadata - we'll get this from the profiles table
 }
 
 export interface Profile {
@@ -86,6 +85,12 @@ export interface DateInvitation {
   venueCount?: number;
   isGroupDate?: boolean;
   participants?: string[];
+  venueName?: string;
+  venueAddress?: string;
+  estimatedCost?: string;
+  duration?: string;
+  hasMultipleOptions?: boolean;
+  specialRequests?: string;
 }
 
 export interface UserPreferences {
