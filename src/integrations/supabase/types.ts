@@ -9,6 +9,160 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_compatibility_scores: {
+        Row: {
+          activity_score: number
+          compatibility_factors: Json | null
+          created_at: string
+          cuisine_score: number
+          id: string
+          overall_score: number
+          price_score: number
+          timing_score: number
+          updated_at: string
+          user1_id: string
+          user2_id: string
+          vibe_score: number
+        }
+        Insert: {
+          activity_score?: number
+          compatibility_factors?: Json | null
+          created_at?: string
+          cuisine_score?: number
+          id?: string
+          overall_score?: number
+          price_score?: number
+          timing_score?: number
+          updated_at?: string
+          user1_id: string
+          user2_id: string
+          vibe_score?: number
+        }
+        Update: {
+          activity_score?: number
+          compatibility_factors?: Json | null
+          created_at?: string
+          cuisine_score?: number
+          id?: string
+          overall_score?: number
+          price_score?: number
+          timing_score?: number
+          updated_at?: string
+          user1_id?: string
+          user2_id?: string
+          vibe_score?: number
+        }
+        Relationships: []
+      }
+      ai_date_recommendations: {
+        Row: {
+          ai_reasoning: string | null
+          backup_venues: string[] | null
+          confidence_level: number
+          created_at: string
+          id: string
+          optimal_time: string | null
+          overall_match_score: number
+          recommendation_factors: Json | null
+          status: string
+          updated_at: string
+          user1_id: string
+          user2_id: string
+          venue_id: string
+        }
+        Insert: {
+          ai_reasoning?: string | null
+          backup_venues?: string[] | null
+          confidence_level?: number
+          created_at?: string
+          id?: string
+          optimal_time?: string | null
+          overall_match_score?: number
+          recommendation_factors?: Json | null
+          status?: string
+          updated_at?: string
+          user1_id: string
+          user2_id: string
+          venue_id: string
+        }
+        Update: {
+          ai_reasoning?: string | null
+          backup_venues?: string[] | null
+          confidence_level?: number
+          created_at?: string
+          id?: string
+          optimal_time?: string | null
+          overall_match_score?: number
+          recommendation_factors?: Json | null
+          status?: string
+          updated_at?: string
+          user1_id?: string
+          user2_id?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_date_recommendations_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_venue_scores: {
+        Row: {
+          ai_score: number
+          contextual_score: number
+          created_at: string
+          crowd_factor: number | null
+          event_factor: number | null
+          id: string
+          match_factors: Json | null
+          time_factor: number | null
+          updated_at: string
+          user_id: string
+          venue_id: string
+          weather_factor: number | null
+        }
+        Insert: {
+          ai_score?: number
+          contextual_score?: number
+          created_at?: string
+          crowd_factor?: number | null
+          event_factor?: number | null
+          id?: string
+          match_factors?: Json | null
+          time_factor?: number | null
+          updated_at?: string
+          user_id: string
+          venue_id: string
+          weather_factor?: number | null
+        }
+        Update: {
+          ai_score?: number
+          contextual_score?: number
+          created_at?: string
+          crowd_factor?: number | null
+          event_factor?: number | null
+          id?: string
+          match_factors?: Json | null
+          time_factor?: number | null
+          updated_at?: string
+          user_id?: string
+          venue_id?: string
+          weather_factor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_venue_scores_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       date_invitations: {
         Row: {
           created_at: string
@@ -136,6 +290,45 @@ export type Database = {
           id?: string
           name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_preference_vectors: {
+        Row: {
+          activity_vector: number[] | null
+          cuisine_vector: number[] | null
+          feature_weights: Json | null
+          id: string
+          last_updated: string
+          learning_data: Json | null
+          price_vector: number[] | null
+          time_vector: number[] | null
+          user_id: string
+          vibe_vector: number[] | null
+        }
+        Insert: {
+          activity_vector?: number[] | null
+          cuisine_vector?: number[] | null
+          feature_weights?: Json | null
+          id?: string
+          last_updated?: string
+          learning_data?: Json | null
+          price_vector?: number[] | null
+          time_vector?: number[] | null
+          user_id: string
+          vibe_vector?: number[] | null
+        }
+        Update: {
+          activity_vector?: number[] | null
+          cuisine_vector?: number[] | null
+          feature_weights?: Json | null
+          id?: string
+          last_updated?: string
+          learning_data?: Json | null
+          price_vector?: number[] | null
+          time_vector?: number[] | null
+          user_id?: string
+          vibe_vector?: number[] | null
         }
         Relationships: []
       }
