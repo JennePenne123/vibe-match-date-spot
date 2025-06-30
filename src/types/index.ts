@@ -1,7 +1,8 @@
 
-export interface User {
-  id: string;
-  email: string;
+import { User as SupabaseUser } from '@supabase/supabase-js';
+
+// Extend Supabase User with our custom properties
+export interface User extends SupabaseUser {
   name?: string;
   avatar_url?: string;
 }
