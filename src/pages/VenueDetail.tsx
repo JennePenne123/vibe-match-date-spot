@@ -5,6 +5,7 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Star, MapPin, DollarSign, Clock, Phone, Share, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
+import { venueToAppVenue } from '@/utils/typeHelpers';
 
 const VenueDetail = () => {
   const { id } = useParams();
@@ -18,23 +19,26 @@ const VenueDetail = () => {
     return null;
   }
 
+  // Convert to AppVenue format for UI
+  const appVenue = venueToAppVenue(venue);
+
   const openDirections = () => {
-    if (venue.google_place_id) {
-      window.open(`https://www.google.com/maps/place/?q=place_id:${venue.google_place_id}`, '_blank');
+    if (appVenue.google_place_id) {
+      window.open(`https://www.google.com/maps/place/?q=place_id:${appVenue.google_place_id}`, '_blank');
     } else {
-      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue.name + ' ' + venue.address)}`, '_blank');
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appVenue.name + ' ' + appVenue.address)}`, '_blank');
     }
   };
 
   const callVenue = () => {
-    if (venue.phone) {
-      window.open(`tel:${venue.phone}`);
+    if (appVenue.phone) {
+      window.open(`tel:${appVenue.phone}`);
     }
   };
 
   const visitWebsite = () => {
-    if (venue.website) {
-      window.open(venue.website, '_blank');
+    if (appVenue.website) {
+      window.open(appVenue.website, '_blank');
     }
   };
 
@@ -44,8 +48,8 @@ const VenueDetail = () => {
         {/* Header Image */}
         <div className="relative">
           <img
-            src={venue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'}
-            alt={venue.name}
+            src={appVenue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'}
+            alt={appVenue.name}
             className="w-full h-64 object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -82,15 +86,15 @@ const VenueDetail = () => {
           <div className="absolute bottom-4 left-4">
             <Badge className="bg-green-500 text-white font-semibold text-base px-3 py-1">
               <Sparkles className="w-4 h-4 mr-2" />
-              {venue.matchScore || 85}% Perfect Match
+              {appVenue.matchScore}% Perfect Match
             </Badge>
           </div>
 
           {/* Open Status */}
-          {venue.isOpen !== undefined && (
+          {appVenue.isOpen !== undefined && (
             <div className="absolute bottom-4 right-4">
-              <Badge className={venue.isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"}>
-                {venue.isOpen ? "Open Now" : "Closed"}
+              <Badge className={appVenue.isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"}>
+                {appVenue.isOpen ? "Open Now" : "Closed"}
               </Badge>
             </div>
           )}
@@ -101,31 +105,31 @@ const VenueDetail = () => {
           {/* Basic Info */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4">
             <div className="flex items-start justify-between mb-3">
-              <h1 className="text-2xl font-bold text-gray-900">{venue.name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{appVenue.name}</h1>
               <div className="flex items-center gap-1">
                 <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                <span className="font-semibold">{venue.rating || 4.5}</span>
+                <span className="font-semibold">{appVenue.rating || 4.5}</span>
               </div>
             </div>
 
-            <p className="text-gray-600 mb-4">{venue.description}</p>
+            <p className="text-gray-600 mb-4">{appVenue.description}</p>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin className="w-4 h-4" />
-                {venue.distance || '0.5 mi'}
+                {appVenue.distance}
               </div>
               <div className="flex items-center gap-2 text-gray-600">
                 <DollarSign className="w-4 h-4" />
-                {venue.price_range || '$$'}
+                {appVenue.price_range || '$$'}
               </div>
             </div>
 
-            {venue.discount && (
+            {appVenue.discount && (
               <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                 <div className="flex items-center gap-2 text-orange-700">
                   <Sparkles className="w-4 h-4" />
-                  <span className="font-semibold">{venue.discount}</span>
+                  <span className="font-semibold">{appVenue.discount}</span>
                 </div>
               </div>
             )}
@@ -135,7 +139,7 @@ const VenueDetail = () => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4">
             <h3 className="font-semibold text-gray-900 mb-3">Perfect For</h3>
             <div className="flex flex-wrap gap-2">
-              {venue.tags?.map((tag) => (
+              {appVenue.tags?.map((tag) => (
                 <Badge key={tag} variant="secondary">
                   {tag}
                 </Badge>
@@ -149,19 +153,19 @@ const VenueDetail = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-600">{venue.address}</span>
+                <span className="text-gray-600">{appVenue.address}</span>
               </div>
-              {venue.phone && (
+              {appVenue.phone && (
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-gray-400" />
-                  <span className="text-gray-600">{venue.phone}</span>
+                  <span className="text-gray-600">{appVenue.phone}</span>
                 </div>
               )}
-              {venue.website && (
+              {appVenue.website && (
                 <div className="flex items-center gap-3">
                   <Globe className="w-5 h-5 text-gray-400" />
                   <a 
-                    href={venue.website} 
+                    href={appVenue.website} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-datespot-pink hover:underline flex items-center gap-1"
@@ -171,16 +175,16 @@ const VenueDetail = () => {
                   </a>
                 </div>
               )}
-              {venue.opening_hours && Array.isArray(venue.opening_hours) && venue.opening_hours.length > 0 && (
+              {appVenue.openingHours && appVenue.openingHours.length > 0 && (
                 <div className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
                   <div className="text-gray-600">
                     <div className="font-medium mb-1">Hours:</div>
-                    {venue.opening_hours.slice(0, 3).map((hours, index) => (
+                    {appVenue.openingHours.slice(0, 3).map((hours, index) => (
                       <div key={index} className="text-sm">{hours}</div>
                     ))}
-                    {venue.opening_hours.length > 3 && (
-                      <div className="text-sm text-gray-500">+ {venue.opening_hours.length - 3} more</div>
+                    {appVenue.openingHours.length > 3 && (
+                      <div className="text-sm text-gray-500">+ {appVenue.openingHours.length - 3} more</div>
                     )}
                   </div>
                 </div>
@@ -204,9 +208,9 @@ const VenueDetail = () => {
               <Button 
                 variant="outline" 
                 className="h-12"
-                onClick={venue.phone ? callVenue : visitWebsite}
+                onClick={appVenue.phone ? callVenue : visitWebsite}
               >
-                {venue.phone ? 'Call Now' : 'Visit Website'}
+                {appVenue.phone ? 'Call Now' : 'Visit Website'}
               </Button>
             </div>
           </div>

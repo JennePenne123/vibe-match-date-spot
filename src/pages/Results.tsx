@@ -5,6 +5,7 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Heart, Star, MapPin, DollarSign, Filter, Sparkles } from 'lucide-react';
+import { venueToAppVenue } from '@/utils/typeHelpers';
 
 const Results = () => {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ const Results = () => {
   const [likedVenues, setLikedVenues] = useState<string[]>([]);
 
   const { venues } = appState;
+
+  // Convert venues to AppVenue format for UI
+  const appVenues = venues.map(venue => venueToAppVenue(venue));
 
   const filters = [
     { id: 'all', name: 'All Spots', icon: '📍' },
@@ -23,8 +27,8 @@ const Results = () => {
   ];
 
   const filteredVenues = filter === 'all' 
-    ? venues 
-    : venues.filter(venue => venue.cuisine_type === filter || venue.tags?.includes(filter));
+    ? appVenues 
+    : appVenues.filter(venue => venue.cuisine_type === filter || venue.tags?.includes(filter));
 
   const toggleLike = (venueId: string) => {
     setLikedVenues(prev =>
@@ -111,7 +115,7 @@ const Results = () => {
                   <div className="absolute top-3 left-3">
                     <Badge className="bg-green-500 text-white font-semibold">
                       <Sparkles className="w-3 h-3 mr-1" />
-                      {venue.matchScore || 85}% match
+                      {venue.matchScore}% match
                     </Badge>
                   </div>
                   <button
@@ -149,7 +153,7 @@ const Results = () => {
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
-                      {venue.address} • {venue.distance || '0.5 mi'}
+                      {venue.address} • {venue.distance}
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="w-4 h-4" />
