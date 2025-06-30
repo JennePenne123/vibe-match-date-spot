@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sparkles, RefreshCw, Users, MapPin } from 'lucide-react';
+import { getUserName } from '@/utils/typeHelpers';
 
 const AIRecommendations: React.FC = () => {
   const { user } = useAuthRedirect();
@@ -27,11 +28,27 @@ const AIRecommendations: React.FC = () => {
 
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
 
-  if (!user) return <LoadingSpinner />;
+  // Memoize user display logic
+  const userInfo = React.useMemo(() => {
+    if (!user) return null;
+    
+    const displayName = getUserName(user);
+    const firstName = displayName.split(' ')[0];
+    
+    return { displayName, firstName };
+  }, [user]);
+
+  if (!user || !userInfo) return <LoadingSpinner />;
+
+  const { displayName, firstName } = userInfo;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <HomeHeader />
+      <HomeHeader 
+        user={user}
+        displayName={displayName}
+        firstName={firstName}
+      />
       
       <main className="p-6 space-y-6 max-w-7xl mx-auto">
         {/* Header Section */}
