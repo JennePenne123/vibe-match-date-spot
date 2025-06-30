@@ -1,8 +1,8 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRealtimeInvitations } from './useRealtimeInvitations';
+import { useErrorHandler } from './useErrorHandler';
 
 interface DateInvitation {
   id: string;
@@ -28,6 +28,7 @@ interface DateInvitation {
 
 export const useInvitations = () => {
   const { user } = useAuth();
+  const { handleError } = useErrorHandler();
   const [invitations, setInvitations] = useState<DateInvitation[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -47,17 +48,23 @@ export const useInvitations = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching invitations:', error);
+        handleError(error, {
+          toastTitle: 'Failed to load invitations',
+          toastDescription: 'Please try refreshing the page',
+        });
         return;
       }
 
       setInvitations(data || []);
     } catch (error) {
-      console.error('Error fetching invitations:', error);
+      handleError(error, {
+        toastTitle: 'Failed to load invitations',
+        toastDescription: 'Please try refreshing the page',
+      });
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, handleError]);
 
   // Real-time subscription handlers
   const handleInvitationReceived = useCallback(() => {
@@ -84,7 +91,10 @@ export const useInvitations = () => {
         .eq('id', invitationId);
 
       if (error) {
-        console.error('Error accepting invitation:', error);
+        handleError(error, {
+          toastTitle: 'Failed to accept invitation',
+          toastDescription: 'Please try again',
+        });
         return;
       }
 
@@ -97,7 +107,10 @@ export const useInvitations = () => {
         )
       );
     } catch (error) {
-      console.error('Error accepting invitation:', error);
+      handleError(error, {
+        toastTitle: 'Failed to accept invitation',
+        toastDescription: 'Please try again',
+      });
     }
   };
 
@@ -109,7 +122,10 @@ export const useInvitations = () => {
         .eq('id', invitationId);
 
       if (error) {
-        console.error('Error declining invitation:', error);
+        handleError(error, {
+          toastTitle: 'Failed to decline invitation',
+          toastDescription: 'Please try again',
+        });
         return;
       }
 
@@ -122,7 +138,10 @@ export const useInvitations = () => {
         )
       );
     } catch (error) {
-      console.error('Error declining invitation:', error);
+      handleError(error, {
+        toastTitle: 'Failed to decline invitation',
+        toastDescription: 'Please try again',
+      });
     }
   };
 
@@ -142,13 +161,19 @@ export const useInvitations = () => {
         });
 
       if (error) {
-        console.error('Error sending invitation:', error);
+        handleError(error, {
+          toastTitle: 'Failed to send invitation',
+          toastDescription: 'Please try again',
+        });
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error sending invitation:', error);
+      handleError(error, {
+        toastTitle: 'Failed to send invitation',
+        toastDescription: 'Please try again',
+      });
       return false;
     }
   };

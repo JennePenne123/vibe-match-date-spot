@@ -1,10 +1,10 @@
-
 import React, { useState, useCallback, useMemo } from 'react';
 import { useInvitations } from '@/hooks/useInvitations';
 import { Button } from '@/components/ui/button';
 import StartNewDateCard from '@/components/StartNewDateCard';
 import DateInvitationsSection from '@/components/DateInvitationsSection';
 import InvitationStatus from '@/components/InvitationStatus';
+import SafeComponent from '@/components/SafeComponent';
 import { useInvitationState } from '@/hooks/useInvitationState';
 
 const HomeContent: React.FC = () => {
@@ -96,19 +96,25 @@ const HomeContent: React.FC = () => {
       )}
 
       {/* Main Content */}
-      {!showEmptyState && (
-        <StartNewDateCard />
-      )}
+      <SafeComponent componentName="StartNewDateCard">
+        {!showEmptyState && (
+          <StartNewDateCard />
+        )}
+      </SafeComponent>
 
-      <DateInvitationsSection
-        invitations={availableInvitations}
-        onAccept={handleAcceptWrapper}
-        onDecline={handleDeclineWrapper}
-        isLoading={invitationsLoading}
-      />
+      <SafeComponent componentName="DateInvitationsSection">
+        <DateInvitationsSection
+          invitations={availableInvitations}
+          onAccept={handleAcceptWrapper}
+          onDecline={handleDeclineWrapper}
+          isLoading={invitationsLoading}
+        />
+      </SafeComponent>
 
       {/* Status Summary */}
-      <InvitationStatus invitationState={invitationState} />
+      <SafeComponent componentName="InvitationStatus">
+        <InvitationStatus invitationState={invitationState} />
+      </SafeComponent>
     </main>
   );
 };
