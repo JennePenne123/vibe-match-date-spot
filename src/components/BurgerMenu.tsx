@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,7 +12,7 @@ const BurgerMenu = () => {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
-  const displayName = user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+  const displayName = user?.name || user?.email?.split('@')[0] || 'User';
 
   const menuItems = [
     {
@@ -61,7 +62,7 @@ const BurgerMenu = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Avatar className="w-12 h-12 border-2 border-pink-200">
-                <AvatarImage src={user?.profile?.avatar_url} alt={displayName} />
+                <AvatarImage src={user?.avatar_url} alt={displayName} />
                 <AvatarFallback className="bg-pink-100 text-pink-600">
                   {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>

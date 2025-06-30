@@ -2,15 +2,18 @@
 export interface User {
   id: string;
   email: string;
-  profile?: {
-    name?: string;
-    avatar_url?: string;
-  };
-  user_metadata?: {
-    name?: string;
-    avatar_url?: string;
-  };
-  friends?: Friend[];
+  name?: string;
+  avatar_url?: string;
+  // Remove profile and user_metadata - we'll get this from the profiles table
+}
+
+export interface Profile {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Friend {
@@ -20,18 +23,18 @@ export interface Friend {
   avatar_url?: string;
   friendship_status?: 'pending' | 'accepted' | 'declined' | 'blocked';
   friendship_id?: string;
-  isInvited?: boolean;
-  // Additional properties for UI display
+  // UI-only properties for compatibility
   status?: 'online' | 'offline';
   lastSeen?: string;
   mutualFriends?: number;
   joinedDate?: string;
+  isInvited?: boolean;
 }
 
 export interface Venue {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   address: string;
   latitude?: number;
   longitude?: number;
@@ -47,19 +50,17 @@ export interface Venue {
   opening_hours?: any[];
   created_at?: string;
   updated_at?: string;
-  // Additional properties for UI display
-  vibe?: string;
+  // UI-only computed properties for compatibility
+  image?: string;
+  location?: string;
   distance?: string;
-  priceLevel?: number;
-  isOpen?: boolean;
-  openingHours?: string[];
-  features?: string[];
+  vibe?: string;
   matchScore?: number;
   discount?: string;
-  location?: string;
-  image?: string;
-  priceRange?: string;
+  isOpen?: boolean;
+  openingHours?: string[];
   placeId?: string;
+  priceRange?: string;
 }
 
 export interface DateInvitation {
@@ -72,12 +73,19 @@ export interface DateInvitation {
   proposed_date?: string;
   status: 'pending' | 'accepted' | 'declined' | 'cancelled';
   created_at: string;
-  sender?: {
-    name: string;
-    email: string;
-    avatar_url?: string;
-  };
+  sender?: Profile;
   venue?: Venue;
+  // UI compatibility properties
+  friendName?: string;
+  friendAvatar?: string;
+  dateType?: string;
+  location?: string;
+  time?: string;
+  description?: string;
+  image?: string;
+  venueCount?: number;
+  isGroupDate?: boolean;
+  participants?: string[];
 }
 
 export interface UserPreferences {

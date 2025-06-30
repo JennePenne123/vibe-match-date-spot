@@ -24,7 +24,7 @@ const Results = () => {
 
   const filteredVenues = filter === 'all' 
     ? venues 
-    : venues.filter(venue => venue.vibe === filter);
+    : venues.filter(venue => venue.cuisine_type === filter || venue.tags?.includes(filter));
 
   const toggleLike = (venueId: string) => {
     setLikedVenues(prev =>
@@ -104,14 +104,14 @@ const Results = () => {
               >
                 <div className="relative">
                   <img
-                    src={venue.image}
+                    src={venue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'}
                     alt={venue.name}
                     className="w-full h-48 object-cover"
                   />
                   <div className="absolute top-3 left-3">
                     <Badge className="bg-green-500 text-white font-semibold">
                       <Sparkles className="w-3 h-3 mr-1" />
-                      {venue.matchScore}% match
+                      {venue.matchScore || 85}% match
                     </Badge>
                   </div>
                   <button
@@ -140,7 +140,7 @@ const Results = () => {
                     <h3 className="font-bold text-lg text-gray-900">{venue.name}</h3>
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm font-medium">{venue.rating}</span>
+                      <span className="text-sm font-medium">{venue.rating || 4.5}</span>
                     </div>
                   </div>
 
@@ -149,16 +149,16 @@ const Results = () => {
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
-                      {venue.location} • {venue.distance}
+                      {venue.address} • {venue.distance || '0.5 mi'}
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="w-4 h-4" />
-                      {venue.priceRange}
+                      {venue.price_range || '$$'}
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {venue.tags.map((tag) => (
+                    {venue.tags?.slice(0, 3).map((tag) => (
                       <Badge key={tag} variant="secondary" className="text-xs">
                         {tag}
                       </Badge>

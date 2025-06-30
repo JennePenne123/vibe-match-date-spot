@@ -21,9 +21,9 @@ const Profile = () => {
       return;
     }
     
-    if (user?.profile) {
-      setEditedName(user.profile.name || '');
-      setEditedEmail(user.profile.email || '');
+    if (user) {
+      setEditedName(user.name || '');
+      setEditedEmail(user.email || '');
     }
   }, [user, loading, navigate]);
 
@@ -48,13 +48,13 @@ const Profile = () => {
   };
 
   const handleCancel = () => {
-    setEditedName(user.profile?.name || '');
-    setEditedEmail(user.profile?.email || '');
+    setEditedName(user.name || '');
+    setEditedEmail(user.email || '');
     setIsEditing(false);
   };
 
-  const displayName = user.profile?.name || user.user_metadata?.name || user.email?.split('@')[0] || 'User';
-  const displayEmail = user.profile?.email || user.email || '';
+  const displayName = user.name || user.email?.split('@')[0] || 'User';
+  const displayEmail = user.email || '';
 
   return (
     <div className="min-h-screen bg-gray-50">

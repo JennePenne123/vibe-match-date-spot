@@ -48,7 +48,7 @@ const Venues = () => {
     }
   ];
 
-  const displayName = user?.profile?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+  const displayName = user?.name || user?.email?.split('@')[0] || 'User';
 
   return (
     <div className="min-h-screen bg-gray-50">

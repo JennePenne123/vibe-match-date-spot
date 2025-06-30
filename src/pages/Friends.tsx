@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,11 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useFriends } from '@/hooks/useFriends';
 
 const Friends = () => {
   const navigate = useNavigate();
-  const { user, inviteFriend } = useAuth();
+  const { user } = useAuth();
   const { updateInvitedFriends } = useApp();
+  const { friends } = useFriends();
   const [searchParams] = useSearchParams();
   const isDemoMode = searchParams.get('demo') === 'true';
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,18 +28,18 @@ const Friends = () => {
 
   // Enhanced demo friends data for testing
   const demoFriends = [
-    { id: '1', name: 'Sarah Johnson', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '2', name: 'Mike Chen', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '3', name: 'Emma Wilson', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '4', name: 'David Rodriguez', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '5', name: 'Jessica Lee', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '6', name: 'Alex Thompson', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '7', name: 'Maya Patel', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '8', name: 'Ryan Kim', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f52?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '1', name: 'Sarah Johnson', avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '2', name: 'Mike Chen', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '3', name: 'Emma Wilson', avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '4', name: 'David Rodriguez', avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '5', name: 'Jessica Lee', avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '6', name: 'Alex Thompson', avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '7', name: 'Maya Patel', avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '8', name: 'Ryan Kim', avatar_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f52?w=150&h=150&fit=crop&crop=face', isInvited: false },
   ];
 
-  const friends = isDemoMode ? demoFriends : (user?.friends || []);
-  const filteredFriends = friends.filter(friend =>
+  const friendsList = isDemoMode ? demoFriends : friends;
+  const filteredFriends = friendsList.filter(friend =>
     friend.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -53,8 +56,6 @@ const Friends = () => {
           ? "Friend removed from your date plans" 
           : "Friend will receive your date recommendations",
       });
-    } else {
-      inviteFriend(friendId);
     }
   };
 
@@ -155,7 +156,7 @@ const Friends = () => {
                   >
                     <div className="flex items-center gap-4">
                       <Avatar className="w-12 h-12">
-                        <AvatarImage src={friend.avatar} alt={friend.name} />
+                        <AvatarImage src={friend.avatar_url} alt={friend.name} />
                         <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink">
                           {friend.name.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>

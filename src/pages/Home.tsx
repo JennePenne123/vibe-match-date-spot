@@ -8,22 +8,12 @@ import HomeHeader from '@/components/HomeHeader';
 import StartNewDateCard from '@/components/StartNewDateCard';
 import DateInvitationsSection from '@/components/DateInvitationsSection';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { DateInvitation } from '@/types';
 
 // Types for better type safety
 interface InvitationState {
   accepted: string[];
   declined: string[];
-}
-
-interface User {
-  id?: string;
-  email?: string;
-  profile?: {
-    name?: string;
-  };
-  user_metadata?: {
-    name?: string;
-  };
 }
 
 const Home: React.FC = () => {
@@ -43,9 +33,7 @@ const Home: React.FC = () => {
   const userInfo = React.useMemo(() => {
     if (!user) return null;
     
-    const displayName = user?.user_metadata?.name || 
-                       user?.email?.split('@')[0] || 
-                       'User';
+    const displayName = user?.name || user?.email?.split('@')[0] || 'User';
     const firstName = displayName.split(' ')[0];
     
     return { displayName, firstName };
@@ -89,15 +77,30 @@ const Home: React.FC = () => {
     setShowEmptyState(prev => !prev);
   }, []);
 
-  // Calculate available invitations
+  // Calculate available invitations and transform for compatibility
   const availableInvitations = React.useMemo(() => {
     if (showEmptyState) return [];
     
-    return invitations.filter(
-      inv => !invitationState.accepted.includes(inv.id) && 
-             !invitationState.declined.includes(inv.id) &&
-             inv.status === 'pending'
-    );
+    return invitations
+      .filter(
+        inv => !invitationState.accepted.includes(inv.id) && 
+               !invitationState.declined.includes(inv.id) &&
+               inv.status === 'pending'
+      )
+      .map(inv => ({
+        ...inv,
+        // Add compatibility properties for DateInvitationsSection
+        friendName: inv.sender?.name || 'Unknown',
+        friendAvatar: inv.sender?.avatar_url,
+        dateType: 'dinner',
+        location: inv.venue?.address || 'Location TBD',
+        time: inv.proposed_date ? new Date(inv.proposed_date).toLocaleTimeString() : 'Time TBD',
+        description: inv.message || inv.title,
+        image: inv.venue?.image_url,
+        venueCount: 1,
+        isGroupDate: false,
+        participants: []
+      }));
   }, [showEmptyState, invitationState, invitations]);
 
   // Early returns for loading and unauthenticated states

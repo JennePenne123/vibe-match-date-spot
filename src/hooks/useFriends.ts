@@ -44,7 +44,13 @@ export const useFriends = () => {
           email: friendProfile.email,
           avatar_url: friendProfile.avatar_url,
           friendship_status: friendship.status as 'pending' | 'accepted' | 'declined' | 'blocked',
-          friendship_id: friendship.id
+          friendship_id: friendship.id,
+          // Add some default UI properties
+          status: 'offline',
+          lastSeen: 'Last seen recently',
+          mutualFriends: 0,
+          joinedDate: '1 month ago',
+          isInvited: false
         };
       }) || [];
 

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
@@ -18,10 +19,10 @@ const VenueDetail = () => {
   }
 
   const openDirections = () => {
-    if (venue.placeId) {
-      window.open(`https://www.google.com/maps/place/?q=place_id:${venue.placeId}`, '_blank');
+    if (venue.google_place_id) {
+      window.open(`https://www.google.com/maps/place/?q=place_id:${venue.google_place_id}`, '_blank');
     } else {
-      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue.name + ' ' + venue.location)}`, '_blank');
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue.name + ' ' + venue.address)}`, '_blank');
     }
   };
 
@@ -43,7 +44,7 @@ const VenueDetail = () => {
         {/* Header Image */}
         <div className="relative">
           <img
-            src={venue.image}
+            src={venue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'}
             alt={venue.name}
             className="w-full h-64 object-cover"
           />
@@ -81,7 +82,7 @@ const VenueDetail = () => {
           <div className="absolute bottom-4 left-4">
             <Badge className="bg-green-500 text-white font-semibold text-base px-3 py-1">
               <Sparkles className="w-4 h-4 mr-2" />
-              {venue.matchScore}% Perfect Match
+              {venue.matchScore || 85}% Perfect Match
             </Badge>
           </div>
 
@@ -103,7 +104,7 @@ const VenueDetail = () => {
               <h1 className="text-2xl font-bold text-gray-900">{venue.name}</h1>
               <div className="flex items-center gap-1">
                 <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                <span className="font-semibold">{venue.rating}</span>
+                <span className="font-semibold">{venue.rating || 4.5}</span>
               </div>
             </div>
 
@@ -112,11 +113,11 @@ const VenueDetail = () => {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin className="w-4 h-4" />
-                {venue.distance}
+                {venue.distance || '0.5 mi'}
               </div>
               <div className="flex items-center gap-2 text-gray-600">
                 <DollarSign className="w-4 h-4" />
-                {venue.priceRange}
+                {venue.price_range || '$$'}
               </div>
             </div>
 
@@ -134,7 +135,7 @@ const VenueDetail = () => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4">
             <h3 className="font-semibold text-gray-900 mb-3">Perfect For</h3>
             <div className="flex flex-wrap gap-2">
-              {venue.tags.map((tag) => (
+              {venue.tags?.map((tag) => (
                 <Badge key={tag} variant="secondary">
                   {tag}
                 </Badge>
@@ -148,7 +149,7 @@ const VenueDetail = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-600">{venue.location}</span>
+                <span className="text-gray-600">{venue.address}</span>
               </div>
               {venue.phone && (
                 <div className="flex items-center gap-3">
@@ -170,16 +171,16 @@ const VenueDetail = () => {
                   </a>
                 </div>
               )}
-              {venue.openingHours && venue.openingHours.length > 0 && (
+              {venue.opening_hours && Array.isArray(venue.opening_hours) && venue.opening_hours.length > 0 && (
                 <div className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
                   <div className="text-gray-600">
                     <div className="font-medium mb-1">Hours:</div>
-                    {venue.openingHours.slice(0, 3).map((hours, index) => (
+                    {venue.opening_hours.slice(0, 3).map((hours, index) => (
                       <div key={index} className="text-sm">{hours}</div>
                     ))}
-                    {venue.openingHours.length > 3 && (
-                      <div className="text-sm text-gray-500">+ {venue.openingHours.length - 3} more</div>
+                    {venue.opening_hours.length > 3 && (
+                      <div className="text-sm text-gray-500">+ {venue.opening_hours.length - 3} more</div>
                     )}
                   </div>
                 </div>
