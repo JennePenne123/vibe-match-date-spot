@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,7 @@ import MyFriends from "./pages/MyFriends";
 import MyVenues from "./pages/MyVenues";
 import NotFound from "./pages/NotFound";
 import AIRecommendations from "./pages/AIRecommendations";
+import SmartDatePlanning from "./pages/SmartDatePlanning";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -67,6 +69,7 @@ const App = () => (
                   <Route path="/my-friends" element={<MyFriends />} />
                   <Route path="/my-venues" element={<MyVenues />} />
                   <Route path="/ai-recommendations" element={<AIRecommendations />} />
+                  <Route path="/plan-date" element={<SmartDatePlanning />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </ErrorBoundary>

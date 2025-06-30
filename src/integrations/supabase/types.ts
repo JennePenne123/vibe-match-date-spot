@@ -163,11 +163,62 @@ export type Database = {
           },
         ]
       }
+      date_feedback: {
+        Row: {
+          ai_accuracy_rating: number | null
+          created_at: string
+          feedback_text: string | null
+          id: string
+          invitation_id: string
+          rating: number | null
+          user_id: string
+          venue_rating: number | null
+          would_recommend_venue: boolean | null
+          would_use_ai_again: boolean | null
+        }
+        Insert: {
+          ai_accuracy_rating?: number | null
+          created_at?: string
+          feedback_text?: string | null
+          id?: string
+          invitation_id: string
+          rating?: number | null
+          user_id: string
+          venue_rating?: number | null
+          would_recommend_venue?: boolean | null
+          would_use_ai_again?: boolean | null
+        }
+        Update: {
+          ai_accuracy_rating?: number | null
+          created_at?: string
+          feedback_text?: string | null
+          id?: string
+          invitation_id?: string
+          rating?: number | null
+          user_id?: string
+          venue_rating?: number | null
+          would_recommend_venue?: boolean | null
+          would_use_ai_again?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "date_feedback_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "date_invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       date_invitations: {
         Row: {
+          ai_compatibility_score: number | null
+          ai_generated_message: string | null
+          ai_reasoning: string | null
           created_at: string
           id: string
           message: string | null
+          planning_session_id: string | null
           proposed_date: string | null
           recipient_id: string
           sender_id: string
@@ -175,11 +226,16 @@ export type Database = {
           title: string
           updated_at: string
           venue_id: string | null
+          venue_match_factors: Json | null
         }
         Insert: {
+          ai_compatibility_score?: number | null
+          ai_generated_message?: string | null
+          ai_reasoning?: string | null
           created_at?: string
           id?: string
           message?: string | null
+          planning_session_id?: string | null
           proposed_date?: string | null
           recipient_id: string
           sender_id: string
@@ -187,11 +243,16 @@ export type Database = {
           title: string
           updated_at?: string
           venue_id?: string | null
+          venue_match_factors?: Json | null
         }
         Update: {
+          ai_compatibility_score?: number | null
+          ai_generated_message?: string | null
+          ai_reasoning?: string | null
           created_at?: string
           id?: string
           message?: string | null
+          planning_session_id?: string | null
           proposed_date?: string | null
           recipient_id?: string
           sender_id?: string
@@ -199,8 +260,16 @@ export type Database = {
           title?: string
           updated_at?: string
           venue_id?: string | null
+          venue_match_factors?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "date_invitations_planning_session_id_fkey"
+            columns: ["planning_session_id"]
+            isOneToOne: false
+            referencedRelation: "date_planning_sessions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "date_invitations_recipient_id_fkey"
             columns: ["recipient_id"]
@@ -223,6 +292,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      date_planning_sessions: {
+        Row: {
+          ai_compatibility_score: number | null
+          created_at: string
+          expires_at: string
+          id: string
+          initiator_id: string
+          partner_id: string
+          preferences_data: Json | null
+          selected_venue_id: string | null
+          session_status: string
+          updated_at: string
+        }
+        Insert: {
+          ai_compatibility_score?: number | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          initiator_id: string
+          partner_id: string
+          preferences_data?: Json | null
+          selected_venue_id?: string | null
+          session_status?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_compatibility_score?: number | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          initiator_id?: string
+          partner_id?: string
+          preferences_data?: Json | null
+          selected_venue_id?: string | null
+          session_status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       friendships: {
         Row: {

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +15,12 @@ interface DateInvitation {
   proposed_date?: string;
   status: 'pending' | 'accepted' | 'declined' | 'cancelled';
   created_at: string;
+  // Enhanced AI fields
+  ai_compatibility_score?: number;
+  ai_reasoning?: string;
+  venue_match_factors?: any;
+  ai_generated_message?: string;
+  planning_session_id?: string;
   sender?: {
     name: string;
     email: string;
@@ -178,6 +185,50 @@ export const useInvitations = () => {
     }
   };
 
+  // Submit date feedback after a date
+  const submitDateFeedback = async (
+    invitationId: string, 
+    rating: number,
+    venueRating: number,
+    aiAccuracyRating: number,
+    feedbackText?: string,
+    wouldRecommendVenue?: boolean,
+    wouldUseAiAgain?: boolean
+  ) => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('date_feedback')
+        .insert({
+          invitation_id: invitationId,
+          user_id: user.id,
+          rating,
+          venue_rating: venueRating,
+          ai_accuracy_rating: aiAccuracyRating,
+          feedback_text: feedbackText,
+          would_recommend_venue: wouldRecommendVenue,
+          would_use_ai_again: wouldUseAiAgain
+        });
+
+      if (error) {
+        handleError(error, {
+          toastTitle: 'Failed to submit feedback',
+          toastDescription: 'Please try again',
+        });
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      handleError(error, {
+        toastTitle: 'Failed to submit feedback',
+        toastDescription: 'Please try again',
+      });
+      return false;
+    }
+  };
+
   useEffect(() => {
     fetchInvitations();
   }, [fetchInvitations]);
@@ -188,6 +239,7 @@ export const useInvitations = () => {
     acceptInvitation,
     declineInvitation,
     sendInvitation,
+    submitDateFeedback,
     fetchInvitations
   };
 };
