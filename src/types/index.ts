@@ -21,6 +21,11 @@ export interface Friend {
   friendship_status?: 'pending' | 'accepted' | 'declined' | 'blocked';
   friendship_id?: string;
   isInvited?: boolean;
+  // Additional properties for UI display
+  status?: 'online' | 'offline';
+  lastSeen?: string;
+  mutualFriends?: number;
+  joinedDate?: string;
 }
 
 export interface Venue {
@@ -32,18 +37,29 @@ export interface Venue {
   longitude?: number;
   phone?: string;
   website?: string;
-  cuisineType?: string;
   cuisine_type?: string;
   price_range?: string;
   rating?: number;
   image_url?: string;
   tags?: string[];
+  is_active?: boolean;
+  google_place_id?: string;
+  opening_hours?: any[];
+  created_at?: string;
+  updated_at?: string;
+  // Additional properties for UI display
   vibe?: string;
   distance?: string;
   priceLevel?: number;
   isOpen?: boolean;
   openingHours?: string[];
   features?: string[];
+  matchScore?: number;
+  discount?: string;
+  location?: string;
+  image?: string;
+  priceRange?: string;
+  placeId?: string;
 }
 
 export interface DateInvitation {

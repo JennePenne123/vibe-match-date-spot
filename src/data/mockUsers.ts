@@ -5,7 +5,8 @@ export const mockFriends: Friend[] = [
   { 
     id: '1', 
     name: 'Sarah Johnson', 
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    email: 'sarah@example.com',
+    avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
     isInvited: false,
     status: 'online',
     lastSeen: 'Active now',
@@ -15,7 +16,8 @@ export const mockFriends: Friend[] = [
   { 
     id: '2', 
     name: 'Mike Chen', 
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    email: 'mike@example.com',
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
     isInvited: false,
     status: 'offline',
     lastSeen: '2 hours ago',
@@ -24,8 +26,9 @@ export const mockFriends: Friend[] = [
   },
   { 
     id: '3', 
-    name: 'Emma Wilson', 
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    name: 'Emma Wilson',
+    email: 'emma@example.com', 
+    avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
     isInvited: false,
     status: 'online',
     lastSeen: 'Active now',
@@ -34,8 +37,9 @@ export const mockFriends: Friend[] = [
   },
   { 
     id: '4', 
-    name: 'David Rodriguez', 
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    name: 'David Rodriguez',
+    email: 'david@example.com',
+    avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     isInvited: false,
     status: 'offline',
     lastSeen: '1 day ago',
@@ -44,8 +48,9 @@ export const mockFriends: Friend[] = [
   },
   { 
     id: '5', 
-    name: 'Jessica Lee', 
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
+    name: 'Jessica Lee',
+    email: 'jessica@example.com',
+    avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
     isInvited: false,
     status: 'online',
     lastSeen: 'Active now',
@@ -63,7 +68,6 @@ export const mockUser: User = {
   },
   profile: {
     name: 'Test User',
-    email: 'test@example.com',
     avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
   },
   friends: mockFriends

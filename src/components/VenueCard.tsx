@@ -25,12 +25,17 @@ const VenueCard = ({
 }: VenueCardProps) => {
   const navigate = useNavigate();
 
+  // Use actual database fields or fallback to computed values
+  const venueImage = venue.image_url || venue.image;
+  const venueLocation = venue.address || venue.location;
+  const venuePriceRange = venue.price_range || venue.priceRange;
+
   if (variant === 'compact') {
     return (
       <div className="flex gap-4 p-4">
         <div className="relative">
           <img 
-            src={venue.image} 
+            src={venueImage} 
             alt={venue.name}
             className="w-16 h-16 rounded-lg object-cover"
           />
@@ -54,15 +59,15 @@ const VenueCard = ({
           
           <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
             <MapPin className="w-3 h-3" />
-            {venue.location} • {venue.cuisineType}
+            {venueLocation} • {venue.cuisine_type}
           </div>
           
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1 text-gray-500">
               <DollarSign className="w-3 h-3" />
-              {venue.priceRange}
+              {venuePriceRange}
             </div>
-            {showMatchScore && (
+            {showMatchScore && venue.matchScore && (
               <Badge className="bg-green-500 text-white text-xs">
                 {venue.matchScore}% match
               </Badge>
@@ -77,11 +82,11 @@ const VenueCard = ({
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative">
         <img
-          src={venue.image}
+          src={venueImage}
           alt={venue.name}
           className="w-full h-48 object-cover"
         />
-        {showMatchScore && (
+        {showMatchScore && venue.matchScore && (
           <div className="absolute top-3 left-3">
             <Badge className="bg-green-500 text-white font-semibold">
               <Sparkles className="w-3 h-3 mr-1" />
@@ -124,16 +129,16 @@ const VenueCard = ({
         <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
           <div className="flex items-center gap-1">
             <MapPin className="w-4 h-4" />
-            {venue.location} • {venue.distance}
+            {venueLocation} {venue.distance && `• ${venue.distance}`}
           </div>
           <div className="flex items-center gap-1">
             <DollarSign className="w-4 h-4" />
-            {venue.priceRange}
+            {venuePriceRange}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          {venue.tags.slice(0, 3).map((tag) => (
+          {venue.tags?.slice(0, 3).map((tag) => (
             <Badge key={tag} variant="secondary" className="text-xs">
               {tag}
             </Badge>

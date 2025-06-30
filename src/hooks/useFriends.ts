@@ -2,15 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-
-interface Friend {
-  id: string;
-  name: string;
-  email: string;
-  avatar_url?: string;
-  friendship_status?: 'pending' | 'accepted' | 'declined' | 'blocked';
-  friendship_id?: string;
-}
+import { Friend } from '@/types';
 
 export const useFriends = () => {
   const { user } = useAuth();
@@ -42,13 +34,16 @@ export const useFriends = () => {
       }
 
       // Transform the data to get the friend's profile (not the current user's)
-      const friendsList = data?.map(friendship => {
+      const friendsList: Friend[] = data?.map(friendship => {
         const isCurrentUserSender = friendship.user_id === user.id;
         const friendProfile = isCurrentUserSender ? friendship.friend : friendship.user;
         
         return {
-          ...friendProfile,
-          friendship_status: friendship.status,
+          id: friendProfile.id,
+          name: friendProfile.name,
+          email: friendProfile.email,
+          avatar_url: friendProfile.avatar_url,
+          friendship_status: friendship.status as 'pending' | 'accepted' | 'declined' | 'blocked',
           friendship_id: friendship.id
         };
       }) || [];

@@ -30,14 +30,14 @@ const FriendCard = ({
     return (
       <div className="flex items-center gap-3 p-2">
         <Avatar className="w-10 h-10 border-2 border-pink-200">
-          <AvatarImage src={friend.avatar} alt={friend.name} />
+          <AvatarImage src={friend.avatar_url} alt={friend.name} />
           <AvatarFallback className="bg-pink-100 text-pink-600">
             {getInitials(friend.name)}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-gray-900 truncate">{friend.name}</h4>
-          {friend.status && (
+          {friend.lastSeen && (
             <p className="text-sm text-gray-500">{friend.lastSeen}</p>
           )}
         </div>
@@ -64,7 +64,7 @@ const FriendCard = ({
         <div className="flex items-center gap-4">
           <div className="relative">
             <Avatar className="w-14 h-14 border-2 border-pink-200">
-              <AvatarImage src={friend.avatar} alt={friend.name} />
+              <AvatarImage src={friend.avatar_url} alt={friend.name} />
               <AvatarFallback className="bg-pink-100 text-pink-600">
                 {getInitials(friend.name)}
               </AvatarFallback>
