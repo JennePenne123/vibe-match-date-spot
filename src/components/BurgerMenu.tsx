@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { Menu, User, Users, MapPin, LogOut, X } from 'lucide-react';
+import { getUserName, getUserAvatar } from '@/utils/typeHelpers';
 
 const BurgerMenu = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
-  const displayName = user?.name || user?.email?.split('@')[0] || 'User';
+  const displayName = getUserName(user);
 
   const menuItems = [
     {
@@ -62,7 +63,7 @@ const BurgerMenu = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Avatar className="w-12 h-12 border-2 border-pink-200">
-                <AvatarImage src={user?.avatar_url} alt={displayName} />
+                <AvatarImage src={getUserAvatar(user)} alt={displayName} />
                 <AvatarFallback className="bg-pink-100 text-pink-600">
                   {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
