@@ -1,7 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRealtimeInvitations } from './useRealtimeInvitations';
 
 interface DateInvitation {
   id: string;
@@ -30,7 +31,7 @@ export const useInvitations = () => {
   const [invitations, setInvitations] = useState<DateInvitation[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchInvitations = async () => {
+  const fetchInvitations = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -56,7 +57,24 @@ export const useInvitations = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  // Real-time subscription handlers
+  const handleInvitationReceived = useCallback(() => {
+    console.log('New invitation received - refreshing list');
+    fetchInvitations();
+  }, [fetchInvitations]);
+
+  const handleInvitationUpdated = useCallback(() => {
+    console.log('Invitation updated - refreshing list');
+    fetchInvitations();
+  }, [fetchInvitations]);
+
+  // Set up real-time subscriptions
+  useRealtimeInvitations({
+    onInvitationReceived: handleInvitationReceived,
+    onInvitationUpdated: handleInvitationUpdated,
+  });
 
   const acceptInvitation = async (invitationId: string) => {
     try {
@@ -70,7 +88,7 @@ export const useInvitations = () => {
         return;
       }
 
-      // Update local state
+      // Update local state optimistically
       setInvitations(prev => 
         prev.map(inv => 
           inv.id === invitationId 
@@ -95,7 +113,7 @@ export const useInvitations = () => {
         return;
       }
 
-      // Update local state
+      // Update local state optimistically
       setInvitations(prev => 
         prev.map(inv => 
           inv.id === invitationId 
@@ -137,7 +155,7 @@ export const useInvitations = () => {
 
   useEffect(() => {
     fetchInvitations();
-  }, [user]);
+  }, [fetchInvitations]);
 
   return {
     invitations,
