@@ -8,7 +8,7 @@ import HomeHeader from '@/components/HomeHeader';
 import StartNewDateCard from '@/components/StartNewDateCard';
 import DateInvitationsSection from '@/components/DateInvitationsSection';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { DateInvitation } from '@/types';
+import { getUserName } from '@/utils/typeHelpers';
 
 // Types for better type safety
 interface InvitationState {
@@ -33,7 +33,7 @@ const Home: React.FC = () => {
   const userInfo = React.useMemo(() => {
     if (!user) return null;
     
-    const displayName = user?.name || user?.email?.split('@')[0] || 'User';
+    const displayName = getUserName(user);
     const firstName = displayName.split(' ')[0];
     
     return { displayName, firstName };
