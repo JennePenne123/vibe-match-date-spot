@@ -229,7 +229,7 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
                   onClick={() => toggleArrayPreference(key, option)}
                 >
                   <div className="flex items-center space-x-2">
-                    <Checkbox checked={isSelected} readOnly />
+                    <Checkbox checked={isSelected} />
                     <span className="text-sm">{option}</span>
                   </div>
                 </div>
