@@ -110,7 +110,7 @@ const MyFriends = () => {
 
           {/* Add Friends CTA */}
           <Card className="bg-gray-100 border-dashed border-2 border-gray-300">
-            <Card`Content className="p-6 text-center">
+            <CardContent className="p-6 text-center">
               <div className="text-gray-400 mb-2">
                 <UserPlus className="w-8 h-8 mx-auto" />
               </div>
