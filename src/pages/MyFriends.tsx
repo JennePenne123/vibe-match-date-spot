@@ -2,18 +2,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMockAuth } from '@/contexts/MockAuthContext';
+import { useFriends } from '@/hooks/useFriends';
+import { useMockFriends } from '@/hooks/useMockFriends';
+import { IS_MOCK_MODE } from '@/utils/mockMode';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Search, UserPlus, Mail, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import FriendCard from '@/components/FriendCard';
-import { useFriends } from '@/hooks/useFriends';
 
 const MyFriends = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { friends } = useFriends();
+  const realAuth = useAuth();
+  const mockAuth = useMockAuth();
+  const realFriends = useFriends();
+  const mockFriends = useMockFriends();
+  
+  // Use mock or real data based on mode
+  const { user } = IS_MOCK_MODE ? mockAuth : realAuth;
+  const { friends } = IS_MOCK_MODE ? mockFriends : realFriends;
+  
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 

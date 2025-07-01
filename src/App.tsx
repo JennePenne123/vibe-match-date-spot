@@ -5,7 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { MockAuthProvider } from "./contexts/MockAuthContext";
 import { AppProvider } from "./contexts/AppContext";
+import { IS_MOCK_MODE } from "./utils/mockMode";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Onboarding from "./pages/Onboarding";
 import RegisterLogin from "./pages/RegisterLogin";
@@ -52,29 +54,55 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AuthProvider>
-            <AppProvider>
-              <ErrorBoundary level="page">
-                <Routes>
-                  <Route path="/" element={<Onboarding />} />
-                  <Route path="/register-login" element={<RegisterLogin />} />
-                  <Route path="/home" element={<Home />} />
-                  <Route path="/preferences" element={<Preferences />} />
-                  <Route path="/friends" element={<Friends />} />
-                  <Route path="/area" element={<Area />} />
-                  <Route path="/results" element={<Results />} />
-                  <Route path="/venue/:id" element={<VenueDetail />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/venues" element={<Venues />} />
-                  <Route path="/my-friends" element={<MyFriends />} />
-                  <Route path="/my-venues" element={<MyVenues />} />
-                  <Route path="/ai-recommendations" element={<AIRecommendations />} />
-                  <Route path="/plan-date" element={<SmartDatePlanning />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </ErrorBoundary>
-            </AppProvider>
-          </AuthProvider>
+          {IS_MOCK_MODE ? (
+            <MockAuthProvider>
+              <AppProvider>
+                <ErrorBoundary level="page">
+                  <Routes>
+                    <Route path="/" element={<Onboarding />} />
+                    <Route path="/register-login" element={<RegisterLogin />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/preferences" element={<Preferences />} />
+                    <Route path="/friends" element={<Friends />} />
+                    <Route path="/area" element={<Area />} />
+                    <Route path="/results" element={<Results />} />
+                    <Route path="/venue/:id" element={<VenueDetail />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/venues" element={<Venues />} />
+                    <Route path="/my-friends" element={<MyFriends />} />
+                    <Route path="/my-venues" element={<MyVenues />} />
+                    <Route path="/ai-recommendations" element={<AIRecommendations />} />
+                    <Route path="/plan-date" element={<SmartDatePlanning />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </ErrorBoundary>
+              </AppProvider>
+            </MockAuthProvider>
+          ) : (
+            <AuthProvider>
+              <AppProvider>
+                <ErrorBoundary level="page">
+                  <Routes>
+                    <Route path="/" element={<Onboarding />} />
+                    <Route path="/register-login" element={<RegisterLogin />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/preferences" element={<Preferences />} />
+                    <Route path="/friends" element={<Friends />} />
+                    <Route path="/area" element={<Area />} />
+                    <Route path="/results" element={<Results />} />
+                    <Route path="/venue/:id" element={<VenueDetail />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/venues" element={<Venues />} />
+                    <Route path="/my-friends" element={<MyFriends />} />
+                    <Route path="/my-venues" element={<MyVenues />} />
+                    <Route path="/ai-recommendations" element={<AIRecommendations />} />
+                    <Route path="/plan-date" element={<SmartDatePlanning />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </ErrorBoundary>
+              </AppProvider>
+            </AuthProvider>
+          )}
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
