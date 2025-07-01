@@ -5,18 +5,11 @@ import HomeContent from '@/components/HomeContent';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getUserName } from '@/utils/typeHelpers';
 import { useNavigate } from 'react-router-dom';
-import { IS_MOCK_MODE } from '@/utils/mockMode';
-
-// Conditionally import the hooks
 import { useAuth } from '@/contexts/AuthContext';
-import { useMockAuth } from '@/contexts/MockAuthContext';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  
-  // Use the appropriate auth hook based on mode
-  const authHook = IS_MOCK_MODE ? useMockAuth() : useAuth();
-  const { user, loading: authLoading } = authHook;
+  const { user, loading: authLoading } = useAuth();
 
   // Handle authentication redirect
   React.useEffect(() => {

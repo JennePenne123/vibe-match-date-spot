@@ -1,23 +1,16 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IS_MOCK_MODE } from '@/utils/mockMode';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Sparkles, AlertCircle } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-// Conditionally import the hooks
-import { useAuth } from '@/contexts/AuthContext';
-import { useMockAuth } from '@/contexts/MockAuthContext';
-
 const RegisterLogin = () => {
   const navigate = useNavigate();
-  
-  // Use the appropriate auth hook based on mode
-  const authHook = IS_MOCK_MODE ? useMockAuth() : useAuth();
-  const { user, loading: authLoading, signUp, signIn } = authHook;
+  const { user, loading: authLoading, signUp, signIn } = useAuth();
   
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -83,13 +76,6 @@ const RegisterLogin = () => {
       <div className="w-full max-w-md mx-auto space-y-6 animate-fade-in">
         {/* Logo and Header */}
         <div className="text-center space-y-4">
-          {IS_MOCK_MODE && (
-            <div className="bg-yellow-100 border border-yellow-300 rounded-md p-3 mb-4">
-              <p className="text-sm text-yellow-800">
-                <strong>Mock Mode:</strong> Use any email/password to test
-              </p>
-            </div>
-          )}
           <div className="flex justify-center">
             <div className="bg-gradient-to-r from-pink-400 to-rose-500 rounded-full p-4 shadow-lg">
               <Heart className="w-12 h-12 text-white" fill="currentColor" />
