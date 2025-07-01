@@ -12,8 +12,17 @@ import NoFriendsEmptyState from '@/components/home/NoFriendsEmptyState';
 import AIRecommendationsSection from '@/components/home/AIRecommendationsSection';
 import RealtimeStatusIndicator from '@/components/home/RealtimeStatusIndicator';
 import DevelopmentControls from '@/components/home/DevelopmentControls';
+import { IS_MOCK_MODE } from '@/utils/mockMode';
+
+// Conditionally import the hooks
+import { useAuth } from '@/contexts/AuthContext';
+import { useMockAuth } from '@/contexts/MockAuthContext';
 
 const HomeContent: React.FC = () => {
+  // Use the appropriate auth hook based on mode
+  const authHook = IS_MOCK_MODE ? useMockAuth() : useAuth();
+  const { user } = authHook;
+
   const { friends } = useFriends();
   const { invitations, loading: invitationsLoading, acceptInvitation, declineInvitation } = useInvitations();
   const { invitationState, handleAcceptInvitation, handleDeclineInvitation } = useInvitationState();
