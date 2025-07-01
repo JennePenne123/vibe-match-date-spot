@@ -1,8 +1,33 @@
 
 import { useState } from 'react';
 
-// Mock invitations data
-const MOCK_INVITATIONS = [
+// Define the invitation type to match the expected structure
+interface MockInvitation {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  venue_id: string;
+  title: string;
+  message: string;
+  proposed_date: string;
+  status: 'pending' | 'accepted' | 'declined' | 'cancelled';
+  created_at: string;
+  ai_compatibility_score: number;
+  ai_reasoning: string;
+  sender: {
+    name: string;
+    email: string;
+    avatar_url: string | null;
+  };
+  venue: {
+    name: string;
+    address: string;
+    image_url: string | null;
+  };
+}
+
+// Mock invitations data with proper typing
+const MOCK_INVITATIONS: MockInvitation[] = [
   {
     id: 'invitation-1',
     sender_id: 'friend-1',
@@ -11,7 +36,7 @@ const MOCK_INVITATIONS = [
     title: 'Coffee Date at Blue Bottle',
     message: 'Hey! Want to grab coffee this weekend?',
     proposed_date: '2024-07-15',
-    status: 'pending' as const,
+    status: 'pending',
     created_at: '2024-07-01T10:00:00Z',
     ai_compatibility_score: 85,
     ai_reasoning: 'Great match based on your coffee preferences!',
@@ -29,7 +54,7 @@ const MOCK_INVITATIONS = [
 ];
 
 export const useMockInvitations = () => {
-  const [invitations, setInvitations] = useState(MOCK_INVITATIONS);
+  const [invitations, setInvitations] = useState<MockInvitation[]>(MOCK_INVITATIONS);
   const [loading, setLoading] = useState(false);
 
   const acceptInvitation = async (invitationId: string) => {
