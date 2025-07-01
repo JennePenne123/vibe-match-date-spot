@@ -3,11 +3,32 @@ import React from 'react';
 import HomeHeader from '@/components/HomeHeader';
 import HomeContent from '@/components/HomeContent';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { getUserName } from '@/utils/typeHelpers';
+import { useNavigate } from 'react-router-dom';
+import { IS_MOCK_MODE } from '@/utils/mockMode';
+
+// Conditionally import the hooks
+import { useAuth } from '@/contexts/AuthContext';
+import { useMockAuth } from '@/contexts/MockAuthContext';
 
 const Home: React.FC = () => {
-  const { user, authLoading } = useAuthRedirect();
+  const navigate = useNavigate();
+  
+  // Use the appropriate auth hook based on mode
+  const authHook = IS_MOCK_MODE ? useMockAuth() : useAuth();
+  const { user, loading: authLoading } = authHook;
+
+  // Handle authentication redirect
+  React.useEffect(() => {
+    const redirectTimer = setTimeout(() => {
+      if (!authLoading && !user) {
+        console.log('No authenticated user found, redirecting to login');
+        navigate('/register-login', { replace: true });
+      }
+    }, 100);
+
+    return () => clearTimeout(redirectTimer);
+  }, [user, authLoading, navigate]);
 
   // Memoize user display logic
   const userInfo = React.useMemo(() => {
