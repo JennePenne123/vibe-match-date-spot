@@ -1,8 +1,6 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useMockAuth } from '@/contexts/MockAuthContext';
 import { IS_MOCK_MODE } from '@/utils/mockMode';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,13 +8,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Heart, Sparkles, AlertCircle } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
+// Conditionally import the hooks
+import { useAuth } from '@/contexts/AuthContext';
+import { useMockAuth } from '@/contexts/MockAuthContext';
+
 const RegisterLogin = () => {
   const navigate = useNavigate();
-  const realAuth = useAuth();
-  const mockAuth = useMockAuth();
   
-  // Use mock or real auth based on mode
-  const { user, loading: authLoading, signUp, signIn } = IS_MOCK_MODE ? mockAuth : realAuth;
+  // Use the appropriate auth hook based on mode
+  const authHook = IS_MOCK_MODE ? useMockAuth() : useAuth();
+  const { user, loading: authLoading, signUp, signIn } = authHook;
   
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
