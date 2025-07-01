@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDatePlanning } from '@/hooks/useDatePlanning';
@@ -18,7 +17,11 @@ import SafeComponent from '@/components/SafeComponent';
 
 type PlanningStep = 'select-partner' | 'set-preferences' | 'review-matches' | 'create-invitation';
 
-const SmartDatePlanner: React.FC = () => {
+interface SmartDatePlannerProps {
+  preselectedFriend?: { id: string; name: string } | null;
+}
+
+const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { friends } = useFriends();
@@ -33,12 +36,23 @@ const SmartDatePlanner: React.FC = () => {
   } = useDatePlanning();
 
   const [currentStep, setCurrentStep] = useState<PlanningStep>('select-partner');
-  const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
   const [selectedVenueId, setSelectedVenueId] = useState<string>('');
   const [invitationMessage, setInvitationMessage] = useState<string>('');
 
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
   const selectedVenue = venueRecommendations.find(v => v.venue_id === selectedVenueId);
+
+  // Auto-advance if friend is pre-selected
+  useEffect(() => {
+    if (preselectedFriend && friends.length > 0) {
+      const friend = friends.find(f => f.id === preselectedFriend.id);
+      if (friend) {
+        setSelectedPartnerId(friend.id);
+        handlePartnerSelection(friend.id);
+      }
+    }
+  }, [preselectedFriend, friends]);
 
   // Check for existing session when partner is selected
   useEffect(() => {
@@ -51,12 +65,13 @@ const SmartDatePlanner: React.FC = () => {
     }
   }, [selectedPartnerId, getActiveSession, currentStep]);
 
-  const handlePartnerSelection = async () => {
-    if (!selectedPartnerId) return;
+  const handlePartnerSelection = async (partnerId?: string) => {
+    const partnerIdToUse = partnerId || selectedPartnerId;
+    if (!partnerIdToUse) return;
 
-    const session = await getActiveSession(selectedPartnerId);
+    const session = await getActiveSession(partnerIdToUse);
     if (!session) {
-      await createPlanningSession(selectedPartnerId);
+      await createPlanningSession(partnerIdToUse);
     }
     setCurrentStep('set-preferences');
   };
@@ -106,7 +121,13 @@ const SmartDatePlanner: React.FC = () => {
 
   const goBack = () => {
     switch (currentStep) {
-      case 'set-preferences': setCurrentStep('select-partner'); break;
+      case 'set-preferences': 
+        if (preselectedFriend) {
+          navigate('/my-friends');
+        } else {
+          setCurrentStep('select-partner');
+        }
+        break;
       case 'review-matches': setCurrentStep('set-preferences'); break;
       case 'create-invitation': setCurrentStep('review-matches'); break;
     }
@@ -140,17 +161,15 @@ const SmartDatePlanner: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        {currentStep !== 'select-partner' && (
-          <div className="flex justify-start">
-            <Button onClick={goBack} variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-          </div>
-        )}
+        <div className="flex justify-start">
+          <Button onClick={goBack} variant="outline" size="sm">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        </div>
 
         {/* Step 1: Select Partner */}
-        {currentStep === 'select-partner' && (
+        {currentStep === 'select-partner' && !preselectedFriend && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -173,7 +192,7 @@ const SmartDatePlanner: React.FC = () => {
               </Select>
               
               <Button 
-                onClick={handlePartnerSelection}
+                onClick={() => handlePartnerSelection()}
                 disabled={!selectedPartnerId || loading}
                 className="w-full"
               >

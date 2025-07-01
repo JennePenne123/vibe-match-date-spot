@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import SmartDatePlanner from '@/components/SmartDatePlanner';
 import HomeHeader from '@/components/HomeHeader';
@@ -8,6 +9,10 @@ import { getUserName } from '@/utils/typeHelpers';
 
 const SmartDatePlanning: React.FC = () => {
   const { user } = useAuthRedirect();
+  const location = useLocation();
+  
+  // Get pre-selected friend from navigation state
+  const preselectedFriend = location.state?.preselectedFriend || null;
 
   // Memoize user display logic
   const userInfo = React.useMemo(() => {
@@ -31,7 +36,7 @@ const SmartDatePlanning: React.FC = () => {
         firstName={firstName}
       />
       
-      <SmartDatePlanner />
+      <SmartDatePlanner preselectedFriend={preselectedFriend} />
     </div>
   );
 };

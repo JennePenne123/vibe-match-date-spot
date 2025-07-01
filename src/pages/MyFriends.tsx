@@ -8,15 +8,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Search, UserPlus, Mail, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import FriendCard from '@/components/FriendCard';
-import { mockFriends } from '@/data/mockUsers';
+import { useFriends } from '@/hooks/useFriends';
 
 const MyFriends = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { friends } = useFriends();
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
-  const filteredFriends = mockFriends.filter(friend =>
+  const filteredFriends = friends.filter(friend =>
     friend.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -28,9 +29,11 @@ const MyFriends = () => {
   };
 
   const handleInviteDate = (friendId: string, friendName: string) => {
-    toast({
-      title: "Date invitation sent!",
-      description: `${friendName} will receive your date invitation`,
+    // Navigate to Smart Date Planning with pre-selected friend
+    navigate('/plan-date', { 
+      state: { 
+        preselectedFriend: { id: friendId, name: friendName }
+      }
     });
   };
 
@@ -49,7 +52,7 @@ const MyFriends = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-semibold text-gray-900">My Friends</h1>
-            <p className="text-sm text-gray-600">{mockFriends.length} connections</p>
+            <p className="text-sm text-gray-600">{friends.length} connections</p>
           </div>
           <Button
             variant="outline"
@@ -77,14 +80,14 @@ const MyFriends = () => {
           <div className="grid grid-cols-2 gap-4">
             <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200">
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-pink-600">{mockFriends.length}</div>
+                <div className="text-2xl font-bold text-pink-600">{friends.length}</div>
                 <div className="text-sm text-gray-600">Total Friends</div>
               </CardContent>
             </Card>
             <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-blue-600">
-                  {mockFriends.filter(f => f.status === 'online').length}
+                  {friends.filter(f => f.status === 'online').length}
                 </div>
                 <div className="text-sm text-gray-600">Online Now</div>
               </CardContent>
@@ -107,7 +110,7 @@ const MyFriends = () => {
 
           {/* Add Friends CTA */}
           <Card className="bg-gray-100 border-dashed border-2 border-gray-300">
-            <CardContent className="p-6 text-center">
+            <Card`Content className="p-6 text-center">
               <div className="text-gray-400 mb-2">
                 <UserPlus className="w-8 h-8 mx-auto" />
               </div>
