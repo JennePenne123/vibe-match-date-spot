@@ -166,6 +166,49 @@ export const createTestVenues = async () => {
   }
 };
 
+export const createOneMockFriend = async (currentUserId: string) => {
+  try {
+    console.log('Creating one mock friend for user:', currentUserId);
+    
+    // First create the test user profile if it doesn't exist
+    const testUser = TEST_USERS[0]; // Use Sarah Johnson
+    
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({
+        id: testUser.id,
+        name: testUser.name,
+        email: testUser.email,
+        avatar_url: testUser.avatar_url
+      }, { onConflict: 'id' });
+
+    if (profileError) {
+      console.error('Error creating test user profile:', profileError);
+      throw profileError;
+    }
+
+    // Then create the friendship
+    const { error: friendshipError } = await supabase
+      .from('friendships')
+      .upsert({
+        user_id: currentUserId,
+        friend_id: testUser.id,
+        status: 'accepted'
+      }, { onConflict: 'user_id,friend_id' });
+
+    if (friendshipError) {
+      console.error('Error creating test friendship:', friendshipError);
+      throw friendshipError;
+    }
+
+    console.log('Mock friend created successfully');
+    return true;
+  } catch (error) {
+    console.error('Error in createOneMockFriend:', error);
+    throw error;
+  }
+};
+
 export const setupTestEnvironment = async (currentUserId: string) => {
   try {
     console.log('Setting up test environment...');
