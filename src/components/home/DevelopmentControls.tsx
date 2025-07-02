@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { createOneMockFriend } from '@/services/testDataService';
+import { createOneMockFriend } from '@/services/testData';
 import { useToast } from '@/hooks/use-toast';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 

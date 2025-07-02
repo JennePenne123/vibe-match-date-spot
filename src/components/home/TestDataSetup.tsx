@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Sparkles, Users, MapPin, Settings } from 'lucide-react';
-import { setupTestEnvironment } from '@/services/testDataService';
+import { setupTestEnvironment } from '@/services/testData';
 
 const TestDataSetup: React.FC = () => {
   const { user } = useAuth();
