@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { createOneMockFriend } from '@/services/testDataService';
 import { useToast } from '@/hooks/use-toast';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 interface DevelopmentControlsProps {
   showEmptyState: boolean;
@@ -16,6 +17,8 @@ const DevelopmentControls: React.FC<DevelopmentControlsProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { handleAsyncError } = useErrorHandler();
+  const [isLoading, setIsLoading] = useState(false);
 
   if (process.env.NODE_ENV !== 'development') return null;
 
@@ -29,19 +32,29 @@ const DevelopmentControls: React.FC<DevelopmentControlsProps> = ({
       return;
     }
 
-    try {
-      await createOneMockFriend(user.id);
+    setIsLoading(true);
+    console.log('Adding mock friend for user:', user.id);
+    
+    const result = await handleAsyncError(
+      () => createOneMockFriend(user.id),
+      {
+        toastTitle: "Failed to add mock friend",
+        toastDescription: "Check console for details",
+        onError: (error) => {
+          console.error('Mock friend creation failed:', error);
+        }
+      }
+    );
+
+    if (result) {
       toast({
         title: "Success",
-        description: "Mock friend Sarah Johnson added! Refresh to see.",
+        description: "Mock friend Sarah Johnson added! Refresh to see changes.",
       });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to add mock friend",
-        variant: "destructive"
-      });
+      console.log('Mock friend added successfully');
     }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -60,8 +73,9 @@ const DevelopmentControls: React.FC<DevelopmentControlsProps> = ({
         variant="outline"
         size="sm"
         className="text-xs text-gray-500 hover:text-gray-700"
+        disabled={isLoading}
       >
-        Add Mock Friend
+        {isLoading ? 'Adding...' : 'Add Mock Friend'}
       </Button>
     </div>
   );
