@@ -5,7 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import { MockAuthProvider } from "./contexts/MockAuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Onboarding from "./pages/Onboarding";
@@ -54,8 +53,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <MockAuthProvider>
-              <AppProvider>
+            <AppProvider>
               <ErrorBoundary level="page">
                 <Routes>
                   <Route path="/" element={<Onboarding />} />
@@ -75,8 +73,7 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </ErrorBoundary>
-              </AppProvider>
-            </MockAuthProvider>
+            </AppProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
