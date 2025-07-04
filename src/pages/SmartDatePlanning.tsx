@@ -7,6 +7,7 @@ import { IS_MOCK_MODE } from '@/utils/mockMode';
 import SmartDatePlanner from '@/components/SmartDatePlanner';
 import HomeHeader from '@/components/HomeHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { getUserName } from '@/utils/typeHelpers';
 
 const SmartDatePlanning: React.FC = () => {
@@ -61,15 +62,19 @@ const SmartDatePlanning: React.FC = () => {
   const { displayName, firstName } = userInfo;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <HomeHeader 
-        user={user}
-        displayName={displayName}
-        firstName={firstName}
-      />
-      
-      <SmartDatePlanner preselectedFriend={preselectedFriend} />
-    </div>
+    <ErrorBoundary level="page">
+      <div className="min-h-screen bg-gray-50">
+        <HomeHeader 
+          user={user}
+          displayName={displayName}
+          firstName={firstName}
+        />
+        
+        <ErrorBoundary level="component">
+          <SmartDatePlanner preselectedFriend={preselectedFriend} />
+        </ErrorBoundary>
+      </div>
+    </ErrorBoundary>
   );
 };
 

@@ -1,6 +1,6 @@
 
 // Toggle this to enable/disable mock mode
-export const IS_MOCK_MODE = false;
+export const IS_MOCK_MODE = true;
 
 // Mock user data
 export const MOCK_USER = {
