@@ -2,8 +2,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMockAuth } from '@/contexts/MockAuthContext';
-import { IS_MOCK_MODE } from '@/utils/mockMode';
 import SmartDatePlanner from '@/components/SmartDatePlanner';
 import HomeHeader from '@/components/HomeHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -11,23 +9,42 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { getUserName } from '@/utils/typeHelpers';
 
 const SmartDatePlanning: React.FC = () => {
-  const realAuth = useAuth();
-  const mockAuth = useMockAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
-  
-  // Use mock or real auth based on mode
-  const { user } = IS_MOCK_MODE ? mockAuth : realAuth;
   
   // Get pre-selected friend from navigation state
   const preselectedFriend = location.state?.preselectedFriend || null;
 
-  console.log('SmartDatePlanning - Auth state:', { user: user?.id, mockMode: IS_MOCK_MODE });
+  console.log('SmartDatePlanning - Auth state:', { user: user?.id, loading });
   console.log('SmartDatePlanning - Preselected friend:', preselectedFriend);
 
-  // Memoize user display logic
+  // Show loading spinner while auth is loading
+  if (loading) {
+    console.log('SmartDatePlanning - Auth loading, showing spinner');
+    return <LoadingSpinner />;
+  }
+
+  // Redirect to login if no user
+  if (!user) {
+    console.log('SmartDatePlanning - No user, redirecting to login');
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-md mx-auto text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h1>
+          <p className="text-gray-600 mb-6">Please sign in to use the Smart Date Planner.</p>
+          <button 
+            onClick={() => window.location.href = '/register-login'}
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Get user display info
   const userInfo = React.useMemo(() => {
-    if (!user) return null;
-    
     try {
       const displayName = getUserName(user);
       const firstName = displayName.split(' ')[0];
@@ -38,41 +55,6 @@ const SmartDatePlanning: React.FC = () => {
       return { displayName: 'User', firstName: 'User' };
     }
   }, [user]);
-
-  if (!user || !userInfo) {
-    console.log('SmartDatePlanning - No user or userInfo, checking mock mode');
-    
-    // In mock mode, automatically provide a user
-    if (IS_MOCK_MODE) {
-      const mockUser = {
-        id: 'mock-user-123',
-        email: 'test@example.com',
-        name: 'Test User',
-        avatar_url: null
-      };
-      const displayName = 'Test User';
-      const firstName = 'Test';
-      
-      console.log('SmartDatePlanning - Using mock user');
-      
-      return (
-        <div className="min-h-screen bg-gray-50">
-          <HomeHeader 
-            user={mockUser}
-            displayName={displayName}
-            firstName={firstName}
-          />
-          
-          <ErrorBoundary level="component">
-            <SmartDatePlanner preselectedFriend={preselectedFriend} />
-          </ErrorBoundary>
-        </div>
-      );
-    }
-    
-    console.log('SmartDatePlanning - No user, showing loading spinner');
-    return <LoadingSpinner />;
-  }
 
   const { displayName, firstName } = userInfo;
 

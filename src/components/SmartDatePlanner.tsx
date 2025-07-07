@@ -1,11 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDatePlanning } from '@/hooks/useDatePlanning';
 import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMockAuth } from '@/contexts/MockAuthContext';
-import { IS_MOCK_MODE } from '@/utils/mockMode';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { usePlanningSteps } from '@/hooks/usePlanningSteps';
@@ -23,9 +20,7 @@ interface SmartDatePlannerProps {
 
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }) => {
   const navigate = useNavigate();
-  const realAuth = useAuth();
-  const mockAuth = useMockAuth();
-  const { user } = IS_MOCK_MODE ? mockAuth : realAuth;
+  const { user } = useAuth();
 
   console.log('SmartDatePlanner - Starting with user:', user?.id);
   console.log('SmartDatePlanner - Preselected friend:', preselectedFriend);
@@ -135,13 +130,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
   const selectedVenue = venueRecommendations.find(v => v.venue_id === selectedVenueId);
 
-  console.log('SmartDatePlanner - Current state:', {
-    currentStep,
-    selectedPartnerId,
-    friendsCount: friends.length,
-    currentSessionId: currentSession?.id
-  });
-
   // Check for existing session when partner is selected
   useEffect(() => {
     if (selectedPartnerId && currentStep === 'select-partner') {
@@ -166,7 +154,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     }
   }, [compatibilityScore, venueRecommendations, currentStep, setCurrentStep]);
 
-  const handlePartnerSelection = async (partnerId?: string) => {
+  async function handlePartnerSelection(partnerId?: string) {
     const partnerIdToUse = partnerId || selectedPartnerId;
     if (!partnerIdToUse) return;
 
@@ -182,14 +170,14 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     } catch (error) {
       console.error('SmartDatePlanner - Error in partner selection:', error);
     }
-  };
+  }
 
-  const handlePreferencesComplete = () => {
+  function handlePreferencesComplete() {
     console.log('SmartDatePlanner - Preferences submitted, starting AI analysis...');
     setAiAnalyzing(true);
-  };
+  }
 
-  const handleVenueSelection = (venueId: string) => {
+  function handleVenueSelection(venueId: string) {
     console.log('SmartDatePlanner - Venue selected:', venueId);
     setSelectedVenueId(venueId);
     setCurrentStep('create-invitation');
@@ -199,9 +187,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
       const aiMessage = `Hi ${selectedPartner.name}! 🌟 Our AI compatibility score is ${compatibilityScore}% - we're a great match! I'd love to take you to ${selectedVenue.venue_name} based on our shared preferences. ${selectedVenue.ai_reasoning} What do you think?`;
       setInvitationMessage(aiMessage);
     }
-  };
+  }
 
-  const handleSendInvitation = async () => {
+  async function handleSendInvitation() {
     if (!currentSession || !selectedVenueId) return;
 
     console.log('SmartDatePlanner - Sending invitation');
@@ -221,7 +209,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     } catch (error) {
       console.error('SmartDatePlanner - Error sending invitation:', error);
     }
-  };
+  }
 
   if (!user) {
     return (
