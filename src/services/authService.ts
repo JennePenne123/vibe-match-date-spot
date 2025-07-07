@@ -3,19 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { AppUser } from '@/types/app';
 import { fetchUserProfile } from '@/utils/userProfileHelpers';
 
-// Auto sign out on app start to prevent authentication state issues
-const autoSignOutOnStart = async () => {
-  try {
-    await supabase.auth.signOut();
-    console.log('Auto signed out on app start');
-  } catch (error) {
-    console.error('Auto sign out error:', error);
-  }
-};
-
-// Call auto sign out immediately when this module loads
-autoSignOutOnStart();
-
 export const signUpUser = async (email: string, password: string, userData?: any) => {
   try {
     const { data, error } = await supabase.auth.signUp({

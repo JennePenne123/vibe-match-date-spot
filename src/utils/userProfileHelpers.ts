@@ -10,10 +10,16 @@ export const fetchUserProfile = async (supabaseUser: SupabaseUser): Promise<AppU
       .from('profiles')
       .select('name, avatar_url')
       .eq('id', supabaseUser.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('Error fetching user profile:', error);
+      return supabaseUserToAppUser(supabaseUser)!;
+    }
+
+    // If no profile exists, return user data from auth
+    if (!profile) {
+      console.log('No profile found, using auth user data');
       return supabaseUserToAppUser(supabaseUser)!;
     }
 
