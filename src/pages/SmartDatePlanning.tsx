@@ -21,17 +21,27 @@ const SmartDatePlanning: React.FC = () => {
   // Get pre-selected friend from navigation state
   const preselectedFriend = location.state?.preselectedFriend || null;
 
+  console.log('SmartDatePlanning - Auth state:', { user: user?.id, mockMode: IS_MOCK_MODE });
+  console.log('SmartDatePlanning - Preselected friend:', preselectedFriend);
+
   // Memoize user display logic
   const userInfo = React.useMemo(() => {
     if (!user) return null;
     
-    const displayName = getUserName(user);
-    const firstName = displayName.split(' ')[0];
-    
-    return { displayName, firstName };
+    try {
+      const displayName = getUserName(user);
+      const firstName = displayName.split(' ')[0];
+      
+      return { displayName, firstName };
+    } catch (error) {
+      console.error('Error getting user name:', error);
+      return { displayName: 'User', firstName: 'User' };
+    }
   }, [user]);
 
   if (!user || !userInfo) {
+    console.log('SmartDatePlanning - No user or userInfo, checking mock mode');
+    
     // In mock mode, automatically provide a user
     if (IS_MOCK_MODE) {
       const mockUser = {
@@ -43,6 +53,8 @@ const SmartDatePlanning: React.FC = () => {
       const displayName = 'Test User';
       const firstName = 'Test';
       
+      console.log('SmartDatePlanning - Using mock user');
+      
       return (
         <div className="min-h-screen bg-gray-50">
           <HomeHeader 
@@ -51,15 +63,20 @@ const SmartDatePlanning: React.FC = () => {
             firstName={firstName}
           />
           
-          <SmartDatePlanner preselectedFriend={preselectedFriend} />
+          <ErrorBoundary level="component">
+            <SmartDatePlanner preselectedFriend={preselectedFriend} />
+          </ErrorBoundary>
         </div>
       );
     }
     
+    console.log('SmartDatePlanning - No user, showing loading spinner');
     return <LoadingSpinner />;
   }
 
   const { displayName, firstName } = userInfo;
+
+  console.log('SmartDatePlanning - Rendering with user:', { displayName, firstName });
 
   return (
     <ErrorBoundary level="page">

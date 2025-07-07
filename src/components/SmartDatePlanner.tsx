@@ -26,7 +26,74 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   const realAuth = useAuth();
   const mockAuth = useMockAuth();
   const { user } = IS_MOCK_MODE ? mockAuth : realAuth;
-  const { friends } = useFriends();
+
+  console.log('SmartDatePlanner - Starting with user:', user?.id);
+  console.log('SmartDatePlanner - Preselected friend:', preselectedFriend);
+
+  // Initialize hooks with error handling
+  let friends = [];
+  let friendsError = null;
+  
+  try {
+    const friendsResult = useFriends();
+    friends = friendsResult.friends || [];
+    console.log('SmartDatePlanner - Friends loaded:', friends.length);
+  } catch (error) {
+    console.error('SmartDatePlanner - Error loading friends:', error);
+    friendsError = error;
+  }
+
+  let datePlanningState = null;
+  let datePlanningError = null;
+  
+  try {
+    datePlanningState = useDatePlanning();
+    console.log('SmartDatePlanner - Date planning state loaded');
+  } catch (error) {
+    console.error('SmartDatePlanner - Error loading date planning state:', error);
+    datePlanningError = error;
+  }
+
+  let planningStepsState = null;
+  let planningStepsError = null;
+  
+  try {
+    planningStepsState = usePlanningSteps({ preselectedFriend });
+    console.log('SmartDatePlanner - Planning steps loaded');
+  } catch (error) {
+    console.error('SmartDatePlanner - Error loading planning steps:', error);
+    planningStepsError = error;
+  }
+
+  // Show error if any critical hooks failed
+  if (friendsError || datePlanningError || planningStepsError) {
+    console.error('SmartDatePlanner - Critical errors detected:', {
+      friendsError,
+      datePlanningError,
+      planningStepsError
+    });
+    
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-md mx-auto text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Loading Error</h1>
+          <p className="text-gray-600 mb-6">
+            There was an error loading the Smart Date Planner. Please try refreshing the page.
+          </p>
+          <div className="text-sm text-red-600 mb-4">
+            {friendsError && <div>Friends Error: {friendsError.message}</div>}
+            {datePlanningError && <div>Date Planning Error: {datePlanningError.message}</div>}
+            {planningStepsError && <div>Planning Steps Error: {planningStepsError.message}</div>}
+          </div>
+          <Button onClick={() => navigate('/home')}>
+            Back to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Extract states from hooks (with defaults if null)
   const {
     currentSession,
     loading,
@@ -35,7 +102,15 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     createPlanningSession,
     getActiveSession,
     completePlanningSession
-  } = useDatePlanning();
+  } = datePlanningState || {
+    currentSession: null,
+    loading: false,
+    compatibilityScore: null,
+    venueRecommendations: [],
+    createPlanningSession: async () => {},
+    getActiveSession: async () => null,
+    completePlanningSession: async () => false
+  };
 
   const {
     currentStep,
@@ -44,7 +119,14 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     setSelectedPartnerId,
     getStepProgress,
     goBack
-  } = usePlanningSteps({ preselectedFriend });
+  } = planningStepsState || {
+    currentStep: 'select-partner',
+    setCurrentStep: () => {},
+    selectedPartnerId: '',
+    setSelectedPartnerId: () => {},
+    getStepProgress: () => 0,
+    goBack: () => {}
+  };
 
   const [selectedVenueId, setSelectedVenueId] = useState<string>('');
   const [invitationMessage, setInvitationMessage] = useState<string>('');
@@ -53,13 +135,24 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
   const selectedVenue = venueRecommendations.find(v => v.venue_id === selectedVenueId);
 
+  console.log('SmartDatePlanner - Current state:', {
+    currentStep,
+    selectedPartnerId,
+    friendsCount: friends.length,
+    currentSessionId: currentSession?.id
+  });
+
   // Check for existing session when partner is selected
   useEffect(() => {
     if (selectedPartnerId && currentStep === 'select-partner') {
+      console.log('SmartDatePlanner - Checking for existing session');
       getActiveSession(selectedPartnerId).then(session => {
         if (session) {
+          console.log('SmartDatePlanner - Found existing session, advancing step');
           setCurrentStep('set-preferences');
         }
+      }).catch(error => {
+        console.error('SmartDatePlanner - Error getting active session:', error);
       });
     }
   }, [selectedPartnerId, getActiveSession, currentStep, setCurrentStep]);
@@ -67,7 +160,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   // Monitor compatibility score and venue recommendations
   useEffect(() => {
     if (compatibilityScore !== null && venueRecommendations.length > 0 && currentStep === 'set-preferences') {
-      console.log('AI analysis complete, advancing to review step');
+      console.log('SmartDatePlanner - AI analysis complete, advancing to review step');
       setAiAnalyzing(false);
       setCurrentStep('review-matches');
     }
@@ -77,19 +170,27 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     const partnerIdToUse = partnerId || selectedPartnerId;
     if (!partnerIdToUse) return;
 
-    const session = await getActiveSession(partnerIdToUse);
-    if (!session) {
-      await createPlanningSession(partnerIdToUse);
+    console.log('SmartDatePlanner - Handling partner selection:', partnerIdToUse);
+    
+    try {
+      const session = await getActiveSession(partnerIdToUse);
+      if (!session) {
+        console.log('SmartDatePlanner - Creating new planning session');
+        await createPlanningSession(partnerIdToUse);
+      }
+      setCurrentStep('set-preferences');
+    } catch (error) {
+      console.error('SmartDatePlanner - Error in partner selection:', error);
     }
-    setCurrentStep('set-preferences');
   };
 
   const handlePreferencesComplete = () => {
-    console.log('Preferences submitted, starting AI analysis...');
+    console.log('SmartDatePlanner - Preferences submitted, starting AI analysis...');
     setAiAnalyzing(true);
   };
 
   const handleVenueSelection = (venueId: string) => {
+    console.log('SmartDatePlanner - Venue selected:', venueId);
     setSelectedVenueId(venueId);
     setCurrentStep('create-invitation');
     
@@ -103,16 +204,22 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   const handleSendInvitation = async () => {
     if (!currentSession || !selectedVenueId) return;
 
-    const success = await completePlanningSession(
-      currentSession.id,
-      selectedVenueId,
-      invitationMessage
-    );
+    console.log('SmartDatePlanner - Sending invitation');
+    
+    try {
+      const success = await completePlanningSession(
+        currentSession.id,
+        selectedVenueId,
+        invitationMessage
+      );
 
-    if (success) {
-      navigate('/home', { 
-        state: { message: 'Smart date invitation sent successfully!' }
-      });
+      if (success) {
+        navigate('/home', { 
+          state: { message: 'Smart date invitation sent successfully!' }
+        });
+      }
+    } catch (error) {
+      console.error('SmartDatePlanner - Error sending invitation:', error);
     }
   };
 
