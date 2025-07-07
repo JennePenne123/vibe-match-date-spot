@@ -1,33 +1,27 @@
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Users, Clock, DollarSign, Utensils, Sparkles } from 'lucide-react';
-import PreferenceSection from './preferences/PreferenceSection';
-import DistanceSlider from './preferences/DistanceSlider';
-import CompatibilitySummary from './preferences/CompatibilitySummary';
-import {
-  CUISINE_OPTIONS,
-  PRICE_OPTIONS,
-  TIME_OPTIONS,
-  VIBE_OPTIONS,
-  DIETARY_OPTIONS
-} from './preferences/PreferenceConstants';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import { Heart, Users, Clock, DollarSign, MapPin, Sparkles } from 'lucide-react';
+import { useDatePlanning } from '@/hooks/useDatePlanning';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CollaborativePreferencesProps {
   sessionId: string;
   partnerId: string;
-  onPreferencesUpdated?: () => void;
+  onPreferencesUpdated: () => void;
 }
 
-interface UserPreferences {
+interface Preferences {
   preferred_cuisines: string[];
+  preferred_vibes: string[];
   preferred_price_range: string[];
   preferred_times: string[];
-  preferred_vibes: string[];
   max_distance: number;
   dietary_restrictions: string[];
 }
@@ -38,62 +32,55 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
   onPreferencesUpdated
 }) => {
   const { user } = useAuth();
-  const [myPreferences, setMyPreferences] = useState<UserPreferences>({
+  const { updateSessionPreferences, currentSession, loading } = useDatePlanning();
+  
+  const [preferences, setPreferences] = useState<Preferences>({
     preferred_cuisines: [],
+    preferred_vibes: [],
     preferred_price_range: [],
     preferred_times: [],
-    preferred_vibes: [],
     max_distance: 10,
     dietary_restrictions: []
   });
   
-  const [partnerPreferences, setPartnerPreferences] = useState<UserPreferences | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [partnerPreferences, setPartnerPreferences] = useState<Preferences | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   // Load existing preferences
   useEffect(() => {
-    loadPreferences();
-    setupRealtimeSubscription();
-  }, [sessionId]);
+    if (user) {
+      loadUserPreferences();
+    }
+  }, [user]);
 
-  const loadPreferences = async () => {
+  // Load partner preferences if they exist
+  useEffect(() => {
+    if (partnerId) {
+      loadPartnerPreferences();
+    }
+  }, [partnerId]);
+
+  const loadUserPreferences = async () => {
     if (!user) return;
-
+    
     try {
-      // Load user's existing preferences
-      const { data: userPrefs } = await supabase
+      const { data, error } = await supabase
         .from('user_preferences')
         .select('*')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
 
-      if (userPrefs) {
-        setMyPreferences({
-          preferred_cuisines: userPrefs.preferred_cuisines || [],
-          preferred_price_range: userPrefs.preferred_price_range || [],
-          preferred_times: userPrefs.preferred_times || [],
-          preferred_vibes: userPrefs.preferred_vibes || [],
-          max_distance: userPrefs.max_distance || 10,
-          dietary_restrictions: userPrefs.dietary_restrictions || []
-        });
-      }
-
-      // Load partner's preferences
-      const { data: partnerPrefs } = await supabase
-        .from('user_preferences')
-        .select('*')
-        .eq('user_id', partnerId)
-        .maybeSingle();
-
-      if (partnerPrefs) {
-        setPartnerPreferences({
-          preferred_cuisines: partnerPrefs.preferred_cuisines || [],
-          preferred_price_range: partnerPrefs.preferred_price_range || [],
-          preferred_times: partnerPrefs.preferred_times || [],
-          preferred_vibes: partnerPrefs.preferred_vibes || [],
-          max_distance: partnerPrefs.max_distance || 10,
-          dietary_restrictions: partnerPrefs.dietary_restrictions || []
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data) {
+        setPreferences({
+          preferred_cuisines: data.preferred_cuisines || [],
+          preferred_vibes: data.preferred_vibes || [],
+          preferred_price_range: data.preferred_price_range || [],
+          preferred_times: data.preferred_times || [],
+          max_distance: data.max_distance || 10,
+          dietary_restrictions: data.dietary_restrictions || []
         });
       }
     } catch (error) {
@@ -101,179 +88,332 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
     }
   };
 
-  const setupRealtimeSubscription = () => {
-    const channel = supabase
-      .channel(`preferences-${sessionId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'date_planning_sessions',
-          filter: `id=eq.${sessionId}`,
-        },
-        () => {
-          loadPreferences();
-        }
-      )
-      .subscribe();
+  const loadPartnerPreferences = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', partnerId)
+        .single();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data) {
+        setPartnerPreferences({
+          preferred_cuisines: data.preferred_cuisines || [],
+          preferred_vibes: data.preferred_vibes || [],
+          preferred_price_range: data.preferred_price_range || [],
+          preferred_times: data.preferred_times || [],
+          max_distance: data.max_distance || 10,
+          dietary_restrictions: data.dietary_restrictions || []
+        });
+      }
+    } catch (error) {
+      console.error('Error loading partner preferences:', error);
+    }
   };
 
-  const updatePreference = (key: keyof UserPreferences, value: any) => {
-    setMyPreferences(prev => ({
+  const handlePreferenceChange = (category: keyof Preferences, value: any) => {
+    setPreferences(prev => ({
       ...prev,
-      [key]: value
+      [category]: value
     }));
   };
 
-  const toggleArrayPreference = (key: keyof UserPreferences, value: string) => {
-    setMyPreferences(prev => {
-      const currentArray = prev[key] as string[];
-      const newArray = currentArray.includes(value)
-        ? currentArray.filter(item => item !== value)
-        : [...currentArray, value];
+  const toggleArrayPreference = (category: keyof Preferences, item: string) => {
+    setPreferences(prev => {
+      const currentArray = prev[category] as string[];
+      const newArray = currentArray.includes(item)
+        ? currentArray.filter(i => i !== item)
+        : [...currentArray, item];
       
       return {
         ...prev,
-        [key]: newArray
+        [category]: newArray
       };
     });
   };
 
   const submitPreferences = async () => {
-    if (!user) return;
-
-    setLoading(true);
+    if (!user || isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
     try {
-      // Update user preferences
+      // First update user preferences
       await supabase
         .from('user_preferences')
         .upsert({
           user_id: user.id,
-          ...myPreferences
+          ...preferences,
+          updated_at: new Date().toISOString()
         });
 
-      // Update planning session
-      await supabase
-        .from('date_planning_sessions')
-        .update({
-          preferences_data: {
-            [user.id]: myPreferences,
-            ...(partnerPreferences && { [partnerId]: partnerPreferences })
-          },
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', sessionId);
-
+      // Then update the session preferences (this triggers AI analysis)
+      await updateSessionPreferences(sessionId, preferences);
+      
       setHasSubmitted(true);
-      onPreferencesUpdated?.();
+      
+      // Trigger the callback to notify parent component
+      setTimeout(() => {
+        onPreferencesUpdated();
+      }, 1000);
+      
     } catch (error) {
       console.error('Error submitting preferences:', error);
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  if (!user) return null;
+  const cuisineOptions = ['Italian', 'Japanese', 'Mexican', 'French', 'American', 'Indian', 'Thai', 'Chinese', 'Mediterranean'];
+  const vibeOptions = ['romantic', 'casual', 'upscale', 'outdoor', 'quiet', 'lively', 'cozy', 'modern'];
+  const priceOptions = ['$', '$$', '$$$', '$$$$'];
+  const timeOptions = ['morning', 'lunch', 'afternoon', 'dinner', 'late night'];
+  const dietaryOptions = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'keto', 'halal', 'kosher'];
+
+  const getSharedPreferences = (category: keyof Preferences) => {
+    if (!partnerPreferences) return [];
+    const userPrefs = preferences[category] as string[];
+    const partnerPrefs = partnerPreferences[category] as string[];
+    return userPrefs.filter(item => partnerPrefs.includes(item));
+  };
+
+  if (hasSubmitted && currentSession?.ai_compatibility_score) {
+    return (
+      <Card className="border-green-200 bg-green-50">
+        <CardContent className="p-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Sparkles className="h-6 w-6 text-green-600" />
+            <h3 className="text-lg font-semibold text-green-800">AI Analysis Complete!</h3>
+          </div>
+          <p className="text-green-700 mb-4">
+            Your preferences have been analyzed and AI recommendations are ready.
+          </p>
+          <Badge className="bg-green-500 text-white">
+            {currentSession.ai_compatibility_score}% Compatible
+          </Badge>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Collaborative Date Preferences
+            <Heart className="h-5 w-5 text-red-500" />
+            Collaborative Preferences
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Set your preferences and see how they match with your partner's choices
+            Share your preferences to get AI-powered venue recommendations
           </p>
         </CardHeader>
-        
-        <CardContent className="space-y-6">
-          <PreferenceSection
-            title="Cuisine Preferences"
-            icon={<Utensils className="h-4 w-4 text-orange-500" />}
-            options={CUISINE_OPTIONS}
-            selectedItems={myPreferences.preferred_cuisines}
-            partnerItems={partnerPreferences?.preferred_cuisines || []}
-            onToggle={(option) => toggleArrayPreference('preferred_cuisines', option)}
-          />
+      </Card>
 
-          <Separator />
-
-          <PreferenceSection
-            title="Price Range"
-            icon={<DollarSign className="h-4 w-4 text-green-500" />}
-            options={PRICE_OPTIONS}
-            selectedItems={myPreferences.preferred_price_range}
-            partnerItems={partnerPreferences?.preferred_price_range || []}
-            onToggle={(option) => toggleArrayPreference('preferred_price_range', option)}
-          />
-
-          <Separator />
-
-          <PreferenceSection
-            title="Preferred Times"
-            icon={<Clock className="h-4 w-4 text-blue-500" />}
-            options={TIME_OPTIONS}
-            selectedItems={myPreferences.preferred_times}
-            partnerItems={partnerPreferences?.preferred_times || []}
-            onToggle={(option) => toggleArrayPreference('preferred_times', option)}
-          />
-
-          <Separator />
-
-          <PreferenceSection
-            title="Atmosphere & Vibe"
-            icon={<Sparkles className="h-4 w-4 text-purple-500" />}
-            options={VIBE_OPTIONS}
-            selectedItems={myPreferences.preferred_vibes}
-            partnerItems={partnerPreferences?.preferred_vibes || []}
-            onToggle={(option) => toggleArrayPreference('preferred_vibes', option)}
-          />
-
-          <Separator />
-
-          <DistanceSlider
-            value={myPreferences.max_distance}
-            onChange={(value) => updatePreference('max_distance', value)}
-          />
-
-          <Separator />
-
-          <PreferenceSection
-            title="Dietary Restrictions"
-            icon={<Utensils className="h-4 w-4 text-yellow-500" />}
-            options={DIETARY_OPTIONS}
-            selectedItems={myPreferences.dietary_restrictions}
-            partnerItems={partnerPreferences?.dietary_restrictions || []}
-            onToggle={(option) => toggleArrayPreference('dietary_restrictions', option)}
-          />
-
-          <div className="pt-4">
-            <Button
-              onClick={submitPreferences}
-              disabled={loading || hasSubmitted}
-              className="w-full"
-              size="lg"
-            >
-              {loading ? 'Analyzing Compatibility...' : hasSubmitted ? 'Preferences Submitted' : 'Submit Preferences & Get AI Matches'}
-              <Sparkles className="h-4 w-4 ml-2" />
-            </Button>
+      {/* Cuisines */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Preferred Cuisines</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {cuisineOptions.map((cuisine) => {
+              const isSelected = preferences.preferred_cuisines.includes(cuisine);
+              const isShared = partnerPreferences && getSharedPreferences('preferred_cuisines').includes(cuisine);
+              
+              return (
+                <div key={cuisine} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`cuisine-${cuisine}`}
+                    checked={isSelected}
+                    onCheckedChange={() => toggleArrayPreference('preferred_cuisines', cuisine)}
+                  />
+                  <Label htmlFor={`cuisine-${cuisine}`} className="text-sm">
+                    {cuisine}
+                    {isShared && <Heart className="inline h-3 w-3 ml-1 text-red-500" />}
+                  </Label>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
 
-      {partnerPreferences && (
-        <CompatibilitySummary
-          myPreferences={myPreferences}
-          partnerPreferences={partnerPreferences}
-        />
-      )}
+      {/* Vibes */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Preferred Vibes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {vibeOptions.map((vibe) => {
+              const isSelected = preferences.preferred_vibes.includes(vibe);
+              const isShared = partnerPreferences && getSharedPreferences('preferred_vibes').includes(vibe);
+              
+              return (
+                <div key={vibe} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`vibe-${vibe}`}
+                    checked={isSelected}
+                    onCheckedChange={() => toggleArrayPreference('preferred_vibes', vibe)}
+                  />
+                  <Label htmlFor={`vibe-${vibe}`} className="text-sm capitalize">
+                    {vibe}
+                    {isShared && <Heart className="inline h-3 w-3 ml-1 text-red-500" />}
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Price Range */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            Price Range
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4">
+            {priceOptions.map((price) => {
+              const isSelected = preferences.preferred_price_range.includes(price);
+              const isShared = partnerPreferences && getSharedPreferences('preferred_price_range').includes(price);
+              
+              return (
+                <div key={price} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`price-${price}`}
+                    checked={isSelected}
+                    onCheckedChange={() => toggleArrayPreference('preferred_price_range', price)}
+                  />
+                  <Label htmlFor={`price-${price}`} className="text-sm">
+                    {price}
+                    {isShared && <Heart className="inline h-3 w-3 ml-1 text-red-500" />}
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Times */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Preferred Times
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {timeOptions.map((time) => {
+              const isSelected = preferences.preferred_times.includes(time);
+              const isShared = partnerPreferences && getSharedPreferences('preferred_times').includes(time);
+              
+              return (
+                <div key={time} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`time-${time}`}
+                    checked={isSelected}
+                    onCheckedChange={() => toggleArrayPreference('preferred_times', time)}
+                  />
+                  <Label htmlFor={`time-${time}`} className="text-sm capitalize">
+                    {time}
+                    {isShared && <Heart className="inline h-3 w-3 ml-1 text-red-500" />}
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Distance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            Maximum Distance: {preferences.max_distance} miles
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Slider
+            value={[preferences.max_distance]}
+            onValueChange={(value) => handlePreferenceChange('max_distance', value[0])}
+            max={25}
+            min={1}
+            step={1}
+            className="w-full"
+          />
+        </CardContent>
+      </Card>
+
+      {/* Dietary Restrictions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Dietary Restrictions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {dietaryOptions.map((dietary) => {
+              const isSelected = preferences.dietary_restrictions.includes(dietary);
+              const isShared = partnerPreferences && getSharedPreferences('dietary_restrictions').includes(dietary);
+              
+              return (
+                <div key={dietary} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`dietary-${dietary}`}
+                    checked={isSelected}
+                    onCheckedChange={() => toggleArrayPreference('dietary_restrictions', dietary)}
+                  />
+                  <Label htmlFor={`dietary-${dietary}`} className="text-sm capitalize">
+                    {dietary}
+                    {isShared && <Heart className="inline h-3 w-3 ml-1 text-red-500" />}
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Submit Button */}
+      <Card>
+        <CardContent className="p-6">
+          <Button
+            onClick={submitPreferences}
+            disabled={isSubmitting || loading}
+            className="w-full"
+            size="lg"
+          >
+            {isSubmitting ? (
+              <>
+                <Sparkles className="h-4 w-4 mr-2 animate-spin" />
+                Analyzing Preferences...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Submit & Get AI Recommendations
+              </>
+            )}
+          </Button>
+          
+          {partnerPreferences && (
+            <p className="text-sm text-gray-600 mt-2 text-center">
+              <Heart className="inline h-3 w-3 mr-1 text-red-500" />
+              Heart icons show shared preferences with your partner
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

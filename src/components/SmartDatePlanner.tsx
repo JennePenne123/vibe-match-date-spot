@@ -1,15 +1,18 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDatePlanning } from '@/hooks/useDatePlanning';
 import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMockAuth } from '@/contexts/MockAuthContext';
+import { IS_MOCK_MODE } from '@/utils/mockMode';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Users, MapPin, Clock, Heart, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Sparkles, Users, MapPin, Clock, Heart, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import CollaborativePreferences from '@/components/CollaborativePreferences';
 import AIMatchSummary from '@/components/AIMatchSummary';
 import AIVenueCard from '@/components/AIVenueCard';
@@ -23,7 +26,9 @@ interface SmartDatePlannerProps {
 
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const realAuth = useAuth();
+  const mockAuth = useMockAuth();
+  const { user } = IS_MOCK_MODE ? mockAuth : realAuth;
   const { friends } = useFriends();
   const {
     currentSession,
@@ -35,13 +40,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     completePlanningSession
   } = useDatePlanning();
 
-  // Add error state
-  const [error, setError] = useState<string | null>(null);
-
   const [currentStep, setCurrentStep] = useState<PlanningStep>('select-partner');
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
   const [selectedVenueId, setSelectedVenueId] = useState<string>('');
   const [invitationMessage, setInvitationMessage] = useState<string>('');
+  const [aiAnalyzing, setAiAnalyzing] = useState(false);
 
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
   const selectedVenue = venueRecommendations.find(v => v.venue_id === selectedVenueId);
@@ -68,6 +71,15 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     }
   }, [selectedPartnerId, getActiveSession, currentStep]);
 
+  // Monitor compatibility score and venue recommendations
+  useEffect(() => {
+    if (compatibilityScore !== null && venueRecommendations.length > 0 && currentStep === 'set-preferences') {
+      console.log('AI analysis complete, advancing to review step');
+      setAiAnalyzing(false);
+      setCurrentStep('review-matches');
+    }
+  }, [compatibilityScore, venueRecommendations, currentStep]);
+
   const handlePartnerSelection = async (partnerId?: string) => {
     const partnerIdToUse = partnerId || selectedPartnerId;
     if (!partnerIdToUse) return;
@@ -80,9 +92,10 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   };
 
   const handlePreferencesComplete = () => {
-    if (compatibilityScore !== null && venueRecommendations.length > 0) {
-      setCurrentStep('review-matches');
-    }
+    console.log('Preferences submitted, starting AI analysis...');
+    setAiAnalyzing(true);
+    // The actual AI analysis is triggered by the CollaborativePreferences component
+    // through the updateSessionPreferences method
   };
 
   const handleVenueSelection = (venueId: string) => {
@@ -150,20 +163,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-md mx-auto text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <Button onClick={() => setError(null)}>
-            Try Again
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -225,8 +224,17 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
                 disabled={!selectedPartnerId || loading}
                 className="w-full"
               >
-                {loading ? 'Creating Planning Session...' : 'Continue'}
-                <ArrowRight className="h-4 w-4 ml-2" />
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Creating Planning Session...
+                  </>
+                ) : (
+                  <>
+                    Continue
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -256,6 +264,20 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
               </CardHeader>
             </Card>
 
+            {aiAnalyzing && (
+              <Card className="border-blue-200 bg-blue-50">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+                    <h3 className="text-lg font-semibold text-blue-800">AI Analysis in Progress</h3>
+                  </div>
+                  <p className="text-blue-700">
+                    Analyzing compatibility and finding perfect venues...
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             <SafeComponent componentName="CollaborativePreferences">
               <CollaborativePreferences
                 sessionId={currentSession.id}
@@ -263,15 +285,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
                 onPreferencesUpdated={handlePreferencesComplete}
               />
             </SafeComponent>
-
-            {compatibilityScore !== null && venueRecommendations.length > 0 && (
-              <div className="text-center">
-                <Button onClick={handlePreferencesComplete} size="lg">
-                  View AI Matches
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </div>
-            )}
           </div>
         )}
 
@@ -286,17 +299,28 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
               />
             </SafeComponent>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {venueRecommendations.map((recommendation) => (
-                <SafeComponent key={recommendation.venue_id} componentName="AIVenueCard">
-                  <AIVenueCard
-                    recommendation={recommendation}
-                    onSelect={handleVenueSelection}
-                    showAIInsights={true}
-                  />
-                </SafeComponent>
-              ))}
-            </div>
+            {venueRecommendations.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {venueRecommendations.map((recommendation) => (
+                  <SafeComponent key={recommendation.venue_id} componentName="AIVenueCard">
+                    <AIVenueCard
+                      recommendation={recommendation}
+                      onSelect={handleVenueSelection}
+                      showAIInsights={true}
+                    />
+                  </SafeComponent>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">No Venues Found</h3>
+                  <p className="text-gray-600">
+                    No venues match your preferences. Try adjusting your preferences or check back later.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         )}
 
@@ -334,8 +358,17 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
                 className="w-full"
                 size="lg"
               >
-                {loading ? 'Sending...' : 'Send Smart Invitation'}
-                <Sparkles className="h-4 w-4 ml-2" />
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    Send Smart Invitation
+                    <Sparkles className="h-4 w-4 ml-2" />
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>

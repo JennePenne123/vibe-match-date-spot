@@ -42,6 +42,8 @@ export const useDatePlanning = () => {
 
     setLoading(true);
     try {
+      console.log('Creating planning session for partner:', partnerId);
+      
       const { data, error } = await supabase
         .from('date_planning_sessions')
         .insert({
@@ -54,9 +56,11 @@ export const useDatePlanning = () => {
 
       if (error) throw error;
 
+      console.log('Planning session created:', data);
       setCurrentSession(data);
       return data;
     } catch (error) {
+      console.error('Error creating planning session:', error);
       handleError(error, {
         toastTitle: 'Failed to create planning session',
         toastDescription: 'Please try again'
@@ -67,12 +71,16 @@ export const useDatePlanning = () => {
     }
   };
 
-  // Update session preferences
+  // Update session preferences and trigger AI analysis
   const updateSessionPreferences = async (sessionId: string, preferences: DatePreferences) => {
-    if (!user) return;
+    if (!user || !currentSession) return;
 
+    setLoading(true);
     try {
-      const { error } = await supabase
+      console.log('Updating session preferences:', preferences);
+      
+      // Update session with preferences
+      const { error: updateError } = await supabase
         .from('date_planning_sessions')
         .update({ 
           preferences_data: preferences,
@@ -80,7 +88,7 @@ export const useDatePlanning = () => {
         })
         .eq('id', sessionId);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
       // Update local state
       setCurrentSession(prev => prev ? { 
@@ -89,13 +97,19 @@ export const useDatePlanning = () => {
         updated_at: new Date().toISOString()
       } : null);
 
+      console.log('Starting AI analysis...');
+      
       // Trigger AI analysis
       await analyzeCompatibilityAndVenues(sessionId, preferences);
+      
     } catch (error) {
+      console.error('Error updating preferences:', error);
       handleError(error, {
         toastTitle: 'Failed to update preferences',
         toastDescription: 'Please try again'
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,25 +118,44 @@ export const useDatePlanning = () => {
     if (!currentSession || !user) return;
 
     try {
+      console.log('Analyzing compatibility and venues...');
+      
       // Get compatibility score
       const compatibility = await getCompatibilityScore(user.id, currentSession.partner_id);
-      setCompatibilityScore(compatibility.overall_score);
+      
+      if (compatibility) {
+        console.log('Compatibility score:', compatibility.overall_score);
+        setCompatibilityScore(compatibility.overall_score);
+        
+        // Update session with compatibility score
+        await supabase
+          .from('date_planning_sessions')
+          .update({ 
+            ai_compatibility_score: compatibility.overall_score,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', sessionId);
+
+        // Update local session state
+        setCurrentSession(prev => prev ? {
+          ...prev,
+          ai_compatibility_score: compatibility.overall_score
+        } : null);
+      }
 
       // Get AI venue recommendations
+      console.log('Getting venue recommendations...');
       const venues = await getAIVenueRecommendations(user.id, currentSession.partner_id, 10);
+      console.log('Venue recommendations:', venues);
+      
       setVenueRecommendations(venues);
 
-      // Update session with compatibility score
-      await supabase
-        .from('date_planning_sessions')
-        .update({ 
-          ai_compatibility_score: compatibility.overall_score,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', sessionId);
-
     } catch (error) {
-      console.error('Error analyzing compatibility:', error);
+      console.error('Error in AI analysis:', error);
+      handleError(error, {
+        toastTitle: 'AI Analysis Error',
+        toastDescription: 'Could not complete compatibility analysis'
+      });
     }
   };
 
@@ -131,6 +164,8 @@ export const useDatePlanning = () => {
     if (!user) return null;
 
     try {
+      console.log('Getting active session for partner:', partnerId);
+      
       const { data, error } = await supabase
         .from('date_planning_sessions')
         .select('*')
@@ -142,9 +177,17 @@ export const useDatePlanning = () => {
 
       if (error) throw error;
       
+      console.log('Active session found:', data);
       setCurrentSession(data);
+      
+      // If session has compatibility score, set it
+      if (data?.ai_compatibility_score) {
+        setCompatibilityScore(data.ai_compatibility_score);
+      }
+      
       return data;
     } catch (error) {
+      console.error('Error getting active session:', error);
       handleError(error, {
         toastTitle: 'Failed to load planning session',
         toastDescription: 'Please try again'
@@ -157,7 +200,10 @@ export const useDatePlanning = () => {
   const completePlanningSession = async (sessionId: string, venueId: string, message: string) => {
     if (!user || !currentSession) return false;
 
+    setLoading(true);
     try {
+      console.log('Completing planning session...');
+      
       // Update session as completed
       await supabase
         .from('date_planning_sessions')
@@ -188,17 +234,22 @@ export const useDatePlanning = () => {
 
       if (inviteError) throw inviteError;
 
+      // Reset state
       setCurrentSession(null);
       setVenueRecommendations([]);
       setCompatibilityScore(null);
       
+      console.log('Planning session completed successfully');
       return true;
     } catch (error) {
+      console.error('Error completing planning session:', error);
       handleError(error, {
         toastTitle: 'Failed to send invitation',
         toastDescription: 'Please try again'
       });
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -206,6 +257,8 @@ export const useDatePlanning = () => {
   useEffect(() => {
     if (!currentSession) return;
 
+    console.log('Setting up real-time subscription for session:', currentSession.id);
+    
     const channel = supabase
       .channel(`planning-session-${currentSession.id}`)
       .on(
@@ -217,13 +270,19 @@ export const useDatePlanning = () => {
           filter: `id=eq.${currentSession.id}`,
         },
         (payload) => {
-          console.log('Planning session updated:', payload);
+          console.log('Planning session updated via realtime:', payload);
           setCurrentSession(payload.new as DatePlanningSession);
+          
+          // Update compatibility score if changed
+          if (payload.new.ai_compatibility_score) {
+            setCompatibilityScore(payload.new.ai_compatibility_score);
+          }
         }
       )
       .subscribe();
 
     return () => {
+      console.log('Removing real-time subscription');
       supabase.removeChannel(channel);
     };
   }, [currentSession?.id]);
