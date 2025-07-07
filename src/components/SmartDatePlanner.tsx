@@ -6,19 +6,16 @@ import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMockAuth } from '@/contexts/MockAuthContext';
 import { IS_MOCK_MODE } from '@/utils/mockMode';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Users, MapPin, Clock, Heart, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
-import CollaborativePreferences from '@/components/CollaborativePreferences';
-import AIMatchSummary from '@/components/AIMatchSummary';
-import AIVenueCard from '@/components/AIVenueCard';
-import SafeComponent from '@/components/SafeComponent';
+import { ArrowLeft } from 'lucide-react';
+import { usePlanningSteps } from '@/hooks/usePlanningSteps';
 
-type PlanningStep = 'select-partner' | 'set-preferences' | 'review-matches' | 'create-invitation';
+// Import step components
+import PlanningHeader from '@/components/date-planning/PlanningHeader';
+import PartnerSelection from '@/components/date-planning/PartnerSelection';
+import PreferencesStep from '@/components/date-planning/PreferencesStep';
+import MatchReview from '@/components/date-planning/MatchReview';
+import InvitationCreation from '@/components/date-planning/InvitationCreation';
 
 interface SmartDatePlannerProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -40,25 +37,21 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     completePlanningSession
   } = useDatePlanning();
 
-  const [currentStep, setCurrentStep] = useState<PlanningStep>('select-partner');
-  const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
+  const {
+    currentStep,
+    setCurrentStep,
+    selectedPartnerId,
+    setSelectedPartnerId,
+    getStepProgress,
+    goBack
+  } = usePlanningSteps({ preselectedFriend });
+
   const [selectedVenueId, setSelectedVenueId] = useState<string>('');
   const [invitationMessage, setInvitationMessage] = useState<string>('');
   const [aiAnalyzing, setAiAnalyzing] = useState(false);
 
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
   const selectedVenue = venueRecommendations.find(v => v.venue_id === selectedVenueId);
-
-  // Auto-advance if friend is pre-selected
-  useEffect(() => {
-    if (preselectedFriend && friends.length > 0) {
-      const friend = friends.find(f => f.id === preselectedFriend.id);
-      if (friend) {
-        setSelectedPartnerId(friend.id);
-        handlePartnerSelection(friend.id);
-      }
-    }
-  }, [preselectedFriend, friends]);
 
   // Check for existing session when partner is selected
   useEffect(() => {
@@ -69,7 +62,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         }
       });
     }
-  }, [selectedPartnerId, getActiveSession, currentStep]);
+  }, [selectedPartnerId, getActiveSession, currentStep, setCurrentStep]);
 
   // Monitor compatibility score and venue recommendations
   useEffect(() => {
@@ -78,7 +71,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
       setAiAnalyzing(false);
       setCurrentStep('review-matches');
     }
-  }, [compatibilityScore, venueRecommendations, currentStep]);
+  }, [compatibilityScore, venueRecommendations, currentStep, setCurrentStep]);
 
   const handlePartnerSelection = async (partnerId?: string) => {
     const partnerIdToUse = partnerId || selectedPartnerId;
@@ -94,8 +87,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   const handlePreferencesComplete = () => {
     console.log('Preferences submitted, starting AI analysis...');
     setAiAnalyzing(true);
-    // The actual AI analysis is triggered by the CollaborativePreferences component
-    // through the updateSessionPreferences method
   };
 
   const handleVenueSelection = (venueId: string) => {
@@ -125,30 +116,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     }
   };
 
-  const getStepProgress = () => {
-    switch (currentStep) {
-      case 'select-partner': return 25;
-      case 'set-preferences': return 50;
-      case 'review-matches': return 75;
-      case 'create-invitation': return 100;
-      default: return 0;
-    }
-  };
-
-  const goBack = () => {
-    switch (currentStep) {
-      case 'set-preferences': 
-        if (preselectedFriend) {
-          navigate('/my-friends');
-        } else {
-          setCurrentStep('select-partner');
-        }
-        break;
-      case 'review-matches': setCurrentStep('set-preferences'); break;
-      case 'create-invitation': setCurrentStep('review-matches'); break;
-    }
-  };
-
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
@@ -167,30 +134,15 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-2">
-            <Sparkles className="h-8 w-8 text-purple-500" />
-            <h1 className="text-3xl font-bold text-gray-900">Smart Date Planner</h1>
-          </div>
-          <p className="text-gray-600">
-            AI-powered date planning with collaborative preferences and smart matching
-          </p>
-          
-          {/* Progress Bar */}
-          <div className="max-w-md mx-auto space-y-2">
-            <Progress value={getStepProgress()} className="h-2" />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Select Partner</span>
-              <span>Set Preferences</span>
-              <span>Review Matches</span>
-              <span>Send Invitation</span>
-            </div>
-          </div>
-        </div>
+        <PlanningHeader progress={getStepProgress()} />
 
         {/* Navigation */}
         <div className="flex justify-start">
-          <Button onClick={goBack} variant="outline" size="sm">
+          <Button 
+            onClick={() => goBack(preselectedFriend, navigate)} 
+            variant="outline" 
+            size="sm"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
@@ -198,180 +150,47 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
 
         {/* Step 1: Select Partner */}
         {currentStep === 'select-partner' && !preselectedFriend && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Choose Your Date Partner
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Select value={selectedPartnerId} onValueChange={setSelectedPartnerId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a friend to plan a date with" />
-                </SelectTrigger>
-                <SelectContent>
-                  {friends.map((friend) => (
-                    <SelectItem key={friend.id} value={friend.id}>
-                      {friend.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Button 
-                onClick={() => handlePartnerSelection()}
-                disabled={!selectedPartnerId || loading}
-                className="w-full"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating Planning Session...
-                  </>
-                ) : (
-                  <>
-                    Continue
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
+          <PartnerSelection
+            friends={friends}
+            selectedPartnerId={selectedPartnerId}
+            loading={loading}
+            onPartnerChange={setSelectedPartnerId}
+            onContinue={() => handlePartnerSelection()}
+          />
         )}
 
         {/* Step 2: Set Preferences */}
         {currentStep === 'set-preferences' && currentSession && selectedPartner && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5" />
-                  Planning Date with {selectedPartner.name}
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">
-                    <Clock className="h-3 w-3 mr-1" />
-                    Session expires in 24h
-                  </Badge>
-                  {compatibilityScore !== null && (
-                    <Badge className="bg-purple-100 text-purple-700">
-                      <Sparkles className="h-3 w-3 mr-1" />
-                      {compatibilityScore}% Compatible
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-            </Card>
-
-            {aiAnalyzing && (
-              <Card className="border-blue-200 bg-blue-50">
-                <CardContent className="p-6 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-4">
-                    <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
-                    <h3 className="text-lg font-semibold text-blue-800">AI Analysis in Progress</h3>
-                  </div>
-                  <p className="text-blue-700">
-                    Analyzing compatibility and finding perfect venues...
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
-            <SafeComponent componentName="CollaborativePreferences">
-              <CollaborativePreferences
-                sessionId={currentSession.id}
-                partnerId={selectedPartnerId}
-                onPreferencesUpdated={handlePreferencesComplete}
-              />
-            </SafeComponent>
-          </div>
+          <PreferencesStep
+            sessionId={currentSession.id}
+            partnerId={selectedPartnerId}
+            partnerName={selectedPartner.name}
+            compatibilityScore={compatibilityScore}
+            aiAnalyzing={aiAnalyzing}
+            onPreferencesComplete={handlePreferencesComplete}
+          />
         )}
 
         {/* Step 3: Review Matches */}
         {currentStep === 'review-matches' && selectedPartner && (
-          <div className="space-y-6">
-            <SafeComponent componentName="AIMatchSummary">
-              <AIMatchSummary
-                compatibilityScore={compatibilityScore || 0}
-                partnerName={selectedPartner.name}
-                venueCount={venueRecommendations.length}
-              />
-            </SafeComponent>
-
-            {venueRecommendations.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {venueRecommendations.map((recommendation) => (
-                  <SafeComponent key={recommendation.venue_id} componentName="AIVenueCard">
-                    <AIVenueCard
-                      recommendation={recommendation}
-                      onSelect={handleVenueSelection}
-                      showAIInsights={true}
-                    />
-                  </SafeComponent>
-                ))}
-              </div>
-            ) : (
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">No Venues Found</h3>
-                  <p className="text-gray-600">
-                    No venues match your preferences. Try adjusting your preferences or check back later.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          <MatchReview
+            compatibilityScore={compatibilityScore || 0}
+            partnerName={selectedPartner.name}
+            venueRecommendations={venueRecommendations}
+            onVenueSelect={handleVenueSelection}
+          />
         )}
 
         {/* Step 4: Create Invitation */}
         {currentStep === 'create-invitation' && selectedPartner && selectedVenue && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                Send Smart Invitation
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h3 className="font-medium text-purple-900 mb-2">Selected Venue</h3>
-                <p className="text-purple-700">{selectedVenue.venue_name}</p>
-                <p className="text-sm text-purple-600 mt-1">{selectedVenue.ai_reasoning}</p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Invitation Message
-                </label>
-                <Textarea
-                  value={invitationMessage}
-                  onChange={(e) => setInvitationMessage(e.target.value)}
-                  placeholder="Write a personalized message..."
-                  rows={4}
-                />
-              </div>
-
-              <Button 
-                onClick={handleSendInvitation}
-                disabled={loading}
-                className="w-full"
-                size="lg"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    Send Smart Invitation
-                    <Sparkles className="h-4 w-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
+          <InvitationCreation
+            partnerName={selectedPartner.name}
+            selectedVenue={selectedVenue}
+            invitationMessage={invitationMessage}
+            loading={loading}
+            onMessageChange={setInvitationMessage}
+            onSendInvitation={handleSendInvitation}
+          />
         )}
       </div>
     </div>
