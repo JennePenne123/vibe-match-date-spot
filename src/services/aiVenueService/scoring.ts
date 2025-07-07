@@ -36,10 +36,15 @@ export const calculateVenueAIScore = async (
       baseScore += cuisineMatch ? 0.3 : -0.1;
     }
 
-    // Price range matching
+    // Price range matching with more flexible scoring
     if (userPrefs.preferred_price_range && venue.price_range) {
       const priceMatch = userPrefs.preferred_price_range.includes(venue.price_range);
-      baseScore += priceMatch ? 0.2 : -0.05;
+      if (priceMatch) {
+        baseScore += 0.2;
+      } else {
+        // Less harsh penalty for price mismatch to allow more venues
+        baseScore += -0.02;
+      }
     }
 
     // Vibe matching through tags

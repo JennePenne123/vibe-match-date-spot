@@ -49,9 +49,13 @@ export const getAIVenueRecommendations = async (
     }
 
     // Sort by AI score and return top recommendations
-    return recommendations
+    // Ensure we always return some venues even if scores are low
+    const sortedRecommendations = recommendations
       .sort((a, b) => b.ai_score - a.ai_score)
       .slice(0, limit);
+
+    console.log(`Returning ${sortedRecommendations.length} venue recommendations`);
+    return sortedRecommendations;
   } catch (error) {
     console.error('Error getting AI venue recommendations:', error);
     return [];

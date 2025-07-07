@@ -145,14 +145,29 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     }
   }, [selectedPartnerId, getActiveSession, currentStep, setCurrentStep]);
 
-  // Monitor compatibility score and venue recommendations
+  // Monitor compatibility score and venue recommendations with timeout
   useEffect(() => {
-    if (compatibilityScore !== null && venueRecommendations.length > 0 && currentStep === 'set-preferences') {
+    if (compatibilityScore !== null && currentStep === 'set-preferences') {
       console.log('SmartDatePlanner - AI analysis complete, advancing to review step');
       setAiAnalyzing(false);
       setCurrentStep('review-matches');
     }
-  }, [compatibilityScore, venueRecommendations, currentStep, setCurrentStep]);
+  }, [compatibilityScore, currentStep, setCurrentStep]);
+
+  // Add timeout for AI analysis
+  useEffect(() => {
+    if (aiAnalyzing) {
+      const timeoutId = setTimeout(() => {
+        if (currentStep === 'set-preferences' && aiAnalyzing) {
+          console.log('SmartDatePlanner - AI analysis timeout, advancing anyway');
+          setAiAnalyzing(false);
+          setCurrentStep('review-matches');
+        }
+      }, 35000); // 35 second timeout
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [aiAnalyzing, currentStep, setCurrentStep]);
 
   async function handlePartnerSelection(partnerId?: string) {
     const partnerIdToUse = partnerId || selectedPartnerId;

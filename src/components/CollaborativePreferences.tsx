@@ -140,14 +140,21 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
     setIsSubmitting(true);
     
     try {
-      // First update user preferences
-      await supabase
+      // First update user preferences with proper conflict handling
+      const { error: prefsError } = await supabase
         .from('user_preferences')
         .upsert({
           user_id: user.id,
           ...preferences,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         });
+
+      if (prefsError) {
+        console.error('Error updating user preferences:', prefsError);
+        throw prefsError;
+      }
 
       // Then update the session preferences (this triggers AI analysis)
       await updateSessionPreferences(sessionId, preferences);
