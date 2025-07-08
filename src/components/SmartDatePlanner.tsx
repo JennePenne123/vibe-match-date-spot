@@ -51,7 +51,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     handlePartnerSelection,
     handlePreferencesComplete,
     handleVenueSelection,
-    handleSendInvitation
+    handleSendInvitation,
+    handleStartFromScratch
   } = handlers;
 
   // Show error if any critical hooks failed
@@ -141,6 +142,19 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
             onMessageChange={setInvitationMessage}
             onSendInvitation={handleSendInvitation}
           />
+        )}
+
+        {/* Start from Scratch CTA - Show on all steps except first */}
+        {currentStep !== 'select-partner' && (
+          <div className="pt-6 border-t border-gray-200">
+            <Button 
+              onClick={handleStartFromScratch}
+              variant="outline"
+              className="w-full text-gray-600 hover:text-gray-800"
+            >
+              Start from Scratch
+            </Button>
+          </div>
         )}
       </div>
     </div>

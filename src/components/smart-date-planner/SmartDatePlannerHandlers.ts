@@ -2,6 +2,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   const {
     selectedPartnerId,
     setCurrentStep,
+    setSelectedPartnerId,
     getActiveSession,
     createPlanningSession,
     setAiAnalyzing,
@@ -72,10 +73,22 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     }
   }
 
+  function handleStartFromScratch() {
+    console.log('SmartDatePlanner - Starting from scratch');
+    // Reset all state and navigate back to partner selection
+    setCurrentStep('select-partner');
+    setSelectedPartnerId('');
+    setSelectedVenueId('');
+    setInvitationMessage('');
+    // Navigate to fresh planning session
+    navigate('/plan-date');
+  }
+
   return {
     handlePartnerSelection,
     handlePreferencesComplete,
     handleVenueSelection,
-    handleSendInvitation
+    handleSendInvitation,
+    handleStartFromScratch
   };
 };
