@@ -87,45 +87,45 @@ const SmartDatePlanningCTA: React.FC = () => {
 
   return (
     <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-3">
-          <div className="bg-purple-100 p-2 rounded-full">
-            <Sparkles className="h-6 w-6 text-purple-600" />
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-start gap-3">
+          <div className="bg-purple-100 p-2 rounded-full shrink-0">
+            <Sparkles className="h-5 w-5 text-purple-600" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">AI-Powered Date Planning</h2>
-            <p className="text-sm text-gray-600 font-normal">Let AI find the perfect match for you and your friends</p>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-lg font-bold text-gray-900 leading-tight">AI-Powered Date Planning</h2>
+            <p className="text-sm text-gray-600 font-normal mt-1">Let AI find the perfect match for you and your friends</p>
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="bg-blue-100 p-2 rounded-full">
-              <Users className="h-5 w-5 text-blue-600" />
+            <div className="bg-blue-100 p-2 rounded-full shrink-0">
+              <Users className="h-4 w-4 text-blue-600" />
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Collaborative</h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-gray-900 text-sm">Collaborative</h3>
               <p className="text-xs text-gray-600">Plan together with friends</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="bg-green-100 p-2 rounded-full">
-              <Brain className="h-5 w-5 text-green-600" />
+            <div className="bg-green-100 p-2 rounded-full shrink-0">
+              <Brain className="h-4 w-4 text-green-600" />
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Smart Matching</h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-gray-900 text-sm">Smart Matching</h3>
               <p className="text-xs text-gray-600">AI finds perfect venues</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="bg-pink-100 p-2 rounded-full">
-              <Sparkles className="h-5 w-5 text-pink-600" />
+            <div className="bg-pink-100 p-2 rounded-full shrink-0">
+              <Sparkles className="h-4 w-4 text-pink-600" />
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Personalized</h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-gray-900 text-sm">Personalized</h3>
               <p className="text-xs text-gray-600">Based on your preferences</p>
             </div>
           </div>
