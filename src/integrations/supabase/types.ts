@@ -492,6 +492,44 @@ export type Database = {
           },
         ]
       }
+      user_venue_feedback: {
+        Row: {
+          context: Json | null
+          created_at: string
+          feedback_type: string
+          id: string
+          updated_at: string
+          user_id: string
+          venue_id: string
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string
+          feedback_type: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          venue_id: string
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string
+          feedback_type?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_venue_feedback_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venues: {
         Row: {
           address: string
