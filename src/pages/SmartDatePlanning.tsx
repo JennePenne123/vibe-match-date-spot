@@ -63,15 +63,17 @@ const SmartDatePlanning: React.FC = () => {
   return (
     <ErrorBoundary level="page">
       <div className="min-h-screen bg-gray-50">
-        <HomeHeader 
-          user={user}
-          displayName={displayName}
-          firstName={firstName}
-        />
-        
-        <ErrorBoundary level="component">
-          <SmartDatePlanner preselectedFriend={preselectedFriend} />
-        </ErrorBoundary>
+        <div className="max-w-md mx-auto">
+          <HomeHeader 
+            user={user}
+            displayName={displayName}
+            firstName={firstName}
+          />
+          
+          <ErrorBoundary level="component">
+            <SmartDatePlanner preselectedFriend={preselectedFriend} />
+          </ErrorBoundary>
+        </div>
       </div>
     </ErrorBoundary>
   );

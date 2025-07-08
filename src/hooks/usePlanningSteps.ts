@@ -36,6 +36,11 @@ export const usePlanningSteps = ({ preselectedFriend }: UsePlanningStepsProps) =
 
   const goBack = (preselectedFriend?: { id: string; name: string } | null, navigate?: (path: string) => void) => {
     switch (currentStep) {
+      case 'select-partner':
+        if (navigate) {
+          navigate('/home');
+        }
+        break;
       case 'set-preferences': 
         if (preselectedFriend && navigate) {
           navigate('/my-friends');
