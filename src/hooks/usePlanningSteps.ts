@@ -42,11 +42,7 @@ export const usePlanningSteps = ({ preselectedFriend }: UsePlanningStepsProps) =
         }
         break;
       case 'set-preferences': 
-        if (preselectedFriend && navigate) {
-          navigate('/my-friends');
-        } else {
-          setCurrentStep('select-partner');
-        }
+        setCurrentStep('select-partner');
         break;
       case 'review-matches': setCurrentStep('set-preferences'); break;
       case 'create-invitation': setCurrentStep('review-matches'); break;
