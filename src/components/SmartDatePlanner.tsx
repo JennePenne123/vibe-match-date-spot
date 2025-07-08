@@ -259,7 +259,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         </div>
 
         {/* Step 1: Select Partner */}
-        {currentStep === 'select-partner' && !preselectedFriend && (
+        {currentStep === 'select-partner' && (
           <PartnerSelection
             friends={friends}
             selectedPartnerId={selectedPartnerId}
