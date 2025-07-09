@@ -19,7 +19,7 @@ const Results = () => {
     venue_name: venue.name,
     venue_address: venue.address || 'Address not available',
     venue_image: venue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
-    ai_score: venue.matchScore || Math.floor(Math.random() * 30) + 70, // 70-100%
+    ai_score: (venue as any).matchScore || Math.floor(Math.random() * 30) + 70, // 70-100%
     match_factors: {
       cuisine_match: venue.cuisine_type === 'italian' || venue.cuisine_type === 'asian',
       price_match: true,
