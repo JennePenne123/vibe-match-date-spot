@@ -28,6 +28,8 @@ export interface FeedbackContext {
   planning_session_id?: string;
   source?: 'recommendations' | 'search' | 'favorites' | 'quick_feedback';
   timestamp?: string;
+  ai_score?: number;
+  confidence_level?: number;
 }
 
 export interface DateFeedback {
