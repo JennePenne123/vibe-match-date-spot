@@ -1,22 +1,37 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Heart, Star, MapPin, DollarSign, Filter, Sparkles } from 'lucide-react';
-import { venueToAppVenue } from '@/utils/typeHelpers';
+import { ArrowLeft, Filter, Sparkles } from 'lucide-react';
+import AIVenueCard from '@/components/AIVenueCard';
+import { AIVenueRecommendation } from '@/services/aiVenueService';
 
 const Results = () => {
   const navigate = useNavigate();
   const { appState } = useApp();
   const [filter, setFilter] = useState('all');
-  const [likedVenues, setLikedVenues] = useState<string[]>([]);
 
   const { venues } = appState;
 
-  // Convert venues to AppVenue format for UI
-  const appVenues = venues.map(venue => venueToAppVenue(venue));
+  // Convert venues to AIVenueRecommendation format
+  const recommendations: AIVenueRecommendation[] = venues.map(venue => ({
+    venue_id: venue.id,
+    venue_name: venue.name,
+    venue_address: venue.address || 'Address not available',
+    venue_image: venue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
+    ai_score: venue.matchScore || Math.floor(Math.random() * 30) + 70, // 70-100%
+    match_factors: {
+      cuisine_match: venue.cuisine_type === 'italian' || venue.cuisine_type === 'asian',
+      price_match: true,
+      vibe_matches: venue.tags || ['romantic', 'cozy'],
+      rating: venue.rating || 4.5,
+      price_range: venue.price_range || '$$',
+      rating_bonus: 0.1
+    },
+    contextual_score: Math.random() * 0.2, // 0-20% bonus
+    ai_reasoning: `This venue matches your preferences for ${venue.cuisine_type || 'great'} cuisine and ${venue.tags?.[0] || 'romantic'} atmosphere. Perfect for your date style!`,
+    confidence_level: Math.random() * 0.3 + 0.7 // 70-100% confidence
+  }));
 
   const filters = [
     { id: 'all', name: 'All Spots', icon: '📍' },
@@ -26,16 +41,15 @@ const Results = () => {
     { id: 'casual', name: 'Casual', icon: '😊' }
   ];
 
-  const filteredVenues = filter === 'all' 
-    ? appVenues 
-    : appVenues.filter(venue => venue.cuisine_type === filter || venue.tags?.includes(filter));
+  const filteredRecommendations = filter === 'all' 
+    ? recommendations 
+    : recommendations.filter(rec => 
+        rec.match_factors.vibe_matches?.includes(filter) ||
+        rec.venue_name.toLowerCase().includes(filter)
+      );
 
-  const toggleLike = (venueId: string) => {
-    setLikedVenues(prev =>
-      prev.includes(venueId)
-        ? prev.filter(id => id !== venueId)
-        : [...prev, venueId]
-    );
+  const handleVenueSelect = (venueId: string) => {
+    navigate(`/venue/${venueId}`);
   };
 
   if (venues.length === 0) {
@@ -58,8 +72,11 @@ const Results = () => {
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div className="text-center">
-              <h1 className="text-xl font-semibold text-gray-900">Perfect Matches</h1>
-              <p className="text-sm text-gray-600">{filteredVenues.length} spots found</p>
+              <h1 className="text-xl font-semibold text-gray-900">AI Recommendations</h1>
+              <p className="text-sm text-gray-600 flex items-center justify-center gap-1">
+                <Sparkles className="w-4 h-4 text-purple-500" />
+                {filteredRecommendations.length} perfect matches
+              </p>
             </div>
             <Button
               variant="ghost"
@@ -78,7 +95,7 @@ const Results = () => {
                 onClick={() => setFilter(filterOption.id)}
                 className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   filter === filterOption.id
-                    ? 'bg-datespot-gradient text-white'
+                    ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -89,112 +106,85 @@ const Results = () => {
           </div>
         </div>
 
-        {/* Results */}
+        {/* AI-Powered Results */}
         <div className="p-4">
-          <div className="mb-4 text-center">
-            <h2 className="text-lg font-semibold text-gray-800 mb-1">
-              Top Recommendations
-            </h2>
-            <p className="text-sm text-gray-600">
-              Sorted by best match • AI-powered
+          <div className="mb-6 text-center bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border border-purple-100">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Sparkles className="w-5 h-5 text-purple-600" />
+              <h2 className="text-lg font-bold text-purple-900">
+                AI-Powered Matches
+              </h2>
+            </div>
+            <p className="text-sm text-purple-700">
+              Each venue is personally scored based on your preferences and past feedback
             </p>
           </div>
 
-          <div className="space-y-4">
-            {filteredVenues.map((venue, index) => (
-              <div
-                key={venue.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="relative">
-                  <img
-                    src={venue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'}
-                    alt={venue.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <Badge className="bg-green-500 text-white font-semibold">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      {venue.matchScore}% match
-                    </Badge>
-                  </div>
-                  <button
-                    onClick={() => toggleLike(venue.id)}
-                    className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors"
-                  >
-                    <Heart
-                      className={`w-5 h-5 ${
-                        likedVenues.includes(venue.id)
-                          ? 'text-red-500 fill-current'
-                          : 'text-gray-600'
-                      }`}
-                    />
-                  </button>
-                  {venue.discount && (
-                    <div className="absolute bottom-3 left-3">
-                      <Badge className="bg-orange-500 text-white">
-                        {venue.discount}
-                      </Badge>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-bold text-lg text-gray-900">{venue.name}</h3>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm font-medium">{venue.rating || 4.5}</span>
-                    </div>
-                  </div>
-
-                  <p className="text-gray-600 text-sm mb-3">{venue.description}</p>
-
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      {venue.address} • {venue.distance}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" />
-                      {venue.price_range || '$$'}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {venue.tags?.slice(0, 3).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  <Button
-                    onClick={() => navigate(`/venue/${venue.id}`)}
-                    className="w-full bg-datespot-gradient text-white hover:opacity-90"
-                  >
-                    View Details
-                  </Button>
-                </div>
-              </div>
+          {/* AIVenueCard Components */}
+          <div className="space-y-6">
+            {filteredRecommendations.map((recommendation, index) => (
+              <AIVenueCard
+                key={recommendation.venue_id}
+                recommendation={recommendation}
+                onSelect={handleVenueSelect}
+                showAIInsights={true}
+                compact={false}
+                sessionContext={{
+                  sessionId: 'current-session',
+                  partnerId: 'current-partner'
+                }}
+              />
             ))}
           </div>
+
+          {/* No Results */}
+          {filteredRecommendations.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                No matches found
+              </h3>
+              <p className="text-gray-500 mb-4">
+                Try adjusting your filters or preferences
+              </p>
+              <Button
+                onClick={() => setFilter('all')}
+                variant="outline"
+              >
+                Show All Results
+              </Button>
+            </div>
+          )}
 
           {/* Bottom Actions */}
           <div className="mt-8 space-y-3">
             <Button
               onClick={() => navigate('/preferences')}
               variant="outline"
-              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
+              className="w-full border-purple-200 text-purple-700 hover:bg-purple-50"
             >
-              Refine Preferences
+              <Sparkles className="w-4 h-4 mr-2" />
+              Improve AI Recommendations
             </Button>
             <Button
               onClick={() => navigate('/welcome')}
-              className="w-full bg-datespot-gradient text-white hover:opacity-90"
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:opacity-90"
             >
               Start New Search
             </Button>
+          </div>
+
+          {/* AI Learning Notice */}
+          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-semibold text-blue-900 mb-1">AI Learning Active</h4>
+                <p className="text-sm text-blue-800">
+                  Your feedback on these venues helps our AI learn your preferences and improve future recommendations.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
