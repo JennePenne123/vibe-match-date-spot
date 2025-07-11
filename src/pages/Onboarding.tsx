@@ -14,7 +14,7 @@ const Onboarding = () => {
       title: "Discover Perfect Date Spots",
       description: "Let AI find the ideal romantic locations tailored to your preferences and mood. From cozy cafés to scenic viewpoints.",
       image: "❤️",
-      gradient: "from-orange-400 to-rose-500"
+      gradient: "from-pink-400 to-rose-500"
     },
     {
       icon: MapPin,

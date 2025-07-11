@@ -29,9 +29,9 @@ const FriendCard = ({
   if (variant === 'compact') {
     return (
       <div className="flex items-center gap-3 p-2">
-        <Avatar className="w-10 h-10 border-2 border-datespot-light-coral">
+        <Avatar className="w-10 h-10 border-2 border-pink-200">
           <AvatarImage src={friend.avatar_url} alt={friend.name} />
-          <AvatarFallback className="bg-datespot-light-coral text-datespot-dark-coral">
+          <AvatarFallback className="bg-pink-100 text-pink-600">
             {getInitials(friend.name)}
           </AvatarFallback>
         </Avatar>
@@ -47,7 +47,7 @@ const FriendCard = ({
             size="sm"
             variant={friend.isInvited ? "default" : "outline"}
             className={friend.isInvited ? 
-              "bg-datespot-gradient text-white hover:opacity-90" : 
+              "bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600" : 
               "border-gray-200 text-gray-700 hover:bg-gray-50"
             }
           >
@@ -63,9 +63,9 @@ const FriendCard = ({
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <Avatar className="w-14 h-14 border-2 border-datespot-light-coral">
+            <Avatar className="w-14 h-14 border-2 border-pink-200">
               <AvatarImage src={friend.avatar_url} alt={friend.name} />
-              <AvatarFallback className="bg-datespot-light-coral text-datespot-dark-coral">
+              <AvatarFallback className="bg-pink-100 text-pink-600">
                 {getInitials(friend.name)}
               </AvatarFallback>
             </Avatar>
@@ -106,7 +106,7 @@ const FriendCard = ({
                   <Button
                     onClick={() => onInvite(friend.id, friend.name)}
                     size="sm"
-                    className="flex-1 bg-datespot-gradient text-white hover:opacity-90"
+                    className="flex-1 bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
                   >
                     <Calendar className="w-4 h-4 mr-1" />
                     Invite

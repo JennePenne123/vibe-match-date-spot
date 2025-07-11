@@ -118,7 +118,7 @@ const Venues = () => {
                   variant={selectedFilters.includes(filter) ? "default" : "secondary"}
                   className={`cursor-pointer transition-colors ${
                     selectedFilters.includes(filter) 
-                      ? 'bg-datespot-coral text-white hover:bg-datespot-dark-coral' 
+                      ? 'bg-pink-500 text-white hover:bg-pink-600' 
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                   onClick={() => toggleFilter(filter)}
@@ -140,7 +140,7 @@ const Venues = () => {
               onClick={() => navigate('/my-venues')}
               variant="outline"
               size="sm"
-              className="border-datespot-light-coral text-datespot-dark-coral hover:bg-datespot-light-coral"
+              className="border-pink-200 text-pink-600 hover:bg-pink-50"
             >
               <MapPin className="w-4 h-4 mr-1" />
               My Venues ({likedVenues.length})

@@ -11,10 +11,10 @@ const NoFriendsEmptyState: React.FC = () => {
 
   return (
     <SafeComponent componentName="NoFriendsEmptyState">
-      <Card className="bg-gradient-to-r from-orange-50 to-rose-50 border-orange-200">
+      <Card className="bg-gradient-to-r from-pink-50 to-rose-50 border-pink-200">
         <CardHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
-            <div className="bg-datespot-gradient rounded-full p-4 shadow-md">
+            <div className="bg-gradient-to-r from-pink-400 to-rose-500 rounded-full p-4 shadow-md">
               <Heart className="w-12 h-12 text-white" fill="currentColor" />
             </div>
           </div>
@@ -27,12 +27,12 @@ const NoFriendsEmptyState: React.FC = () => {
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-white rounded-lg border border-datespot-light-coral">
-              <Users className="h-8 w-8 text-datespot-coral mx-auto mb-2" />
+            <div className="p-4 bg-white rounded-lg border border-pink-100">
+              <Users className="h-8 w-8 text-pink-500 mx-auto mb-2" />
               <h3 className="font-medium text-gray-800 mb-1">Connect with Friends</h3>
               <p className="text-sm text-gray-600">Add friends to start planning dates together</p>
             </div>
-            <div className="p-4 bg-white rounded-lg border border-datespot-light-coral">
+            <div className="p-4 bg-white rounded-lg border border-pink-100">
               <Sparkles className="h-8 w-8 text-purple-500 mx-auto mb-2" />
               <h3 className="font-medium text-gray-800 mb-1">AI-Powered Matching</h3>
               <p className="text-sm text-gray-600">Get personalized venue recommendations</p>
@@ -41,7 +41,7 @@ const NoFriendsEmptyState: React.FC = () => {
           
           <Button 
             onClick={() => navigate('/my-friends')}
-            className="bg-datespot-gradient text-white hover:opacity-90"
+            className="bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
             size="lg"
           >
             <UserPlus className="h-4 w-4 mr-2" />

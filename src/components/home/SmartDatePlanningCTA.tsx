@@ -22,7 +22,7 @@ const SmartDatePlanningCTA: React.FC = () => {
 
   if (!hasFriends) {
     return (
-      <Card className="bg-gradient-to-br from-purple-50 to-orange-50 border-purple-200">
+      <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
             <div className="bg-purple-100 p-2 rounded-full">
@@ -64,7 +64,7 @@ const SmartDatePlanningCTA: React.FC = () => {
             <div className="flex gap-2">
               <Button 
                 onClick={handleStartPlanning}
-                className="flex-1 bg-gradient-to-r from-purple-600 to-orange-600 hover:from-purple-700 hover:to-orange-700 text-white"
+                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                 size="lg"
               >
                 Start Planning
@@ -86,7 +86,7 @@ const SmartDatePlanningCTA: React.FC = () => {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-purple-50 to-orange-50 border-purple-200">
+    <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-start gap-3">
           <div className="bg-purple-100 p-2 rounded-full shrink-0">
@@ -121,8 +121,8 @@ const SmartDatePlanningCTA: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="bg-orange-100 p-2 rounded-full shrink-0">
-              <Sparkles className="h-4 w-4 text-orange-600" />
+            <div className="bg-pink-100 p-2 rounded-full shrink-0">
+              <Sparkles className="h-4 w-4 text-pink-600" />
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="font-semibold text-gray-900 text-sm">Personalized</h3>
@@ -133,7 +133,7 @@ const SmartDatePlanningCTA: React.FC = () => {
         
         <Button 
           onClick={handleStartPlanning}
-          className="w-full bg-gradient-to-r from-purple-600 to-orange-600 hover:from-purple-700 hover:to-orange-700 text-white"
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
           size="lg"
         >
           Start Smart Planning

@@ -36,12 +36,12 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-datespot-coral cursor-pointer">
+        <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-pink-400 cursor-pointer">
           <CardContent className="p-4">
             <div className="flex items-start gap-4">
-              <Avatar className="w-12 h-12 border-2 border-datespot-light-coral">
+              <Avatar className="w-12 h-12 border-2 border-pink-200">
                 <AvatarImage src={invitation.friendAvatar} alt={invitation.friendName} />
-                <AvatarFallback className="bg-datespot-light-coral text-datespot-dark-coral">
+                <AvatarFallback className="bg-pink-100 text-pink-600">
                   {invitation.friendName.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
@@ -51,7 +51,7 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
                   <h3 className="font-semibold text-gray-900 truncate">
                     {invitation.friendName}
                   </h3>
-                  <Badge className="text-xs text-datespot-dark-coral font-medium bg-datespot-light-coral">
+                  <Badge className="text-xs text-pink-600 font-medium bg-pink-100">
                     {invitation.dateType}
                   </Badge>
                 </div>
@@ -77,9 +77,9 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
       <DialogContent className="max-w-md mx-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <Avatar className="w-10 h-10 border-2 border-datespot-light-coral">
+            <Avatar className="w-10 h-10 border-2 border-pink-200">
               <AvatarImage src={invitation.friendAvatar} alt={invitation.friendName} />
-              <AvatarFallback className="bg-datespot-light-coral text-datespot-dark-coral">
+              <AvatarFallback className="bg-pink-100 text-pink-600">
                 {invitation.friendName.split(' ').map(n => n[0]).join('')}
               </AvatarFallback>
             </Avatar>
@@ -99,7 +99,7 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
               className="w-full h-48 object-cover"
             />
             <div className="absolute top-3 left-3">
-              <Badge className="bg-datespot-coral text-white">
+              <Badge className="bg-pink-500 text-white">
                 {invitation.dateType}
               </Badge>
             </div>
@@ -157,7 +157,7 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
                 onAccept(invitation.id);
                 setIsOpen(false);
               }}
-              className="flex-1 bg-datespot-gradient text-white hover:opacity-90"
+              className="flex-1 bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
             >
               <Check className="w-4 h-4 mr-2" />
               Accept Date

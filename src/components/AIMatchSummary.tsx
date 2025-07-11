@@ -38,7 +38,7 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
   };
 
   return (
-    <Card className="bg-gradient-to-r from-purple-50 to-orange-50 border-purple-200">
+    <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-purple-500" />
@@ -50,7 +50,7 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
         {/* Compatibility Score */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-4">
-            <Heart className="h-8 w-8 text-datespot-coral" />
+            <Heart className="h-8 w-8 text-pink-500" />
             <div>
               <div className="text-3xl font-bold text-gray-900">
                 {Math.round(compatibilityScore)}%

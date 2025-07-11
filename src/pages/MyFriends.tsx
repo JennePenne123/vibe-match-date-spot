@@ -58,7 +58,7 @@ const MyFriends = () => {
           <Button
             variant="outline"
             size="icon"
-            className="text-datespot-dark-coral border-datespot-light-coral hover:bg-datespot-light-coral"
+            className="text-pink-600 border-pink-200 hover:bg-pink-50"
           >
             <UserPlus className="w-5 h-5" />
           </Button>
@@ -79,9 +79,9 @@ const MyFriends = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-gradient-to-br from-orange-50 to-rose-50 border-orange-200">
+            <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200">
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-datespot-coral">{friends.length}</div>
+                <div className="text-2xl font-bold text-pink-600">{friends.length}</div>
                 <div className="text-sm text-gray-600">Total Friends</div>
               </CardContent>
             </Card>

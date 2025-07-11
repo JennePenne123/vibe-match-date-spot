@@ -77,7 +77,7 @@ const RegisterLogin = () => {
         {/* Logo and Header */}
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="bg-datespot-gradient rounded-full p-4 shadow-lg">
+            <div className="bg-gradient-to-r from-pink-400 to-rose-500 rounded-full p-4 shadow-lg">
               <Heart className="w-12 h-12 text-white" fill="currentColor" />
             </div>
           </div>
@@ -147,7 +147,7 @@ const RegisterLogin = () => {
               </div>
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-datespot-gradient hover:opacity-90 text-white font-semibold border-0"
+                className="w-full h-12 bg-gradient-to-r from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white font-semibold border-0"
                 disabled={loading}
               >
                 {loading ? (

@@ -48,9 +48,9 @@ const ProfileHeader = ({
 
       {/* Profile Header */}
       <div className="text-center">
-        <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-datespot-light-coral">
+        <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-datespot-light-pink">
           <AvatarImage src={user.profile?.avatar_url} alt={displayName} />
-          <AvatarFallback className="bg-datespot-light-coral text-datespot-dark-coral text-2xl">
+          <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
             {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
           </AvatarFallback>
         </Avatar>
