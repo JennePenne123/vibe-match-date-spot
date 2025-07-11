@@ -63,24 +63,24 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// DateSpot brand colors - updated to pink theme with light backgrounds
+				// DateSpot brand colors - updated to coral/orange theme
 				datespot: {
-					pink: '#EC4899',
-					'dark-pink': '#BE185D',
-					'light-pink': '#FCE7F3',
-					'soft-pink': '#FDF2F8',
-					rose: '#F43F5E',
-					'light-rose': '#FFE4E6',
+					coral: '#FF6B47',
+					'dark-coral': '#E55B3C',
+					'light-coral': '#FFF4F2',
+					'soft-coral': '#FFEFEC',
+					orange: '#FF8A65',
+					'light-orange': '#FFF3E0',
 					gradient: {
-						from: '#F472B6',
-						to: '#EC4899'
+						from: '#FF8A65',
+						to: '#FF6B47'
 					}
 				}
 			},
 			backgroundImage: {
-				'datespot-gradient': 'linear-gradient(135deg, #F472B6 0%, #EC4899 100%)',
-				'datespot-gradient-soft': 'linear-gradient(135deg, #F472B6 0%, #F43F5E 100%)',
-				'datespot-gradient-light': 'linear-gradient(135deg, #FCE7F3 0%, #FDF2F8 100%)',
+				'datespot-gradient': 'linear-gradient(135deg, #FF8A65 0%, #FF6B47 100%)',
+				'datespot-gradient-soft': 'linear-gradient(135deg, #FF8A65 0%, #FF7043 100%)',
+				'datespot-gradient-light': 'linear-gradient(135deg, #FFF4F2 0%, #FFEFEC 100%)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
