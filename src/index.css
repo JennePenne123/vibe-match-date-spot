@@ -6,105 +6,89 @@
 
 @layer base {
   :root {
-    /* Wellness-inspired color palette */
-    --background: 28 25% 97%;
-    --foreground: 25 15% 25%;
-    --card: 30 20% 95%;
-    --card-foreground: 25 15% 30%;
-    --popover: 30 25% 98%;
-    --popover-foreground: 25 15% 25%;
-    
-    /* Muted earth tones */
-    --primary: 25 45% 65%;
-    --primary-foreground: 30 25% 98%;
-    --primary-soft: 22 35% 75%;
-    
-    --secondary: 35 20% 88%;
-    --secondary-foreground: 25 15% 35%;
-    
-    --muted: 32 15% 92%;
-    --muted-foreground: 25 12% 45%;
-    
-    --accent: 28 25% 90%;
-    --accent-foreground: 25 15% 30%;
-    
-    --destructive: 0 45% 65%;
-    --destructive-foreground: 30 25% 98%;
-    
-    --border: 30 20% 88%;
-    --input: 30 20% 90%;
-    --ring: 25 45% 65%;
-    --radius: 1rem;
-    
-    /* Wellness gradients inspired by uploads */
-    --gradient-coral: linear-gradient(135deg, hsl(12 85% 75%) 0%, hsl(20 70% 85%) 100%);
-    --gradient-lavender: linear-gradient(135deg, hsl(260 25% 88%) 0%, hsl(280 20% 92%) 100%);
-    --gradient-sage: linear-gradient(135deg, hsl(90 20% 80%) 0%, hsl(120 15% 85%) 100%);
-    --gradient-wellness: linear-gradient(135deg, hsl(25 45% 85%) 0%, hsl(35 35% 90%) 50%, hsl(45 25% 92%) 100%);
-    
-    /* Soft shadows for wellness aesthetic */
-    --shadow-gentle: 0 4px 20px -4px hsl(25 45% 65% / 0.15);
-    --shadow-soft: 0 8px 32px -8px hsl(25 45% 65% / 0.12);
-    --shadow-floating: 0 12px 48px -12px hsl(25 45% 65% / 0.18);
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
-    /* Sidebar - wellness theme */
-    --sidebar-background: 32 15% 94%;
-    --sidebar-foreground: 25 15% 30%;
-    --sidebar-primary: 25 45% 65%;
-    --sidebar-primary-foreground: 30 25% 98%;
-    --sidebar-accent: 28 25% 90%;
-    --sidebar-accent-foreground: 25 15% 30%;
-    --sidebar-border: 30 20% 88%;
-    --sidebar-ring: 25 45% 65%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 25 15% 12%;
-    --foreground: 30 20% 90%;
-    --card: 25 15% 15%;
-    --card-foreground: 30 20% 88%;
-    --popover: 25 15% 14%;
-    --popover-foreground: 30 20% 90%;
-    
-    --primary: 25 45% 70%;
-    --primary-foreground: 25 15% 15%;
-    --primary-soft: 22 35% 65%;
-    
-    --secondary: 25 12% 20%;
-    --secondary-foreground: 30 20% 85%;
-    
-    --muted: 25 12% 18%;
-    --muted-foreground: 30 15% 65%;
-    
-    --accent: 25 15% 22%;
-    --accent-foreground: 30 20% 88%;
-    
-    --destructive: 0 55% 60%;
-    --destructive-foreground: 30 20% 92%;
-    
-    --border: 25 12% 25%;
-    --input: 25 12% 22%;
-    --ring: 25 45% 70%;
-    
-    /* Dark mode wellness gradients */
-    --gradient-coral: linear-gradient(135deg, hsl(12 55% 45%) 0%, hsl(20 45% 55%) 100%);
-    --gradient-lavender: linear-gradient(135deg, hsl(260 15% 35%) 0%, hsl(280 12% 40%) 100%);
-    --gradient-sage: linear-gradient(135deg, hsl(90 12% 40%) 0%, hsl(120 10% 45%) 100%);
-    --gradient-wellness: linear-gradient(135deg, hsl(25 25% 25%) 0%, hsl(35 20% 30%) 50%, hsl(45 15% 35%) 100%);
-    
-    --shadow-gentle: 0 4px 20px -4px hsl(0 0% 0% / 0.25);
-    --shadow-soft: 0 8px 32px -8px hsl(0 0% 0% / 0.20);
-    --shadow-floating: 0 12px 48px -12px hsl(0 0% 0% / 0.30);
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    /* Dark sidebar */
-    --sidebar-background: 25 15% 10%;
-    --sidebar-foreground: 30 20% 88%;
-    --sidebar-primary: 25 45% 70%;
-    --sidebar-primary-foreground: 25 15% 15%;
-    --sidebar-accent: 25 15% 18%;
-    --sidebar-accent-foreground: 30 20% 88%;
-    --sidebar-border: 25 12% 20%;
-    --sidebar-ring: 25 45% 70%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -115,38 +99,5 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    line-height: 1.6;
-    letter-spacing: -0.01em;
-  }
-  
-  /* Wellness-inspired component styles */
-  .wellness-card {
-    @apply bg-card border border-border rounded-2xl p-6 shadow-[var(--shadow-gentle)] transition-all duration-300 hover:shadow-[var(--shadow-soft)];
-  }
-  
-  .wellness-button {
-    @apply bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--primary-soft))] text-primary-foreground px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-[var(--shadow-gentle)] hover:scale-[1.02] active:scale-[0.98];
-  }
-  
-  .wellness-input {
-    @apply bg-input border border-border rounded-xl px-4 py-3 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary;
-  }
-  
-  .gradient-coral {
-    background: var(--gradient-coral);
-  }
-  
-  .gradient-lavender {
-    background: var(--gradient-lavender);
-  }
-  
-  .gradient-sage {
-    background: var(--gradient-sage);
-  }
-  
-  .gradient-wellness {
-    background: var(--gradient-wellness);
   }
 }

@@ -19,9 +19,6 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -30,8 +27,7 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))',
-					soft: 'hsl(var(--primary-soft))',
+					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -67,28 +63,29 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
+				// DateSpot brand colors - updated to pink theme with light backgrounds
+				datespot: {
+					pink: '#EC4899',
+					'dark-pink': '#BE185D',
+					'light-pink': '#FCE7F3',
+					'soft-pink': '#FDF2F8',
+					rose: '#F43F5E',
+					'light-rose': '#FFE4E6',
+					gradient: {
+						from: '#F472B6',
+						to: '#EC4899'
+					}
+				}
 			},
 			backgroundImage: {
-				'wellness-gradient': 'var(--gradient-wellness)',
-				'coral-gradient': 'var(--gradient-coral)',
-				'lavender-gradient': 'var(--gradient-lavender)',
-				'sage-gradient': 'var(--gradient-sage)',
+				'datespot-gradient': 'linear-gradient(135deg, #F472B6 0%, #EC4899 100%)',
+				'datespot-gradient-soft': 'linear-gradient(135deg, #F472B6 0%, #F43F5E 100%)',
+				'datespot-gradient-light': 'linear-gradient(135deg, #FCE7F3 0%, #FDF2F8 100%)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)',
-				xl: 'calc(var(--radius) + 4px)',
-				'2xl': 'calc(var(--radius) + 8px)',
-			},
-			spacing: {
-				'18': '4.5rem',
-				'88': '22rem',
-			},
-			boxShadow: {
-				'gentle': 'var(--shadow-gentle)',
-				'soft': 'var(--shadow-soft)',
-				'floating': 'var(--shadow-floating)',
+				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
 				'accordion-down': {
@@ -126,24 +123,13 @@ export default {
 						transform: 'scale(1)',
 						opacity: '1'
 					}
-				},
-				'gentle-pulse': {
-					'0%, 100%': {
-						opacity: '1',
-						transform: 'scale(1)'
-					},
-					'50%': {
-						opacity: '0.8',
-						transform: 'scale(1.02)'
-					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
-				'scale-in': 'scale-in 0.2s ease-out',
-				'gentle-pulse': 'gentle-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+				'scale-in': 'scale-in 0.2s ease-out'
 			}
 		}
 	},
