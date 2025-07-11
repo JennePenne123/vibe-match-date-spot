@@ -1,6 +1,7 @@
 
 import { calculateVenueAIScore, calculateConfidenceLevel } from './scoring';
 import { getActiveVenues, getStoredAIScore } from './fetching';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface AIVenueRecommendation {
   venue_id: string;
@@ -20,10 +21,19 @@ export const getAIVenueRecommendations = async (
   limit: number = 10
 ): Promise<AIVenueRecommendation[]> => {
   try {
-    console.log('Getting AI venue recommendations for user:', userId);
+    console.log('Getting AI venue recommendations for user:', userId, 'partner:', partnerId);
 
-    // Get venues with basic filtering
-    const venues = await getActiveVenues(50);
+    // First try to get real venues from Google Places API
+    let venues = await getVenuesFromGooglePlaces(userId, limit);
+    
+    // Fallback to database venues if Google Places fails
+    if (!venues || venues.length === 0) {
+      console.log('No Google Places venues, falling back to database venues');
+      venues = await getActiveVenues(50);
+    } else {
+      console.log('Got venues from Google Places:', venues.length);
+    }
+
     const recommendations: AIVenueRecommendation[] = [];
 
     // Calculate AI scores for each venue
@@ -58,6 +68,109 @@ export const getAIVenueRecommendations = async (
     return sortedRecommendations;
   } catch (error) {
     console.error('Error getting AI venue recommendations:', error);
+    return [];
+  }
+};
+
+// Get venues from Google Places API based on user preferences
+const getVenuesFromGooglePlaces = async (userId: string, limit: number) => {
+  try {
+    // Get user preferences
+    const { data: userPrefs } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (!userPrefs) return [];
+
+    // Use mock user location for now (could be made dynamic)
+    const location = 'San Francisco, CA';
+    const latitude = 37.7749;
+    const longitude = -122.4194;
+
+    console.log('Searching venues with preferences:', {
+      cuisines: userPrefs.preferred_cuisines,
+      vibes: userPrefs.preferred_vibes,
+      location
+    });
+
+    // Call the search-venues edge function
+    const { data: searchResult, error } = await supabase.functions.invoke('search-venues', {
+      body: {
+        location,
+        cuisines: userPrefs.preferred_cuisines || ['italian'],
+        vibes: userPrefs.preferred_vibes || ['romantic'],
+        latitude,
+        longitude,
+        radius: (userPrefs.max_distance || 10) * 1609 // Convert miles to meters
+      }
+    });
+
+    if (error) {
+      console.error('Error calling search-venues function:', error);
+      return [];
+    }
+
+    const venues = searchResult?.venues || [];
+    console.log('Google Places returned:', venues.length, 'venues');
+
+    // Transform and save venues to database
+    const transformedVenues = [];
+    for (const venue of venues.slice(0, limit)) {
+      // Save venue to database if not exists
+      const { data: existingVenue } = await supabase
+        .from('venues')
+        .select('id')
+        .eq('google_place_id', venue.placeId)
+        .single();
+
+      let venueId = existingVenue?.id;
+      
+      if (!existingVenue && venue.placeId) {
+        const { data: newVenue, error: insertError } = await supabase
+          .from('venues')
+          .insert({
+            name: venue.name,
+            address: venue.location,
+            cuisine_type: venue.cuisineType,
+            price_range: venue.priceRange,
+            rating: venue.rating,
+            image_url: venue.image,
+            google_place_id: venue.placeId,
+            phone: venue.phone,
+            website: venue.website,
+            tags: venue.tags || [],
+            latitude: venue.latitude,
+            longitude: venue.longitude,
+            description: venue.description
+          })
+          .select('id')
+          .single();
+
+        if (!insertError && newVenue) {
+          venueId = newVenue.id;
+          console.log('Saved new venue to database:', venue.name);
+        }
+      }
+
+      if (venueId) {
+        transformedVenues.push({
+          id: venueId,
+          name: venue.name,
+          address: venue.location,
+          cuisine_type: venue.cuisineType,
+          price_range: venue.priceRange,
+          rating: venue.rating,
+          image_url: venue.image,
+          tags: venue.tags || []
+        });
+      }
+    }
+
+    return transformedVenues;
+  } catch (error) {
+    console.error('Error getting venues from Google Places:', error);
     return [];
   }
 };

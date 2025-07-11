@@ -33,29 +33,36 @@ export const useFriends = () => {
         return;
       }
 
-      // Transform the data to get the friend's profile (not the current user's)
-      const friendsList: Friend[] = data?.map(friendship => {
+      // Transform the data to get the friend's profile and deduplicate
+      const friendsMap = new Map();
+      
+      data?.forEach(friendship => {
         const isCurrentUserSender = friendship.user_id === user.id;
         const friendProfile = isCurrentUserSender ? friendship.friend : friendship.user;
         
         // Handle the case where friendProfile might be an array
         const profile = Array.isArray(friendProfile) ? friendProfile[0] : friendProfile;
         
-        return {
-          id: profile.id,
-          name: profile.name,
-          email: profile.email,
-          avatar_url: profile.avatar_url,
-          friendship_status: friendship.status as 'pending' | 'accepted' | 'declined' | 'blocked',
-          friendship_id: friendship.id,
-          // Add some default UI properties
-          status: 'offline',
-          lastSeen: 'Last seen recently',
-          mutualFriends: 0,
-          joinedDate: '1 month ago',
-          isInvited: false
-        };
-      }) || [];
+        // Only add if we haven't seen this friend before
+        if (!friendsMap.has(profile.id)) {
+          friendsMap.set(profile.id, {
+            id: profile.id,
+            name: profile.name,
+            email: profile.email,
+            avatar_url: profile.avatar_url,
+            friendship_status: friendship.status as 'pending' | 'accepted' | 'declined' | 'blocked',
+            friendship_id: friendship.id,
+            // Add some default UI properties
+            status: 'offline',
+            lastSeen: 'Last seen recently',
+            mutualFriends: 0,
+            joinedDate: '1 month ago',
+            isInvited: false
+          });
+        }
+      });
+      
+      const friendsList: Friend[] = Array.from(friendsMap.values());
 
       setFriends(friendsList);
     } catch (error) {
