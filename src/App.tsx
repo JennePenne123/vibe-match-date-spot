@@ -22,6 +22,7 @@ import MyVenues from "./pages/MyVenues";
 import NotFound from "./pages/NotFound";
 import AIRecommendations from "./pages/AIRecommendations";
 import SmartDatePlanning from "./pages/SmartDatePlanning";
+import AIVenueCardDemo from "./pages/AIVenueCardDemo";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +71,7 @@ const App = () => (
                   <Route path="/my-venues" element={<MyVenues />} />
                   <Route path="/ai-recommendations" element={<AIRecommendations />} />
                   <Route path="/plan-date" element={<SmartDatePlanning />} />
+                  <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </ErrorBoundary>
