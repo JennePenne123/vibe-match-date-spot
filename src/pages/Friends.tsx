@@ -157,7 +157,7 @@ const Friends = () => {
                     <div className="flex items-center gap-4">
                       <Avatar className="w-12 h-12">
                         <AvatarImage src={friend.avatar_url} alt={friend.name} />
-                        <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink">
+                        <AvatarFallback className="bg-datespot-light-coral text-datespot-dark-coral">
                           {friend.name.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>
@@ -201,8 +201,8 @@ const Friends = () => {
                 {/* Referral Link Section */}
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                   <div className="text-center mb-4">
-                    <div className="bg-datespot-light-pink rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
-                      <Share2 className="w-8 h-8 text-datespot-pink" />
+                    <div className="bg-datespot-light-coral rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                      <Share2 className="w-8 h-8 text-datespot-coral" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Invite Friends to DateSpot</h3>
                     <p className="text-sm text-gray-600">Share your referral link and discover amazing dates together</p>

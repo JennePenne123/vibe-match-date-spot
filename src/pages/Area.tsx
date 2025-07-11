@@ -151,7 +151,7 @@ const Area = () => {
                 disabled={appState.isLoading}
                 className={`w-full p-4 rounded-xl border-2 transition-all ${
                   selectedArea === area.id
-                    ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
+                    ? 'bg-datespot-light-coral border-datespot-coral text-datespot-dark-coral'
                     : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                 } ${appState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
@@ -159,10 +159,10 @@ const Area = () => {
                   <div className="text-2xl">{area.emoji}</div>
                   <div className="flex-1 text-left">
                     <div className="font-semibold">{area.name}</div>
-                    <div className={`text-sm ${selectedArea === area.id ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
+                    <div className={`text-sm ${selectedArea === area.id ? 'text-datespot-dark-coral' : 'text-gray-500'}`}>
                       {area.description}
                     </div>
-                    <div className={`flex items-center gap-4 text-xs mt-1 ${selectedArea === area.id ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
+                    <div className={`flex items-center gap-4 text-xs mt-1 ${selectedArea === area.id ? 'text-datespot-dark-coral' : 'text-gray-500'}`}>
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {area.time}

@@ -62,9 +62,9 @@ const BurgerMenu = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12 border-2 border-pink-200">
+              <Avatar className="w-12 h-12 border-2 border-datespot-light-coral">
                 <AvatarImage src={getUserAvatar(user)} alt={displayName} />
-                <AvatarFallback className="bg-pink-100 text-pink-600">
+                <AvatarFallback className="bg-datespot-light-coral text-datespot-dark-coral">
                   {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -91,8 +91,8 @@ const BurgerMenu = () => {
                 onClick={() => handleMenuItemClick(item.path)}
                 className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors text-left"
               >
-                <div className="flex items-center justify-center w-10 h-10 bg-pink-100 rounded-lg">
-                  <item.icon className="w-5 h-5 text-pink-600" />
+                <div className="flex items-center justify-center w-10 h-10 bg-datespot-light-coral rounded-lg">
+                  <item.icon className="w-5 h-5 text-datespot-dark-coral" />
                 </div>
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">{item.label}</div>

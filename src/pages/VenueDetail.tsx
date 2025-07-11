@@ -168,7 +168,7 @@ const VenueDetail = () => {
                     href={appVenue.website} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-datespot-pink hover:underline flex items-center gap-1"
+                    className="text-datespot-coral hover:underline flex items-center gap-1"
                   >
                     Visit Website
                     <ExternalLink className="w-3 h-3" />

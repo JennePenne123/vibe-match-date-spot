@@ -59,7 +59,7 @@ const DateInvitationsSection = ({ invitations, onAccept, onDecline, isLoading = 
           <div className="space-y-2">
             <Button
               onClick={() => navigate('/preferences')}
-              className="w-full bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
+              className="w-full bg-datespot-gradient text-white hover:opacity-90"
             >
               <Plus className="w-4 h-4 mr-2" />
               Plan a New Date
@@ -82,7 +82,7 @@ const DateInvitationsSection = ({ invitations, onAccept, onDecline, isLoading = 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900">Date Invitations</h2>
-        <div className="bg-pink-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+        <div className="bg-datespot-coral text-white text-xs px-2 py-1 rounded-full font-medium">
           {invitations.length} new
         </div>
       </div>

@@ -50,7 +50,7 @@ const SkeletonLoader = ({ variant, count = 1 }: SkeletonLoaderProps) => {
 
       case 'date-invite':
         return (
-          <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-l-pink-200">
+          <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-l-datespot-light-coral">
             <div className="flex items-start gap-4">
               <Skeleton className="w-12 h-12 rounded-full" />
               <div className="flex-1 space-y-2">

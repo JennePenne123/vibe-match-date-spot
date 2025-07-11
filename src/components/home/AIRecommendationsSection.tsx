@@ -21,7 +21,7 @@ const AIRecommendationsSection: React.FC<AIRecommendationsSectionProps> = ({
 
   return (
     <SafeComponent componentName="AIRecommendationsSection">
-      <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+      <Card className="bg-gradient-to-r from-purple-50 to-orange-50 border-purple-200">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-purple-500" />
