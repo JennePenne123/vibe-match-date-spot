@@ -78,7 +78,7 @@ export default {
 				}
 			},
 			backgroundImage: {
-				'datespot-gradient': 'linear-gradient(135deg, #FF8A65 0%, #FF6B47 100%)',
+				'datespot-gradient': 'linear-gradient(135deg, #FCC1A7 0%, #CA5039 100%)',
 				'datespot-gradient-soft': 'linear-gradient(135deg, #FF8A65 0%, #FF7043 100%)',
 				'datespot-gradient-light': 'linear-gradient(135deg, #FFF4F2 0%, #FFEFEC 100%)',
 			},
