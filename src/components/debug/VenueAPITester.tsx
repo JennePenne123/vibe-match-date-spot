@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { getAIVenueRecommendations } from '@/services/aiVenueService/recommendations';
 import { calculateVenueAIScore } from '@/services/aiVenueService/scoring';
+import { TestResultsVisualization } from './TestResultsVisualization';
 
 export const VenueAPITester = () => {
   const [results, setResults] = useState<any>(null);
@@ -189,14 +190,7 @@ export const VenueAPITester = () => {
           </div>
         )}
 
-        {results && (
-          <div className="bg-muted p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Test Results:</h3>
-            <pre className="text-sm overflow-auto">
-              {JSON.stringify(results, null, 2)}
-            </pre>
-          </div>
-        )}
+        {results && <TestResultsVisualization results={results} />}
       </CardContent>
     </Card>
   );
