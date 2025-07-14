@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 
 // Import step components
 import PlanningHeader from '@/components/date-planning/PlanningHeader';
@@ -156,6 +157,16 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
             </Button>
           </div>
         )}
+
+        {/* Debug Component */}
+        <SmartPlannerDebug
+          currentUser={user}
+          selectedPartner={selectedPartner}
+          currentSession={currentSession}
+          compatibilityScore={compatibilityScore}
+          venueRecommendations={venueRecommendations}
+          currentStep={currentStep}
+        />
       </div>
     </div>
   );
