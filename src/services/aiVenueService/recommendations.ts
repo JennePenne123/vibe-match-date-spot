@@ -33,6 +33,12 @@ export const getAIVenueRecommendations = async (
       console.log('🔄 RECOMMENDATIONS: No Google Places venues, falling back to database venues');
       venues = await getActiveVenues(50);
       console.log('🗄️ RECOMMENDATIONS: Database returned:', venues?.length || 0, 'venues');
+      
+      // If database also has no venues, create some mock recommendations for debugging
+      if (!venues || venues.length === 0) {
+        console.warn('⚠️ RECOMMENDATIONS: No venues in database either, creating mock venues for debugging');
+        venues = await createMockVenues();
+      }
     }
 
     // If still no venues, something is wrong
@@ -260,4 +266,43 @@ export const generateAIReasoning = (venue: any, matchFactors: any, aiScore: numb
   }
   
   return reasons.join('. ') + `.`;
+};
+
+// Create mock venues for debugging when no real venues are available
+const createMockVenues = async () => {
+  const mockVenues = [
+    {
+      id: 'mock-1',
+      name: 'Romantic Italian Bistro',
+      address: 'Hamburg City Center',
+      cuisine_type: 'Italian',
+      price_range: '$$',
+      rating: 4.5,
+      image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
+      tags: ['romantic', 'italian', 'wine']
+    },
+    {
+      id: 'mock-2', 
+      name: 'Cozy Pasta Corner',
+      address: 'Hamburg Old Town',
+      cuisine_type: 'Italian',
+      price_range: '$$',
+      rating: 4.2,
+      image_url: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop',
+      tags: ['casual', 'pasta', 'local']
+    },
+    {
+      id: 'mock-3',
+      name: 'Bella Vista Restaurant',
+      address: 'Hamburg Harbor District',
+      cuisine_type: 'Italian',
+      price_range: '$$$',
+      rating: 4.7,
+      image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+      tags: ['fine-dining', 'view', 'date-night']
+    }
+  ];
+  
+  console.log('🎭 RECOMMENDATIONS: Created', mockVenues.length, 'mock venues for debugging');
+  return mockVenues;
 };
