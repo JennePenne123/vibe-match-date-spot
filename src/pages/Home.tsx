@@ -6,8 +6,6 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { getUserName } from '@/utils/typeHelpers';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { VenueAPITester } from '@/components/debug/VenueAPITester';
-import { TestDataControls } from '@/components/debug/TestDataControls';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -66,12 +64,6 @@ const Home: React.FC = () => {
           firstName={firstName} 
         />
         <HomeContent />
-      </div>
-      
-      {/* Debug Components - Remove after testing */}
-      <div className="container mx-auto px-4 py-8 space-y-6">
-        <TestDataControls />
-        <VenueAPITester />
       </div>
     </div>
   );
