@@ -201,52 +201,139 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       radius: (userPrefs.max_distance || 10) * 1609
     });
 
-    // Call the search-venues edge function with timeout and better error handling
+    // ===== EDGE FUNCTION CALL DEBUGGING =====
+    console.log('🚀 GOOGLE PLACES: ===== STARTING EDGE FUNCTION CALL =====');
     console.log('🚀 GOOGLE PLACES: About to call search-venues edge function...');
-    
-    // Create timeout promise
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Edge function timeout after 30 seconds')), 30000);
-    });
-    
-    // Call edge function with timeout
-    const edgeFunctionCall = supabase.functions.invoke('search-venues', {
+    console.log('🚀 GOOGLE PLACES: Edge function parameters:', {
+      functionName: 'search-venues',
       body: {
         location,
         cuisines: userPrefs.preferred_cuisines || ['italian'],
         vibes: userPrefs.preferred_vibes || ['romantic'],
         latitude,
         longitude,
-        radius: (userPrefs.max_distance || 10) * 1609 // Convert miles to meters
+        radius: (userPrefs.max_distance || 10) * 1609
       }
     });
     
+    // Test edge function accessibility first
+    console.log('🧪 GOOGLE PLACES: Testing edge function accessibility...');
+    
     let searchResult, error;
     try {
+      console.log('📡 GOOGLE PLACES: Calling supabase.functions.invoke...');
+      
+      const startTime = Date.now();
+      const edgeFunctionCall = supabase.functions.invoke('search-venues', {
+        body: {
+          location,
+          cuisines: userPrefs.preferred_cuisines || ['italian'],
+          vibes: userPrefs.preferred_vibes || ['romantic'],
+          latitude,
+          longitude,
+          radius: (userPrefs.max_distance || 10) * 1609 // Convert miles to meters
+        }
+      });
+      
+      console.log('⏱️ GOOGLE PLACES: Edge function call initiated, waiting for response...');
+      
+      // Create timeout promise (60 seconds for debugging)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Edge function timeout after 60 seconds')), 60000);
+      });
+      
       const result = await Promise.race([edgeFunctionCall, timeoutPromise]) as { data: any; error: any };
+      const endTime = Date.now();
+      
+      console.log('⏱️ GOOGLE PLACES: Edge function completed in:', endTime - startTime, 'ms');
+      console.log('📡 GOOGLE PLACES: Raw edge function result:', {
+        hasData: !!result.data,
+        hasError: !!result.error,
+        dataKeys: result.data ? Object.keys(result.data) : [],
+        errorMessage: result.error?.message
+      });
+      
       searchResult = result.data;
       error = result.error;
+      
     } catch (timeoutError) {
-      console.error('❌ GOOGLE PLACES: Edge function timed out:', timeoutError);
+      console.error('❌ GOOGLE PLACES: Edge function timed out or threw error:', timeoutError);
+      console.error('❌ GOOGLE PLACES: Timeout error details:', {
+        name: timeoutError.name,
+        message: timeoutError.message,
+        stack: timeoutError.stack
+      });
       error = timeoutError;
     }
 
-    console.log('📡 GOOGLE PLACES: Edge function response:', { 
+    // ===== DETAILED RESPONSE ANALYSIS =====
+    console.log('📡 GOOGLE PLACES: ===== ANALYZING EDGE FUNCTION RESPONSE =====');
+    console.log('📡 GOOGLE PLACES: Edge function response details:', { 
       success: !error, 
       hasData: !!searchResult,
       dataType: typeof searchResult,
       venueCount: searchResult?.venues?.length || 0,
       error: error?.message || 'none',
-      Hamburg_debug: location.includes('Hamburg') ? 'HAMBURG SEARCH DETECTED' : 'Not Hamburg'
+      Hamburg_debug: location.includes('Hamburg') ? 'HAMBURG SEARCH DETECTED' : 'Not Hamburg',
+      fullResult: searchResult,
+      fullError: error
     });
 
     if (error) {
+      console.error('❌ GOOGLE PLACES: ===== EDGE FUNCTION ERROR DETECTED =====');
       console.error('❌ GOOGLE PLACES: Error calling search-venues function:', {
+        errorType: typeof error,
+        errorName: error.name,
         message: error.message,
         details: error.details || 'No additional details',
         stack: error.stack,
-        Hamburg_location: location.includes('Hamburg') ? `SEARCHING HAMBURG: ${latitude}, ${longitude}` : 'Different location'
+        Hamburg_location: location.includes('Hamburg') ? `SEARCHING HAMBURG: ${latitude}, ${longitude}` : 'Different location',
+        isTimeoutError: error.message?.includes('timeout'),
+        isNetworkError: error.message?.includes('network') || error.message?.includes('fetch'),
+        isAuthError: error.message?.includes('auth') || error.message?.includes('unauthorized')
       });
+      
+      // Try to implement fallback strategy
+      console.log('🔄 GOOGLE PLACES: Attempting fallback to database venues...');
+      
+      try {
+        const { data: dbVenues, error: dbError } = await supabase
+          .from('venues')
+          .select('*')
+          .eq('is_active', true)
+          .limit(10);
+          
+        if (dbError) {
+          console.error('❌ GOOGLE PLACES: Database fallback also failed:', dbError);
+          throw error; // Re-throw original error
+        }
+        
+        if (dbVenues && dbVenues.length > 0) {
+          console.log('✅ GOOGLE PLACES: Using database fallback venues:', dbVenues.length);
+          
+          // Transform database venues to expected format
+          const transformedVenues = dbVenues.map(venue => ({
+            id: venue.id,
+            name: venue.name,
+            description: venue.description || 'Great local venue',
+            image: venue.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop',
+            rating: venue.rating || 4.0,
+            distance: '0.5 mi', // Default distance for database venues
+            priceRange: venue.price_range || '$$',
+            location: venue.address,
+            cuisineType: venue.cuisine_type || 'International',
+            vibe: 'casual',
+            matchScore: 75,
+            tags: venue.tags || [],
+            phone: venue.phone,
+            website: venue.website
+          }));
+          
+          return transformedVenues;
+        }
+      } catch (fallbackError) {
+        console.error('❌ GOOGLE PLACES: Fallback strategy failed:', fallbackError);
+      }
       
       // Throw error to be caught by parent function for user feedback
       throw new Error(`Failed to search venues: ${error.message}. Please check your internet connection and try again.`);
