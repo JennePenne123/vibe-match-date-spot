@@ -148,26 +148,40 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         {/* Step 3: Review Matches */}
         {currentStep === 'review-matches' && selectedPartner && (
           <div className="space-y-4">
+            {/* Location Requirement Check */}
+            {!userLocation && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-lg">📍</span>
+                  <div>
+                    <h4 className="font-semibold text-yellow-800">Location Required</h4>
+                    <p className="text-sm text-yellow-700">
+                      Real location access is required for venue recommendations. Please enable location to continue.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {/* Debug Info */}
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <h4 className="font-semibold text-blue-800 mb-2">🔍 Debug Information:</h4>
+              <h4 className="font-semibold text-blue-800 mb-2">🔍 Location & Search Status:</h4>
               <div className="text-sm text-blue-700 space-y-1">
+                <p><strong>Real User Location:</strong> {userLocation ? `✅ ${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}` : '❌ Required'}</p>
+                <p><strong>Venue Search Status:</strong> {userLocation ? 'Ready for Google Places API' : 'Blocked - no location'}</p>
                 <p><strong>Compatibility Score:</strong> {compatibilityScore || 'Loading...'}</p>
                 <p><strong>Venue Recommendations:</strong> {venueRecommendations?.length || 0} venues</p>
                 <p><strong>Partner:</strong> {selectedPartner?.name || 'None'}</p>
-                <p><strong>Session ID:</strong> {currentSession?.id || 'None'}</p>
-                <p><strong>User Location:</strong> {userLocation ? `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}` : 'Not available'}</p>
-                <p><strong>AI Analyzing:</strong> {aiAnalyzing ? 'Yes' : 'No'}</p>
               </div>
               {venueRecommendations && venueRecommendations.length > 0 && (
                 <div className="mt-2 text-xs text-blue-600">
-                  <p><strong>Venues:</strong> {venueRecommendations.map(v => v.venue_name).join(', ')}</p>
+                  <p><strong>Real Venues:</strong> {venueRecommendations.map(v => v.venue_name).join(', ')}</p>
                 </div>
               )}
             </div>
             
             <MatchReview
-              compatibilityScore={compatibilityScore || 75}
+              compatibilityScore={compatibilityScore || 0}
               partnerName={selectedPartner.name}
               venueRecommendations={venueRecommendations || []}
               onVenueSelect={handleVenueSelection}

@@ -167,9 +167,10 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     }, delay);
   }, [requestLocation, locationRequested]);
 
-  // Request location permission when Smart Date Planner is used
+  // Request location permission immediately when Smart Date Planner is used
   useEffect(() => {
-    if (user && !appState.userLocation && !appState.locationError && !locationRequested) {
+    if (user && !appState.userLocation && !appState.locationError) {
+      console.log('🎯 PLANNER STATE: User detected, requesting location immediately');
       handleLocationRequest();
     }
     

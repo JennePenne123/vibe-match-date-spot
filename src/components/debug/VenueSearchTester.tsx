@@ -13,28 +13,9 @@ export const VenueSearchTester = () => {
   const testDirectEdgeFunction = async () => {
     setLoading(true);
     setResults(null);
-    console.log('🧪 TESTER: Testing direct edge function call...');
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('search-venues', {
-        body: {
-          location: 'Hamburg, Germany',
-          cuisines: ['italian'],
-          vibes: ['romantic'],
-          latitude: 53.5511,
-          longitude: 9.9937,
-          radius: 16093.4
-        }
-      });
-
-      console.log('🧪 TESTER: Edge function response:', { data, error });
-      setResults({ type: 'edge-function', data, error });
-    } catch (err: any) {
-      console.error('🧪 TESTER: Edge function test failed:', err);
-      setResults({ type: 'error', message: err.message });
-    } finally {
-      setLoading(false);
-    }
+    console.log('🧪 TESTER: Testing direct edge function call - requires real location');
+    setResults({ type: 'error', message: 'Direct edge function test disabled - only use real user location' });
+    setLoading(false);
   };
 
   const testFullRecommendationFlow = async () => {
@@ -42,24 +23,12 @@ export const VenueSearchTester = () => {
     
     setLoading(true);
     setResults(null);
-    console.log('🧪 TESTER: Testing full recommendation flow...');
-    
-    try {
-      const recommendations = await getAIVenueRecommendations(
-        user.id, 
-        undefined, 
-        10, 
-        { latitude: 53.5511, longitude: 9.9937, address: 'Hamburg, Germany' }
-      );
-
-      console.log('🧪 TESTER: Recommendations:', recommendations);
-      setResults({ type: 'recommendations', data: recommendations });
-    } catch (err: any) {
-      console.error('🧪 TESTER: Recommendation flow test failed:', err);
-      setResults({ type: 'error', message: err.message });
-    } finally {
-      setLoading(false);
-    }
+    console.log('🧪 TESTER: Full recommendation flow disabled - requires real user location');
+    setResults({ 
+      type: 'error', 
+      message: 'Recommendation test disabled - only use real user location from Smart Date Planner' 
+    });
+    setLoading(false);
   };
 
   const testUserPreferences = async () => {

@@ -69,8 +69,8 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
     );
   }
 
-  // Convert coordinates to a readable location (Hamburg, Germany for our user)
-  const displayLocation = userLocation.address || `Hamburg, Germany`;
+  // Display real location coordinates or address
+  const displayLocation = userLocation.address || `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`;
   
   return (
     <Card className="border-primary/20 bg-primary/5">

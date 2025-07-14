@@ -24,27 +24,34 @@ export const getAIVenueRecommendations = async (
   try {
     console.log('🎯 RECOMMENDATIONS: Starting for user:', userId, 'partner:', partnerId, 'location:', userLocation);
 
-    // First try to get real venues from Google Places API
+    // Require real user location - no fallbacks to hardcoded data
+    if (!userLocation || !userLocation.latitude || !userLocation.longitude) {
+      console.error('❌ RECOMMENDATIONS: No valid user location provided. Real location required for venue search.');
+      throw new Error('User location is required for venue recommendations. Please enable location access.');
+    }
+
+    // Validate location coordinates
+    if (Math.abs(userLocation.latitude) > 90 || Math.abs(userLocation.longitude) > 180) {
+      console.error('❌ RECOMMENDATIONS: Invalid location coordinates:', userLocation);
+      throw new Error('Invalid location coordinates provided.');
+    }
+
+    // Only use Google Places API with real user location
+    console.log('🌐 RECOMMENDATIONS: Getting venues from Google Places with real location:', userLocation);
     let venues = await getVenuesFromGooglePlaces(userId, limit, userLocation);
     console.log('🌐 RECOMMENDATIONS: Google Places returned:', venues?.length || 0, 'venues');
     
-    // Fallback to database venues if Google Places fails
+    // Only fallback to database venues if Google Places fails (no mock data)
     if (!venues || venues.length === 0) {
-      console.log('🔄 RECOMMENDATIONS: No Google Places venues, falling back to database venues');
+      console.log('🔄 RECOMMENDATIONS: Google Places failed, trying database venues');
       venues = await getActiveVenues(50);
       console.log('🗄️ RECOMMENDATIONS: Database returned:', venues?.length || 0, 'venues');
-      
-      // If database also has no venues, create some mock recommendations for debugging
-      if (!venues || venues.length === 0) {
-        console.warn('⚠️ RECOMMENDATIONS: No venues in database either, creating mock venues for debugging');
-        venues = await createMockVenues();
-      }
     }
 
-    // If still no venues, something is wrong
+    // If still no venues, return empty array with clear error
     if (!venues || venues.length === 0) {
-      console.error('❌ RECOMMENDATIONS: No venues found from either source!');
-      return [];
+      console.error('❌ RECOMMENDATIONS: No venues found! Google Places and database both empty.');
+      throw new Error('No venues found in your area. Please try a different location or check your internet connection.');
     }
 
     const recommendations: AIVenueRecommendation[] = [];
@@ -130,10 +137,15 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       userPrefs.preferred_vibes = ['romantic'];
     }
 
-    // Use provided location or default to Hamburg, Germany for this user
-    const latitude = userLocation?.latitude || 53.5511;
-    const longitude = userLocation?.longitude || 9.9937;
-    const location = userLocation?.address || 'Hamburg, Germany';
+    // Require valid user location - no hardcoded fallbacks
+    if (!userLocation || !userLocation.latitude || !userLocation.longitude) {
+      console.error('❌ GOOGLE PLACES: No valid user location provided');
+      throw new Error('Real user location is required for Google Places search');
+    }
+
+    const latitude = userLocation.latitude;
+    const longitude = userLocation.longitude;
+    const location = userLocation.address || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 
     console.log('🏙️ GOOGLE PLACES: Searching venues with preferences:', {
       cuisines: userPrefs.preferred_cuisines,
@@ -268,41 +280,4 @@ export const generateAIReasoning = (venue: any, matchFactors: any, aiScore: numb
   return reasons.join('. ') + `.`;
 };
 
-// Create mock venues for debugging when no real venues are available
-const createMockVenues = async () => {
-  const mockVenues = [
-    {
-      id: 'mock-1',
-      name: 'Romantic Italian Bistro',
-      address: 'Hamburg City Center',
-      cuisine_type: 'Italian',
-      price_range: '$$',
-      rating: 4.5,
-      image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
-      tags: ['romantic', 'italian', 'wine']
-    },
-    {
-      id: 'mock-2', 
-      name: 'Cozy Pasta Corner',
-      address: 'Hamburg Old Town',
-      cuisine_type: 'Italian',
-      price_range: '$$',
-      rating: 4.2,
-      image_url: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop',
-      tags: ['casual', 'pasta', 'local']
-    },
-    {
-      id: 'mock-3',
-      name: 'Bella Vista Restaurant',
-      address: 'Hamburg Harbor District',
-      cuisine_type: 'Italian',
-      price_range: '$$$',
-      rating: 4.7,
-      image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
-      tags: ['fine-dining', 'view', 'date-night']
-    }
-  ];
-  
-  console.log('🎭 RECOMMENDATIONS: Created', mockVenues.length, 'mock venues for debugging');
-  return mockVenues;
-};
+// Mock venues function removed - only real venues allowed
