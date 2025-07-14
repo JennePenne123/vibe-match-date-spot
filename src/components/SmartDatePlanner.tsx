@@ -147,12 +147,32 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
 
         {/* Step 3: Review Matches */}
         {currentStep === 'review-matches' && selectedPartner && (
-          <MatchReview
-            compatibilityScore={compatibilityScore || 0}
-            partnerName={selectedPartner.name}
-            venueRecommendations={venueRecommendations}
-            onVenueSelect={handleVenueSelection}
-          />
+          <div className="space-y-4">
+            {/* Debug Info */}
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-blue-800 mb-2">🔍 Debug Information:</h4>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p><strong>Compatibility Score:</strong> {compatibilityScore || 'Loading...'}</p>
+                <p><strong>Venue Recommendations:</strong> {venueRecommendations?.length || 0} venues</p>
+                <p><strong>Partner:</strong> {selectedPartner?.name || 'None'}</p>
+                <p><strong>Session ID:</strong> {currentSession?.id || 'None'}</p>
+                <p><strong>User Location:</strong> {userLocation ? `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}` : 'Not available'}</p>
+                <p><strong>AI Analyzing:</strong> {aiAnalyzing ? 'Yes' : 'No'}</p>
+              </div>
+              {venueRecommendations && venueRecommendations.length > 0 && (
+                <div className="mt-2 text-xs text-blue-600">
+                  <p><strong>Venues:</strong> {venueRecommendations.map(v => v.venue_name).join(', ')}</p>
+                </div>
+              )}
+            </div>
+            
+            <MatchReview
+              compatibilityScore={compatibilityScore || 75}
+              partnerName={selectedPartner.name}
+              venueRecommendations={venueRecommendations || []}
+              onVenueSelect={handleVenueSelection}
+            />
+          </div>
         )}
 
         {/* Step 4: Create Invitation */}

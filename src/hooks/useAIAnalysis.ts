@@ -70,10 +70,12 @@ export const useAIAnalysis = () => {
 
         console.log('🏢 AI ANALYSIS: Step 2 - Getting venue recommendations...');
         console.log('📍 AI ANALYSIS: Using location:', userLocation);
+        console.log('🎯 AI ANALYSIS: Calling getAIVenueRecommendations with:', { userId: user.id, partnerId, location: userLocation });
         
         // Get AI venue recommendations with user location
         const venues = await getAIVenueRecommendations(user.id, partnerId, 10, userLocation);
         console.log('📍 AI ANALYSIS: Venue recommendations received:', venues?.length || 0);
+        console.log('🏢 AI ANALYSIS: Venue details:', venues?.map(v => ({ name: v.venue_name, score: v.ai_score })));
         
         if (!venues || venues.length === 0) {
           console.error('❌ AI ANALYSIS: No venue recommendations found!');
