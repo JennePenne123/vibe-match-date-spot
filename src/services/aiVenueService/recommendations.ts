@@ -95,14 +95,33 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       .eq('user_id', userId)
       .single();
 
+    console.log('👤 GOOGLE PLACES: User preferences query result:', { userPrefs, prefsError });
+
     if (prefsError) {
       console.error('❌ GOOGLE PLACES: Error fetching user preferences:', prefsError);
       return [];
     }
 
     if (!userPrefs) {
-      console.warn('⚠️ GOOGLE PLACES: No user preferences found');
+      console.warn('⚠️ GOOGLE PLACES: No user preferences found for user:', userId);
       return [];
+    }
+
+    // Validate preferences
+    if (!userPrefs.preferred_price_range || userPrefs.preferred_price_range.length === 0) {
+      console.error('❌ GOOGLE PLACES: User has empty price range preferences!', userPrefs);
+      // Set default price range to continue
+      userPrefs.preferred_price_range = ['$$'];
+    }
+
+    if (!userPrefs.preferred_cuisines || userPrefs.preferred_cuisines.length === 0) {
+      console.warn('⚠️ GOOGLE PLACES: User has empty cuisine preferences, using default');
+      userPrefs.preferred_cuisines = ['italian'];
+    }
+
+    if (!userPrefs.preferred_vibes || userPrefs.preferred_vibes.length === 0) {
+      console.warn('⚠️ GOOGLE PLACES: User has empty vibe preferences, using default');
+      userPrefs.preferred_vibes = ['romantic'];
     }
 
     // Use provided location or default to Hamburg, Germany for this user
@@ -114,10 +133,14 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       cuisines: userPrefs.preferred_cuisines,
       vibes: userPrefs.preferred_vibes,
       priceRange: userPrefs.preferred_price_range,
-      location
+      location,
+      latitude,
+      longitude,
+      radius: (userPrefs.max_distance || 10) * 1609
     });
 
     // Call the search-venues edge function
+    console.log('🚀 GOOGLE PLACES: About to call search-venues edge function...');
     const { data: searchResult, error } = await supabase.functions.invoke('search-venues', {
       body: {
         location,
@@ -127,6 +150,14 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
         longitude,
         radius: (userPrefs.max_distance || 10) * 1609 // Convert miles to meters
       }
+    });
+
+    console.log('📡 GOOGLE PLACES: Edge function response:', { 
+      success: !error, 
+      hasData: !!searchResult,
+      dataType: typeof searchResult,
+      venueCount: searchResult?.venues?.length || 0,
+      error: error?.message || 'none'
     });
 
     if (error) {

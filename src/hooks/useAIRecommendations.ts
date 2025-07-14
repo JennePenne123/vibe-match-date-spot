@@ -14,16 +14,20 @@ export const useAIRecommendations = (partnerId?: string) => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchRecommendations = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('🚫 AI RECOMMENDATIONS: No user found, skipping');
+      return;
+    }
 
+    console.log('🎯 AI RECOMMENDATIONS: Starting fetch for user:', user.id, 'with partner:', partnerId);
     setLoading(true);
     setError(null);
 
     try {
-      console.log('Fetching AI recommendations for user:', user.id);
-
       // Get venue recommendations
+      console.log('📍 AI RECOMMENDATIONS: Calling getAIVenueRecommendations...');
       const venueRecs = await getAIVenueRecommendations(user.id, partnerId, 10);
+      console.log('✅ AI RECOMMENDATIONS: Received', venueRecs.length, 'venue recommendations');
       setRecommendations(venueRecs);
 
       // Get compatibility score if partner is specified

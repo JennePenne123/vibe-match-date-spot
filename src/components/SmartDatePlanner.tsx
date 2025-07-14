@@ -16,6 +16,7 @@ import { createSmartDatePlannerHandlers } from '@/components/smart-date-planner/
 import SmartDatePlannerError from '@/components/smart-date-planner/SmartDatePlannerError';
 import SmartDatePlannerAuth from '@/components/smart-date-planner/SmartDatePlannerAuth';
 import LocationDisplay from '@/components/smart-date-planner/LocationDisplay';
+import { VenueSearchTester } from '@/components/debug/VenueSearchTester';
 
 interface SmartDatePlannerProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -171,15 +172,19 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
           </div>
         )}
 
-        {/* Debug Component */}
-        <SmartPlannerDebug
-          currentUser={user}
-          selectedPartner={selectedPartner}
-          currentSession={currentSession}
-          compatibilityScore={compatibilityScore}
-          venueRecommendations={venueRecommendations}
-          currentStep={currentStep}
-        />
+        {/* Debug Components */}
+        <div className="space-y-4 border-t border-gray-200 pt-6">
+          <VenueSearchTester />
+          
+          <SmartPlannerDebug
+            currentUser={user}
+            selectedPartner={selectedPartner}
+            currentSession={currentSession}
+            compatibilityScore={compatibilityScore}
+            venueRecommendations={venueRecommendations}
+            currentStep={currentStep}
+          />
+        </div>
       </div>
     </div>
   );
