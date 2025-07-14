@@ -157,18 +157,20 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
     const longitude = userLocation.longitude;
     const location = userLocation.address || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 
-// Create simplified database fallback first
-    console.log('🔄 GOOGLE PLACES: Using direct database fallback for Hamburg Italian venues...');
+    // IMMEDIATE DATABASE RETURN FOR DEBUG
+    console.log('🔄 EMERGENCY: Immediately returning database venues to debug the issue...');
     
     const { data: dbVenues, error: dbError } = await supabase
       .from('venues')
       .select('*')
       .eq('is_active', true)
-      .ilike('cuisine_type', '%Italian%')
-      .limit(10);
+      .limit(20);
+      
+    console.log('🗄️ DATABASE QUERY RESULT:', { dbVenues, dbError, count: dbVenues?.length });
       
     if (!dbError && dbVenues && dbVenues.length > 0) {
-      console.log('✅ GOOGLE PLACES: Found Hamburg Italian venues in database:', dbVenues.length);
+      console.log('✅ EMERGENCY: Immediately returning', dbVenues.length, 'database venues');
+      console.log('📋 VENUE DETAILS:', dbVenues.map(v => ({ name: v.name, cuisine: v.cuisine_type, active: v.is_active })));
       
       return dbVenues.map(venue => ({
         id: venue.id,
@@ -185,7 +187,7 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       }));
     }
     
-    console.log('⚠️ GOOGLE PLACES: No database venues found, trying edge function...');
+    console.log('❌ EMERGENCY: No database venues found at all!');
 
     // Enhanced edge function call with retry logic
     const requestPayload = {
