@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import VenueCard from '@/components/VenueCard';
+import { Venue } from '@/types';
 
 export const HamburgVenueTest = () => {
   const [loading, setLoading] = useState(false);
@@ -163,13 +165,45 @@ export const HamburgVenueTest = () => {
               )}
               
               {results.venues && results.venues.length > 0 && (
-                <div className="mt-2">
-                  <p className="font-medium">Sample venues:</p>
-                  {results.venues.map((venue: any, i: number) => (
-                    <div key={i} className="ml-4 text-sm">
-                      • {venue.name} - {venue.cuisineType} ({venue.distance})
-                    </div>
-                  ))}
+                <div className="mt-4 space-y-4">
+                  <p className="font-medium">Found venues:</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {results.venues.map((venue: any, i: number) => {
+                      // Convert API venue to Venue type
+                      const venueData: Venue = {
+                        id: venue.place_id || `hamburg-venue-${i}`,
+                        name: venue.name,
+                        address: venue.vicinity || venue.formatted_address || 'Hamburg, Germany',
+                        image_url: venue.photos?.[0]?.photo_reference 
+                          ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${venue.photos[0].photo_reference}&key=${venue.api_key}`
+                          : '/placeholder.svg',
+                        rating: venue.rating || 4.0,
+                        price_range: venue.price_level ? '$'.repeat(venue.price_level) : '$$',
+                        cuisine_type: venue.types?.includes('restaurant') ? 'Italian' : 'Restaurant',
+                        tags: venue.types || ['restaurant', 'food'],
+                        description: `${venue.name} - Italian restaurant in Hamburg`,
+                        latitude: venue.geometry?.location?.lat,
+                        longitude: venue.geometry?.location?.lng,
+                        phone: venue.formatted_phone_number,
+                        website: venue.website,
+                        google_place_id: venue.place_id,
+                        opening_hours: venue.opening_hours,
+                        is_active: true,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                      };
+                      
+                      return (
+                        <VenueCard
+                          key={venueData.id}
+                          venue={venueData}
+                          variant="compact"
+                          showMatchScore={false}
+                          showActions={false}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
               )}
               
