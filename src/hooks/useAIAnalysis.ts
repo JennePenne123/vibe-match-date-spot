@@ -29,10 +29,15 @@ export const useAIAnalysis = () => {
     preferences: DatePreferences,
     userLocation?: { latitude: number; longitude: number; address?: string }
     ) => {
+    console.log('🚀 AI ANALYSIS: ===== STARTING AI ANALYSIS =====');
+    console.log('🚀 AI ANALYSIS: Function called with params:', { sessionId, partnerId, userLocation, preferences });
+    
     if (!user) {
       console.error('🚫 AI ANALYSIS: No user found');
       return;
     }
+    
+    console.log('👤 AI ANALYSIS: User verified:', user.id);
 
     console.log('🚀 AI ANALYSIS: Starting comprehensive analysis for session:', sessionId);
     console.log('👥 AI ANALYSIS: User:', user.id, 'Partner:', partnerId);

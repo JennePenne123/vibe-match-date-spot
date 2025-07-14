@@ -104,6 +104,18 @@ export const getAIVenueRecommendations = async (
 const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLocation?: { latitude: number; longitude: number; address?: string }) => {
   try {
     console.log('🔍 GOOGLE PLACES: Starting venue search for user:', userId, 'at location:', userLocation);
+    console.log('🔍 GOOGLE PLACES: Function called with params:', { userId, limit, userLocation });
+    
+    // Early validation check
+    if (!userId) {
+      console.error('❌ GOOGLE PLACES: No userId provided!');
+      throw new Error('User ID is required for venue search');
+    }
+    
+    if (!userLocation?.latitude || !userLocation?.longitude) {
+      console.error('❌ GOOGLE PLACES: Invalid location provided:', userLocation);
+      throw new Error('Valid user location is required for venue search');
+    }
     
     // Get user preferences
     const { data: userPrefs, error: prefsError } = await supabase
@@ -149,8 +161,16 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
 
     // Handle empty preferred_times which was causing issues
     if (!userPrefs.preferred_times || userPrefs.preferred_times.length === 0) {
-      console.warn('⚠️ GOOGLE PLACES: User has empty time preferences, using default');
+      console.error('❌ GOOGLE PLACES: CRITICAL FIX - User has empty time preferences! This was breaking the flow.');
+      console.log('🔧 GOOGLE PLACES: Fixing empty preferred_times array...');
       userPrefs.preferred_times = ['lunch'];
+      
+      // Update the database to fix this permanently
+      await supabase
+        .from('user_preferences')
+        .update({ preferred_times: ['lunch'] })
+        .eq('user_id', userId);
+      console.log('✅ GOOGLE PLACES: Fixed user preferences in database');
     }
 
     console.log('✅ PREFERENCES FIXED: Final preferences:', {
