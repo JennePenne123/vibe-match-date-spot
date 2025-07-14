@@ -2,6 +2,7 @@
 import { calculateVenueAIScore, calculateConfidenceLevel } from './scoring';
 import { getActiveVenues, getStoredAIScore } from './fetching';
 import { supabase } from '@/integrations/supabase/client';
+import { validateLocation } from '@/utils/locationValidation';
 
 export interface AIVenueRecommendation {
   venue_id: string;
@@ -24,16 +25,11 @@ export const getAIVenueRecommendations = async (
   try {
     console.log('🎯 RECOMMENDATIONS: Starting for user:', userId, 'partner:', partnerId, 'location:', userLocation);
 
-    // Require real user location - no fallbacks to hardcoded data
-    if (!userLocation || !userLocation.latitude || !userLocation.longitude) {
-      console.error('❌ RECOMMENDATIONS: No valid user location provided. Real location required for venue search.');
-      throw new Error('User location is required for venue recommendations. Please enable location access.');
-    }
-
-    // Validate location coordinates
-    if (Math.abs(userLocation.latitude) > 90 || Math.abs(userLocation.longitude) > 180) {
-      console.error('❌ RECOMMENDATIONS: Invalid location coordinates:', userLocation);
-      throw new Error('Invalid location coordinates provided.');
+    // Validate user location using comprehensive validation
+    const locationValidation = validateLocation(userLocation);
+    if (!locationValidation.isValid) {
+      console.error('❌ RECOMMENDATIONS: Location validation failed:', locationValidation.error);
+      throw new Error(locationValidation.error || 'Invalid user location provided');
     }
 
     // Only use Google Places API with real user location
@@ -137,10 +133,11 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       userPrefs.preferred_vibes = ['romantic'];
     }
 
-    // Require valid user location - no hardcoded fallbacks
-    if (!userLocation || !userLocation.latitude || !userLocation.longitude) {
-      console.error('❌ GOOGLE PLACES: No valid user location provided');
-      throw new Error('Real user location is required for Google Places search');
+    // Validate user location before Google Places call
+    const locationValidation = validateLocation(userLocation);
+    if (!locationValidation.isValid) {
+      console.error('❌ GOOGLE PLACES: Location validation failed:', locationValidation.error);
+      throw new Error(locationValidation.error || 'Invalid user location for Google Places search');
     }
 
     const latitude = userLocation.latitude;

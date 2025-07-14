@@ -49,21 +49,24 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
             </p>
             <p className="text-xs text-primary/80">
               {locationRequested 
-                ? 'For the best venue recommendations' 
-                : 'Enable location for better recommendations'
+                ? 'Please allow location access in your browser' 
+                : 'Click the button to enable location access'
               }
             </p>
           </div>
-          {!locationRequested && (
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={onRequestLocation}
-              className="border-primary/20 text-primary hover:bg-primary/10"
-            >
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={onRequestLocation}
+            disabled={locationRequested}
+            className="border-primary/20 text-primary hover:bg-primary/10"
+          >
+            {locationRequested ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
               <MapPin className="h-4 w-4" />
-            </Button>
-          )}
+            )}
+          </Button>
         </CardContent>
       </Card>
     );

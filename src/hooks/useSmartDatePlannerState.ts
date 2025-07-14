@@ -139,11 +139,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     }
   }, [aiAnalyzing, currentStep, setCurrentStep]);
 
-  // Memoized location request function with Firefox handling
+  // Improved location request function with proper retry logic
   const handleLocationRequest = useCallback(async () => {
-    if (locationRequested) return;
-    
-    setLocationRequested(true);
     console.log('SmartDatePlanner - Requesting location permission');
     
     // Clear any existing timeout
@@ -151,21 +148,17 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
       clearTimeout(locationTimeoutRef.current);
     }
     
-    // Firefox-specific handling: add delay to prevent rapid successive calls
-    const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-    const delay = isFirefox ? 500 : 0;
+    setLocationRequested(true);
     
-    locationTimeoutRef.current = setTimeout(async () => {
-      try {
-        await requestLocation();
-      } catch (error) {
-        console.error('Location request failed:', error);
-      } finally {
-        // Reset the flag after a delay to allow retries
-        setTimeout(() => setLocationRequested(false), 2000);
-      }
-    }, delay);
-  }, [requestLocation, locationRequested]);
+    try {
+      await requestLocation();
+    } catch (error) {
+      console.error('Location request failed:', error);
+    } finally {
+      // Reset the flag after a delay to allow retries
+      setTimeout(() => setLocationRequested(false), 2000);
+    }
+  }, [requestLocation]);
 
   // Request location permission immediately when Smart Date Planner is used
   useEffect(() => {

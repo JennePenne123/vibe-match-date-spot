@@ -79,12 +79,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const requestLocation = async () => {
-    // Prevent multiple simultaneous requests
-    if (appState.userLocation) {
-      console.log('Location already available, skipping request');
-      return;
-    }
-
     console.log('Requesting user location...');
     setAppState(prev => ({ ...prev, locationError: null }));
 
