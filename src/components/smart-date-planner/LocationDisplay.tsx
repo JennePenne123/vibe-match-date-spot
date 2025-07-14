@@ -45,12 +45,12 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
           <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-medium text-primary">
-              {locationRequested ? 'Getting your location...' : 'Location needed'}
+              {locationRequested ? 'Requesting location access...' : 'Location access required'}
             </p>
             <p className="text-xs text-primary/80">
               {locationRequested 
-                ? 'Please allow location access in your browser' 
-                : 'Click the button to enable location access'
+                ? 'Please click "Allow" in the browser popup. For Firefox users: click quickly when prompted.' 
+                : 'Click the button below to enable location for venue recommendations'
               }
             </p>
           </div>

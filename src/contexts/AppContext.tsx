@@ -89,15 +89,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return;
     }
 
-    // Firefox-specific configuration
+    // Firefox-specific handling to prevent flickering
     const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-    const options = {
-      enableHighAccuracy: !isFirefox, // Firefox has issues with high accuracy
-      timeout: isFirefox ? 15000 : 10000, // Longer timeout for Firefox
-      maximumAge: 300000 // 5 minutes
+    
+    // Check if we're in a secure context (required for geolocation)
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      const error = 'Location access requires HTTPS. Please use a secure connection.';
+      console.error(error);
+      setAppState(prev => ({ ...prev, locationError: error }));
+      return;
+    }
+
+    // Firefox-specific configuration to prevent issues
+    const options: PositionOptions = {
+      enableHighAccuracy: false, // Disable high accuracy for Firefox to prevent flickering
+      timeout: isFirefox ? 20000 : 10000, // Longer timeout for Firefox
+      maximumAge: isFirefox ? 600000 : 300000 // 10 minutes for Firefox, 5 for others
     };
 
+    console.log('🦊 Firefox detected:', isFirefox, 'Using options:', options);
+
     try {
+      // For Firefox, check permissions first to avoid popup issues
+      if (isFirefox && 'permissions' in navigator) {
+        try {
+          const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+          console.log('🦊 Firefox permission status:', permissionStatus.state);
+          
+          if (permissionStatus.state === 'denied') {
+            throw new Error('Location access is blocked. Please enable it in browser settings and refresh the page.');
+          }
+        } catch (permError) {
+          console.log('🦊 Permission check failed (expected in some Firefox versions):', permError);
+        }
+      }
+
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           resolve,
@@ -111,7 +137,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         longitude: position.coords.longitude
       };
 
-      console.log('Location obtained:', userLocation);
+      console.log('✅ Location obtained successfully:', userLocation);
       setAppState(prev => ({ 
         ...prev, 
         userLocation, 
@@ -120,15 +146,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (error: any) {
       let errorMessage = 'Unable to get your location';
       
+      console.error('❌ Location error details:', { 
+        code: error.code, 
+        message: error.message,
+        isFirefox,
+        userAgent: navigator.userAgent
+      });
+      
       if (error.code === 1) {
-        errorMessage = 'Location access denied. Please enable location services.';
+        errorMessage = isFirefox 
+          ? 'Location blocked in Firefox. Click the location icon in the address bar or go to Preferences → Privacy & Security → Permissions → Location to allow access.'
+          : 'Location access denied. Please enable location services and refresh the page.';
       } else if (error.code === 2) {
-        errorMessage = 'Location unavailable. Please try again.';
+        errorMessage = 'Location unavailable. Please check your internet connection and try again.';
       } else if (error.code === 3) {
-        errorMessage = 'Location request timed out. Please try again.';
+        errorMessage = isFirefox 
+          ? 'Location request timed out in Firefox. Try refreshing the page and clicking "Allow" quickly when prompted.'
+          : 'Location request timed out. Please try again.';
+      } else if (error.message && error.message.includes('blocked')) {
+        errorMessage = 'Location access is blocked. Please enable it in browser settings and refresh the page.';
       }
 
-      console.error('Location error:', error);
       setAppState(prev => ({ ...prev, locationError: errorMessage }));
     }
   };

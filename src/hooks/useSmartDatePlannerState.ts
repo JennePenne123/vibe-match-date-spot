@@ -95,6 +95,7 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
   const [locationRequested, setLocationRequested] = useState(false);
   const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
+  const [locationRequestInProgress, setLocationRequestInProgress] = useState(false);
   const locationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
@@ -139,41 +140,52 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     }
   }, [aiAnalyzing, currentStep, setCurrentStep]);
 
-  // Improved location request function with proper retry logic
+  // Firefox-optimized location request to prevent flickering
   const handleLocationRequest = useCallback(async () => {
-    console.log('SmartDatePlanner - Requesting location permission');
-    
-    // Clear any existing timeout
-    if (locationTimeoutRef.current) {
-      clearTimeout(locationTimeoutRef.current);
+    // Prevent multiple simultaneous requests that cause flickering
+    if (locationRequestInProgress) {
+      console.log('🦊 Location request already in progress, skipping...');
+      return;
     }
-    
+
+    console.log('🦊 SmartDatePlanner - Requesting location permission');
+    setLocationRequestInProgress(true);
     setLocationRequested(true);
     
     try {
       await requestLocation();
     } catch (error) {
-      console.error('Location request failed:', error);
+      console.error('🦊 Location request failed:', error);
     } finally {
-      // Reset the flag after a delay to allow retries
-      setTimeout(() => setLocationRequested(false), 2000);
+      // Reset flags after a delay to prevent rapid retries
+      setTimeout(() => {
+        setLocationRequestInProgress(false);
+        setLocationRequested(false);
+      }, 3000); // 3 second cooldown
     }
-  }, [requestLocation]);
+  }, [requestLocation, locationRequestInProgress]);
 
-  // Request location permission immediately when Smart Date Planner is used
+  // Request location only once when user is detected, with Firefox-specific handling
   useEffect(() => {
-    if (user && !appState.userLocation && !appState.locationError) {
-      console.log('🎯 PLANNER STATE: User detected, requesting location immediately');
-      handleLocationRequest();
-    }
-    
-    // Cleanup timeout on unmount
-    return () => {
-      if (locationTimeoutRef.current) {
-        clearTimeout(locationTimeoutRef.current);
+    if (user && !appState.userLocation && !appState.locationError && !locationRequestInProgress) {
+      const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+      
+      console.log('🎯 PLANNER STATE: User detected, requesting location', { 
+        isFirefox, 
+        hasLocation: !!appState.userLocation,
+        hasError: !!appState.locationError
+      });
+      
+      // For Firefox, add a small delay to prevent issues with rapid state changes
+      if (isFirefox) {
+        setTimeout(() => {
+          handleLocationRequest();
+        }, 500);
+      } else {
+        handleLocationRequest();
       }
-    };
-  }, [user, appState.userLocation, appState.locationError, handleLocationRequest]);
+    }
+  }, [user, appState.userLocation, appState.locationError, locationRequestInProgress, handleLocationRequest]);
 
   return {
     user,
