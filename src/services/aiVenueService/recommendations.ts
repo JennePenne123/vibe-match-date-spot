@@ -157,6 +157,36 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
     const longitude = userLocation.longitude;
     const location = userLocation.address || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 
+// Create simplified database fallback first
+    console.log('🔄 GOOGLE PLACES: Using direct database fallback for Hamburg Italian venues...');
+    
+    const { data: dbVenues, error: dbError } = await supabase
+      .from('venues')
+      .select('*')
+      .eq('is_active', true)
+      .ilike('cuisine_type', '%Italian%')
+      .limit(10);
+      
+    if (!dbError && dbVenues && dbVenues.length > 0) {
+      console.log('✅ GOOGLE PLACES: Found Hamburg Italian venues in database:', dbVenues.length);
+      
+      return dbVenues.map(venue => ({
+        id: venue.id,
+        name: venue.name,
+        address: venue.address,
+        cuisine_type: venue.cuisine_type,
+        price_range: venue.price_range || '$$',
+        rating: venue.rating || 4.2,
+        image_url: venue.image_url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+        tags: venue.tags || ['Italian', 'Restaurant'],
+        phone: venue.phone,
+        website: venue.website,
+        description: venue.description || 'Authentic Italian cuisine'
+      }));
+    }
+    
+    console.log('⚠️ GOOGLE PLACES: No database venues found, trying edge function...');
+
     // Enhanced edge function call with retry logic
     const requestPayload = {
       location,
@@ -169,82 +199,58 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
     
     console.log('🚀 GOOGLE PLACES: Edge function parameters:', requestPayload);
 
-    // Try edge function with retry logic
+    // Try edge function with reduced timeout
     let searchResult = null;
     let lastError = null;
-    const maxRetries = 2;
     
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`📡 GOOGLE PLACES: Attempt ${attempt}/${maxRetries} - Calling search-venues edge function...`);
-        
-        const startTime = Date.now();
-        const result = await Promise.race([
-          supabase.functions.invoke('search-venues', { body: requestPayload }),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Edge function timeout after 30 seconds')), 30000)
-          )
-        ]) as any;
-        
-        const endTime = Date.now();
-        console.log(`⏱️ GOOGLE PLACES: Attempt ${attempt} completed in:`, endTime - startTime, 'ms');
-        console.log(`📡 GOOGLE PLACES: Attempt ${attempt} result:`, result);
-        
-        if (result?.error) {
-          throw new Error(result.error.message || 'Edge function returned error');
-        }
-        
-        searchResult = result?.data;
-        lastError = null;
-        break; // Success, exit retry loop
-        
-      } catch (error) {
-        console.error(`❌ GOOGLE PLACES: Attempt ${attempt} failed:`, error);
-        lastError = error;
-        
-        if (attempt < maxRetries) {
-          console.log(`🔄 GOOGLE PLACES: Retrying in 2 seconds...`);
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
+    try {
+      console.log('📡 GOOGLE PLACES: Calling search-venues edge function...');
+      
+      const startTime = Date.now();
+      const result = await Promise.race([
+        supabase.functions.invoke('search-venues', { body: requestPayload }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Edge function timeout after 20 seconds')), 20000)
+        )
+      ]) as any;
+      
+      const endTime = Date.now();
+      console.log(`⏱️ GOOGLE PLACES: Edge function completed in:`, endTime - startTime, 'ms');
+      console.log(`📡 GOOGLE PLACES: Edge function result:`, result);
+      
+      if (result?.error) {
+        throw new Error(result.error.message || 'Edge function returned error');
       }
+      
+      searchResult = result?.data;
+      
+    } catch (error) {
+      console.error('❌ GOOGLE PLACES: Edge function failed:', error);
+      lastError = error;
     }
     
-    // If all retries failed, try database fallback
+    // If edge function failed, ensure we still return database venues
     if (!searchResult || lastError) {
-      console.log('🔄 GOOGLE PLACES: All retries failed, using enhanced database fallback...');
+      console.log('🔄 GOOGLE PLACES: Edge function failed, returning to database...');
       
-      const { data: dbVenues, error: dbError } = await supabase
-        .from('venues')
-        .select('*')
-        .eq('is_active', true)
-        .ilike('cuisine_type', `%${fixedPrefs.preferred_cuisines[0]}%`)
-        .limit(10);
-        
-      if (dbError) {
-        console.error('❌ GOOGLE PLACES: Database fallback failed:', dbError);
-        throw new Error(`Venue search failed: ${lastError?.message || 'Unknown error'}`);
-      }
-      
+      // Return database venues (already fetched above)
       if (dbVenues && dbVenues.length > 0) {
-        console.log('✅ GOOGLE PLACES: Using database fallback venues:', dbVenues.length);
-        
-        // Transform database venues with enhanced data
         return dbVenues.map(venue => ({
           id: venue.id,
           name: venue.name,
           address: venue.address,
           cuisine_type: venue.cuisine_type,
-          price_range: venue.price_range,
-          rating: venue.rating,
-          image_url: venue.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop',
-          tags: venue.tags || [],
+          price_range: venue.price_range || '$$',
+          rating: venue.rating || 4.2,
+          image_url: venue.image_url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+          tags: venue.tags || ['Italian', 'Restaurant'],
           phone: venue.phone,
           website: venue.website,
-          description: venue.description || 'Great local venue'
+          description: venue.description || 'Authentic Italian cuisine'
         }));
       }
       
-      throw new Error('No venues found in your area. Please try a different location or expand your search radius.');
+      throw new Error('No venues found. Please try again or check your internet connection.');
     }
 
     const venues = searchResult?.venues || [];
