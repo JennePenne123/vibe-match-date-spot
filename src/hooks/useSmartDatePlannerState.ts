@@ -60,6 +60,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     loading,
     compatibilityScore,
     venueRecommendations,
+    venueSearchError,
+    analyzeCompatibilityAndVenues,
     createPlanningSession,
     getActiveSession,
     completePlanningSession
@@ -68,6 +70,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     loading: false,
     compatibilityScore: null,
     venueRecommendations: [],
+    venueSearchError: null,
+    analyzeCompatibilityAndVenues: async () => {},
     createPlanningSession: async () => {},
     getActiveSession: async () => null,
     completePlanningSession: async () => false
@@ -197,6 +201,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     loading,
     compatibilityScore,
     venueRecommendations,
+    venueSearchError,
+    analyzeCompatibilityAndVenues,
     createPlanningSession,
     getActiveSession,
     completePlanningSession,

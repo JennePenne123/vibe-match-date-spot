@@ -36,6 +36,7 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
     setCompatibilityScore,
     venueRecommendations,
     setVenueRecommendations,
+    venueSearchError,
     analyzeCompatibilityAndVenues,
     resetAIState
   } = useAIAnalysis();
@@ -109,6 +110,8 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
     loading,
     compatibilityScore,
     venueRecommendations,
+    venueSearchError,
+    analyzeCompatibilityAndVenues,
     createPlanningSession,
     updateSessionPreferences: updateSessionPreferencesWithAI,
     getActiveSession,

@@ -87,8 +87,16 @@ export const getAIVenueRecommendations = async (
       sortedRecommendations.slice(0, 3).map(r => `${r.venue_name}: ${r.ai_score}%`));
     return sortedRecommendations;
   } catch (error) {
-    console.error('Error getting AI venue recommendations:', error);
-    return [];
+    console.error('❌ RECOMMENDATIONS: Critical error in getAIVenueRecommendations:', {
+      message: error.message,
+      stack: error.stack,
+      userId,
+      partnerId,
+      userLocation
+    });
+    
+    // Re-throw error with user-friendly message to show in UI
+    throw new Error(error.message || 'Failed to get venue recommendations. Please try again.');
   }
 };
 
@@ -116,10 +124,16 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       return [];
     }
 
-    // Validate preferences
+    // Validate and fix preferences with detailed logging
+    console.log('🔍 PREFERENCES CHECK: Raw preferences:', {
+      cuisines: userPrefs.preferred_cuisines,
+      vibes: userPrefs.preferred_vibes,
+      times: userPrefs.preferred_times,
+      priceRange: userPrefs.preferred_price_range
+    });
+
     if (!userPrefs.preferred_price_range || userPrefs.preferred_price_range.length === 0) {
       console.error('❌ GOOGLE PLACES: User has empty price range preferences!', userPrefs);
-      // Set default price range to continue
       userPrefs.preferred_price_range = ['$$'];
     }
 
@@ -132,6 +146,19 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       console.warn('⚠️ GOOGLE PLACES: User has empty vibe preferences, using default');
       userPrefs.preferred_vibes = ['romantic'];
     }
+
+    // Handle empty preferred_times which was causing issues
+    if (!userPrefs.preferred_times || userPrefs.preferred_times.length === 0) {
+      console.warn('⚠️ GOOGLE PLACES: User has empty time preferences, using default');
+      userPrefs.preferred_times = ['lunch'];
+    }
+
+    console.log('✅ PREFERENCES FIXED: Final preferences:', {
+      cuisines: userPrefs.preferred_cuisines,
+      vibes: userPrefs.preferred_vibes,
+      times: userPrefs.preferred_times,
+      priceRange: userPrefs.preferred_price_range
+    });
 
     // Validate user location before Google Places call
     const locationValidation = validateLocation(userLocation);
@@ -154,9 +181,16 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       radius: (userPrefs.max_distance || 10) * 1609
     });
 
-    // Call the search-venues edge function
+    // Call the search-venues edge function with timeout and better error handling
     console.log('🚀 GOOGLE PLACES: About to call search-venues edge function...');
-    const { data: searchResult, error } = await supabase.functions.invoke('search-venues', {
+    
+    // Create timeout promise
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Edge function timeout after 30 seconds')), 30000);
+    });
+    
+    // Call edge function with timeout
+    const edgeFunctionCall = supabase.functions.invoke('search-venues', {
       body: {
         location,
         cuisines: userPrefs.preferred_cuisines || ['italian'],
@@ -166,21 +200,36 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
         radius: (userPrefs.max_distance || 10) * 1609 // Convert miles to meters
       }
     });
+    
+    let searchResult, error;
+    try {
+      const result = await Promise.race([edgeFunctionCall, timeoutPromise]) as { data: any; error: any };
+      searchResult = result.data;
+      error = result.error;
+    } catch (timeoutError) {
+      console.error('❌ GOOGLE PLACES: Edge function timed out:', timeoutError);
+      error = timeoutError;
+    }
 
     console.log('📡 GOOGLE PLACES: Edge function response:', { 
       success: !error, 
       hasData: !!searchResult,
       dataType: typeof searchResult,
       venueCount: searchResult?.venues?.length || 0,
-      error: error?.message || 'none'
+      error: error?.message || 'none',
+      Hamburg_debug: location.includes('Hamburg') ? 'HAMBURG SEARCH DETECTED' : 'Not Hamburg'
     });
 
     if (error) {
       console.error('❌ GOOGLE PLACES: Error calling search-venues function:', {
         message: error.message,
-        details: error.details || 'No additional details'
+        details: error.details || 'No additional details',
+        stack: error.stack,
+        Hamburg_location: location.includes('Hamburg') ? `SEARCHING HAMBURG: ${latitude}, ${longitude}` : 'Different location'
       });
-      return [];
+      
+      // Throw error to be caught by parent function for user feedback
+      throw new Error(`Failed to search venues: ${error.message}. Please check your internet connection and try again.`);
     }
 
     const venues = searchResult?.venues || [];

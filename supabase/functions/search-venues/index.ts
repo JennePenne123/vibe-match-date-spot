@@ -55,8 +55,18 @@ const handler = async (req: Request): Promise<Response> => {
       vibes, 
       latitude, 
       longitude, 
-      radius 
+      radius,
+      Hamburg_debug: location?.includes('Hamburg') ? 'HAMBURG SEARCH DETECTED!' : 'Not Hamburg'
     });
+
+    // Hamburg-specific debugging
+    if (location?.includes('Hamburg') || (latitude >= 53.5 && latitude <= 53.6 && longitude >= 9.9 && longitude <= 10.1)) {
+      console.log('🏢 HAMBURG DEBUG: Searching in Hamburg area!', {
+        expectedCoords: { lat: 53.5745, lng: 9.9602 },
+        receivedCoords: { lat: latitude, lng: longitude },
+        distanceFromCenter: Math.sqrt(Math.pow(latitude - 53.5745, 2) + Math.pow(longitude - 9.9602, 2))
+      });
+    }
 
     const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
 
@@ -69,6 +79,17 @@ const handler = async (req: Request): Promise<Response> => {
       console.error('❌ EDGE FUNCTION: Missing location coordinates');
       throw new Error('User location (latitude/longitude) is required');
     }
+
+    // Validate preferences arrays to handle empty arrays
+    const validCuisines = cuisines && cuisines.length > 0 ? cuisines : ['italian'];
+    const validVibes = vibes && vibes.length > 0 ? vibes : ['romantic'];
+    
+    console.log('✅ EDGE FUNCTION: Using validated preferences:', {
+      originalCuisines: cuisines,
+      validCuisines,
+      originalVibes: vibes, 
+      validVibes
+    });
 
     console.log('✅ EDGE FUNCTION: Starting venue search with valid parameters');
 
@@ -96,14 +117,14 @@ const handler = async (req: Request): Promise<Response> => {
       'adventurous': ['restaurant', 'bar']
     };
 
-    // Combine cuisine and vibe types
+    // Combine cuisine and vibe types using validated arrays
     const allTypes = new Set<string>();
-    cuisines.forEach(cuisine => {
-      const types = cuisineTypeMap[cuisine] || ['restaurant'];
+    validCuisines.forEach(cuisine => {
+      const types = cuisineTypeMap[cuisine.toLowerCase()] || ['restaurant'];
       types.forEach(type => allTypes.add(type));
     });
-    vibes.forEach(vibe => {
-      const types = vibeTypeMap[vibe] || ['restaurant'];
+    validVibes.forEach(vibe => {
+      const types = vibeTypeMap[vibe.toLowerCase()] || ['restaurant'];
       types.forEach(type => allTypes.add(type));
     });
 
@@ -157,10 +178,22 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Transform Google Places data to our venue format
     const venues = (data.places || []).map((place: GooglePlace, index: number) => {
-      const cuisineType = getCuisineFromTypes(place.types, cuisines);
-      const vibe = getVibeFromTypes(place.types, vibes);
-      const matchScore = calculateMatchScore(place, cuisines, vibes);
+      const cuisineType = getCuisineFromTypes(place.types, validCuisines);
+      const vibe = getVibeFromTypes(place.types, validVibes);
+      const matchScore = calculateMatchScore(place, validCuisines, validVibes);
       const distance = calculateDistance(latitude, longitude, place.location.latitude, place.location.longitude);
+      
+      // Hamburg-specific debugging
+      if (location?.includes('Hamburg')) {
+        console.log('🏢 HAMBURG VENUE:', {
+          name: place.displayName?.text,
+          distance: `${distance.toFixed(1)} mi`,
+          types: place.types,
+          cuisineType,
+          vibe,
+          rating: place.rating
+        });
+      }
       
       const transformedVenue = {
         id: place.id || `venue-${index}`,
@@ -174,7 +207,7 @@ const handler = async (req: Request): Promise<Response> => {
         cuisineType,
         vibe,
         matchScore,
-        tags: getTagsFromPlace(place, cuisines, vibes),
+        tags: getTagsFromPlace(place, validCuisines, validVibes),
         placeId: place.id,
         phone: place.nationalPhoneNumber,
         website: place.websiteUri,
@@ -190,7 +223,21 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Sort by match score and distance
-    venues.sort((a, b) => {
+    // Filter venues that are too far away (validation)
+    const filteredVenues = venues.filter(venue => {
+      const distanceInMiles = parseFloat(venue.distance);
+      const maxDistance = radius / 1609; // Convert meters to miles
+      const isWithinRange = distanceInMiles <= maxDistance;
+      
+      if (!isWithinRange) {
+        console.log(`🚫 EDGE FUNCTION: Filtering out ${venue.name} - too far (${venue.distance} > ${maxDistance.toFixed(1)} mi)`);
+      }
+      
+      return isWithinRange;
+    });
+
+    // Sort by match score and distance
+    filteredVenues.sort((a, b) => {
       const scoreA = b.matchScore - a.matchScore;
       if (Math.abs(scoreA) < 5) { // If scores are close, prefer closer venues
         return parseFloat(a.distance) - parseFloat(b.distance);
@@ -198,10 +245,20 @@ const handler = async (req: Request): Promise<Response> => {
       return scoreA;
     });
 
-    console.log(`✅ EDGE FUNCTION: Successfully returning ${venues.length} venues with scores:`, 
-      venues.slice(0, 3).map(v => `${v.name}: ${v.matchScore}%`));
+    console.log(`✅ EDGE FUNCTION: Successfully returning ${filteredVenues.length} venues (filtered from ${venues.length}) with scores:`, 
+      filteredVenues.slice(0, 3).map(v => `${v.name}: ${v.matchScore}% (${v.distance})`));
 
-    return new Response(JSON.stringify({ venues }), {
+    // Hamburg-specific final debug
+    if (location?.includes('Hamburg')) {
+      console.log('🏢 HAMBURG FINAL RESULTS:', filteredVenues.map(v => ({
+        name: v.name,
+        distance: v.distance,
+        score: v.matchScore,
+        cuisine: v.cuisineType
+      })));
+    }
+
+    return new Response(JSON.stringify({ venues: filteredVenues }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

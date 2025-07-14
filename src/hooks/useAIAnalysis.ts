@@ -20,6 +20,7 @@ export const useAIAnalysis = () => {
   const { handleError } = useErrorHandler();
   const [compatibilityScore, setCompatibilityScore] = useState<number | null>(null);
   const [venueRecommendations, setVenueRecommendations] = useState<any[]>([]);
+  const [venueSearchError, setVenueSearchError] = useState<string | null>(null);
 
   // Analyze compatibility and get venue recommendations with timeout and better error handling
   const analyzeCompatibilityAndVenues = useCallback(async (
@@ -27,7 +28,7 @@ export const useAIAnalysis = () => {
     partnerId: string, 
     preferences: DatePreferences,
     userLocation?: { latitude: number; longitude: number; address?: string }
-  ) => {
+    ) => {
     if (!user) {
       console.error('🚫 AI ANALYSIS: No user found');
       return;
@@ -36,6 +37,9 @@ export const useAIAnalysis = () => {
     console.log('🚀 AI ANALYSIS: Starting comprehensive analysis for session:', sessionId);
     console.log('👥 AI ANALYSIS: User:', user.id, 'Partner:', partnerId);
     console.log('⚙️ AI ANALYSIS: Preferences:', preferences);
+    
+    // Clear previous errors
+    setVenueSearchError(null);
 
     const timeout = 45000; // Increased to 45 seconds
     const timeoutPromise = new Promise((_, reject) => 
@@ -88,17 +92,13 @@ export const useAIAnalysis = () => {
         
         if (!venues || venues.length === 0) {
           console.error('❌ AI ANALYSIS: No venue recommendations found!');
-          console.log('🔍 AI ANALYSIS: This indicates either:');
-          console.log('  - Google Places API issues');
-          console.log('  - No database venues available');
-          console.log('  - Scoring algorithm too restrictive');
-          console.log('  - User preferences too specific');
-          
-          // Set empty array but continue flow
+          const errorMessage = 'No venues found in your area. Please check your location or try adjusting your preferences.';
+          setVenueSearchError(errorMessage);
           setVenueRecommendations([]);
         } else {
           console.log('🎉 AI ANALYSIS: Successfully got venues:', venues.map(v => `${v.venue_name} (${v.ai_score}%)`));
           setVenueRecommendations(venues);
+          setVenueSearchError(null); // Clear any previous errors on success
         }
         
         console.log('✅ AI ANALYSIS: Analysis completed successfully');
@@ -115,17 +115,20 @@ export const useAIAnalysis = () => {
         partnerId
       });
       
-      // Set fallback values to unblock the UI
+      // Set error state and fallback values
+      const errorMessage = error.message || 'Failed to get venue recommendations';
+      setVenueSearchError(errorMessage);
       setVenueRecommendations([]);
+      
       if (!compatibilityScore) {
         setCompatibilityScore(75); // Default compatibility score
       }
       
       handleError(error, {
-        toastTitle: 'AI Analysis Error',
-        toastDescription: error.message === 'AI analysis timed out after 45 seconds' 
+        toastTitle: 'AI Analysis Error', 
+        toastDescription: error.message === 'AI analysis timed out after 45 seconds'
           ? 'Analysis took too long, continuing with available data'
-          : 'Could not complete full analysis, continuing with defaults'
+          : 'Could not complete venue search, please try again'
       });
     }
   }, [user, handleError, compatibilityScore]);
@@ -133,6 +136,7 @@ export const useAIAnalysis = () => {
   const resetAIState = useCallback(() => {
     setCompatibilityScore(null);
     setVenueRecommendations([]);
+    setVenueSearchError(null);
   }, []);
 
   return {
@@ -140,6 +144,7 @@ export const useAIAnalysis = () => {
     setCompatibilityScore,
     venueRecommendations,
     setVenueRecommendations,
+    venueSearchError,
     analyzeCompatibilityAndVenues,
     resetAIState
   };
