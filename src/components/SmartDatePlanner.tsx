@@ -51,7 +51,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     userLocation,
     locationError,
     locationRequested,
-    requestLocation
+    requestLocation,
+    dateMode,
+    setDateMode,
+    selectedPartnerIds,
+    setSelectedPartnerIds
   } = state;
 
   const {
@@ -119,8 +123,12 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
           <PartnerSelection
             friends={friends}
             selectedPartnerId={selectedPartnerId}
+            selectedPartnerIds={selectedPartnerIds}
+            dateMode={dateMode}
             loading={loading}
             onPartnerChange={setSelectedPartnerId}
+            onPartnerIdsChange={setSelectedPartnerIds}
+            onDateModeChange={setDateMode}
             onContinue={() => handlePartnerSelection()}
           />
         )}

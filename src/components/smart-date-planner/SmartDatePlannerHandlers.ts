@@ -1,8 +1,12 @@
 export const createSmartDatePlannerHandlers = (state: any) => {
   const {
     selectedPartnerId,
+    selectedPartnerIds,
+    dateMode,
     setCurrentStep,
     setSelectedPartnerId,
+    setSelectedPartnerIds,
+    setDateMode,
     getActiveSession,
     createPlanningSession,
     setAiAnalyzing,
@@ -17,20 +21,42 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   } = state;
 
   async function handlePartnerSelection(partnerId?: string) {
-    const partnerIdToUse = partnerId || selectedPartnerId;
-    if (!partnerIdToUse) return;
+    if (dateMode === 'single') {
+      const partnerIdToUse = partnerId || selectedPartnerId;
+      if (!partnerIdToUse) return;
 
-    console.log('SmartDatePlanner - Handling partner selection:', partnerIdToUse);
-    
-    try {
-      const session = await getActiveSession(partnerIdToUse);
-      if (!session) {
-        console.log('SmartDatePlanner - Creating new planning session');
-        await createPlanningSession(partnerIdToUse);
+      console.log('SmartDatePlanner - Handling single partner selection:', partnerIdToUse);
+      
+      try {
+        const session = await getActiveSession(partnerIdToUse);
+        if (!session) {
+          console.log('SmartDatePlanner - Creating new planning session');
+          await createPlanningSession(partnerIdToUse);
+        }
+        setCurrentStep('set-preferences');
+      } catch (error) {
+        console.error('SmartDatePlanner - Error in partner selection:', error);
       }
-      setCurrentStep('set-preferences');
-    } catch (error) {
-      console.error('SmartDatePlanner - Error in partner selection:', error);
+    } else {
+      // Group mode
+      if (selectedPartnerIds.length === 0) return;
+
+      console.log('SmartDatePlanner - Handling group selection:', selectedPartnerIds);
+      
+      try {
+        // For now, use the first partner as the primary partner
+        // and store the rest in participant_ids
+        const primaryPartnerId = selectedPartnerIds[0];
+        const session = await getActiveSession(primaryPartnerId);
+        
+        if (!session) {
+          console.log('SmartDatePlanner - Creating new group planning session');
+          await createPlanningSession(primaryPartnerId, selectedPartnerIds);
+        }
+        setCurrentStep('set-preferences');
+      } catch (error) {
+        console.error('SmartDatePlanner - Error in group selection:', error);
+      }
     }
   }
 
@@ -78,6 +104,8 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     // Reset all state and navigate back to partner selection
     setCurrentStep('select-partner');
     setSelectedPartnerId('');
+    setSelectedPartnerIds([]);
+    setDateMode('single');
     setSelectedVenueId('');
     setInvitationMessage('');
     // Navigate to fresh planning session

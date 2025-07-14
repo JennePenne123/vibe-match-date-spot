@@ -305,6 +305,7 @@ export type Database = {
           expires_at: string
           id: string
           initiator_id: string
+          participant_ids: Json | null
           partner_id: string
           preferences_data: Json | null
           selected_venue_id: string | null
@@ -317,6 +318,7 @@ export type Database = {
           expires_at?: string
           id?: string
           initiator_id: string
+          participant_ids?: Json | null
           partner_id: string
           preferences_data?: Json | null
           selected_venue_id?: string | null
@@ -329,6 +331,7 @@ export type Database = {
           expires_at?: string
           id?: string
           initiator_id?: string
+          participant_ids?: Json | null
           partner_id?: string
           preferences_data?: Json | null
           selected_venue_id?: string | null

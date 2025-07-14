@@ -8,6 +8,7 @@ interface DatePlanningSession {
   id: string;
   initiator_id: string;
   partner_id: string;
+  participant_ids?: string[];
   session_status: 'active' | 'completed' | 'expired';
   preferences_data?: any;
   ai_compatibility_score?: number;
@@ -33,7 +34,7 @@ export const useSessionManagement = () => {
   const [loading, setLoading] = useState(false);
 
   // Create a new planning session
-  const createPlanningSession = useCallback(async (partnerId: string) => {
+  const createPlanningSession = useCallback(async (partnerId: string, participantIds?: string[]) => {
     if (!user) {
       console.error('🚫 SESSION: Cannot create session - no user');
       return null;
@@ -41,7 +42,7 @@ export const useSessionManagement = () => {
 
     setLoading(true);
     try {
-      console.log('🆕 SESSION: Creating planning session for partner:', partnerId);
+      console.log('🆕 SESSION: Creating planning session for partner:', partnerId, 'participants:', participantIds);
       
       // First check if there's already an active session
       const existingSession = await getActiveSession(partnerId);
@@ -50,13 +51,20 @@ export const useSessionManagement = () => {
         return existingSession;
       }
       
+      const sessionData: any = {
+        initiator_id: user.id,
+        partner_id: partnerId,
+        session_status: 'active'
+      };
+
+      // Add participant_ids for group planning
+      if (participantIds && participantIds.length > 1) {
+        sessionData.participant_ids = participantIds;
+      }
+      
       const { data, error } = await supabase
         .from('date_planning_sessions')
-        .insert({
-          initiator_id: user.id,
-          partner_id: partnerId,
-          session_status: 'active'
-        })
+        .insert(sessionData)
         .select()
         .single();
 

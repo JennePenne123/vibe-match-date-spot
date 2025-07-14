@@ -93,6 +93,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
   const [invitationMessage, setInvitationMessage] = useState<string>('');
   const [aiAnalyzing, setAiAnalyzing] = useState(false);
   const [locationRequested, setLocationRequested] = useState(false);
+  const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
+  const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
   const locationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
@@ -210,6 +212,10 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     userLocation: appState.userLocation,
     locationError: appState.locationError,
     requestLocation: handleLocationRequest,
-    locationRequested
+    locationRequested,
+    dateMode,
+    setDateMode,
+    selectedPartnerIds,
+    setSelectedPartnerIds
   };
 };
