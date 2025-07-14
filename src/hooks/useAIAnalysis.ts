@@ -25,7 +25,8 @@ export const useAIAnalysis = () => {
   const analyzeCompatibilityAndVenues = useCallback(async (
     sessionId: string, 
     partnerId: string, 
-    preferences: DatePreferences
+    preferences: DatePreferences,
+    userLocation?: { latitude: number; longitude: number; address?: string }
   ) => {
     if (!user) {
       console.error('🚫 AI ANALYSIS: No user found');
@@ -68,9 +69,10 @@ export const useAIAnalysis = () => {
         }
 
         console.log('🏢 AI ANALYSIS: Step 2 - Getting venue recommendations...');
+        console.log('📍 AI ANALYSIS: Using location:', userLocation);
         
-        // Get AI venue recommendations
-        const venues = await getAIVenueRecommendations(user.id, partnerId, 10);
+        // Get AI venue recommendations with user location
+        const venues = await getAIVenueRecommendations(user.id, partnerId, 10, userLocation);
         console.log('📍 AI ANALYSIS: Venue recommendations received:', venues?.length || 0);
         
         if (!venues || venues.length === 0) {

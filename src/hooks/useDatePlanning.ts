@@ -16,7 +16,7 @@ interface DatePreferences {
   dietary_restrictions?: string[];
 }
 
-export const useDatePlanning = () => {
+export const useDatePlanning = (userLocation?: { latitude: number; longitude: number; address?: string }) => {
   const { user } = useAuth();
   const { handleError } = useErrorHandler();
   
@@ -51,12 +51,14 @@ export const useDatePlanning = () => {
   const updateSessionPreferencesWithAI = useCallback(async (sessionId: string, preferences: DatePreferences) => {
     if (!currentSession) return;
 
+    console.log('🎯 DATE PLANNING: Starting session preferences update with location:', userLocation);
+
     // Update preferences first
     await updateSessionPreferences(sessionId, preferences);
     
-    // Then trigger AI analysis
-    await analyzeCompatibilityAndVenues(sessionId, currentSession.partner_id, preferences);
-  }, [currentSession, updateSessionPreferences, analyzeCompatibilityAndVenues]);
+    // Then trigger AI analysis with user location
+    await analyzeCompatibilityAndVenues(sessionId, currentSession.partner_id, preferences, userLocation);
+  }, [currentSession, updateSessionPreferences, analyzeCompatibilityAndVenues, userLocation]);
 
   // Enhanced complete planning session with invitation creation
   const completePlanningSession = useCallback(async (sessionId: string, venueId: string, message: string) => {

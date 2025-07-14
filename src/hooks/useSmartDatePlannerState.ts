@@ -4,6 +4,7 @@ import { useDatePlanning } from '@/hooks/useDatePlanning';
 import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlanningSteps } from '@/hooks/usePlanningSteps';
+import { useApp } from '@/contexts/AppContext';
 
 interface UseSmartDatePlannerStateProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -12,9 +13,11 @@ interface UseSmartDatePlannerStateProps {
 export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlannerStateProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { appState, requestLocation } = useApp();
 
   console.log('SmartDatePlanner - Starting with user:', user?.id);
   console.log('SmartDatePlanner - Preselected friend:', preselectedFriend);
+  console.log('SmartDatePlanner - User location:', appState.userLocation);
 
   // Initialize hooks with error handling
   let friends = [];
@@ -33,8 +36,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
   let datePlanningError = null;
   
   try {
-    datePlanningState = useDatePlanning();
-    console.log('SmartDatePlanner - Date planning state loaded');
+    datePlanningState = useDatePlanning(appState.userLocation);
+    console.log('SmartDatePlanner - Date planning state loaded with location:', appState.userLocation);
   } catch (error) {
     console.error('SmartDatePlanner - Error loading date planning state:', error);
     datePlanningError = error;
@@ -132,6 +135,14 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     }
   }, [aiAnalyzing, currentStep, setCurrentStep]);
 
+  // Request location permission when Smart Date Planner is used
+  useEffect(() => {
+    if (user && !appState.userLocation && !appState.locationError) {
+      console.log('SmartDatePlanner - Requesting location permission');
+      requestLocation();
+    }
+  }, [user, appState.userLocation, appState.locationError, requestLocation]);
+
   return {
     user,
     friends,
@@ -159,6 +170,9 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     setAiAnalyzing,
     selectedPartner,
     selectedVenue,
-    navigate
+    navigate,
+    userLocation: appState.userLocation,
+    locationError: appState.locationError,
+    requestLocation
   };
 };

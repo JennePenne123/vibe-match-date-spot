@@ -15,6 +15,7 @@ import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
 import { createSmartDatePlannerHandlers } from '@/components/smart-date-planner/SmartDatePlannerHandlers';
 import SmartDatePlannerError from '@/components/smart-date-planner/SmartDatePlannerError';
 import SmartDatePlannerAuth from '@/components/smart-date-planner/SmartDatePlannerAuth';
+import LocationDisplay from '@/components/smart-date-planner/LocationDisplay';
 
 interface SmartDatePlannerProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -45,7 +46,10 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     aiAnalyzing,
     selectedPartner,
     selectedVenue,
-    navigate
+    navigate,
+    userLocation,
+    locationError,
+    requestLocation
   } = state;
 
   const {
@@ -87,6 +91,13 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
       <div className="max-w-md mx-auto p-6 space-y-6">
         {/* Header */}
         <PlanningHeader progress={getStepProgress()} />
+
+        {/* Location Display */}
+        <LocationDisplay 
+          userLocation={userLocation}
+          locationError={locationError}
+          onRequestLocation={requestLocation}
+        />
 
         {/* Navigation */}
         <div className="flex justify-start">

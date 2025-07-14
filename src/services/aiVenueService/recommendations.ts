@@ -18,13 +18,14 @@ export interface AIVenueRecommendation {
 export const getAIVenueRecommendations = async (
   userId: string,
   partnerId?: string,
-  limit: number = 10
+  limit: number = 10,
+  userLocation?: { latitude: number; longitude: number; address?: string }
 ): Promise<AIVenueRecommendation[]> => {
   try {
-    console.log('🎯 RECOMMENDATIONS: Starting for user:', userId, 'partner:', partnerId);
+    console.log('🎯 RECOMMENDATIONS: Starting for user:', userId, 'partner:', partnerId, 'location:', userLocation);
 
     // First try to get real venues from Google Places API
-    let venues = await getVenuesFromGooglePlaces(userId, limit);
+    let venues = await getVenuesFromGooglePlaces(userId, limit, userLocation);
     console.log('🌐 RECOMMENDATIONS: Google Places returned:', venues?.length || 0, 'venues');
     
     // Fallback to database venues if Google Places fails
@@ -82,10 +83,10 @@ export const getAIVenueRecommendations = async (
   }
 };
 
-// Get venues from Google Places API based on user preferences
-const getVenuesFromGooglePlaces = async (userId: string, limit: number) => {
+// Get venues from Google Places API based on user preferences and location
+const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLocation?: { latitude: number; longitude: number; address?: string }) => {
   try {
-    console.log('🔍 GOOGLE PLACES: Starting venue search for user:', userId);
+    console.log('🔍 GOOGLE PLACES: Starting venue search for user:', userId, 'at location:', userLocation);
     
     // Get user preferences
     const { data: userPrefs, error: prefsError } = await supabase
@@ -104,10 +105,10 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number) => {
       return [];
     }
 
-    // Use mock user location for now (could be made dynamic)
-    const location = 'San Francisco, CA';
-    const latitude = 37.7749;
-    const longitude = -122.4194;
+    // Use provided location or default to Hamburg, Germany for this user
+    const latitude = userLocation?.latitude || 53.5511;
+    const longitude = userLocation?.longitude || 9.9937;
+    const location = userLocation?.address || 'Hamburg, Germany';
 
     console.log('🏙️ GOOGLE PLACES: Searching venues with preferences:', {
       cuisines: userPrefs.preferred_cuisines,
