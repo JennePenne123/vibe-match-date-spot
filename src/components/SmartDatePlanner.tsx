@@ -18,6 +18,7 @@ import SmartDatePlannerAuth from '@/components/smart-date-planner/SmartDatePlann
 import LocationDisplay from '@/components/smart-date-planner/LocationDisplay';
 import { VenueSearchTester } from '@/components/debug/VenueSearchTester';
 import { EdgeFunctionTester } from '@/components/debug/EdgeFunctionTester';
+import { HamburgVenueTest } from '@/components/debug/HamburgVenueTest';
 
 interface SmartDatePlannerProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -224,6 +225,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
 
         {/* Debug Components */}
         <div className="space-y-4 border-t border-gray-200 pt-6">
+          <HamburgVenueTest />
           <VenueSearchTester />
           <EdgeFunctionTester />
           

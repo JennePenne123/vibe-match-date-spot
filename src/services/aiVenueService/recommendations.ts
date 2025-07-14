@@ -201,69 +201,52 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       radius: (userPrefs.max_distance || 10) * 1609
     });
 
-    // ===== EDGE FUNCTION CALL DEBUGGING =====
+    // ===== SIMPLIFIED EDGE FUNCTION CALL =====
     console.log('🚀 GOOGLE PLACES: ===== STARTING EDGE FUNCTION CALL =====');
     console.log('🚀 GOOGLE PLACES: About to call search-venues edge function...');
-    console.log('🚀 GOOGLE PLACES: Edge function parameters:', {
-      functionName: 'search-venues',
-      body: {
-        location,
-        cuisines: userPrefs.preferred_cuisines || ['italian'],
-        vibes: userPrefs.preferred_vibes || ['romantic'],
-        latitude,
-        longitude,
-        radius: (userPrefs.max_distance || 10) * 1609
-      }
-    });
     
-    // Test edge function accessibility first
-    console.log('🧪 GOOGLE PLACES: Testing edge function accessibility...');
+    const requestPayload = {
+      location,
+      cuisines: userPrefs.preferred_cuisines || ['italian'],
+      vibes: userPrefs.preferred_vibes || ['romantic'],
+      latitude,
+      longitude,
+      radius: (userPrefs.max_distance || 10) * 1609
+    };
+    
+    console.log('🚀 GOOGLE PLACES: Edge function parameters:', requestPayload);
     
     let searchResult, error;
+    const startTime = Date.now();
+    
     try {
-      console.log('📡 GOOGLE PLACES: Calling supabase.functions.invoke...');
+      console.log('📡 GOOGLE PLACES: Calling supabase.functions.invoke directly...');
       
-      const startTime = Date.now();
-      const edgeFunctionCall = supabase.functions.invoke('search-venues', {
-        body: {
-          location,
-          cuisines: userPrefs.preferred_cuisines || ['italian'],
-          vibes: userPrefs.preferred_vibes || ['romantic'],
-          latitude,
-          longitude,
-          radius: (userPrefs.max_distance || 10) * 1609 // Convert miles to meters
-        }
+      // Direct call without Promise.race to avoid timeout masking
+      const result = await supabase.functions.invoke('search-venues', {
+        body: requestPayload
       });
       
-      console.log('⏱️ GOOGLE PLACES: Edge function call initiated, waiting for response...');
-      
-      // Create timeout promise (60 seconds for debugging)
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Edge function timeout after 60 seconds')), 60000);
-      });
-      
-      const result = await Promise.race([edgeFunctionCall, timeoutPromise]) as { data: any; error: any };
       const endTime = Date.now();
-      
       console.log('⏱️ GOOGLE PLACES: Edge function completed in:', endTime - startTime, 'ms');
-      console.log('📡 GOOGLE PLACES: Raw edge function result:', {
-        hasData: !!result.data,
-        hasError: !!result.error,
-        dataKeys: result.data ? Object.keys(result.data) : [],
-        errorMessage: result.error?.message
-      });
+      console.log('📡 GOOGLE PLACES: Raw edge function result:', result);
       
       searchResult = result.data;
       error = result.error;
       
-    } catch (timeoutError) {
-      console.error('❌ GOOGLE PLACES: Edge function timed out or threw error:', timeoutError);
-      console.error('❌ GOOGLE PLACES: Timeout error details:', {
-        name: timeoutError.name,
-        message: timeoutError.message,
-        stack: timeoutError.stack
+    } catch (callError) {
+      const endTime = Date.now();
+      console.error('❌ GOOGLE PLACES: Edge function call threw exception:', callError);
+      console.error('❌ GOOGLE PLACES: Call failed after:', endTime - startTime, 'ms');
+      console.error('❌ GOOGLE PLACES: Exception details:', {
+        name: callError.name,
+        message: callError.message,
+        stack: callError.stack,
+        isNetworkError: callError.message?.includes('network') || callError.message?.includes('fetch'),
+        isTimeoutError: callError.message?.includes('timeout'),
+        isAuthError: callError.message?.includes('auth') || callError.message?.includes('unauthorized')
       });
-      error = timeoutError;
+      error = callError;
     }
 
     // ===== DETAILED RESPONSE ANALYSIS =====
