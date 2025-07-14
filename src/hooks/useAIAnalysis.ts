@@ -27,22 +27,29 @@ export const useAIAnalysis = () => {
     partnerId: string, 
     preferences: DatePreferences
   ) => {
-    if (!user) return;
+    if (!user) {
+      console.error('🚫 AI ANALYSIS: No user found');
+      return;
+    }
 
-    const timeout = 30000; // 30 second timeout
+    console.log('🚀 AI ANALYSIS: Starting comprehensive analysis for session:', sessionId);
+    console.log('👥 AI ANALYSIS: User:', user.id, 'Partner:', partnerId);
+    console.log('⚙️ AI ANALYSIS: Preferences:', preferences);
+
+    const timeout = 45000; // Increased to 45 seconds
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('AI analysis timed out')), timeout)
+      setTimeout(() => reject(new Error('AI analysis timed out after 45 seconds')), timeout)
     );
 
     try {
-      console.log('Analyzing compatibility and venues...');
-      
       const analysisPromise = async () => {
+        console.log('📊 AI ANALYSIS: Step 1 - Getting compatibility score...');
+        
         // Get compatibility score
         const compatibility = await getCompatibilityScore(user.id, partnerId);
         
         if (compatibility) {
-          console.log('Compatibility score:', compatibility.overall_score);
+          console.log('❤️ AI ANALYSIS: Compatibility score received:', compatibility.overall_score + '%');
           setCompatibilityScore(compatibility.overall_score);
           
           // Update session with compatibility score
@@ -53,40 +60,62 @@ export const useAIAnalysis = () => {
               updated_at: new Date().toISOString()
             })
             .eq('id', sessionId);
+            
+          console.log('✅ AI ANALYSIS: Session updated with compatibility score');
+        } else {
+          console.warn('⚠️ AI ANALYSIS: No compatibility score received, using default');
+          setCompatibilityScore(75);
         }
 
-        // Get AI venue recommendations
-        console.log('Getting venue recommendations...');
-        const venues = await getAIVenueRecommendations(user.id, partnerId, 10);
-        console.log('Venue recommendations received:', venues?.length || 0);
+        console.log('🏢 AI ANALYSIS: Step 2 - Getting venue recommendations...');
         
-        // Ensure we always have some venues, even if scoring is low
+        // Get AI venue recommendations
+        const venues = await getAIVenueRecommendations(user.id, partnerId, 10);
+        console.log('📍 AI ANALYSIS: Venue recommendations received:', venues?.length || 0);
+        
         if (!venues || venues.length === 0) {
-          console.warn('No AI venue recommendations found, this might indicate a matching issue');
-          // Still set empty array to complete the flow
+          console.error('❌ AI ANALYSIS: No venue recommendations found!');
+          console.log('🔍 AI ANALYSIS: This indicates either:');
+          console.log('  - Google Places API issues');
+          console.log('  - No database venues available');
+          console.log('  - Scoring algorithm too restrictive');
+          console.log('  - User preferences too specific');
+          
+          // Set empty array but continue flow
           setVenueRecommendations([]);
         } else {
+          console.log('🎉 AI ANALYSIS: Successfully got venues:', venues.map(v => `${v.venue_name} (${v.ai_score}%)`));
           setVenueRecommendations(venues);
         }
+        
+        console.log('✅ AI ANALYSIS: Analysis completed successfully');
       };
 
       await Promise.race([analysisPromise(), timeoutPromise]);
 
     } catch (error) {
-      console.error('Error in AI analysis:', error);
+      console.error('❌ AI ANALYSIS: Critical error occurred:', {
+        message: error.message,
+        stack: error.stack,
+        sessionId,
+        userId: user.id,
+        partnerId
+      });
       
-      // Set empty recommendations to unblock the UI
+      // Set fallback values to unblock the UI
       setVenueRecommendations([]);
-      setCompatibilityScore(75); // Default compatibility score
+      if (!compatibilityScore) {
+        setCompatibilityScore(75); // Default compatibility score
+      }
       
       handleError(error, {
         toastTitle: 'AI Analysis Error',
-        toastDescription: error.message === 'AI analysis timed out' 
-          ? 'Analysis took too long, using default recommendations'
-          : 'Could not complete compatibility analysis, using defaults'
+        toastDescription: error.message === 'AI analysis timed out after 45 seconds' 
+          ? 'Analysis took too long, continuing with available data'
+          : 'Could not complete full analysis, continuing with defaults'
       });
     }
-  }, [user, handleError]);
+  }, [user, handleError, compatibilityScore]);
 
   const resetAIState = useCallback(() => {
     setCompatibilityScore(null);

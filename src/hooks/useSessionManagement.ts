@@ -34,11 +34,21 @@ export const useSessionManagement = () => {
 
   // Create a new planning session
   const createPlanningSession = useCallback(async (partnerId: string) => {
-    if (!user) return null;
+    if (!user) {
+      console.error('🚫 SESSION: Cannot create session - no user');
+      return null;
+    }
 
     setLoading(true);
     try {
-      console.log('Creating planning session for partner:', partnerId);
+      console.log('🆕 SESSION: Creating planning session for partner:', partnerId);
+      
+      // First check if there's already an active session
+      const existingSession = await getActiveSession(partnerId);
+      if (existingSession) {
+        console.log('♻️ SESSION: Found existing active session:', existingSession.id);
+        return existingSession;
+      }
       
       const { data, error } = await supabase
         .from('date_planning_sessions')
@@ -52,11 +62,17 @@ export const useSessionManagement = () => {
 
       if (error) throw error;
 
-      console.log('Planning session created:', data);
+      console.log('✅ SESSION: Planning session created successfully:', {
+        id: data.id,
+        initiator: data.initiator_id,
+        partner: data.partner_id,
+        status: data.session_status
+      });
+      
       setCurrentSession(data);
       return data;
     } catch (error) {
-      console.error('Error creating planning session:', error);
+      console.error('❌ SESSION: Error creating planning session:', error);
       handleError(error, {
         toastTitle: 'Failed to create planning session',
         toastDescription: 'Please try again'
@@ -69,10 +85,13 @@ export const useSessionManagement = () => {
 
   // Get active session
   const getActiveSession = useCallback(async (partnerId: string) => {
-    if (!user) return null;
+    if (!user) {
+      console.error('🚫 SESSION: Cannot get session - no user');
+      return null;
+    }
 
     try {
-      console.log('Getting active session for partner:', partnerId);
+      console.log('🔍 SESSION: Getting active session for partner:', partnerId);
       
       const { data, error } = await supabase
         .from('date_planning_sessions')
@@ -85,12 +104,36 @@ export const useSessionManagement = () => {
 
       if (error) throw error;
       
-      console.log('Active session found:', data);
-      setCurrentSession(data);
+      if (data) {
+        console.log('✅ SESSION: Active session found:', {
+          id: data.id,
+          status: data.session_status,
+          created: data.created_at,
+          expires: data.expires_at,
+          hasPreferences: !!data.preferences_data,
+          compatibilityScore: data.ai_compatibility_score
+        });
+        
+        // Check if session is expired
+        const now = new Date();
+        const expiresAt = new Date(data.expires_at);
+        if (now > expiresAt) {
+          console.warn('⚠️ SESSION: Session expired, cleaning up');
+          await supabase
+            .from('date_planning_sessions')
+            .update({ session_status: 'expired' })
+            .eq('id', data.id);
+          setCurrentSession(null);
+          return null;
+        }
+      } else {
+        console.log('📭 SESSION: No active session found');
+      }
       
+      setCurrentSession(data);
       return data;
     } catch (error) {
-      console.error('Error getting active session:', error);
+      console.error('❌ SESSION: Error getting active session:', error);
       handleError(error, {
         toastTitle: 'Failed to load planning session',
         toastDescription: 'Please try again'

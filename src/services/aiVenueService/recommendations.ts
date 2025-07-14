@@ -21,23 +21,31 @@ export const getAIVenueRecommendations = async (
   limit: number = 10
 ): Promise<AIVenueRecommendation[]> => {
   try {
-    console.log('Getting AI venue recommendations for user:', userId, 'partner:', partnerId);
+    console.log('🎯 RECOMMENDATIONS: Starting for user:', userId, 'partner:', partnerId);
 
     // First try to get real venues from Google Places API
     let venues = await getVenuesFromGooglePlaces(userId, limit);
+    console.log('🌐 RECOMMENDATIONS: Google Places returned:', venues?.length || 0, 'venues');
     
     // Fallback to database venues if Google Places fails
     if (!venues || venues.length === 0) {
-      console.log('No Google Places venues, falling back to database venues');
+      console.log('🔄 RECOMMENDATIONS: No Google Places venues, falling back to database venues');
       venues = await getActiveVenues(50);
-    } else {
-      console.log('Got venues from Google Places:', venues.length);
+      console.log('🗄️ RECOMMENDATIONS: Database returned:', venues?.length || 0, 'venues');
+    }
+
+    // If still no venues, something is wrong
+    if (!venues || venues.length === 0) {
+      console.error('❌ RECOMMENDATIONS: No venues found from either source!');
+      return [];
     }
 
     const recommendations: AIVenueRecommendation[] = [];
 
     // Calculate AI scores for each venue
+    console.log('🧮 RECOMMENDATIONS: Calculating AI scores for', venues.length, 'venues');
     for (const venue of venues) {
+      console.log(`📊 RECOMMENDATIONS: Scoring venue: ${venue.name} (${venue.cuisine_type || 'unknown cuisine'})`);
       const aiScore = await calculateVenueAIScore(venue.id, userId, partnerId);
       
       // Get stored AI score data for additional context
@@ -55,6 +63,7 @@ export const getAIVenueRecommendations = async (
         confidence_level: calculateConfidenceLevel(aiScore, scoreData?.match_factors)
       };
 
+      console.log(`✅ RECOMMENDATIONS: ${venue.name} scored ${aiScore}% (confidence: ${Math.round(recommendation.confidence_level * 100)}%)`);
       recommendations.push(recommendation);
     }
 
@@ -64,7 +73,8 @@ export const getAIVenueRecommendations = async (
       .sort((a, b) => b.ai_score - a.ai_score)
       .slice(0, limit);
 
-    console.log(`Returning ${sortedRecommendations.length} venue recommendations`);
+    console.log(`🎉 RECOMMENDATIONS: Returning ${sortedRecommendations.length} venue recommendations:`,
+      sortedRecommendations.slice(0, 3).map(r => `${r.venue_name}: ${r.ai_score}%`));
     return sortedRecommendations;
   } catch (error) {
     console.error('Error getting AI venue recommendations:', error);
@@ -75,23 +85,34 @@ export const getAIVenueRecommendations = async (
 // Get venues from Google Places API based on user preferences
 const getVenuesFromGooglePlaces = async (userId: string, limit: number) => {
   try {
+    console.log('🔍 GOOGLE PLACES: Starting venue search for user:', userId);
+    
     // Get user preferences
-    const { data: userPrefs } = await supabase
+    const { data: userPrefs, error: prefsError } = await supabase
       .from('user_preferences')
       .select('*')
       .eq('user_id', userId)
       .single();
 
-    if (!userPrefs) return [];
+    if (prefsError) {
+      console.error('❌ GOOGLE PLACES: Error fetching user preferences:', prefsError);
+      return [];
+    }
+
+    if (!userPrefs) {
+      console.warn('⚠️ GOOGLE PLACES: No user preferences found');
+      return [];
+    }
 
     // Use mock user location for now (could be made dynamic)
     const location = 'San Francisco, CA';
     const latitude = 37.7749;
     const longitude = -122.4194;
 
-    console.log('Searching venues with preferences:', {
+    console.log('🏙️ GOOGLE PLACES: Searching venues with preferences:', {
       cuisines: userPrefs.preferred_cuisines,
       vibes: userPrefs.preferred_vibes,
+      priceRange: userPrefs.preferred_price_range,
       location
     });
 
@@ -108,12 +129,20 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number) => {
     });
 
     if (error) {
-      console.error('Error calling search-venues function:', error);
+      console.error('❌ GOOGLE PLACES: Error calling search-venues function:', {
+        message: error.message,
+        details: error.details || 'No additional details'
+      });
       return [];
     }
 
     const venues = searchResult?.venues || [];
-    console.log('Google Places returned:', venues.length, 'venues');
+    console.log('📍 GOOGLE PLACES: Edge function returned:', venues.length, 'venues');
+
+    if (venues.length === 0) {
+      console.warn('⚠️ GOOGLE PLACES: No venues returned from edge function');
+      return [];
+    }
 
     // Transform and save venues to database
     const transformedVenues = [];

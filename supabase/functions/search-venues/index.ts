@@ -49,17 +49,28 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { location, cuisines, vibes, latitude, longitude, radius = 5000 }: SearchRequest = await req.json();
+    console.log('🔍 EDGE FUNCTION: search-venues called with:', { 
+      location, 
+      cuisines, 
+      vibes, 
+      latitude, 
+      longitude, 
+      radius 
+    });
+
     const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
 
     if (!apiKey) {
+      console.error('❌ EDGE FUNCTION: Google Places API key not configured');
       throw new Error('Google Places API key not configured');
     }
 
     if (!latitude || !longitude) {
+      console.error('❌ EDGE FUNCTION: Missing location coordinates');
       throw new Error('User location (latitude/longitude) is required');
     }
 
-    console.log('Searching venues for:', { location, cuisines, vibes, latitude, longitude });
+    console.log('✅ EDGE FUNCTION: Starting venue search with valid parameters');
 
     // Map cuisines to Google Places types
     const cuisineTypeMap: Record<string, string[]> = {
@@ -117,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     };
 
-    console.log('Making request to Places API with:', searchBody);
+    console.log('🌐 EDGE FUNCTION: Making request to Google Places API with:', searchBody);
 
     const response = await fetch(searchUrl, {
       method: 'POST',
@@ -129,14 +140,20 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify(searchBody)
     });
 
+    console.log(`📡 EDGE FUNCTION: Google Places API response status: ${response.status}`);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Google Places API error: ${response.status} - ${errorText}`);
-      throw new Error(`Google Places API error: ${response.status}`);
+      console.error(`❌ EDGE FUNCTION: Google Places API error: ${response.status} - ${errorText}`);
+      throw new Error(`Google Places API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Google Places API response:', JSON.stringify(data, null, 2));
+    console.log('📊 EDGE FUNCTION: Google Places API returned data:', {
+      placesCount: data.places?.length || 0,
+      hasPlaces: !!(data.places),
+      firstPlaceName: data.places?.[0]?.displayName?.text
+    });
 
     // Transform Google Places data to our venue format
     const venues = (data.places || []).map((place: GooglePlace, index: number) => {
@@ -145,7 +162,7 @@ const handler = async (req: Request): Promise<Response> => {
       const matchScore = calculateMatchScore(place, cuisines, vibes);
       const distance = calculateDistance(latitude, longitude, place.location.latitude, place.location.longitude);
       
-      return {
+      const transformedVenue = {
         id: place.id || `venue-${index}`,
         name: place.displayName?.text || 'Unknown Venue',
         description: place.editorialSummary?.text || `${cuisineType} restaurant with great atmosphere`,
@@ -162,8 +179,14 @@ const handler = async (req: Request): Promise<Response> => {
         phone: place.nationalPhoneNumber,
         website: place.websiteUri,
         openingHours: place.currentOpeningHours?.weekdayDescriptions || [],
-        isOpen: place.currentOpeningHours?.openNow
+        isOpen: place.currentOpeningHours?.openNow,
+        latitude: place.location.latitude,
+        longitude: place.location.longitude
       };
+
+      console.log(`🏢 EDGE FUNCTION: Transformed venue: ${transformedVenue.name} (${cuisineType}, ${matchScore}% match)`);
+      
+      return transformedVenue;
     });
 
     // Sort by match score and distance
@@ -175,7 +198,8 @@ const handler = async (req: Request): Promise<Response> => {
       return scoreA;
     });
 
-    console.log(`Returning ${venues.length} venues`);
+    console.log(`✅ EDGE FUNCTION: Successfully returning ${venues.length} venues with scores:`, 
+      venues.slice(0, 3).map(v => `${v.name}: ${v.matchScore}%`));
 
     return new Response(JSON.stringify({ venues }), {
       status: 200,
@@ -186,9 +210,16 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
   } catch (error: any) {
-    console.error('Error in search-venues function:', error);
+    console.error('❌ EDGE FUNCTION: Critical error in search-venues:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: 'Check edge function logs for more information'
+      }),
       {
         status: 500,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
