@@ -100,11 +100,10 @@ export const getAIVenueRecommendations = async (
   }
 };
 
-// Get venues from Google Places API based on user preferences and location
+// Enhanced venue search with retry logic and improved fallback
 const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLocation?: { latitude: number; longitude: number; address?: string }) => {
   try {
-    console.log('🔍 GOOGLE PLACES: Starting venue search for user:', userId, 'at location:', userLocation);
-    console.log('🔍 GOOGLE PLACES: Function called with params:', { userId, limit, userLocation });
+    console.log('🔍 GOOGLE PLACES: Starting enhanced venue search for user:', userId, 'at location:', userLocation);
     
     // Early validation check
     if (!userId) {
@@ -117,7 +116,7 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       throw new Error('Valid user location is required for venue search');
     }
     
-    // Get user preferences
+    // Get user preferences with enhanced error handling
     const { data: userPrefs, error: prefsError } = await supabase
       .from('user_preferences')
       .select('*')
@@ -128,265 +127,221 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
 
     if (prefsError) {
       console.error('❌ GOOGLE PLACES: Error fetching user preferences:', prefsError);
-      return [];
+      throw new Error('Failed to fetch user preferences');
     }
 
     if (!userPrefs) {
       console.warn('⚠️ GOOGLE PLACES: No user preferences found for user:', userId);
-      return [];
+      throw new Error('User preferences not found. Please set your preferences first.');
     }
 
-    // Validate and fix preferences with detailed logging
-    console.log('🔍 PREFERENCES CHECK: Raw preferences:', {
-      cuisines: userPrefs.preferred_cuisines,
-      vibes: userPrefs.preferred_vibes,
-      times: userPrefs.preferred_times,
-      priceRange: userPrefs.preferred_price_range
-    });
+    // Validate and fix preferences
+    const fixedPrefs = {
+      preferred_cuisines: userPrefs.preferred_cuisines?.length ? userPrefs.preferred_cuisines : ['Italian'],
+      preferred_vibes: userPrefs.preferred_vibes?.length ? userPrefs.preferred_vibes : ['romantic'],
+      preferred_times: userPrefs.preferred_times?.length ? userPrefs.preferred_times : ['lunch'],
+      preferred_price_range: userPrefs.preferred_price_range?.length ? userPrefs.preferred_price_range : ['$$'],
+      max_distance: userPrefs.max_distance || 10
+    };
 
-    if (!userPrefs.preferred_price_range || userPrefs.preferred_price_range.length === 0) {
-      console.error('❌ GOOGLE PLACES: User has empty price range preferences!', userPrefs);
-      userPrefs.preferred_price_range = ['$$'];
-    }
+    console.log('✅ PREFERENCES VALIDATED:', fixedPrefs);
 
-    if (!userPrefs.preferred_cuisines || userPrefs.preferred_cuisines.length === 0) {
-      console.warn('⚠️ GOOGLE PLACES: User has empty cuisine preferences, using default');
-      userPrefs.preferred_cuisines = ['italian'];
-    }
-
-    if (!userPrefs.preferred_vibes || userPrefs.preferred_vibes.length === 0) {
-      console.warn('⚠️ GOOGLE PLACES: User has empty vibe preferences, using default');
-      userPrefs.preferred_vibes = ['romantic'];
-    }
-
-    // Handle empty preferred_times which was causing issues
-    if (!userPrefs.preferred_times || userPrefs.preferred_times.length === 0) {
-      console.error('❌ GOOGLE PLACES: CRITICAL FIX - User has empty time preferences! This was breaking the flow.');
-      console.log('🔧 GOOGLE PLACES: Fixing empty preferred_times array...');
-      userPrefs.preferred_times = ['lunch'];
-      
-      // Update the database to fix this permanently
-      await supabase
-        .from('user_preferences')
-        .update({ preferred_times: ['lunch'] })
-        .eq('user_id', userId);
-      console.log('✅ GOOGLE PLACES: Fixed user preferences in database');
-    }
-
-    console.log('✅ PREFERENCES FIXED: Final preferences:', {
-      cuisines: userPrefs.preferred_cuisines,
-      vibes: userPrefs.preferred_vibes,
-      times: userPrefs.preferred_times,
-      priceRange: userPrefs.preferred_price_range
-    });
-
-    // Validate user location before Google Places call
+    // Validate location
     const locationValidation = validateLocation(userLocation);
     if (!locationValidation.isValid) {
       console.error('❌ GOOGLE PLACES: Location validation failed:', locationValidation.error);
-      throw new Error(locationValidation.error || 'Invalid user location for Google Places search');
+      throw new Error(locationValidation.error || 'Invalid user location');
     }
 
     const latitude = userLocation.latitude;
     const longitude = userLocation.longitude;
     const location = userLocation.address || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 
-    console.log('🏙️ GOOGLE PLACES: Searching venues with preferences:', {
-      cuisines: userPrefs.preferred_cuisines,
-      vibes: userPrefs.preferred_vibes,
-      priceRange: userPrefs.preferred_price_range,
-      location,
-      latitude,
-      longitude,
-      radius: (userPrefs.max_distance || 10) * 1609
-    });
-
-    // ===== SIMPLIFIED EDGE FUNCTION CALL =====
-    console.log('🚀 GOOGLE PLACES: ===== STARTING EDGE FUNCTION CALL =====');
-    console.log('🚀 GOOGLE PLACES: About to call search-venues edge function...');
-    
+    // Enhanced edge function call with retry logic
     const requestPayload = {
       location,
-      cuisines: userPrefs.preferred_cuisines || ['italian'],
-      vibes: userPrefs.preferred_vibes || ['romantic'],
+      cuisines: fixedPrefs.preferred_cuisines,
+      vibes: fixedPrefs.preferred_vibes,
       latitude,
       longitude,
-      radius: (userPrefs.max_distance || 10) * 1609
+      radius: fixedPrefs.max_distance * 1609 // Convert km to meters
     };
     
     console.log('🚀 GOOGLE PLACES: Edge function parameters:', requestPayload);
-    
-    let searchResult, error;
-    const startTime = Date.now();
-    
-    try {
-      console.log('📡 GOOGLE PLACES: Calling supabase.functions.invoke directly...');
-      
-      // Direct call without Promise.race to avoid timeout masking
-      const result = await supabase.functions.invoke('search-venues', {
-        body: requestPayload
-      });
-      
-      const endTime = Date.now();
-      console.log('⏱️ GOOGLE PLACES: Edge function completed in:', endTime - startTime, 'ms');
-      console.log('📡 GOOGLE PLACES: Raw edge function result:', result);
-      
-      searchResult = result.data;
-      error = result.error;
-      
-    } catch (callError) {
-      const endTime = Date.now();
-      console.error('❌ GOOGLE PLACES: Edge function call threw exception:', callError);
-      console.error('❌ GOOGLE PLACES: Call failed after:', endTime - startTime, 'ms');
-      console.error('❌ GOOGLE PLACES: Exception details:', {
-        name: callError.name,
-        message: callError.message,
-        stack: callError.stack,
-        isNetworkError: callError.message?.includes('network') || callError.message?.includes('fetch'),
-        isTimeoutError: callError.message?.includes('timeout'),
-        isAuthError: callError.message?.includes('auth') || callError.message?.includes('unauthorized')
-      });
-      error = callError;
-    }
 
-    // ===== DETAILED RESPONSE ANALYSIS =====
-    console.log('📡 GOOGLE PLACES: ===== ANALYZING EDGE FUNCTION RESPONSE =====');
-    console.log('📡 GOOGLE PLACES: Edge function response details:', { 
-      success: !error, 
-      hasData: !!searchResult,
-      dataType: typeof searchResult,
-      venueCount: searchResult?.venues?.length || 0,
-      error: error?.message || 'none',
-      Hamburg_debug: location.includes('Hamburg') ? 'HAMBURG SEARCH DETECTED' : 'Not Hamburg',
-      fullResult: searchResult,
-      fullError: error
-    });
-
-    if (error) {
-      console.error('❌ GOOGLE PLACES: ===== EDGE FUNCTION ERROR DETECTED =====');
-      console.error('❌ GOOGLE PLACES: Error calling search-venues function:', {
-        errorType: typeof error,
-        errorName: error.name,
-        message: error.message,
-        details: error.details || 'No additional details',
-        stack: error.stack,
-        Hamburg_location: location.includes('Hamburg') ? `SEARCHING HAMBURG: ${latitude}, ${longitude}` : 'Different location',
-        isTimeoutError: error.message?.includes('timeout'),
-        isNetworkError: error.message?.includes('network') || error.message?.includes('fetch'),
-        isAuthError: error.message?.includes('auth') || error.message?.includes('unauthorized')
-      });
-      
-      // Try to implement fallback strategy
-      console.log('🔄 GOOGLE PLACES: Attempting fallback to database venues...');
-      
+    // Try edge function with retry logic
+    let searchResult = null;
+    let lastError = null;
+    const maxRetries = 2;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const { data: dbVenues, error: dbError } = await supabase
-          .from('venues')
-          .select('*')
-          .eq('is_active', true)
-          .limit(10);
-          
-        if (dbError) {
-          console.error('❌ GOOGLE PLACES: Database fallback also failed:', dbError);
-          throw error; // Re-throw original error
+        console.log(`📡 GOOGLE PLACES: Attempt ${attempt}/${maxRetries} - Calling search-venues edge function...`);
+        
+        const startTime = Date.now();
+        const result = await Promise.race([
+          supabase.functions.invoke('search-venues', { body: requestPayload }),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Edge function timeout after 30 seconds')), 30000)
+          )
+        ]) as any;
+        
+        const endTime = Date.now();
+        console.log(`⏱️ GOOGLE PLACES: Attempt ${attempt} completed in:`, endTime - startTime, 'ms');
+        console.log(`📡 GOOGLE PLACES: Attempt ${attempt} result:`, result);
+        
+        if (result?.error) {
+          throw new Error(result.error.message || 'Edge function returned error');
         }
         
-        if (dbVenues && dbVenues.length > 0) {
-          console.log('✅ GOOGLE PLACES: Using database fallback venues:', dbVenues.length);
-          
-          // Transform database venues to expected format
-          const transformedVenues = dbVenues.map(venue => ({
-            id: venue.id,
-            name: venue.name,
-            description: venue.description || 'Great local venue',
-            image: venue.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop',
-            rating: venue.rating || 4.0,
-            distance: '0.5 mi', // Default distance for database venues
-            priceRange: venue.price_range || '$$',
-            location: venue.address,
-            cuisineType: venue.cuisine_type || 'International',
-            vibe: 'casual',
-            matchScore: 75,
-            tags: venue.tags || [],
-            phone: venue.phone,
-            website: venue.website
-          }));
-          
-          return transformedVenues;
+        searchResult = result?.data;
+        lastError = null;
+        break; // Success, exit retry loop
+        
+      } catch (error) {
+        console.error(`❌ GOOGLE PLACES: Attempt ${attempt} failed:`, error);
+        lastError = error;
+        
+        if (attempt < maxRetries) {
+          console.log(`🔄 GOOGLE PLACES: Retrying in 2 seconds...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
-      } catch (fallbackError) {
-        console.error('❌ GOOGLE PLACES: Fallback strategy failed:', fallbackError);
+      }
+    }
+    
+    // If all retries failed, try database fallback
+    if (!searchResult || lastError) {
+      console.log('🔄 GOOGLE PLACES: All retries failed, using enhanced database fallback...');
+      
+      const { data: dbVenues, error: dbError } = await supabase
+        .from('venues')
+        .select('*')
+        .eq('is_active', true)
+        .ilike('cuisine_type', `%${fixedPrefs.preferred_cuisines[0]}%`)
+        .limit(10);
+        
+      if (dbError) {
+        console.error('❌ GOOGLE PLACES: Database fallback failed:', dbError);
+        throw new Error(`Venue search failed: ${lastError?.message || 'Unknown error'}`);
       }
       
-      // Throw error to be caught by parent function for user feedback
-      throw new Error(`Failed to search venues: ${error.message}. Please check your internet connection and try again.`);
+      if (dbVenues && dbVenues.length > 0) {
+        console.log('✅ GOOGLE PLACES: Using database fallback venues:', dbVenues.length);
+        
+        // Transform database venues with enhanced data
+        return dbVenues.map(venue => ({
+          id: venue.id,
+          name: venue.name,
+          address: venue.address,
+          cuisine_type: venue.cuisine_type,
+          price_range: venue.price_range,
+          rating: venue.rating,
+          image_url: venue.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop',
+          tags: venue.tags || [],
+          phone: venue.phone,
+          website: venue.website,
+          description: venue.description || 'Great local venue'
+        }));
+      }
+      
+      throw new Error('No venues found in your area. Please try a different location or expand your search radius.');
     }
 
     const venues = searchResult?.venues || [];
     console.log('📍 GOOGLE PLACES: Edge function returned:', venues.length, 'venues');
 
     if (venues.length === 0) {
-      console.warn('⚠️ GOOGLE PLACES: No venues returned from edge function');
+      console.warn('⚠️ GOOGLE PLACES: No venues from Google Places, trying database fallback...');
+      
+      const { data: dbVenues, error: dbError } = await supabase
+        .from('venues')
+        .select('*')
+        .eq('is_active', true)
+        .limit(10);
+        
+      if (!dbError && dbVenues?.length > 0) {
+        console.log('✅ GOOGLE PLACES: Using database fallback venues:', dbVenues.length);
+        return dbVenues.map(venue => ({
+          id: venue.id,
+          name: venue.name,
+          address: venue.address,
+          cuisine_type: venue.cuisine_type,
+          price_range: venue.price_range,
+          rating: venue.rating,
+          image_url: venue.image_url,
+          tags: venue.tags || []
+        }));
+      }
+      
       return [];
     }
 
-    // Transform and save venues to database
+    // Transform and save Google Places venues to database
     const transformedVenues = [];
     for (const venue of venues.slice(0, limit)) {
-      // Save venue to database if not exists
-      const { data: existingVenue } = await supabase
-        .from('venues')
-        .select('id')
-        .eq('google_place_id', venue.placeId)
-        .single();
-
-      let venueId = existingVenue?.id;
-      
-      if (!existingVenue && venue.placeId) {
-        const { data: newVenue, error: insertError } = await supabase
+      try {
+        // Check if venue exists
+        const { data: existingVenue } = await supabase
           .from('venues')
-          .insert({
+          .select('id')
+          .eq('google_place_id', venue.placeId)
+          .maybeSingle();
+
+        let venueId = existingVenue?.id;
+        
+        // Save new venue if it doesn't exist
+        if (!existingVenue && venue.placeId) {
+          const { data: newVenue, error: insertError } = await supabase
+            .from('venues')
+            .insert({
+              name: venue.name,
+              address: venue.location,
+              cuisine_type: venue.cuisineType,
+              price_range: venue.priceRange,
+              rating: venue.rating,
+              image_url: venue.image,
+              google_place_id: venue.placeId,
+              phone: venue.phone,
+              website: venue.website,
+              tags: venue.tags || [],
+              latitude: venue.latitude,
+              longitude: venue.longitude,
+              description: venue.description
+            })
+            .select('id')
+            .single();
+
+          if (!insertError && newVenue) {
+            venueId = newVenue.id;
+            console.log('✅ GOOGLE PLACES: Saved new venue:', venue.name);
+          } else {
+            console.warn('⚠️ GOOGLE PLACES: Failed to save venue:', venue.name, insertError);
+          }
+        }
+
+        if (venueId) {
+          transformedVenues.push({
+            id: venueId,
             name: venue.name,
             address: venue.location,
             cuisine_type: venue.cuisineType,
             price_range: venue.priceRange,
             rating: venue.rating,
             image_url: venue.image,
-            google_place_id: venue.placeId,
-            phone: venue.phone,
-            website: venue.website,
-            tags: venue.tags || [],
-            latitude: venue.latitude,
-            longitude: venue.longitude,
-            description: venue.description
-          })
-          .select('id')
-          .single();
-
-        if (!insertError && newVenue) {
-          venueId = newVenue.id;
-          console.log('Saved new venue to database:', venue.name);
+            tags: venue.tags || []
+          });
         }
-      }
-
-      if (venueId) {
-        transformedVenues.push({
-          id: venueId,
-          name: venue.name,
-          address: venue.location,
-          cuisine_type: venue.cuisineType,
-          price_range: venue.priceRange,
-          rating: venue.rating,
-          image_url: venue.image,
-          tags: venue.tags || []
-        });
+      } catch (venueError) {
+        console.warn('⚠️ GOOGLE PLACES: Error processing venue:', venue.name, venueError);
       }
     }
 
+    console.log('🎉 GOOGLE PLACES: Successfully processed', transformedVenues.length, 'venues');
     return transformedVenues;
+    
   } catch (error) {
-    console.error('Error getting venues from Google Places:', error);
-    return [];
+    console.error('❌ GOOGLE PLACES: Critical error in getVenuesFromGooglePlaces:', error);
+    throw error;
   }
 };
 
