@@ -598,7 +598,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      reset_user_preferences_to_default: {
+        Args: { target_user_id: string }
+        Returns: boolean
+      }
+      setup_test_user_preferences: {
+        Args: {
+          target_user_id: string
+          cuisines?: string[]
+          vibes?: string[]
+          times?: string[]
+          price_range?: string[]
+          max_dist?: number
+          dietary?: string[]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

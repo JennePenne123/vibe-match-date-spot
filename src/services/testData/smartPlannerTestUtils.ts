@@ -70,18 +70,15 @@ export const TEST_SCENARIOS = {
 
 export const updateUserPreferences = async (preferences: TestUserPreferences) => {
   try {
-    const { error } = await supabase
-      .from('user_preferences')
-      .upsert({
-        user_id: preferences.userId,
-        preferred_cuisines: preferences.preferred_cuisines,
-        preferred_vibes: preferences.preferred_vibes,
-        preferred_times: preferences.preferred_times,
-        preferred_price_range: preferences.preferred_price_range,
-        max_distance: preferences.max_distance,
-        dietary_restrictions: preferences.dietary_restrictions,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
+    const { error } = await supabase.rpc('setup_test_user_preferences', {
+      target_user_id: preferences.userId,
+      cuisines: preferences.preferred_cuisines,
+      vibes: preferences.preferred_vibes,
+      times: preferences.preferred_times,
+      price_range: preferences.preferred_price_range,
+      max_dist: preferences.max_distance,
+      dietary: preferences.dietary_restrictions
+    });
 
     if (error) throw error;
     
@@ -112,18 +109,9 @@ export const applyTestScenario = async (scenario: keyof typeof TEST_SCENARIOS, u
 
 export const resetToDefaultPreferences = async (userId: string) => {
   try {
-    const { error } = await supabase
-      .from('user_preferences')
-      .upsert({
-        user_id: userId,
-        preferred_cuisines: ['Italian'],
-        preferred_vibes: ['casual'],
-        preferred_times: ['lunch'],
-        preferred_price_range: ['$$'],
-        max_distance: 15,
-        dietary_restrictions: [],
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
+    const { error } = await supabase.rpc('reset_user_preferences_to_default', {
+      target_user_id: userId
+    });
 
     if (error) throw error;
     
