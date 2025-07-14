@@ -49,6 +49,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     navigate,
     userLocation,
     locationError,
+    locationRequested,
     requestLocation
   } = state;
 
@@ -96,6 +97,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         <LocationDisplay 
           userLocation={userLocation}
           locationError={locationError}
+          locationRequested={locationRequested}
           onRequestLocation={requestLocation}
         />
 

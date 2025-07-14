@@ -79,6 +79,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const requestLocation = async () => {
+    // Prevent multiple simultaneous requests
+    if (appState.userLocation) {
+      console.log('Location already available, skipping request');
+      return;
+    }
+
     console.log('Requesting user location...');
     setAppState(prev => ({ ...prev, locationError: null }));
 
@@ -89,16 +95,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return;
     }
 
+    // Firefox-specific configuration
+    const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+    const options = {
+      enableHighAccuracy: !isFirefox, // Firefox has issues with high accuracy
+      timeout: isFirefox ? 15000 : 10000, // Longer timeout for Firefox
+      maximumAge: 300000 // 5 minutes
+    };
+
     try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           resolve,
           reject,
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 300000 // 5 minutes
-          }
+          options
         );
       });
 
@@ -108,7 +118,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
 
       console.log('Location obtained:', userLocation);
-      setAppState(prev => ({ ...prev, userLocation, locationError: null }));
+      setAppState(prev => ({ 
+        ...prev, 
+        userLocation, 
+        locationError: null 
+      }));
     } catch (error: any) {
       let errorMessage = 'Unable to get your location';
       

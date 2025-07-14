@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDatePlanning } from '@/hooks/useDatePlanning';
 import { useFriends } from '@/hooks/useFriends';
@@ -92,6 +92,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
   const [selectedVenueId, setSelectedVenueId] = useState<string>('');
   const [invitationMessage, setInvitationMessage] = useState<string>('');
   const [aiAnalyzing, setAiAnalyzing] = useState(false);
+  const [locationRequested, setLocationRequested] = useState(false);
+  const locationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
   const selectedVenue = venueRecommendations.find(v => v.venue_id === selectedVenueId);
@@ -135,13 +137,47 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     }
   }, [aiAnalyzing, currentStep, setCurrentStep]);
 
+  // Memoized location request function with Firefox handling
+  const handleLocationRequest = useCallback(async () => {
+    if (locationRequested) return;
+    
+    setLocationRequested(true);
+    console.log('SmartDatePlanner - Requesting location permission');
+    
+    // Clear any existing timeout
+    if (locationTimeoutRef.current) {
+      clearTimeout(locationTimeoutRef.current);
+    }
+    
+    // Firefox-specific handling: add delay to prevent rapid successive calls
+    const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+    const delay = isFirefox ? 500 : 0;
+    
+    locationTimeoutRef.current = setTimeout(async () => {
+      try {
+        await requestLocation();
+      } catch (error) {
+        console.error('Location request failed:', error);
+      } finally {
+        // Reset the flag after a delay to allow retries
+        setTimeout(() => setLocationRequested(false), 2000);
+      }
+    }, delay);
+  }, [requestLocation, locationRequested]);
+
   // Request location permission when Smart Date Planner is used
   useEffect(() => {
-    if (user && !appState.userLocation && !appState.locationError) {
-      console.log('SmartDatePlanner - Requesting location permission');
-      requestLocation();
+    if (user && !appState.userLocation && !appState.locationError && !locationRequested) {
+      handleLocationRequest();
     }
-  }, [user, appState.userLocation, appState.locationError, requestLocation]);
+    
+    // Cleanup timeout on unmount
+    return () => {
+      if (locationTimeoutRef.current) {
+        clearTimeout(locationTimeoutRef.current);
+      }
+    };
+  }, [user, appState.userLocation, appState.locationError, handleLocationRequest]);
 
   return {
     user,
@@ -173,6 +209,7 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     navigate,
     userLocation: appState.userLocation,
     locationError: appState.locationError,
-    requestLocation
+    requestLocation: handleLocationRequest,
+    locationRequested
   };
 };

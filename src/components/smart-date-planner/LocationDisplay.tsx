@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button';
 interface LocationDisplayProps {
   userLocation: { latitude: number; longitude: number; address?: string } | null;
   locationError: string | null;
+  locationRequested?: boolean;
   onRequestLocation: () => void;
 }
 
 const LocationDisplay: React.FC<LocationDisplayProps> = ({
   userLocation,
   locationError,
+  locationRequested = false,
   onRequestLocation
 }) => {
   if (locationError) {
@@ -42,9 +44,26 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
         <CardContent className="flex items-center space-x-3 p-4">
           <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-primary">Getting your location...</p>
-            <p className="text-xs text-primary/80">For the best venue recommendations</p>
+            <p className="text-sm font-medium text-primary">
+              {locationRequested ? 'Getting your location...' : 'Location needed'}
+            </p>
+            <p className="text-xs text-primary/80">
+              {locationRequested 
+                ? 'For the best venue recommendations' 
+                : 'Enable location for better recommendations'
+              }
+            </p>
           </div>
+          {!locationRequested && (
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={onRequestLocation}
+              className="border-primary/20 text-primary hover:bg-primary/10"
+            >
+              <MapPin className="h-4 w-4" />
+            </Button>
+          )}
         </CardContent>
       </Card>
     );
