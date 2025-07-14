@@ -200,7 +200,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
     
     setLoading(true);
     try {
-      // Update user preferences
+      // Update user preferences using upsert with conflict resolution
       const { error: prefError } = await supabase
         .from('user_preferences')
         .upsert({
@@ -212,9 +212,14 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
           max_distance: maxDistance,
           dietary_restrictions: selectedDietary,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         });
 
-      if (prefError) throw prefError;
+      if (prefError) {
+        console.error('Error saving user preferences:', prefError);
+        throw prefError;
+      }
 
       // Update session with preferences
       const sessionPreferences = {
