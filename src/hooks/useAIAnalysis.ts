@@ -46,9 +46,9 @@ export const useAIAnalysis = () => {
     // Clear previous errors
     setVenueSearchError(null);
 
-    const timeout = 20000; // Reduced to 20 seconds for faster debugging
+    const timeout = 45000; // Give Google Places API more time to respond
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('AI analysis timed out after 20 seconds')), timeout)
+      setTimeout(() => reject(new Error('AI analysis timed out after 45 seconds')), timeout)
     );
 
     try {
@@ -131,7 +131,7 @@ export const useAIAnalysis = () => {
       
       handleError(error, {
         toastTitle: 'AI Analysis Error', 
-        toastDescription: error.message === 'AI analysis timed out after 20 seconds'
+        toastDescription: error.message === 'AI analysis timed out after 45 seconds'
           ? 'Analysis took too long, continuing with available data'
           : 'Could not complete venue search, please try again'
       });
