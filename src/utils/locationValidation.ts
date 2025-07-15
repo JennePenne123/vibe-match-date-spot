@@ -3,6 +3,12 @@ export interface LocationValidationResult {
   error?: string;
 }
 
+export interface LocationPermissionResult {
+  granted: boolean;
+  error?: string;
+  position?: GeolocationPosition;
+}
+
 export const validateLocation = (location: { latitude: number; longitude: number } | null): LocationValidationResult => {
   if (!location) {
     return { isValid: false, error: 'Location is required for venue search' };
@@ -38,4 +44,50 @@ export const isHTTPS = (): boolean => {
 
 export const canUseGeolocation = (): boolean => {
   return 'geolocation' in navigator && isHTTPS();
+};
+
+export const requestLocationPermission = (): Promise<LocationPermissionResult> => {
+  return new Promise((resolve) => {
+    if (!canUseGeolocation()) {
+      resolve({
+        granted: false,
+        error: 'Geolocation not supported or not HTTPS'
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          granted: true,
+          position
+        });
+      },
+      (error) => {
+        let errorMessage = 'Location access denied';
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location permission denied by user';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information unavailable';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out';
+            break;
+        }
+        
+        resolve({
+          granted: false,
+          error: errorMessage
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
+      }
+    );
+  });
 };
