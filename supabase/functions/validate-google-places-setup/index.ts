@@ -2,79 +2,118 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 
 serve(async (req) => {
-  console.log('🔧 VALIDATE SETUP: Function started');
-
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Test API Key
-    const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
-    console.log('🔑 VALIDATE SETUP: API Key check:', {
-      exists: !!apiKey,
-      length: apiKey?.length || 0,
-      prefix: apiKey ? apiKey.substring(0, 8) + '...' : 'MISSING'
-    });
+    console.log('🔍 VALIDATE GOOGLE PLACES: Starting validation...');
 
+    // Check if API key is available
+    const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
+    console.log('🔑 VALIDATE GOOGLE PLACES: API Key available:', !!apiKey);
+    
     if (!apiKey) {
       return Response.json({
-        success: false,
-        error: 'Google Places API key not found',
-        checks: {
-          apiKey: false,
-          connectivity: false,
-          permissions: false
-        }
+        isValid: false,
+        error: 'GOOGLE_PLACES_API_KEY environment variable not set',
+        details: 'API key missing from environment'
       }, { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       });
     }
 
-    // Test API connectivity with a simple geocoding request
-    const testUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=Hamburg&key=${apiKey}`;
+    // Test API key with a simple Places API call
+    const testUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=restaurant&inputtype=textquery&fields=place_id,name&key=${apiKey}`;
     
-    console.log('🌐 VALIDATE SETUP: Testing API connectivity...');
-    const response = await fetch(testUrl);
-    const data = await response.json();
+    console.log('📡 VALIDATE GOOGLE PLACES: Testing API key with test request...');
     
-    console.log('📊 VALIDATE SETUP: API Response:', {
-      status: data.status,
-      hasResults: !!data.results?.length
-    });
+    const testResponse = await fetch(testUrl);
+    const testData = await testResponse.json();
+    
+    console.log('🏢 VALIDATE GOOGLE PLACES: Test response status:', testResponse.status);
+    console.log('📊 VALIDATE GOOGLE PLACES: Test response data:', JSON.stringify(testData, null, 2));
 
-    const checks = {
-      apiKey: true,
-      connectivity: response.ok,
-      permissions: data.status === 'OK',
-      quotaOk: data.status !== 'OVER_QUERY_LIMIT',
-      validKey: data.status !== 'REQUEST_DENIED'
-    };
+    if (testResponse.status !== 200) {
+      return Response.json({
+        isValid: false,
+        error: 'Google Places API returned non-200 status',
+        details: {
+          status: testResponse.status,
+          statusText: testResponse.statusText,
+          data: testData
+        }
+      }, { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
 
+    if (testData.status === 'REQUEST_DENIED') {
+      return Response.json({
+        isValid: false,
+        error: 'Google Places API request denied',
+        details: {
+          status: testData.status,
+          error_message: testData.error_message || 'API key invalid or billing not enabled'
+        }
+      }, { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
+
+    if (testData.status === 'OVER_QUERY_LIMIT') {
+      return Response.json({
+        isValid: false,
+        error: 'Google Places API quota exceeded',
+        details: {
+          status: testData.status,
+          error_message: testData.error_message || 'Daily quota exceeded'
+        }
+      }, { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
+
+    if (testData.status === 'OK' || testData.status === 'ZERO_RESULTS') {
+      console.log('✅ VALIDATE GOOGLE PLACES: API key validation successful');
+      return Response.json({
+        isValid: true,
+        message: 'Google Places API is working correctly',
+        details: {
+          status: testData.status,
+          candidates_found: testData.candidates?.length || 0
+        }
+      }, { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
+
+    // Unknown status
     return Response.json({
-      success: checks.connectivity && checks.permissions,
-      checks,
-      apiStatus: data.status,
-      message: data.error_message || 'API validation complete'
+      isValid: false,
+      error: 'Unknown Google Places API response',
+      details: {
+        status: testData.status,
+        raw_response: testData
+      }
     }, { 
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
     });
 
   } catch (error) {
-    console.error('❌ VALIDATE SETUP: Error:', error);
+    console.error('❌ VALIDATE GOOGLE PLACES: Validation error:', error);
     
     return Response.json({
-      success: false,
-      error: error.message,
-      checks: {
-        apiKey: false,
-        connectivity: false,
-        permissions: false
+      isValid: false,
+      error: 'Validation failed with exception',
+      details: {
+        message: error.message,
+        stack: error.stack
       }
     }, { 
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
     });
   }
-});
+})
