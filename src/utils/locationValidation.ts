@@ -3,91 +3,62 @@ export interface LocationValidationResult {
   error?: string;
 }
 
-export interface LocationPermissionResult {
-  granted: boolean;
-  error?: string;
-  position?: GeolocationPosition;
-}
-
-export const validateLocation = (location: { latitude: number; longitude: number } | null): LocationValidationResult => {
-  if (!location) {
-    return { isValid: false, error: 'Location is required for venue search' };
+export const validateLocation = (userLocation?: { latitude: number; longitude: number; address?: string }): LocationValidationResult => {
+  if (!userLocation) {
+    return { isValid: false, error: 'No location provided' };
   }
-
-  const { latitude, longitude } = location;
-
-  // Check if coordinates are valid numbers
+  
+  const { latitude, longitude } = userLocation;
+  
   if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-    return { isValid: false, error: 'Invalid location coordinates' };
+    return { isValid: false, error: 'Invalid coordinate types - must be numbers' };
   }
-
-  // Check if coordinates are within valid ranges
+  
+  if (isNaN(latitude) || isNaN(longitude)) {
+    return { isValid: false, error: 'Invalid coordinates - NaN values' };
+  }
+  
   if (latitude < -90 || latitude > 90) {
-    return { isValid: false, error: 'Invalid latitude value' };
+    return { isValid: false, error: 'Invalid latitude range - must be between -90 and 90' };
   }
-
+  
   if (longitude < -180 || longitude > 180) {
-    return { isValid: false, error: 'Invalid longitude value' };
+    return { isValid: false, error: 'Invalid longitude range - must be between -180 and 180' };
   }
-
-  // Check if coordinates are not (0, 0) which might indicate a default/invalid location
+  
+  // Additional validation: Not in the middle of the ocean
   if (latitude === 0 && longitude === 0) {
-    return { isValid: false, error: 'Location coordinates appear to be invalid' };
+    return { isValid: false, error: 'Invalid null coordinates (0,0)' };
   }
-
+  
+  // Check for obviously fake coordinates
+  if (Math.abs(latitude) < 0.001 && Math.abs(longitude) < 0.001) {
+    return { isValid: false, error: 'Coordinates too close to origin - likely invalid' };
+  }
+  
   return { isValid: true };
 };
 
-export const isHTTPS = (): boolean => {
-  return window.location.protocol === 'https:' || window.location.hostname === 'localhost';
+export const formatLocationForDisplay = (location: { latitude: number; longitude: number; address?: string }): string => {
+  if (location.address) {
+    return location.address;
+  }
+  
+  return `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`;
 };
 
-export const canUseGeolocation = (): boolean => {
-  return 'geolocation' in navigator && isHTTPS();
-};
-
-export const requestLocationPermission = (): Promise<LocationPermissionResult> => {
-  return new Promise((resolve) => {
-    if (!canUseGeolocation()) {
-      resolve({
-        granted: false,
-        error: 'Geolocation not supported or not HTTPS'
-      });
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          granted: true,
-          position
-        });
-      },
-      (error) => {
-        let errorMessage = 'Location access denied';
-        
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Location permission denied by user';
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information unavailable';
-            break;
-          case error.TIMEOUT:
-            errorMessage = 'Location request timed out';
-            break;
-        }
-        
-        resolve({
-          granted: false,
-          error: errorMessage
-        });
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000 // 5 minutes
-      }
-    );
-  });
+export const calculateDistance = (
+  lat1: number, 
+  lon1: number, 
+  lat2: number, 
+  lon2: number
+): number => {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
 };
