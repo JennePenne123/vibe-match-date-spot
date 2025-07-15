@@ -1,387 +1,261 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { corsHeaders } from '../_shared/cors.ts'
 
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+serve(async (req) => {
+ console.log('🔍 SEARCH VENUES: ===== FUNCTION START =====');
+ console.log('🔍 SEARCH VENUES: Request method:', req.method);
+ console.log('🔍 SEARCH VENUES: Timestamp:', new Date().toISOString());
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+ if (req.method === 'OPTIONS') {
+   return new Response('ok', { headers: corsHeaders });
+ }
 
-interface SearchRequest {
-  location: string;
-  cuisines: string[];
-  vibes: string[];
-  latitude?: number;
-  longitude?: number;
-  radius?: number;
+ try {
+   // 1. Parse Request Body
+   const requestBody = await req.json();
+   console.log('📥 SEARCH VENUES: Request body received:', JSON.stringify(requestBody, null, 2));
+
+   const { 
+     location, 
+     cuisines, 
+     originalCuisines,
+     latitude, 
+     longitude, 
+     radius = 5000,
+     types = ['restaurant'],
+     minRating = 3.0 
+   } = requestBody;
+
+   // 2. Validate API Key
+   const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
+   console.log('🔑 SEARCH VENUES: API Key status:', {
+     exists: !!apiKey,
+     length: apiKey?.length || 0,
+     prefix: apiKey ? apiKey.substring(0, 8) + '...' : 'MISSING'
+   });
+
+   if (!apiKey) {
+     console.error('❌ SEARCH VENUES: No Google Places API key found');
+     return Response.json({
+       success: false,
+       error: 'Google Places API key not configured',
+       venues: []
+     }, { 
+       status: 500,
+       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+     });
+   }
+
+   // 3. Validate Location
+   if (!latitude || !longitude || typeof latitude !== 'number' || typeof longitude !== 'number') {
+     console.error('❌ SEARCH VENUES: Invalid location:', { latitude, longitude });
+     return Response.json({
+       success: false,
+       error: 'Valid latitude and longitude required',
+       venues: []
+     }, { 
+       status: 400,
+       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+     });
+   }
+
+   // 4. Build Google Places Request
+   const baseUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+   const searchParams = new URLSearchParams({
+     location: `${latitude},${longitude}`,
+     radius: radius.toString(),
+     type: 'restaurant',
+     key: apiKey,
+     language: 'de'
+   });
+
+   // Add cuisine-based keyword search
+   if (originalCuisines && originalCuisines.length > 0) {
+     const keywords = originalCuisines.join(' OR ');
+     searchParams.append('keyword', keywords);
+     console.log('🔍 SEARCH VENUES: Using keyword search:', keywords);
+   }
+
+   const googleUrl = `${baseUrl}?${searchParams.toString()}`;
+   console.log('📡 SEARCH VENUES: Google Places URL (masked):', googleUrl.replace(apiKey, '[API_KEY_MASKED]'));
+
+   // 5. Make Google Places API Call
+   console.log('📡 SEARCH VENUES: Making API request...');
+   const startTime = Date.now();
+   
+   const response = await fetch(googleUrl, {
+     method: 'GET',
+     headers: {
+       'Accept': 'application/json',
+       'User-Agent': 'DateSpot-App/1.0'
+     }
+   });
+   
+   const requestDuration = Date.now() - startTime;
+   console.log('⏱️ SEARCH VENUES: API request completed in:', requestDuration + 'ms');
+   console.log('📡 SEARCH VENUES: Response status:', response.status, response.statusText);
+
+   if (!response.ok) {
+     const errorText = await response.text();
+     console.error('❌ SEARCH VENUES: HTTP Error:', {
+       status: response.status,
+       statusText: response.statusText,
+       body: errorText
+     });
+     
+     return Response.json({
+       success: false,
+       error: `Google Places API HTTP error: ${response.status}`,
+       details: errorText,
+       venues: []
+     }, { 
+       status: 500,
+       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+     });
+   }
+
+   // 6. Parse Google Places Response
+   const placesData = await response.json();
+   console.log('📊 SEARCH VENUES: Google Places API Response:', {
+     status: placesData.status,
+     results_count: placesData.results?.length || 0,
+     error_message: placesData.error_message,
+     next_page_token: !!placesData.next_page_token
+   });
+
+   // 7. Handle Google Places API Errors
+   if (placesData.status === 'REQUEST_DENIED') {
+     console.error('❌ SEARCH VENUES: REQUEST_DENIED:', placesData.error_message);
+     return Response.json({
+       success: false,
+       error: 'Google Places API access denied',
+       details: placesData.error_message || 'Check API key and billing',
+       venues: []
+     }, { 
+       status: 403,
+       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+     });
+   }
+
+   if (placesData.status === 'OVER_QUERY_LIMIT') {
+     console.error('❌ SEARCH VENUES: OVER_QUERY_LIMIT');
+     return Response.json({
+       success: false,
+       error: 'Google Places API quota exceeded',
+       details: 'Daily request limit reached',
+       venues: []
+     }, { 
+       status: 429,
+       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+     });
+   }
+
+   if (placesData.status !== 'OK' && placesData.status !== 'ZERO_RESULTS') {
+     console.error('❌ SEARCH VENUES: Unexpected status:', placesData.status);
+     return Response.json({
+       success: false,
+       error: `Google Places API error: ${placesData.status}`,
+       details: placesData.error_message,
+       venues: []
+     }, { 
+       status: 500,
+       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+     });
+   }
+
+   // 8. Process Results
+   const venues = [];
+   
+   if (placesData.results && placesData.results.length > 0) {
+     console.log('🏢 SEARCH VENUES: Processing', placesData.results.length, 'venues...');
+     
+     for (const place of placesData.results.slice(0, 20)) {
+       try {
+         const venue = {
+           placeId: place.place_id,
+           name: place.name,
+           location: place.vicinity || place.formatted_address,
+           latitude: place.geometry?.location?.lat,
+           longitude: place.geometry?.location?.lng,
+           rating: place.rating || 4.0,
+           priceRange: '€'.repeat(place.price_level || 2),
+           image: place.photos?.[0] ? 
+             `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${apiKey}` :
+             'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+           cuisineType: determineCuisineType(place, originalCuisines),
+           tags: place.types || ['restaurant'],
+           openNow: place.opening_hours?.open_now,
+           phone: null,
+           website: null,
+           description: `${place.name} in ${place.vicinity || 'der Nähe'}`
+         };
+         
+         venues.push(venue);
+         
+         if (venues.length <= 3) {
+           console.log(`🏢 SEARCH VENUES: Venue ${venues.length}:`, {
+             name: venue.name,
+             location: venue.location,
+             rating: venue.rating,
+             cuisine: venue.cuisineType
+           });
+         }
+         
+       } catch (venueError) {
+         console.warn('⚠️ SEARCH VENUES: Error processing venue:', place.name, venueError.message);
+       }
+     }
+   }
+
+   console.log('✅ SEARCH VENUES: Successfully processed', venues.length, 'venues');
+   
+   return Response.json({
+     success: true,
+     venues: venues,
+     metadata: {
+       total_found: placesData.results?.length || 0,
+       search_location: `${latitude}, ${longitude}`,
+       search_radius: radius,
+       search_cuisines: originalCuisines,
+       response_time_ms: requestDuration
+     }
+   }, { 
+     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+   });
+
+ } catch (error) {
+   console.error('❌ SEARCH VENUES: Critical error:', {
+     message: error.message,
+     stack: error.stack,
+     name: error.name
+   });
+   
+   return Response.json({
+     success: false,
+     error: 'Internal server error',
+     details: error.message,
+     venues: []
+   }, { 
+     status: 500,
+     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+   });
+ }
+});
+
+function determineCuisineType(place: any, preferredCuisines: string[]): string {
+ const types = place.types || [];
+ const name = place.name.toLowerCase();
+ 
+ for (const cuisine of preferredCuisines || []) {
+   if (name.includes(cuisine.toLowerCase()) || 
+       types.some(type => type.includes(cuisine.toLowerCase()))) {
+     return cuisine;
+   }
+ }
+ 
+ if (types.includes('meal_takeaway')) return 'Schnellimbiss';
+ if (types.includes('bakery')) return 'Bäckerei';
+ if (types.includes('cafe')) return 'Café';
+ 
+ return 'Restaurant';
 }
-
-interface GooglePlace {
-  id: string;
-  displayName: { text: string };
-  types: string[];
-  rating?: number;
-  userRatingCount?: number;
-  priceLevel?: string;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
-  formattedAddress: string;
-  photos?: Array<{
-    name: string;
-    widthPx: number;
-    heightPx: number;
-  }>;
-  currentOpeningHours?: {
-    openNow: boolean;
-    weekdayDescriptions: string[];
-  };
-  nationalPhoneNumber?: string;
-  websiteUri?: string;
-  editorialSummary?: { text: string };
-}
-
-const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  try {
-    const { location, cuisines, vibes, latitude, longitude, radius = 5000 }: SearchRequest = await req.json();
-    console.log('🔍 EDGE FUNCTION: search-venues called with:', { 
-      location, 
-      cuisines, 
-      vibes, 
-      latitude, 
-      longitude, 
-      radius,
-      Hamburg_debug: location?.includes('Hamburg') ? 'HAMBURG SEARCH DETECTED!' : 'Not Hamburg'
-    });
-
-    // Hamburg-specific debugging
-    if (location?.includes('Hamburg') || (latitude >= 53.5 && latitude <= 53.6 && longitude >= 9.9 && longitude <= 10.1)) {
-      console.log('🏢 HAMBURG DEBUG: Searching in Hamburg area!', {
-        expectedCoords: { lat: 53.5745, lng: 9.9602 },
-        receivedCoords: { lat: latitude, lng: longitude },
-        distanceFromCenter: Math.sqrt(Math.pow(latitude - 53.5745, 2) + Math.pow(longitude - 9.9602, 2))
-      });
-    }
-
-    const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
-
-    if (!apiKey) {
-      console.error('❌ EDGE FUNCTION: Google Places API key not configured');
-      throw new Error('Google Places API key not configured');
-    }
-
-    if (!latitude || !longitude) {
-      console.error('❌ EDGE FUNCTION: Missing location coordinates');
-      throw new Error('User location (latitude/longitude) is required');
-    }
-
-    // Validate preferences arrays to handle empty arrays
-    const validCuisines = cuisines && cuisines.length > 0 ? cuisines : ['italian'];
-    const validVibes = vibes && vibes.length > 0 ? vibes : ['romantic'];
-    
-    console.log('✅ EDGE FUNCTION: Using validated preferences:', {
-      originalCuisines: cuisines,
-      validCuisines,
-      originalVibes: vibes, 
-      validVibes
-    });
-
-    console.log('✅ EDGE FUNCTION: Starting venue search with valid parameters');
-
-    // Map cuisines to Google Places types
-    const cuisineTypeMap: Record<string, string[]> = {
-      'italian': ['italian_restaurant'],
-      'japanese': ['japanese_restaurant', 'sushi_restaurant'],
-      'mexican': ['mexican_restaurant'],
-      'french': ['french_restaurant'],
-      'indian': ['indian_restaurant'],
-      'mediterranean': ['mediterranean_restaurant', 'greek_restaurant'],
-      'american': ['american_restaurant', 'hamburger_restaurant'],
-      'thai': ['thai_restaurant'],
-      'chinese': ['chinese_restaurant'],
-      'korean': ['korean_restaurant']
-    };
-
-    // Map vibes to place types
-    const vibeTypeMap: Record<string, string[]> = {
-      'romantic': ['fine_dining_restaurant', 'wine_bar'],
-      'casual': ['restaurant', 'cafe'],
-      'outdoor': ['restaurant', 'bar'],
-      'nightlife': ['bar', 'night_club', 'cocktail_lounge'],
-      'cultural': ['restaurant', 'cafe'],
-      'adventurous': ['restaurant', 'bar']
-    };
-
-    // Combine cuisine and vibe types using validated arrays
-    const allTypes = new Set<string>();
-    validCuisines.forEach(cuisine => {
-      const types = cuisineTypeMap[cuisine.toLowerCase()] || ['restaurant'];
-      types.forEach(type => allTypes.add(type));
-    });
-    validVibes.forEach(vibe => {
-      const types = vibeTypeMap[vibe.toLowerCase()] || ['restaurant'];
-      types.forEach(type => allTypes.add(type));
-    });
-
-    // If no specific types, default to restaurant
-    if (allTypes.size === 0) {
-      allTypes.add('restaurant');
-    }
-
-    // Search for places using the new Places API
-    const searchUrl = 'https://places.googleapis.com/v1/places:searchNearby';
-    const searchBody = {
-      includedTypes: Array.from(allTypes).slice(0, 10), // Limit to avoid API limits
-      maxResultCount: 20,
-      locationRestriction: {
-        circle: {
-          center: { 
-            latitude: latitude, 
-            longitude: longitude 
-          },
-          radius: radius
-        }
-      }
-    };
-
-    console.log('🌐 EDGE FUNCTION: Making request to Google Places API with:', searchBody);
-
-    const response = await fetch(searchUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.types,places.rating,places.userRatingCount,places.priceLevel,places.location,places.formattedAddress,places.photos,places.currentOpeningHours,places.nationalPhoneNumber,places.websiteUri,places.editorialSummary'
-      },
-      body: JSON.stringify(searchBody)
-    });
-
-    console.log(`📡 EDGE FUNCTION: Google Places API response status: ${response.status}`);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ EDGE FUNCTION: Google Places API error: ${response.status} - ${errorText}`);
-      throw new Error(`Google Places API error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    console.log('📊 EDGE FUNCTION: Google Places API returned data:', {
-      placesCount: data.places?.length || 0,
-      hasPlaces: !!(data.places),
-      firstPlaceName: data.places?.[0]?.displayName?.text
-    });
-
-    // Transform Google Places data to our venue format
-    const venues = (data.places || []).map((place: GooglePlace, index: number) => {
-      const cuisineType = getCuisineFromTypes(place.types, validCuisines);
-      const vibe = getVibeFromTypes(place.types, validVibes);
-      const matchScore = calculateMatchScore(place, validCuisines, validVibes);
-      const distance = calculateDistance(latitude, longitude, place.location.latitude, place.location.longitude);
-      
-      // Hamburg-specific debugging
-      if (location?.includes('Hamburg')) {
-        console.log('🏢 HAMBURG VENUE:', {
-          name: place.displayName?.text,
-          distance: `${distance.toFixed(1)} mi`,
-          types: place.types,
-          cuisineType,
-          vibe,
-          rating: place.rating
-        });
-      }
-      
-      const transformedVenue = {
-        id: place.id || `venue-${index}`,
-        name: place.displayName?.text || 'Unknown Venue',
-        description: place.editorialSummary?.text || `${cuisineType} restaurant with great atmosphere`,
-        image: getPhotoUrl(place.photos?.[0], apiKey),
-        rating: place.rating || 4.0,
-        distance: `${distance.toFixed(1)} mi`,
-        priceRange: mapPriceLevel(place.priceLevel),
-        location: place.formattedAddress || location,
-        cuisineType,
-        vibe,
-        matchScore,
-        tags: getTagsFromPlace(place, validCuisines, validVibes),
-        placeId: place.id,
-        phone: place.nationalPhoneNumber,
-        website: place.websiteUri,
-        openingHours: place.currentOpeningHours?.weekdayDescriptions || [],
-        isOpen: place.currentOpeningHours?.openNow,
-        latitude: place.location.latitude,
-        longitude: place.location.longitude
-      };
-
-      console.log(`🏢 EDGE FUNCTION: Transformed venue: ${transformedVenue.name} (${cuisineType}, ${matchScore}% match)`);
-      
-      return transformedVenue;
-    });
-
-    // Sort by match score and distance
-    // Filter venues that are too far away (validation)
-    const filteredVenues = venues.filter(venue => {
-      const distanceInMiles = parseFloat(venue.distance);
-      const maxDistance = radius / 1609; // Convert meters to miles
-      const isWithinRange = distanceInMiles <= maxDistance;
-      
-      if (!isWithinRange) {
-        console.log(`🚫 EDGE FUNCTION: Filtering out ${venue.name} - too far (${venue.distance} > ${maxDistance.toFixed(1)} mi)`);
-      }
-      
-      return isWithinRange;
-    });
-
-    // Sort by match score and distance
-    filteredVenues.sort((a, b) => {
-      const scoreA = b.matchScore - a.matchScore;
-      if (Math.abs(scoreA) < 5) { // If scores are close, prefer closer venues
-        return parseFloat(a.distance) - parseFloat(b.distance);
-      }
-      return scoreA;
-    });
-
-    console.log(`✅ EDGE FUNCTION: Successfully returning ${filteredVenues.length} venues (filtered from ${venues.length}) with scores:`, 
-      filteredVenues.slice(0, 3).map(v => `${v.name}: ${v.matchScore}% (${v.distance})`));
-
-    // Hamburg-specific final debug
-    if (location?.includes('Hamburg')) {
-      console.log('🏢 HAMBURG FINAL RESULTS:', filteredVenues.map(v => ({
-        name: v.name,
-        distance: v.distance,
-        score: v.matchScore,
-        cuisine: v.cuisineType
-      })));
-    }
-
-    return new Response(JSON.stringify({ venues: filteredVenues }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        ...corsHeaders,
-      },
-    });
-
-  } catch (error: any) {
-    console.error('❌ EDGE FUNCTION: Critical error in search-venues:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
-    return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        details: 'Check edge function logs for more information'
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      }
-    );
-  }
-};
-
-// Helper functions
-function getCuisineFromTypes(types: string[], userCuisines: string[]): string {
-  const typeMap: Record<string, string> = {
-    'italian_restaurant': 'Italian',
-    'japanese_restaurant': 'Japanese',
-    'sushi_restaurant': 'Japanese',
-    'mexican_restaurant': 'Mexican',
-    'french_restaurant': 'French',
-    'indian_restaurant': 'Indian',
-    'mediterranean_restaurant': 'Mediterranean',
-    'greek_restaurant': 'Mediterranean',
-    'american_restaurant': 'American',
-    'hamburger_restaurant': 'American',
-    'thai_restaurant': 'Thai',
-    'chinese_restaurant': 'Chinese',
-    'korean_restaurant': 'Korean'
-  };
-
-  for (const type of types) {
-    if (typeMap[type]) {
-      return typeMap[type];
-    }
-  }
-
-  return userCuisines[0] ? userCuisines[0].charAt(0).toUpperCase() + userCuisines[0].slice(1) : 'International';
-}
-
-function getVibeFromTypes(types: string[], userVibes: string[]): string {
-  if (types.includes('fine_dining_restaurant') || types.includes('wine_bar')) return 'romantic';
-  if (types.includes('bar') || types.includes('night_club')) return 'nightlife';
-  if (types.includes('cafe')) return 'casual';
-  
-  return userVibes[0] || 'casual';
-}
-
-function calculateMatchScore(place: GooglePlace, cuisines: string[], vibes: string[]): number {
-  let score = 60; // Base score
-  
-  // Rating boost
-  if (place.rating) {
-    score += (place.rating - 3) * 10; // 4.0 rating = +10, 5.0 rating = +20
-  }
-  
-  // Review count boost
-  if (place.userRatingCount && place.userRatingCount > 100) {
-    score += 5;
-  }
-  
-  // Type matching
-  const cuisineMatch = getCuisineFromTypes(place.types, cuisines);
-  if (cuisines.some(c => c.toLowerCase() === cuisineMatch.toLowerCase())) {
-    score += 15;
-  }
-  
-  return Math.min(score, 98); // Cap at 98%
-}
-
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 3959; // Earth's radius in miles
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-}
-
-function mapPriceLevel(priceLevel?: string): string {
-  switch (priceLevel) {
-    case 'PRICE_LEVEL_INEXPENSIVE': return '$';
-    case 'PRICE_LEVEL_MODERATE': return '$$';
-    case 'PRICE_LEVEL_EXPENSIVE': return '$$$';
-    case 'PRICE_LEVEL_VERY_EXPENSIVE': return '$$$$';
-    default: return '$$';
-  }
-}
-
-function getPhotoUrl(photo: any, apiKey: string): string {
-  if (!photo) {
-    return 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop';
-  }
-  
-  return `https://places.googleapis.com/v1/${photo.name}/media?maxWidthPx=400&maxHeightPx=300&key=${apiKey}`;
-}
-
-function getTagsFromPlace(place: GooglePlace, cuisines: string[], vibes: string[]): string[] {
-  const tags: string[] = [];
-  
-  if (place.types.includes('fine_dining_restaurant')) tags.push('fine dining');
-  if (place.types.includes('bar')) tags.push('bar');
-  if (place.types.includes('wine_bar')) tags.push('wine');
-  if (place.currentOpeningHours?.openNow) tags.push('open now');
-  if (place.rating && place.rating >= 4.5) tags.push('highly rated');
-  
-  return tags;
-}
-
-serve(handler);
