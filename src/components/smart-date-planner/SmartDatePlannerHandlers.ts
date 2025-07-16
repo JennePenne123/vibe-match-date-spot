@@ -60,9 +60,35 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     }
   }
 
-  function handlePreferencesComplete() {
-    console.log('SmartDatePlanner - Preferences submitted, starting AI analysis...');
+  function handlePreferencesComplete(preferences: any) {
+    console.log('SmartDatePlanner - Preferences submitted, starting AI analysis...', preferences);
     setAiAnalyzing(true);
+    
+    if (currentSession && selectedPartnerId && state.userLocation) {
+      console.log('SmartDatePlanner - Triggering AI analysis with:', {
+        sessionId: currentSession.id,
+        partnerId: selectedPartnerId,
+        preferences,
+        userLocation: state.userLocation
+      });
+      
+      state.analyzeCompatibilityAndVenues(
+        currentSession.id,
+        selectedPartnerId,
+        preferences,
+        state.userLocation
+      ).catch(error => {
+        console.error('SmartDatePlanner - AI analysis error:', error);
+        setAiAnalyzing(false);
+      });
+    } else {
+      console.error('SmartDatePlanner - Missing required data for AI analysis:', {
+        hasSession: !!currentSession,
+        hasPartnerId: !!selectedPartnerId,
+        hasLocation: !!state.userLocation
+      });
+      setAiAnalyzing(false);
+    }
   }
 
   function handleVenueSelection(venueId: string) {

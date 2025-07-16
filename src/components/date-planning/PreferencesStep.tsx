@@ -32,7 +32,16 @@ interface PreferencesStepProps {
   partnerName: string;
   compatibilityScore: number | null;
   aiAnalyzing: boolean;
-  onPreferencesComplete: () => void;
+  onPreferencesComplete: (preferences: DatePreferences) => void;
+}
+
+interface DatePreferences {
+  preferred_cuisines: string[];
+  preferred_vibes: string[];
+  preferred_price_range: string[];
+  preferred_times: string[];
+  max_distance: number;
+  dietary_restrictions: string[];
 }
 
 const PreferencesStep: React.FC<PreferencesStepProps> = ({
@@ -221,34 +230,22 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
         throw prefError;
       }
 
-      // Update session with preferences
-      const sessionPreferences = {
-        [user.id]: {
-          preferred_cuisines: selectedCuisines,
-          preferred_vibes: selectedVibes,
-          preferred_price_range: selectedPriceRange,
-          preferred_times: selectedTimePreferences,
-          max_distance: maxDistance,
-          dietary_restrictions: selectedDietary
-        }
-      };
-
-      const { error: sessionError } = await supabase
-        .from('date_planning_sessions')
-        .update({
-          preferences_data: sessionPreferences,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', sessionId);
-
-      if (sessionError) throw sessionError;
-
       toast({
         title: "Preferences saved!",
-        description: "Your preferences have been saved and shared with your partner.",
+        description: "Starting AI analysis to find perfect venues...",
       });
 
-      onPreferencesComplete();
+      // Pass preferences to parent component for AI analysis
+      const preferences: DatePreferences = {
+        preferred_cuisines: selectedCuisines,
+        preferred_vibes: selectedVibes,
+        preferred_price_range: selectedPriceRange,
+        preferred_times: selectedTimePreferences,
+        max_distance: maxDistance,
+        dietary_restrictions: selectedDietary
+      };
+
+      onPreferencesComplete(preferences);
     } catch (error) {
       console.error('Error saving preferences:', error);
       toast({
