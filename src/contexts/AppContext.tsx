@@ -132,10 +132,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         );
       });
 
-      const userLocation = {
+      let userLocation = {
         latitude: position.coords.latitude,
-        longitude: position.coords.longitude
+        longitude: position.coords.longitude,
+        address: undefined as string | undefined
       };
+
+      // Try to get city name using reverse geocoding
+      try {
+        const response = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.city || data.locality || data.countryName) {
+            userLocation.address = data.city || data.locality || data.countryName;
+            console.log('✅ Address resolved:', userLocation.address);
+          }
+        }
+      } catch (geocodeError) {
+        console.log('📍 Reverse geocoding failed, using coordinates:', geocodeError);
+      }
 
       console.log('✅ Location obtained successfully:', userLocation);
       setAppState(prev => ({ 
