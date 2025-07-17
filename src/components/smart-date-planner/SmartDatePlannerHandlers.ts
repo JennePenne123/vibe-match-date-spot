@@ -104,7 +104,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   }
 
   async function handleSendInvitation() {
-    if (!currentSession || !state.selectedVenueId) return;
+    if (!currentSession || !state.selectedVenueId || !selectedPartnerId) return;
 
     console.log('SmartDatePlanner - Sending invitation');
     
@@ -116,8 +116,16 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       );
 
       if (success) {
+        // Show success toast with enhanced messaging
         navigate('/home', { 
-          state: { message: 'Smart date invitation sent successfully!' }
+          state: { 
+            message: 'Smart date invitation sent successfully!',
+            toastData: {
+              title: 'Invitation Sent! 🚀',
+              description: `Your AI-powered date invitation has been sent to ${selectedPartner?.name}! They'll receive a notification and can respond right away.`,
+              duration: 6000
+            }
+          }
         });
       }
     } catch (error) {

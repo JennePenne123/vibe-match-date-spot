@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
+import NotificationSystem from "./components/NotificationSystem";
 import Onboarding from "./pages/Onboarding";
 import RegisterLogin from "./pages/RegisterLogin";
 import Home from "./pages/Home";
@@ -55,26 +56,28 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <AppProvider>
-              <ErrorBoundary level="page">
-                <Routes>
-                  <Route path="/" element={<Onboarding />} />
-                  <Route path="/register-login" element={<RegisterLogin />} />
-                  <Route path="/home" element={<Home />} />
-                  <Route path="/preferences" element={<Preferences />} />
-                  <Route path="/friends" element={<Friends />} />
-                  <Route path="/area" element={<Area />} />
-                  <Route path="/results" element={<Results />} />
-                  <Route path="/venue/:id" element={<VenueDetail />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/venues" element={<Venues />} />
-                  <Route path="/my-friends" element={<MyFriends />} />
-                  <Route path="/my-venues" element={<MyVenues />} />
-                  <Route path="/ai-recommendations" element={<AIRecommendations />} />
-                  <Route path="/plan-date" element={<SmartDatePlanning />} />
-                  <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </ErrorBoundary>
+              <NotificationSystem>
+                <ErrorBoundary level="page">
+                  <Routes>
+                    <Route path="/" element={<Onboarding />} />
+                    <Route path="/register-login" element={<RegisterLogin />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/preferences" element={<Preferences />} />
+                    <Route path="/friends" element={<Friends />} />
+                    <Route path="/area" element={<Area />} />
+                    <Route path="/results" element={<Results />} />
+                    <Route path="/venue/:id" element={<VenueDetail />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/venues" element={<Venues />} />
+                    <Route path="/my-friends" element={<MyFriends />} />
+                    <Route path="/my-venues" element={<MyVenues />} />
+                    <Route path="/ai-recommendations" element={<AIRecommendations />} />
+                    <Route path="/plan-date" element={<SmartDatePlanning />} />
+                    <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </ErrorBoundary>
+              </NotificationSystem>
             </AppProvider>
           </AuthProvider>
         </BrowserRouter>
