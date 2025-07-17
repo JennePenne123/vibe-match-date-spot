@@ -15,9 +15,18 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
   useEffect(() => {
     if (!user) return;
 
+    // Clean up any existing channel first
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
+    // Create a unique channel name to prevent conflicts
+    const channelName = `date-invitations-${user.id}-${Date.now()}`;
+    
     // Create a channel for real-time updates
     const channel = supabase
-      .channel('date-invitations-changes')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -51,9 +60,10 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
       }
     };
-  }, [user, onInvitationReceived, onInvitationUpdated]);
+  }, [user?.id]); // Only depend on user.id to prevent unnecessary re-subscriptions
 
   return null;
 };
