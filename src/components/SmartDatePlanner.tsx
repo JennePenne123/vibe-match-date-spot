@@ -161,10 +161,10 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         )}
 
         {/* Step 4: Create Invitation */}
-        {currentStep === 'create-invitation' && selectedPartner && selectedVenue && (
+        {currentStep === 'create-invitation' && selectedPartner && (selectedVenue || selectedVenueId) && (
           <InvitationCreation
             partnerName={selectedPartner.name}
-            selectedVenue={selectedVenue}
+            selectedVenue={selectedVenue || venueRecommendations?.find(v => v.venue_id === selectedVenueId)}
             invitationMessage={invitationMessage}
             loading={loading}
             onMessageChange={setInvitationMessage}

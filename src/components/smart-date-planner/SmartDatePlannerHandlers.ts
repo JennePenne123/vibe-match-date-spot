@@ -92,14 +92,29 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   }
 
   function handleVenueSelection(venueId: string) {
-    console.log('SmartDatePlanner - Venue selected:', venueId);
+    console.log('🎯 VENUE SELECTION - Venue selected:', venueId);
     setSelectedVenueId(venueId);
+    
+    // Log the state immediately after setting
+    console.log('🎯 VENUE SELECTION - setSelectedVenueId called with:', venueId);
+    console.log('🎯 VENUE SELECTION - Current state.selectedVenueId before update:', state.selectedVenueId);
+    
     setCurrentStep('create-invitation');
     
     // Generate AI-powered invitation message
-    if (selectedPartner && selectedVenue) {
-      const aiMessage = `Hi ${selectedPartner.name}! 🌟 Our AI compatibility score is ${compatibilityScore}% - we're a great match! I'd love to take you to ${selectedVenue.venue_name} based on our shared preferences. ${selectedVenue.ai_reasoning} What do you think?`;
+    // Need to find the venue from recommendations since selectedVenue might not be updated yet
+    const venue = state.venueRecommendations?.find(v => v.venue_id === venueId);
+    console.log('🎯 VENUE SELECTION - Found venue for message:', venue?.venue_name);
+    
+    if (selectedPartner && venue) {
+      const aiMessage = `Hi ${selectedPartner.name}! 🌟 Our AI compatibility score is ${compatibilityScore}% - we're a great match! I'd love to take you to ${venue.venue_name} based on our shared preferences. ${venue.ai_reasoning} What do you think?`;
+      console.log('🎯 VENUE SELECTION - Generated AI message:', aiMessage.substring(0, 100) + '...');
       setInvitationMessage(aiMessage);
+    } else {
+      console.log('🎯 VENUE SELECTION - Missing data for AI message:', {
+        hasPartner: !!selectedPartner,
+        hasVenue: !!venue
+      });
     }
   }
 
@@ -111,7 +126,10 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       selectedPartnerId,
       selectedPartner: selectedPartner?.name,
       selectedVenue: selectedVenue?.venue_name,
-      invitationMessage: state.invitationMessage?.substring(0, 50) + '...'
+      invitationMessage: state.invitationMessage?.substring(0, 50) + '...',
+      // Debug: Check all venue-related state
+      venueRecommendationsCount: state.venueRecommendations?.length || 0,
+      allVenueIds: state.venueRecommendations?.map(v => v.venue_id) || []
     });
 
     if (!currentSession) {
@@ -119,8 +137,31 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       return;
     }
     
-    if (!state.selectedVenueId) {
+    // More robust venue ID check - try to get it from different sources
+    let venueIdToUse = state.selectedVenueId;
+    
+    if (!venueIdToUse && selectedVenue) {
+      console.log('🚀 SEND INVITATION - Trying to get venue ID from selectedVenue object');
+      venueIdToUse = selectedVenue.venue_id;
+    }
+    
+    if (!venueIdToUse && state.venueRecommendations?.length > 0) {
+      console.log('🚀 SEND INVITATION - No venue selected, checking if we should use first recommendation');
+      // For debugging - don't auto-select, but show what's available
+      console.log('🚀 SEND INVITATION - Available venues:', state.venueRecommendations.map(v => ({
+        id: v.venue_id,
+        name: v.venue_name
+      })));
+    }
+    
+    if (!venueIdToUse) {
       console.error('🚀 SEND INVITATION - ERROR: No venue selected');
+      console.error('🚀 SEND INVITATION - Debug info:', {
+        selectedVenueId: state.selectedVenueId,
+        selectedVenue: selectedVenue,
+        hasRecommendations: !!state.venueRecommendations?.length,
+        recommendations: state.venueRecommendations?.map(v => v.venue_name)
+      });
       return;
     }
     
@@ -129,12 +170,12 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       return;
     }
 
-    console.log('🚀 SEND INVITATION - All validation passed, calling completePlanningSession...');
+    console.log('🚀 SEND INVITATION - All validation passed, calling completePlanningSession with venue ID:', venueIdToUse);
     
     try {
       const success = await completePlanningSession(
         currentSession.id,
-        state.selectedVenueId,
+        venueIdToUse,
         state.invitationMessage
       );
 
