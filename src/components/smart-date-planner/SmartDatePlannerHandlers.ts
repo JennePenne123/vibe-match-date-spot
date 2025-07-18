@@ -104,9 +104,32 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   }
 
   async function handleSendInvitation() {
-    if (!currentSession || !state.selectedVenueId || !selectedPartnerId) return;
+    console.log('🚀 SEND INVITATION - Starting process with:', {
+      hasCurrentSession: !!currentSession,
+      currentSessionId: currentSession?.id,
+      selectedVenueId: state.selectedVenueId,
+      selectedPartnerId,
+      selectedPartner: selectedPartner?.name,
+      selectedVenue: selectedVenue?.venue_name,
+      invitationMessage: state.invitationMessage?.substring(0, 50) + '...'
+    });
 
-    console.log('SmartDatePlanner - Sending invitation');
+    if (!currentSession) {
+      console.error('🚀 SEND INVITATION - ERROR: No current session');
+      return;
+    }
+    
+    if (!state.selectedVenueId) {
+      console.error('🚀 SEND INVITATION - ERROR: No venue selected');
+      return;
+    }
+    
+    if (!selectedPartnerId) {
+      console.error('🚀 SEND INVITATION - ERROR: No partner selected');
+      return;
+    }
+
+    console.log('🚀 SEND INVITATION - All validation passed, calling completePlanningSession...');
     
     try {
       const success = await completePlanningSession(
@@ -115,7 +138,10 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         state.invitationMessage
       );
 
+      console.log('🚀 SEND INVITATION - completePlanningSession result:', success);
+
       if (success) {
+        console.log('🚀 SEND INVITATION - SUCCESS! Navigating to home with toast data');
         // Show success toast with enhanced messaging
         navigate('/home', { 
           state: { 
@@ -127,9 +153,11 @@ export const createSmartDatePlannerHandlers = (state: any) => {
             }
           }
         });
+      } else {
+        console.error('🚀 SEND INVITATION - FAILED: completePlanningSession returned false');
       }
     } catch (error) {
-      console.error('SmartDatePlanner - Error sending invitation:', error);
+      console.error('🚀 SEND INVITATION - ERROR during sending:', error);
     }
   }
 

@@ -301,70 +301,6 @@ export const useInvitations = () => {
     console.log('Notification for recipient:', recipientId, notification);
   };
 
-  // Create test invitation data for development
-  const createTestInvitation = async () => {
-    if (!user) return false;
-
-    try {
-      // Get current user's friends for test data
-      const { data: friends } = await supabase
-        .from('friendships')
-        .select('friend_id, profiles!friend_id(name)')
-        .eq('user_id', user.id)
-        .eq('status', 'accepted')
-        .limit(1);
-
-      if (!friends || friends.length === 0) {
-        console.log('No friends found for test invitation');
-        return false;
-      }
-
-      // Get a venue for test data
-      const { data: venues } = await supabase
-        .from('venues')
-        .select('*')
-        .eq('is_active', true)
-        .limit(1);
-
-      if (!venues || venues.length === 0) {
-        console.log('No venues found for test invitation');
-        return false;
-      }
-
-      const testInvitation = {
-        sender_id: friends[0].friend_id, // Friend sends to current user
-        recipient_id: user.id,
-        venue_id: venues[0].id,
-        title: 'Dinner & Drinks',
-        message: 'Hey! I found this amazing place that I think you\'d love. Want to check it out together? 😊',
-        status: 'pending' as const,
-        ai_compatibility_score: 87,
-        ai_reasoning: 'Based on your shared love for Italian cuisine and cozy atmospheres, this venue is a perfect match!',
-        venue_match_factors: {
-          cuisine_match: 0.9,
-          vibe_match: 0.85,
-          price_match: 0.8
-        },
-        proposed_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // Tomorrow
-      };
-
-      const { error } = await supabase
-        .from('date_invitations')
-        .insert(testInvitation);
-
-      if (error) {
-        console.error('Failed to create test invitation:', error);
-        return false;
-      }
-
-      console.log('Test invitation created successfully');
-      fetchInvitations(); // Refresh the list
-      return true;
-    } catch (error) {
-      console.error('Error creating test invitation:', error);
-      return false;
-    }
-  };
 
   useEffect(() => {
     fetchInvitations();
@@ -377,7 +313,6 @@ export const useInvitations = () => {
     declineInvitation,
     sendInvitation,
     submitDateFeedback,
-    fetchInvitations,
-    createTestInvitation
+    fetchInvitations
   };
 };

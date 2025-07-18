@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, Users } from 'lucide-react';
 import SmartDatePlanningCTA from '@/components/home/SmartDatePlanningCTA';
 import DateInvitationSection from '@/components/DateInvitationSection';
-import InvitationTestControls from '@/components/InvitationTestControls';
+
 import { useToast } from '@/hooks/use-toast';
 const HomeContent: React.FC = () => {
   const navigate = useNavigate();
@@ -40,7 +40,6 @@ const HomeContent: React.FC = () => {
       <div className="max-w-md mx-auto space-y-6">
         <DateInvitationSection />
         <SmartDatePlanningCTA />
-        <InvitationTestControls />
       </div>
     </main>;
 };

@@ -21,7 +21,7 @@ interface DateInvite {
 }
 
 const DateInvitationSection: React.FC = () => {
-  const { invitations, loading, acceptInvitation, declineInvitation, createTestInvitation } = useInvitations();
+  const { invitations, loading, acceptInvitation, declineInvitation } = useInvitations();
   const { toast } = useToast();
 
   // Filter for pending invitations only
@@ -51,24 +51,6 @@ const DateInvitationSection: React.FC = () => {
     }
   };
 
-  // Debug function to create test invitation
-  const handleCreateTestInvitation = async () => {
-    const success = await createTestInvitation();
-    if (success) {
-      toast({
-        title: "Test Invitation Created! 🧪",
-        description: "A sample date invitation has been added for testing",
-        duration: 3000,
-      });
-    } else {
-      toast({
-        title: "Cannot Create Test Invitation",
-        description: "Make sure you have friends and venues in the database",
-        variant: "destructive",
-        duration: 3000,
-      });
-    }
-  };
 
   // Transform database invitation format to DateInviteCard format
   const transformInvitation = (dbInvitation: any): DateInvite => {
@@ -104,23 +86,15 @@ const DateInvitationSection: React.FC = () => {
     );
   }
 
-  // Show test invitation creator in development
+  // Show empty state when no invitations
   if (pendingInvitations.length === 0) {
     return (
       <div className="space-y-4 mb-6">
         <div className="text-center p-6 bg-muted/30 rounded-lg border-2 border-dashed border-muted">
           <h3 className="text-lg font-medium text-muted-foreground mb-2">No Date Invitations</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            You don't have any pending date invitations right now.
+          <p className="text-sm text-muted-foreground">
+            You don't have any pending date invitations right now. Use the Smart Date Planner below to create and send invitations to your friends!
           </p>
-          {process.env.NODE_ENV === 'development' && (
-            <button
-              onClick={handleCreateTestInvitation}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors"
-            >
-              Create Test Invitation 🧪
-            </button>
-          )}
         </div>
       </div>
     );

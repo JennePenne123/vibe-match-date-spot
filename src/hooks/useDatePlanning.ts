@@ -63,40 +63,85 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
 
   // Enhanced complete planning session with invitation creation
   const completePlanningSession = useCallback(async (sessionId: string, venueId: string, message: string) => {
-    if (!user || !currentSession) return false;
+    console.log('💾 COMPLETE PLANNING SESSION - Starting with:', {
+      sessionId,
+      venueId,
+      hasUser: !!user,
+      userId: user?.id,
+      hasCurrentSession: !!currentSession,
+      currentSessionPartnerId: currentSession?.partner_id,
+      messageLength: message?.length || 0,
+      compatibilityScore,
+      venueRecommendationsCount: venueRecommendations?.length || 0
+    });
+
+    if (!user) {
+      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No user');
+      return false;
+    }
+    
+    if (!currentSession) {
+      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No current session');
+      return false;
+    }
 
     try {
+      console.log('💾 COMPLETE PLANNING SESSION - Step 1: Completing session...');
       // Complete session first
       const sessionCompleted = await completeSession(sessionId, venueId);
-      if (!sessionCompleted) return false;
+      console.log('💾 COMPLETE PLANNING SESSION - Session completion result:', sessionCompleted);
+      
+      if (!sessionCompleted) {
+        console.error('💾 COMPLETE PLANNING SESSION - ERROR: Session completion failed');
+        return false;
+      }
 
+      console.log('💾 COMPLETE PLANNING SESSION - Step 2: Finding selected venue...');
       // Create the invitation with AI insights
       const selectedVenue = venueRecommendations.find(v => v.venue_id === venueId);
+      console.log('💾 COMPLETE PLANNING SESSION - Selected venue:', {
+        found: !!selectedVenue,
+        venueName: selectedVenue?.venue_name,
+        venueId: selectedVenue?.venue_id,
+        aiReasoning: selectedVenue?.ai_reasoning?.substring(0, 50) + '...'
+      });
       
-      const { error: inviteError } = await supabase
+      console.log('💾 COMPLETE PLANNING SESSION - Step 3: Creating invitation in database...');
+      const invitationData = {
+        sender_id: user.id,
+        recipient_id: currentSession.partner_id,
+        venue_id: venueId,
+        title: 'AI-Matched Date Invitation',
+        message: message,
+        planning_session_id: sessionId,
+        ai_compatibility_score: compatibilityScore,
+        ai_reasoning: selectedVenue?.ai_reasoning,
+        venue_match_factors: selectedVenue?.match_factors,
+        status: 'pending'
+      };
+      
+      console.log('💾 COMPLETE PLANNING SESSION - Invitation data to insert:', invitationData);
+      
+      const { data: insertedInvitation, error: inviteError } = await supabase
         .from('date_invitations')
-        .insert({
-          sender_id: user.id,
-          recipient_id: currentSession.partner_id,
-          venue_id: venueId,
-          title: 'AI-Matched Date Invitation',
-          message: message,
-          planning_session_id: sessionId,
-          ai_compatibility_score: compatibilityScore,
-          ai_reasoning: selectedVenue?.ai_reasoning,
-          venue_match_factors: selectedVenue?.match_factors,
-          status: 'pending'
-        });
+        .insert(invitationData)
+        .select()
+        .single();
 
-      if (inviteError) throw inviteError;
+      if (inviteError) {
+        console.error('💾 COMPLETE PLANNING SESSION - DATABASE ERROR:', inviteError);
+        throw inviteError;
+      }
+
+      console.log('💾 COMPLETE PLANNING SESSION - Invitation created successfully:', insertedInvitation);
 
       // Reset AI state
       resetAIState();
       
-      console.log('Planning session and invitation completed successfully');
+      console.log('💾 COMPLETE PLANNING SESSION - SUCCESS! Planning session and invitation completed successfully');
       return true;
     } catch (error) {
-      console.error('Error completing planning session:', error);
+      console.error('💾 COMPLETE PLANNING SESSION - CATCH ERROR:', error);
       handleError(error, {
         toastTitle: 'Failed to send invitation',
         toastDescription: 'Please try again'
