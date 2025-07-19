@@ -187,7 +187,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
                 <h3 className="font-semibold mb-2">No Venue Selected</h3>
                 <p className="mb-4">Please go back and select a venue for your date invitation.</p>
                 <Button 
-                  onClick={() => setCurrentStep('review-matches')}
+                  onClick={() => state.setCurrentStep('review-matches')}
                   variant="outline"
                 >
                   Back to Venue Selection

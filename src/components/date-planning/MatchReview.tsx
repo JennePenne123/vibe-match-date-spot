@@ -66,10 +66,18 @@ const MatchReview: React.FC<MatchReviewProps> = ({
 
   return (
     <div className="space-y-6">
-      <CompatibilityScore 
-        score={compatibilityScore} 
-        partnerName={partnerName}
-      />
+      {typeof compatibilityScore === 'object' && compatibilityScore !== null ? (
+        <CompatibilityScore 
+          score={compatibilityScore} 
+          partnerName={partnerName}
+        />
+      ) : (
+        <Card>
+          <CardContent className="text-center py-6">
+            <p className="text-gray-600">Calculating compatibility...</p>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
@@ -92,9 +100,8 @@ const MatchReview: React.FC<MatchReviewProps> = ({
             venueRecommendations.map((venue, index) => (
               <div key={venue.venue_id || `venue-${index}`} className="border rounded-lg p-4">
                 <AIVenueCard
-                  venue={venue}
+                  recommendation={venue}
                   onSelect={() => handleVenueSelect(venue)}
-                  showSelectButton={true}
                 />
               </div>
             ))
