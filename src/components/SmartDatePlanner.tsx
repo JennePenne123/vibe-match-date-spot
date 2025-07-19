@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -161,21 +162,36 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         )}
 
         {/* Step 4: Create Invitation */}
-        {currentStep === 'create-invitation' && selectedPartner && (selectedVenue || selectedVenueId) && (() => {
-          const venueToUse = selectedVenue || venueRecommendations?.find(v => v.venue_id === selectedVenueId);
-          console.log('🎯 INVITATION STEP - Rendering with:', {
-            hasSelectedVenue: !!selectedVenue,
+        {currentStep === 'create-invitation' && selectedPartner && (() => {
+          // Enhanced venue resolution with better debugging
+          const venueFromState = selectedVenue;
+          const venueFromId = selectedVenueId ? venueRecommendations?.find(v => v.venue_id === selectedVenueId) : null;
+          const venueToUse = venueFromState || venueFromId;
+          
+          console.log('🎯 INVITATION STEP - Enhanced venue resolution:', {
+            currentStep,
+            hasSelectedPartner: !!selectedPartner,
             selectedVenueId,
+            hasSelectedVenue: !!selectedVenue,
             hasVenueRecommendations: !!venueRecommendations?.length,
+            venueFromState: venueFromState?.venue_name,
+            venueFromId: venueFromId?.venue_name,
             venueToUse: venueToUse?.venue_name,
-            currentStep
+            allVenueIds: venueRecommendations?.map(v => ({ id: v.venue_id, name: v.venue_name })) || []
           });
           
           if (!venueToUse) {
             console.error('🎯 INVITATION STEP - ERROR: No venue found for invitation creation');
             return (
-              <div className="text-center p-6 text-red-600">
-                No venue selected. Please go back and select a venue.
+              <div className="text-center p-6 text-red-600 bg-red-50 rounded-lg">
+                <h3 className="font-semibold mb-2">No Venue Selected</h3>
+                <p className="mb-4">Please go back and select a venue for your date invitation.</p>
+                <Button 
+                  onClick={() => setCurrentStep('review-matches')}
+                  variant="outline"
+                >
+                  Back to Venue Selection
+                </Button>
               </div>
             );
           }

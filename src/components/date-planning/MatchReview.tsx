@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import AIMatchSummary from '@/components/AIMatchSummary';
-import AIVenueCard from '@/components/AIVenueCard';
-import SafeComponent from '@/components/SafeComponent';
-import { VenueSearchErrorDisplay } from '@/components/debug/VenueSearchErrorDisplay';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { MapPin, Star, DollarSign, Clock, AlertCircle } from 'lucide-react';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
+import CompatibilityScore from '@/components/CompatibilityScore';
+import AIVenueCard from '@/components/AIVenueCard';
 
 interface MatchReviewProps {
   compatibilityScore: number;
@@ -24,49 +24,83 @@ const MatchReview: React.FC<MatchReviewProps> = ({
   error,
   onRetrySearch
 }) => {
+  const handleVenueSelect = (venue: AIVenueRecommendation) => {
+    console.log('🎯 MATCH REVIEW - Venue selected:', {
+      venueName: venue.venue_name,
+      venueId: venue.venue_id,
+      hasVenueId: !!venue.venue_id
+    });
+    
+    // Ensure we have a valid venue ID before proceeding
+    if (!venue.venue_id) {
+      console.error('🎯 MATCH REVIEW - ERROR: Venue missing ID, using fallback');
+      // Create a fallback ID if missing
+      const fallbackId = `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      venue.venue_id = fallbackId;
+      console.log('🎯 MATCH REVIEW - Generated fallback ID:', fallbackId);
+    }
+    
+    onVenueSelect(venue.venue_id);
+  };
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-red-600">
+            <AlertCircle className="h-5 w-5" />
+            Search Error
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-red-600">{error}</p>
+          {onRetrySearch && (
+            <Button onClick={onRetrySearch} variant="outline">
+              Retry Search
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <SafeComponent componentName="AIMatchSummary">
-        <AIMatchSummary
-          compatibilityScore={compatibilityScore}
-          partnerName={partnerName}
-          venueCount={venueRecommendations.length}
-        />
-      </SafeComponent>
+      <CompatibilityScore 
+        score={compatibilityScore} 
+        partnerName={partnerName}
+      />
 
-      {error ? (
-        <VenueSearchErrorDisplay 
-          error={error} 
-          onRetry={onRetrySearch}
-          showLocationTip={true}
-        />
-      ) : venueRecommendations.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {venueRecommendations.map((recommendation) => (
-            <SafeComponent key={recommendation.venue_id} componentName="AIVenueCard">
-              <AIVenueCard
-                recommendation={recommendation}
-                onSelect={onVenueSelect}
-                showAIInsights={true}
-              />
-            </SafeComponent>
-          ))}
-        </div>
-      ) : (
-        <Card>
-          <CardContent className="p-6 text-center">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">No Venues Found</h3>
-            <p className="text-gray-600">
-              We couldn't find any venues that match your preferences in your area. This could be due to:
-              <br />• Limited venue availability in your location
-              <br />• Very specific preference filters
-              <br />• Network connectivity issues
-              <br /><br />
-              Try adjusting your preferences or check your location settings.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            AI-Matched Venues
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {venueRecommendations.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">No venue recommendations found.</p>
+              {onRetrySearch && (
+                <Button onClick={onRetrySearch} variant="outline">
+                  Search Again
+                </Button>
+              )}
+            </div>
+          ) : (
+            venueRecommendations.map((venue, index) => (
+              <div key={venue.venue_id || `venue-${index}`} className="border rounded-lg p-4">
+                <AIVenueCard
+                  venue={venue}
+                  onSelect={() => handleVenueSelect(venue)}
+                  showSelectButton={true}
+                />
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

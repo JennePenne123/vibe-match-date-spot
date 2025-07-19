@@ -1,3 +1,6 @@
+
+import { toast } from '@/hooks/use-toast';
+
 export const createSmartDatePlannerHandlers = (state: any) => {
   const {
     selectedPartnerId,
@@ -36,6 +39,11 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         setCurrentStep('set-preferences');
       } catch (error) {
         console.error('SmartDatePlanner - Error in partner selection:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to select partner. Please try again.'
+        });
       }
     } else {
       // Group mode
@@ -44,8 +52,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       console.log('SmartDatePlanner - Handling group selection:', selectedPartnerIds);
       
       try {
-        // For now, use the first partner as the primary partner
-        // and store the rest in participant_ids
         const primaryPartnerId = selectedPartnerIds[0];
         const session = await getActiveSession(primaryPartnerId);
         
@@ -56,6 +62,11 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         setCurrentStep('set-preferences');
       } catch (error) {
         console.error('SmartDatePlanner - Error in group selection:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to select group. Please try again.'
+        });
       }
     }
   }
@@ -80,6 +91,11 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       ).catch(error => {
         console.error('SmartDatePlanner - AI analysis error:', error);
         setAiAnalyzing(false);
+        toast({
+          variant: 'destructive',
+          title: 'AI Analysis Failed',
+          description: 'Unable to analyze compatibility. Please try again.'
+        });
       });
     } else {
       console.error('SmartDatePlanner - Missing required data for AI analysis:', {
@@ -88,21 +104,32 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         hasLocation: !!state.userLocation
       });
       setAiAnalyzing(false);
+      toast({
+        variant: 'destructive',
+        title: 'Missing Information',
+        description: 'Please ensure location is enabled and try again.'
+      });
     }
   }
 
   function handleVenueSelection(venueId: string) {
     console.log('🎯 VENUE SELECTION - Venue selected:', venueId);
+    
+    if (!venueId) {
+      console.error('🎯 VENUE SELECTION - ERROR: No venue ID provided');
+      toast({
+        variant: 'destructive',
+        title: 'Selection Error',
+        description: 'Unable to select venue. Please try again.'
+      });
+      return;
+    }
+    
+    // Set selected venue ID immediately
     setSelectedVenueId(venueId);
-    
-    // Log the state immediately after setting
     console.log('🎯 VENUE SELECTION - setSelectedVenueId called with:', venueId);
-    console.log('🎯 VENUE SELECTION - Current state.selectedVenueId before update:', state.selectedVenueId);
     
-    setCurrentStep('create-invitation');
-    
-    // Generate AI-powered invitation message
-    // Need to find the venue from recommendations since selectedVenue might not be updated yet
+    // Find the venue from recommendations
     const venue = state.venueRecommendations?.find(v => v.venue_id === venueId);
     console.log('🎯 VENUE SELECTION - Found venue for message:', venue?.venue_name);
     
@@ -116,6 +143,14 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         hasVenue: !!venue
       });
     }
+    
+    // Move to next step
+    setCurrentStep('create-invitation');
+    
+    toast({
+      title: 'Venue Selected!',
+      description: `${venue?.venue_name || 'Venue'} has been selected for your date.`
+    });
   }
 
   async function handleSendInvitation() {
@@ -127,52 +162,63 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       selectedPartner: selectedPartner?.name,
       selectedVenue: selectedVenue?.venue_name,
       invitationMessage: state.invitationMessage?.substring(0, 50) + '...',
-      // Debug: Check all venue-related state
-      venueRecommendationsCount: state.venueRecommendations?.length || 0,
-      allVenueIds: state.venueRecommendations?.map(v => v.venue_id) || []
+      venueRecommendationsCount: state.venueRecommendations?.length || 0
     });
 
+    // Validation checks with user feedback
     if (!currentSession) {
       console.error('🚀 SEND INVITATION - ERROR: No current session');
-      return;
-    }
-    
-    // More robust venue ID check - try to get it from different sources
-    let venueIdToUse = state.selectedVenueId;
-    
-    if (!venueIdToUse && selectedVenue) {
-      console.log('🚀 SEND INVITATION - Trying to get venue ID from selectedVenue object');
-      venueIdToUse = selectedVenue.venue_id;
-    }
-    
-    if (!venueIdToUse && state.venueRecommendations?.length > 0) {
-      console.log('🚀 SEND INVITATION - No venue selected, checking if we should use first recommendation');
-      // For debugging - don't auto-select, but show what's available
-      console.log('🚀 SEND INVITATION - Available venues:', state.venueRecommendations.map(v => ({
-        id: v.venue_id,
-        name: v.venue_name
-      })));
-    }
-    
-    if (!venueIdToUse) {
-      console.error('🚀 SEND INVITATION - ERROR: No venue selected');
-      console.error('🚀 SEND INVITATION - Debug info:', {
-        selectedVenueId: state.selectedVenueId,
-        selectedVenue: selectedVenue,
-        hasRecommendations: !!state.venueRecommendations?.length,
-        recommendations: state.venueRecommendations?.map(v => v.venue_name)
+      toast({
+        variant: 'destructive',
+        title: 'Session Error',
+        description: 'No active planning session. Please start over.'
       });
       return;
     }
     
     if (!selectedPartnerId) {
       console.error('🚀 SEND INVITATION - ERROR: No partner selected');
+      toast({
+        variant: 'destructive',
+        title: 'Partner Required',
+        description: 'Please select a partner for your date.'
+      });
+      return;
+    }
+
+    // Get venue ID with fallback logic
+    let venueIdToUse = state.selectedVenueId;
+    
+    if (!venueIdToUse && selectedVenue) {
+      console.log('🚀 SEND INVITATION - Using venue ID from selectedVenue object');
+      venueIdToUse = selectedVenue.venue_id;
+    }
+    
+    if (!venueIdToUse && state.venueRecommendations?.length > 0) {
+      console.log('🚀 SEND INVITATION - No venue selected, using first recommendation');
+      venueIdToUse = state.venueRecommendations[0].venue_id;
+      console.log('🚀 SEND INVITATION - Using first venue:', venueIdToUse);
+    }
+    
+    if (!venueIdToUse) {
+      console.error('🚀 SEND INVITATION - ERROR: No venue selected');
+      toast({
+        variant: 'destructive',
+        title: 'Venue Required',
+        description: 'Please select a venue for your date invitation.'
+      });
       return;
     }
 
     console.log('🚀 SEND INVITATION - All validation passed, calling completePlanningSession with venue ID:', venueIdToUse);
     
     try {
+      // Show loading toast
+      toast({
+        title: 'Sending Invitation...',
+        description: 'Your smart date invitation is being prepared.'
+      });
+
       const success = await completePlanningSession(
         currentSession.id,
         venueIdToUse,
@@ -183,7 +229,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
 
       if (success) {
         console.log('🚀 SEND INVITATION - SUCCESS! Navigating to home with toast data');
-        // Show success toast with enhanced messaging
         navigate('/home', { 
           state: { 
             message: 'Smart date invitation sent successfully!',
@@ -196,22 +241,30 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         });
       } else {
         console.error('🚀 SEND INVITATION - FAILED: completePlanningSession returned false');
+        toast({
+          variant: 'destructive',
+          title: 'Send Failed',
+          description: 'Unable to send invitation. Please try again.'
+        });
       }
     } catch (error) {
       console.error('🚀 SEND INVITATION - ERROR during sending:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Send Error',
+        description: 'An error occurred while sending the invitation. Please try again.'
+      });
     }
   }
 
   function handleStartFromScratch() {
     console.log('SmartDatePlanner - Starting from scratch');
-    // Reset all state and navigate back to partner selection
     setCurrentStep('select-partner');
     setSelectedPartnerId('');
     setSelectedPartnerIds([]);
     setDateMode('single');
     setSelectedVenueId('');
     setInvitationMessage('');
-    // Navigate to fresh planning session
     navigate('/plan-date');
   }
 
