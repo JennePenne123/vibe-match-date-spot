@@ -51,7 +51,10 @@ const InvitationCreation: React.FC<InvitationCreationProps> = ({
         </div>
 
         <Button 
-          onClick={onSendInvitation}
+          onClick={() => {
+            console.log('🚀 BUTTON CLICK - Send Smart Invitation button clicked!');
+            onSendInvitation();
+          }}
           disabled={loading}
           className="w-full"
           size="lg"

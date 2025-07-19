@@ -161,16 +161,36 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         )}
 
         {/* Step 4: Create Invitation */}
-        {currentStep === 'create-invitation' && selectedPartner && (selectedVenue || selectedVenueId) && (
-          <InvitationCreation
-            partnerName={selectedPartner.name}
-            selectedVenue={selectedVenue || venueRecommendations?.find(v => v.venue_id === selectedVenueId)}
-            invitationMessage={invitationMessage}
-            loading={loading}
-            onMessageChange={setInvitationMessage}
-            onSendInvitation={handleSendInvitation}
-          />
-        )}
+        {currentStep === 'create-invitation' && selectedPartner && (selectedVenue || selectedVenueId) && (() => {
+          const venueToUse = selectedVenue || venueRecommendations?.find(v => v.venue_id === selectedVenueId);
+          console.log('🎯 INVITATION STEP - Rendering with:', {
+            hasSelectedVenue: !!selectedVenue,
+            selectedVenueId,
+            hasVenueRecommendations: !!venueRecommendations?.length,
+            venueToUse: venueToUse?.venue_name,
+            currentStep
+          });
+          
+          if (!venueToUse) {
+            console.error('🎯 INVITATION STEP - ERROR: No venue found for invitation creation');
+            return (
+              <div className="text-center p-6 text-red-600">
+                No venue selected. Please go back and select a venue.
+              </div>
+            );
+          }
+          
+          return (
+            <InvitationCreation
+              partnerName={selectedPartner.name}
+              selectedVenue={venueToUse}
+              invitationMessage={invitationMessage}
+              loading={loading}
+              onMessageChange={setInvitationMessage}
+              onSendInvitation={handleSendInvitation}
+            />
+          );
+        })()}
 
         {/* Start from Scratch CTA - Show on all steps except first */}
         {currentStep !== 'select-partner' && (
