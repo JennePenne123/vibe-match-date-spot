@@ -275,18 +275,19 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
           }
         }
 
-        if (venueId) {
-          transformedVenues.push({
-            id: venueId,
-            name: venue.name,
-            address: venue.location,
-            cuisine_type: venue.cuisineType,
-            price_range: venue.priceRange,
-            rating: venue.rating,
-            image_url: venue.image,
-            tags: venue.tags || []
-          });
-        }
+        // Always create a venue ID - use database ID if available, otherwise generate fallback
+        const finalVenueId = venueId || `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        transformedVenues.push({
+          id: finalVenueId,
+          name: venue.name,
+          address: venue.location,
+          cuisine_type: venue.cuisineType,
+          price_range: venue.priceRange,
+          rating: venue.rating,
+          image_url: venue.image,
+          tags: venue.tags || []
+        });
       } catch (venueError) {
         console.warn('⚠️ GOOGLE PLACES: Error processing venue:', venue.name, venueError);
       }

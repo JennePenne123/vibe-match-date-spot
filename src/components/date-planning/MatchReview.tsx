@@ -4,11 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, Star, DollarSign, Clock, AlertCircle } from 'lucide-react';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
+import { CompatibilityScore as CompatibilityScoreType } from '@/services/aiMatchingService';
 import CompatibilityScore from '@/components/CompatibilityScore';
+import AIMatchSummary from '@/components/AIMatchSummary';
 import AIVenueCard from '@/components/AIVenueCard';
 
 interface MatchReviewProps {
-  compatibilityScore: number;
+  compatibilityScore: number | CompatibilityScoreType;
   partnerName: string;
   venueRecommendations: AIVenueRecommendation[];
   onVenueSelect: (venueId: string) => void;
@@ -67,9 +69,16 @@ const MatchReview: React.FC<MatchReviewProps> = ({
   return (
     <div className="space-y-6">
       {typeof compatibilityScore === 'object' && compatibilityScore !== null ? (
-        <CompatibilityScore 
-          score={compatibilityScore} 
+        <AIMatchSummary 
+          compatibilityScore={Math.round(compatibilityScore.overall_score * 100)}
           partnerName={partnerName}
+          venueCount={venueRecommendations.length}
+        />
+      ) : typeof compatibilityScore === 'number' ? (
+        <AIMatchSummary 
+          compatibilityScore={compatibilityScore}
+          partnerName={partnerName}
+          venueCount={venueRecommendations.length}
         />
       ) : (
         <Card>
