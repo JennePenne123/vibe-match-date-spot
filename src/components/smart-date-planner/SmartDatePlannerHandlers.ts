@@ -20,7 +20,9 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     setInvitationMessage,
     currentSession,
     completePlanningSession,
-    navigate
+    navigate,
+    currentPreferences,
+    setCurrentPreferences
   } = state;
 
   async function handlePartnerSelection(partnerId?: string) {
@@ -74,6 +76,9 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   function handlePreferencesComplete(preferences: any) {
     console.log('SmartDatePlanner - Preferences submitted, starting AI analysis...', preferences);
     setAiAnalyzing(true);
+    
+    // Store preferences for later use when completing session
+    setCurrentPreferences(preferences);
     
     if (currentSession && selectedPartnerId && state.userLocation) {
       console.log('SmartDatePlanner - Triggering AI analysis with:', {
@@ -222,7 +227,8 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       const success = await completePlanningSession(
         currentSession.id,
         venueIdToUse,
-        state.invitationMessage
+        state.invitationMessage,
+        currentPreferences
       );
 
       console.log('🚀 SEND INVITATION - completePlanningSession result:', success);

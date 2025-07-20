@@ -4,10 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Heart, Clock, Sparkles, Loader2, Check, DollarSign, MapPin, Coffee, Settings } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Heart, Clock, Sparkles, Loader2, Check, DollarSign, MapPin, Coffee, Settings, CalendarIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import SafeComponent from '@/components/SafeComponent';
 
 interface Preference {
@@ -42,6 +47,8 @@ interface DatePreferences {
   preferred_times: string[];
   max_distance: number;
   dietary_restrictions: string[];
+  preferred_date?: Date;
+  preferred_time?: string;
 }
 
 const PreferencesStep: React.FC<PreferencesStepProps> = ({
@@ -64,6 +71,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
   const [selectedTimePreferences, setSelectedTimePreferences] = useState<string[]>([]);
   const [maxDistance, setMaxDistance] = useState<number>(15);
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedTime, setSelectedTime] = useState<string>('');
   const [partnerPreferences, setPartnerPreferences] = useState<UserPreferences | null>(null);
 
   // Data definitions
@@ -242,7 +251,9 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
         preferred_price_range: selectedPriceRange,
         preferred_times: selectedTimePreferences,
         max_distance: maxDistance,
-        dietary_restrictions: selectedDietary
+        dietary_restrictions: selectedDietary,
+        preferred_date: selectedDate,
+        preferred_time: selectedTime
       };
 
       onPreferencesComplete(preferences);
@@ -366,6 +377,68 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
         <p className="text-muted-foreground mb-6">Choose your preferred timing</p>
         {renderPreferenceGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times')}
       </div>
+
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-2">Specific Date & Time</h2>
+        <p className="text-muted-foreground mb-6">When would you like to go on this date?</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Date Picker */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Preferred Date</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !selectedDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  disabled={(date) => date < new Date()}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Time Picker */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Preferred Time</label>
+            <Select value={selectedTime} onValueChange={setSelectedTime}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="9:00">9:00 AM</SelectItem>
+                <SelectItem value="10:00">10:00 AM</SelectItem>
+                <SelectItem value="11:00">11:00 AM</SelectItem>
+                <SelectItem value="12:00">12:00 PM</SelectItem>
+                <SelectItem value="13:00">1:00 PM</SelectItem>
+                <SelectItem value="14:00">2:00 PM</SelectItem>
+                <SelectItem value="15:00">3:00 PM</SelectItem>
+                <SelectItem value="16:00">4:00 PM</SelectItem>
+                <SelectItem value="17:00">5:00 PM</SelectItem>
+                <SelectItem value="18:00">6:00 PM</SelectItem>
+                <SelectItem value="19:00">7:00 PM</SelectItem>
+                <SelectItem value="20:00">8:00 PM</SelectItem>
+                <SelectItem value="21:00">9:00 PM</SelectItem>
+                <SelectItem value="22:00">10:00 PM</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
     </>
   );
 
@@ -480,6 +553,22 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
                 {selectedDietary.map(diet => (
                   <Badge key={diet} variant="secondary">{diet}</Badge>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {(selectedDate || selectedTime) && (
+          <Card>
+            <CardContent className="p-4">
+              <h3 className="font-semibold mb-2">Preferred Date & Time</h3>
+              <div className="space-y-2">
+                {selectedDate && (
+                  <Badge variant="secondary">📅 {format(selectedDate, "PPP")}</Badge>
+                )}
+                {selectedTime && (
+                  <Badge variant="secondary">🕐 {selectedTime}</Badge>
+                )}
               </div>
             </CardContent>
           </Card>

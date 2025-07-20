@@ -14,6 +14,8 @@ interface DatePreferences {
   preferred_vibes?: string[];
   max_distance?: number;
   dietary_restrictions?: string[];
+  preferred_date?: Date;
+  preferred_time?: string;
 }
 
 export const useDatePlanning = (userLocation?: { latitude: number; longitude: number; address?: string }) => {
@@ -62,7 +64,7 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
   }, [currentSession, updateSessionPreferences, analyzeCompatibilityAndVenues, userLocation]);
 
   // Enhanced complete planning session with invitation creation
-  const completePlanningSession = useCallback(async (sessionId: string, venueId: string, message: string) => {
+  const completePlanningSession = useCallback(async (sessionId: string, venueId: string, message: string, preferences?: DatePreferences) => {
     console.log('💾 COMPLETE PLANNING SESSION - Starting with:', {
       sessionId,
       venueId,
@@ -107,12 +109,24 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
       });
       
       console.log('💾 COMPLETE PLANNING SESSION - Step 3: Creating invitation in database...');
+      
+      // Combine selected date and time if available
+      let proposedDateTime = null;
+      if (preferences?.preferred_date && preferences?.preferred_time) {
+        const [hours, minutes] = preferences.preferred_time.split(':');
+        proposedDateTime = new Date(preferences.preferred_date);
+        proposedDateTime.setHours(parseInt(hours), parseInt(minutes) || 0, 0, 0);
+      } else if (preferences?.preferred_date) {
+        proposedDateTime = preferences.preferred_date;
+      }
+      
       const invitationData = {
         sender_id: user.id,
         recipient_id: currentSession.partner_id,
         venue_id: venueId,
         title: 'AI-Matched Date Invitation',
         message: message,
+        proposed_date: proposedDateTime?.toISOString(),
         planning_session_id: sessionId,
         ai_compatibility_score: compatibilityScore,
         ai_reasoning: selectedVenue?.ai_reasoning,

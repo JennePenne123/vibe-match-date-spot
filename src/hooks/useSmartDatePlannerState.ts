@@ -99,6 +99,7 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
   const [locationRequested, setLocationRequested] = useState(false);
   const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
+  const [currentPreferences, setCurrentPreferences] = useState<any>(null);
   const [locationRequestInProgress, setLocationRequestInProgress] = useState(false);
   const locationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -228,6 +229,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
     dateMode,
     setDateMode,
     selectedPartnerIds,
-    setSelectedPartnerIds
+    setSelectedPartnerIds,
+    currentPreferences,
+    setCurrentPreferences
   };
 };
