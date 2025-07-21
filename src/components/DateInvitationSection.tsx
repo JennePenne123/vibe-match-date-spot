@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { useInvitations } from '@/hooks/useInvitations';
 import DateInviteCard from '@/components/DateInviteCard';
 import { useToast } from '@/hooks/use-toast';
 
 interface DateInvite {
-  id: number;
+  id: string; // Changed from number to string
   friendName: string;
   friendAvatar: string;
   dateType: string;
@@ -27,8 +28,9 @@ const DateInvitationSection: React.FC = () => {
   // Filter for pending invitations only
   const pendingInvitations = invitations.filter(inv => inv.status === 'pending');
 
-  const handleAccept = async (id: number) => {
-    const invitation = pendingInvitations.find(inv => parseInt(inv.id) === id);
+  const handleAccept = async (id: string) => { // Changed from number to string
+    console.log('🎯 ACCEPT INVITATION - ID:', id, 'Type:', typeof id);
+    const invitation = pendingInvitations.find(inv => inv.id === id); // Removed parseInt
     if (invitation) {
       await acceptInvitation(invitation.id);
       toast({
@@ -36,11 +38,14 @@ const DateInvitationSection: React.FC = () => {
         description: `You've accepted the date invitation from ${invitation.sender?.name || 'your friend'}. Time to get excited! ✨`,
         duration: 5000,
       });
+    } else {
+      console.error('🚨 ACCEPT INVITATION - Invitation not found for ID:', id);
     }
   };
 
-  const handleDecline = async (id: number) => {
-    const invitation = pendingInvitations.find(inv => parseInt(inv.id) === id);
+  const handleDecline = async (id: string) => { // Changed from number to string
+    console.log('🎯 DECLINE INVITATION - ID:', id, 'Type:', typeof id);
+    const invitation = pendingInvitations.find(inv => inv.id === id); // Removed parseInt
     if (invitation) {
       await declineInvitation(invitation.id);
       toast({
@@ -48,14 +53,23 @@ const DateInvitationSection: React.FC = () => {
         description: `You've respectfully declined the invitation from ${invitation.sender?.name || 'your friend'}. No worries! 💙`,
         duration: 4000,
       });
+    } else {
+      console.error('🚨 DECLINE INVITATION - Invitation not found for ID:', id);
     }
   };
 
-
   // Transform database invitation format to DateInviteCard format
   const transformInvitation = (dbInvitation: any): DateInvite => {
+    console.log('🔄 TRANSFORM INVITATION - Raw data:', {
+      id: dbInvitation.id,
+      idType: typeof dbInvitation.id,
+      hasVenue: !!dbInvitation.venue,
+      venueName: dbInvitation.venue?.name,
+      hasSender: !!dbInvitation.sender
+    });
+
     return {
-      id: parseInt(dbInvitation.id),
+      id: dbInvitation.id, // Keep as string, no parseInt
       friendName: dbInvitation.sender?.name || 'Friend',
       friendAvatar: dbInvitation.sender?.avatar_url || '',
       dateType: dbInvitation.title || 'Date',

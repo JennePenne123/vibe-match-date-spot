@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin, Check, X, DollarSign, Calendar, Info } from 'lucide-react';
 
 interface DateInvite {
-  id: number;
+  id: string; // Changed from number to string
   friendName: string;
   friendAvatar: string;
   dateType: string;
@@ -26,8 +26,8 @@ interface DateInvite {
 
 interface DateInviteCardProps {
   invitation: DateInvite;
-  onAccept: (id: number) => void;
-  onDecline: (id: number) => void;
+  onAccept: (id: string) => void; // Changed from number to string
+  onDecline: (id: string) => void; // Changed from number to string
 }
 
 const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps) => {
@@ -154,6 +154,7 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
           <div className="flex gap-3 pt-4">
             <Button
               onClick={() => {
+                console.log('🎯 ACCEPT BUTTON CLICKED - ID:', invitation.id);
                 onAccept(invitation.id);
                 setIsOpen(false);
               }}
@@ -164,6 +165,7 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
             </Button>
             <Button
               onClick={() => {
+                console.log('🎯 DECLINE BUTTON CLICKED - ID:', invitation.id);
                 onDecline(invitation.id);
                 setIsOpen(false);
               }}

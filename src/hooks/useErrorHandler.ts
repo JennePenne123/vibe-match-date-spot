@@ -23,12 +23,26 @@ export const useErrorHandler = () => {
       onError,
     } = options;
 
-    // Ensure we have an Error object
-    const errorObj = error instanceof Error ? error : new Error(String(error));
+    // Ensure we have an Error object and properly serialize it
+    let errorObj: Error;
+    if (error instanceof Error) {
+      errorObj = error;
+    } else if (typeof error === 'object' && error !== null) {
+      // Handle Supabase errors and other objects
+      const errorStr = JSON.stringify(error, null, 2);
+      errorObj = new Error(`Error object: ${errorStr}`);
+    } else {
+      errorObj = new Error(String(error));
+    }
 
-    // Log the error
+    // Log the error with better formatting
     if (logError) {
-      console.error('Error handled by useErrorHandler:', errorObj);
+      console.error('🚨 ERROR HANDLER - Error details:', {
+        message: errorObj.message,
+        stack: errorObj.stack,
+        originalError: error,
+        timestamp: new Date().toISOString()
+      });
     }
 
     // Show toast notification

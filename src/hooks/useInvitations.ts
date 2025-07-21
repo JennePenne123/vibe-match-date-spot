@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -40,8 +39,12 @@ export const useInvitations = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchInvitations = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('🚨 FETCH INVITATIONS - No user, skipping fetch');
+      return;
+    }
 
+    console.log('🔄 FETCH INVITATIONS - Starting fetch for user:', user.id);
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -55,6 +58,7 @@ export const useInvitations = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error('🚨 FETCH INVITATIONS - Database error:', error);
         handleError(error, {
           toastTitle: 'Failed to load invitations',
           toastDescription: 'Please try refreshing the page',
@@ -62,9 +66,23 @@ export const useInvitations = () => {
         return;
       }
 
+      console.log('✅ FETCH INVITATIONS - Success:', {
+        count: data?.length || 0,
+        invitations: data?.map(inv => ({
+          id: inv.id,
+          idType: typeof inv.id,
+          hasVenue: !!inv.venue,
+          hasSender: !!inv.sender,
+          status: inv.status
+        }))
+      });
+
       setInvitations(data || []);
     } catch (error) {
-      handleError(error, {
+      console.error('🚨 FETCH INVITATIONS - Catch error:', error);
+      // Improved error serialization
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      handleError(new Error(`Failed to load invitations: ${errorMessage}`), {
         toastTitle: 'Failed to load invitations',
         toastDescription: 'Please try refreshing the page',
       });
@@ -75,12 +93,12 @@ export const useInvitations = () => {
 
   // Real-time subscription handlers
   const handleInvitationReceived = useCallback(() => {
-    console.log('New invitation received - refreshing list');
+    console.log('🔔 REALTIME - New invitation received, refreshing list');
     fetchInvitations();
   }, [fetchInvitations]);
 
   const handleInvitationUpdated = useCallback(() => {
-    console.log('Invitation updated - refreshing list');
+    console.log('🔔 REALTIME - Invitation updated, refreshing list');
     fetchInvitations();
   }, [fetchInvitations]);
 
@@ -91,9 +109,11 @@ export const useInvitations = () => {
   });
 
   const acceptInvitation = async (invitationId: string) => {
+    console.log('✅ ACCEPT INVITATION - Starting for ID:', invitationId);
     try {
       // Get invitation details for enhanced feedback
       const invitation = invitations.find(inv => inv.id === invitationId);
+      console.log('✅ ACCEPT INVITATION - Found invitation:', !!invitation);
       
       const { error } = await supabase
         .from('date_invitations')
@@ -101,12 +121,15 @@ export const useInvitations = () => {
         .eq('id', invitationId);
 
       if (error) {
+        console.error('🚨 ACCEPT INVITATION - Database error:', error);
         handleError(error, {
           toastTitle: 'Failed to accept invitation',
           toastDescription: 'Please try again',
         });
         return;
       }
+
+      console.log('✅ ACCEPT INVITATION - Database update successful');
 
       // Update local state optimistically
       setInvitations(prev => 
@@ -127,7 +150,9 @@ export const useInvitations = () => {
         });
       }
     } catch (error) {
-      handleError(error, {
+      console.error('🚨 ACCEPT INVITATION - Catch error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      handleError(new Error(`Failed to accept invitation: ${errorMessage}`), {
         toastTitle: 'Failed to accept invitation',
         toastDescription: 'Please try again',
       });
@@ -135,9 +160,11 @@ export const useInvitations = () => {
   };
 
   const declineInvitation = async (invitationId: string) => {
+    console.log('❌ DECLINE INVITATION - Starting for ID:', invitationId);
     try {
       // Get invitation details for enhanced feedback
       const invitation = invitations.find(inv => inv.id === invitationId);
+      console.log('❌ DECLINE INVITATION - Found invitation:', !!invitation);
       
       const { error } = await supabase
         .from('date_invitations')
@@ -145,12 +172,15 @@ export const useInvitations = () => {
         .eq('id', invitationId);
 
       if (error) {
+        console.error('🚨 DECLINE INVITATION - Database error:', error);
         handleError(error, {
           toastTitle: 'Failed to decline invitation',
           toastDescription: 'Please try again',
         });
         return;
       }
+
+      console.log('❌ DECLINE INVITATION - Database update successful');
 
       // Update local state optimistically
       setInvitations(prev => 
@@ -171,7 +201,9 @@ export const useInvitations = () => {
         });
       }
     } catch (error) {
-      handleError(error, {
+      console.error('🚨 DECLINE INVITATION - Catch error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      handleError(new Error(`Failed to decline invitation: ${errorMessage}`), {
         toastTitle: 'Failed to decline invitation',
         toastDescription: 'Please try again',
       });
@@ -291,16 +323,15 @@ export const useInvitations = () => {
   const createNotificationForSender = async (senderId: string, notification: any) => {
     // This could be enhanced with a proper notifications table
     // For now, we'll use real-time updates to show toasts
-    console.log('Notification for sender:', senderId, notification);
+    console.log('📬 Notification for sender:', senderId, notification);
   };
 
   // Helper function to create notifications for recipient  
   const createNotificationForRecipient = async (recipientId: string, notification: any) => {
     // This could be enhanced with a proper notifications table
     // For now, we'll use real-time updates to show toasts
-    console.log('Notification for recipient:', recipientId, notification);
+    console.log('📬 Notification for recipient:', recipientId, notification);
   };
-
 
   useEffect(() => {
     fetchInvitations();
