@@ -3,23 +3,7 @@ import React from 'react';
 import { useInvitations } from '@/hooks/useInvitations';
 import DateInviteCard from '@/components/DateInviteCard';
 import { useToast } from '@/hooks/use-toast';
-
-interface DateInvite {
-  id: string; // Changed from number to string
-  friendName: string;
-  friendAvatar: string;
-  dateType: string;
-  location: string;
-  time: string;
-  message: string;
-  status: string;
-  venueName: string;
-  venueAddress: string;
-  estimatedCost: string;
-  duration: string;
-  specialNotes: string;
-  venueImage: string;
-}
+import { DateInvitation } from '@/types/index';
 
 const DateInvitationSection: React.FC = () => {
   const { invitations, loading, acceptInvitation, declineInvitation } = useInvitations();
@@ -28,9 +12,9 @@ const DateInvitationSection: React.FC = () => {
   // Filter for pending invitations only
   const pendingInvitations = invitations.filter(inv => inv.status === 'pending');
 
-  const handleAccept = async (id: string) => { // Changed from number to string
+  const handleAccept = async (id: string) => {
     console.log('🎯 ACCEPT INVITATION - ID:', id, 'Type:', typeof id);
-    const invitation = pendingInvitations.find(inv => inv.id === id); // Removed parseInt
+    const invitation = pendingInvitations.find(inv => inv.id === id);
     if (invitation) {
       await acceptInvitation(invitation.id);
       toast({
@@ -43,9 +27,9 @@ const DateInvitationSection: React.FC = () => {
     }
   };
 
-  const handleDecline = async (id: string) => { // Changed from number to string
+  const handleDecline = async (id: string) => {
     console.log('🎯 DECLINE INVITATION - ID:', id, 'Type:', typeof id);
-    const invitation = pendingInvitations.find(inv => inv.id === id); // Removed parseInt
+    const invitation = pendingInvitations.find(inv => inv.id === id);
     if (invitation) {
       await declineInvitation(invitation.id);
       toast({
@@ -58,8 +42,8 @@ const DateInvitationSection: React.FC = () => {
     }
   };
 
-  // Transform database invitation format to DateInviteCard format
-  const transformInvitation = (dbInvitation: any): DateInvite => {
+  // Transform database invitation format to DateInvitation format
+  const transformInvitation = (dbInvitation: any): DateInvitation => {
     console.log('🔄 TRANSFORM INVITATION - Raw data:', {
       id: dbInvitation.id,
       idType: typeof dbInvitation.id,
@@ -69,7 +53,18 @@ const DateInvitationSection: React.FC = () => {
     });
 
     return {
-      id: dbInvitation.id, // Keep as string, no parseInt
+      id: dbInvitation.id,
+      sender_id: dbInvitation.sender_id,
+      recipient_id: dbInvitation.recipient_id,
+      venue_id: dbInvitation.venue_id,
+      title: dbInvitation.title || 'Date',
+      message: dbInvitation.message || dbInvitation.ai_generated_message || 'Let\'s have a great time together!',
+      proposed_date: dbInvitation.proposed_date,
+      status: dbInvitation.status,
+      created_at: dbInvitation.created_at,
+      sender: dbInvitation.sender,
+      venue: dbInvitation.venue,
+      // UI compatibility properties
       friendName: dbInvitation.sender?.name || 'Friend',
       friendAvatar: dbInvitation.sender?.avatar_url || '',
       dateType: dbInvitation.title || 'Date',
@@ -77,14 +72,12 @@ const DateInvitationSection: React.FC = () => {
       time: dbInvitation.proposed_date 
         ? new Date(dbInvitation.proposed_date).toLocaleString()
         : 'Time TBD',
-      message: dbInvitation.message || dbInvitation.ai_generated_message || 'Let\'s have a great time together!',
-      status: dbInvitation.status,
       venueName: dbInvitation.venue?.name || 'Venue TBD',
       venueAddress: dbInvitation.venue?.address || 'Address TBD',
       estimatedCost: '$$',
       duration: '2-3 hours',
-      specialNotes: dbInvitation.ai_reasoning || '',
-      venueImage: dbInvitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04'
+      specialRequests: dbInvitation.ai_reasoning || '',
+      image: dbInvitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04'
     };
   };
 

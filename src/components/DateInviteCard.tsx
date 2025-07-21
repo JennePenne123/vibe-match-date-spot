@@ -6,32 +6,33 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin, Check, X, DollarSign, Calendar, Info } from 'lucide-react';
-
-interface DateInvite {
-  id: string; // Changed from number to string
-  friendName: string;
-  friendAvatar: string;
-  dateType: string;
-  location: string;
-  time: string;
-  message: string;
-  status: string;
-  venueName: string;
-  venueAddress: string;
-  estimatedCost: string;
-  duration: string;
-  specialNotes: string;
-  venueImage: string;
-}
+import { DateInvitation } from '@/types/index';
 
 interface DateInviteCardProps {
-  invitation: DateInvite;
-  onAccept: (id: string) => void; // Changed from number to string
-  onDecline: (id: string) => void; // Changed from number to string
+  invitation: DateInvitation;
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
 }
 
 const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Transform DateInvitation to display format
+  const displayData = {
+    id: invitation.id,
+    friendName: invitation.friendName || invitation.sender?.name || 'Friend',
+    friendAvatar: invitation.friendAvatar || invitation.sender?.avatar_url || '',
+    dateType: invitation.dateType || invitation.title || 'Date',
+    location: invitation.location || invitation.venue?.name || 'TBD',
+    time: invitation.time || (invitation.proposed_date ? new Date(invitation.proposed_date).toLocaleString() : 'Time TBD'),
+    message: invitation.message || 'Let\'s have a great time together!',
+    venueName: invitation.venueName || invitation.venue?.name || 'Venue TBD',
+    venueAddress: invitation.venueAddress || invitation.venue?.address || 'Address TBD',
+    estimatedCost: invitation.estimatedCost || '$$',
+    duration: invitation.duration || '2-3 hours',
+    specialNotes: invitation.specialRequests || '',
+    venueImage: invitation.image || invitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04'
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -40,32 +41,32 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
           <CardContent className="p-4">
             <div className="flex items-start gap-4">
               <Avatar className="w-12 h-12 border-2 border-pink-200">
-                <AvatarImage src={invitation.friendAvatar} alt={invitation.friendName} />
+                <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
                 <AvatarFallback className="bg-pink-100 text-pink-600">
-                  {invitation.friendName.split(' ').map(n => n[0]).join('')}
+                  {displayData.friendName.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="font-semibold text-gray-900 truncate">
-                    {invitation.friendName}
+                    {displayData.friendName}
                   </h3>
                   <Badge className="text-xs text-pink-600 font-medium bg-pink-100">
-                    {invitation.dateType}
+                    {displayData.dateType}
                   </Badge>
                 </div>
                 
-                <p className="text-sm text-gray-600 mb-2">{invitation.message}</p>
+                <p className="text-sm text-gray-600 mb-2">{displayData.message}</p>
                 
                 <div className="flex items-center gap-4 text-xs text-gray-500">
                   <div className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {invitation.time}
+                    {displayData.time}
                   </div>
                   <div className="flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
-                    {invitation.location}
+                    {displayData.location}
                   </div>
                 </div>
               </div>
@@ -78,13 +79,13 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <Avatar className="w-10 h-10 border-2 border-pink-200">
-              <AvatarImage src={invitation.friendAvatar} alt={invitation.friendName} />
+              <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
               <AvatarFallback className="bg-pink-100 text-pink-600">
-                {invitation.friendName.split(' ').map(n => n[0]).join('')}
+                {displayData.friendName.split(' ').map(n => n[0]).join('')}
               </AvatarFallback>
             </Avatar>
             <div>
-              <div className="font-semibold text-gray-900">{invitation.friendName}</div>
+              <div className="font-semibold text-gray-900">{displayData.friendName}</div>
               <div className="text-sm text-gray-600 font-normal">invited you to a date</div>
             </div>
           </DialogTitle>
@@ -94,56 +95,56 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
           {/* Venue Image */}
           <div className="relative rounded-lg overflow-hidden">
             <img 
-              src={invitation.venueImage} 
-              alt={invitation.venueName}
+              src={displayData.venueImage} 
+              alt={displayData.venueName}
               className="w-full h-48 object-cover"
             />
             <div className="absolute top-3 left-3">
               <Badge className="bg-pink-500 text-white">
-                {invitation.dateType}
+                {displayData.dateType}
               </Badge>
             </div>
           </div>
 
           {/* Message */}
           <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="text-gray-700 italic">"{invitation.message}"</p>
+            <p className="text-gray-700 italic">"{displayData.message}"</p>
           </div>
 
           {/* Venue Details */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-gray-900">{invitation.venueName}</h3>
+            <h3 className="font-semibold text-gray-900">{displayData.venueName}</h3>
             
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600">{invitation.time}</span>
+                <span className="text-gray-600">{displayData.time}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600">{invitation.duration}</span>
+                <span className="text-gray-600">{displayData.duration}</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600">{invitation.location}</span>
+                <span className="text-gray-600">{displayData.location}</span>
               </div>
               <div className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600">{invitation.estimatedCost}</span>
+                <span className="text-gray-600">{displayData.estimatedCost}</span>
               </div>
             </div>
 
             <div className="text-sm text-gray-600">
-              <strong>Address:</strong> {invitation.venueAddress}
+              <strong>Address:</strong> {displayData.venueAddress}
             </div>
 
-            {invitation.specialNotes && (
+            {displayData.specialNotes && (
               <div className="bg-blue-50 p-3 rounded-lg">
                 <div className="flex items-start gap-2">
                   <Info className="w-4 h-4 text-blue-600 mt-0.5" />
                   <div>
                     <div className="text-sm font-medium text-blue-900">Special Notes</div>
-                    <div className="text-sm text-blue-700">{invitation.specialNotes}</div>
+                    <div className="text-sm text-blue-700">{displayData.specialNotes}</div>
                   </div>
                 </div>
               </div>

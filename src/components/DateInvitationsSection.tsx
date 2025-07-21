@@ -6,28 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Plus, Users } from 'lucide-react';
 import DateInviteCard from '@/components/DateInviteCard';
 import SkeletonLoader from '@/components/SkeletonLoader';
-
-interface DateInvite {
-  id: number;
-  friendName: string;
-  friendAvatar: string;
-  dateType: string;
-  location: string;
-  time: string;
-  message: string;
-  status: string;
-  venueName: string;
-  venueAddress: string;
-  estimatedCost: string;
-  duration: string;
-  specialNotes: string;
-  venueImage: string;
-}
+import { DateInvitation } from '@/types/index';
 
 interface DateInvitationsSectionProps {
-  invitations: DateInvite[];
-  onAccept: (id: number) => void;
-  onDecline: (id: number) => void;
+  invitations: DateInvitation[];
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
   isLoading?: boolean;
 }
 

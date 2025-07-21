@@ -1,6 +1,6 @@
 
 export interface DateInvite {
-  id: number;
+  id: string;
   friendName: string;
   friendAvatar: string;
   dateType: string;
@@ -18,7 +18,7 @@ export interface DateInvite {
 
 export const mockFriendInvitations: DateInvite[] = [
   {
-    id: 1,
+    id: '1',
     friendName: 'Sarah Chen',
     friendAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
     dateType: 'Coffee & Brunch',
@@ -34,7 +34,7 @@ export const mockFriendInvitations: DateInvite[] = [
     venueImage: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&h=300&fit=crop'
   },
   {
-    id: 2,
+    id: '2',
     friendName: 'Mike Johnson',
     friendAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     dateType: 'Dinner & Movies',
@@ -50,7 +50,7 @@ export const mockFriendInvitations: DateInvite[] = [
     venueImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop'
   },
   {
-    id: 3,
+    id: '3',
     friendName: 'Emma Wilson',
     friendAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
     dateType: 'Art Gallery',
