@@ -1,20 +1,35 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useInvitations } from '@/hooks/useInvitations';
 import DateInviteCard from '@/components/DateInviteCard';
 import { useToast } from '@/hooks/use-toast';
 import { DateInvitation } from '@/types/index';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const DateInvitationSection: React.FC = () => {
-  const { invitations, loading, acceptInvitation, declineInvitation } = useInvitations();
+  const { invitations, loading, acceptInvitation, declineInvitation, fetchInvitations } = useInvitations();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('pending');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Filter for pending invitations only
+  // Filter invitations by status
   const pendingInvitations = invitations.filter(inv => inv.status === 'pending');
+  const acceptedInvitations = invitations.filter(inv => inv.status === 'accepted');
+  const declinedInvitations = invitations.filter(inv => inv.status === 'declined');
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchInvitations();
+    setIsRefreshing(false);
+  };
 
   const handleAccept = async (id: string) => {
     console.log('🎯 ACCEPT INVITATION - ID:', id, 'Type:', typeof id);
-    const invitation = pendingInvitations.find(inv => inv.id === id);
+    const invitation = invitations.find(inv => inv.id === id);
     if (invitation) {
       await acceptInvitation(invitation.id);
       toast({
@@ -29,7 +44,7 @@ const DateInvitationSection: React.FC = () => {
 
   const handleDecline = async (id: string) => {
     console.log('🎯 DECLINE INVITATION - ID:', id, 'Type:', typeof id);
-    const invitation = pendingInvitations.find(inv => inv.id === id);
+    const invitation = invitations.find(inv => inv.id === id);
     if (invitation) {
       await declineInvitation(invitation.id);
       toast({
@@ -81,48 +96,127 @@ const DateInvitationSection: React.FC = () => {
     };
   };
 
-  // Show loading state
+  // Show improved loading state with skeletons
   if (loading) {
     return (
       <div className="space-y-4 mb-6">
-        <div className="animate-pulse">
-          <div className="h-4 bg-muted rounded w-48 mb-3"></div>
-          <div className="h-32 bg-muted rounded"></div>
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-6 w-20" />
+        </div>
+        <div className="space-y-3">
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
         </div>
       </div>
     );
   }
 
-  // Show empty state when no invitations
-  if (pendingInvitations.length === 0) {
+  // Show empty state when no invitations at all
+  if (invitations.length === 0) {
     return (
       <div className="space-y-4 mb-6">
         <div className="text-center p-6 bg-muted/30 rounded-lg border-2 border-dashed border-muted">
           <h3 className="text-lg font-medium text-muted-foreground mb-2">No Date Invitations</h3>
-          <p className="text-sm text-muted-foreground">
-            You don't have any pending date invitations right now. Use the Smart Date Planner below to create and send invitations to your friends!
+          <p className="text-sm text-muted-foreground mb-4">
+            You don't have any date invitations yet. Use the Smart Date Planner below to create and send invitations to your friends!
           </p>
+          <Button 
+            onClick={handleRefresh}
+            variant="outline"
+            size="sm"
+            disabled={isRefreshing}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
         </div>
       </div>
     );
   }
 
+  const renderInvitationList = (invitationList: any[], showActions: boolean = true) => {
+    if (invitationList.length === 0) {
+      return (
+        <div className="text-center p-4 text-muted-foreground">
+          <p>No invitations in this category</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-3">
+        {invitationList.map((invitation) => (
+          <DateInviteCard
+            key={invitation.id}
+            invitation={transformInvitation(invitation)}
+            onAccept={showActions ? handleAccept : undefined}
+            onDecline={showActions ? handleDecline : undefined}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Pending Date Invitations</h2>
-        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-          {pendingInvitations.length} pending
-        </span>
+        <h2 className="text-lg font-semibold text-foreground">Date Invitations</h2>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="text-xs">
+            {invitations.length} total
+          </Badge>
+          <Button 
+            onClick={handleRefresh}
+            variant="ghost"
+            size="sm"
+            disabled={isRefreshing}
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
       </div>
-      {pendingInvitations.map((invitation) => (
-        <DateInviteCard
-          key={invitation.id}
-          invitation={transformInvitation(invitation)}
-          onAccept={handleAccept}
-          onDecline={handleDecline}
-        />
-      ))}
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="pending" className="relative">
+            Pending
+            {pendingInvitations.length > 0 && (
+              <Badge variant="destructive" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
+                {pendingInvitations.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="accepted" className="relative">
+            Accepted
+            {acceptedInvitations.length > 0 && (
+              <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
+                {acceptedInvitations.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="declined" className="relative">
+            Declined
+            {declinedInvitations.length > 0 && (
+              <Badge variant="outline" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
+                {declinedInvitations.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="pending" className="mt-4">
+          {renderInvitationList(pendingInvitations, true)}
+        </TabsContent>
+        
+        <TabsContent value="accepted" className="mt-4">
+          {renderInvitationList(acceptedInvitations, false)}
+        </TabsContent>
+        
+        <TabsContent value="declined" className="mt-4">
+          {renderInvitationList(declinedInvitations, false)}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
