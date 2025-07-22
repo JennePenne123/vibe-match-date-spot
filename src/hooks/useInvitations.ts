@@ -51,8 +51,7 @@ export const useInvitations = () => {
         .from('date_invitations')
         .select(`
           *,
-          sender:profiles!sender_id(name, email, avatar_url),
-          venue:venues(name, address, image_url)
+          sender:profiles!sender_id(name, email, avatar_url)
         `)
         .eq('recipient_id', user.id)
         .order('created_at', { ascending: false });
@@ -71,13 +70,24 @@ export const useInvitations = () => {
         invitations: data?.map(inv => ({
           id: inv.id,
           idType: typeof inv.id,
-          hasVenue: !!inv.venue,
+          venue_id: inv.venue_id,
           hasSender: !!inv.sender,
           status: inv.status
         }))
       });
 
-      setInvitations(data || []);
+      // For now, we'll enrich invitations with basic venue info from venue_id
+      // In the future, we could fetch venue details separately or store venue name in invitations
+      const enrichedInvitations = (data || []).map(invitation => ({
+        ...invitation,
+        venue: invitation.venue_id ? {
+          name: 'Selected Venue',
+          address: 'Venue details will be available soon',
+          image_url: undefined
+        } : undefined
+      }));
+
+      setInvitations(enrichedInvitations);
     } catch (error) {
       console.error('🚨 FETCH INVITATIONS - Catch error:', error);
       // Improved error serialization
