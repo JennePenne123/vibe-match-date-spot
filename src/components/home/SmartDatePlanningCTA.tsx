@@ -74,7 +74,7 @@ const SmartDatePlanningCTA: React.FC = () => {
       <CardContent className="space-y-4">
         
         
-        <Button onClick={handleStartPlanning} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white" size="lg">
+        <Button onClick={handleStartPlanning} size="lg" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-[9px] my-[14px] px-[9px] mx-0">
           Start Smart Planning
           <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
