@@ -14,6 +14,7 @@ interface DateInvitation {
   proposed_date?: string;
   status: 'pending' | 'accepted' | 'declined' | 'cancelled';
   created_at: string;
+  direction: 'received' | 'sent'; // New field to track direction
   // Enhanced AI fields
   ai_compatibility_score?: number;
   ai_reasoning?: string;
@@ -21,6 +22,11 @@ interface DateInvitation {
   ai_generated_message?: string;
   planning_session_id?: string;
   sender?: {
+    name: string;
+    email: string;
+    avatar_url?: string;
+  };
+  recipient?: {
     name: string;
     email: string;
     avatar_url?: string;
@@ -47,7 +53,8 @@ export const useInvitations = () => {
     console.log('🔄 FETCH INVITATIONS - Starting fetch for user:', user.id);
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Fetch received invitations (where user is recipient)
+      const { data: receivedData, error: receivedError } = await supabase
         .from('date_invitations')
         .select(`
           *,
@@ -56,30 +63,30 @@ export const useInvitations = () => {
         .eq('recipient_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('🚨 FETCH INVITATIONS - Database error:', error);
-        handleError(error, {
-          toastTitle: 'Failed to load invitations',
-          toastDescription: 'Please try refreshing the page',
-        });
-        return;
-      }
+      if (receivedError) throw receivedError;
+
+      // Fetch sent invitations (where user is sender)
+      const { data: sentData, error: sentError } = await supabase
+        .from('date_invitations')
+        .select(`
+          *,
+          recipient:profiles!recipient_id(name, email, avatar_url)
+        `)
+        .eq('sender_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (sentError) throw sentError;
 
       console.log('✅ FETCH INVITATIONS - Success:', {
-        count: data?.length || 0,
-        invitations: data?.map(inv => ({
-          id: inv.id,
-          idType: typeof inv.id,
-          venue_id: inv.venue_id,
-          hasSender: !!inv.sender,
-          status: inv.status
-        }))
+        receivedCount: receivedData?.length || 0,
+        sentCount: sentData?.length || 0,
+        totalCount: (receivedData?.length || 0) + (sentData?.length || 0)
       });
 
-      // For now, we'll enrich invitations with basic venue info from venue_id
-      // In the future, we could fetch venue details separately or store venue name in invitations
-      const enrichedInvitations = (data || []).map(invitation => ({
+      // Enrich and combine invitations
+      const enrichedReceived = (receivedData || []).map(invitation => ({
         ...invitation,
+        direction: 'received' as const,
         venue: invitation.venue_id ? {
           name: 'Selected Venue',
           address: 'Venue details will be available soon',
@@ -87,10 +94,23 @@ export const useInvitations = () => {
         } : undefined
       }));
 
-      setInvitations(enrichedInvitations);
+      const enrichedSent = (sentData || []).map(invitation => ({
+        ...invitation,
+        direction: 'sent' as const,
+        venue: invitation.venue_id ? {
+          name: 'Selected Venue',
+          address: 'Venue details will be available soon',
+          image_url: undefined
+        } : undefined
+      }));
+
+      // Combine and sort by created_at
+      const allInvitations = [...enrichedReceived, ...enrichedSent]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      setInvitations(allInvitations);
     } catch (error) {
       console.error('🚨 FETCH INVITATIONS - Catch error:', error);
-      // Improved error serialization
       const errorMessage = error instanceof Error ? error.message : String(error);
       handleError(new Error(`Failed to load invitations: ${errorMessage}`), {
         toastTitle: 'Failed to load invitations',

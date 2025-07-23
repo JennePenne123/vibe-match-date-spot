@@ -10,28 +10,47 @@ import { DateInvitation } from '@/types/index';
 
 interface DateInviteCardProps {
   invitation: DateInvitation;
-  onAccept: (id: string) => void;
-  onDecline: (id: string) => void;
+  direction: 'received' | 'sent';
+  onAccept?: (id: string) => void;
+  onDecline?: (id: string) => void;
 }
 
-const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps) => {
+const DateInviteCard = ({ invitation, direction, onAccept, onDecline }: DateInviteCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Transform DateInvitation to display format
-  const displayData = {
-    id: invitation.id,
-    friendName: invitation.friendName || invitation.sender?.name || 'Friend',
-    friendAvatar: invitation.friendAvatar || invitation.sender?.avatar_url || '',
-    dateType: invitation.dateType || invitation.title || 'Date',
-    location: invitation.location || invitation.venue?.name || 'TBD',
-    time: invitation.time || (invitation.proposed_date ? new Date(invitation.proposed_date).toLocaleString() : 'Time TBD'),
-    message: invitation.message || 'Let\'s have a great time together!',
-    venueName: invitation.venueName || invitation.venue?.name || 'Venue TBD',
-    venueAddress: invitation.venueAddress || invitation.venue?.address || 'Address TBD',
-    estimatedCost: invitation.estimatedCost || '$$',
-    duration: invitation.duration || '2-3 hours',
-    specialNotes: invitation.specialRequests || '',
-    venueImage: invitation.image || invitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04'
+  // Transform invitation data for display based on direction
+  const displayData = direction === 'received' ? {
+    friendName: invitation.sender?.name || 'Unknown',
+    friendAvatar: invitation.sender?.avatar_url,
+    relationLabel: 'From',
+    dateType: invitation.title || 'Date Invitation',
+    timeProposed: invitation.proposed_date || 'Time TBD',
+    location: invitation.venue?.name || 'Venue TBD',
+    address: invitation.venue?.address || 'Address TBD',
+    venueImage: invitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04',
+    message: invitation.message || '',
+    venueName: invitation.venue?.name || 'Venue TBD',
+    venueAddress: invitation.venue?.address || 'Address TBD',
+    time: invitation.proposed_date || 'Time TBD',
+    duration: '2-3 hours',
+    estimatedCost: '$$',
+    specialNotes: ''
+  } : {
+    friendName: 'Recipient',
+    friendAvatar: undefined,
+    relationLabel: 'To',
+    dateType: invitation.title || 'Date Invitation',
+    timeProposed: invitation.proposed_date || 'Time TBD',
+    location: invitation.venue?.name || 'Venue TBD',
+    address: invitation.venue?.address || 'Address TBD',
+    venueImage: invitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04',
+    message: invitation.message || '',
+    venueName: invitation.venue?.name || 'Venue TBD',
+    venueAddress: invitation.venue?.address || 'Address TBD',
+    time: invitation.proposed_date || 'Time TBD',
+    duration: '2-3 hours',
+    estimatedCost: '$$',
+    specialNotes: ''
   };
 
   return (
@@ -39,38 +58,40 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
       <DialogTrigger asChild>
         <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-pink-400 cursor-pointer">
           <CardContent className="p-4">
-            <div className="flex items-start gap-4">
-              <Avatar className="w-12 h-12 border-2 border-pink-200">
-                <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
-                <AvatarFallback className="bg-pink-100 text-pink-600">
-                  {displayData.friendName.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-gray-900 truncate">
-                    {displayData.friendName}
-                  </h3>
-                  <Badge className="text-xs text-pink-600 font-medium bg-pink-100">
-                    {displayData.dateType}
-                  </Badge>
-                </div>
+              <div className="flex items-start gap-4">
+                <Avatar className="w-12 h-12 border-2 border-pink-200">
+                  <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
+                  <AvatarFallback className="bg-pink-100 text-pink-600">
+                    {displayData.friendName.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
                 
-                <p className="text-sm text-gray-600 mb-2">{displayData.message}</p>
-                
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {displayData.time}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-gray-900 truncate">
+                      {displayData.friendName}
+                    </h3>
+                    <Badge className="text-xs text-pink-600 font-medium bg-pink-100">
+                      {displayData.dateType}
+                    </Badge>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {displayData.location}
+                  
+                  <p className="text-sm text-gray-600 mb-2">
+                    {displayData.relationLabel} • Status: {invitation.status}
+                  </p>
+                  
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {displayData.timeProposed}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {displayData.location}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
           </CardContent>
         </Card>
       </DialogTrigger>
@@ -151,32 +172,39 @@ const DateInviteCard = ({ invitation, onAccept, onDecline }: DateInviteCardProps
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              onClick={() => {
-                console.log('🎯 ACCEPT BUTTON CLICKED - ID:', invitation.id);
-                onAccept(invitation.id);
-                setIsOpen(false);
-              }}
-              className="flex-1 bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
-            >
-              <Check className="w-4 h-4 mr-2" />
-              Accept Date
-            </Button>
-            <Button
-              onClick={() => {
-                console.log('🎯 DECLINE BUTTON CLICKED - ID:', invitation.id);
-                onDecline(invitation.id);
-                setIsOpen(false);
-              }}
-              variant="outline"
-              className="flex-1 border-gray-300 text-gray-600 hover:bg-gray-50"
-            >
-              <X className="w-4 h-4 mr-2" />
-              Decline
-            </Button>
-          </div>
+          {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && (
+            <div className="flex space-x-2 mt-6">
+              <Button 
+                onClick={() => {
+                  onAccept(invitation.id);
+                  setIsOpen(false);
+                }}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Accept
+              </Button>
+              <Button 
+                onClick={() => {
+                  onDecline(invitation.id);
+                  setIsOpen(false);
+                }}
+                variant="outline" 
+                className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Decline
+              </Button>
+            </div>
+          )}
+          
+          {direction === 'sent' && (
+            <div className="mt-6 p-3 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                Invitation sent • Status: <span className="capitalize font-medium">{invitation.status}</span>
+              </p>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

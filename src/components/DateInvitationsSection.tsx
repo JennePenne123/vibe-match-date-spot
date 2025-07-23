@@ -75,6 +75,7 @@ const DateInvitationsSection = ({ invitations, onAccept, onDecline, isLoading = 
         <DateInviteCard
           key={invitation.id}
           invitation={invitation}
+          direction="received"
           onAccept={onAccept}
           onDecline={onDecline}
         />

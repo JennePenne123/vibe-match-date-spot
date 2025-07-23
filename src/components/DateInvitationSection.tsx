@@ -16,10 +16,18 @@ const DateInvitationSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState('pending');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Filter invitations by status
-  const pendingInvitations = invitations.filter(inv => inv.status === 'pending');
-  const acceptedInvitations = invitations.filter(inv => inv.status === 'accepted');
-  const declinedInvitations = invitations.filter(inv => inv.status === 'declined');
+  // Filter invitations by direction and status
+  const receivedInvitations = invitations.filter(inv => inv.direction === 'received');
+  const sentInvitations = invitations.filter(inv => inv.direction === 'sent');
+  
+  // Further filter by status within each direction
+  const receivedPending = receivedInvitations.filter(inv => inv.status === 'pending');
+  const receivedAccepted = receivedInvitations.filter(inv => inv.status === 'accepted');
+  const receivedDeclined = receivedInvitations.filter(inv => inv.status === 'declined');
+  
+  const sentPending = sentInvitations.filter(inv => inv.status === 'pending');
+  const sentAccepted = sentInvitations.filter(inv => inv.status === 'accepted');
+  const sentDeclined = sentInvitations.filter(inv => inv.status === 'declined');
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -135,27 +143,24 @@ const DateInvitationSection: React.FC = () => {
     );
   }
 
-  const renderInvitationList = (invitationList: any[], showActions: boolean = true) => {
-    if (invitationList.length === 0) {
+  const renderInvitationList = (inviteList: any[], direction: 'received' | 'sent') => {
+    if (inviteList.length === 0) {
       return (
-        <div className="text-center p-4 text-muted-foreground">
-          <p>No invitations in this category</p>
+        <div className="text-center py-8 text-muted-foreground">
+          <p>No {direction} invitations in this category</p>
         </div>
       );
     }
 
-    return (
-      <div className="space-y-3">
-        {invitationList.map((invitation) => (
-          <DateInviteCard
-            key={invitation.id}
-            invitation={transformInvitation(invitation)}
-            onAccept={showActions ? handleAccept : undefined}
-            onDecline={showActions ? handleDecline : undefined}
-          />
-        ))}
-      </div>
-    );
+    return inviteList.map((invitation) => (
+      <DateInviteCard
+        key={invitation.id}
+        invitation={transformInvitation(invitation)}
+        direction={direction}
+        onAccept={direction === 'received' ? handleAccept : undefined}
+        onDecline={direction === 'received' ? handleDecline : undefined}
+      />
+    ));
   };
 
   return (
@@ -177,44 +182,76 @@ const DateInvitationSection: React.FC = () => {
         </div>
       </div>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="pending" className="relative">
-            Pending
-            {pendingInvitations.length > 0 && (
-              <Badge variant="destructive" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
-                {pendingInvitations.length}
+      <Tabs defaultValue="received" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="received" className="flex items-center gap-2">
+            Received
+            {receivedInvitations.length > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {receivedInvitations.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="accepted" className="relative">
-            Accepted
-            {acceptedInvitations.length > 0 && (
-              <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
-                {acceptedInvitations.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="declined" className="relative">
-            Declined
-            {declinedInvitations.length > 0 && (
-              <Badge variant="outline" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
-                {declinedInvitations.length}
+          <TabsTrigger value="sent" className="flex items-center gap-2">
+            Sent
+            {sentInvitations.length > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {sentInvitations.length}
               </Badge>
             )}
           </TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="pending" className="mt-4">
-          {renderInvitationList(pendingInvitations, true)}
+
+        <TabsContent value="received" className="space-y-6 mt-6">
+          <Tabs defaultValue="pending" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="pending">
+                Pending ({receivedPending.length})
+              </TabsTrigger>
+              <TabsTrigger value="accepted">
+                Accepted ({receivedAccepted.length})
+              </TabsTrigger>
+              <TabsTrigger value="declined">
+                Declined ({receivedDeclined.length})
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="pending" className="space-y-4 mt-4">
+              {renderInvitationList(receivedPending, 'received')}
+            </TabsContent>
+            <TabsContent value="accepted" className="space-y-4 mt-4">
+              {renderInvitationList(receivedAccepted, 'received')}
+            </TabsContent>
+            <TabsContent value="declined" className="space-y-4 mt-4">
+              {renderInvitationList(receivedDeclined, 'received')}
+            </TabsContent>
+          </Tabs>
         </TabsContent>
-        
-        <TabsContent value="accepted" className="mt-4">
-          {renderInvitationList(acceptedInvitations, false)}
-        </TabsContent>
-        
-        <TabsContent value="declined" className="mt-4">
-          {renderInvitationList(declinedInvitations, false)}
+
+        <TabsContent value="sent" className="space-y-6 mt-6">
+          <Tabs defaultValue="pending" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="pending">
+                Pending ({sentPending.length})
+              </TabsTrigger>
+              <TabsTrigger value="accepted">
+                Accepted ({sentAccepted.length})
+              </TabsTrigger>
+              <TabsTrigger value="declined">
+                Declined ({sentDeclined.length})
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="pending" className="space-y-4 mt-4">
+              {renderInvitationList(sentPending, 'sent')}
+            </TabsContent>
+            <TabsContent value="accepted" className="space-y-4 mt-4">
+              {renderInvitationList(sentAccepted, 'sent')}
+            </TabsContent>
+            <TabsContent value="declined" className="space-y-4 mt-4">
+              {renderInvitationList(sentDeclined, 'sent')}
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
     </div>
