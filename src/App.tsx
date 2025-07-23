@@ -20,6 +20,7 @@ import Profile from "./pages/Profile";
 import Venues from "./pages/Venues";
 import MyFriends from "./pages/MyFriends";
 import MyVenues from "./pages/MyVenues";
+import Invitations from "./pages/Invitations";
 import NotFound from "./pages/NotFound";
 import AIRecommendations from "./pages/AIRecommendations";
 import SmartDatePlanning from "./pages/SmartDatePlanning";
@@ -71,6 +72,7 @@ const App = () => (
                     <Route path="/venues" element={<Venues />} />
                     <Route path="/my-friends" element={<MyFriends />} />
                     <Route path="/my-venues" element={<MyVenues />} />
+                    <Route path="/invitations" element={<Invitations />} />
                     <Route path="/ai-recommendations" element={<AIRecommendations />} />
                     <Route path="/plan-date" element={<SmartDatePlanning />} />
                     <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />

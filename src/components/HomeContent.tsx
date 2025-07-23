@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Users } from 'lucide-react';
 import SmartDatePlanningCTA from '@/components/home/SmartDatePlanningCTA';
-import DateInvitationSection from '@/components/DateInvitationSection';
+import DateInvitationStatsCard from '@/components/DateInvitationStatsCard';
 
 import { useToast } from '@/hooks/use-toast';
 const HomeContent: React.FC = () => {
@@ -35,12 +35,13 @@ const HomeContent: React.FC = () => {
     }
   }, [location.state, toast, navigate]);
 
-  // Always show the Smart Date Planning CTA - it will handle the no friends case internally
-  return <main className="p-6">
+  return (
+    <main className="p-6">
       <div className="max-w-md mx-auto space-y-6">
-        <DateInvitationSection />
+        <DateInvitationStatsCard />
         <SmartDatePlanningCTA />
       </div>
-    </main>;
+    </main>
+  );
 };
 export default HomeContent;
