@@ -1,28 +1,23 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFriends } from '@/hooks/useFriends';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Users, Brain, ArrowRight, UserPlus } from 'lucide-react';
-
 const SmartDatePlanningCTA: React.FC = () => {
   const navigate = useNavigate();
-  const { friends } = useFriends();
-
+  const {
+    friends
+  } = useFriends();
   const handleStartPlanning = () => {
     navigate('/plan-date');
   };
-
   const handleAddFriends = () => {
     navigate('/my-friends');
   };
-
   const hasFriends = friends.length > 0;
-
   if (!hasFriends) {
-    return (
-      <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+    return <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
             <div className="bg-purple-100 p-2 rounded-full">
@@ -62,86 +57,28 @@ const SmartDatePlanningCTA: React.FC = () => {
               You can start planning even without friends added yet. The AI will help you find the perfect date spot!
             </p>
             <div className="flex gap-2">
-              <Button 
-                onClick={handleStartPlanning}
-                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                size="lg"
-              >
+              <Button onClick={handleStartPlanning} className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white" size="lg">
                 Start Planning
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
-              <Button 
-                onClick={handleAddFriends}
-                variant="outline"
-                size="lg"
-                className="border-purple-200 text-purple-600 hover:bg-purple-50"
-              >
+              <Button onClick={handleAddFriends} variant="outline" size="lg" className="border-purple-200 text-purple-600 hover:bg-purple-50">
                 <UserPlus className="h-4 w-4" />
               </Button>
             </div>
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
-
-  return (
-    <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-start gap-3">
-          <div className="bg-purple-100 p-2 rounded-full shrink-0">
-            <Sparkles className="h-5 w-5 text-purple-600" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-bold text-gray-900 leading-tight">AI-Powered Date Planning</h2>
-            <p className="text-sm text-gray-600 font-normal mt-1">Let AI find the perfect match for you and your friends</p>
-          </div>
-        </CardTitle>
-      </CardHeader>
+  return <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+      
       <CardContent className="space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-100 p-2 rounded-full shrink-0">
-              <Users className="h-4 w-4 text-blue-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-gray-900 text-sm">Collaborative</h3>
-              <p className="text-xs text-gray-600">Plan together with friends</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <div className="bg-green-100 p-2 rounded-full shrink-0">
-              <Brain className="h-4 w-4 text-green-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-gray-900 text-sm">Smart Matching</h3>
-              <p className="text-xs text-gray-600">AI finds perfect venues</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <div className="bg-pink-100 p-2 rounded-full shrink-0">
-              <Sparkles className="h-4 w-4 text-pink-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-gray-900 text-sm">Personalized</h3>
-              <p className="text-xs text-gray-600">Based on your preferences</p>
-            </div>
-          </div>
-        </div>
         
-        <Button 
-          onClick={handleStartPlanning}
-          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-          size="lg"
-        >
+        
+        <Button onClick={handleStartPlanning} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white" size="lg">
           Start Smart Planning
           <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
-
 export default SmartDatePlanningCTA;
