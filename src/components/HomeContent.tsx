@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Users } from 'lucide-react';
 import SmartDatePlanningCTA from '@/components/home/SmartDatePlanningCTA';
-import DateInvitationStatsCard from '@/components/DateInvitationStatsCard';
+import RecentReceivedInvitationsCard from '@/components/home/RecentReceivedInvitationsCard';
 
 import { useToast } from '@/hooks/use-toast';
 const HomeContent: React.FC = () => {
@@ -38,7 +38,7 @@ const HomeContent: React.FC = () => {
   return (
     <main className="p-6">
       <div className="max-w-md mx-auto space-y-6">
-        <DateInvitationStatsCard />
+        <RecentReceivedInvitationsCard />
         <SmartDatePlanningCTA />
       </div>
     </main>
