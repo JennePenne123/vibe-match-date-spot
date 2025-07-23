@@ -69,7 +69,7 @@ const SmartDatePlanningCTA: React.FC = () => {
         </CardContent>
       </Card>;
   }
-  return <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+  return <Card>
       
       <CardContent className="space-y-4">
         
