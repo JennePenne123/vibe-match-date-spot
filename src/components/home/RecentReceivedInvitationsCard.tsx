@@ -118,14 +118,6 @@ const RecentReceivedInvitationsCard: React.FC = () => {
           ))}
         </div>
         
-        <Button 
-          variant="outline" 
-          onClick={handleViewAll} 
-          className="w-full mt-4"
-        >
-          View All Invitations
-          <ArrowRight className="h-4 w-4 ml-2" />
-        </Button>
       </CardContent>
     </Card>
   );
