@@ -185,7 +185,7 @@ serve(async (req) => {
               thumbnail: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=${photo.photo_reference}&key=${apiKey}`,
               width: photo.width || 400,
               height: photo.height || 300,
-              attribution: photo.html_attributions?.[0] || 'Google Photos',
+              attribution: cleanAttribution(photo.html_attributions?.[0]),
               isGooglePhoto: true
             })) || [],
             // Fallback image for backwards compatibility
@@ -251,6 +251,19 @@ serve(async (req) => {
     });
   }
 });
+
+// Helper function to strip HTML tags from attribution
+function stripHtmlTags(html: string): string {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
+// Helper function to clean attribution text
+function cleanAttribution(attribution: string): string {
+  if (!attribution) return 'Google Photos';
+  const cleaned = stripHtmlTags(attribution);
+  return cleaned || 'Google Photos';
+}
 
 function determineCuisineType(place: any, preferredCuisines: string[]): string {
   const types = place.types || [];

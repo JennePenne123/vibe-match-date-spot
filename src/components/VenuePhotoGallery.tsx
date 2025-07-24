@@ -145,7 +145,7 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
       {currentPhoto.attribution && (
         <div className="mt-1 text-xs text-gray-500 flex items-center gap-1">
           <ExternalLink className="w-3 h-3" />
-          <span>{currentPhoto.attribution}</span>
+          <span>Photo by {currentPhoto.attribution}</span>
         </div>
       )}
     </div>
