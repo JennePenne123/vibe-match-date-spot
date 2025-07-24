@@ -271,7 +271,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     setDateMode('single');
     setSelectedVenueId('');
     setInvitationMessage('');
-    navigate('/plan-date');
+    navigate('/home');
   }
 
   return {
