@@ -31,6 +31,8 @@ export const calculateCompatibilityScore = async (
     console.log('🔄 COMPATIBILITY: Calculating compatibility for users:', user1Id, user2Id);
 
     // Get both users' preferences
+    console.log('🔍 COMPATIBILITY: Querying preferences for users:', [user1Id, user2Id]);
+    
     const { data: preferences, error: prefError } = await supabase
       .from('user_preferences')
       .select('*')
@@ -42,14 +44,19 @@ export const calculateCompatibilityScore = async (
     }
 
     console.log('📊 COMPATIBILITY: Retrieved preferences:', preferences);
+    console.log('📊 COMPATIBILITY: Preferences count:', preferences?.length || 0);
+    
+    // Debug: Check individual user preferences
+    const user1Prefs = preferences?.find(p => p.user_id === user1Id);
+    const user2Prefs = preferences?.find(p => p.user_id === user2Id);
+    console.log('📊 COMPATIBILITY: User 1 preferences found:', !!user1Prefs);
+    console.log('📊 COMPATIBILITY: User 2 preferences found:', !!user2Prefs);
 
     if (!preferences || preferences.length < 2) {
       console.log('⚠️ COMPATIBILITY: Not enough preference data for calculation. Found:', preferences?.length || 0, 'preferences');
+      console.log('⚠️ COMPATIBILITY: Expected 2 users, but only found preferences for:', preferences?.map(p => p.user_id) || []);
       return null;
     }
-
-    const user1Prefs = preferences.find(p => p.user_id === user1Id);
-    const user2Prefs = preferences.find(p => p.user_id === user2Id);
 
     if (!user1Prefs || !user2Prefs) {
       console.log('⚠️ COMPATIBILITY: Missing preferences for one or both users');
