@@ -105,15 +105,7 @@ export type Database = {
           user2_id?: string
           venue_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "ai_date_recommendations_venue_id_fkey"
-            columns: ["venue_id"]
-            isOneToOne: false
-            referencedRelation: "venues"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       ai_venue_scores: {
         Row: {
@@ -158,15 +150,7 @@ export type Database = {
           venue_id?: string
           weather_factor?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ai_venue_scores_venue_id_fkey"
-            columns: ["venue_id"]
-            isOneToOne: false
-            referencedRelation: "venues"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       date_feedback: {
         Row: {
@@ -287,13 +271,6 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "date_invitations_venue_id_fkey"
-            columns: ["venue_id"]
-            isOneToOne: false
-            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
@@ -523,15 +500,7 @@ export type Database = {
           user_id?: string
           venue_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_venue_feedback_venue_id_fkey"
-            columns: ["venue_id"]
-            isOneToOne: false
-            referencedRelation: "venues"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       venues: {
         Row: {
