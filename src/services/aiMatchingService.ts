@@ -28,7 +28,7 @@ export const calculateCompatibilityScore = async (
   user2Id: string
 ): Promise<CompatibilityScore | null> => {
   try {
-    console.log('Calculating compatibility for users:', user1Id, user2Id);
+    console.log('🔄 COMPATIBILITY: Calculating compatibility for users:', user1Id, user2Id);
 
     // Get both users' preferences
     const { data: preferences, error: prefError } = await supabase
@@ -36,17 +36,29 @@ export const calculateCompatibilityScore = async (
       .select('*')
       .in('user_id', [user1Id, user2Id]);
 
-    if (prefError) throw prefError;
+    if (prefError) {
+      console.error('🚨 COMPATIBILITY: Error fetching preferences:', prefError);
+      throw prefError;
+    }
+
+    console.log('📊 COMPATIBILITY: Retrieved preferences:', preferences);
 
     if (!preferences || preferences.length < 2) {
-      console.log('Not enough preference data for compatibility calculation');
+      console.log('⚠️ COMPATIBILITY: Not enough preference data for calculation. Found:', preferences?.length || 0, 'preferences');
       return null;
     }
 
     const user1Prefs = preferences.find(p => p.user_id === user1Id);
     const user2Prefs = preferences.find(p => p.user_id === user2Id);
 
-    if (!user1Prefs || !user2Prefs) return null;
+    if (!user1Prefs || !user2Prefs) {
+      console.log('⚠️ COMPATIBILITY: Missing preferences for one or both users');
+      console.log('User 1 preferences:', !!user1Prefs);
+      console.log('User 2 preferences:', !!user2Prefs);
+      return null;
+    }
+
+    console.log('✅ COMPATIBILITY: Found preferences for both users, calculating scores...');
 
     // Calculate compatibility scores for each dimension
     const cuisineScore = calculateArrayCompatibility(
@@ -75,6 +87,14 @@ export const calculateCompatibilityScore = async (
       user2Prefs.dietary_restrictions || []
     );
 
+    console.log('📊 COMPATIBILITY: Individual scores calculated:', {
+      cuisine: Math.round(cuisineScore * 100),
+      vibe: Math.round(vibeScore * 100),
+      price: Math.round(priceScore * 100),
+      timing: Math.round(timingScore * 100),
+      activity: Math.round(activityScore * 100)
+    });
+
     // Calculate weighted overall score
     const overallScore = (
       cuisineScore * 0.3 +
@@ -83,6 +103,8 @@ export const calculateCompatibilityScore = async (
       timingScore * 0.15 +
       activityScore * 0.1
     );
+
+    console.log('🎯 COMPATIBILITY: Overall score calculated:', Math.round(overallScore * 100));
 
     const compatibilityData: CompatibilityScore = {
       overall_score: Math.round(overallScore * 100) / 100,
@@ -99,18 +121,24 @@ export const calculateCompatibilityScore = async (
       }
     };
 
+    console.log('💾 COMPATIBILITY: Storing compatibility data:', compatibilityData);
+
     // Store the compatibility score
-    const { error: insertError } = await supabase
+    const { data: storedData, error: insertError } = await supabase
       .from('ai_compatibility_scores')
       .upsert({
         user1_id: user1Id,
         user2_id: user2Id,
         ...compatibilityData,
         updated_at: new Date().toISOString()
-      });
+      })
+      .select()
+      .single();
 
     if (insertError) {
-      console.error('Error storing compatibility score:', insertError);
+      console.error('🚨 COMPATIBILITY: Error storing compatibility score:', insertError);
+    } else {
+      console.log('✅ COMPATIBILITY: Successfully stored compatibility score:', storedData);
     }
 
     return compatibilityData;

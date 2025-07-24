@@ -8,10 +8,13 @@ import { CompatibilityScore as CompatibilityScoreType } from '@/services/aiMatch
 import CompatibilityScore from '@/components/CompatibilityScore';
 import AIMatchSummary from '@/components/AIMatchSummary';
 import AIVenueCard from '@/components/AIVenueCard';
+import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MatchReviewProps {
   compatibilityScore: number | CompatibilityScoreType;
   partnerName: string;
+  partnerId?: string;
   venueRecommendations: AIVenueRecommendation[];
   onVenueSelect: (venueId: string) => void;
   error?: string;
@@ -21,11 +24,13 @@ interface MatchReviewProps {
 const MatchReview: React.FC<MatchReviewProps> = ({
   compatibilityScore,
   partnerName,
+  partnerId,
   venueRecommendations,
   onVenueSelect,
   error,
   onRetrySearch
 }) => {
+  const { user } = useAuth();
   const handleVenueSelect = (venue: AIVenueRecommendation) => {
     console.log('🎯 MATCH REVIEW - Venue selected:', {
       venueName: venue.venue_name,
@@ -68,13 +73,13 @@ const MatchReview: React.FC<MatchReviewProps> = ({
 
   return (
     <div className="space-y-6">
-      {typeof compatibilityScore === 'object' && compatibilityScore !== null ? (
-        <AIMatchSummary 
-          compatibilityScore={Math.round(compatibilityScore.overall_score * 100)}
-          partnerName={partnerName}
-          venueCount={venueRecommendations.length}
-        />
-      ) : typeof compatibilityScore === 'number' ? (
+      <CompatibilityDebug 
+        compatibilityScore={compatibilityScore}
+        partnerId={partnerId}
+        userId={user?.id}
+      />
+      
+      {(typeof compatibilityScore === 'object' && compatibilityScore !== null) || typeof compatibilityScore === 'number' ? (
         <AIMatchSummary 
           compatibilityScore={compatibilityScore}
           partnerName={partnerName}

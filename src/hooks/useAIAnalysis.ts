@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { getCompatibilityScore } from '@/services/aiMatchingService';
+import { getCompatibilityScore, CompatibilityScore } from '@/services/aiMatchingService';
 import { getAIVenueRecommendations } from '@/services/aiVenueService';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -19,7 +19,7 @@ export const useAIAnalysis = () => {
   const { handleError } = useErrorHandler();
   
   // Enhanced state management
-  const [compatibilityScore, setCompatibilityScore] = useState<number | null>(null);
+  const [compatibilityScore, setCompatibilityScore] = useState<CompatibilityScore | number | null>(null);
   const [venueRecommendations, setVenueRecommendations] = useState<any[]>([]);
   const [venueSearchError, setVenueSearchError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -125,7 +125,8 @@ export const useAIAnalysis = () => {
       
       if (compatibility) {
         console.log('❤️ AI ANALYSIS: Compatibility score received:', compatibility.overall_score + '%');
-        setCompatibilityScore(compatibility.overall_score);
+        console.log('📊 AI ANALYSIS: Full compatibility data:', compatibility);
+        setCompatibilityScore(compatibility); // Store full compatibility object
         
         await supabase
           .from('date_planning_sessions')
