@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, Star, MapPin, DollarSign, Sparkles } from 'lucide-react';
 import { Venue } from '@/types';
+import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 
 interface VenueCardProps {
   venue: Venue;
@@ -29,6 +30,17 @@ const VenueCard = ({
   const venueImage = venue.image_url || venue.image;
   const venueLocation = venue.address || venue.location;
   const venuePriceRange = venue.price_range || venue.priceRange;
+  
+  // Process venue photos for gallery
+  const venuePhotos = venue.photos && venue.photos.length > 0 
+    ? venue.photos 
+    : [{
+        url: venueImage || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+        width: 400,
+        height: 300,
+        attribution: venue.photos?.length ? 'Google Photos' : 'Stock Photo',
+        isGooglePhoto: venue.photos?.length > 0
+      }];
 
   if (variant === 'compact') {
     return (
@@ -81,10 +93,11 @@ const VenueCard = ({
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative">
-        <img
-          src={venueImage}
-          alt={venue.name}
-          className="w-full h-48 object-cover"
+        <VenuePhotoGallery 
+          photos={venuePhotos}
+          venueName={venue.name}
+          maxHeight="h-48"
+          showThumbnails={false}
         />
         {showMatchScore && venue.matchScore && (
           <div className="absolute top-3 left-3">

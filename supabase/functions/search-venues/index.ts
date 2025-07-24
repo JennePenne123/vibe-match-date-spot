@@ -179,8 +179,18 @@ serve(async (req) => {
             longitude: place.geometry?.location?.lng,
             rating: place.rating || 4.0,
             priceRange: '€'.repeat(place.price_level || 2),
+            // Process photos - get multiple sizes and photos
+            photos: place.photos?.slice(0, 5).map((photo: any, index: number) => ({
+              url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${index === 0 ? 800 : 400}&photoreference=${photo.photo_reference}&key=${apiKey}`,
+              thumbnail: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=${photo.photo_reference}&key=${apiKey}`,
+              width: photo.width || 400,
+              height: photo.height || 300,
+              attribution: photo.html_attributions?.[0] || 'Google Photos',
+              isGooglePhoto: true
+            })) || [],
+            // Fallback image for backwards compatibility
             image: place.photos?.[0] ? 
-              `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${apiKey}` :
+              `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${place.photos[0].photo_reference}&key=${apiKey}` :
               'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
             cuisineType: determineCuisineType(place, originalCuisines),
             tags: place.types || ['restaurant'],

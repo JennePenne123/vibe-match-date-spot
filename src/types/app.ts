@@ -20,6 +20,14 @@ export interface AppVenue {
   price_range?: string;
   rating?: number;
   image_url?: string;
+  photos?: Array<{
+    url: string;
+    thumbnail?: string;
+    width: number;
+    height: number;
+    attribution?: string;
+    isGooglePhoto: boolean;
+  }>;
   tags?: string[];
   is_active?: boolean;
   google_place_id?: string;

@@ -6,6 +6,14 @@ export interface AIVenueRecommendation {
   venue_name: string;
   venue_address: string;
   venue_image?: string;
+  venue_photos?: Array<{
+    url: string;
+    thumbnail?: string;
+    width: number;
+    height: number;
+    attribution?: string;
+    isGooglePhoto: boolean;
+  }>;
   ai_score: number;
   match_factors: any;
   contextual_score: number;
@@ -89,6 +97,7 @@ export const getAIVenueRecommendations = async (
         venue_name: venue.name,
         venue_address: venue.address,
         venue_image: venue.image_url,
+        venue_photos: venue.photos || [],
         ai_score: aiScore,
         match_factors: {},
         contextual_score: aiScore * 0.8,

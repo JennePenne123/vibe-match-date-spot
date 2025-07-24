@@ -19,6 +19,7 @@ import {
 import VenueFeedbackButtons from '@/components/VenueFeedbackButtons';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { type FeedbackType } from '@/services/feedbackService';
+import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 
 interface AIVenueCardProps {
   recommendation: AIVenueRecommendation;
@@ -53,6 +54,17 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
     confidence_level
   } = recommendation;
 
+  // Process venue photos for gallery
+  const venuePhotos = recommendation.venue_photos && recommendation.venue_photos.length > 0 
+    ? recommendation.venue_photos 
+    : [{
+        url: venue_image || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+        width: 400,
+        height: 300,
+        attribution: recommendation.venue_photos?.length ? 'Google Photos' : 'Stock Photo',
+        isGooglePhoto: recommendation.venue_photos?.length > 0
+      }];
+
   // Handle feedback change for real-time UI updates
   const handleFeedbackChange = (feedbackType: FeedbackType | null) => {
     setUserFeedback(feedbackType);
@@ -81,45 +93,45 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-2 hover:border-purple-200">
       {/* Venue Image */}
-      {venue_image && (
-        <div className="relative h-48 overflow-hidden">
-          <img 
-            src={venue_image} 
-            alt={venue_name}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-          />
+      <div className="relative">
+        <VenuePhotoGallery 
+          photos={venuePhotos}
+          venueName={venue_name}
+          maxHeight="h-48"
+          showThumbnails={false}
+          className="transition-transform duration-300 hover:scale-105"
+        />
           
-          {/* AI Score Overlay */}
-          <div className="absolute top-3 right-3">
-            <Badge className={`${getScoreColor(ai_score)} font-bold`}>
-              <Brain className="w-3 h-3 mr-1" />
-              {Math.round(ai_score)}% AI Match
+        {/* AI Score Overlay */}
+        <div className="absolute top-3 right-3">
+          <Badge className={`${getScoreColor(ai_score)} font-bold`}>
+            <Brain className="w-3 h-3 mr-1" />
+            {Math.round(ai_score)}% AI Match
+          </Badge>
+        </div>
+
+        {/* Confidence Indicator */}
+        <div className="absolute top-3 left-3">
+          <div className="flex items-center bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+            <div className={`w-2 h-2 rounded-full ${confidenceInfo.color} mr-1`}></div>
+            <span className="text-xs font-medium text-gray-700">{confidenceInfo.text}</span>
+          </div>
+        </div>
+
+        {/* Feedback overlay for user's choice */}
+        {userFeedback && (
+          <div className="absolute bottom-3 left-3">
+            <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm">
+              {userFeedback === 'like' && '❤️ Liked'}
+              {userFeedback === 'super_like' && '✨ Super Liked'}
+              {userFeedback === 'dislike' && '👎 Disliked'}
+              {userFeedback === 'skip' && '⏭️ Skipped'}
+              {userFeedback === 'interested' && '👀 Interested'}
+              {userFeedback === 'visited' && '✅ Visited'}
             </Badge>
           </div>
-
-          {/* Confidence Indicator */}
-          <div className="absolute top-3 left-3">
-            <div className="flex items-center bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-              <div className={`w-2 h-2 rounded-full ${confidenceInfo.color} mr-1`}></div>
-              <span className="text-xs font-medium text-gray-700">{confidenceInfo.text}</span>
-            </div>
-          </div>
-
-          {/* Feedback overlay for user's choice */}
-          {userFeedback && (
-            <div className="absolute bottom-3 left-3">
-              <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm">
-                {userFeedback === 'like' && '❤️ Liked'}
-                {userFeedback === 'super_like' && '✨ Super Liked'}
-                {userFeedback === 'dislike' && '👎 Disliked'}
-                {userFeedback === 'skip' && '⏭️ Skipped'}
-                {userFeedback === 'interested' && '👀 Interested'}
-                {userFeedback === 'visited' && '✅ Visited'}
-              </Badge>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
