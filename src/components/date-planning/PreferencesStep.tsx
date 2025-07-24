@@ -31,11 +31,20 @@ interface UserPreferences {
   dietary_restrictions: string[];
 }
 
+interface CompatibilityScore {
+  overall_score: number;
+  cuisine_score: number;
+  vibe_score: number;
+  price_score: number;
+  timing_score: number;
+  compatibility_factors: string[];
+}
+
 interface PreferencesStepProps {
   sessionId: string;
   partnerId: string;
   partnerName: string;
-  compatibilityScore: number | null;
+  compatibilityScore: CompatibilityScore | number | null;
   aiAnalyzing: boolean;
   onPreferencesComplete: (preferences: DatePreferences) => void;
 }
@@ -689,7 +698,9 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
             {compatibilityScore !== null && (
               <Badge className="bg-purple-100 text-purple-700">
                 <Sparkles className="h-3 w-3 mr-1" />
-                {compatibilityScore}% Compatible
+                {typeof compatibilityScore === 'number' 
+                  ? compatibilityScore 
+                  : compatibilityScore.overall_score}% Compatible
               </Badge>
             )}
           </div>
