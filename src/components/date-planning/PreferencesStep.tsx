@@ -122,6 +122,39 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
     { id: 'kosher', name: 'Kosher', emoji: '✡️' }
   ];
 
+  const quickStartTemplates = [
+    {
+      id: 'romantic-dinner',
+      title: 'Romantic Dinner',
+      emoji: '💕',
+      description: 'Candlelight, fine dining, intimate atmosphere',
+      cuisines: ['Italian', 'French'],
+      vibes: ['romantic', 'upscale'],
+      priceRange: ['$$$', '$$$$'],
+      timePreferences: ['evening']
+    },
+    {
+      id: 'casual-brunch',
+      title: 'Casual Brunch',
+      emoji: '☕',
+      description: 'Relaxed, tasty, social',
+      cuisines: ['American', 'Mediterranean'],
+      vibes: ['casual', 'cozy'],
+      priceRange: ['$', '$$'],
+      timePreferences: ['morning', 'lunch']
+    },
+    {
+      id: 'trendy-cocktail',
+      title: 'Trendy Cocktail Bar',
+      emoji: '🍸',
+      description: 'Hip, stylish, perfect for drinks',
+      cuisines: ['American'],
+      vibes: ['lively', 'upscale'],
+      priceRange: ['$$', '$$$'],
+      timePreferences: ['evening', 'night']
+    }
+  ];
+
   // Load existing preferences
   useEffect(() => {
     loadUserPreferences();
@@ -211,6 +244,18 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
       Array.isArray(partnerPreferences[category]) && 
       (partnerPreferences[category] as string[]).includes(item)
     );
+  };
+
+  const applyQuickStartTemplate = (template: typeof quickStartTemplates[0]) => {
+    setSelectedCuisines(template.cuisines);
+    setSelectedVibes(template.vibes);
+    setSelectedPriceRange(template.priceRange);
+    setSelectedTimePreferences(template.timePreferences);
+    
+    toast({
+      title: `${template.title} template applied!`,
+      description: "You can still customize your preferences.",
+    });
   };
 
   const submitPreferences = async () => {
@@ -350,6 +395,29 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
 
   const renderStep1 = () => (
     <>
+      {/* Quick Start Section */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold mb-2">Quick Start</h2>
+        <p className="text-muted-foreground mb-4">Or choose a ready-made template</p>
+        <div className="grid grid-cols-1 gap-3">
+          {quickStartTemplates.map((template) => (
+            <button
+              key={template.id}
+              onClick={() => applyQuickStartTemplate(template)}
+              className="p-4 rounded-lg border border-border text-left transition-all hover:bg-muted hover:border-primary/20"
+            >
+              <div className="flex items-start gap-3">
+                <div className="text-2xl">{template.emoji}</div>
+                <div className="flex-1">
+                  <div className="font-medium text-sm">{template.title}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{template.description}</div>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-2">What are you craving?</h2>
         <p className="text-muted-foreground mb-6">Choose your favorite cuisines</p>
