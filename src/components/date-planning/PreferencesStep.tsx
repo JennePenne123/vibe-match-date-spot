@@ -653,7 +653,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
                     Saving...
                   </>
                 ) : (
-                  'Save Preferences'
+                  'Send Invite'
                 )}
               </Button>
             )}
