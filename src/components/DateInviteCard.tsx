@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin, Check, X, DollarSign, Calendar, Info } from 'lucide-react';
 import { DateInvitation } from '@/types/index';
+import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 
 interface DateInviteCardProps {
   invitation: DateInvitation;
@@ -113,13 +114,24 @@ const DateInviteCard = ({ invitation, direction, onAccept, onDecline }: DateInvi
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Venue Image */}
-          <div className="relative rounded-lg overflow-hidden">
-            <img 
-              src={displayData.venueImage} 
-              alt={displayData.venueName}
-              className="w-full h-48 object-cover"
-            />
+          {/* Venue Photos */}
+          <div className="relative">
+            {invitation.venue?.photos && invitation.venue.photos.length > 0 ? (
+              <VenuePhotoGallery
+                photos={invitation.venue.photos}
+                venueName={displayData.venueName}
+                maxHeight="h-48"
+                showThumbnails={invitation.venue.photos.length > 1}
+              />
+            ) : (
+              <div className="relative rounded-lg overflow-hidden">
+                <img 
+                  src={displayData.venueImage} 
+                  alt={displayData.venueName}
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+            )}
             <div className="absolute top-3 left-3">
               <Badge className="bg-pink-500 text-white">
                 {displayData.dateType}
