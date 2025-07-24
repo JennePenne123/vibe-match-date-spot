@@ -3,9 +3,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Star, MapPin, DollarSign, Sparkles } from 'lucide-react';
+import { Heart, Star, MapPin, DollarSign, Sparkles, Navigation, Clock } from 'lucide-react';
 import { Venue } from '@/types';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
+import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
 
 interface VenueCardProps {
   venue: Venue;
@@ -28,8 +29,9 @@ const VenueCard = ({
 
   // Use actual database fields or fallback to computed values
   const venueImage = venue.image_url || venue.image;
-  const venueLocation = venue.address || venue.location;
+  const venueLocation = formatVenueAddress(venue);
   const venuePriceRange = venue.price_range || venue.priceRange;
+  const venueNeighborhood = extractNeighborhood(venue.address);
   
   // Process venue photos for gallery
   const venuePhotos = venue.photos && venue.photos.length > 0 
@@ -71,7 +73,27 @@ const VenueCard = ({
           
           <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
             <MapPin className="w-3 h-3" />
-            {venueLocation} • {venue.cuisine_type}
+            <span className="truncate">{venueLocation}</span>
+            {venue.cuisine_type && <span> • {venue.cuisine_type}</span>}
+          </div>
+          
+          {/* Distance and Status */}
+          <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+            {venue.distance && (
+              <div className="flex items-center gap-1">
+                <Navigation className="w-3 h-3" />
+                <span>{venue.distance}</span>
+              </div>
+            )}
+            {venueNeighborhood && (
+              <span>• {venueNeighborhood}</span>
+            )}
+            {venue.isOpen !== undefined && (
+              <span className={`flex items-center gap-1 ${venue.isOpen ? 'text-green-500' : 'text-red-500'}`}>
+                • <Clock className="w-3 h-3" />
+                {venue.isOpen ? 'Open' : 'Closed'}
+              </span>
+            )}
           </div>
           
           <div className="flex items-center justify-between text-xs">
@@ -139,15 +161,36 @@ const VenueCard = ({
 
         <p className="text-gray-600 text-sm mb-3">{venue.description}</p>
 
-        <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-          <div className="flex items-center gap-1">
-            <MapPin className="w-4 h-4" />
-            {venueLocation} {venue.distance && `• ${venue.distance}`}
+        <div className="space-y-2 mb-3">
+          <div className="flex items-center gap-1 text-sm text-gray-500">
+            <MapPin className="w-4 h-4 flex-shrink-0" />
+            <span className="truncate">{venueLocation}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <DollarSign className="w-4 h-4" />
-            {venuePriceRange}
+          
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            {venue.distance && (
+              <div className="flex items-center gap-1">
+                <Navigation className="w-4 h-4" />
+                <span>{venue.distance}</span>
+              </div>
+            )}
+            {venuePriceRange && (
+              <div className="flex items-center gap-1">
+                <DollarSign className="w-4 h-4" />
+                <span>{venuePriceRange}</span>
+              </div>
+            )}
+            {venueNeighborhood && (
+              <span>{venueNeighborhood}</span>
+            )}
           </div>
+          
+          {venue.isOpen !== undefined && (
+            <div className={`flex items-center gap-1 text-sm ${venue.isOpen ? 'text-green-600' : 'text-red-600'}`}>
+              <Clock className="w-4 h-4" />
+              <span>{venue.isOpen ? 'Open now' : 'Currently closed'}</span>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">

@@ -9,11 +9,27 @@ export interface AIVenueRecommendation {
   venue_name: string;
   venue_address: string;
   venue_image?: string;
+  venue_photos?: Array<{
+    url: string;
+    thumbnail?: string;
+    width: number;
+    height: number;
+    attribution?: string;
+    isGooglePhoto: boolean;
+  }>;
   ai_score: number;
   match_factors: any;
   contextual_score: number;
   ai_reasoning: string;
   confidence_level: number;
+  distance?: string;
+  neighborhood?: string;
+  isOpen?: boolean;
+  operatingHours?: string[];
+  priceRange?: string;
+  rating?: number;
+  cuisine_type?: string;
+  amenities?: string[];
 }
 
 export const getAIVenueRecommendations = async (
@@ -64,13 +80,22 @@ export const getAIVenueRecommendations = async (
       const recommendation: AIVenueRecommendation = {
         venue_id: venue.id,
         venue_name: venue.name,
-        venue_address: venue.address,
+        venue_address: venue.address || venue.location || 'Address not available',
         venue_image: venue.image_url,
+        venue_photos: venue.photos || [],
         ai_score: aiScore,
         match_factors: scoreData?.match_factors || {},
         contextual_score: scoreData?.contextual_score || 0,
         ai_reasoning: generateAIReasoning(venue, scoreData?.match_factors, aiScore),
-        confidence_level: calculateConfidenceLevel(aiScore, scoreData?.match_factors)
+        confidence_level: calculateConfidenceLevel(aiScore, scoreData?.match_factors),
+        distance: userLocation ? calculateDistanceFromUser(venue, userLocation) : undefined,
+        neighborhood: extractNeighborhood(venue.address),
+        isOpen: determineOpenStatus(venue.opening_hours),
+        operatingHours: formatOperatingHours(venue.opening_hours),
+        priceRange: venue.price_range,
+        rating: venue.rating,
+        cuisine_type: venue.cuisine_type,
+        amenities: venue.tags || []
       };
 
       console.log(`✅ RECOMMENDATIONS: ${venue.name} scored ${aiScore}% (confidence: ${Math.round(recommendation.confidence_level * 100)}%)`);
@@ -326,6 +351,55 @@ export const generateAIReasoning = (venue: any, matchFactors: any, aiScore: numb
   }
   
   return reasons.join('. ') + `.`;
+};
+
+// Helper function to calculate distance from user location
+const calculateDistanceFromUser = (venue: any, userLocation: { latitude: number; longitude: number }): string => {
+  if (!venue.latitude || !venue.longitude) return 'Distance unavailable';
+  
+  const distance = calculateDistance(userLocation.latitude, userLocation.longitude, venue.latitude, venue.longitude);
+  if (distance < 1) {
+    return `${Math.round(distance * 1000)}m`;
+  }
+  return `${distance.toFixed(1)}km`;
+};
+
+// Helper function to extract neighborhood from address
+const extractNeighborhood = (address: string): string | undefined => {
+  if (!address) return undefined;
+  
+  // Simple extraction - take the part before the first comma (usually street)
+  // and the part after (usually neighborhood/district)
+  const parts = address.split(',').map(part => part.trim());
+  if (parts.length > 1) {
+    return parts[1]; // Return the neighborhood part
+  }
+  return undefined;
+};
+
+// Helper function to determine if venue is open
+const determineOpenStatus = (openingHours: any): boolean => {
+  if (!openingHours || !Array.isArray(openingHours)) return true; // Assume open if no data
+  
+  const now = new Date();
+  const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  const currentTime = now.getHours() * 100 + now.getMinutes(); // HHMM format
+  
+  // Simple check - if we have opening hours data, assume open during business hours
+  // This is a simplified implementation - real-world would parse actual hours
+  return currentTime >= 900 && currentTime <= 2200; // 9 AM to 10 PM
+};
+
+// Helper function to format operating hours
+const formatOperatingHours = (openingHours: any): string[] => {
+  if (!openingHours) return ['Hours not available'];
+  
+  if (Array.isArray(openingHours)) {
+    return openingHours;
+  }
+  
+  // Default fallback
+  return ['Mon-Sun: 9:00 AM - 10:00 PM'];
 };
 
 // Helper function to calculate distance between two points

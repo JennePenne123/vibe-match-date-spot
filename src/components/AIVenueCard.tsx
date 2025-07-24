@@ -14,12 +14,19 @@ import {
   ChevronDown, 
   ChevronUp,
   Brain,
-  TrendingUp
+  TrendingUp,
+  Navigation,
+  Phone,
+  Globe,
+  Wifi,
+  Car,
+  TreePine
 } from 'lucide-react';
 import VenueFeedbackButtons from '@/components/VenueFeedbackButtons';
-import { AIVenueRecommendation } from '@/services/aiVenueService';
+import { AIVenueRecommendation } from '@/services/aiVenueService/recommendations';
 import { type FeedbackType } from '@/services/feedbackService';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
+import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
 
 interface AIVenueCardProps {
   recommendation: AIVenueRecommendation;
@@ -47,22 +54,35 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
     venue_name,
     venue_address,
     venue_image,
+    venue_photos,
     ai_score,
     match_factors,
     contextual_score,
     ai_reasoning,
-    confidence_level
+    confidence_level,
+    distance,
+    neighborhood,
+    isOpen,
+    operatingHours,
+    priceRange,
+    rating,
+    cuisine_type,
+    amenities
   } = recommendation;
 
+  // Format address with fallback
+  const formattedAddress = formatVenueAddress(recommendation);
+  const venueNeighborhood = neighborhood || extractNeighborhood(venue_address);
+
   // Process venue photos for gallery
-  const venuePhotos = recommendation.venue_photos && recommendation.venue_photos.length > 0 
-    ? recommendation.venue_photos 
+  const processedPhotos = venue_photos && venue_photos.length > 0 
+    ? venue_photos 
     : [{
         url: venue_image || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
         width: 400,
         height: 300,
-        attribution: recommendation.venue_photos?.length ? 'Google Photos' : 'Stock Photo',
-        isGooglePhoto: recommendation.venue_photos?.length > 0
+        attribution: venue_photos?.length ? 'Google Photos' : 'Stock Photo',
+        isGooglePhoto: venue_photos?.length > 0
       }];
 
   // Handle feedback change for real-time UI updates
@@ -95,7 +115,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
       {/* Venue Image */}
       <div className="relative">
         <VenuePhotoGallery 
-          photos={venuePhotos}
+          photos={processedPhotos}
           venueName={venue_name}
           maxHeight="h-48"
           showThumbnails={false}
@@ -142,7 +162,26 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
             
             <div className="flex items-center text-sm text-gray-600 mt-1">
               <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-              <span className="truncate">{venue_address}</span>
+              <span className="truncate">{formattedAddress}</span>
+            </div>
+
+            {/* Distance and Neighborhood */}
+            <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+              {distance && (
+                <div className="flex items-center gap-1">
+                  <Navigation className="w-3 h-3" />
+                  <span>{distance}</span>
+                </div>
+              )}
+              {venueNeighborhood && (
+                <span>• {venueNeighborhood}</span>
+              )}
+              {isOpen !== undefined && (
+                <span className={`flex items-center gap-1 ${isOpen ? 'text-green-600' : 'text-red-600'}`}>
+                  <Clock className="w-3 h-3" />
+                  {isOpen ? 'Open' : 'Closed'}
+                </span>
+              )}
             </div>
           </div>
 
@@ -162,17 +201,23 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
       <CardContent className="space-y-4">
         {/* Venue Metrics */}
         <div className="flex items-center gap-4 text-sm">
-          {match_factors?.rating && (
+          {(rating || match_factors?.rating) && (
             <div className="flex items-center text-yellow-600">
               <Star className="w-4 h-4 mr-1 fill-current" />
-              <span className="font-medium">{match_factors.rating}</span>
+              <span className="font-medium">{rating || match_factors.rating}</span>
             </div>
           )}
           
-          {match_factors?.price_range && (
+          {(priceRange || match_factors?.price_range) && (
             <div className="flex items-center text-green-600">
               <DollarSign className="w-4 h-4 mr-1" />
-              <span className="font-medium">{match_factors.price_range}</span>
+              <span className="font-medium">{priceRange || match_factors.price_range}</span>
+            </div>
+          )}
+
+          {cuisine_type && (
+            <div className="flex items-center text-purple-600">
+              <span className="font-medium">{cuisine_type}</span>
             </div>
           )}
           
@@ -183,6 +228,32 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
             </div>
           )}
         </div>
+
+        {/* Amenities */}
+        {amenities && amenities.length > 0 && (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-gray-500">Amenities:</span>
+            <div className="flex flex-wrap gap-1">
+              {amenities.slice(0, 4).map((amenity, index) => (
+                <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
+                  {amenity}
+                </Badge>
+              ))}
+              {amenities.length > 4 && (
+                <Badge variant="outline" className="text-xs px-2 py-0.5">
+                  +{amenities.length - 4} more
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Operating Hours (if available) */}
+        {operatingHours && operatingHours.length > 0 && (
+          <div className="text-xs text-gray-500">
+            <span className="font-medium">Hours:</span> {operatingHours[0]}
+          </div>
+        )}
 
         {/* AI Reasoning */}
         {showAIInsights && ai_reasoning && (

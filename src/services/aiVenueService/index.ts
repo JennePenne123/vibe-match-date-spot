@@ -4,5 +4,3 @@ export { calculateVenueAIScore, calculateContextualFactors, calculateConfidenceL
 export { getActiveVenues, getStoredAIScore } from './fetching';
 export { getAIVenueRecommendations, generateAIReasoning } from './recommendations';
 export type { AIVenueRecommendation } from './recommendations';
-
-// Note: AIVenueRecommendation type is already exported above, no need to duplicate
