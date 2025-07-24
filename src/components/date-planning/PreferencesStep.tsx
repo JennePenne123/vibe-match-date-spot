@@ -314,7 +314,22 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
     }
   };
 
+  // Validation function for step 2 (date and time are mandatory)
+  const canProceedFromStep2 = () => {
+    return selectedDate && selectedTime;
+  };
+
   const nextStep = () => {
+    // Validate step 2 before proceeding
+    if (currentStep === 2 && !canProceedFromStep2()) {
+      toast({
+        title: "Date and Time Required",
+        description: "Please select both a preferred date and time to continue.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -453,14 +468,16 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Date Picker */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Preferred Date</label>
+            <label className="text-sm font-medium">
+              Preferred Date <span className="text-destructive">*</span>
+            </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !selectedDate && "text-muted-foreground"
+                    !selectedDate && "text-muted-foreground border-destructive/50"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -478,13 +495,21 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
                 />
               </PopoverContent>
             </Popover>
+            {!selectedDate && (
+              <p className="text-sm text-destructive">Date is required to continue</p>
+            )}
           </div>
 
           {/* Time Picker */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Preferred Time</label>
+            <label className="text-sm font-medium">
+              Preferred Time <span className="text-destructive">*</span>
+            </label>
             <Select value={selectedTime} onValueChange={setSelectedTime}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className={cn(
+                "w-full",
+                !selectedTime && "border-destructive/50"
+              )}>
                 <SelectValue placeholder="Select time" />
               </SelectTrigger>
               <SelectContent>
@@ -504,6 +529,9 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
                 <SelectItem value="22:00">10:00 PM</SelectItem>
               </SelectContent>
             </Select>
+            {!selectedTime && (
+              <p className="text-sm text-destructive">Time is required to continue</p>
+            )}
           </div>
         </div>
       </div>
@@ -710,7 +738,10 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
             </Button>
             
             {currentStep < totalSteps ? (
-              <Button onClick={nextStep}>
+              <Button 
+                onClick={nextStep}
+                disabled={currentStep === 2 && !canProceedFromStep2()}
+              >
                 Next
               </Button>
             ) : (
