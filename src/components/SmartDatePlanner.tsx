@@ -149,6 +149,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
           <MatchReview
             compatibilityScore={compatibilityScore || 0}
             partnerName={selectedPartner.name}
+            partnerId={selectedPartnerId}
             venueRecommendations={venueRecommendations || []}
             onVenueSelect={handleVenueSelection}
             error={state.venueSearchError || undefined}
