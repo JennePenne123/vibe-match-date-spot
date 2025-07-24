@@ -80,8 +80,8 @@ export const getAIVenueRecommendations = async (
       const recommendation: AIVenueRecommendation = {
         venue_id: venue.id,
         venue_name: venue.name,
-        venue_address: venue.address || venue.location || 'Address not available',
-        venue_image: venue.image_url,
+        venue_address: venue.address || venue.location || venue.vicinity || 'Address not available',
+        venue_image: venue.image_url || venue.image,
         venue_photos: venue.photos || [],
         ai_score: aiScore,
         match_factors: scoreData?.match_factors || {},
@@ -89,12 +89,12 @@ export const getAIVenueRecommendations = async (
         ai_reasoning: generateAIReasoning(venue, scoreData?.match_factors, aiScore),
         confidence_level: calculateConfidenceLevel(aiScore, scoreData?.match_factors),
         distance: userLocation ? calculateDistanceFromUser(venue, userLocation) : undefined,
-        neighborhood: extractNeighborhood(venue.address),
-        isOpen: determineOpenStatus(venue.opening_hours),
+        neighborhood: extractNeighborhood(venue.address || venue.location || venue.vicinity),
+        isOpen: determineOpenStatus(venue.opening_hours || venue.openNow),
         operatingHours: formatOperatingHours(venue.opening_hours),
-        priceRange: venue.price_range,
+        priceRange: venue.price_range || venue.priceRange,
         rating: venue.rating,
-        cuisine_type: venue.cuisine_type,
+        cuisine_type: venue.cuisine_type || venue.cuisineType,
         amenities: venue.tags || []
       };
 
@@ -307,11 +307,21 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
           id: finalVenueId,
           name: venue.name,
           address: venue.location,
+          location: venue.location, // Add for backwards compatibility
+          vicinity: venue.location, // Add for address fallback
           cuisine_type: venue.cuisineType,
+          cuisineType: venue.cuisineType, // Add for backwards compatibility
           price_range: venue.priceRange,
+          priceRange: venue.priceRange, // Add for backwards compatibility
           rating: venue.rating,
           image_url: venue.image,
-          tags: venue.tags || []
+          image: venue.image, // Add for backwards compatibility
+          photos: venue.photos || [], // Add enhanced photos
+          tags: venue.tags || [],
+          latitude: venue.latitude,
+          longitude: venue.longitude,
+          openNow: venue.openNow,
+          opening_hours: venue.openNow ? ['Open now'] : ['Hours not available']
         });
       } catch (venueError) {
         console.warn('⚠️ GOOGLE PLACES: Error processing venue:', venue.name, venueError);
@@ -379,6 +389,9 @@ const extractNeighborhood = (address: string): string | undefined => {
 
 // Helper function to determine if venue is open
 const determineOpenStatus = (openingHours: any): boolean => {
+  // Handle Google Places openNow boolean
+  if (typeof openingHours === 'boolean') return openingHours;
+  
   if (!openingHours || !Array.isArray(openingHours)) return true; // Assume open if no data
   
   const now = new Date();
