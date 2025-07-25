@@ -72,32 +72,14 @@ const DateInviteCard = ({
         <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-pink-200 cursor-pointer rounded-xl overflow-hidden">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
-              <div className="flex flex-col gap-3">
-                <Avatar className="w-14 h-14 border-2 border-pink-200 shadow-sm flex-shrink-0">
-                  <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
-                  <AvatarFallback className="bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700 font-semibold text-lg">
-                    {displayData.friendName.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="w-14 flex flex-col gap-2 text-xs text-gray-600">
-                  <div className="flex flex-col items-center gap-1">
-                    <Clock className="w-3 h-3 text-gray-400" />
-                    <span className="font-medium text-center leading-tight">
-                      {displayData.timeProposed !== 'Time TBD' 
-                        ? `${new Date(displayData.timeProposed).toLocaleDateString()} ${new Date(displayData.timeProposed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                        : 'Time TBD'
-                      }
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <MapPin className="w-3 h-3 text-gray-400" />
-                    <span className="font-medium text-center leading-tight">{displayData.location}</span>
-                  </div>
-                </div>
-              </div>
+              <Avatar className="w-14 h-14 border-2 border-pink-200 shadow-sm flex-shrink-0">
+                <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
+                <AvatarFallback className="bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700 font-semibold text-lg">
+                  {displayData.friendName.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
               
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 space-y-3">
                 <div>
                   <h3 className="font-semibold text-gray-900 text-lg leading-tight mb-1">
                     {displayData.friendName}
@@ -107,6 +89,22 @@ const DateInviteCard = ({
                       {invitation.status}
                     </span>
                   </p>
+                </div>
+                
+                <div className="flex items-center justify-between w-full text-sm text-gray-600">
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Clock className="w-4 h-4 text-gray-400" />
+                    <span className="font-medium whitespace-nowrap">
+                      {displayData.timeProposed !== 'Time TBD' 
+                        ? `${new Date(displayData.timeProposed).toLocaleDateString()} ${new Date(displayData.timeProposed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                        : 'Time TBD'
+                      }
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 min-w-0 flex-1 ml-4">
+                    <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <span className="font-medium truncate">{displayData.location}</span>
+                  </div>
                 </div>
               </div>
 
