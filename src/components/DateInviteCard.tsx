@@ -94,7 +94,12 @@ const DateInviteCard = ({
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4" />
-                    <span>{new Date(displayData.timeProposed).toLocaleDateString()}</span>
+                    <span>
+                      {displayData.timeProposed !== 'Time TBD' 
+                        ? `${new Date(displayData.timeProposed).toLocaleDateString()} ${new Date(displayData.timeProposed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                        : 'Time TBD'
+                      }
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <MapPin className="w-4 h-4" />
