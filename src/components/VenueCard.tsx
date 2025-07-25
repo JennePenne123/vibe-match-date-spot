@@ -3,7 +3,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Star, MapPin, DollarSign, Sparkles, Navigation, Clock } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Heart, Star, MapPin, DollarSign, Sparkles, Navigation, Clock, Users, List, Check, X } from 'lucide-react';
 import { Venue } from '@/types';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
@@ -15,6 +16,15 @@ interface VenueCardProps {
   showActions?: boolean;
   isLiked?: boolean;
   onToggleLike?: (venueId: string) => void;
+  // New props for invitation-style cards
+  partnerNames?: string[];
+  partnerAvatars?: string[];
+  dateType?: string;
+  dateTime?: string;
+  category?: string;
+  showInvitationActions?: boolean;
+  onAccept?: () => void;
+  onDecline?: () => void;
 }
 
 const VenueCard = ({ 
@@ -23,7 +33,16 @@ const VenueCard = ({
   showMatchScore = true,
   showActions = true,
   isLiked = false,
-  onToggleLike 
+  onToggleLike,
+  // New props
+  partnerNames = [],
+  partnerAvatars = [],
+  dateType = "Date invitation",
+  dateTime = "Today, 18:00",
+  category = "Dining",
+  showInvitationActions = false,
+  onAccept,
+  onDecline
 }: VenueCardProps) => {
   const navigate = useNavigate();
 
@@ -112,8 +131,102 @@ const VenueCard = ({
     );
   }
 
+  // If showing invitation actions, use the new design
+  if (showInvitationActions) {
+    return (
+      <div className="venue-card p-4 max-w-sm bg-gradient-to-br from-background to-muted/20 border border-border/50 rounded-lg shadow-sm">
+        {/* Header with names and date type */}
+        {partnerNames.length > 0 && (
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex flex-col">
+              <h3 className="font-semibold text-foreground text-lg">
+                {partnerNames.join(" and ")}
+              </h3>
+              <Badge 
+                variant="secondary" 
+                className="w-fit mt-1 bg-muted/50 text-muted-foreground hover:bg-muted/70"
+              >
+                <Users className="w-3 h-3 mr-1" />
+                {dateType}
+              </Badge>
+            </div>
+            
+            {/* Partner avatars */}
+            <div className="flex -space-x-2">
+              {partnerAvatars.length > 0 ? (
+                partnerAvatars.map((avatar, index) => (
+                  <Avatar key={index} className="w-12 h-12 border-2 border-background">
+                    <AvatarImage src={avatar} />
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {partnerNames[index]?.[0] || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                ))
+              ) : (
+                partnerNames.map((name, index) => (
+                  <Avatar key={index} className="w-12 h-12 border-2 border-background">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {name[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Venue information */}
+        <div className="space-y-2 mb-4">
+          {/* Venue name with rating */}
+          <div className="flex items-center gap-2">
+            <h4 className="font-medium text-foreground flex-1">
+              {venue.name}
+            </h4>
+            {venue.rating && (
+              <div className="flex items-center gap-1 text-sm">
+                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                <span className="text-muted-foreground">{venue.rating}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Date and time */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="w-4 h-4" />
+            <span>{dateTime}</span>
+          </div>
+
+          {/* Category */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <List className="w-4 h-4" />
+            <span>{category}</span>
+          </div>
+        </div>
+
+        {/* Accept/Decline buttons */}
+        <div className="flex gap-2">
+          <Button
+            onClick={onDecline}
+            variant="outline"
+            className="flex-1 border-destructive/20 text-destructive hover:bg-destructive/10"
+          >
+            <X className="w-4 h-4 mr-2" />
+            Decline
+          </Button>
+          <Button
+            onClick={onAccept}
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            <Check className="w-4 h-4 mr-2" />
+            Accept
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="venue-card overflow-hidden">
+    <div className="venue-card overflow-hidden bg-gradient-to-br from-background to-muted/10 border border-border/50 shadow-sm">
       <div className="relative">
         <VenuePhotoGallery 
           photos={venuePhotos}
