@@ -70,18 +70,18 @@ const DateInviteCard = ({
   return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-pink-200 cursor-pointer rounded-xl overflow-hidden">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12 border-2 border-pink-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <Avatar className="w-14 h-14 border-2 border-pink-200 shadow-sm flex-shrink-0">
                 <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
-                <AvatarFallback className="bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700 font-semibold">
+                <AvatarFallback className="bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700 font-semibold text-lg">
                   {displayData.friendName.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               
-              <div className="flex-1 min-w-0">
-                <div className="mb-1">
-                  <h3 className="font-semibold text-gray-900 text-base">
+              <div className="flex-1 min-w-0 space-y-3">
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-lg leading-tight mb-1">
                     {displayData.friendName}
                   </h3>
                   <p className="text-sm text-gray-600">
@@ -91,24 +91,24 @@ const DateInviteCard = ({
                   </p>
                 </div>
                 
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <Clock className="w-4 h-4" />
-                    <span>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Clock className="w-4 h-4 text-gray-400" />
+                    <span className="font-medium">
                       {displayData.timeProposed !== 'Time TBD' 
                         ? `${new Date(displayData.timeProposed).toLocaleDateString()} ${new Date(displayData.timeProposed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                         : 'Time TBD'
                       }
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <MapPin className="w-4 h-4" />
-                    <span className="truncate">{displayData.location}</span>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="font-medium truncate">{displayData.location}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 shadow-sm flex-shrink-0">
+              <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-gray-100 shadow-sm flex-shrink-0 bg-gray-50">
                 <img 
                   src={displayData.venueImage.includes('undefined') ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80' : displayData.venueImage} 
                   alt={displayData.venueName}
