@@ -69,6 +69,20 @@ const DateInviteCard = ({
     return fallback;
   };
 
+  // Get the primary venue image - prioritize real venue photos over stock images
+  const getVenueImage = () => {
+    // First try to get from venue photos array
+    if (invitation.venue?.photos && invitation.venue.photos.length > 0) {
+      return invitation.venue.photos[0].url;
+    }
+    // Then try image_url if it's not a stock image
+    if (invitation.venue?.image_url && !invitation.venue.image_url.includes('unsplash.com')) {
+      return invitation.venue.image_url;
+    }
+    // Fallback to a restaurant placeholder
+    return 'https://images.unsplash.com/photo-1497644083578-611b798c60f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+  };
+
   // Transform invitation data for display based on direction
   const displayData = direction === 'received' ? {
     friendName: invitation.sender?.name || 'Unknown',
@@ -78,7 +92,7 @@ const DateInviteCard = ({
     timeProposed: invitation.proposed_date || 'Time TBD',
     location: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
     address: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
-    venueImage: invitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04',
+    venueImage: getVenueImage(),
     message: invitation.message || '',
     venueName: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
     venueAddress: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
@@ -94,7 +108,7 @@ const DateInviteCard = ({
     timeProposed: invitation.proposed_date || 'Time TBD',
     location: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
     address: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
-    venueImage: invitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04',
+    venueImage: getVenueImage(),
     message: invitation.message || '',
     venueName: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
     venueAddress: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
