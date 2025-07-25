@@ -149,7 +149,42 @@ const DateInviteCard = ({
           
 
           {/* Venue Details */}
-          
+          <div className="space-y-3">
+            <h3 className="font-semibold text-gray-900">{displayData.venueName}</h3>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600">{displayData.time}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600">{displayData.duration}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600">{displayData.location}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600">{displayData.estimatedCost}</span>
+              </div>
+            </div>
+
+            <div className="text-sm text-gray-600">
+              <strong>Address:</strong> {displayData.venueAddress}
+            </div>
+
+            {displayData.specialNotes && <div className="bg-blue-50 p-3 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <Info className="w-4 h-4 text-blue-600 mt-0.5" />
+                  <div>
+                    <div className="text-sm font-medium text-blue-900">Special Notes</div>
+                    <div className="text-sm text-blue-700">{displayData.specialNotes}</div>
+                  </div>
+                </div>
+              </div>}
+          </div>
 
           {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex space-x-2 mt-6">
               <Button onClick={() => {
