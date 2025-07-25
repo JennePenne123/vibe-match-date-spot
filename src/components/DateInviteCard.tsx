@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Clock, MapPin, Check, X, DollarSign, Calendar, Info } from 'lucide-react';
+import { Clock, MapPin, Check, X, DollarSign, Calendar, Info, User, Heart, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { DateInvitation } from '@/types/index';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 interface DateInviteCardProps {
@@ -20,6 +20,42 @@ const DateInviteCard = ({
   onDecline
 }: DateInviteCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Status configuration
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case 'accepted':
+        return {
+          icon: CheckCircle,
+          variant: 'default' as const,
+          bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+          textColor: 'text-emerald-700 dark:text-emerald-300',
+          borderColor: 'border-emerald-200 dark:border-emerald-800',
+          label: 'Accepted'
+        };
+      case 'declined':
+        return {
+          icon: XCircle,
+          variant: 'destructive' as const,
+          bgColor: 'bg-red-50 dark:bg-red-950',
+          textColor: 'text-red-700 dark:text-red-300',
+          borderColor: 'border-red-200 dark:border-red-800',
+          label: 'Declined'
+        };
+      default:
+        return {
+          icon: AlertCircle,
+          variant: 'secondary' as const,
+          bgColor: 'bg-amber-50 dark:bg-amber-950',
+          textColor: 'text-amber-700 dark:text-amber-300',
+          borderColor: 'border-amber-200 dark:border-amber-800',
+          label: 'Pending'
+        };
+    }
+  };
+
+  const statusConfig = getStatusConfig(invitation.status);
+  const StatusIcon = statusConfig.icon;
 
   // Extract venue name from message if venue data is placeholder
   const extractVenueFromMessage = (message: string, fallback: string) => {
@@ -69,50 +105,125 @@ const DateInviteCard = ({
   };
   return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-pink-200 cursor-pointer rounded-xl overflow-hidden">
+        <Card 
+          className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border-2 hover:shadow-lg ${statusConfig.borderColor} ${statusConfig.bgColor} hover:scale-[1.02] active:scale-[0.98]`}
+          role="button"
+          tabIndex={0}
+          aria-label={`View date invitation from ${displayData.friendName}`}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsOpen(true);
+            }
+          }}
+        >
+          {/* Status indicator */}
+          <div className="absolute top-4 right-4 z-10">
+            <Badge variant={statusConfig.variant} className="flex items-center gap-1.5 px-2.5 py-1">
+              <StatusIcon className="w-3.5 h-3.5" />
+              <span className="text-xs font-medium">{statusConfig.label}</span>
+            </Badge>
+          </div>
+
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
-              <Avatar className="w-14 h-14 border-2 border-pink-200 shadow-sm flex-shrink-0">
-                <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
-                <AvatarFallback className="bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700 font-semibold text-lg">
-                  {displayData.friendName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
+              {/* Enhanced Avatar */}
+              <div className="relative flex-shrink-0">
+                <Avatar className="w-16 h-16 border-3 border-background shadow-lg ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-primary/40">
+                  <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
+                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/30 text-primary font-bold text-xl">
+                    {displayData.friendName.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                {direction === 'received' && (
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-2 border-background">
+                    <Heart className="w-3 h-3 text-primary-foreground fill-current" />
+                  </div>
+                )}
+              </div>
               
-              <div className="flex-1 min-w-0 space-y-3">
+              <div className="flex-1 min-w-0 space-y-4">
+                {/* Header */}
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-lg leading-tight mb-1">
-                    {displayData.friendName}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Status: <span className={`font-medium ${invitation.status === 'accepted' ? 'text-green-600' : invitation.status === 'declined' ? 'text-red-600' : 'text-amber-600'}`}>
-                      {invitation.status}
-                    </span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-foreground text-lg leading-tight">
+                      {displayData.friendName}
+                    </h3>
+                    {direction === 'received' && (
+                      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                        invited you
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm font-medium text-primary">
+                    {displayData.dateType}
                   </p>
                 </div>
                 
-                <div className="space-y-2 w-full text-sm text-gray-600">
+                {/* Venue and Time Info */}
+                <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="font-medium flex-1">{displayData.location}</span>
+                    <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="font-semibold text-foreground flex-1 truncate">
+                      {displayData.location}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-400" />
-                    <span className="font-medium whitespace-nowrap">
+                    <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-sm text-muted-foreground">
                       {displayData.timeProposed !== 'Time TBD' 
-                        ? `${new Date(displayData.timeProposed).toLocaleDateString()} ${new Date(displayData.timeProposed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                        ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })
                         : 'Time TBD'
                       }
                     </span>
                   </div>
                 </div>
+
+                {/* Quick Actions for pending invitations */}
+                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && (
+                  <div className="flex gap-2 pt-2">
+                    <Button 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onAccept(invitation.id);
+                      }}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1"
+                    >
+                      <Check className="w-3.5 h-3.5 mr-1.5" />
+                      Accept
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDecline(invitation.id);
+                      }}
+                      className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex-1"
+                    >
+                      <X className="w-3.5 h-3.5 mr-1.5" />
+                      Decline
+                    </Button>
+                  </div>
+                )}
               </div>
 
-              <div className="w-12 h-12 rounded-lg overflow-hidden border-2 border-gray-100 shadow-sm flex-shrink-0 bg-gray-50">
+              {/* Enhanced Venue Image */}
+              <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border shadow-md flex-shrink-0 bg-muted transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
                 <img 
-                  src={displayData.venueImage.includes('undefined') ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80' : displayData.venueImage} 
+                  src={displayData.venueImage.includes('undefined') 
+                    ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80' 
+                    : displayData.venueImage
+                  } 
                   alt={displayData.venueName}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
               </div>
             </div>
