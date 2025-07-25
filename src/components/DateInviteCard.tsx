@@ -70,7 +70,7 @@ const DateInviteCard = ({ invitation, direction, onAccept, onDecline }: DateInvi
               <div className="flex-1 min-w-0 space-y-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate text-base">
+                    <h3 className="font-semibold text-gray-900 text-base leading-tight">
                       {displayData.friendName}
                     </h3>
                     <p className="text-sm text-gray-600 mt-0.5">
