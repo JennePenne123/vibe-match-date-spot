@@ -517,6 +517,7 @@ export type Database = {
           name: string
           opening_hours: Json | null
           phone: string | null
+          photos: Json | null
           price_range: string | null
           rating: number | null
           tags: string[] | null
@@ -537,6 +538,7 @@ export type Database = {
           name: string
           opening_hours?: Json | null
           phone?: string | null
+          photos?: Json | null
           price_range?: string | null
           rating?: number | null
           tags?: string[] | null
@@ -557,6 +559,7 @@ export type Database = {
           name?: string
           opening_hours?: Json | null
           phone?: string | null
+          photos?: Json | null
           price_range?: string | null
           rating?: number | null
           tags?: string[] | null
