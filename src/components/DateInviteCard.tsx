@@ -57,42 +57,49 @@ const DateInviteCard = ({ invitation, direction, onAccept, onDecline }: DateInvi
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-pink-400 cursor-pointer">
-          <CardContent className="p-4">
-              <div className="flex items-start gap-4">
-                <Avatar className="w-12 h-12 border-2 border-pink-200">
-                  <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
-                  <AvatarFallback className="bg-pink-100 text-pink-600">
-                    {displayData.friendName.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-gray-900 truncate">
+        <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-pink-200 cursor-pointer rounded-xl overflow-hidden">
+          <CardContent className="p-5">
+            <div className="flex items-start gap-4">
+              <Avatar className="w-14 h-14 border-2 border-pink-200 shadow-sm">
+                <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
+                <AvatarFallback className="bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700 font-semibold text-lg">
+                  {displayData.friendName.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div className="flex-1 min-w-0 space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 truncate text-base">
                       {displayData.friendName}
                     </h3>
-                    <Badge className="text-xs text-pink-600 font-medium bg-pink-100">
-                      {displayData.dateType}
-                    </Badge>
+                    <p className="text-sm text-gray-600 mt-0.5">
+                      {displayData.relationLabel} • Status: <span className={`font-medium ${
+                        invitation.status === 'accepted' ? 'text-green-600' :
+                        invitation.status === 'declined' ? 'text-red-600' :
+                        'text-amber-600'
+                      }`}>
+                        {invitation.status}
+                      </span>
+                    </p>
                   </div>
-                  
-                  <p className="text-sm text-gray-600 mb-2">
-                    {displayData.relationLabel} • Status: {invitation.status}
-                  </p>
-                  
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {displayData.timeProposed}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      {displayData.location}
-                    </div>
+                  <Badge className="text-xs px-2.5 py-1 font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white border-0 shadow-sm">
+                    {displayData.dateType}
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center gap-5 text-sm text-gray-600 pt-1">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-gray-400" />
+                    <span>{displayData.timeProposed}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="truncate">{displayData.location}</span>
                   </div>
                 </div>
               </div>
+            </div>
           </CardContent>
         </Card>
       </DialogTrigger>
