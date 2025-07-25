@@ -91,8 +91,8 @@ const DateInviteCard = ({
                   </p>
                 </div>
                 
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <div className="flex items-center gap-1.5">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-sm text-gray-500">
                     <Clock className="w-4 h-4" />
                     <span>
                       {displayData.timeProposed !== 'Time TBD' 
@@ -101,7 +101,7 @@ const DateInviteCard = ({
                       }
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 text-sm text-gray-500">
                     <MapPin className="w-4 h-4" />
                     <span className="truncate">{displayData.location}</span>
                   </div>
