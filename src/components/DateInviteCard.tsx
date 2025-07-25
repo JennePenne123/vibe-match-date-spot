@@ -91,18 +91,18 @@ const DateInviteCard = ({
                   </p>
                 </div>
                 
-                <div className="flex items-center gap-6 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between w-full text-sm text-gray-600">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <Clock className="w-4 h-4 text-gray-400" />
-                    <span className="font-medium">
+                    <span className="font-medium whitespace-nowrap">
                       {displayData.timeProposed !== 'Time TBD' 
                         ? `${new Date(displayData.timeProposed).toLocaleDateString()} ${new Date(displayData.timeProposed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                         : 'Time TBD'
                       }
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400" />
+                  <div className="flex items-center gap-2 min-w-0 flex-1 ml-4">
+                    <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
                     <span className="font-medium truncate">{displayData.location}</span>
                   </div>
                 </div>
