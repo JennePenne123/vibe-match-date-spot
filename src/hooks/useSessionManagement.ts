@@ -34,7 +34,7 @@ export const useSessionManagement = () => {
   const [loading, setLoading] = useState(false);
 
   // Create a new planning session
-  const createPlanningSession = useCallback(async (partnerId: string, participantIds?: string[]) => {
+  const createPlanningSession = useCallback(async (partnerId: string, participantIds?: string[], planningMode: 'solo' | 'collaborative' = 'solo') => {
     if (!user) {
       console.error('🚫 SESSION: Cannot create session - no user');
       return null;
@@ -54,7 +54,8 @@ export const useSessionManagement = () => {
       const sessionData: any = {
         initiator_id: user.id,
         partner_id: partnerId,
-        session_status: 'active'
+        session_status: 'active',
+        planning_mode: planningMode
       };
 
       // Add participant_ids for group planning

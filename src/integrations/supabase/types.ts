@@ -282,8 +282,12 @@ export type Database = {
           expires_at: string
           id: string
           initiator_id: string
+          initiator_preferences_complete: boolean | null
+          mutual_venue_selection: boolean | null
           participant_ids: Json | null
           partner_id: string
+          partner_preferences_complete: boolean | null
+          planning_mode: string
           preferences_data: Json | null
           selected_venue_id: string | null
           session_status: string
@@ -295,8 +299,12 @@ export type Database = {
           expires_at?: string
           id?: string
           initiator_id: string
+          initiator_preferences_complete?: boolean | null
+          mutual_venue_selection?: boolean | null
           participant_ids?: Json | null
           partner_id: string
+          partner_preferences_complete?: boolean | null
+          planning_mode?: string
           preferences_data?: Json | null
           selected_venue_id?: string | null
           session_status?: string
@@ -308,14 +316,68 @@ export type Database = {
           expires_at?: string
           id?: string
           initiator_id?: string
+          initiator_preferences_complete?: boolean | null
+          mutual_venue_selection?: boolean | null
           participant_ids?: Json | null
           partner_id?: string
+          partner_preferences_complete?: boolean | null
+          planning_mode?: string
           preferences_data?: Json | null
           selected_venue_id?: string | null
           session_status?: string
           updated_at?: string
         }
         Relationships: []
+      }
+      date_proposals: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          message: string | null
+          planning_session_id: string | null
+          proposed_date: string
+          proposer_id: string
+          recipient_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          message?: string | null
+          planning_session_id?: string | null
+          proposed_date: string
+          proposer_id: string
+          recipient_id: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          message?: string | null
+          planning_session_id?: string | null
+          proposed_date?: string
+          proposer_id?: string
+          recipient_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "date_proposals_planning_session_id_fkey"
+            columns: ["planning_session_id"]
+            isOneToOne: false
+            referencedRelation: "date_planning_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       friendships: {
         Row: {
