@@ -281,6 +281,7 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
               price_range: venue.priceRange,
               rating: venue.rating,
               image_url: venue.image,
+              photos: venue.photos || [], // Save the photos array
               google_place_id: venue.placeId,
               phone: venue.phone,
               website: venue.website,
@@ -294,7 +295,7 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
 
           if (!insertError && newVenue) {
             venueId = newVenue.id;
-            console.log('✅ GOOGLE PLACES: Saved new venue:', venue.name);
+            console.log('✅ GOOGLE PLACES: Saved new venue with photos:', venue.name, venue.photos?.length || 0, 'photos');
           } else {
             console.warn('⚠️ GOOGLE PLACES: Failed to save venue:', venue.name, insertError);
           }

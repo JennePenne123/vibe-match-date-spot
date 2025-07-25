@@ -35,8 +35,31 @@ interface DateInvitation {
     name: string;
     address: string;
     image_url?: string;
+    photos?: Array<{
+      url: string;
+      thumbnail?: string;
+      width: number;
+      height: number;
+      attribution?: string;
+      isGooglePhoto: boolean;
+    }>;
+    rating?: number;
+    price_range?: string;
+    cuisine_type?: string;
   };
 }
+
+// Helper function to extract venue name from message
+const extractVenueFromMessage = (message: string, fallback: string) => {
+  if (fallback === 'Selected Venue' || fallback === 'Venue TBD') {
+    // Try to extract venue name from message like "I'd love to take you to Il Siciliano based on..."
+    const venueMatch = message.match(/take you to ([^\.]+?) based on/i);
+    if (venueMatch) {
+      return venueMatch[1].trim();
+    }
+  }
+  return fallback;
+};
 
 export const useInvitations = () => {
   const { user } = useAuth();
@@ -83,25 +106,85 @@ export const useInvitations = () => {
         totalCount: (receivedData?.length || 0) + (sentData?.length || 0)
       });
 
-      // Enrich and combine invitations
-      const enrichedReceived = (receivedData || []).map(invitation => ({
-        ...invitation,
-        direction: 'received' as const,
-        venue: invitation.venue_id ? {
-          name: 'Selected Venue',
-          address: 'Venue details will be available soon',
-          image_url: undefined
-        } : undefined
+      // Enrich and combine invitations with real venue data
+      const enrichedReceived = await Promise.all((receivedData || []).map(async invitation => {
+        let venue = null;
+        
+        if (invitation.venue_id) {
+          // First try to get from database
+          const { data: dbVenue } = await supabase
+            .from('venues')
+            .select('*')
+            .eq('id', invitation.venue_id)
+            .single();
+            
+          if (dbVenue) {
+            venue = {
+              name: dbVenue.name,
+              address: dbVenue.address,
+              image_url: dbVenue.image_url,
+              photos: dbVenue.photos || [],
+              rating: dbVenue.rating,
+              price_range: dbVenue.price_range,
+              cuisine_type: dbVenue.cuisine_type
+            };
+          } else {
+            // If venue not in database, try to extract from message
+            const extractedName = extractVenueFromMessage(invitation.message || '', 'Venue TBD');
+            venue = {
+              name: extractedName,
+              address: 'Address TBD',
+              image_url: undefined,
+              photos: []
+            };
+          }
+        }
+        
+        return {
+          ...invitation,
+          direction: 'received' as const,
+          venue
+        };
       }));
 
-      const enrichedSent = (sentData || []).map(invitation => ({
-        ...invitation,
-        direction: 'sent' as const,
-        venue: invitation.venue_id ? {
-          name: 'Selected Venue',
-          address: 'Venue details will be available soon',
-          image_url: undefined
-        } : undefined
+      const enrichedSent = await Promise.all((sentData || []).map(async invitation => {
+        let venue = null;
+        
+        if (invitation.venue_id) {
+          // First try to get from database
+          const { data: dbVenue } = await supabase
+            .from('venues')
+            .select('*')
+            .eq('id', invitation.venue_id)
+            .single();
+            
+          if (dbVenue) {
+            venue = {
+              name: dbVenue.name,
+              address: dbVenue.address,
+              image_url: dbVenue.image_url,
+              photos: dbVenue.photos || [],
+              rating: dbVenue.rating,
+              price_range: dbVenue.price_range,
+              cuisine_type: dbVenue.cuisine_type
+            };
+          } else {
+            // If venue not in database, try to extract from message
+            const extractedName = extractVenueFromMessage(invitation.message || '', 'Venue TBD');
+            venue = {
+              name: extractedName,
+              address: 'Address TBD',
+              image_url: undefined,
+              photos: []
+            };
+          }
+        }
+        
+        return {
+          ...invitation,
+          direction: 'sent' as const,
+          venue
+        };
       }));
 
       // Combine and sort by created_at
