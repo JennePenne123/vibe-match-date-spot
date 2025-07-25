@@ -13,12 +13,12 @@ const RecentReceivedInvitationsCard: React.FC = () => {
   const navigate = useNavigate();
   const { invitations, loading, acceptInvitation, declineInvitation } = useInvitations();
 
-  // Filter and get the 3 most recent received invitations
+  // Filter and get the 3 most recent received invitations (exclude declined)
   const recentReceivedInvitations = React.useMemo(() => {
     if (!invitations || invitations.length === 0) return [];
     
     const received = invitations
-      .filter(inv => inv.direction === 'received')
+      .filter(inv => inv.direction === 'received' && inv.status !== 'declined')
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 3)
       .map(inv => ({
