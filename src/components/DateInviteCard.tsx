@@ -86,7 +86,7 @@ const DateInviteCard = ({
                   </div>
                   <div className="flex items-center gap-1.5">
                     <MapPin className="w-4 h-4" />
-                    <span>Select</span>
+                    <span className="truncate">{displayData.location}</span>
                   </div>
                 </div>
               </div>
