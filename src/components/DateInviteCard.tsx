@@ -21,6 +21,10 @@ const DateInviteCard = ({
 }: DateInviteCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Debug logging to check venue data
+  console.log('DateInviteCard - invitation data:', invitation);
+  console.log('DateInviteCard - venue data:', invitation.venue);
+
   // Transform invitation data for display based on direction
   const displayData = direction === 'received' ? {
     friendName: invitation.sender?.name || 'Unknown',
