@@ -129,14 +129,31 @@ export const useInvitations = () => {
               cuisine_type: dbVenue.cuisine_type
             };
           } else if (invitation.venue_id?.startsWith('venue_')) {
-            // For temporary venue IDs, try to extract venue data from AI reasoning
-            console.log('🔍 VENUE LOOKUP - Temporary venue ID found, using fallback data for:', invitation.venue_id);
-            const extractedName = extractVenueFromMessage(invitation.message || '', 'AI Recommended Venue');
+            // For temporary venue IDs, try to extract venue data from AI reasoning or venue_match_factors
+            console.log('🔍 VENUE LOOKUP - Temporary venue ID found, extracting from AI data for:', invitation.venue_id);
+            const extractedName = extractVenueFromMessage(invitation.message || '', invitation.title || 'AI Recommended Venue');
+            
+            // Try to get venue data from venue_match_factors if available
+            let venuePhotos = [];
+            let venueImage = undefined;
+            let actualName = extractedName;
+            let actualAddress = 'AI Recommended Location';
+            
+            if (invitation.venue_match_factors) {
+              const venueData = invitation.venue_match_factors;
+              if (venueData.venue_name) actualName = venueData.venue_name;
+              if (venueData.venue_address) actualAddress = venueData.venue_address;
+              if (venueData.venue_image) venueImage = venueData.venue_image;
+              if (venueData.venue_photos && Array.isArray(venueData.venue_photos)) {
+                venuePhotos = venueData.venue_photos;
+              }
+            }
+            
             venue = {
-              name: extractedName,
-              address: 'AI Recommended Location',
-              image_url: undefined,
-              photos: []
+              name: actualName,
+              address: actualAddress,
+              image_url: venueImage,
+              photos: venuePhotos
             };
           } else {
             // If venue not in database, try to extract from message
@@ -179,14 +196,31 @@ export const useInvitations = () => {
               cuisine_type: dbVenue.cuisine_type
             };
           } else if (invitation.venue_id?.startsWith('venue_')) {
-            // For temporary venue IDs, try to extract venue data from AI reasoning
-            console.log('🔍 VENUE LOOKUP - Temporary venue ID found, using fallback data for:', invitation.venue_id);
-            const extractedName = extractVenueFromMessage(invitation.message || '', 'AI Recommended Venue');
+            // For temporary venue IDs, try to extract venue data from AI reasoning or venue_match_factors
+            console.log('🔍 VENUE LOOKUP - Temporary venue ID found, extracting from AI data for:', invitation.venue_id);
+            const extractedName = extractVenueFromMessage(invitation.message || '', invitation.title || 'AI Recommended Venue');
+            
+            // Try to get venue data from venue_match_factors if available
+            let venuePhotos = [];
+            let venueImage = undefined;
+            let actualName = extractedName;
+            let actualAddress = 'AI Recommended Location';
+            
+            if (invitation.venue_match_factors) {
+              const venueData = invitation.venue_match_factors;
+              if (venueData.venue_name) actualName = venueData.venue_name;
+              if (venueData.venue_address) actualAddress = venueData.venue_address;
+              if (venueData.venue_image) venueImage = venueData.venue_image;
+              if (venueData.venue_photos && Array.isArray(venueData.venue_photos)) {
+                venuePhotos = venueData.venue_photos;
+              }
+            }
+            
             venue = {
-              name: extractedName,
-              address: 'AI Recommended Location',
-              image_url: undefined,
-              photos: []
+              name: actualName,
+              address: actualAddress,
+              image_url: venueImage,
+              photos: venuePhotos
             };
           } else {
             // If venue not in database, try to extract from message

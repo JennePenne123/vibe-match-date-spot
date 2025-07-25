@@ -166,7 +166,7 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         planning_session_id: sessionId,
         ai_compatibility_score: compatibilityScore,
         ai_reasoning: selectedVenue?.ai_reasoning,
-        venue_match_factors: selectedVenue?.match_factors,
+        venue_match_factors: selectedVenue, // Store the entire venue data for fallback
         status: 'pending'
       };
       
