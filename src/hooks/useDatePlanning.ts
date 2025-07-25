@@ -120,10 +120,46 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         proposedDateTime = preferences.preferred_date;
       }
       
+      let finalVenueId = venueId;
+      
+      // If we have venue data from AI recommendations, save it to database first
+      if (selectedVenue && venueId.startsWith('venue_')) {
+        console.log('🔄 SAVE VENUE - Saving AI venue to database:', selectedVenue.venue_name);
+        
+        const venueToSave = {
+          name: selectedVenue.venue_name,
+          address: selectedVenue.venue_address,
+          google_place_id: selectedVenue.venue_id,
+          rating: selectedVenue.rating,
+          price_range: selectedVenue.priceRange,
+          cuisine_type: selectedVenue.cuisine_type,
+          phone: selectedVenue.phone,
+          opening_hours: selectedVenue.operatingHours,
+          image_url: selectedVenue.venue_image,
+          photos: selectedVenue.venue_photos || [],
+          tags: selectedVenue.amenities,
+          is_active: true
+        };
+
+        const { data: savedVenue, error: venueError } = await supabase
+          .from('venues')
+          .insert(venueToSave)
+          .select('id')
+          .single();
+
+        if (venueError) {
+          console.error('🚨 SAVE VENUE - Failed to save venue:', venueError);
+          // Continue with original venueId if save fails
+        } else {
+          finalVenueId = savedVenue.id;
+          console.log('✅ SAVE VENUE - Venue saved with ID:', finalVenueId);
+        }
+      }
+      
       const invitationData = {
         sender_id: user.id,
         recipient_id: currentSession.partner_id,
-        venue_id: venueId,
+        venue_id: finalVenueId,
         title: 'AI-Matched Date Invitation',
         message: message,
         proposed_date: proposedDateTime?.toISOString(),

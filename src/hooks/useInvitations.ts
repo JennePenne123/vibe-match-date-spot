@@ -333,17 +333,54 @@ export const useInvitations = () => {
       ai_reasoning?: string;
       venue_match_factors?: any;
       planning_session_id?: string;
+      venue_data?: any; // Add venue data from AI recommendations
     }
   ) => {
     if (!user) return false;
 
     try {
+      let finalVenueId = venueId;
+      
+      // If we have venue data from AI recommendations, save it to database first
+      if (aiData?.venue_data && venueId.startsWith('venue_')) {
+        console.log('🔄 SAVE VENUE - Saving AI venue to database:', aiData.venue_data.name);
+        
+        const venueToSave = {
+          name: aiData.venue_data.name,
+          address: aiData.venue_data.address || aiData.venue_data.location || aiData.venue_data.vicinity,
+          google_place_id: aiData.venue_data.place_id,
+          rating: aiData.venue_data.rating,
+          price_range: aiData.venue_data.price_range || aiData.venue_data.priceRange,
+          cuisine_type: aiData.venue_data.cuisine_type || aiData.venue_data.cuisineType,
+          phone: aiData.venue_data.phone,
+          opening_hours: aiData.venue_data.opening_hours || aiData.venue_data.operatingHours,
+          image_url: aiData.venue_data.image_url || aiData.venue_data.image,
+          photos: aiData.venue_data.photos || [],
+          tags: aiData.venue_data.tags || aiData.venue_data.amenities,
+          is_active: true
+        };
+
+        const { data: savedVenue, error: venueError } = await supabase
+          .from('venues')
+          .insert(venueToSave)
+          .select('id')
+          .single();
+
+        if (venueError) {
+          console.error('🚨 SAVE VENUE - Failed to save venue:', venueError);
+          // Continue with original venueId if save fails
+        } else {
+          finalVenueId = savedVenue.id;
+          console.log('✅ SAVE VENUE - Venue saved with ID:', finalVenueId);
+        }
+      }
+
       const { data, error } = await supabase
         .from('date_invitations')
         .insert({
           sender_id: user.id,
           recipient_id: recipientId,
-          venue_id: venueId,
+          venue_id: finalVenueId,
           title,
           message,
           status: 'pending',
