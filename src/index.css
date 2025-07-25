@@ -52,11 +52,11 @@
 
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Date invitation card gradients */
-    --gradient-accepted: linear-gradient(135deg, hsl(120 60% 97%), hsl(142 71% 45%));
-    --gradient-pending: linear-gradient(135deg, hsl(10 100% 98%), hsl(12 100% 72%));
-    --gradient-accepted-hover: linear-gradient(135deg, hsl(120 60% 95%), hsl(142 71% 41%));
-    --gradient-pending-hover: linear-gradient(135deg, hsl(10 100% 96%), hsl(12 100% 68%));
+    /* Date invitation card gradients - soft light green */
+    --gradient-accepted: linear-gradient(135deg, hsl(144 40% 98%), hsl(144 30% 95%));
+    --gradient-pending: linear-gradient(135deg, hsl(144 35% 98%), hsl(144 25% 96%));
+    --gradient-accepted-hover: linear-gradient(135deg, hsl(144 40% 96%), hsl(144 30% 93%));
+    --gradient-pending-hover: linear-gradient(135deg, hsl(144 35% 96%), hsl(144 25% 94%));
     
     /* Button gradients */
     --gradient-success: linear-gradient(135deg, hsl(142 71% 45%), hsl(158 64% 52%));
@@ -104,11 +104,11 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Date invitation card gradients - darker for dark mode */
-    --gradient-accepted: linear-gradient(135deg, hsl(120 50% 87%), hsl(142 61% 35%));
-    --gradient-pending: linear-gradient(135deg, hsl(10 80% 88%), hsl(12 80% 62%));
-    --gradient-accepted-hover: linear-gradient(135deg, hsl(120 50% 83%), hsl(142 61% 31%));
-    --gradient-pending-hover: linear-gradient(135deg, hsl(10 80% 84%), hsl(12 80% 58%));
+    /* Date invitation card gradients - soft light green for dark mode */
+    --gradient-accepted: linear-gradient(135deg, hsl(144 25% 22%), hsl(144 20% 18%));
+    --gradient-pending: linear-gradient(135deg, hsl(144 20% 22%), hsl(144 15% 18%));
+    --gradient-accepted-hover: linear-gradient(135deg, hsl(144 25% 24%), hsl(144 20% 20%));
+    --gradient-pending-hover: linear-gradient(135deg, hsl(144 20% 24%), hsl(144 15% 20%));
     
     /* Button gradients - darker for dark mode */
     --gradient-success: linear-gradient(135deg, hsl(142 60% 35%), hsl(158 50% 42%));
