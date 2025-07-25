@@ -103,7 +103,7 @@ const DateInviteCard = ({
                   </div>
                   <div className="flex items-center gap-2 min-w-0 flex-1 ml-4">
                     <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="font-medium">{displayData.location}</span>
+                    <span className="font-medium flex-1">{displayData.location}</span>
                   </div>
                 </div>
               </div>
