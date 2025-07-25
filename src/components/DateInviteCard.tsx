@@ -107,6 +107,14 @@ const DateInviteCard = ({
                   </div>
                 </div>
               </div>
+
+              <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 shadow-sm flex-shrink-0">
+                <img 
+                  src={displayData.venueImage.includes('undefined') ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80' : displayData.venueImage} 
+                  alt={displayData.venueName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
