@@ -122,6 +122,7 @@ const DateInviteCard = ({
             onDecline={showInvitationActions ? handleDecline : undefined}
             showMatchScore={false}
             showActions={false}
+            isAccepted={invitation.status === 'accepted'}
           />
         </div>
       </DialogTrigger>

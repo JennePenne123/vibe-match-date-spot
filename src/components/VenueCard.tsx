@@ -25,6 +25,7 @@ interface VenueCardProps {
   showInvitationActions?: boolean;
   onAccept?: () => void;
   onDecline?: () => void;
+  isAccepted?: boolean; // New prop to indicate accepted invitation
 }
 
 const VenueCard = ({ 
@@ -42,7 +43,8 @@ const VenueCard = ({
   category = "Dining",
   showInvitationActions = false,
   onAccept,
-  onDecline
+  onDecline,
+  isAccepted = false
 }: VenueCardProps) => {
   const navigate = useNavigate();
 
@@ -134,7 +136,7 @@ const VenueCard = ({
   // If showing invitation actions, use the new design
   if (showInvitationActions) {
     return (
-      <div className="venue-card p-4 max-w-sm bg-gradient-to-br from-green-50 to-green-100 border border-green-200/50 rounded-lg shadow-sm">
+      <div className={`venue-card p-4 max-w-sm ${isAccepted ? 'bg-gradient-to-r from-green-100 to-white border-green-200' : 'bg-gradient-to-br from-background to-muted/20 border-border/50'} rounded-lg shadow-sm`}>
         {/* Header with names and date type */}
         {partnerNames.length > 0 && (
           <div className="flex items-center justify-between mb-3">
