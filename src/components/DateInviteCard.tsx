@@ -69,12 +69,18 @@ const DateInviteCard = ({
     return fallback;
   };
 
-  // Get the primary venue image - use real venue image_url or fallback
+  // Get the primary venue image - prioritize Google Places photos over fallbacks
   const getVenueImage = () => {
-    // Use venue image_url if available
-    if (invitation.venue?.image_url) {
-      return invitation.venue.image_url;
+    // First check for Google Places photos array (real venue photos)
+    if (invitation.venue?.photos && invitation.venue.photos.length > 0) {
+      return invitation.venue.photos[0].url;
     }
+    
+    // Check for direct image URL (backwards compatibility)
+    if (invitation.venue?.image_url || invitation.venue?.image) {
+      return invitation.venue.image_url || invitation.venue.image;
+    }
+    
     // Fallback to a restaurant placeholder
     return 'https://images.unsplash.com/photo-1497644083578-611b798c60f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
   };
