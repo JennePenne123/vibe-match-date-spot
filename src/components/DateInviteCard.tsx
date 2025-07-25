@@ -85,7 +85,7 @@ const DateInviteCard = ({
                     {displayData.friendName}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    {displayData.relationLabel} • Status: <span className={`font-medium ${invitation.status === 'accepted' ? 'text-green-600' : invitation.status === 'declined' ? 'text-red-600' : 'text-amber-600'}`}>
+                    Status: <span className={`font-medium ${invitation.status === 'accepted' ? 'text-green-600' : invitation.status === 'declined' ? 'text-red-600' : 'text-amber-600'}`}>
                       {invitation.status}
                     </span>
                   </p>
