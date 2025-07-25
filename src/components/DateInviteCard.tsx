@@ -21,9 +21,17 @@ const DateInviteCard = ({
 }: DateInviteCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Debug logging to check venue data
-  console.log('DateInviteCard - invitation data:', invitation);
-  console.log('DateInviteCard - venue data:', invitation.venue);
+  // Extract venue name from message if venue data is placeholder
+  const extractVenueFromMessage = (message: string, fallback: string) => {
+    if (fallback === 'Selected Venue' || fallback === 'Venue TBD') {
+      // Try to extract venue name from message like "I'd love to take you to Il Siciliano based on..."
+      const venueMatch = message.match(/take you to ([^\.]+?) based on/i);
+      if (venueMatch) {
+        return venueMatch[1].trim();
+      }
+    }
+    return fallback;
+  };
 
   // Transform invitation data for display based on direction
   const displayData = direction === 'received' ? {
@@ -32,12 +40,12 @@ const DateInviteCard = ({
     relationLabel: 'From',
     dateType: invitation.title || 'Date Invitation',
     timeProposed: invitation.proposed_date || 'Time TBD',
-    location: invitation.venue?.name || 'Venue TBD',
-    address: invitation.venue?.address || 'Address TBD',
+    location: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
+    address: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
     venueImage: invitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04',
     message: invitation.message || '',
-    venueName: invitation.venue?.name || 'Venue TBD',
-    venueAddress: invitation.venue?.address || 'Address TBD',
+    venueName: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
+    venueAddress: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
     time: invitation.proposed_date || 'Time TBD',
     duration: '2-3 hours',
     estimatedCost: '$$',
@@ -48,12 +56,12 @@ const DateInviteCard = ({
     relationLabel: 'To',
     dateType: invitation.title || 'Date Invitation',
     timeProposed: invitation.proposed_date || 'Time TBD',
-    location: invitation.venue?.name || 'Venue TBD',
-    address: invitation.venue?.address || 'Address TBD',
+    location: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
+    address: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
     venueImage: invitation.venue?.image_url || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04',
     message: invitation.message || '',
-    venueName: invitation.venue?.name || 'Venue TBD',
-    venueAddress: invitation.venue?.address || 'Address TBD',
+    venueName: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
+    venueAddress: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
     time: invitation.proposed_date || 'Time TBD',
     duration: '2-3 hours',
     estimatedCost: '$$',
