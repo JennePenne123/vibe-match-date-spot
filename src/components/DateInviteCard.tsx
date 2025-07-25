@@ -29,7 +29,7 @@ const DateInviteCard = ({
           icon: CheckCircle,
           variant: 'default' as const,
           bgGradient: '[background:var(--gradient-accepted)]',
-          textColor: 'text-white',
+          textColor: 'text-foreground',
           borderColor: 'border-emerald-200 dark:border-emerald-800',
           label: 'Accepted'
         };
@@ -47,7 +47,7 @@ const DateInviteCard = ({
           icon: AlertCircle,
           variant: 'secondary' as const,
           bgGradient: '[background:var(--gradient-pending)]',
-          textColor: 'text-white',
+          textColor: 'text-foreground',
           borderColor: 'border-orange-200 dark:border-orange-800',
           label: 'Pending'
         };
@@ -116,7 +116,7 @@ const DateInviteCard = ({
   return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Card 
-          className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border-0 hover:shadow-lg ${statusConfig.bgGradient} hover:scale-[1.02] active:scale-[0.98]`}
+          className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border-0 hover:shadow-lg ${statusConfig.bgGradient} opacity-50 hover:scale-[1.02] active:scale-[0.98]`}
           role="button"
           tabIndex={0}
           aria-label={`View date invitation from ${displayData.friendName}`}
@@ -165,14 +165,14 @@ const DateInviteCard = ({
                 {/* Venue and Time Info */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <MapPin className={`w-4 h-4 flex-shrink-0 ${invitation.status === 'pending' || invitation.status === 'accepted' ? 'text-white/80' : 'text-muted-foreground'}`} />
+                    <MapPin className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
                     <span className={`font-semibold flex-1 truncate ${statusConfig.textColor}`}>
                       {displayData.location}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className={`w-4 h-4 flex-shrink-0 ${invitation.status === 'pending' || invitation.status === 'accepted' ? 'text-white/80' : 'text-muted-foreground'}`} />
-                    <span className={`text-sm ${invitation.status === 'pending' || invitation.status === 'accepted' ? 'text-white/90' : 'text-muted-foreground'}`}>
+                    <Clock className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
                       {displayData.timeProposed !== 'Time TBD' 
                         ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
                             weekday: 'short',
