@@ -149,11 +149,6 @@ const DateInviteCard = ({
                     <h3 className="font-bold text-foreground text-lg leading-tight">
                       {displayData.friendName}
                     </h3>
-                    {direction === 'received' && (
-                      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                        invited you
-                      </span>
-                    )}
                   </div>
                 </div>
                 
