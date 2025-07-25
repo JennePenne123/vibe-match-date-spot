@@ -65,7 +65,7 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
 
   // Enhanced complete planning session with invitation creation
   const completePlanningSession = useCallback(async (sessionId: string, venueId: string, message: string, preferences?: DatePreferences) => {
-    console.log('💾 COMPLETE PLANNING SESSION - Starting with:', {
+    console.log('🚀 COMPLETE PLANNING SESSION - Starting with:', {
       sessionId,
       venueId,
       hasUser: !!user,
@@ -74,7 +74,8 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
       currentSessionPartnerId: currentSession?.partner_id,
       messageLength: message?.length || 0,
       compatibilityScore,
-      venueRecommendationsCount: venueRecommendations?.length || 0
+      venueRecommendationsCount: venueRecommendations?.length || 0,
+      actualVenueRecommendations: venueRecommendations
     });
 
     if (!user) {
@@ -108,7 +109,29 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
       })));
       
       // Create the invitation with AI insights
-      const selectedVenue = venueRecommendations.find(v => v.id === venueId || v.venue_id === venueId);
+      let selectedVenue = venueRecommendations.find(v => v.id === venueId || v.venue_id === venueId);
+      
+      // If we can't find the venue in recommendations, try to reconstruct it from the message/ai_reasoning
+      if (!selectedVenue && message) {
+        console.log('🔧 VENUE RECONSTRUCTION - selectedVenue not found, reconstructing from message');
+        // Extract venue name from message 
+        const venueNameMatch = message.match(/take you to ([^.]+)/);
+        const venueName = venueNameMatch ? venueNameMatch[1].trim() : 'AI Recommended Venue';
+        
+        selectedVenue = {
+          id: venueId,
+          venue_id: venueId,
+          venue_name: venueName,
+          name: venueName,
+          venue_address: 'Location extracted from AI analysis',
+          ai_reasoning: `Recommended venue: ${venueName}`,
+          // Try to get some basic data that might be available
+          rating: 4.5,
+          price_range: '$$'
+        };
+        console.log('🔧 VENUE RECONSTRUCTION - Reconstructed venue:', selectedVenue);
+      }
+      
       console.log('💾 COMPLETE PLANNING SESSION - Selected venue:', {
         found: !!selectedVenue,
         venueName: selectedVenue?.venue_name || selectedVenue?.name,

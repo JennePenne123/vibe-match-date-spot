@@ -131,7 +131,12 @@ export const useInvitations = () => {
           } else if (invitation.venue_id?.startsWith('venue_')) {
             // For temporary venue IDs, try to extract venue data from AI reasoning or venue_match_factors
             console.log('🔍 VENUE LOOKUP - Temporary venue ID found, extracting from AI data for:', invitation.venue_id);
-            const extractedName = extractVenueFromMessage(invitation.message || '', invitation.title || 'AI Recommended Venue');
+            
+            // Try to extract venue name from the message first as a fallback
+            const extractedNameFromMessage = extractVenueFromMessage(invitation.message || '', '');
+            console.log('🔍 VENUE LOOKUP - Extracted from message:', extractedNameFromMessage);
+            
+            const extractedName = extractedNameFromMessage || invitation.title || 'AI Recommended Venue';
             
             // Try to get venue data from venue_match_factors if available
             let venuePhotos = [];
@@ -211,7 +216,12 @@ export const useInvitations = () => {
           } else if (invitation.venue_id?.startsWith('venue_')) {
             // For temporary venue IDs, try to extract venue data from AI reasoning or venue_match_factors
             console.log('🔍 VENUE LOOKUP - Temporary venue ID found, extracting from AI data for:', invitation.venue_id);
-            const extractedName = extractVenueFromMessage(invitation.message || '', invitation.title || 'AI Recommended Venue');
+            
+            // Try to extract venue name from the message first as a fallback
+            const extractedNameFromMessage = extractVenueFromMessage(invitation.message || '', '');
+            console.log('🔍 VENUE LOOKUP - Extracted from message:', extractedNameFromMessage);
+            
+            const extractedName = extractedNameFromMessage || invitation.title || 'AI Recommended Venue';
             
             // Try to get venue data from venue_match_factors if available
             let venuePhotos = [];
