@@ -129,3 +129,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .venue-card {
+    @apply bg-venue-gradient border border-border/20 rounded-xl shadow-sm hover:shadow-md transition-all duration-300;
+  }
+  
+  .venue-ai-card {
+    @apply bg-venue-ai-gradient border border-border/20 overflow-hidden hover:shadow-lg transition-all duration-300;
+  }
+}

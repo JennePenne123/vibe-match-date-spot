@@ -113,7 +113,7 @@ const VenueCard = ({
   }
 
   return (
-    <div className="rounded-xl shadow-sm border border-border/20 overflow-hidden hover:shadow-md transition-all duration-300 [background:var(--gradient-venue)]">
+    <div className="venue-card overflow-hidden">
       <div className="relative">
         <VenuePhotoGallery 
           photos={venuePhotos}

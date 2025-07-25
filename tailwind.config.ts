@@ -81,6 +81,8 @@ export default {
 				'datespot-gradient': 'linear-gradient(135deg, #F472B6 0%, #EC4899 100%)',
 				'datespot-gradient-soft': 'linear-gradient(135deg, #F472B6 0%, #F43F5E 100%)',
 				'datespot-gradient-light': 'linear-gradient(135deg, #FCE7F3 0%, #FDF2F8 100%)',
+				'venue-gradient': 'var(--gradient-venue)',
+				'venue-ai-gradient': 'var(--gradient-venue-ai)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

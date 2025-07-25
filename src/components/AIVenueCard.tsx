@@ -111,7 +111,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   const confidenceInfo = getConfidenceIndicator(confidence_level);
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border border-border/20 hover:border-purple-200/50 [background:var(--gradient-venue-ai)]">
+    <Card className="venue-ai-card hover:border-purple-200/50">
       {/* Venue Image */}
       <div className="relative">
         <VenuePhotoGallery 
