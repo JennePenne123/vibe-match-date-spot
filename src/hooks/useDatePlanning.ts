@@ -127,17 +127,17 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         console.log('🔄 SAVE VENUE - Saving AI venue to database:', selectedVenue.venue_name);
         
         const venueToSave = {
-          name: selectedVenue.venue_name,
-          address: selectedVenue.venue_address,
-          google_place_id: selectedVenue.venue_id,
-          rating: selectedVenue.rating,
-          price_range: selectedVenue.priceRange,
-          cuisine_type: selectedVenue.cuisine_type,
-          phone: selectedVenue.phone,
-          opening_hours: selectedVenue.operatingHours,
-          image_url: selectedVenue.venue_image,
-          photos: selectedVenue.venue_photos || [],
-          tags: selectedVenue.amenities,
+          name: selectedVenue.venue_name || 'Unknown Venue',
+          address: selectedVenue.venue_address || selectedVenue.address || selectedVenue.location || 'Address not available',
+          google_place_id: selectedVenue.venue_id || selectedVenue.place_id,
+          rating: selectedVenue.rating || null,
+          price_range: selectedVenue.priceRange || selectedVenue.price_range || '$$',
+          cuisine_type: selectedVenue.cuisine_type || selectedVenue.cuisineType || 'Restaurant',
+          phone: selectedVenue.phone || null,
+          opening_hours: selectedVenue.operatingHours || selectedVenue.opening_hours || null,
+          image_url: selectedVenue.venue_image || selectedVenue.image_url || selectedVenue.image,
+          photos: selectedVenue.venue_photos || selectedVenue.photos || [],
+          tags: selectedVenue.amenities || selectedVenue.tags || [],
           is_active: true
         };
 

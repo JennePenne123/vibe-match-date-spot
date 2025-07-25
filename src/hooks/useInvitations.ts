@@ -116,7 +116,7 @@ export const useInvitations = () => {
             .from('venues')
             .select('*')
             .eq('id', invitation.venue_id)
-            .single();
+            .maybeSingle();
             
           if (dbVenue) {
             venue = {
@@ -127,6 +127,16 @@ export const useInvitations = () => {
               rating: dbVenue.rating,
               price_range: dbVenue.price_range,
               cuisine_type: dbVenue.cuisine_type
+            };
+          } else if (invitation.venue_id?.startsWith('venue_')) {
+            // For temporary venue IDs, try to extract venue data from AI reasoning
+            console.log('🔍 VENUE LOOKUP - Temporary venue ID found, using fallback data for:', invitation.venue_id);
+            const extractedName = extractVenueFromMessage(invitation.message || '', 'AI Recommended Venue');
+            venue = {
+              name: extractedName,
+              address: 'AI Recommended Location',
+              image_url: undefined,
+              photos: []
             };
           } else {
             // If venue not in database, try to extract from message
@@ -156,7 +166,7 @@ export const useInvitations = () => {
             .from('venues')
             .select('*')
             .eq('id', invitation.venue_id)
-            .single();
+            .maybeSingle();
             
           if (dbVenue) {
             venue = {
@@ -167,6 +177,16 @@ export const useInvitations = () => {
               rating: dbVenue.rating,
               price_range: dbVenue.price_range,
               cuisine_type: dbVenue.cuisine_type
+            };
+          } else if (invitation.venue_id?.startsWith('venue_')) {
+            // For temporary venue IDs, try to extract venue data from AI reasoning
+            console.log('🔍 VENUE LOOKUP - Temporary venue ID found, using fallback data for:', invitation.venue_id);
+            const extractedName = extractVenueFromMessage(invitation.message || '', 'AI Recommended Venue');
+            venue = {
+              name: extractedName,
+              address: 'AI Recommended Location',
+              image_url: undefined,
+              photos: []
             };
           } else {
             // If venue not in database, try to extract from message
@@ -346,17 +366,17 @@ export const useInvitations = () => {
         console.log('🔄 SAVE VENUE - Saving AI venue to database:', aiData.venue_data.name);
         
         const venueToSave = {
-          name: aiData.venue_data.name,
-          address: aiData.venue_data.address || aiData.venue_data.location || aiData.venue_data.vicinity,
-          google_place_id: aiData.venue_data.place_id,
-          rating: aiData.venue_data.rating,
-          price_range: aiData.venue_data.price_range || aiData.venue_data.priceRange,
-          cuisine_type: aiData.venue_data.cuisine_type || aiData.venue_data.cuisineType,
-          phone: aiData.venue_data.phone,
-          opening_hours: aiData.venue_data.opening_hours || aiData.venue_data.operatingHours,
-          image_url: aiData.venue_data.image_url || aiData.venue_data.image,
-          photos: aiData.venue_data.photos || [],
-          tags: aiData.venue_data.tags || aiData.venue_data.amenities,
+          name: aiData.venue_data.name || aiData.venue_data.venue_name || 'Unknown Venue',
+          address: aiData.venue_data.address || aiData.venue_data.venue_address || aiData.venue_data.location || aiData.venue_data.vicinity || 'Address not available',
+          google_place_id: aiData.venue_data.place_id || aiData.venue_data.venue_id,
+          rating: aiData.venue_data.rating || null,
+          price_range: aiData.venue_data.price_range || aiData.venue_data.priceRange || '$$',
+          cuisine_type: aiData.venue_data.cuisine_type || aiData.venue_data.cuisineType || 'Restaurant',
+          phone: aiData.venue_data.phone || null,
+          opening_hours: aiData.venue_data.opening_hours || aiData.venue_data.operatingHours || null,
+          image_url: aiData.venue_data.image_url || aiData.venue_data.venue_image || aiData.venue_data.image,
+          photos: aiData.venue_data.photos || aiData.venue_data.venue_photos || [],
+          tags: aiData.venue_data.tags || aiData.venue_data.amenities || [],
           is_active: true
         };
 
