@@ -116,7 +116,7 @@ const DateInviteCard = ({
   return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Card 
-          className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border-0 hover:shadow-lg ${statusConfig.bgGradient} opacity-50 hover:scale-[1.02] active:scale-[0.98]`}
+          className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border border-border/20 shadow-sm hover:shadow-md ${statusConfig.bgGradient} hover:scale-[1.02] active:scale-[0.98]`}
           role="button"
           tabIndex={0}
           aria-label={`View date invitation from ${displayData.friendName}`}
