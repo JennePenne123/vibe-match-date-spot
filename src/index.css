@@ -51,6 +51,16 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Date invitation card gradients */
+    --gradient-accepted: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
+    --gradient-pending: linear-gradient(135deg, hsl(24 95% 53%), hsl(20 95% 63%));
+    --gradient-accepted-hover: linear-gradient(135deg, hsl(142 76% 32%), hsl(142 76% 42%));
+    --gradient-pending-hover: linear-gradient(135deg, hsl(24 95% 49%), hsl(20 95% 59%));
+    
+    /* Button gradients */
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
+    --gradient-success-hover: linear-gradient(135deg, hsl(142 76% 32%), hsl(142 76% 42%));
   }
 
   .dark {
@@ -89,6 +99,16 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Date invitation card gradients - darker for dark mode */
+    --gradient-accepted: linear-gradient(135deg, hsl(142 60% 26%), hsl(142 60% 36%));
+    --gradient-pending: linear-gradient(135deg, hsl(24 80% 43%), hsl(20 80% 53%));
+    --gradient-accepted-hover: linear-gradient(135deg, hsl(142 60% 22%), hsl(142 60% 32%));
+    --gradient-pending-hover: linear-gradient(135deg, hsl(24 80% 39%), hsl(20 80% 49%));
+    
+    /* Button gradients - darker for dark mode */
+    --gradient-success: linear-gradient(135deg, hsl(142 60% 26%), hsl(142 60% 36%));
+    --gradient-success-hover: linear-gradient(135deg, hsl(142 60% 22%), hsl(142 60% 32%));
   }
 }
 

@@ -28,8 +28,8 @@ const DateInviteCard = ({
         return {
           icon: CheckCircle,
           variant: 'default' as const,
-          bgColor: 'bg-emerald-50 dark:bg-emerald-950',
-          textColor: 'text-emerald-700 dark:text-emerald-300',
+          bgGradient: '[background:var(--gradient-accepted)]',
+          textColor: 'text-white',
           borderColor: 'border-emerald-200 dark:border-emerald-800',
           label: 'Accepted'
         };
@@ -37,7 +37,7 @@ const DateInviteCard = ({
         return {
           icon: XCircle,
           variant: 'destructive' as const,
-          bgColor: 'bg-red-50 dark:bg-red-950',
+          bgGradient: 'bg-red-50 dark:bg-red-950',
           textColor: 'text-red-700 dark:text-red-300',
           borderColor: 'border-red-200 dark:border-red-800',
           label: 'Declined'
@@ -46,9 +46,9 @@ const DateInviteCard = ({
         return {
           icon: AlertCircle,
           variant: 'secondary' as const,
-          bgColor: 'bg-amber-50 dark:bg-amber-950',
-          textColor: 'text-amber-700 dark:text-amber-300',
-          borderColor: 'border-amber-200 dark:border-amber-800',
+          bgGradient: '[background:var(--gradient-pending)]',
+          textColor: 'text-white',
+          borderColor: 'border-orange-200 dark:border-orange-800',
           label: 'Pending'
         };
     }
@@ -69,14 +69,10 @@ const DateInviteCard = ({
     return fallback;
   };
 
-  // Get the primary venue image - prioritize real venue photos over stock images
+  // Get the primary venue image - use real venue image_url or fallback
   const getVenueImage = () => {
-    // First try to get from venue photos array
-    if (invitation.venue?.photos && invitation.venue.photos.length > 0) {
-      return invitation.venue.photos[0].url;
-    }
-    // Then try image_url if it's not a stock image
-    if (invitation.venue?.image_url && !invitation.venue.image_url.includes('unsplash.com')) {
+    // Use venue image_url if available
+    if (invitation.venue?.image_url) {
       return invitation.venue.image_url;
     }
     // Fallback to a restaurant placeholder
@@ -120,7 +116,7 @@ const DateInviteCard = ({
   return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Card 
-          className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border-2 hover:shadow-lg ${statusConfig.borderColor} ${statusConfig.bgColor} hover:scale-[1.02] active:scale-[0.98]`}
+          className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border-2 hover:shadow-lg ${statusConfig.borderColor} ${statusConfig.bgGradient} hover:scale-[1.02] active:scale-[0.98]`}
           role="button"
           tabIndex={0}
           aria-label={`View date invitation from ${displayData.friendName}`}
@@ -160,7 +156,7 @@ const DateInviteCard = ({
                 {/* Header */}
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-foreground text-lg leading-tight">
+                    <h3 className={`font-bold text-lg leading-tight ${statusConfig.textColor}`}>
                       {displayData.friendName}
                     </h3>
                   </div>
@@ -169,14 +165,14 @@ const DateInviteCard = ({
                 {/* Venue and Time Info */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="font-semibold text-foreground flex-1 truncate">
+                    <MapPin className={`w-4 h-4 flex-shrink-0 ${invitation.status === 'pending' || invitation.status === 'accepted' ? 'text-white/80' : 'text-muted-foreground'}`} />
+                    <span className={`font-semibold flex-1 truncate ${statusConfig.textColor}`}>
                       {displayData.location}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="text-sm text-muted-foreground">
+                    <Clock className={`w-4 h-4 flex-shrink-0 ${invitation.status === 'pending' || invitation.status === 'accepted' ? 'text-white/80' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm ${invitation.status === 'pending' || invitation.status === 'accepted' ? 'text-white/90' : 'text-muted-foreground'}`}>
                       {displayData.timeProposed !== 'Time TBD' 
                         ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
                             weekday: 'short',
@@ -200,7 +196,7 @@ const DateInviteCard = ({
                         e.stopPropagation();
                         onAccept(invitation.id);
                       }}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1"
+                      className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0"
                     >
                       <Check className="w-3.5 h-3.5 mr-1.5" />
                       Accept
@@ -256,9 +252,9 @@ const DateInviteCard = ({
         <div className="space-y-4">
           {/* Venue Photos */}
           <div className="relative">
-            {invitation.venue?.photos && invitation.venue.photos.length > 0 ? <VenuePhotoGallery photos={invitation.venue.photos} venueName={displayData.venueName} maxHeight="h-48" showThumbnails={invitation.venue.photos.length > 1} /> : <div className="relative rounded-lg overflow-hidden">
-                <img src={displayData.venueImage} alt={displayData.venueName} className="w-full h-48 object-cover" />
-              </div>}
+            <div className="relative rounded-lg overflow-hidden">
+              <img src={displayData.venueImage} alt={displayData.venueName} className="w-full h-48 object-cover" />
+            </div>
             <div className="absolute top-3 left-3">
               <Badge className="bg-pink-500 text-white">
                 {displayData.dateType}
@@ -313,7 +309,7 @@ const DateInviteCard = ({
               <Button onClick={() => {
             onAccept(invitation.id);
             setIsOpen(false);
-          }} className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+          }} className="flex-1 [background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white border-0">
                 <Check className="w-4 h-4 mr-2" />
                 Accept
               </Button>
