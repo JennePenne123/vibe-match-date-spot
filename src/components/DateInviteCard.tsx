@@ -155,9 +155,6 @@ const DateInviteCard = ({
                       </span>
                     )}
                   </div>
-                  <p className="text-sm font-medium text-primary">
-                    {displayData.dateType}
-                  </p>
                 </div>
                 
                 {/* Venue and Time Info */}
