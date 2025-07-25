@@ -13,6 +13,13 @@ const HomeHeader = ({
   displayName,
   firstName
 }: HomeHeaderProps) => {
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   return <div className="flex justify-between items-center p-4 pt-12 bg-white shadow-sm">
       <div className="flex items-center gap-3">
         <Avatar className="w-10 h-10 border-2 border-pink-200">
@@ -22,7 +29,7 @@ const HomeHeader = ({
           </AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-lg font-semibold text-gray-900">Hey {firstName}! 👋</h1>
+          <h1 className="text-lg font-semibold text-gray-900">{getTimeBasedGreeting()} {firstName}! 👋</h1>
           
         </div>
       </div>
