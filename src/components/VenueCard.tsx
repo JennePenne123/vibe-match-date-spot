@@ -3,8 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, Star, MapPin, DollarSign, Sparkles, Navigation, Clock, Users, List, Check, X } from 'lucide-react';
+import { Heart, Star, MapPin, DollarSign, Sparkles, Navigation, Clock } from 'lucide-react';
 import { Venue } from '@/types';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
@@ -16,16 +15,6 @@ interface VenueCardProps {
   showActions?: boolean;
   isLiked?: boolean;
   onToggleLike?: (venueId: string) => void;
-  // New props for invitation-style cards
-  partnerNames?: string[];
-  partnerAvatars?: string[];
-  dateType?: string;
-  dateTime?: string;
-  category?: string;
-  showInvitationActions?: boolean;
-  onAccept?: () => void;
-  onDecline?: () => void;
-  isAccepted?: boolean; // New prop to indicate accepted invitation
 }
 
 const VenueCard = ({ 
@@ -34,17 +23,7 @@ const VenueCard = ({
   showMatchScore = true,
   showActions = true,
   isLiked = false,
-  onToggleLike,
-  // New props
-  partnerNames = [],
-  partnerAvatars = [],
-  dateType = "Date invitation",
-  dateTime = "Today, 18:00",
-  category = "Dining",
-  showInvitationActions = false,
-  onAccept,
-  onDecline,
-  isAccepted = false
+  onToggleLike 
 }: VenueCardProps) => {
   const navigate = useNavigate();
 
@@ -133,125 +112,8 @@ const VenueCard = ({
     );
   }
 
-  // If showing invitation actions, use the compact design with status
-  if (showInvitationActions || isAccepted) {
-    const getStatusBadge = () => {
-      if (isAccepted) {
-        return (
-          <Badge className="bg-green-500 text-white">
-            ✓ Accepted
-          </Badge>
-        );
-      }
-      return (
-        <Badge variant="secondary" className="bg-orange-100 text-orange-800">
-          ⏳ Pending
-        </Badge>
-      );
-    };
-
-    return (
-      <div className="venue-card p-4 bg-background border border-border/50 rounded-lg shadow-sm">
-        {/* Status badge */}
-        <div className="flex justify-end mb-2">
-          {getStatusBadge()}
-        </div>
-
-        {/* Header with names and avatars */}
-        {partnerNames.length > 0 && (
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              {/* Partner avatars */}
-              <div className="flex -space-x-2">
-                {partnerAvatars.length > 0 ? (
-                  partnerAvatars.map((avatar, index) => (
-                    <Avatar key={index} className="w-10 h-10 border-2 border-background">
-                      <AvatarImage src={avatar} />
-                      <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                        {partnerNames[index]?.[0] || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  ))
-                ) : (
-                  partnerNames.slice(0, 1).map((name, index) => (
-                    <Avatar key={index} className="w-10 h-10 border-2 border-background">
-                      <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                        {name[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                  ))
-                )}
-              </div>
-
-              <div className="flex flex-col">
-                <h3 className="font-semibold text-foreground text-base">
-                  {partnerNames.join(" and ")}
-                </h3>
-              </div>
-            </div>
-            
-            {/* Small venue image */}
-            <div className="w-12 h-12 rounded-lg overflow-hidden border border-border shadow-sm flex-shrink-0">
-              <img 
-                src={venueImage || 'https://images.unsplash.com/photo-1497644083578-611b798c60f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'} 
-                alt={venue.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Venue and time info */}
-        <div className="space-y-2">
-          {/* Venue name with location icon */}
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <span className="font-medium text-foreground">
-              {venue.name}
-            </span>
-            {venue.rating && (
-              <div className="flex items-center gap-1 text-sm ml-auto">
-                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                <span className="text-muted-foreground text-xs">{venue.rating}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Date and time */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="w-4 h-4 flex-shrink-0" />
-            <span>{dateTime}</span>
-          </div>
-        </div>
-
-        {/* Accept/Decline buttons for pending invitations */}
-        {showInvitationActions && !isAccepted && (
-          <div className="flex gap-2 mt-4">
-            <Button
-              onClick={onDecline}
-              variant="outline"
-              size="sm"
-              className="flex-1 border-destructive/20 text-destructive hover:bg-destructive/10"
-            >
-              <X className="w-3 h-3 mr-1" />
-              Decline
-            </Button>
-            <Button
-              onClick={onAccept}
-              size="sm"
-              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <Check className="w-3 h-3 mr-1" />
-              Accept
-            </Button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
-    <div className="venue-card overflow-hidden bg-gradient-to-br from-background to-muted/10 border border-border/50 shadow-sm">
+    <div className="venue-card overflow-hidden">
       <div className="relative">
         <VenuePhotoGallery 
           photos={venuePhotos}
