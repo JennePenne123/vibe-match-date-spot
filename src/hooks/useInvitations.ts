@@ -140,13 +140,26 @@ export const useInvitations = () => {
             let actualAddress = 'AI Recommended Location';
             
             if (invitation.venue_match_factors) {
+              console.log('🎯 VENUE DATA - Extracting from venue_match_factors:', invitation.venue_match_factors);
               const venueData = invitation.venue_match_factors;
-              if (venueData.venue_name) actualName = venueData.venue_name;
-              if (venueData.venue_address) actualAddress = venueData.venue_address;
-              if (venueData.venue_image) venueImage = venueData.venue_image;
+              
+              // Try different field names for venue name
+              actualName = venueData.venue_name || venueData.name || extractedName;
+              
+              // Try different field names for address  
+              actualAddress = venueData.venue_address || venueData.address || venueData.location || 'AI Recommended Location';
+              
+              // Try different field names for image
+              venueImage = venueData.venue_image || venueData.image_url || venueData.image;
+              
+              // Try different field names for photos
               if (venueData.venue_photos && Array.isArray(venueData.venue_photos)) {
                 venuePhotos = venueData.venue_photos;
+              } else if (venueData.photos && Array.isArray(venueData.photos)) {
+                venuePhotos = venueData.photos;
               }
+              
+              console.log('🎯 VENUE DATA - Extracted:', { actualName, actualAddress, venueImage, venuePhotos });
             }
             
             venue = {
@@ -207,13 +220,26 @@ export const useInvitations = () => {
             let actualAddress = 'AI Recommended Location';
             
             if (invitation.venue_match_factors) {
+              console.log('🎯 VENUE DATA - Extracting from venue_match_factors:', invitation.venue_match_factors);
               const venueData = invitation.venue_match_factors;
-              if (venueData.venue_name) actualName = venueData.venue_name;
-              if (venueData.venue_address) actualAddress = venueData.venue_address;
-              if (venueData.venue_image) venueImage = venueData.venue_image;
+              
+              // Try different field names for venue name
+              actualName = venueData.venue_name || venueData.name || extractedName;
+              
+              // Try different field names for address  
+              actualAddress = venueData.venue_address || venueData.address || venueData.location || 'AI Recommended Location';
+              
+              // Try different field names for image
+              venueImage = venueData.venue_image || venueData.image_url || venueData.image;
+              
+              // Try different field names for photos
               if (venueData.venue_photos && Array.isArray(venueData.venue_photos)) {
                 venuePhotos = venueData.venue_photos;
+              } else if (venueData.photos && Array.isArray(venueData.photos)) {
+                venuePhotos = venueData.photos;
               }
+              
+              console.log('🎯 VENUE DATA - Extracted:', { actualName, actualAddress, venueImage, venuePhotos });
             }
             
             venue = {

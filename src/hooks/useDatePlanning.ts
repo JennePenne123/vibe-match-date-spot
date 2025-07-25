@@ -99,12 +99,21 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
       }
 
       console.log('💾 COMPLETE PLANNING SESSION - Step 2: Finding selected venue...');
+      console.log('💾 COMPLETE PLANNING SESSION - Looking for venueId:', venueId);
+      console.log('💾 COMPLETE PLANNING SESSION - Available venues:', venueRecommendations.map(v => ({
+        id: v.id,
+        venue_id: v.venue_id,
+        venue_name: v.venue_name,
+        name: v.name
+      })));
+      
       // Create the invitation with AI insights
-      const selectedVenue = venueRecommendations.find(v => v.venue_id === venueId);
+      const selectedVenue = venueRecommendations.find(v => v.id === venueId || v.venue_id === venueId);
       console.log('💾 COMPLETE PLANNING SESSION - Selected venue:', {
         found: !!selectedVenue,
-        venueName: selectedVenue?.venue_name,
-        venueId: selectedVenue?.venue_id,
+        venueName: selectedVenue?.venue_name || selectedVenue?.name,
+        venueId: selectedVenue?.venue_id || selectedVenue?.id,
+        photos: selectedVenue?.venue_photos || selectedVenue?.photos,
         aiReasoning: selectedVenue?.ai_reasoning?.substring(0, 50) + '...'
       });
       
