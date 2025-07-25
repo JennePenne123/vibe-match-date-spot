@@ -53,7 +53,6 @@ const DateInviteCard = ({
         };
     }
   };
-
   const statusConfig = getStatusConfig(invitation.status);
   const StatusIcon = statusConfig.icon;
 
@@ -75,12 +74,12 @@ const DateInviteCard = ({
     if (invitation.venue?.photos && invitation.venue.photos.length > 0) {
       return invitation.venue.photos[0].url;
     }
-    
+
     // Check for direct image URL (backwards compatibility)
     if (invitation.venue?.image_url || invitation.venue?.image) {
       return invitation.venue.image_url || invitation.venue.image;
     }
-    
+
     // Fallback to a restaurant placeholder
     return 'https://images.unsplash.com/photo-1497644083578-611b798c60f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
   };
@@ -93,11 +92,11 @@ const DateInviteCard = ({
     dateType: invitation.title || 'Date Invitation',
     timeProposed: invitation.proposed_date || 'Time TBD',
     location: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
-    address: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
+    address: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : invitation.venue?.address || 'Address TBD',
     venueImage: getVenueImage(),
     message: invitation.message || '',
     venueName: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
-    venueAddress: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
+    venueAddress: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : invitation.venue?.address || 'Address TBD',
     time: invitation.proposed_date || 'Time TBD',
     duration: '2-3 hours',
     estimatedCost: '$$',
@@ -109,11 +108,11 @@ const DateInviteCard = ({
     dateType: invitation.title || 'Date Invitation',
     timeProposed: invitation.proposed_date || 'Time TBD',
     location: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
-    address: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
+    address: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : invitation.venue?.address || 'Address TBD',
     venueImage: getVenueImage(),
     message: invitation.message || '',
     venueName: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
-    venueAddress: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : (invitation.venue?.address || 'Address TBD'),
+    venueAddress: invitation.venue?.address === 'Venue details will be available soon' ? 'Address TBD' : invitation.venue?.address || 'Address TBD',
     time: invitation.proposed_date || 'Time TBD',
     duration: '2-3 hours',
     estimatedCost: '$$',
@@ -121,18 +120,12 @@ const DateInviteCard = ({
   };
   return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Card 
-          className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border border-border/20 shadow-sm hover:shadow-md ${statusConfig.bgGradient} hover:scale-[1.02] active:scale-[0.98]`}
-          role="button"
-          tabIndex={0}
-          aria-label={`View date invitation from ${displayData.friendName}`}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              setIsOpen(true);
-            }
-          }}
-        >
+        <Card className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border border-border/20 shadow-sm hover:shadow-md ${statusConfig.bgGradient} hover:scale-[1.02] active:scale-[0.98]`} role="button" tabIndex={0} aria-label={`View date invitation from ${displayData.friendName}`} onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setIsOpen(true);
+        }
+      }}>
           {/* Status indicator */}
           <div className="absolute top-4 right-4 z-10">
             <Badge variant={statusConfig.variant} className="flex items-center gap-1.5 px-2.5 py-1">
@@ -141,7 +134,7 @@ const DateInviteCard = ({
             </Badge>
           </div>
 
-          <CardContent className="p-6">
+          <CardContent className="p-6 rounded-none bg-emerald-100">
             <div className="flex items-start gap-4">
               {/* Enhanced Avatar */}
               <div className="relative flex-shrink-0">
@@ -151,11 +144,9 @@ const DateInviteCard = ({
                     {displayData.friendName.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                {direction === 'received' && (
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-2 border-background">
+                {direction === 'received' && <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-2 border-background">
                     <Heart className="w-3 h-3 text-primary-foreground fill-current" />
-                  </div>
-                )}
+                  </div>}
               </div>
               
               <div className="flex-1 min-w-0 space-y-4">
@@ -179,60 +170,39 @@ const DateInviteCard = ({
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">
-                      {displayData.timeProposed !== 'Time TBD' 
-                        ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short', 
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })
-                        : 'Time TBD'
-                      }
+                      {displayData.timeProposed !== 'Time TBD' ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) : 'Time TBD'}
                     </span>
                   </div>
                 </div>
 
                 {/* Quick Actions for pending invitations */}
-                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && (
-                  <div className="flex gap-2 pt-2">
-                    <Button 
-                      size="sm" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAccept(invitation.id);
-                      }}
-                      className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0"
-                    >
+                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-2 pt-2">
+                    <Button size="sm" onClick={e => {
+                  e.stopPropagation();
+                  onAccept(invitation.id);
+                }} className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0">
                       <Check className="w-3.5 h-3.5 mr-1.5" />
                       Accept
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDecline(invitation.id);
-                      }}
-                      className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex-1"
-                    >
+                    <Button size="sm" variant="outline" onClick={e => {
+                  e.stopPropagation();
+                  onDecline(invitation.id);
+                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex-1">
                       <X className="w-3.5 h-3.5 mr-1.5" />
                       Decline
                     </Button>
-                  </div>
-                )}
+                  </div>}
               </div>
 
               {/* Enhanced Venue Image */}
               <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border shadow-md flex-shrink-0 bg-muted transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
-                <img 
-                  src={displayData.venueImage.includes('undefined') 
-                    ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80' 
-                    : displayData.venueImage
-                  } 
-                  alt={displayData.venueName}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
+                <img src={displayData.venueImage.includes('undefined') ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80' : displayData.venueImage} alt={displayData.venueName} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
               </div>
             </div>
           </CardContent>
