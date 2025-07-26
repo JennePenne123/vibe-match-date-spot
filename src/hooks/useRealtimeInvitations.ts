@@ -24,7 +24,7 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
     // Create a unique channel name to prevent conflicts
     const channelName = `date-invitations-${user.id}-${Date.now()}`;
     
-    // Create a channel for real-time updates
+// Create a channel for real-time updates
     const channel = supabase
       .channel(channelName)
       .on(
@@ -50,6 +50,32 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
         },
         (payload) => {
           console.log('Invitation updated:', payload);
+          onInvitationUpdated();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'date_proposals',
+          filter: `recipient_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('New date proposal received:', payload);
+          onInvitationReceived();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'date_proposals',
+          filter: `recipient_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Date proposal updated:', payload);
           onInvitationUpdated();
         }
       )
