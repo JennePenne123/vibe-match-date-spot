@@ -1,7 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, User } from 'lucide-react';
+import { Users, User, ArrowLeft } from 'lucide-react';
 
 interface PlanningModeSelectorProps {
   onModeSelect: (mode: 'solo' | 'collaborative') => void;
@@ -12,8 +13,18 @@ const PlanningModeSelector: React.FC<PlanningModeSelectorProps> = ({
   onModeSelect,
   selectedFriendName
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6">
+      <Button
+        variant="ghost"
+        className="mb-4"
+        onClick={() => navigate('/home')}
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back Home
+      </Button>
       <div className="text-center">
         <h2 className="text-2xl font-bold text-foreground mb-2">Choose Planning Mode</h2>
         <p className="text-muted-foreground">
