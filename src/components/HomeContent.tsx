@@ -20,6 +20,15 @@ const HomeContent: React.FC = () => {
   const handlePlanDate = () => {
     navigate('/plan-date');
   };
+
+  const handleProposalAccepted = (sessionId: string) => {
+    navigate('/plan-date', { 
+      state: { 
+        sessionId,
+        fromProposal: true 
+      } 
+    });
+  };
   const hasFriends = friends.length > 0;
 
   // Show success toast when returning from successful invitation sending
@@ -39,7 +48,7 @@ const HomeContent: React.FC = () => {
   return (
     <main className="p-6">
       <div className="max-w-md mx-auto space-y-6">
-        <DateProposalsList />
+        <DateProposalsList onProposalAccepted={handleProposalAccepted} />
         <RecentReceivedInvitationsCard />
         <SmartDatePlanningCTA />
       </div>
