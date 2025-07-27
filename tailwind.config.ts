@@ -18,6 +18,10 @@ export default {
 				'2xl': '1400px'
 			}
 		},
+		fontFamily: {
+			sans: ['Inter', 'system-ui', 'sans-serif'],
+			display: ['Playfair Display', 'serif'],
+		},
 		extend: {
 			colors: {
 				border: 'hsl(var(--border))',
