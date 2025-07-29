@@ -33,14 +33,14 @@ const ProfileHeader = ({
   onCancel
 }: ProfileHeaderProps) => {
   return (
-    <div className="bg-white p-4 pt-12 shadow-sm">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Profile</h1>
+    <div className="bg-card p-layout-sm pt-12 shadow-sm">
+      <div className="flex items-center justify-between mb-layout-sm">
+        <h1 className="text-heading-h2 font-heading-h2 text-foreground">Profile</h1>
         <Button
           onClick={onEditToggle}
           variant="ghost"
           size="icon"
-          className="text-gray-600 hover:bg-gray-100"
+          className="text-muted-foreground hover:bg-muted"
         >
           {isEditing ? <X className="w-6 h-6" /> : <Edit className="w-6 h-6" />}
         </Button>
@@ -48,32 +48,32 @@ const ProfileHeader = ({
 
       {/* Profile Header */}
       <div className="text-center">
-        <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-datespot-light-pink">
+        <Avatar className="w-24 h-24 mx-auto mb-component-lg border-4 border-primary/20 shadow-elegant">
           <AvatarImage src={user.profile?.avatar_url} alt={displayName} />
-          <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
+          <AvatarFallback className="bg-primary/10 text-primary text-heading-h2 font-heading-h2">
             {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
           </AvatarFallback>
         </Avatar>
         
         {isEditing ? (
-          <div className="space-y-3 max-w-xs mx-auto">
+          <div className="space-y-component-md max-w-xs mx-auto">
             <Input
               value={editedName}
               onChange={(e) => onEditedNameChange(e.target.value)}
-              className="bg-white text-gray-900 text-center font-semibold border-gray-200"
+              className="bg-card text-foreground text-center font-body-base border-border"
               placeholder="Your name"
             />
             <Input
               value={editedEmail}
               onChange={(e) => onEditedEmailChange(e.target.value)}
-              className="bg-white text-gray-900 text-center border-gray-200"
+              className="bg-card text-foreground text-center border-border"
               placeholder="Your email"
               type="email"
             />
-            <div className="flex gap-2 justify-center">
+            <div className="flex gap-component-xs justify-center">
               <Button
                 onClick={onSave}
-                className="bg-datespot-gradient text-white hover:opacity-90"
+                variant="premium"
               >
                 <Save className="w-4 h-4 mr-2" />
                 Save
@@ -81,7 +81,7 @@ const ProfileHeader = ({
               <Button
                 onClick={onCancel}
                 variant="outline"
-                className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                className="border-border text-muted-foreground hover:bg-muted"
               >
                 Cancel
               </Button>
@@ -89,8 +89,8 @@ const ProfileHeader = ({
           </div>
         ) : (
           <>
-            <h2 className="text-2xl font-bold mb-1 text-gray-900">{displayName}</h2>
-            <p className="text-gray-600">{displayEmail}</p>
+            <h2 className="text-heading-h1 font-heading-h1 mb-1 text-foreground">{displayName}</h2>
+            <p className="text-body-base text-muted-foreground">{displayEmail}</p>
           </>
         )}
       </div>

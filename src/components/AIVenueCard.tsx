@@ -111,7 +111,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   const confidenceInfo = getConfidenceIndicator(confidence_level);
 
   return (
-    <Card className="venue-ai-card hover:border-purple-200/50">
+    <Card variant="venue" className="venue-ai-card">
       {/* Venue Image */}
       <div className="relative">
         <VenuePhotoGallery 
@@ -119,22 +119,22 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           venueName={venue_name}
           maxHeight="h-48"
           showThumbnails={false}
-          className="transition-transform duration-300 hover:scale-105"
+          className="transition-elegant"
         />
           
         {/* AI Score Overlay */}
-        <div className="absolute top-3 right-3">
-          <Badge className={`${getScoreColor(ai_score)} font-bold`}>
+        <div className="absolute top-component-md right-component-md">
+          <Badge variant="compatibility" className="font-caption">
             <Brain className="w-3 h-3 mr-1" />
             {Math.round(ai_score)}% AI Match
           </Badge>
         </div>
 
         {/* Confidence Indicator */}
-        <div className="absolute top-3 left-3">
-          <div className="flex items-center bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+        <div className="absolute top-component-md left-component-md">
+          <div className="flex items-center bg-card/90 backdrop-blur-sm rounded-full px-component-xs py-component-xs border border-border/50">
             <div className={`w-2 h-2 rounded-full ${confidenceInfo.color} mr-1`}></div>
-            <span className="text-xs font-medium text-gray-700">{confidenceInfo.text}</span>
+            <span className="text-caption font-caption text-muted-foreground">{confidenceInfo.text}</span>
           </div>
         </div>
 
@@ -153,20 +153,20 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
         )}
       </div>
 
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
+      <CardHeader className="pb-component-md">
+        <div className="flex items-start justify-between gap-component-md">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-bold text-gray-900 truncate">
+            <CardTitle className="truncate">
               {venue_name}
             </CardTitle>
             
-            <div className="flex items-center text-sm text-gray-600 mt-1">
+            <div className="flex items-center text-body-sm text-muted-foreground mt-1">
               <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
               <span className="truncate">{formattedAddress}</span>
             </div>
 
             {/* Distance and Neighborhood */}
-            <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+            <div className="flex items-center gap-component-md text-caption text-muted-foreground mt-1">
               {distance && (
                 <div className="flex items-center gap-1">
                   <Navigation className="w-3 h-3" />
@@ -177,7 +177,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
                 <span>• {venueNeighborhood}</span>
               )}
               {isOpen !== undefined && (
-                <span className={`flex items-center gap-1 ${isOpen ? 'text-green-600' : 'text-red-600'}`}>
+                <span className={`flex items-center gap-1 ${isOpen ? 'text-success' : 'text-destructive'}`}>
                   <Clock className="w-3 h-3" />
                   {isOpen ? 'Open' : 'Closed'}
                 </span>
@@ -186,11 +186,11 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           </div>
 
           {/* Quick actions */}
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col items-end gap-component-xs">
             <Button
               size="sm"
               onClick={() => onSelect(venue_id)}
-              className="bg-purple-600 hover:bg-purple-700"
+              variant="premium"
             >
               Select
             </Button>
@@ -198,33 +198,33 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-component-lg">
         {/* Venue Metrics */}
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-component-lg text-body-sm">
           {(rating || match_factors?.rating) && (
-            <div className="flex items-center text-yellow-600">
+            <div className="flex items-center text-warning">
               <Star className="w-4 h-4 mr-1 fill-current" />
-              <span className="font-medium">{rating || match_factors.rating}</span>
+              <span className="font-body-sm">{rating || match_factors.rating}</span>
             </div>
           )}
           
           {(priceRange || match_factors?.price_range) && (
-            <div className="flex items-center text-green-600">
+            <div className="flex items-center text-success">
               <DollarSign className="w-4 h-4 mr-1" />
-              <span className="font-medium">{priceRange || match_factors.price_range}</span>
+              <span className="font-body-sm">{priceRange || match_factors.price_range}</span>
             </div>
           )}
 
           {cuisine_type && (
-            <div className="flex items-center text-purple-600">
-              <span className="font-medium">{cuisine_type}</span>
+            <div className="flex items-center text-primary">
+              <span className="font-body-sm">{cuisine_type}</span>
             </div>
           )}
           
           {contextual_score > 0 && (
-            <div className="flex items-center text-blue-600">
+            <div className="flex items-center text-accent">
               <TrendingUp className="w-4 h-4 mr-1" />
-              <span className="font-medium">Context Bonus</span>
+              <span className="font-body-sm">Context Bonus</span>
             </div>
           )}
         </div>

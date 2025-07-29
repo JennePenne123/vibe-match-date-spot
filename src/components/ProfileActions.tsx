@@ -15,21 +15,21 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
   return (
     <>
       {/* Friends List Placeholder */}
-      <Card className="mb-6 bg-white shadow-sm border-gray-100">
+      <Card variant="elevated" className="mb-layout-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900">
+          <CardTitle className="flex items-center gap-component-xs text-foreground">
             <Users className="w-5 h-5" />
             Friends (0)
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-6 text-gray-500">
-            <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+          <div className="text-center py-layout-sm text-muted-foreground">
+            <Users className="w-12 h-12 mx-auto mb-component-xs opacity-50" />
             <p>No friends added yet</p>
             <Button
               onClick={() => navigate('/my-friends')}
               variant="outline"
-              className="mt-3 border-gray-200 text-gray-700 hover:bg-gray-50"
+              className="mt-component-md"
             >
               Add Friends
             </Button>
@@ -38,24 +38,25 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
       </Card>
 
       {/* Actions */}
-      <div className="space-y-3">
+      <div className="space-y-component-md">
         <Button
           onClick={() => navigate('/preferences')}
           variant="outline"
-          className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
+          className="w-full"
         >
           Update Preferences
         </Button>
         <Button
           onClick={() => navigate('/home')}
-          className="w-full bg-datespot-gradient text-white hover:opacity-90"
+          variant="premium"
+          className="w-full"
         >
           Find New Date Spots
         </Button>
         <Button
           onClick={onLogout}
           variant="outline"
-          className="w-full text-red-600 border-red-200 hover:bg-red-50"
+          className="w-full text-destructive border-destructive/20 hover:bg-destructive/10"
         >
           Sign Out
         </Button>
