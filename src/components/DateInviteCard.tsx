@@ -152,19 +152,16 @@ const DateInviteCard = ({
               <div className="flex-1 min-w-0 space-y-2">
                 {/* Header */}
                 <div>
-                  <div className="text-xs text-muted-foreground mb-0.5">
-                    {direction === 'received' ? 'From:' : 'To:'}
+                  <div className="text-xs text-muted-foreground mb-0.5 truncate">
+                    {direction === 'received' ? 'From: ' : 'To: '}{displayData.friendName}
                   </div>
-                  <h3 className={`font-semibold text-base leading-tight truncate ${statusConfig.textColor}`}>
-                    {displayData.friendName}
-                  </h3>
                 </div>
                 
                 {/* Venue and Time Info */}
                 <div className="space-y-1.5">
                   <div className="flex items-start gap-2">
                     <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground mt-0.5" />
-                    <span className={`font-medium text-sm leading-tight line-clamp-2 ${statusConfig.textColor}`}>
+                    <span className={`font-medium text-sm leading-tight truncate ${statusConfig.textColor}`}>
                       {displayData.location}
                     </span>
                   </div>
@@ -172,7 +169,6 @@ const DateInviteCard = ({
                     <Clock className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground truncate">
                       {displayData.timeProposed !== 'Time TBD' ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
-                      weekday: 'short',
                       month: 'short',
                       day: 'numeric',
                       hour: '2-digit',
@@ -183,18 +179,18 @@ const DateInviteCard = ({
                 </div>
 
                 {/* Quick Actions for pending invitations */}
-                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-2 pt-3">
+                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-1.5 pt-2">
                     <Button size="sm" onClick={e => {
                   e.stopPropagation();
                   onAccept(invitation.id);
-                }} className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0 text-xs h-8">
+                }} className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0 text-xs h-7 px-2">
                       <Check className="w-3 h-3 mr-1" />
-                      Accept & Start Planning
+                      Accept
                     </Button>
                     <Button size="sm" variant="outline" onClick={e => {
                   e.stopPropagation();
                   onDecline(invitation.id);
-                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-3 text-xs h-8">
+                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-2 text-xs h-7 min-w-0">
                       <X className="w-3 h-3" />
                     </Button>
                   </div>}
