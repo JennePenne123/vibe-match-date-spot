@@ -134,42 +134,43 @@ const DateInviteCard = ({
             </Badge>
           </div>
 
-          <CardContent className="p-6 rounded-none bg-emerald-100">
-            <div className="flex items-start gap-4">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
               {/* Enhanced Avatar */}
               <div className="relative flex-shrink-0">
-                <Avatar className="w-16 h-16 border-3 border-background shadow-lg ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-primary/40">
+                <Avatar className="w-12 h-12 border-2 border-background shadow-lg ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-primary/40">
                   <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/30 text-primary font-bold text-xl">
+                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/30 text-primary font-bold text-sm">
                     {displayData.friendName.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                {direction === 'received' && <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-2 border-background">
-                    <Heart className="w-3 h-3 text-primary-foreground fill-current" />
+                {direction === 'received' && <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center border-2 border-background">
+                    <Heart className="w-2.5 h-2.5 text-primary-foreground fill-current" />
                   </div>}
               </div>
               
-              <div className="flex-1 min-w-0 space-y-4">
+              <div className="flex-1 min-w-0 space-y-2">
                 {/* Header */}
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className={`font-bold text-lg leading-tight ${statusConfig.textColor}`}>
-                      {displayData.friendName}
-                    </h3>
+                  <div className="text-xs text-muted-foreground mb-0.5">
+                    {direction === 'received' ? 'From:' : 'To:'}
                   </div>
+                  <h3 className={`font-semibold text-base leading-tight truncate ${statusConfig.textColor}`}>
+                    {displayData.friendName}
+                  </h3>
                 </div>
                 
                 {/* Venue and Time Info */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
-                    <span className={`font-semibold flex-1 truncate ${statusConfig.textColor}`}>
+                <div className="space-y-1.5">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground mt-0.5" />
+                    <span className={`font-medium text-sm leading-tight line-clamp-2 ${statusConfig.textColor}`}>
                       {displayData.location}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
+                    <Clock className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground truncate">
                       {displayData.timeProposed !== 'Time TBD' ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
                       weekday: 'short',
                       month: 'short',
@@ -182,26 +183,25 @@ const DateInviteCard = ({
                 </div>
 
                 {/* Quick Actions for pending invitations */}
-                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-2 pt-2">
+                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-2 pt-3">
                     <Button size="sm" onClick={e => {
                   e.stopPropagation();
                   onAccept(invitation.id);
-                }} className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0">
-                      <Check className="w-3.5 h-3.5 mr-1.5" />
-                      Accept
+                }} className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0 text-xs h-8">
+                      <Check className="w-3 h-3 mr-1" />
+                      Accept & Start Planning
                     </Button>
                     <Button size="sm" variant="outline" onClick={e => {
                   e.stopPropagation();
                   onDecline(invitation.id);
-                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex-1">
-                      <X className="w-3.5 h-3.5 mr-1.5" />
-                      Decline
+                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-3 text-xs h-8">
+                      <X className="w-3 h-3" />
                     </Button>
                   </div>}
               </div>
 
               {/* Enhanced Venue Image */}
-              <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border shadow-md flex-shrink-0 bg-muted transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+              <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-border shadow-md flex-shrink-0 bg-muted transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
                 <img src={displayData.venueImage.includes('undefined') ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80' : displayData.venueImage} alt={displayData.venueName} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
               </div>
             </div>
