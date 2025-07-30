@@ -33,24 +33,24 @@ const CompatibilityScore: React.FC<CompatibilityScoreProps> = ({
   const formatPercentage = (value: number) => Math.round(value * 100);
 
   return (
-    <Card variant="elevated" className={`w-full ${className}`}>
-      <CardHeader className="pb-component-lg">
-        <CardTitle className="flex items-center gap-component-xs">
-          <Heart className="h-5 w-5 text-destructive" />
+    <Card className={`w-full ${className}`}>
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Heart className="h-5 w-5 text-red-500" />
           Compatibility with {partnerName}
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-layout-sm">
+      <CardContent className="space-y-6">
         {/* Overall Score */}
-        <div className="text-center space-y-component-xs">
-          <div className="flex items-center justify-center gap-component-xs">
-            <Sparkles className="h-6 w-6 text-primary" />
-            <span className={`text-display-lg font-display-lg ${getScoreColor(score.overall_score)}`}>
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <Sparkles className="h-6 w-6 text-purple-500" />
+            <span className={`text-3xl font-bold ${getScoreColor(score.overall_score)}`}>
               {formatPercentage(score.overall_score)}%
             </span>
           </div>
-          <p className="text-body-sm text-muted-foreground">
+          <p className="text-sm text-gray-600">
             {getScoreText(score.overall_score)} compatibility overall
           </p>
           <Progress 
@@ -60,15 +60,15 @@ const CompatibilityScore: React.FC<CompatibilityScoreProps> = ({
         </div>
 
         {/* Detailed Scores */}
-        <div className="grid grid-cols-2 gap-component-lg">
-          <div className="space-y-component-xs">
-            <div className="flex items-center gap-component-xs">
-              <Utensils className="h-4 w-4 text-accent" />
-              <span className="text-body-sm font-body-sm">Cuisine</span>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Utensils className="h-4 w-4 text-orange-500" />
+              <span className="text-sm font-medium">Cuisine</span>
             </div>
-            <div className="flex items-center gap-component-xs">
+            <div className="flex items-center gap-2">
               <Progress value={formatPercentage(score.cuisine_score)} className="flex-1" />
-              <span className="text-body-sm font-body-sm min-w-[3rem]">
+              <span className="text-sm font-semibold min-w-[3rem]">
                 {formatPercentage(score.cuisine_score)}%
               </span>
             </div>

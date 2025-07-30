@@ -46,8 +46,8 @@ const HomeContent: React.FC = () => {
   }, [location.state, toast, navigate]);
 
   return (
-    <main className="p-layout-sm">
-      <div className="max-w-md mx-auto space-y-layout-sm">
+    <main className="p-6">
+      <div className="max-w-md mx-auto space-y-6">
         <DateProposalsList onProposalAccepted={handleProposalAccepted} />
         <RecentReceivedInvitationsCard />
         <SmartDatePlanningCTA />

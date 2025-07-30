@@ -57,15 +57,15 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="warning">Pending</Badge>;
+        return <Badge variant="secondary">Pending</Badge>;
       case 'accepted':
-        return <Badge variant="success">Accepted</Badge>;
+        return <Badge variant="default">Accepted</Badge>;
       case 'declined':
         return <Badge variant="destructive">Declined</Badge>;
       case 'expired':
         return <Badge variant="outline">Expired</Badge>;
       default:
-        return <Badge variant="status">{status}</Badge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
@@ -89,18 +89,18 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
     <div className="space-y-6">
       {pendingProposals.length > 0 && (
         <div>
-          <h3 className="text-heading-h3 font-heading-h3 text-foreground mb-component-lg">Pending Proposals</h3>
-          <div className="space-y-component-lg">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Pending Proposals</h3>
+          <div className="space-y-4">
             {pendingProposals.map((proposal) => (
-              <Card key={proposal.id} variant="invitation">
+              <Card key={proposal.id} className="border-primary/20">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{proposal.title}</CardTitle>
+                    <CardTitle className="text-lg">{proposal.title}</CardTitle>
                     {getStatusBadge(proposal.status)}
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-component-lg">
-                  <div className="flex items-center gap-component-lg text-body-sm text-muted-foreground">
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <User className="h-4 w-4" />
                       {proposal.proposer_id === user?.id 
@@ -119,18 +119,17 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
                   </div>
 
                   {proposal.message && (
-                    <p className="text-body-sm text-muted-foreground italic">
+                    <p className="text-sm text-muted-foreground italic">
                       "{proposal.message}"
                     </p>
                   )}
 
                   {proposal.recipient_id === user?.id && (
-                    <div className="flex gap-component-xs pt-component-xs">
+                    <div className="flex gap-2 pt-2">
                       <Button
                         onClick={() => handleAcceptProposal(proposal)}
                         disabled={loading}
                         className="flex-1"
-                        variant="premium"
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
                         Accept & Start Planning
@@ -155,18 +154,18 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
 
       {otherProposals.length > 0 && (
         <div>
-          <h3 className="text-heading-h3 font-heading-h3 text-foreground mb-component-lg">Previous Proposals</h3>
-          <div className="space-y-component-lg">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Previous Proposals</h3>
+          <div className="space-y-4">
             {otherProposals.map((proposal) => (
-              <Card key={proposal.id} className="opacity-75" variant="default">
+              <Card key={proposal.id} className="opacity-75">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{proposal.title}</CardTitle>
+                    <CardTitle className="text-lg">{proposal.title}</CardTitle>
                     {getStatusBadge(proposal.status)}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-component-lg text-body-sm text-muted-foreground">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <User className="h-4 w-4" />
                       {proposal.proposer_id === user?.id 
