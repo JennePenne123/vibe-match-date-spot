@@ -16,6 +16,10 @@ interface DatePlanningSession {
   created_at: string;
   updated_at: string;
   expires_at: string;
+  initiator_preferences_complete: boolean;
+  partner_preferences_complete: boolean;
+  both_preferences_complete: boolean;
+  planning_mode: string;
 }
 
 interface DatePreferences {
@@ -159,12 +163,22 @@ export const useSessionManagement = () => {
     try {
       console.log('Updating session preferences:', preferences);
       
+      // Determine which preference completion flag to update
+      const isInitiator = currentSession.initiator_id === user.id;
+      const updateData: any = {
+        preferences_data: preferences,
+        updated_at: new Date().toISOString()
+      };
+
+      if (isInitiator) {
+        updateData.initiator_preferences_complete = true;
+      } else {
+        updateData.partner_preferences_complete = true;
+      }
+      
       const { error: updateError } = await supabase
         .from('date_planning_sessions')
-        .update({ 
-          preferences_data: preferences,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', sessionId);
 
       if (updateError) throw updateError;
@@ -173,7 +187,8 @@ export const useSessionManagement = () => {
       setCurrentSession(prev => prev ? { 
         ...prev, 
         preferences_data: preferences,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        ...(isInitiator ? { initiator_preferences_complete: true } : { partner_preferences_complete: true })
       } : null);
       
     } catch (error) {

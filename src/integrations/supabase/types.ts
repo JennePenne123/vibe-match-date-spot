@@ -278,6 +278,7 @@ export type Database = {
       date_planning_sessions: {
         Row: {
           ai_compatibility_score: number | null
+          both_preferences_complete: boolean | null
           created_at: string
           expires_at: string
           id: string
@@ -295,6 +296,7 @@ export type Database = {
         }
         Insert: {
           ai_compatibility_score?: number | null
+          both_preferences_complete?: boolean | null
           created_at?: string
           expires_at?: string
           id?: string
@@ -312,6 +314,7 @@ export type Database = {
         }
         Update: {
           ai_compatibility_score?: number | null
+          both_preferences_complete?: boolean | null
           created_at?: string
           expires_at?: string
           id?: string

@@ -13,6 +13,10 @@ interface DatePlanningSession {
   created_at: string;
   updated_at: string;
   expires_at: string;
+  initiator_preferences_complete: boolean;
+  partner_preferences_complete: boolean;
+  both_preferences_complete: boolean;
+  planning_mode: string;
 }
 
 export const useSessionRealtime = (

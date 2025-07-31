@@ -295,6 +295,10 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
               {},
               state.userLocation
             )}
+            sessionId={currentSession?.id}
+            isCollaborative={planningMode === 'collaborative'}
+            hasPartnerSetPreferences={currentSession?.partner_preferences_complete || false}
+            isWaitingForPartner={planningMode === 'collaborative' && !currentSession?.both_preferences_complete}
           />
         )}
 

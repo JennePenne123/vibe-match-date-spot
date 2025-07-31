@@ -9,6 +9,7 @@ import CompatibilityScore from '@/components/CompatibilityScore';
 import AIMatchSummary from '@/components/AIMatchSummary';
 import AIVenueCard from '@/components/AIVenueCard';
 import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
+import CollaborativeWaitingState from '@/components/date-planning/CollaborativeWaitingState';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface MatchReviewProps {
@@ -19,6 +20,10 @@ interface MatchReviewProps {
   onVenueSelect: (venueId: string) => void;
   error?: string;
   onRetrySearch?: () => void;
+  sessionId?: string;
+  isCollaborative?: boolean;
+  hasPartnerSetPreferences?: boolean;
+  isWaitingForPartner?: boolean;
 }
 
 const MatchReview: React.FC<MatchReviewProps> = ({
@@ -28,7 +33,11 @@ const MatchReview: React.FC<MatchReviewProps> = ({
   venueRecommendations,
   onVenueSelect,
   error,
-  onRetrySearch
+  onRetrySearch,
+  sessionId,
+  isCollaborative = false,
+  hasPartnerSetPreferences = true,
+  isWaitingForPartner = false
 }) => {
   const { user } = useAuth();
   const handleVenueSelect = (venue: AIVenueRecommendation) => {
@@ -68,6 +77,20 @@ const MatchReview: React.FC<MatchReviewProps> = ({
           )}
         </CardContent>
       </Card>
+    );
+  }
+
+  // Show waiting state for collaborative planning when partner hasn't set preferences
+  if (isCollaborative && (!hasPartnerSetPreferences || isWaitingForPartner)) {
+    return (
+      <div className="space-y-6">
+        <CollaborativeWaitingState
+          partnerName={partnerName}
+          sessionId={sessionId || ''}
+          hasPartnerSetPreferences={hasPartnerSetPreferences}
+          isWaitingForPartner={isWaitingForPartner}
+        />
+      </div>
     );
   }
 

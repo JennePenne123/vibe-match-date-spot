@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, User, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle, XCircle, Play } from 'lucide-react';
 import { useDateProposals, DateProposal } from '@/hooks/useDateProposals';
 import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,6 +20,7 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   const { proposals, getMyProposals, acceptProposal, updateProposalStatus, loading } = useDateProposals();
   const { friends } = useFriends();
   const { toast } = useToast();
+  const [hiddenProposals, setHiddenProposals] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     getMyProposals();
@@ -45,12 +46,13 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   const handleDeclineProposal = async (proposalId: string) => {
     const success = await updateProposalStatus(proposalId, 'declined');
     if (success) {
+      // Hide the proposal card immediately
+      setHiddenProposals(prev => new Set([...prev, proposalId]));
       toast({
         title: "Proposal Declined",
         description: "The proposal has been declined",
         variant: "default"
       });
-      getMyProposals(); // Refresh the list
     }
   };
 
@@ -69,14 +71,17 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
     }
   };
 
-  const pendingProposals = proposals.filter(p => p.status === 'pending');
-  const otherProposals = proposals.filter(p => p.status !== 'pending');
+  // Filter out hidden proposals and separate by status
+  const visibleProposals = proposals.filter(p => !hiddenProposals.has(p.id));
+  const pendingProposals = visibleProposals.filter(p => p.status === 'pending');
+  const acceptedProposals = visibleProposals.filter(p => p.status === 'accepted');
+  const otherProposals = visibleProposals.filter(p => p.status !== 'pending' && p.status !== 'accepted');
 
   if (loading) {
     return <div className="text-center py-8 text-muted-foreground">Loading proposals...</div>;
   }
 
-  if (proposals.length === 0) {
+  if (visibleProposals.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -142,6 +147,61 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
                       >
                         <XCircle className="h-4 w-4 mr-2" />
                         Decline
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {acceptedProposals.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold text-foreground mb-4">Accepted Proposals</h3>
+          <div className="space-y-4">
+            {acceptedProposals.map((proposal) => (
+              <Card key={proposal.id} className="border-green-200 bg-green-50">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">{proposal.title}</CardTitle>
+                    {getStatusBadge(proposal.status)}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <User className="h-4 w-4" />
+                      {proposal.proposer_id === user?.id 
+                        ? `To: ${getFriendName(proposal.recipient_id)}`
+                        : `From: ${getFriendName(proposal.proposer_id)}`
+                      }
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      {format(new Date(proposal.proposed_date), 'MMM dd, yyyy')}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      {format(new Date(proposal.proposed_date), 'HH:mm')}
+                    </div>
+                  </div>
+
+                  {proposal.message && (
+                    <p className="text-sm text-muted-foreground italic">
+                      "{proposal.message}"
+                    </p>
+                  )}
+
+                  {proposal.planning_session_id && (
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        onClick={() => onProposalAccepted?.(proposal.planning_session_id!)}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        Start AI Planning
                       </Button>
                     </div>
                   )}
