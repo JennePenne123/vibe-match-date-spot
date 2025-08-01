@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
@@ -9,9 +10,6 @@ import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import PreferencesStep from '@/components/date-planning/PreferencesStep';
 import MatchReview from '@/components/date-planning/MatchReview';
 import InvitationCreation from '@/components/date-planning/InvitationCreation';
-import PlanningModeSelector from '@/components/date-planning/PlanningModeSelector';
-import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
-import DateProposalsList from '@/components/date-planning/DateProposalsList';
 
 // Import refactored components and hooks
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
@@ -25,13 +23,14 @@ interface SmartDatePlannerProps {
 }
 
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }) => {
+  const location = useLocation();
   const state = useSmartDatePlannerState({ preselectedFriend });
   const handlers = createSmartDatePlannerHandlers(state);
   
-  // New state for collaborative flow
-  const [planningMode, setPlanningMode] = useState<'solo' | 'collaborative' | null>(null);
-  const [showProposalCreation, setShowProposalCreation] = useState(false);
-  const [showProposalsList, setShowProposalsList] = useState(false);
+  // Get planning mode and session from navigation state
+  const planningMode = location.state?.planningMode || 'solo';
+  const sessionId = location.state?.sessionId;
+  const fromProposal = location.state?.fromProposal;
 
   const {
     user,
@@ -73,40 +72,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     handleStartFromScratch
   } = handlers;
 
-  // Handle mode selection
-  const handleModeSelect = (mode: 'solo' | 'collaborative') => {
-    setPlanningMode(mode);
-    if (mode === 'collaborative') {
-      setShowProposalsList(true);
-    } else {
-      // Continue with existing solo flow
-      // Don't auto-advance to partner selection, let the existing flow handle it
-    }
-  };
-
-  // Handle collaborative flow
-  const handleCreateProposal = () => {
-    setShowProposalsList(false);
-    setShowProposalCreation(true);
-  };
-
-  const handleProposalSent = () => {
-    setShowProposalCreation(false);
-    setShowProposalsList(true);
-  };
-
-  const handleProposalAccepted = (sessionId: string) => {
-    // Navigate to collaborative planning with the session
-    setShowProposalsList(false);
-    // The session is already created, just continue to preferences
-  };
-
-  const handleBackToMode = () => {
-    setPlanningMode(null);
-    setShowProposalCreation(false);
-    setShowProposalsList(false);
-  };
-
   // Show error if any critical hooks failed
   if (friendsError || datePlanningError || planningStepsError) {
     console.error('SmartDatePlanner - Critical errors detected:', {
@@ -133,75 +98,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     );
   }
 
-  // Show mode selector first if no mode is selected
-  if (!planningMode) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto p-6">
-          <PlanningModeSelector 
-            onModeSelect={handleModeSelect}
-            selectedFriendName={preselectedFriend?.name}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // Show collaborative flow screens
-  if (planningMode === 'collaborative') {
-    if (showProposalCreation && selectedPartnerId) {
-      const selectedFriend = friends?.find(f => f.id === selectedPartnerId);
-      return (
-        <div className="min-h-screen bg-gray-50">
-          <div className="max-w-4xl mx-auto p-6">
-            <DateProposalCreation
-              recipientId={selectedPartnerId}
-              recipientName={selectedFriend?.name || 'Friend'}
-              onProposalSent={handleProposalSent}
-              onBack={() => setShowProposalCreation(false)}
-            />
-          </div>
-        </div>
-      );
-    }
-
-    if (showProposalsList) {
-      return (
-        <div className="min-h-screen bg-gray-50">
-          <div className="max-w-4xl mx-auto p-6">
-            <div className="mb-6">
-              <Button
-                variant="outline"
-                onClick={handleBackToMode}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Mode Selection
-              </Button>
-            </div>
-            <div className="space-y-6">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-foreground mb-2">Date Proposals</h2>
-                <p className="text-muted-foreground">
-                  Send new proposals or respond to existing ones
-                </p>
-                <Button
-                  onClick={() => {
-                    setShowProposalsList(false);
-                    // Trigger partner selection for collaborative mode
-                  }}
-                  className="mt-4"
-                >
-                  Create New Proposal
-                </Button>
-              </div>
-              <DateProposalsList onProposalAccepted={handleProposalAccepted} />
-            </div>
-          </div>
-        </div>
-      );
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -220,13 +116,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         {/* Navigation */}
         <div className="flex justify-start">
           <Button 
-            onClick={() => {
-              if (planningMode === 'collaborative') {
-                handleBackToMode();
-              } else {
-                goBack(preselectedFriend, navigate);
-              }
-            }} 
+            onClick={() => goBack(preselectedFriend, navigate)} 
             variant="outline" 
             size="sm"
           >
@@ -236,30 +126,12 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         </div>
 
         {/* Step 1: Select Partner */}
-        {currentStep === 'select-partner' && planningMode === 'collaborative' && (
+        {currentStep === 'select-partner' && (
           <PartnerSelection
             friends={friends}
             selectedPartnerId={selectedPartnerId}
             selectedPartnerIds={selectedPartnerIds}
-            dateMode="single"
-            loading={loading}
-            onPartnerChange={setSelectedPartnerId}
-            onPartnerIdsChange={setSelectedPartnerIds}
-            onDateModeChange={setDateMode}
-            onContinue={() => {
-              if (selectedPartnerId) {
-                setShowProposalCreation(true);
-              }
-            }}
-          />
-        )}
-
-        {currentStep === 'select-partner' && planningMode === 'solo' && (
-          <PartnerSelection
-            friends={friends}
-            selectedPartnerId={selectedPartnerId}
-            selectedPartnerIds={selectedPartnerIds}
-            dateMode={dateMode}
+            dateMode={planningMode === 'collaborative' ? 'single' : dateMode}
             loading={loading}
             onPartnerChange={setSelectedPartnerId}
             onPartnerIdsChange={setSelectedPartnerIds}

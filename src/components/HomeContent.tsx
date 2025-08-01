@@ -1,34 +1,73 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useFriends } from '@/hooks/useFriends';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Users } from 'lucide-react';
-import SmartDatePlanningCTA from '@/components/home/SmartDatePlanningCTA';
+import { Sparkles, Users, User } from 'lucide-react';
 import RecentReceivedInvitationsCard from '@/components/home/RecentReceivedInvitationsCard';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
+import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
+import PartnerSelection from '@/components/date-planning/PartnerSelection';
 
 import { useToast } from '@/hooks/use-toast';
 const HomeContent: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const {
-    friends
-  } = useFriends();
+  const { friends } = useFriends();
   
-  const handlePlanDate = () => {
-    navigate('/plan-date');
+  // State for managing different flows
+  const [selectedMode, setSelectedMode] = useState<'solo' | 'collaborative' | null>(null);
+  const [showPartnerSelection, setShowPartnerSelection] = useState(false);
+  const [showProposalCreation, setShowProposalCreation] = useState(false);
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
+  const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
+  const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
+
+  const handleSoloPlanning = () => {
+    navigate('/plan-date', { state: { planningMode: 'solo' } });
+  };
+
+  const handleCollaborativePlanning = () => {
+    setSelectedMode('collaborative');
+    setShowPartnerSelection(true);
+  };
+
+  const handlePartnerSelectionContinue = () => {
+    if (selectedPartnerId) {
+      setShowPartnerSelection(false);
+      setShowProposalCreation(true);
+    }
+  };
+
+  const handleProposalSent = () => {
+    setShowProposalCreation(false);
+    setSelectedMode(null);
+    setSelectedPartnerId('');
+    toast({
+      title: "Proposal Sent!",
+      description: "Your date proposal has been sent successfully.",
+      duration: 3000
+    });
   };
 
   const handleProposalAccepted = (sessionId: string) => {
     navigate('/plan-date', { 
       state: { 
         sessionId,
+        planningMode: 'collaborative',
         fromProposal: true 
       } 
     });
   };
+
+  const handleBackToModeSelection = () => {
+    setSelectedMode(null);
+    setShowPartnerSelection(false);
+    setShowProposalCreation(false);
+    setSelectedPartnerId('');
+  };
+  
   const hasFriends = friends.length > 0;
 
   // Show success toast when returning from successful invitation sending
@@ -45,12 +84,107 @@ const HomeContent: React.FC = () => {
     }
   }, [location.state, toast, navigate]);
 
+  // Show proposal creation flow
+  if (showProposalCreation && selectedPartnerId) {
+    const selectedFriend = friends.find(f => f.id === selectedPartnerId);
+    return (
+      <main className="p-6">
+        <div className="max-w-md mx-auto space-y-6">
+          <DateProposalCreation
+            recipientId={selectedPartnerId}
+            recipientName={selectedFriend?.name || 'Friend'}
+            onProposalSent={handleProposalSent}
+            onBack={handleBackToModeSelection}
+          />
+        </div>
+      </main>
+    );
+  }
+
+  // Show partner selection for collaborative mode
+  if (showPartnerSelection) {
+    return (
+      <main className="p-6">
+        <div className="max-w-md mx-auto space-y-6">
+          <div className="flex justify-start mb-4">
+            <Button variant="outline" onClick={handleBackToModeSelection}>
+              Back to Mode Selection
+            </Button>
+          </div>
+          <PartnerSelection
+            friends={friends}
+            selectedPartnerId={selectedPartnerId}
+            selectedPartnerIds={selectedPartnerIds}
+            dateMode={dateMode}
+            loading={false}
+            onPartnerChange={setSelectedPartnerId}
+            onPartnerIdsChange={setSelectedPartnerIds}
+            onDateModeChange={setDateMode}
+            onContinue={handlePartnerSelectionContinue}
+          />
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="p-6">
       <div className="max-w-md mx-auto space-y-6">
+        {/* Date Proposals Section */}
         <DateProposalsList onProposalAccepted={handleProposalAccepted} />
+        
+        {/* Recent Invitations */}
         <RecentReceivedInvitationsCard />
-        <SmartDatePlanningCTA />
+        
+        {/* Planning Mode Selection */}
+        <div className="space-y-4">
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-foreground mb-2">Plan a New Date</h2>
+            <p className="text-muted-foreground text-sm">
+              Choose how you'd like to plan your date
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-4">
+            {/* Solo Planning Card */}
+            <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={handleSoloPlanning}>
+              <CardHeader className="text-center pb-3">
+                <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
+                  <User className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle className="text-lg">Solo Planning</CardTitle>
+                <CardDescription className="text-sm">
+                  Plan the date yourself and send an invitation
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button className="w-full" variant="outline">
+                  Start Solo Planning
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Collaborative Planning Card */}
+            <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={handleCollaborativePlanning}>
+              <CardHeader className="text-center pb-3">
+                <div className="mx-auto mb-2 p-2 rounded-full bg-secondary/10">
+                  <Users className="h-6 w-6 text-secondary" />
+                </div>
+                <CardTitle className="text-lg">Collaborative Planning</CardTitle>
+                <CardDescription className="text-sm">
+                  Send a proposal and plan together
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button className="w-full" variant="default">
+                  Send Date Proposal
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </main>
   );
