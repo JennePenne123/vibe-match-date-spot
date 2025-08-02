@@ -6,117 +6,172 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
+    /* Premium Base Colors */
+    --background: 330 20% 99%;
+    --foreground: 330 22% 12%;
+    --card: 330 20% 99%;
+    --card-foreground: 330 22% 12%;
+    --popover: 330 20% 99%;
+    --popover-foreground: 330 22% 12%;
+    
+    /* Enhanced Brand Colors */
+    --primary: 330 81% 60%;
+    --primary-foreground: 330 85% 98%;
+    --secondary: 351 86% 55%;
+    --secondary-foreground: 330 20% 99%;
+    --accent: 45 90% 96%;
+    --accent-foreground: 330 22% 12%;
+    
+    /* Premium Neutrals */
+    --muted: 330 15% 97%;
+    --muted-foreground: 330 8% 36%;
+    --border: 330 12% 93%;
+    --input: 330 12% 93%;
+    --ring: 330 81% 60%;
+    
+    /* Enhanced Semantic Colors */
+    --destructive: 0 85% 62%;
+    --destructive-foreground: 0 90% 98%;
+    --success: 142 76% 48%;
+    --success-foreground: 138 85% 98%;
+    --warning: 38 88% 52%;
+    --warning-foreground: 48 100% 97%;
+    
+    /* Chart Colors */
+    --chart-1: 330 81% 60%;
+    --chart-2: 351 86% 55%;
+    --chart-3: 45 90% 96%;
+    --chart-4: 142 76% 48%;
+    --chart-5: 195 87% 45%;
+    
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Premium Gradient System */
+    --gradient-primary: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(45, 90%, 96%) 0%, hsl(35, 75%, 55%) 100%);
+    --gradient-romantic: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(330, 85%, 95%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 90%, 96%) 70%, hsl(330, 82%, 95%) 100%);
+    --gradient-dreamy: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 25%, hsl(351, 95%, 94%) 50%, hsl(45, 85%, 90%) 75%, hsl(330, 85%, 98%) 100%);
+    --gradient-luxe: linear-gradient(135deg, hsl(330, 94%, 28%) 0%, hsl(330, 81%, 60%) 50%, hsl(351, 86%, 55%) 100%);
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Premium Surface Gradients */
+    --gradient-surface-subtle: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
+    --gradient-surface-warm: linear-gradient(135deg, hsl(330, 20%, 99%) 0%, hsl(330, 15%, 97%) 100%);
+    --gradient-surface-soft: linear-gradient(135deg, hsl(330, 81%, 60% / 0.03) 0%, hsl(351, 86%, 55% / 0.08) 100%);
+    --gradient-surface-medium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.15) 100%);
+    --gradient-surface-rich: linear-gradient(135deg, hsl(330, 81%, 60% / 0.15) 0%, hsl(351, 86%, 55% / 0.25) 100%);
+    --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Special Effect Gradients */
+    --gradient-aurora: linear-gradient(135deg, hsl(330, 81%, 60% / 0.8) 0%, hsl(351, 86%, 55% / 0.6) 25%, hsl(45, 90%, 96% / 0.4) 50%, hsl(195, 87%, 45% / 0.6) 75%, hsl(330, 81%, 60% / 0.8) 100%);
+    --gradient-cosmic: radial-gradient(circle at 30% 20%, hsl(330, 81%, 60% / 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(351, 86%, 55% / 0.2) 0%, transparent 50%);
+    --gradient-shimmer: linear-gradient(45deg, transparent 30%, hsl(330, 81%, 60% / 0.1) 50%, transparent 70%);
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    /* Component-Specific Gradients */
+    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
+    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    --gradient-card-elegant: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
+    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.05) 0%, hsl(351, 86%, 55% / 0.08) 100%);
+    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
 
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-
-    /* Date invitation card gradients - soft light green */
-    --gradient-accepted: linear-gradient(135deg, hsl(144 35% 98%), hsl(144 35% 70%));
-    --gradient-pending: linear-gradient(135deg, hsl(144 35% 98%), hsl(144 25% 96%));
-    --gradient-accepted-hover: linear-gradient(135deg, hsl(144 40% 96%), hsl(144 30% 93%));
-    --gradient-pending-hover: linear-gradient(135deg, hsl(144 35% 96%), hsl(144 25% 94%));
+    /* Premium Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.3);
+    --shadow-romantic: 0 12px 32px -8px hsl(330 81% 60% / 0.4), 0 4px 16px -4px hsl(330 81% 60% / 0.2);
+    --shadow-glow: 0 0 24px hsl(330 81% 60% / 0.35), 0 0 48px hsl(330 81% 60% / 0.2);
+    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
+    --shadow-dreamy: 0 0 40px hsl(330 85% 95% / 0.8), 0 8px 24px hsl(330 81% 60% / 0.25);
     
-    /* Button gradients */
-    --gradient-success: linear-gradient(135deg, hsl(142 71% 45%), hsl(158 64% 52%));
-    
-    /* Venue card gradients */
-    --gradient-venue: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(210 10% 96%) 100%);
-    --gradient-venue-ai: linear-gradient(135deg, hsl(270 10% 98%) 0%, hsl(270 15% 95%) 100%);
-    --gradient-success-hover: linear-gradient(135deg, hsl(142 71% 41%), hsl(158 64% 48%));
+    /* Sidebar variables */
+    --sidebar-background: 330 20% 99%;
+    --sidebar-foreground: 330 22% 12%;
+    --sidebar-primary: 330 81% 60%;
+    --sidebar-primary-foreground: 330 85% 98%;
+    --sidebar-accent: 330 15% 97%;
+    --sidebar-accent-foreground: 330 22% 12%;
+    --sidebar-border: 330 12% 93%;
+    --sidebar-ring: 330 81% 60%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-
-    /* Date invitation card gradients - soft light green for dark mode */
-    --gradient-accepted: linear-gradient(135deg, hsl(144 25% 22%), hsl(144 20% 18%));
-    --gradient-pending: linear-gradient(135deg, hsl(144 20% 22%), hsl(144 15% 18%));
-    --gradient-accepted-hover: linear-gradient(135deg, hsl(144 25% 24%), hsl(144 20% 20%));
-    --gradient-pending-hover: linear-gradient(135deg, hsl(144 20% 24%), hsl(144 15% 20%));
+    /* Premium Dark Base Colors */
+    --background: 330 22% 12%;
+    --foreground: 330 20% 99%;
+    --card: 330 16% 18%;
+    --card-foreground: 330 20% 99%;
+    --popover: 330 16% 18%;
+    --popover-foreground: 330 20% 99%;
     
-    /* Button gradients - darker for dark mode */
-    --gradient-success: linear-gradient(135deg, hsl(142 60% 35%), hsl(158 50% 42%));
+    /* Enhanced Brand Colors for Dark */
+    --primary: 330 81% 60%;
+    --primary-foreground: 330 22% 12%;
+    --secondary: 351 86% 55%;
+    --secondary-foreground: 330 22% 12%;
+    --accent: 45 75% 55%;
+    --accent-foreground: 330 22% 12%;
     
-    /* Venue card gradients - darker for dark mode */
-    --gradient-venue: linear-gradient(135deg, hsl(240 10% 8%) 0%, hsl(240 15% 12%) 100%);
-    --gradient-venue-ai: linear-gradient(135deg, hsl(270 15% 8%) 0%, hsl(270 20% 12%) 100%);
-    --gradient-success-hover: linear-gradient(135deg, hsl(142 60% 31%), hsl(158 50% 38%));
+    /* Premium Dark Neutrals */
+    --muted: 330 16% 18%;
+    --muted-foreground: 330 8% 68%;
+    --border: 330 12% 28%;
+    --input: 330 12% 28%;
+    --ring: 330 81% 60%;
+    
+    /* Enhanced Semantic Colors for Dark */
+    --destructive: 0 85% 62%;
+    --destructive-foreground: 0 90% 98%;
+    --success: 142 76% 48%;
+    --success-foreground: 138 85% 98%;
+    --warning: 38 88% 52%;
+    --warning-foreground: 48 100% 97%;
+
+    /* Chart Colors for Dark */
+    --chart-1: 330 81% 60%;
+    --chart-2: 351 86% 55%;
+    --chart-3: 45 75% 55%;
+    --chart-4: 142 76% 48%;
+    --chart-5: 195 87% 45%;
+
+    /* Dark Mode Premium Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(45, 75%, 55%) 0%, hsl(35, 78%, 48%) 100%);
+    --gradient-romantic: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(330, 16%, 18%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 75%, 55%) 70%, hsl(330, 16%, 18%) 100%);
+    --gradient-dreamy: linear-gradient(135deg, hsl(330, 22%, 12%) 0%, hsl(330, 16%, 18%) 25%, hsl(351, 86%, 55% / 0.2) 50%, hsl(45, 75%, 55% / 0.15) 75%, hsl(330, 22%, 12%) 100%);
+    --gradient-luxe: linear-gradient(135deg, hsl(330, 94%, 28%) 0%, hsl(330, 81%, 60%) 50%, hsl(351, 86%, 55%) 100%);
+
+    /* Dark Mode Surface Gradients */
+    --gradient-surface-subtle: linear-gradient(135deg, hsl(330, 16%, 18%) 0%, hsl(330, 12%, 22%) 100%);
+    --gradient-surface-warm: linear-gradient(135deg, hsl(330, 22%, 12%) 0%, hsl(330, 16%, 18%) 100%);
+    --gradient-surface-soft: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
+    --gradient-surface-medium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.15) 0%, hsl(351, 86%, 55% / 0.20) 100%);
+    --gradient-surface-rich: linear-gradient(135deg, hsl(330, 81%, 60% / 0.25) 0%, hsl(351, 86%, 55% / 0.35) 100%);
+    --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+    /* Dark Mode Component Gradients */
+    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
+    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    --gradient-card-elegant: linear-gradient(135deg, hsl(330, 16%, 18%) 0%, hsl(330, 12%, 22%) 100%);
+    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
+    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+    /* Dark Mode Premium Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.4);
+    --shadow-romantic: 0 12px 32px -8px hsl(330 81% 60% / 0.5), 0 4px 16px -4px hsl(330 81% 60% / 0.3);
+    --shadow-glow: 0 0 24px hsl(330 81% 60% / 0.45), 0 0 48px hsl(330 81% 60% / 0.3);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-dreamy: 0 0 40px hsl(330 81% 60% / 0.3), 0 8px 24px hsl(330 81% 60% / 0.35);
+    
+    /* Dark sidebar variables */
+    --sidebar-background: 330 22% 12%;
+    --sidebar-foreground: 330 20% 99%;
+    --sidebar-primary: 330 81% 60%;
+    --sidebar-primary-foreground: 330 22% 12%;
+    --sidebar-accent: 330 16% 18%;
+    --sidebar-accent-foreground: 330 20% 99%;
+    --sidebar-border: 330 12% 28%;
+    --sidebar-ring: 330 81% 60%;
   }
 }
 

@@ -1,6 +1,6 @@
 // Design system effects tokens (shadows, borders, etc.)
 export const effectTokens = {
-  // Shadow system
+  // Premium shadow system with layered depths
   boxShadow: {
     xs: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
     sm: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
@@ -12,59 +12,90 @@ export const effectTokens = {
     none: '0 0 #0000',
   },
 
-  // Brand-specific shadows (with DateSpot pink)
+  // Premium brand shadows with sophisticated layering
   brandShadow: {
-    sm: '0 1px 3px 0 hsl(330 81% 60% / 0.1), 0 1px 2px -1px hsl(330 81% 60% / 0.1)',
-    md: '0 4px 6px -1px hsl(330 81% 60% / 0.1), 0 2px 4px -2px hsl(330 81% 60% / 0.1)',
-    lg: '0 10px 15px -3px hsl(330 81% 60% / 0.1), 0 4px 6px -4px hsl(330 81% 60% / 0.1)',
-    glow: '0 0 20px hsl(330 81% 60% / 0.3)',
+    subtle: '0 2px 8px -2px hsl(330 81% 60% / 0.12)',
+    soft: '0 4px 16px -4px hsl(330 81% 60% / 0.18)',
+    medium: '0 8px 24px -6px hsl(330 81% 60% / 0.24)',
+    elegant: '0 10px 30px -10px hsl(330 81% 60% / 0.3), 0 2px 8px -2px hsl(330 81% 60% / 0.1)',
+    strong: '0 16px 40px -8px hsl(330 81% 60% / 0.32)',
+    glow: '0 0 24px hsl(330 81% 60% / 0.35), 0 0 48px hsl(330 81% 60% / 0.2)',
+    romantic: '0 12px 32px -8px hsl(330 81% 60% / 0.4), 0 4px 16px -4px hsl(330 81% 60% / 0.2), 0 0 0 1px hsl(330 81% 60% / 0.08)',
+    glass: '0 8px 32px rgba(31, 38, 135, 0.37)',
+    dreamy: '0 0 40px hsl(330 85% 95% / 0.8), 0 8px 24px hsl(330 81% 60% / 0.25)',
   },
 
-  // Border radius
+  // Enhanced border radius with premium curves
   borderRadius: {
     none: '0px',
-    sm: '0.125rem',     // 2px
-    md: '0.25rem',      // 4px
-    DEFAULT: '0.375rem', // 6px
-    lg: '0.5rem',       // 8px
-    xl: '0.75rem',      // 12px
-    '2xl': '1rem',      // 16px
-    '3xl': '1.5rem',    // 24px
+    xs: '0.0625rem',   // 1px
+    sm: '0.125rem',    // 2px
+    md: '0.375rem',    // 6px
+    lg: '0.5rem',      // 8px
+    xl: '0.75rem',     // 12px
+    '2xl': '1rem',     // 16px
+    '3xl': '1.5rem',   // 24px
+    '4xl': '2rem',     // 32px
     full: '9999px',
   },
 
-  // Border widths
+  // Premium border system
   borderWidth: {
     0: '0px',
-    DEFAULT: '1px',
+    0.5: '0.5px',
+    1: '1px',
+    1.5: '1.5px',
     2: '2px',
+    3: '3px',
     4: '4px',
+    6: '6px',
     8: '8px',
   },
 
-  // Backdrop filters
+  // Advanced backdrop blur for premium glass effects
   backdropBlur: {
     none: 'blur(0)',
+    xs: 'blur(2px)',
     sm: 'blur(4px)',
-    md: 'blur(8px)',
+    md: 'blur(12px)',
     lg: 'blur(16px)',
     xl: 'blur(24px)',
     '2xl': 'blur(40px)',
     '3xl': 'blur(64px)',
+    subtle: 'blur(8px) saturate(150%)',
+    premium: 'blur(16px) saturate(180%) brightness(110%)',
   },
 
-  // Gradients
+  // Premium gradient system with sophisticated color transitions
   gradients: {
+    // Enhanced brand gradients
     brand: {
-      primary: 'linear-gradient(135deg, hsl(330 81% 60%), hsl(330 81% 52%))',
-      secondary: 'linear-gradient(135deg, hsl(351 86% 55%), hsl(351 83% 48%))',
-      accent: 'linear-gradient(135deg, hsl(195 87% 45%), hsl(195 85% 38%))',
+      primary: 'linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%)',
+      secondary: 'linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%)',
+      accent: 'linear-gradient(135deg, hsl(45, 90%, 96%) 0%, hsl(35, 75%, 55%) 100%)',
+      romantic: 'linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(330, 85%, 95%) 100%)',
+      sunset: 'linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 90%, 96%) 70%, hsl(330, 82%, 95%) 100%)',
+      dreamy: 'linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 25%, hsl(351, 95%, 94%) 50%, hsl(45, 85%, 90%) 75%, hsl(330, 85%, 98%) 100%)',
+      luxe: 'linear-gradient(135deg, hsl(330, 94%, 28%) 0%, hsl(330, 81%, 60%) 50%, hsl(351, 86%, 55%) 100%)',
     },
+    
+    // Surface gradients with premium feel
     surface: {
-      subtle: 'linear-gradient(135deg, hsl(210 20% 98%), hsl(220 14% 96%))',
-      card: 'linear-gradient(135deg, hsl(0 0% 100%), hsl(220 14% 96%))',
-    }
-  }
+      subtle: 'linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%)',
+      warm: 'linear-gradient(135deg, hsl(330, 20%, 99%) 0%, hsl(330, 15%, 97%) 100%)',
+      soft: 'linear-gradient(135deg, hsl(330, 81%, 60% / 0.03) 0%, hsl(351, 86%, 55% / 0.08) 100%)',
+      medium: 'linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.15) 100%)',
+      rich: 'linear-gradient(135deg, hsl(330, 81%, 60% / 0.15) 0%, hsl(351, 86%, 55% / 0.25) 100%)',
+      glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+    },
+
+    // Special effect gradients
+    special: {
+      aurora: 'linear-gradient(135deg, hsl(330, 81%, 60% / 0.8) 0%, hsl(351, 86%, 55% / 0.6) 25%, hsl(45, 90%, 96% / 0.4) 50%, hsl(195, 87%, 45% / 0.6) 75%, hsl(330, 81%, 60% / 0.8) 100%)',
+      cosmic: 'radial-gradient(circle at 30% 20%, hsl(330, 81%, 60% / 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(351, 86%, 55% / 0.2) 0%, transparent 50%)',
+      shimmer: 'linear-gradient(45deg, transparent 30%, hsl(330, 81%, 60% / 0.1) 50%, transparent 70%)',
+    },
+  },
 };
 
 // Animation and transition tokens
