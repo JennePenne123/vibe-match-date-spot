@@ -24,6 +24,7 @@ export default {
 		},
 		extend: {
 			colors: {
+				// Core design system colors
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -67,26 +68,71 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// DateSpot brand colors - updated to pink theme with light backgrounds
-				datespot: {
-					pink: '#EC4899',
-					'dark-pink': '#BE185D',
-					'light-pink': '#FCE7F3',
-					'soft-pink': '#FDF2F8',
-					rose: '#F43F5E',
-					'light-rose': '#FFE4E6',
-					gradient: {
-						from: '#F472B6',
-						to: '#EC4899'
-					}
+				// Premium brand color system
+				brand: {
+					50: 'hsl(var(--brand-50))',
+					100: 'hsl(var(--brand-100))',
+					200: 'hsl(var(--brand-200))',
+					300: 'hsl(var(--brand-300))',
+					400: 'hsl(var(--brand-400))',
+					500: 'hsl(var(--brand-500))',
+					600: 'hsl(var(--brand-600))',
+					700: 'hsl(var(--brand-700))',
+					800: 'hsl(var(--brand-800))',
+					900: 'hsl(var(--brand-900))',
+				},
+				// Enhanced semantic colors
+				success: {
+					50: 'hsl(var(--success-50))',
+					500: 'hsl(var(--success-500))',
+					600: 'hsl(var(--success-600))',
+				},
+				warning: {
+					50: 'hsl(var(--warning-50))',
+					500: 'hsl(var(--warning-500))',
+					600: 'hsl(var(--warning-600))',
+				},
+				error: {
+					50: 'hsl(var(--error-50))',
+					500: 'hsl(var(--error-500))',
+					600: 'hsl(var(--error-600))',
+				},
+				// Glass and surface colors
+				glass: {
+					white: 'hsl(var(--glass-white))',
+					neutral: 'hsl(var(--glass-neutral))',
+					dark: 'hsl(var(--glass-dark))',
 				}
 			},
 			backgroundImage: {
-				'datespot-gradient': 'linear-gradient(135deg, #F472B6 0%, #EC4899 100%)',
-				'datespot-gradient-soft': 'linear-gradient(135deg, #F472B6 0%, #F43F5E 100%)',
-				'datespot-gradient-light': 'linear-gradient(135deg, #FCE7F3 0%, #FDF2F8 100%)',
+				// Premium gradients from design system
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-secondary': 'var(--gradient-secondary)',
+				'gradient-accent': 'var(--gradient-accent)',
+				'gradient-romantic': 'var(--gradient-romantic)',
+				'gradient-dreamy': 'var(--gradient-dreamy)',
+				'gradient-surface-light': 'var(--gradient-surface-light)',
+				'gradient-surface-dark': 'var(--gradient-surface-dark)',
+				'gradient-glass-light': 'var(--gradient-glass-light)',
+				'gradient-glass-dark': 'var(--gradient-glass-dark)',
 				'venue-gradient': 'var(--gradient-venue)',
 				'venue-ai-gradient': 'var(--gradient-venue-ai)',
+			},
+			boxShadow: {
+				// Premium shadow system
+				'premium-sm': 'var(--shadow-premium-sm)',
+				'premium-md': 'var(--shadow-premium-md)',
+				'premium-lg': 'var(--shadow-premium-lg)',
+				'premium-xl': 'var(--shadow-premium-xl)',
+				'glow-sm': 'var(--shadow-glow-sm)',
+				'glow-md': 'var(--shadow-glow-md)',
+				'glow-lg': 'var(--shadow-glow-lg)',
+				'glass': 'var(--shadow-glass)',
+				'glass-strong': 'var(--shadow-glass-strong)',
+			},
+			backdropBlur: {
+				'glass': 'var(--blur-glass)',
+				'glass-strong': 'var(--blur-glass-strong)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
