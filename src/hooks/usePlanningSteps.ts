@@ -25,16 +25,16 @@ export const usePlanningSteps = ({ preselectedFriend }: UsePlanningStepsProps) =
       currentStep 
     });
     
-    if (preselectedFriend && friends.length > 0 && !hasAutoAdvanced.current && !hasManuallyNavigated) {
+    if (preselectedFriend && friends.length > 0 && !hasAutoAdvanced.current && !hasManuallyNavigated && currentStep === 'select-partner') {
       const friend = friends.find(f => f.id === preselectedFriend.id);
       if (friend) {
         console.log('Planning steps - Auto-advancing to preferences for friend:', friend.name);
         setSelectedPartnerId(friend.id);
-        setCurrentStep('set-preferences');
+        // Don't auto-advance to preferences - let the session management handle it
         hasAutoAdvanced.current = true;
       }
     }
-  }, [preselectedFriend, friends, hasManuallyNavigated]);
+  }, [preselectedFriend, friends, hasManuallyNavigated, currentStep]);
 
   const getStepProgress = () => {
     switch (currentStep) {
@@ -57,10 +57,17 @@ export const usePlanningSteps = ({ preselectedFriend }: UsePlanningStepsProps) =
         }
         break;
       case 'set-preferences': 
-        console.log('Planning steps - Navigating back to select-partner');
-        setCurrentStep('select-partner');
-        // Clear selected partner to prevent re-advancement
-        setSelectedPartnerId('');
+        // If we have a preselected friend, skip back to avoid re-selection
+        if (preselectedFriend) {
+          console.log('Planning steps - Preselected friend detected, going back to home');
+          if (navigate) {
+            navigate('/home');
+          }
+        } else {
+          console.log('Planning steps - Navigating back to select-partner');
+          setCurrentStep('select-partner');
+          setSelectedPartnerId('');
+        }
         break;
       case 'review-matches': 
         setCurrentStep('set-preferences'); 
