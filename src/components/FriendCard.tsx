@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageCircle, Calendar, Check, X } from 'lucide-react';
 import { Friend } from '@/types';
+import { Heading, Text } from '@/design-system/components';
 
 interface FriendCardProps {
   friend: Friend;
@@ -36,9 +37,9 @@ const FriendCard = ({
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-gray-900 truncate">{friend.name}</h4>
+          <Heading size="h3" className="truncate">{friend.name}</Heading>
           {friend.lastSeen && (
-            <p className="text-sm text-gray-500">{friend.lastSeen}</p>
+            <Text size="sm" className="text-muted-foreground">{friend.lastSeen}</Text>
           )}
         </div>
         {onToggleInvite && (
@@ -77,16 +78,16 @@ const FriendCard = ({
           </div>
           
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 truncate">
+            <Heading size="h2" className="truncate">
               {friend.name}
-            </h3>
+            </Heading>
             
             {friend.lastSeen && (
-              <p className="text-sm text-gray-500 mb-1">{friend.lastSeen}</p>
+              <Text size="sm" className="text-muted-foreground mb-1">{friend.lastSeen}</Text>
             )}
             
             {friend.mutualFriends !== undefined && (
-              <p className="text-xs text-gray-400">{friend.mutualFriends} mutual friends</p>
+              <Text size="xs" className="text-muted-foreground">{friend.mutualFriends} mutual friends</Text>
             )}
             
             {showActions && (

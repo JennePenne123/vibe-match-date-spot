@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Heading, Text, Caption } from '@/design-system/components';
 import { 
   MapPin, 
   Star, 
@@ -156,30 +157,32 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-bold text-gray-900 truncate">
+            <Heading size="h2" className="truncate">
               {venue_name}
-            </CardTitle>
+            </Heading>
             
-            <div className="flex items-center text-sm text-gray-600 mt-1">
-              <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-              <span className="truncate">{formattedAddress}</span>
+            <div className="flex items-center mt-1">
+              <MapPin className="w-4 h-4 mr-1 flex-shrink-0 text-muted-foreground" />
+              <Text size="sm" className="text-muted-foreground truncate">{formattedAddress}</Text>
             </div>
 
             {/* Distance and Neighborhood */}
-            <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+            <div className="flex items-center gap-3 mt-1">
               {distance && (
                 <div className="flex items-center gap-1">
-                  <Navigation className="w-3 h-3" />
-                  <span>{distance}</span>
+                  <Navigation className="w-3 h-3 text-muted-foreground" />
+                  <Caption className="text-muted-foreground">{distance}</Caption>
                 </div>
               )}
               {venueNeighborhood && (
-                <span>• {venueNeighborhood}</span>
+                <Caption className="text-muted-foreground">• {venueNeighborhood}</Caption>
               )}
               {isOpen !== undefined && (
                 <span className={`flex items-center gap-1 ${isOpen ? 'text-green-600' : 'text-red-600'}`}>
                   <Clock className="w-3 h-3" />
-                  {isOpen ? 'Open' : 'Closed'}
+                  <Caption className={isOpen ? 'text-green-600' : 'text-red-600'}>
+                    {isOpen ? 'Open' : 'Closed'}
+                  </Caption>
                 </span>
               )}
             </div>
@@ -261,12 +264,12 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
             <div className="flex items-start gap-2">
               <Sparkles className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-purple-900 mb-1">
+                <Text size="sm" weight="semibold" className="text-purple-900 mb-1">
                   AI Reasoning
-                </p>
-                <p className="text-sm text-purple-800 leading-relaxed">
+                </Text>
+                <Text size="sm" className="text-purple-800 leading-relaxed">
                   {ai_reasoning}
-                </p>
+                </Text>
               </div>
             </div>
           </div>
@@ -281,7 +284,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
               onClick={() => setShowFullInsights(!showFullInsights)}
               className="w-full justify-between p-2 h-auto"
             >
-              <span className="text-sm font-medium">Match Details</span>
+              <Text size="sm" weight="semibold">Match Details</Text>
               {showFullInsights ? (
                 <ChevronUp className="w-4 h-4" />
               ) : (

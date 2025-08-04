@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import BurgerMenu from '@/components/BurgerMenu';
 import { AppUser } from '@/types/app';
 import { getUserAvatar } from '@/utils/typeHelpers';
+import { Heading } from '@/design-system/components';
 interface HomeHeaderProps {
   user: AppUser;
   displayName: string;
@@ -29,8 +30,7 @@ const HomeHeader = ({
           </AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-lg font-semibold text-gray-900">{getTimeBasedGreeting()} {firstName}! 👋</h1>
-          
+          <Heading size="h2" className="text-foreground">{getTimeBasedGreeting()} {firstName}! 👋</Heading>
         </div>
       </div>
       <BurgerMenu />

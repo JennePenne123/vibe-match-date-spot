@@ -4,6 +4,7 @@ import { useFriends } from '@/hooks/useFriends';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Users, User } from 'lucide-react';
+import { Heading, Text } from '@/design-system/components';
 import RecentReceivedInvitationsCard from '@/components/home/RecentReceivedInvitationsCard';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
@@ -139,10 +140,10 @@ const HomeContent: React.FC = () => {
         {/* Planning Mode Selection */}
         <div className="space-y-4">
           <div className="text-center">
-            <h2 className="text-xl font-bold text-foreground mb-2">Plan a New Date</h2>
-            <p className="text-muted-foreground text-sm">
+            <Heading size="h1" className="mb-2">Plan a New Date</Heading>
+            <Text size="sm" className="text-muted-foreground">
               Choose how you'd like to plan your date
-            </p>
+            </Text>
           </div>
           
           <div className="grid grid-cols-1 gap-4">
