@@ -106,27 +106,7 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
   const selectedVenue = venueRecommendations.find(v => v.venue_id === selectedVenueId);
 
-  // Check for existing session when partner is selected and only advance if coming from invitation
-  useEffect(() => {
-    if (selectedPartnerId && currentStep === 'select-partner' && preselectedFriend) {
-      console.log('SmartDatePlanner - Checking for existing session for preselected friend');
-      getActiveSession(selectedPartnerId).then(session => {
-        if (session) {
-          console.log('SmartDatePlanner - Found existing session, advancing step');
-          setCurrentStep('set-preferences');
-        } else {
-          console.log('SmartDatePlanner - No existing session, creating new one');
-          createPlanningSession(selectedPartnerId).then(() => {
-            setCurrentStep('set-preferences');
-          }).catch(error => {
-            console.error('SmartDatePlanner - Error creating session:', error);
-          });
-        }
-      }).catch(error => {
-        console.error('SmartDatePlanner - Error getting active session:', error);
-      });
-    }
-  }, [selectedPartnerId, getActiveSession, currentStep, setCurrentStep, preselectedFriend, createPlanningSession]);
+  // Remove automatic step advancement - let user manually proceed with "Continue" button
 
   // Monitor compatibility score and venue recommendations with timeout
   useEffect(() => {
