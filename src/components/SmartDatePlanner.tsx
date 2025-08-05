@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -17,6 +17,8 @@ import { createSmartDatePlannerHandlers } from '@/components/smart-date-planner/
 import SmartDatePlannerError from '@/components/smart-date-planner/SmartDatePlannerError';
 import SmartDatePlannerAuth from '@/components/smart-date-planner/SmartDatePlannerAuth';
 import LocationDisplay from '@/components/smart-date-planner/LocationDisplay';
+import { useCollaborativeSession } from '@/hooks/useCollaborativeSession';
+import { useFriends } from '@/hooks/useFriends';
 
 interface SmartDatePlannerProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -24,13 +26,43 @@ interface SmartDatePlannerProps {
 
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }) => {
   const location = useLocation();
-  const state = useSmartDatePlannerState({ preselectedFriend });
-  const handlers = createSmartDatePlannerHandlers(state);
   
   // Get planning mode and session from navigation state
   const planningMode = location.state?.planningMode || 'solo';
   const sessionId = location.state?.sessionId;
   const fromProposal = location.state?.fromProposal;
+  
+  // Use collaborative session hook if coming from a proposal
+  const { session: collaborativeSession, isUserInitiator, loading: sessionLoading } = useCollaborativeSession(
+    fromProposal ? sessionId : null
+  );
+  const { friends: allFriends } = useFriends();
+  
+  // Extract partner information from session when coming from proposal
+  const sessionPartner = useMemo(() => {
+    if (!collaborativeSession || !allFriends.length) return null;
+    
+    const partnerId = isUserInitiator 
+      ? collaborativeSession.partner_id 
+      : collaborativeSession.initiator_id;
+    
+    const partner = allFriends.find(f => f.id === partnerId);
+    return partner ? { id: partner.id, name: partner.name } : null;
+  }, [collaborativeSession, allFriends, isUserInitiator]);
+  
+  // Determine which friend to use (session partner takes priority over preselected)
+  const effectivePreselectedFriend = sessionPartner || preselectedFriend;
+  
+  console.log('SmartDatePlanner - Session data:', {
+    fromProposal,
+    sessionId,
+    hasCollaborativeSession: !!collaborativeSession,
+    sessionPartner,
+    effectivePreselectedFriend
+  });
+  
+  const state = useSmartDatePlannerState({ preselectedFriend: effectivePreselectedFriend });
+  const handlers = createSmartDatePlannerHandlers(state);
 
   const {
     user,
@@ -116,7 +148,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         {/* Navigation */}
         <div className="flex justify-start">
           <Button 
-            onClick={() => goBack(preselectedFriend, navigate)} 
+            onClick={() => goBack(effectivePreselectedFriend, navigate)} 
             variant="outline" 
             size="sm"
           >

@@ -28,9 +28,9 @@ export const usePlanningSteps = ({ preselectedFriend }: UsePlanningStepsProps) =
     if (preselectedFriend && friends.length > 0 && !hasAutoAdvanced.current && !hasManuallyNavigated && currentStep === 'select-partner') {
       const friend = friends.find(f => f.id === preselectedFriend.id);
       if (friend) {
-        console.log('Planning steps - Auto-advancing to preferences for friend:', friend.name);
+        console.log('Planning steps - Auto-advancing for preselected friend:', friend.name);
         setSelectedPartnerId(friend.id);
-        // Don't auto-advance to preferences - let the session management handle it
+        setCurrentStep('set-preferences');
         hasAutoAdvanced.current = true;
       }
     }
