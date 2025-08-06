@@ -13,6 +13,14 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'solo' }: U
   const { friends } = useFriends();
   // For collaborative mode with preselected friend, start at preferences
   const initialStep = (planningMode === 'collaborative' && preselectedFriend) ? 'set-preferences' : 'select-partner';
+  
+  console.log('🔧 Planning Steps - Initialization:', {
+    preselectedFriend: preselectedFriend?.name,
+    planningMode,
+    initialStep,
+    willStartAtPreferences: planningMode === 'collaborative' && !!preselectedFriend
+  });
+  
   const [currentStep, setCurrentStep] = useState<PlanningStep>(initialStep);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
   const [hasManuallyNavigated, setHasManuallyNavigated] = useState(false);

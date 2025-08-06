@@ -65,6 +65,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     preselectedFriend: effectivePreselectedFriend,
     planningMode: planningMode as 'solo' | 'collaborative'
   });
+  
+  console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'planningMode:', planningMode, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
   const handlers = createSmartDatePlannerHandlers(state);
 
   const {
@@ -162,17 +164,20 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
 
         {/* Step 1: Select Partner */}
         {currentStep === 'select-partner' && (
-          <PartnerSelection
-            friends={friends}
-            selectedPartnerId={selectedPartnerId}
-            selectedPartnerIds={selectedPartnerIds}
-            dateMode={planningMode === 'collaborative' ? 'single' : dateMode}
-            loading={loading}
-            onPartnerChange={setSelectedPartnerId}
-            onPartnerIdsChange={setSelectedPartnerIds}
-            onDateModeChange={setDateMode}
-            onContinue={() => handlePartnerSelection()}
-          />
+          <>
+            {console.log('🔧 RENDERING SELECT PARTNER STEP - currentStep:', currentStep, 'planningMode:', planningMode, 'effectivePreselectedFriend:', !!effectivePreselectedFriend)}
+            <PartnerSelection
+              friends={friends}
+              selectedPartnerId={selectedPartnerId}
+              selectedPartnerIds={selectedPartnerIds}
+              dateMode={planningMode === 'collaborative' ? 'single' : dateMode}
+              loading={loading}
+              onPartnerChange={setSelectedPartnerId}
+              onPartnerIdsChange={setSelectedPartnerIds}
+              onDateModeChange={setDateMode}
+              onContinue={() => handlePartnerSelection()}
+            />
+          </>
         )}
 
         {/* Step 2: Set Preferences */}
