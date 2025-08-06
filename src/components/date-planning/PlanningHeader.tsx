@@ -6,9 +6,10 @@ import { Display, Text, Caption } from '@/design-system/components';
 
 interface PlanningHeaderProps {
   progress: number;
+  planningMode?: 'solo' | 'collaborative';
 }
 
-const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress }) => {
+const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress, planningMode = 'solo' }) => {
   return (
     <div className="text-center space-y-4">
       <div className="flex items-center justify-center gap-2">
@@ -23,10 +24,20 @@ const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress }) => {
       <div className="max-w-md mx-auto space-y-2">
         <Progress value={progress} className="h-2" />
         <div className="flex justify-between">
-          <Caption className="text-muted-foreground">Select Partner</Caption>
-          <Caption className="text-muted-foreground">Set Preferences</Caption>
-          <Caption className="text-muted-foreground">Review Matches</Caption>
-          <Caption className="text-muted-foreground">Send Invitation</Caption>
+          {planningMode === 'collaborative' ? (
+            <>
+              <Caption className="text-muted-foreground">Set Preferences</Caption>
+              <Caption className="text-muted-foreground">Review Matches</Caption>
+              <Caption className="text-muted-foreground">Send Invitation</Caption>
+            </>
+          ) : (
+            <>
+              <Caption className="text-muted-foreground">Select Partner</Caption>
+              <Caption className="text-muted-foreground">Set Preferences</Caption>
+              <Caption className="text-muted-foreground">Review Matches</Caption>
+              <Caption className="text-muted-foreground">Send Invitation</Caption>
+            </>
+          )}
         </div>
       </div>
     </div>

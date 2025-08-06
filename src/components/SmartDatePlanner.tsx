@@ -61,7 +61,10 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     effectivePreselectedFriend
   });
   
-  const state = useSmartDatePlannerState({ preselectedFriend: effectivePreselectedFriend });
+  const state = useSmartDatePlannerState({ 
+    preselectedFriend: effectivePreselectedFriend,
+    planningMode: planningMode as 'solo' | 'collaborative'
+  });
   const handlers = createSmartDatePlannerHandlers(state);
 
   const {
@@ -135,7 +138,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto p-6 space-y-6">
         {/* Header */}
-        <PlanningHeader progress={getStepProgress()} />
+        <PlanningHeader progress={getStepProgress()} planningMode={planningMode as 'solo' | 'collaborative'} />
 
         {/* Location Display */}
         <LocationDisplay 

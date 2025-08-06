@@ -6,43 +6,60 @@ export type PlanningStep = 'select-partner' | 'set-preferences' | 'review-matche
 
 interface UsePlanningStepsProps {
   preselectedFriend?: { id: string; name: string } | null;
+  planningMode?: 'solo' | 'collaborative';
 }
 
-export const usePlanningSteps = ({ preselectedFriend }: UsePlanningStepsProps) => {
+export const usePlanningSteps = ({ preselectedFriend, planningMode = 'solo' }: UsePlanningStepsProps) => {
   const { friends } = useFriends();
-  const [currentStep, setCurrentStep] = useState<PlanningStep>('select-partner');
+  // For collaborative mode with preselected friend, start at preferences
+  const initialStep = (planningMode === 'collaborative' && preselectedFriend) ? 'set-preferences' : 'select-partner';
+  const [currentStep, setCurrentStep] = useState<PlanningStep>(initialStep);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
   const [hasManuallyNavigated, setHasManuallyNavigated] = useState(false);
   const hasAutoAdvanced = useRef(false);
 
-  // Auto-advance if friend is pre-selected (only once on initial load)
+  // Auto-advance if friend is pre-selected (only for solo mode)
   useEffect(() => {
     console.log('Planning steps - Auto-advance check:', { 
       preselectedFriend, 
       friendsLength: friends.length, 
       hasAutoAdvanced: hasAutoAdvanced.current,
       hasManuallyNavigated,
-      currentStep 
+      currentStep,
+      planningMode
     });
     
-    if (preselectedFriend && friends.length > 0 && !hasAutoAdvanced.current && !hasManuallyNavigated && currentStep === 'select-partner') {
+    // Only auto-advance for solo mode - collaborative should start at preferences
+    if (preselectedFriend && friends.length > 0 && !hasAutoAdvanced.current && !hasManuallyNavigated && currentStep === 'select-partner' && planningMode === 'solo') {
       const friend = friends.find(f => f.id === preselectedFriend.id);
       if (friend) {
-        console.log('Planning steps - Auto-advancing for preselected friend:', friend.name);
+        console.log('Planning steps - Auto-advancing for preselected friend (solo mode):', friend.name);
         setSelectedPartnerId(friend.id);
         setCurrentStep('set-preferences');
         hasAutoAdvanced.current = true;
       }
     }
-  }, [preselectedFriend, friends, hasManuallyNavigated, currentStep]);
+  }, [preselectedFriend, friends, hasManuallyNavigated, currentStep, planningMode]);
 
   const getStepProgress = () => {
-    switch (currentStep) {
-      case 'select-partner': return 25;
-      case 'set-preferences': return 50;
-      case 'review-matches': return 75;
-      case 'create-invitation': return 100;
-      default: return 0;
+    if (planningMode === 'collaborative') {
+      // Collaborative mode: skip partner selection, so 3 steps: preferences -> review -> invitation
+      switch (currentStep) {
+        case 'select-partner': return 0; // Should not be shown
+        case 'set-preferences': return 33;
+        case 'review-matches': return 66;
+        case 'create-invitation': return 100;
+        default: return 0;
+      }
+    } else {
+      // Solo mode: 4 steps: select -> preferences -> review -> invitation
+      switch (currentStep) {
+        case 'select-partner': return 25;
+        case 'set-preferences': return 50;
+        case 'review-matches': return 75;
+        case 'create-invitation': return 100;
+        default: return 0;
+      }
     }
   };
 

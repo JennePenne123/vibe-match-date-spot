@@ -8,9 +8,10 @@ import { useApp } from '@/contexts/AppContext';
 
 interface UseSmartDatePlannerStateProps {
   preselectedFriend?: { id: string; name: string } | null;
+  planningMode?: 'solo' | 'collaborative';
 }
 
-export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlannerStateProps) => {
+export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'solo' }: UseSmartDatePlannerStateProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { appState, requestLocation } = useApp();
@@ -47,7 +48,7 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
   let planningStepsError = null;
   
   try {
-    planningStepsState = usePlanningSteps({ preselectedFriend });
+    planningStepsState = usePlanningSteps({ preselectedFriend, planningMode });
     console.log('SmartDatePlanner - Planning steps loaded');
   } catch (error) {
     console.error('SmartDatePlanner - Error loading planning steps:', error);
@@ -108,21 +109,21 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
 
   // Remove automatic step advancement - let user manually proceed with "Continue" button
 
-  // Monitor compatibility score and venue recommendations with timeout
+  // Monitor compatibility score - only auto-advance for solo mode
   useEffect(() => {
-    if (compatibilityScore !== null && currentStep === 'set-preferences') {
-      console.log('SmartDatePlanner - AI analysis complete, advancing to review step');
+    if (compatibilityScore !== null && currentStep === 'set-preferences' && planningMode === 'solo') {
+      console.log('SmartDatePlanner - AI analysis complete, advancing to review step (solo mode)');
       setAiAnalyzing(false);
       setCurrentStep('review-matches');
     }
-  }, [compatibilityScore, currentStep, setCurrentStep]);
+  }, [compatibilityScore, currentStep, setCurrentStep, planningMode]);
 
-  // Add timeout for AI analysis
+  // Add timeout for AI analysis - only for solo mode
   useEffect(() => {
-    if (aiAnalyzing) {
+    if (aiAnalyzing && planningMode === 'solo') {
       const timeoutId = setTimeout(() => {
         if (currentStep === 'set-preferences' && aiAnalyzing) {
-          console.log('SmartDatePlanner - AI analysis timeout, advancing anyway');
+          console.log('SmartDatePlanner - AI analysis timeout, advancing anyway (solo mode)');
           setAiAnalyzing(false);
           setCurrentStep('review-matches');
         }
@@ -130,7 +131,7 @@ export const useSmartDatePlannerState = ({ preselectedFriend }: UseSmartDatePlan
 
       return () => clearTimeout(timeoutId);
     }
-  }, [aiAnalyzing, currentStep, setCurrentStep]);
+  }, [aiAnalyzing, currentStep, setCurrentStep, planningMode]);
 
   // Firefox-optimized location request to prevent flickering
   const handleLocationRequest = useCallback(async () => {
