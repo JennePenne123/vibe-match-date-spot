@@ -176,11 +176,16 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
         )}
 
         {/* Step 2: Set Preferences */}
-        {currentStep === 'set-preferences' && currentSession && selectedPartner && (
+        {currentStep === 'set-preferences' && (
+          // For collaborative sessions from proposals, show preferences if we have partner info
+          (planningMode === 'collaborative' && effectivePreselectedFriend) || 
+          // For other cases, require both session and partner
+          (currentSession && selectedPartner)
+        ) && (
           <PreferencesStep
-            sessionId={currentSession.id}
-            partnerId={selectedPartnerId}
-            partnerName={selectedPartner.name}
+            sessionId={currentSession?.id || sessionId || ''}
+            partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
+            partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
             compatibilityScore={compatibilityScore}
             aiAnalyzing={aiAnalyzing}
             onPreferencesComplete={handlePreferencesComplete}
