@@ -17,7 +17,7 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   onProposalAccepted
 }) => {
   const { user } = useAuth();
-  const { proposals, getMyProposals, acceptProposal, updateProposalStatus, loading } = useDateProposals();
+  const { proposals, getMyProposals, acceptProposal, updateProposalStatus, cancelProposal, loading } = useDateProposals();
   const { friends } = useFriends();
   const { toast } = useToast();
   const [hiddenProposals, setHiddenProposals] = useState<Set<string>>(new Set());
@@ -51,6 +51,17 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
       toast({
         title: "Proposal Declined",
         description: "The proposal has been declined",
+        variant: "default"
+      });
+    }
+  };
+
+  const handleCancelProposal = async (proposalId: string) => {
+    const success = await cancelProposal(proposalId);
+    if (success) {
+      toast({
+        title: "Proposal Cancelled",
+        description: "Your proposal has been cancelled",
         variant: "default"
       });
     }
@@ -147,6 +158,20 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
                       >
                         <XCircle className="h-4 w-4 mr-2" />
                         Decline
+                      </Button>
+                    </div>
+                  )}
+
+                  {proposal.proposer_id === user?.id && (
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        onClick={() => handleCancelProposal(proposal.id)}
+                        disabled={loading}
+                        variant="destructive"
+                        className="flex-1"
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Cancel Proposal
                       </Button>
                     </div>
                   )}

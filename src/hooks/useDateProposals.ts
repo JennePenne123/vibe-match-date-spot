@@ -107,6 +107,15 @@ export const useDateProposals = () => {
     }
   };
 
+  const cancelProposal = async (proposalId: string): Promise<boolean> => {
+    const success = await updateProposalStatus(proposalId, 'declined');
+    if (success) {
+      // Update local state to remove the cancelled proposal
+      setProposals(prev => prev.filter(p => p.id !== proposalId));
+    }
+    return success;
+  };
+
   const acceptProposal = async (proposalId: string): Promise<string | null> => {
     const success = await updateProposalStatus(proposalId, 'accepted');
     if (!success) return null;
@@ -147,6 +156,7 @@ export const useDateProposals = () => {
     createProposal,
     updateProposalStatus,
     getMyProposals,
-    acceptProposal
+    acceptProposal,
+    cancelProposal
   };
 };
