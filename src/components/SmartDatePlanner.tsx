@@ -140,7 +140,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto p-6 space-y-6">
         {/* Header */}
-        <PlanningHeader progress={getStepProgress()} planningMode={planningMode as 'solo' | 'collaborative'} />
+        {(() => {
+          const progressValue = getStepProgress();
+          console.log('🔍 SmartDatePlanner progress value:', progressValue, 'currentStep:', currentStep, 'planningMode:', planningMode);
+          return <PlanningHeader progress={progressValue} planningMode={planningMode as 'solo' | 'collaborative'} />;
+        })()}
 
         {/* Location Display */}
         <LocationDisplay 
