@@ -162,8 +162,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
           </Button>
         </div>
 
-        {/* Step 1: Select Partner */}
-        {currentStep === 'select-partner' && (
+        {/* Step 1: Select Partner - Skip for collaborative mode with preselected friend */}
+        {currentStep === 'select-partner' && !(planningMode === 'collaborative' && effectivePreselectedFriend) && (
           <>
             {console.log('🔧 RENDERING SELECT PARTNER STEP - currentStep:', currentStep, 'planningMode:', planningMode, 'effectivePreselectedFriend:', !!effectivePreselectedFriend)}
             <PartnerSelection
@@ -180,8 +180,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
           </>
         )}
 
-        {/* Step 2: Set Preferences */}
-        {currentStep === 'set-preferences' && (
+        {/* Step 2: Set Preferences - Show for collaborative mode with preselected friend OR normal flow */}
+        {(currentStep === 'set-preferences' || (planningMode === 'collaborative' && effectivePreselectedFriend)) && (
           // For collaborative sessions from proposals, show preferences if we have partner info
           (planningMode === 'collaborative' && effectivePreselectedFriend) || 
           // For other cases, require both session and partner

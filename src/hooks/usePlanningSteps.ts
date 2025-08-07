@@ -24,6 +24,30 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'solo' }: U
   const [currentStep, setCurrentStep] = useState<PlanningStep>(initialStep);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
   const [hasManuallyNavigated, setHasManuallyNavigated] = useState(false);
+
+  // Sync currentStep with initialStep changes (for cases when props change after initial render)
+  useEffect(() => {
+    const expectedStep = (planningMode === 'collaborative' && preselectedFriend) ? 'set-preferences' : 'select-partner';
+    
+    console.log('🔧 Planning Steps - Sync Effect:', {
+      currentStep,
+      expectedStep,
+      planningMode,
+      hasPreselectedFriend: !!preselectedFriend,
+      hasManuallyNavigated
+    });
+    
+    // Only sync if we haven't manually navigated and the expected step is different
+    if (!hasManuallyNavigated && currentStep !== expectedStep) {
+      console.log('🔧 Planning Steps - SYNCING currentStep from', currentStep, 'to', expectedStep);
+      setCurrentStep(expectedStep);
+      
+      // Also update selected partner ID if we have a preselected friend
+      if (preselectedFriend && selectedPartnerId !== preselectedFriend.id) {
+        setSelectedPartnerId(preselectedFriend.id);
+      }
+    }
+  }, [planningMode, preselectedFriend, currentStep, selectedPartnerId, hasManuallyNavigated]);
   const hasAutoAdvanced = useRef(false);
 
   // Auto-advance if friend is pre-selected (only for solo mode)
