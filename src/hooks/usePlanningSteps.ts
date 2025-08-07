@@ -74,25 +74,35 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'solo' }: U
   }, [preselectedFriend, friends, hasManuallyNavigated, currentStep, planningMode]);
 
   const getStepProgress = () => {
-    if (planningMode === 'collaborative') {
-      // Collaborative mode: skip partner selection, so 3 steps: preferences -> review -> invitation
-      switch (currentStep) {
-        case 'select-partner': return 0; // Should not be shown
-        case 'set-preferences': return 33;
-        case 'review-matches': return 66;
-        case 'create-invitation': return 100;
-        default: return 0;
-      }
-    } else {
-      // Solo mode: 4 steps: select -> preferences -> review -> invitation
-      switch (currentStep) {
-        case 'select-partner': return 25;
-        case 'set-preferences': return 50;
-        case 'review-matches': return 75;
-        case 'create-invitation': return 100;
-        default: return 0;
-      }
-    }
+    const progress = planningMode === 'collaborative' 
+      ? (() => {
+          // Collaborative mode: skip partner selection, so 3 steps: preferences -> review -> invitation
+          switch (currentStep) {
+            case 'select-partner': return 0; // Should not be shown
+            case 'set-preferences': return 33;
+            case 'review-matches': return 66;
+            case 'create-invitation': return 100;
+            default: return 0;
+          }
+        })()
+      : (() => {
+          // Solo mode: 4 steps: select -> preferences -> review -> invitation
+          switch (currentStep) {
+            case 'select-partner': return 25;
+            case 'set-preferences': return 50;
+            case 'review-matches': return 75;
+            case 'create-invitation': return 100;
+            default: return 0;
+          }
+        })();
+    
+    console.log('🚀 Progress calculation:', {
+      currentStep,
+      planningMode,
+      progress
+    });
+    
+    return progress;
   };
 
   const goBack = (preselectedFriend?: { id: string; name: string } | null, navigate?: (path: string) => void) => {
