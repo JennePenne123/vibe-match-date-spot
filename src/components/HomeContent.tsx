@@ -147,25 +147,6 @@ const HomeContent: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 gap-4">
-            {/* Solo Planning Card */}
-            <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer"
-                  onClick={handleSoloPlanning}>
-              <CardHeader className="text-center pb-3">
-                <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
-                  <User className="h-6 w-6 text-primary" />
-                </div>
-                <CardTitle className="text-lg">Solo Planning</CardTitle>
-                <CardDescription className="text-sm">
-                  Plan the date yourself and send an invitation
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <Button className="w-full" variant="outline">
-                  Start Solo Planning
-                </Button>
-              </CardContent>
-            </Card>
-
             {/* Collaborative Planning Card */}
             <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer"
                   onClick={handleCollaborativePlanning}>
