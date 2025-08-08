@@ -19,6 +19,7 @@ import SmartDatePlannerAuth from '@/components/smart-date-planner/SmartDatePlann
 import LocationDisplay from '@/components/smart-date-planner/LocationDisplay';
 import { useCollaborativeSession } from '@/hooks/useCollaborativeSession';
 import { useFriends } from '@/hooks/useFriends';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SmartDatePlannerProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -66,8 +67,29 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     planningMode: planningMode as 'solo' | 'collaborative'
   });
   
-  console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'planningMode:', planningMode, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
+console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'planningMode:', planningMode, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
   const handlers = createSmartDatePlannerHandlers(state);
+
+  // Prefill proposed date/time from linked proposal when coming from a proposal
+  const [proposalDateISO, setProposalDateISO] = useState<string | undefined>();
+  useEffect(() => {
+    const loadProposalDate = async () => {
+      if (!fromProposal || !sessionId) return;
+      try {
+        const { data, error } = await supabase
+          .from('date_proposals')
+          .select('proposed_date')
+          .eq('planning_session_id', sessionId)
+          .limit(1);
+        if (error) throw error;
+        const row = Array.isArray(data) ? data?.[0] : (data as any);
+        if (row?.proposed_date) setProposalDateISO(row.proposed_date);
+      } catch (err) {
+        console.error('Failed to load proposal proposed_date:', err);
+      }
+    };
+    loadProposalDate();
+  }, [fromProposal, sessionId]);
 
   const {
     user,
@@ -198,6 +220,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
             compatibilityScore={compatibilityScore}
             aiAnalyzing={aiAnalyzing}
             onPreferencesComplete={handlePreferencesComplete}
+            initialProposedDate={proposalDateISO}
           />
         )}
 

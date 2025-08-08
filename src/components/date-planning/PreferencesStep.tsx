@@ -337,9 +337,9 @@ useEffect(() => {
     }
   };
 
-  // Validation function for step 2 (date and time are mandatory)
+  // Validation function for step 2 (allow proceed if proposal prefilled)
   const canProceedFromStep2 = () => {
-    return selectedDate && selectedTime;
+    return Boolean(initialProposedDate) || (Boolean(selectedDate) && Boolean(selectedTime));
   };
 
   const nextStep = () => {
@@ -492,7 +492,7 @@ useEffect(() => {
           {/* Date Picker */}
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              Preferred Date <span className="text-destructive">*</span>
+              Preferred Date { !initialProposedDate && (<span className="text-destructive">*</span>) }
             </label>
             <Popover>
               <PopoverTrigger asChild>
@@ -500,7 +500,7 @@ useEffect(() => {
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !selectedDate && "text-muted-foreground border-destructive/50"
+                    (!selectedDate && !initialProposedDate) && "text-muted-foreground border-destructive/50"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -518,7 +518,7 @@ useEffect(() => {
                 />
               </PopoverContent>
             </Popover>
-            {!selectedDate && (
+            {(!selectedDate && !initialProposedDate) && (
               <p className="text-sm text-destructive">Date is required to continue</p>
             )}
           </div>
@@ -526,12 +526,12 @@ useEffect(() => {
           {/* Time Picker */}
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              Preferred Time <span className="text-destructive">*</span>
+              Preferred Time { !initialProposedDate && (<span className="text-destructive">*</span>) }
             </label>
             <Select value={selectedTime} onValueChange={setSelectedTime}>
               <SelectTrigger className={cn(
                 "w-full",
-                !selectedTime && "border-destructive/50"
+                (!selectedTime && !initialProposedDate) && "border-destructive/50"
               )}>
                 <SelectValue placeholder="Select time" />
               </SelectTrigger>
@@ -562,7 +562,7 @@ useEffect(() => {
                 <SelectItem value="22:00">10:00 PM</SelectItem>
               </SelectContent>
             </Select>
-            {!selectedTime && (
+            {(!selectedTime && !initialProposedDate) && (
               <p className="text-sm text-destructive">Time is required to continue</p>
             )}
           </div>
