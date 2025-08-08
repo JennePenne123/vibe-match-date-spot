@@ -47,6 +47,7 @@ interface PreferencesStepProps {
   compatibilityScore: CompatibilityScore | number | null;
   aiAnalyzing: boolean;
   onPreferencesComplete: (preferences: DatePreferences) => void;
+  initialProposedDate?: string; // ISO string from proposal, optional
 }
 
 interface DatePreferences {
@@ -66,7 +67,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
   partnerName,
   compatibilityScore,
   aiAnalyzing,
-  onPreferencesComplete
+  onPreferencesComplete,
+  initialProposedDate
 }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -84,7 +86,19 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [partnerPreferences, setPartnerPreferences] = useState<UserPreferences | null>(null);
 
-  // Data definitions
+// Prefill date & time from proposal when provided
+useEffect(() => {
+  if (initialProposedDate) {
+    const dt = new Date(initialProposedDate);
+    if (!isNaN(dt.getTime())) {
+      setSelectedDate((prev) => prev ?? dt);
+      const hhmm = format(dt, 'H:mm');
+      setSelectedTime((prev) => prev || hhmm);
+    }
+  }
+}, [initialProposedDate]);
+
+// Data definitions
   const cuisines: Preference[] = [
     { id: 'Italian', name: 'Italian', emoji: '🍝' },
     { id: 'Japanese', name: 'Japanese', emoji: '🍣' },
@@ -471,8 +485,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
       </div>
 
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">Specific Date & Time</h2>
-        <p className="text-muted-foreground mb-6">When would you like to go on this date?</p>
+        <h2 className="text-2xl font-bold mb-2">{initialProposedDate ? 'Proposed Date & Time (adjustable)' : 'Specific Date & Time'}</h2>
+        <p className="text-muted-foreground mb-6">{initialProposedDate ? 'Pre-filled from the proposal. You can adjust below.' : 'When would you like to go on this date?'}</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Date Picker */}
@@ -522,6 +536,16 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
                 <SelectValue placeholder="Select time" />
               </SelectTrigger>
               <SelectContent>
+                {initialProposedDate && (() => {
+                  const dt = new Date(initialProposedDate);
+                  if (isNaN(dt.getTime())) return null;
+                  const hhmm = format(dt, 'H:mm');
+                  const label = format(dt, 'p');
+                  const exists = ['9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'].includes(hhmm);
+                  return !exists ? (
+                    <SelectItem value={hhmm}>Proposed {label}</SelectItem>
+                  ) : null;
+                })()}
                 <SelectItem value="9:00">9:00 AM</SelectItem>
                 <SelectItem value="10:00">10:00 AM</SelectItem>
                 <SelectItem value="11:00">11:00 AM</SelectItem>
