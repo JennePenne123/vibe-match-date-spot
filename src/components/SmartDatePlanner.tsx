@@ -215,7 +215,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
         ) && (
           <div className="animate-fade-in">
             <PreferencesStep
-              sessionId={currentSession?.id || sessionId || ''}
+              sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
               partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
               partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
               compatibilityScore={compatibilityScore}
