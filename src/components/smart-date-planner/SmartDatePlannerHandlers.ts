@@ -73,23 +73,25 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     }
   }
 
-  function handlePreferencesComplete(preferences: any) {
+  function handlePreferencesComplete(preferences: any, sessionId?: string) {
     console.log('SmartDatePlanner - Preferences submitted, starting AI analysis...', preferences);
     setAiAnalyzing(true);
     
     // Store preferences for later use when completing session
     setCurrentPreferences(preferences);
     
-    if (currentSession && selectedPartnerId && state.userLocation) {
+    const effectiveSessionId = sessionId || currentSession?.id;
+    
+    if (effectiveSessionId && selectedPartnerId && state.userLocation) {
       console.log('SmartDatePlanner - Triggering AI analysis with:', {
-        sessionId: currentSession.id,
+        sessionId: effectiveSessionId,
         partnerId: selectedPartnerId,
         preferences,
         userLocation: state.userLocation
       });
       
       state.analyzeCompatibilityAndVenues(
-        currentSession.id,
+        effectiveSessionId,
         selectedPartnerId,
         preferences,
         state.userLocation
@@ -104,7 +106,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       });
     } else {
       console.error('SmartDatePlanner - Missing required data for AI analysis:', {
-        hasSession: !!currentSession,
+        hasSession: !!effectiveSessionId,
         hasPartnerId: !!selectedPartnerId,
         hasLocation: !!state.userLocation
       });

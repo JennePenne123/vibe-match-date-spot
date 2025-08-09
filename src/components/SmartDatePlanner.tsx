@@ -220,7 +220,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
               partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
               compatibilityScore={compatibilityScore}
               aiAnalyzing={aiAnalyzing}
-              onPreferencesComplete={handlePreferencesComplete}
+              onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
               initialProposedDate={proposalDateISO}
             />
           </div>
