@@ -11,31 +11,47 @@ interface PlanningHeaderProps {
 
 const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress, planningMode = 'solo' }) => {
   return (
-    <div className="text-center space-y-4">
-      <div className="flex items-center justify-center gap-2">
-        <Sparkles className="h-8 w-8 text-primary" />
-        <Display size="lg">Smart Date Planner</Display>
+    <div className="text-center space-y-6 animate-fade-in">
+      <div className="flex items-center justify-center gap-3">
+        <Sparkles className="h-8 w-8 text-primary animate-pulse" />
+        <Display size="lg" className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          Smart Date Planner
+        </Display>
       </div>
-      <Text className="text-muted-foreground">
+      <Text className="text-muted-foreground max-w-sm mx-auto leading-relaxed">
         AI-powered date planning with collaborative preferences and smart matching
       </Text>
       
       {/* Progress Bar */}
-      <div className="max-w-md mx-auto space-y-2">
-        <Progress value={progress} className="h-2" />
-        <div className="flex justify-between">
+      <div className="max-w-md mx-auto space-y-3">
+        <Progress value={progress} className="h-3 animate-scale-in" />
+        <div className="flex justify-between px-2">
           {planningMode === 'collaborative' ? (
             <>
-              <Caption className="text-muted-foreground">Set Preferences</Caption>
-              <Caption className="text-muted-foreground">Review Matches</Caption>
-              <Caption className="text-muted-foreground">Send Invitation</Caption>
+              <Caption className={`transition-colors duration-300 ${progress >= 33 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                Set Preferences
+              </Caption>
+              <Caption className={`transition-colors duration-300 ${progress >= 66 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                Review Matches
+              </Caption>
+              <Caption className={`transition-colors duration-300 ${progress >= 100 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                Send Invitation
+              </Caption>
             </>
           ) : (
             <>
-              <Caption className="text-muted-foreground">Select Partner</Caption>
-              <Caption className="text-muted-foreground">Set Preferences</Caption>
-              <Caption className="text-muted-foreground">Review Matches</Caption>
-              <Caption className="text-muted-foreground">Send Invitation</Caption>
+              <Caption className={`transition-colors duration-300 ${progress >= 25 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                Select Partner
+              </Caption>
+              <Caption className={`transition-colors duration-300 ${progress >= 50 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                Set Preferences
+              </Caption>
+              <Caption className={`transition-colors duration-300 ${progress >= 75 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                Review Matches
+              </Caption>
+              <Caption className={`transition-colors duration-300 ${progress >= 100 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                Send Invitation
+              </Caption>
             </>
           )}
         </div>
