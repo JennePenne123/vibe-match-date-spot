@@ -7,13 +7,14 @@ import { Slider } from '@/components/ui/slider';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Heart, Clock, Sparkles, Loader2, Check, DollarSign, MapPin, Coffee, Settings, CalendarIcon } from 'lucide-react';
+import { Heart, Clock, Sparkles, Loader2, Check, DollarSign, MapPin, Coffee, Settings, CalendarIcon, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import SafeComponent from '@/components/SafeComponent';
+import CollaborativeWaitingState from '@/components/date-planning/CollaborativeWaitingState';
 
 interface Preference {
   id: string;
@@ -48,6 +49,12 @@ interface PreferencesStepProps {
   aiAnalyzing: boolean;
   onPreferencesComplete: (preferences: DatePreferences) => void;
   initialProposedDate?: string; // ISO string from proposal, optional
+  planningMode?: 'solo' | 'collaborative';
+  collaborativeSession?: {
+    hasUserSetPreferences: boolean;
+    hasPartnerSetPreferences: boolean;
+    canShowResults: boolean;
+  };
 }
 
 interface DatePreferences {
@@ -68,7 +75,9 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
   compatibilityScore,
   aiAnalyzing,
   onPreferencesComplete,
-  initialProposedDate
+  initialProposedDate,
+  planningMode = 'solo',
+  collaborativeSession
 }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -743,6 +752,57 @@ useEffect(() => {
             </p>
           </CardContent>
         </Card>
+      )}
+      
+      {/* Show collaborative waiting state if user has completed preferences but partner hasn't */}
+      {planningMode === 'collaborative' && collaborativeSession && !aiAnalyzing && (
+        (() => {
+          const userHasCompletedPrefs = collaborativeSession.hasUserSetPreferences;
+          const partnerHasCompletedPrefs = collaborativeSession.hasPartnerSetPreferences;
+          const canShowResults = collaborativeSession.canShowResults;
+          
+          console.log('PreferencesStep - Collaborative state check:', {
+            userHasCompletedPrefs,
+            partnerHasCompletedPrefs,
+            canShowResults,
+            currentStep,
+            hasCompatibilityScore: !!compatibilityScore
+          });
+          
+          // If user has completed but partner hasn't, show waiting state
+          if (userHasCompletedPrefs && !partnerHasCompletedPrefs) {
+            return (
+              <div className="space-y-4">
+                <CollaborativeWaitingState
+                  partnerName={partnerName}
+                  sessionId={sessionId}
+                  hasPartnerSetPreferences={partnerHasCompletedPrefs}
+                  isWaitingForPartner={true}
+                />
+                
+                <Card className="border-green-200 bg-green-50">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <CheckCircle className="h-6 w-6 text-green-600" />
+                      <h3 className="text-lg font-semibold text-green-800">Your Preferences Saved!</h3>
+                    </div>
+                    <p className="text-green-700 mb-4">
+                      Your date preferences have been successfully saved. We'll show AI-matched venues once {partnerName} completes their preferences.
+                    </p>
+                    <div className="bg-white/60 rounded-lg p-3 border border-green-200">
+                      <p className="text-sm text-green-700">
+                        <strong>What happens next:</strong> Once {partnerName} sets their preferences, 
+                        you'll both see AI-curated venue recommendations based on your combined compatibility.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          }
+          
+          return null;
+        })()
       )}
 
       <Card>

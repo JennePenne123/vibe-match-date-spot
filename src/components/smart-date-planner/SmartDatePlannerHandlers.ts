@@ -83,11 +83,17 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     
     // Check if we're in collaborative mode and need to wait for partner
     if (state.planningMode === 'collaborative' && state.collaborativeSession) {
-      const { canShowResults } = state.collaborativeSession;
+      const { canShowResults, hasPartnerSetPreferences } = state.collaborativeSession;
       
-      if (!canShowResults) {
-        console.log('SmartDatePlanner - Partner has not set preferences yet, waiting...');
-        // Just update preferences, don't run AI analysis
+      if (!hasPartnerSetPreferences) {
+        console.log('SmartDatePlanner - Partner has not set preferences yet, staying on preferences step...');
+        // Just update preferences, don't run AI analysis yet, stay on preferences step
+        return;
+      }
+      
+      if (canShowResults) {
+        console.log('SmartDatePlanner - Both partners have set preferences, advancing to review-matches');
+        setCurrentStep('review-matches');
         return;
       }
     }
@@ -111,6 +117,10 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       ).then(() => {
         console.log('SmartDatePlanner - AI analysis completed successfully');
         setAiAnalyzing(false);
+        // For solo mode, advance to review-matches after AI analysis
+        if (state.planningMode === 'solo') {
+          setCurrentStep('review-matches');
+        }
       }).catch(error => {
         console.error('SmartDatePlanner - AI analysis error:', error);
         setAiAnalyzing(false);

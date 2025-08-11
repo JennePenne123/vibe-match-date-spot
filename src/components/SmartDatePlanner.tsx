@@ -34,7 +34,14 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   const fromProposal = location.state?.fromProposal;
   
   // Use collaborative session hook if coming from a proposal
-  const { session: collaborativeSession, isUserInitiator, loading: sessionLoading } = useCollaborativeSession(
+  const { 
+    session: collaborativeSession, 
+    isUserInitiator, 
+    loading: sessionLoading,
+    hasUserSetPreferences,
+    hasPartnerSetPreferences,
+    canShowResults
+  } = useCollaborativeSession(
     fromProposal ? sessionId : null
   );
   const { friends: allFriends } = useFriends();
@@ -222,6 +229,12 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
               aiAnalyzing={aiAnalyzing}
               onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
               initialProposedDate={proposalDateISO}
+              planningMode={planningMode}
+              collaborativeSession={collaborativeSession ? {
+                hasUserSetPreferences,
+                hasPartnerSetPreferences,
+                canShowResults
+              } : undefined}
             />
           </div>
         )}
