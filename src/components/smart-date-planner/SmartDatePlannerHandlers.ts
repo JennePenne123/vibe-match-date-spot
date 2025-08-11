@@ -74,21 +74,34 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   }
 
   function handlePreferencesComplete(preferences: any, sessionId?: string) {
-    console.log('SmartDatePlanner - Preferences submitted, starting AI analysis...', preferences);
-    setAiAnalyzing(true);
+    console.log('SmartDatePlanner - Preferences submitted', preferences);
     
     // Store preferences for later use when completing session
     setCurrentPreferences(preferences);
     
     const effectiveSessionId = sessionId || currentSession?.id;
     
+    // Check if we're in collaborative mode and need to wait for partner
+    if (state.planningMode === 'collaborative' && state.collaborativeSession) {
+      const { canShowResults } = state.collaborativeSession;
+      
+      if (!canShowResults) {
+        console.log('SmartDatePlanner - Partner has not set preferences yet, waiting...');
+        // Just update preferences, don't run AI analysis
+        return;
+      }
+    }
+    
+    // Run AI analysis only if we have all required data and (solo mode OR both partners have set preferences)
     if (effectiveSessionId && selectedPartnerId && state.userLocation) {
-      console.log('SmartDatePlanner - Triggering AI analysis with:', {
+      console.log('SmartDatePlanner - Starting AI analysis with:', {
         sessionId: effectiveSessionId,
         partnerId: selectedPartnerId,
         preferences,
         userLocation: state.userLocation
       });
+      
+      setAiAnalyzing(true);
       
       state.analyzeCompatibilityAndVenues(
         effectiveSessionId,
@@ -113,7 +126,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         hasPartnerId: !!selectedPartnerId,
         hasLocation: !!state.userLocation
       });
-      setAiAnalyzing(false);
       toast({
         variant: 'destructive',
         title: 'Missing Information',
