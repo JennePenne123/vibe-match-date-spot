@@ -95,7 +95,10 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         selectedPartnerId,
         preferences,
         state.userLocation
-      ).catch(error => {
+      ).then(() => {
+        console.log('SmartDatePlanner - AI analysis completed successfully');
+        setAiAnalyzing(false);
+      }).catch(error => {
         console.error('SmartDatePlanner - AI analysis error:', error);
         setAiAnalyzing(false);
         toast({

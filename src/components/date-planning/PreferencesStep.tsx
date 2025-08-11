@@ -723,8 +723,8 @@ useEffect(() => {
               <Badge className="bg-purple-100 text-purple-700">
                 <Sparkles className="h-3 w-3 mr-1" />
                 {typeof compatibilityScore === 'number' 
-                  ? compatibilityScore 
-                  : compatibilityScore.overall_score}% Compatible
+                  ? Math.round(compatibilityScore * 100) 
+                  : Math.round(compatibilityScore.overall_score * 100)}% Compatible
               </Badge>
             )}
           </div>
