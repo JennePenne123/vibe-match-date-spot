@@ -88,6 +88,10 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       if (!hasPartnerSetPreferences) {
         console.log('SmartDatePlanner - Partner has not set preferences yet, staying on preferences step...');
         // Just update preferences, don't run AI analysis yet, stay on preferences step
+        toast({
+          title: "Preferences saved!",
+          description: `Waiting for ${state.selectedPartner?.name || 'partner'} to set their preferences...`,
+        });
         return;
       }
       
@@ -96,6 +100,10 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         setCurrentStep('review-matches');
         return;
       }
+      
+      // If partner has set preferences but can't show results yet, don't run AI analysis
+      console.log('SmartDatePlanner - Partner has preferences but canShowResults is false, waiting...');
+      return;
     }
     
     // Run AI analysis only if we have all required data and (solo mode OR both partners have set preferences)
