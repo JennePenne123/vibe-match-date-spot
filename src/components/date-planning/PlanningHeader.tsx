@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles } from 'lucide-react';
@@ -29,13 +28,13 @@ const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress, planningMode 
           {planningMode === 'collaborative' ? (
             <>
               <Caption className={`transition-colors duration-300 ${progress >= 33 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                Set Preferences
+                Both Set Preferences
               </Caption>
               <Caption className={`transition-colors duration-300 ${progress >= 66 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                Review Matches
+                AI Match Analysis
               </Caption>
               <Caption className={`transition-colors duration-300 ${progress >= 100 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                Send Invitation
+                Plan Together
               </Caption>
             </>
           ) : (
@@ -47,7 +46,7 @@ const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress, planningMode 
                 Set Preferences
               </Caption>
               <Caption className={`transition-colors duration-300 ${progress >= 75 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                Review Matches
+                AI Match Analysis
               </Caption>
               <Caption className={`transition-colors duration-300 ${progress >= 100 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
                 Send Invitation

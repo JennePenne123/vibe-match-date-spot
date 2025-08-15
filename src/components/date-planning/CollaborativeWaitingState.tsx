@@ -30,18 +30,18 @@ const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
             <LoadingSpinner size="sm" />
             <div>
               <p className="text-sm text-amber-700 font-medium">
-                {partnerName} needs to set their preferences
+                Waiting for {partnerName} to set their date preferences
               </p>
               <p className="text-xs text-amber-600">
-                You'll see AI recommendations once they complete their preferences
+                AI will analyze compatibility and suggest venues once both partners complete preferences
               </p>
             </div>
           </div>
           
           <div className="bg-white/60 rounded-lg p-3 border border-amber-200">
             <p className="text-xs text-amber-700">
-              <strong>Next steps:</strong> Once {partnerName} sets their preferences, 
-              you'll both see AI-matched venues based on your compatibility.
+              <strong>Next steps:</strong> Once {partnerName} completes their date preferences, 
+              our AI will analyze your compatibility and recommend perfect venues for both of you.
             </p>
           </div>
         </CardContent>
@@ -63,10 +63,10 @@ const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
             <User className="h-8 w-8 text-gray-400" />
             <div>
               <p className="text-sm text-gray-700 font-medium">
-                {partnerName} has not gone through the selection of preferences
+                {partnerName} hasn't set their date preferences yet
               </p>
               <p className="text-xs text-gray-600">
-                Please wait for them to complete their preferences.
+                Waiting for them to complete their date preferences before AI analysis can begin.
               </p>
             </div>
           </div>
@@ -76,7 +76,7 @@ const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
               <strong>Session ID:</strong> {sessionId.slice(0, 8)}...
             </p>
             <p className="text-xs text-gray-600 mt-1">
-              We'll automatically show the AI results when both of you have set your preferences.
+              AI analysis will automatically start when both partners have completed their date preferences.
             </p>
           </div>
         </CardContent>
