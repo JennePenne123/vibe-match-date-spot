@@ -417,7 +417,10 @@ useEffect(() => {
     category: keyof UserPreferences,
     gridCols = "grid-cols-2"
   ) => {
-    const sharedItems = getSharedPreferences(category);
+    // Only show matches in collaborative mode when partner has set preferences
+    const shouldShowMatches = planningMode === 'collaborative' && 
+                             collaborativeSession?.hasPartnerSetPreferences;
+    const sharedItems = shouldShowMatches ? getSharedPreferences(category) : [];
 
     return (
       <div className={`grid ${gridCols} gap-3`}>
