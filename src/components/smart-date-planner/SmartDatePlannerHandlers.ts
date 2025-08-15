@@ -88,10 +88,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       if (!hasPartnerSetPreferences) {
         console.log('SmartDatePlanner - Partner has not set preferences yet, staying on preferences step...');
         // Just update preferences, don't run AI analysis yet, stay on preferences step
-        toast({
-          title: "Preferences saved!",
-          description: `Waiting for ${state.selectedPartner?.name || 'partner'} to set their preferences...`,
-        });
+        // Don't show misleading "Starting AI analysis" toast
         return;
       }
       

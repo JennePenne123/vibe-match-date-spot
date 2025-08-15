@@ -316,10 +316,27 @@ useEffect(() => {
         throw prefError;
       }
 
-      toast({
-        title: "Preferences saved!",
-        description: "Starting AI analysis to find perfect venues...",
-      });
+      // Show appropriate toast based on planning mode and collaborative session
+      if (planningMode === 'collaborative' && collaborativeSession) {
+        const { hasPartnerSetPreferences } = collaborativeSession;
+        
+        if (!hasPartnerSetPreferences) {
+          toast({
+            title: "Preferences saved!",
+            description: `Waiting for ${partnerName} to set their preferences...`,
+          });
+        } else {
+          toast({
+            title: "Preferences saved!",
+            description: "Starting AI analysis to find perfect venues...",
+          });
+        }
+      } else {
+        toast({
+          title: "Preferences saved!",
+          description: "Starting AI analysis to find perfect venues...",
+        });
+      }
 
       // Pass preferences to parent component for AI analysis
       const preferences: DatePreferences = {
