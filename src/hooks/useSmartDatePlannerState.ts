@@ -65,7 +65,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'so
     analyzeCompatibilityAndVenues,
     createPlanningSession,
     getActiveSession,
-    completePlanningSession
+    completePlanningSession,
+    updateSessionPreferences
   } = datePlanningState || {
     currentSession: null,
     loading: false,
@@ -75,7 +76,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'so
     analyzeCompatibilityAndVenues: async () => {},
     createPlanningSession: async () => {},
     getActiveSession: async () => null,
-    completePlanningSession: async () => false
+    completePlanningSession: async () => false,
+    updateSessionPreferences: async () => {}
   };
 
   const {
@@ -195,6 +197,7 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'so
     createPlanningSession,
     getActiveSession,
     completePlanningSession,
+    updateSessionPreferences,
     currentStep,
     setCurrentStep,
     selectedPartnerId,

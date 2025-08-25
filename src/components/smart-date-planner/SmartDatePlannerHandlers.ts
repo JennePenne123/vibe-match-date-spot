@@ -22,7 +22,8 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     completePlanningSession,
     navigate,
     currentPreferences,
-    setCurrentPreferences
+    setCurrentPreferences,
+    updateSessionPreferences
   } = state;
 
   async function handlePartnerSelection(partnerId?: string) {
@@ -73,13 +74,30 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     }
   }
 
-  function handlePreferencesComplete(preferences: any, sessionId?: string) {
+  async function handlePreferencesComplete(preferences: any, sessionId?: string) {
     console.log('SmartDatePlanner - Preferences submitted', preferences);
     
     // Store preferences for later use when completing session
     setCurrentPreferences(preferences);
     
     const effectiveSessionId = sessionId || currentSession?.id;
+    
+    // First, save preferences to the session to trigger completion flags
+    if (effectiveSessionId) {
+      try {
+        console.log('SmartDatePlanner - Updating session preferences for session:', effectiveSessionId);
+        await updateSessionPreferences(effectiveSessionId, preferences);
+        console.log('SmartDatePlanner - Session preferences updated successfully');
+      } catch (error) {
+        console.error('SmartDatePlanner - Error updating session preferences:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to save preferences. Please try again.'
+        });
+        return;
+      }
+    }
     
     // Check if we're in collaborative mode and need to wait for partner
     if (state.planningMode === 'collaborative' && state.collaborativeSession) {
