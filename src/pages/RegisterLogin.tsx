@@ -81,7 +81,7 @@ const RegisterLogin = () => {
               <Heart className="w-12 h-12 text-white" fill="currentColor" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900">DateSpot</h1>
+          <h1 className="text-4xl font-bold text-gray-900">VybePulse</h1>
           <p className="text-lg text-gray-700">
             Ready to Create Unforgettable Memories?
           </p>

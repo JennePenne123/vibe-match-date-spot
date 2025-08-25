@@ -46,7 +46,7 @@ const PremiumDesignSystemDemo = () => {
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
-              <Display size="lg" className="text-foreground">DateSpot Premium Design System</Display>
+              <Display size="lg" className="text-foreground">VybePulse Premium Design System</Display>
               <Text size="sm" className="text-muted-foreground">A comprehensive showcase of enhanced design tokens and components</Text>
             </div>
           </div>
@@ -94,7 +94,7 @@ const PremiumDesignSystemDemo = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Current Palette</CardTitle>
-                    <CardDescription>DateSpot's existing color system</CardDescription>
+                    <CardDescription>VybePulse's existing color system</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {currentColors.map((color, index) => (
@@ -399,7 +399,7 @@ const PremiumDesignSystemDemo = () => {
               
               <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20 shadow-[0_20px_50px_-10px_rgba(330,81%,60%,0.3)]">
                 <CardHeader>
-                  <CardTitle>Premium DateSpot Experience</CardTitle>
+                  <CardTitle>Premium VybePulse Experience</CardTitle>
                   <CardDescription>How the enhanced design system elevates the user experience</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
