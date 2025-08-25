@@ -2,7 +2,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import SmartDatePlanner from '@/components/SmartDatePlanner';
+import SmartDatePlannerV2 from '@/components/SmartDatePlannerV2';
 import HomeHeader from '@/components/HomeHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -71,7 +71,7 @@ const SmartDatePlanning: React.FC = () => {
           />
           
           <ErrorBoundary level="component">
-            <SmartDatePlanner preselectedFriend={preselectedFriend} />
+            <SmartDatePlannerV2 preselectedFriend={preselectedFriend} />
           </ErrorBoundary>
         </div>
       </div>
