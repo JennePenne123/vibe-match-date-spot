@@ -88,19 +88,18 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       if (!hasPartnerSetPreferences) {
         console.log('SmartDatePlanner - Partner has not set preferences yet, staying on preferences step...');
         // Just update preferences, don't run AI analysis yet, stay on preferences step
-        // Don't show misleading "Starting AI analysis" toast
         return;
       }
       
       if (canShowResults) {
-        console.log('SmartDatePlanner - Both partners have set preferences, advancing to review-matches');
-        setCurrentStep('review-matches');
+        console.log('SmartDatePlanner - Both partners have set preferences, running AI analysis...');
+        // Don't advance to review-matches yet - let AI analysis complete first
+        // AI analysis will run below and advance the step when done
+      } else {
+        // If partner has set preferences but can't show results yet, don't run AI analysis
+        console.log('SmartDatePlanner - Partner has preferences but canShowResults is false, waiting...');
         return;
       }
-      
-      // If partner has set preferences but can't show results yet, don't run AI analysis
-      console.log('SmartDatePlanner - Partner has preferences but canShowResults is false, waiting...');
-      return;
     }
     
     // Run AI analysis only if we have all required data and (solo mode OR both partners have set preferences)
@@ -122,10 +121,8 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       ).then(() => {
         console.log('SmartDatePlanner - AI analysis completed successfully');
         setAiAnalyzing(false);
-        // For solo mode, advance to review-matches after AI analysis
-        if (state.planningMode === 'solo') {
-          setCurrentStep('review-matches');
-        }
+        // Advance to review-matches after AI analysis for both solo and collaborative modes
+        setCurrentStep('review-matches');
       }).catch(error => {
         console.error('SmartDatePlanner - AI analysis error:', error);
         setAiAnalyzing(false);
