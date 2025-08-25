@@ -25,7 +25,6 @@ import NotFound from "./pages/NotFound";
 import AIRecommendations from "./pages/AIRecommendations";
 import SmartDatePlanning from "./pages/SmartDatePlanning";
 import AIVenueCardDemo from "./pages/AIVenueCardDemo";
-import UIDesignDemo from "./pages/UIDesignDemo";
 import PremiumDesignSystemDemo from "./pages/PremiumDesignSystemDemo";
 
 const queryClient = new QueryClient({
@@ -78,8 +77,7 @@ const App = () => (
                     <Route path="/ai-recommendations" element={<AIRecommendations />} />
                     <Route path="/plan-date" element={<SmartDatePlanning />} />
                     <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
-                    <Route path="/demo/ui-design-demo" element={<UIDesignDemo />} />
-                    <Route path="/demo/premium-design" element={<PremiumDesignSystemDemo />} />
+                    <Route path="/demo/premium-design-system" element={<PremiumDesignSystemDemo />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </ErrorBoundary>

@@ -284,7 +284,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(cuisine.id, selectedCuisines, setSelectedCuisines)}
               className={`p-4 rounded-xl border-2 transition-all ${
                 selectedCuisines.includes(cuisine.id)
-                  ? 'bg-primary-light border-primary text-primary-dark'
+                  ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -310,7 +310,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(vibe.id, selectedVibes, setSelectedVibes)}
               className={`w-full p-4 rounded-xl border-2 transition-all ${
                 selectedVibes.includes(vibe.id)
-                  ? 'bg-primary-light border-primary text-primary-dark'
+                  ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -318,7 +318,7 @@ const Preferences = () => {
                 <div className="text-2xl">{vibe.emoji}</div>
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{vibe.name}</div>
-                  <div className={`text-sm ${selectedVibes.includes(vibe.id) ? 'text-primary-dark' : 'text-gray-500'}`}>
+                  <div className={`text-sm ${selectedVibes.includes(vibe.id) ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
                     {vibe.desc}
                   </div>
                 </div>
@@ -347,7 +347,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(price.id, selectedPriceRange, setSelectedPriceRange)}
               className={`w-full p-4 rounded-xl border-2 transition-all ${
                 selectedPriceRange.includes(price.id)
-                  ? 'bg-primary-light border-primary text-primary-dark'
+                  ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -355,7 +355,7 @@ const Preferences = () => {
                 <div className="text-2xl">{price.emoji}</div>
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{price.name}</div>
-                  <div className={`text-sm ${selectedPriceRange.includes(price.id) ? 'text-primary-dark' : 'text-gray-500'}`}>
+                  <div className={`text-sm ${selectedPriceRange.includes(price.id) ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
                     {price.desc}
                   </div>
                 </div>
@@ -380,13 +380,13 @@ const Preferences = () => {
               onClick={() => toggleSelection(time.id, selectedTimePreferences, setSelectedTimePreferences)}
               className={`p-4 rounded-xl border-2 transition-all ${
                 selectedTimePreferences.includes(time.id)
-                  ? 'bg-primary-light border-primary text-primary-dark'
+                  ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
               <div className="text-2xl mb-1">{time.emoji}</div>
               <div className="font-medium text-sm">{time.name}</div>
-              <div className={`text-xs ${selectedTimePreferences.includes(time.id) ? 'text-primary-dark' : 'text-gray-500'}`}>
+              <div className={`text-xs ${selectedTimePreferences.includes(time.id) ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
                 {time.desc}
               </div>
               {selectedTimePreferences.includes(time.id) && (
@@ -409,7 +409,7 @@ const Preferences = () => {
               onClick={() => toggleSingleSelection(duration.id, setSelectedDuration)}
               className={`w-full p-4 rounded-xl border-2 transition-all ${
                 selectedDuration === duration.id
-                  ? 'bg-primary-light border-primary text-primary-dark'
+                  ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -417,7 +417,7 @@ const Preferences = () => {
                 <div className="text-2xl">{duration.emoji}</div>
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{duration.name}</div>
-                  <div className={`text-sm ${selectedDuration === duration.id ? 'text-primary-dark' : 'text-gray-500'}`}>
+                  <div className={`text-sm ${selectedDuration === duration.id ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
                     {duration.desc}
                   </div>
                 </div>
@@ -446,7 +446,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(activity.id, selectedActivities, setSelectedActivities)}
               className={`w-full p-4 rounded-xl border-2 transition-all ${
                 selectedActivities.includes(activity.id)
-                  ? 'bg-primary-light border-primary text-primary-dark'
+                  ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -454,7 +454,7 @@ const Preferences = () => {
                 <div className="text-2xl">{activity.emoji}</div>
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{activity.name}</div>
-                  <div className={`text-sm ${selectedActivities.includes(activity.id) ? 'text-primary-dark' : 'text-gray-500'}`}>
+                  <div className={`text-sm ${selectedActivities.includes(activity.id) ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
                     {activity.desc}
                   </div>
                 </div>
@@ -479,7 +479,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(ent.id, selectedEntertainment, setSelectedEntertainment)}
               className={`p-4 rounded-xl border-2 transition-all ${
                 selectedEntertainment.includes(ent.id)
-                  ? 'bg-primary-light border-primary text-primary-dark'
+                  ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -509,7 +509,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(dietary.id, selectedDietary, setSelectedDietary)}
               className={`p-4 rounded-xl border-2 transition-all ${
                 selectedDietary.includes(dietary.id)
-                  ? 'bg-primary-light border-primary text-primary-dark'
+                  ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -535,7 +535,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(access.id, selectedAccessibility, setSelectedAccessibility)}
               className={`w-full p-4 rounded-xl border-2 transition-all ${
                 selectedAccessibility.includes(access.id)
-                  ? 'bg-primary-light border-primary text-primary-dark'
+                  ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -590,7 +590,7 @@ const Preferences = () => {
         <div className="px-6 mb-8 pt-4">
           <div className="bg-gray-200 rounded-full h-2">
             <div 
-              className="bg-gradient-primary rounded-full h-2 transition-all duration-300" 
+              className="bg-datespot-gradient rounded-full h-2 transition-all duration-300" 
               style={{ width: `${(currentStep / totalSteps) * 100}%` }}
             />
           </div>
@@ -606,7 +606,7 @@ const Preferences = () => {
               <Button
                 onClick={prevStep}
                 variant="outline"
-                className="flex-1 h-12 border-primary text-primary hover:bg-primary-light"
+                className="flex-1 h-12 border-datespot-pink text-datespot-pink hover:bg-datespot-light-pink"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
@@ -616,7 +616,7 @@ const Preferences = () => {
             <Button
               onClick={handleNext}
               disabled={!isStepValid()}
-              className={`h-12 bg-gradient-primary text-white hover:opacity-90 font-semibold disabled:opacity-50 ${
+              className={`h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold disabled:opacity-50 ${
                 currentStep === 1 ? 'w-full' : 'flex-1'
               }`}
             >

@@ -1,6 +1,6 @@
 // Design system color tokens
 export const colorTokens = {
-  // Premium Brand palette - Enhanced VybePulse theme
+  // Premium Brand palette - Enhanced DateSpot theme
   brand: {
     primary: {
       50: 'hsl(330, 85%, 98%)',   // Rose Quartz
@@ -8,7 +8,7 @@ export const colorTokens = {
       200: 'hsl(330, 78%, 88%)',  // Warm Blush
       300: 'hsl(330, 75%, 78%)',  // Light Romance
       400: 'hsl(330, 72%, 68%)',  // Medium Romance
-      500: 'hsl(330, 81%, 60%)',  // Romantic Pink (VybePulse primary)
+      500: 'hsl(330, 81%, 60%)',  // Romantic Pink (DateSpot primary)
       600: 'hsl(330, 84%, 52%)',  // Deep Romance
       700: 'hsl(330, 87%, 45%)',  // Rich Romance
       800: 'hsl(330, 90%, 38%)',  // Dark Romance

@@ -109,21 +109,21 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'so
 
   // Remove automatic step advancement - let user manually proceed with "Continue" button
 
-  // Monitor compatibility score - auto-advance for both solo and collaborative modes
+  // Monitor compatibility score - only auto-advance for solo mode
   useEffect(() => {
-    if (compatibilityScore !== null && currentStep === 'set-preferences') {
-      console.log('SmartDatePlanner - AI analysis complete, advancing to review step');
+    if (compatibilityScore !== null && currentStep === 'set-preferences' && planningMode === 'solo') {
+      console.log('SmartDatePlanner - AI analysis complete, advancing to review step (solo mode)');
       setAiAnalyzing(false);
       setCurrentStep('review-matches');
     }
-  }, [compatibilityScore, currentStep, setCurrentStep]);
+  }, [compatibilityScore, currentStep, setCurrentStep, planningMode]);
 
-  // Add timeout for AI analysis - for both solo and collaborative modes
+  // Add timeout for AI analysis - only for solo mode
   useEffect(() => {
-    if (aiAnalyzing) {
+    if (aiAnalyzing && planningMode === 'solo') {
       const timeoutId = setTimeout(() => {
         if (currentStep === 'set-preferences' && aiAnalyzing) {
-          console.log('SmartDatePlanner - AI analysis timeout, advancing anyway');
+          console.log('SmartDatePlanner - AI analysis timeout, advancing anyway (solo mode)');
           setAiAnalyzing(false);
           setCurrentStep('review-matches');
         }
@@ -131,7 +131,7 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'so
 
       return () => clearTimeout(timeoutId);
     }
-  }, [aiAnalyzing, currentStep, setCurrentStep]);
+  }, [aiAnalyzing, currentStep, setCurrentStep, planningMode]);
 
   // Firefox-optimized location request to prevent flickering
   const handleLocationRequest = useCallback(async () => {

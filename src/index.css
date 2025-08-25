@@ -4,129 +4,178 @@
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
-@layer utilities {
-  /* Interactive animations */
-  .hover-scale {
-    @apply transition-transform duration-200 hover:scale-105;
+@layer base {
+  :root {
+    /* Premium Base Colors */
+    --background: 330 20% 99%;
+    --foreground: 330 22% 12%;
+    --card: 330 20% 99%;
+    --card-foreground: 330 22% 12%;
+    --popover: 330 20% 99%;
+    --popover-foreground: 330 22% 12%;
+    
+    /* Enhanced Brand Colors */
+    --primary: 330 81% 60%;
+    --primary-foreground: 330 85% 98%;
+    --secondary: 351 86% 55%;
+    --secondary-foreground: 330 20% 99%;
+    --accent: 45 90% 96%;
+    --accent-foreground: 330 22% 12%;
+    
+    /* Premium Neutrals */
+    --muted: 330 15% 97%;
+    --muted-foreground: 330 8% 36%;
+    --border: 330 12% 93%;
+    --input: 330 12% 93%;
+    --ring: 330 81% 60%;
+    
+    /* Enhanced Semantic Colors */
+    --destructive: 0 85% 62%;
+    --destructive-foreground: 0 90% 98%;
+    --success: 142 76% 48%;
+    --success-foreground: 138 85% 98%;
+    --warning: 38 88% 52%;
+    --warning-foreground: 48 100% 97%;
+    
+    /* Chart Colors */
+    --chart-1: 330 81% 60%;
+    --chart-2: 351 86% 55%;
+    --chart-3: 45 90% 96%;
+    --chart-4: 142 76% 48%;
+    --chart-5: 195 87% 45%;
+    
+    --radius: 0.5rem;
+
+    /* Premium Gradient System */
+    --gradient-primary: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(45, 90%, 96%) 0%, hsl(35, 75%, 55%) 100%);
+    --gradient-romantic: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(330, 85%, 95%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 90%, 96%) 70%, hsl(330, 82%, 95%) 100%);
+    --gradient-dreamy: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 25%, hsl(351, 95%, 94%) 50%, hsl(45, 85%, 90%) 75%, hsl(330, 85%, 98%) 100%);
+    --gradient-luxe: linear-gradient(135deg, hsl(330, 94%, 28%) 0%, hsl(330, 81%, 60%) 50%, hsl(351, 86%, 55%) 100%);
+
+    /* Premium Surface Gradients */
+    --gradient-surface-subtle: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
+    --gradient-surface-warm: linear-gradient(135deg, hsl(330, 20%, 99%) 0%, hsl(330, 15%, 97%) 100%);
+    --gradient-surface-soft: linear-gradient(135deg, hsl(330, 81%, 60% / 0.03) 0%, hsl(351, 86%, 55% / 0.08) 100%);
+    --gradient-surface-medium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.15) 100%);
+    --gradient-surface-rich: linear-gradient(135deg, hsl(330, 81%, 60% / 0.15) 0%, hsl(351, 86%, 55% / 0.25) 100%);
+    --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+
+    /* Special Effect Gradients */
+    --gradient-aurora: linear-gradient(135deg, hsl(330, 81%, 60% / 0.8) 0%, hsl(351, 86%, 55% / 0.6) 25%, hsl(45, 90%, 96% / 0.4) 50%, hsl(195, 87%, 45% / 0.6) 75%, hsl(330, 81%, 60% / 0.8) 100%);
+    --gradient-cosmic: radial-gradient(circle at 30% 20%, hsl(330, 81%, 60% / 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(351, 86%, 55% / 0.2) 0%, transparent 50%);
+    --gradient-shimmer: linear-gradient(45deg, transparent 30%, hsl(330, 81%, 60% / 0.1) 50%, transparent 70%);
+
+    /* Component-Specific Gradients */
+    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
+    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    --gradient-card-elegant: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
+    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.05) 0%, hsl(351, 86%, 55% / 0.08) 100%);
+    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+
+    /* Premium Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.3);
+    --shadow-romantic: 0 12px 32px -8px hsl(330 81% 60% / 0.4), 0 4px 16px -4px hsl(330 81% 60% / 0.2);
+    --shadow-glow: 0 0 24px hsl(330 81% 60% / 0.35), 0 0 48px hsl(330 81% 60% / 0.2);
+    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
+    --shadow-dreamy: 0 0 40px hsl(330 85% 95% / 0.8), 0 8px 24px hsl(330 81% 60% / 0.25);
+    
+    /* Sidebar variables */
+    --sidebar-background: 330 20% 99%;
+    --sidebar-foreground: 330 22% 12%;
+    --sidebar-primary: 330 81% 60%;
+    --sidebar-primary-foreground: 330 85% 98%;
+    --sidebar-accent: 330 15% 97%;
+    --sidebar-accent-foreground: 330 22% 12%;
+    --sidebar-border: 330 12% 93%;
+    --sidebar-ring: 330 81% 60%;
   }
-  
-  .story-link {
-    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+
+  .dark {
+    /* Premium Dark Base Colors */
+    --background: 330 22% 12%;
+    --foreground: 330 20% 99%;
+    --card: 330 16% 18%;
+    --card-foreground: 330 20% 99%;
+    --popover: 330 16% 18%;
+    --popover-foreground: 330 20% 99%;
+    
+    /* Enhanced Brand Colors for Dark */
+    --primary: 330 81% 60%;
+    --primary-foreground: 330 22% 12%;
+    --secondary: 351 86% 55%;
+    --secondary-foreground: 330 22% 12%;
+    --accent: 45 75% 55%;
+    --accent-foreground: 330 22% 12%;
+    
+    /* Premium Dark Neutrals */
+    --muted: 330 16% 18%;
+    --muted-foreground: 330 8% 68%;
+    --border: 330 12% 28%;
+    --input: 330 12% 28%;
+    --ring: 330 81% 60%;
+    
+    /* Enhanced Semantic Colors for Dark */
+    --destructive: 0 85% 62%;
+    --destructive-foreground: 0 90% 98%;
+    --success: 142 76% 48%;
+    --success-foreground: 138 85% 98%;
+    --warning: 38 88% 52%;
+    --warning-foreground: 48 100% 97%;
+
+    /* Chart Colors for Dark */
+    --chart-1: 330 81% 60%;
+    --chart-2: 351 86% 55%;
+    --chart-3: 45 75% 55%;
+    --chart-4: 142 76% 48%;
+    --chart-5: 195 87% 45%;
+
+    /* Dark Mode Premium Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(45, 75%, 55%) 0%, hsl(35, 78%, 48%) 100%);
+    --gradient-romantic: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(330, 16%, 18%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 75%, 55%) 70%, hsl(330, 16%, 18%) 100%);
+    --gradient-dreamy: linear-gradient(135deg, hsl(330, 22%, 12%) 0%, hsl(330, 16%, 18%) 25%, hsl(351, 86%, 55% / 0.2) 50%, hsl(45, 75%, 55% / 0.15) 75%, hsl(330, 22%, 12%) 100%);
+    --gradient-luxe: linear-gradient(135deg, hsl(330, 94%, 28%) 0%, hsl(330, 81%, 60%) 50%, hsl(351, 86%, 55%) 100%);
+
+    /* Dark Mode Surface Gradients */
+    --gradient-surface-subtle: linear-gradient(135deg, hsl(330, 16%, 18%) 0%, hsl(330, 12%, 22%) 100%);
+    --gradient-surface-warm: linear-gradient(135deg, hsl(330, 22%, 12%) 0%, hsl(330, 16%, 18%) 100%);
+    --gradient-surface-soft: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
+    --gradient-surface-medium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.15) 0%, hsl(351, 86%, 55% / 0.20) 100%);
+    --gradient-surface-rich: linear-gradient(135deg, hsl(330, 81%, 60% / 0.25) 0%, hsl(351, 86%, 55% / 0.35) 100%);
+    --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+    /* Dark Mode Component Gradients */
+    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
+    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    --gradient-card-elegant: linear-gradient(135deg, hsl(330, 16%, 18%) 0%, hsl(330, 12%, 22%) 100%);
+    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
+    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+    /* Dark Mode Premium Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.4);
+    --shadow-romantic: 0 12px 32px -8px hsl(330 81% 60% / 0.5), 0 4px 16px -4px hsl(330 81% 60% / 0.3);
+    --shadow-glow: 0 0 24px hsl(330 81% 60% / 0.45), 0 0 48px hsl(330 81% 60% / 0.3);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-dreamy: 0 0 40px hsl(330 81% 60% / 0.3), 0 8px 24px hsl(330 81% 60% / 0.35);
+    
+    /* Dark sidebar variables */
+    --sidebar-background: 330 22% 12%;
+    --sidebar-foreground: 330 20% 99%;
+    --sidebar-primary: 330 81% 60%;
+    --sidebar-primary-foreground: 330 22% 12%;
+    --sidebar-accent: 330 16% 18%;
+    --sidebar-accent-foreground: 330 20% 99%;
+    --sidebar-border: 330 12% 28%;
+    --sidebar-ring: 330 81% 60%;
   }
 }
 
 @layer base {
-  :root {
-    /* Educational Color Palette - Inspired by learning environments */
-    --background: 200 30% 98%;
-    --foreground: 215 25% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
-    
-    /* Primary - Soft Blue for main actions */
-    --primary: 200 85% 70%;
-    --primary-foreground: 0 0% 100%;
-    --primary-light: 200 95% 85%;
-    --primary-dark: 200 75% 55%;
-    
-    /* Secondary - Warm Green for success/secondary actions */
-    --secondary: 100 65% 75%;
-    --secondary-foreground: 95 40% 25%;
-    --secondary-light: 100 75% 88%;
-    --secondary-dark: 100 55% 60%;
-    
-    /* Accent Colors - Playful pastels */
-    --accent: 320 70% 80%;
-    --accent-foreground: 320 30% 25%;
-    --accent-light: 320 80% 92%;
-    --accent-yellow: 50 100% 80%;
-    --accent-purple: 270 60% 80%;
-    --accent-coral: 15 85% 78%;
-    
-    /* Neutrals */
-    --muted: 200 20% 92%;
-    --muted-foreground: 215 15% 45%;
-    --border: 200 25% 88%;
-    --input: 200 25% 95%;
-    --ring: 200 85% 70%;
-    
-    /* System colors */
-    --destructive: 0 75% 65%;
-    --destructive-foreground: 0 0% 98%;
-    
-    --radius: 1rem;
-    
-    /* Learning-specific gradients */
-    --gradient-learning: linear-gradient(135deg, hsl(var(--primary-light)), hsl(var(--secondary-light)));
-    --gradient-focus: linear-gradient(135deg, hsl(var(--accent-yellow)), hsl(var(--accent-coral)));
-    --gradient-success: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--accent-yellow)));
-    --gradient-venue: linear-gradient(135deg, hsl(var(--card)), hsl(var(--muted)));
-    --gradient-venue-ai: linear-gradient(135deg, hsl(var(--primary-light)), hsl(var(--accent-light)));
-    
-    /* Chart colors for educational data */
-    --chart-1: 200 85% 70%;
-    --chart-2: 100 65% 75%;
-    --chart-3: 320 70% 80%;
-    --chart-4: 50 100% 80%;
-    --chart-5: 270 60% 80%;
-  }
-
-  .dark {
-    /* Dark mode with softer, educational-friendly colors */
-    --background: 215 35% 8%;
-    --foreground: 200 20% 92%;
-    --card: 215 30% 12%;
-    --card-foreground: 200 20% 92%;
-    --popover: 215 30% 12%;
-    --popover-foreground: 200 20% 92%;
-    
-    /* Primary - Softer blue for dark mode */
-    --primary: 200 70% 65%;
-    --primary-foreground: 215 35% 8%;
-    --primary-light: 200 60% 75%;
-    --primary-dark: 200 80% 55%;
-    
-    /* Secondary - Muted green */
-    --secondary: 100 45% 60%;
-    --secondary-foreground: 215 35% 8%;
-    --secondary-light: 100 35% 70%;
-    --secondary-dark: 100 55% 50%;
-    
-    /* Accent Colors - Darker but still playful */
-    --accent: 320 50% 65%;
-    --accent-foreground: 215 35% 8%;
-    --accent-light: 320 40% 75%;
-    --accent-yellow: 50 80% 70%;
-    --accent-purple: 270 45% 70%;
-    --accent-coral: 15 65% 68%;
-    
-    /* Neutrals for dark mode */
-    --muted: 215 25% 18%;
-    --muted-foreground: 200 15% 65%;
-    --border: 215 25% 22%;
-    --input: 215 25% 18%;
-    --ring: 200 70% 65%;
-    
-    --destructive: 0 65% 60%;
-    --destructive-foreground: 0 0% 98%;
-    
-    /* Dark mode gradients */
-    --gradient-learning: linear-gradient(135deg, hsl(var(--primary-dark)), hsl(var(--secondary-dark)));
-    --gradient-focus: linear-gradient(135deg, hsl(var(--accent-yellow)), hsl(var(--accent-coral)));
-    --gradient-success: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--accent-yellow)));
-    --gradient-venue: linear-gradient(135deg, hsl(var(--card)), hsl(var(--muted)));
-    --gradient-venue-ai: linear-gradient(135deg, hsl(var(--primary-light)), hsl(var(--accent-light)));
-    
-    /* Chart colors for dark mode */
-    --chart-1: 200 70% 65%;
-    --chart-2: 100 45% 60%;
-    --chart-3: 320 50% 65%;
-    --chart-4: 50 80% 70%;
-    --chart-5: 270 45% 70%;
-  }
-
   * {
     @apply border-border;
   }

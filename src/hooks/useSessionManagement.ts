@@ -161,7 +161,7 @@ export const useSessionManagement = () => {
 
     setLoading(true);
     try {
-      console.log('🔄 SESSION: Updating session preferences:', preferences);
+      console.log('Updating session preferences:', preferences);
       
       // Determine which preference completion flag to update
       const isInitiator = currentSession.initiator_id === user.id;
@@ -175,11 +175,7 @@ export const useSessionManagement = () => {
       } else {
         updateData.partner_preferences_complete = true;
       }
-
-      // The database trigger will automatically set both_preferences_complete
-      // when both individual flags become true
       
-      console.log('🔧 SESSION: Updating database with:', updateData);
       const { error: updateError } = await supabase
         .from('date_planning_sessions')
         .update(updateData)
@@ -187,24 +183,13 @@ export const useSessionManagement = () => {
 
       if (updateError) throw updateError;
 
-      // Fetch the updated session to get the latest both_preferences_complete flag
-      const { data: updatedSession, error: fetchError } = await supabase
-        .from('date_planning_sessions')
-        .select('*')
-        .eq('id', sessionId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      console.log('✅ SESSION: Updated session:', {
-        id: updatedSession.id,
-        initiator_complete: updatedSession.initiator_preferences_complete,
-        partner_complete: updatedSession.partner_preferences_complete,
-        both_complete: updatedSession.both_preferences_complete
-      });
-
-      // Update local state with the complete updated session
-      setCurrentSession(updatedSession);
+      // Update local state
+      setCurrentSession(prev => prev ? { 
+        ...prev, 
+        preferences_data: preferences,
+        updated_at: new Date().toISOString(),
+        ...(isInitiator ? { initiator_preferences_complete: true } : { partner_preferences_complete: true })
+      } : null);
       
     } catch (error) {
       console.error('Error updating preferences:', error);

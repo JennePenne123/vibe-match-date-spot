@@ -1,7 +1,7 @@
 
 import { toast } from '@/hooks/use-toast';
 
-export const createSmartDatePlannerHandlers = (state: any, handlersContext?: { refetchCollaborativeSession?: () => Promise<void> }) => {
+export const createSmartDatePlannerHandlers = (state: any) => {
   const {
     selectedPartnerId,
     selectedPartnerIds,
@@ -73,7 +73,7 @@ export const createSmartDatePlannerHandlers = (state: any, handlersContext?: { r
     }
   }
 
-  async function handlePreferencesComplete(preferences: any, sessionId?: string) {
+  function handlePreferencesComplete(preferences: any, sessionId?: string) {
     console.log('SmartDatePlanner - Preferences submitted', preferences);
     
     // Store preferences for later use when completing session
@@ -88,33 +88,19 @@ export const createSmartDatePlannerHandlers = (state: any, handlersContext?: { r
       if (!hasPartnerSetPreferences) {
         console.log('SmartDatePlanner - Partner has not set preferences yet, staying on preferences step...');
         // Just update preferences, don't run AI analysis yet, stay on preferences step
+        // Don't show misleading "Starting AI analysis" toast
         return;
       }
       
-      // Check if both preferences are complete (the database trigger should have set this)
       if (canShowResults) {
-        console.log('SmartDatePlanner - Both partners have set preferences (canShowResults=true), proceeding with AI analysis...');
-        // Proceed with AI analysis below
-      } else {
-        console.log('SmartDatePlanner - Partner has preferences but canShowResults is still false, refetching session...');
-        
-        // Refetch the session to get the latest both_preferences_complete status
-        if (handlersContext?.refetchCollaborativeSession) {
-          await handlersContext.refetchCollaborativeSession();
-          console.log('SmartDatePlanner - Session refetched, checking canShowResults again');
-          
-          // After refetch, check again if we can show results
-          const updatedCanShowResults = state.collaborativeSession?.canShowResults;
-          if (!updatedCanShowResults) {
-            console.log('SmartDatePlanner - Still cannot show results after refetch, waiting...');
-            return;
-          }
-          console.log('SmartDatePlanner - Can now show results after refetch, proceeding with AI analysis');
-        } else {
-          console.log('SmartDatePlanner - No refetch function available, waiting...');
-          return;
-        }
+        console.log('SmartDatePlanner - Both partners have set preferences, advancing to review-matches');
+        setCurrentStep('review-matches');
+        return;
       }
+      
+      // If partner has set preferences but can't show results yet, don't run AI analysis
+      console.log('SmartDatePlanner - Partner has preferences but canShowResults is false, waiting...');
+      return;
     }
     
     // Run AI analysis only if we have all required data and (solo mode OR both partners have set preferences)
@@ -136,8 +122,10 @@ export const createSmartDatePlannerHandlers = (state: any, handlersContext?: { r
       ).then(() => {
         console.log('SmartDatePlanner - AI analysis completed successfully');
         setAiAnalyzing(false);
-        // Advance to review-matches after AI analysis for both solo and collaborative modes
-        setCurrentStep('review-matches');
+        // For solo mode, advance to review-matches after AI analysis
+        if (state.planningMode === 'solo') {
+          setCurrentStep('review-matches');
+        }
       }).catch(error => {
         console.error('SmartDatePlanner - AI analysis error:', error);
         setAiAnalyzing(false);

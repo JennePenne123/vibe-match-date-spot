@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
+  // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -644,13 +644,13 @@ export type Database = {
       }
       setup_test_user_preferences: {
         Args: {
-          cuisines?: string[]
-          dietary?: string[]
-          max_dist?: number
-          price_range?: string[]
           target_user_id: string
-          times?: string[]
+          cuisines?: string[]
           vibes?: string[]
+          times?: string[]
+          price_range?: string[]
+          max_dist?: number
+          dietary?: string[]
         }
         Returns: boolean
       }
