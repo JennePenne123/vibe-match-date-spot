@@ -40,7 +40,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     loading: sessionLoading,
     hasUserSetPreferences,
     hasPartnerSetPreferences,
-    canShowResults
+    canShowResults,
+    refetchSession
   } = useCollaborativeSession(
     fromProposal ? sessionId : null
   );
@@ -74,8 +75,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     planningMode: planningMode as 'solo' | 'collaborative'
   });
   
-console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'planningMode:', planningMode, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
-  const handlers = createSmartDatePlannerHandlers(state);
+  const handlers = React.useMemo(() => {
+    return createSmartDatePlannerHandlers(state, {
+      refetchCollaborativeSession: refetchSession
+    });
+  }, [state, refetchSession]);
 
   // Prefill proposed date/time from linked proposal when coming from a proposal
   const [proposalDateISO, setProposalDateISO] = useState<string | undefined>();
@@ -227,7 +231,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
               partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
               compatibilityScore={compatibilityScore}
               aiAnalyzing={aiAnalyzing}
-              onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
+              onPreferencesComplete={(preferences) => handlers.handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
               initialProposedDate={proposalDateISO}
               planningMode={planningMode}
               collaborativeSession={collaborativeSession ? {
