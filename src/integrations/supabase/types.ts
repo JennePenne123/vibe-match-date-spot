@@ -283,10 +283,12 @@ export type Database = {
           expires_at: string
           id: string
           initiator_id: string
+          initiator_preferences: Json | null
           initiator_preferences_complete: boolean | null
           mutual_venue_selection: boolean | null
           participant_ids: Json | null
           partner_id: string
+          partner_preferences: Json | null
           partner_preferences_complete: boolean | null
           planning_mode: string
           preferences_data: Json | null
@@ -301,10 +303,12 @@ export type Database = {
           expires_at?: string
           id?: string
           initiator_id: string
+          initiator_preferences?: Json | null
           initiator_preferences_complete?: boolean | null
           mutual_venue_selection?: boolean | null
           participant_ids?: Json | null
           partner_id: string
+          partner_preferences?: Json | null
           partner_preferences_complete?: boolean | null
           planning_mode?: string
           preferences_data?: Json | null
@@ -319,10 +323,12 @@ export type Database = {
           expires_at?: string
           id?: string
           initiator_id?: string
+          initiator_preferences?: Json | null
           initiator_preferences_complete?: boolean | null
           mutual_venue_selection?: boolean | null
           participant_ids?: Json | null
           partner_id?: string
+          partner_preferences?: Json | null
           partner_preferences_complete?: boolean | null
           planning_mode?: string
           preferences_data?: Json | null

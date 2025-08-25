@@ -11,6 +11,8 @@ interface DatePlanningSession {
   participant_ids?: string[];
   session_status: 'active' | 'completed' | 'expired';
   preferences_data?: any;
+  initiator_preferences?: any;
+  partner_preferences?: any;
   ai_compatibility_score?: number;
   selected_venue_id?: string;
   created_at: string;
@@ -161,19 +163,43 @@ export const useSessionManagement = () => {
 
     setLoading(true);
     try {
-      console.log('Updating session preferences:', preferences);
+      console.log('🔄 SESSION: Updating session preferences for user:', user.id, 'session:', sessionId);
+      console.log('📋 SESSION: Preferences being set:', preferences);
       
       // Determine which preference completion flag to update
       const isInitiator = currentSession.initiator_id === user.id;
+      
+      // First fetch current session to avoid overwriting
+      const { data: currentSessionData, error: fetchError } = await supabase
+        .from('date_planning_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      console.log('📊 SESSION: Current session data:', {
+        id: currentSessionData.id,
+        initiator_complete: currentSessionData.initiator_preferences_complete,
+        partner_complete: currentSessionData.partner_preferences_complete,
+        both_complete: currentSessionData.both_preferences_complete,
+        hasInitiatorPrefs: !!currentSessionData.initiator_preferences,
+        hasPartnerPrefs: !!currentSessionData.partner_preferences
+      });
+
+      // Store preferences in user-specific column and set completion flag
       const updateData: any = {
-        preferences_data: preferences,
         updated_at: new Date().toISOString()
       };
 
       if (isInitiator) {
+        updateData.initiator_preferences = preferences;
         updateData.initiator_preferences_complete = true;
+        console.log('✅ SESSION: Setting initiator preferences and flag');
       } else {
+        updateData.partner_preferences = preferences;
         updateData.partner_preferences_complete = true;
+        console.log('✅ SESSION: Setting partner preferences and flag');
       }
       
       const { error: updateError } = await supabase
@@ -183,16 +209,26 @@ export const useSessionManagement = () => {
 
       if (updateError) throw updateError;
 
-      // Update local state
+      console.log('🎯 SESSION: Preferences updated successfully');
+
+      // Update local state with new preference data
       setCurrentSession(prev => prev ? { 
         ...prev, 
-        preferences_data: preferences,
         updated_at: new Date().toISOString(),
-        ...(isInitiator ? { initiator_preferences_complete: true } : { partner_preferences_complete: true })
+        ...(isInitiator 
+          ? { 
+              initiator_preferences: preferences,
+              initiator_preferences_complete: true 
+            } 
+          : { 
+              partner_preferences: preferences,
+              partner_preferences_complete: true 
+            }
+        )
       } : null);
       
     } catch (error) {
-      console.error('Error updating preferences:', error);
+      console.error('❌ SESSION: Error updating preferences:', error);
       handleError(error, {
         toastTitle: 'Failed to update preferences',
         toastDescription: 'Please try again'

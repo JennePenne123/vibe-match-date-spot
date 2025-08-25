@@ -9,6 +9,8 @@ interface DatePlanningSession {
   partner_id: string;
   session_status: 'active' | 'completed' | 'expired';
   preferences_data?: any;
+  initiator_preferences?: any;
+  partner_preferences?: any;
   ai_compatibility_score?: number;
   selected_venue_id?: string;
   created_at: string;
