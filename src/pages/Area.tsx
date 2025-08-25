@@ -98,7 +98,7 @@ const Area = () => {
         {/* Progress Bar */}
         <div className="px-6 mb-8 pt-4">
           <div className="bg-gray-200 rounded-full h-2">
-            <div className="bg-datespot-gradient rounded-full h-2 w-full transition-all duration-300" />
+            <div className="bg-gradient-primary rounded-full h-2 w-full transition-all duration-300" />
           </div>
         </div>
 
@@ -151,7 +151,7 @@ const Area = () => {
                 disabled={appState.isLoading}
                 className={`w-full p-4 rounded-xl border-2 transition-all ${
                   selectedArea === area.id
-                    ? 'bg-datespot-light-pink border-datespot-pink text-datespot-dark-pink'
+                    ? 'bg-primary-light border-primary text-primary-dark'
                     : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                 } ${appState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
@@ -159,10 +159,10 @@ const Area = () => {
                   <div className="text-2xl">{area.emoji}</div>
                   <div className="flex-1 text-left">
                     <div className="font-semibold">{area.name}</div>
-                    <div className={`text-sm ${selectedArea === area.id ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
+                    <div className={`text-sm ${selectedArea === area.id ? 'text-primary-dark' : 'text-gray-500'}`}>
                       {area.description}
                     </div>
-                    <div className={`flex items-center gap-4 text-xs mt-1 ${selectedArea === area.id ? 'text-datespot-dark-pink' : 'text-gray-500'}`}>
+                    <div className={`flex items-center gap-4 text-xs mt-1 ${selectedArea === area.id ? 'text-primary-dark' : 'text-gray-500'}`}>
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {area.time}
@@ -185,7 +185,7 @@ const Area = () => {
           <Button
             onClick={handleNext}
             disabled={!selectedArea || appState.isLoading}
-            className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold disabled:opacity-50"
+            className="w-full h-12 bg-gradient-primary text-white hover:opacity-90 font-semibold disabled:opacity-50"
           >
             {appState.isLoading ? (
               <>

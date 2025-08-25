@@ -87,8 +87,8 @@ const Friends = () => {
 
   const shareViaEmail = () => {
     const link = generateReferralLink();
-    const subject = "Join me on DateSpot - Find Amazing Date Ideas!";
-    const body = `Hey! I've been using DateSpot to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
+    const subject = "Join me on VybePulse - Find Amazing Date Ideas!";
+    const body = `Hey! I've been using VybePulse to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 
@@ -121,7 +121,7 @@ const Friends = () => {
         {/* Progress Bar */}
         <div className="px-6 mb-8 pt-4">
           <div className="bg-gray-200 rounded-full h-2">
-            <div className="bg-datespot-gradient rounded-full h-2 w-2/3 transition-all duration-300" />
+            <div className="bg-gradient-primary rounded-full h-2 w-2/3 transition-all duration-300" />
           </div>
         </div>
 
@@ -157,7 +157,7 @@ const Friends = () => {
                     <div className="flex items-center gap-4">
                       <Avatar className="w-12 h-12">
                         <AvatarImage src={friend.avatar_url} alt={friend.name} />
-                        <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink">
+                        <AvatarFallback className="bg-primary-light text-primary-dark">
                           {friend.name.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>
@@ -169,7 +169,7 @@ const Friends = () => {
                         onClick={() => handleInviteFriend(friend.id)}
                         variant={isInvited ? "default" : "outline"}
                         className={isInvited 
-                          ? "bg-datespot-gradient text-white hover:opacity-90" 
+                          ? "bg-gradient-primary text-white hover:opacity-90" 
                           : "border-gray-200 text-gray-700 hover:bg-gray-50"
                         }
                       >
@@ -195,16 +195,16 @@ const Friends = () => {
                 <div className="text-center py-8">
                   <div className="text-4xl mb-4">👥</div>
                   <h3 className="text-gray-900 font-semibold mb-2">No friends found</h3>
-                  <p className="text-gray-600">Invite your friends to join DateSpot!</p>
+                  <p className="text-gray-600">Invite your friends to join VybePulse!</p>
                 </div>
 
                 {/* Referral Link Section */}
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                   <div className="text-center mb-4">
-                    <div className="bg-datespot-light-pink rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
-                      <Share2 className="w-8 h-8 text-datespot-pink" />
+                    <div className="bg-primary-light rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                      <Share2 className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Invite Friends to DateSpot</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Invite Friends to VybePulse</h3>
                     <p className="text-sm text-gray-600">Share your referral link and discover amazing dates together</p>
                   </div>
 
@@ -268,7 +268,7 @@ const Friends = () => {
           {/* Next Button */}
           <Button
             onClick={handleNext}
-            className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold"
+            className="w-full h-12 bg-gradient-primary text-white hover:opacity-90 font-semibold"
           >
             Next: Choose Area
             <ArrowRight className="w-4 h-4 ml-2" />

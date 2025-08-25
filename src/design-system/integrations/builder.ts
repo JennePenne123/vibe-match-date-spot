@@ -4,7 +4,7 @@ import { builderTheme } from '../tokens';
 /**
  * Builder.io integration utilities
  * 
- * This file provides utilities for integrating DateSpot components
+ * This file provides utilities for integrating VybePulse components
  * with Builder.io for visual editing and page building.
  */
 
@@ -15,7 +15,7 @@ export const builderConfig = {
   // Custom component definitions for Builder.io
   components: [
     {
-      name: 'DateSpot Button',
+      name: 'VybePulse Button',
       component: 'Button',
       inputs: [
         {
@@ -63,7 +63,7 @@ export const builderConfig = {
       ],
     },
     {
-      name: 'DateSpot Display',
+      name: 'VybePulse Display',
       component: 'Display',
       inputs: [
         {
@@ -105,7 +105,7 @@ export const builderConfig = {
       ],
     },
     {
-      name: 'DateSpot Card',
+      name: 'VybePulse Card',
       component: 'Card',
       inputs: [
         {
@@ -142,7 +142,7 @@ export const builderConfig = {
   // Custom sections for page building
   sections: [
     {
-      name: 'DateSpot Hero',
+      name: 'VybePulse Hero',
       component: 'HeroSection',
       inputs: [
         {
@@ -168,13 +168,13 @@ export const builderConfig = {
       ],
     },
     {
-      name: 'DateSpot Features',
+      name: 'VybePulse Features',
       component: 'FeaturesSection',
       inputs: [
         {
           name: 'title',
           type: 'text',
-          defaultValue: 'Why Choose DateSpot?',
+          defaultValue: 'Why Choose VybePulse?',
         },
         {
           name: 'features',
@@ -219,21 +219,21 @@ export function initBuilderIntegration(apiKey: string) {
     // Uncomment when @builder.io/react is installed:
     // import('@builder.io/react').then(({ Builder }) => {
     //   Builder.init(apiKey);
-    //   console.log('Builder.io initialized with DateSpot design system');
+    //   console.log('Builder.io initialized with VybePulse design system');
     // });
   }
 }
 
 // Visual editor integration
 export const builderVisualConfig = {
-  // Custom toolbar for DateSpot components
+  // Custom toolbar for VybePulse components
   toolbar: {
-    datespot: {
-      label: 'DateSpot',
+    vybepulse: {
+      label: 'VybePulse',
       items: [
-        'DateSpot Button',
-        'DateSpot Display',
-        'DateSpot Card',
+        'VybePulse Button',
+        'VybePulse Display',
+        'VybePulse Card',
       ],
     },
   },
