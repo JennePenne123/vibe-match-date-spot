@@ -62,6 +62,8 @@
     --gradient-learning: linear-gradient(135deg, hsl(var(--primary-light)), hsl(var(--secondary-light)));
     --gradient-focus: linear-gradient(135deg, hsl(var(--accent-yellow)), hsl(var(--accent-coral)));
     --gradient-success: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--accent-yellow)));
+    --gradient-venue: linear-gradient(135deg, hsl(var(--card)), hsl(var(--muted)));
+    --gradient-venue-ai: linear-gradient(135deg, hsl(var(--primary-light)), hsl(var(--accent-light)));
     
     /* Chart colors for educational data */
     --chart-1: 200 85% 70%;
@@ -114,6 +116,8 @@
     --gradient-learning: linear-gradient(135deg, hsl(var(--primary-dark)), hsl(var(--secondary-dark)));
     --gradient-focus: linear-gradient(135deg, hsl(var(--accent-yellow)), hsl(var(--accent-coral)));
     --gradient-success: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--accent-yellow)));
+    --gradient-venue: linear-gradient(135deg, hsl(var(--card)), hsl(var(--muted)));
+    --gradient-venue-ai: linear-gradient(135deg, hsl(var(--primary-light)), hsl(var(--accent-light)));
     
     /* Chart colors for dark mode */
     --chart-1: 200 70% 65%;
