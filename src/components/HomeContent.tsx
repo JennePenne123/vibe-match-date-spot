@@ -9,14 +9,17 @@ import RecentReceivedInvitationsCard from '@/components/home/RecentReceivedInvit
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
-
 import { useToast } from '@/hooks/use-toast';
 const HomeContent: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
-  const { friends } = useFriends();
-  
+  const {
+    toast
+  } = useToast();
+  const {
+    friends
+  } = useFriends();
+
   // State for managing different flows
   const [selectedMode, setSelectedMode] = useState<'solo' | 'collaborative' | null>(null);
   const [showPartnerSelection, setShowPartnerSelection] = useState(false);
@@ -24,23 +27,23 @@ const HomeContent: React.FC = () => {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
   const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
-
   const handleSoloPlanning = () => {
-    navigate('/plan-date', { state: { planningMode: 'solo' } });
+    navigate('/plan-date', {
+      state: {
+        planningMode: 'solo'
+      }
+    });
   };
-
   const handleCollaborativePlanning = () => {
     setSelectedMode('collaborative');
     setShowPartnerSelection(true);
   };
-
   const handlePartnerSelectionContinue = () => {
     if (selectedPartnerId) {
       setShowPartnerSelection(false);
       setShowProposalCreation(true);
     }
   };
-
   const handleProposalSent = () => {
     setShowProposalCreation(false);
     setSelectedMode(null);
@@ -51,85 +54,66 @@ const HomeContent: React.FC = () => {
       duration: 3000
     });
   };
-
   const handleProposalAccepted = (sessionId: string) => {
-    navigate('/plan-date', { 
-      state: { 
+    navigate('/plan-date', {
+      state: {
         sessionId,
         planningMode: 'collaborative',
-        fromProposal: true 
-      } 
+        fromProposal: true
+      }
     });
   };
-
   const handleBackToModeSelection = () => {
     setSelectedMode(null);
     setShowPartnerSelection(false);
     setShowProposalCreation(false);
     setSelectedPartnerId('');
   };
-  
   const hasFriends = friends.length > 0;
 
   // Show success toast when returning from successful invitation sending
   useEffect(() => {
     if (location.state?.toastData) {
-      const { title, description, duration } = location.state.toastData;
+      const {
+        title,
+        description,
+        duration
+      } = location.state.toastData;
       toast({
         title,
         description,
         duration
       });
       // Clear the state to prevent showing the toast again
-      navigate('/home', { replace: true, state: {} });
+      navigate('/home', {
+        replace: true,
+        state: {}
+      });
     }
   }, [location.state, toast, navigate]);
 
   // Show proposal creation flow
   if (showProposalCreation && selectedPartnerId) {
     const selectedFriend = friends.find(f => f.id === selectedPartnerId);
-    return (
-      <main className="p-6">
+    return <main className="p-6">
         <div className="max-w-md mx-auto space-y-6">
-          <DateProposalCreation
-            recipientId={selectedPartnerId}
-            recipientName={selectedFriend?.name || 'Friend'}
-            onProposalSent={handleProposalSent}
-            onBack={handleBackToModeSelection}
-          />
+          <DateProposalCreation recipientId={selectedPartnerId} recipientName={selectedFriend?.name || 'Friend'} onProposalSent={handleProposalSent} onBack={handleBackToModeSelection} />
         </div>
-      </main>
-    );
+      </main>;
   }
 
   // Show partner selection for collaborative mode
   if (showPartnerSelection) {
-    return (
-      <main className="p-6">
+    return <main className="p-6">
         <div className="max-w-md mx-auto space-y-6">
           <div className="flex justify-start mb-4">
-            <Button variant="outline" onClick={handleBackToModeSelection}>
-              Back to Mode Selection
-            </Button>
+            <Button variant="outline" onClick={handleBackToModeSelection}>Back to the Start</Button>
           </div>
-          <PartnerSelection
-            friends={friends}
-            selectedPartnerId={selectedPartnerId}
-            selectedPartnerIds={selectedPartnerIds}
-            dateMode={dateMode}
-            loading={false}
-            onPartnerChange={setSelectedPartnerId}
-            onPartnerIdsChange={setSelectedPartnerIds}
-            onDateModeChange={setDateMode}
-            onContinue={handlePartnerSelectionContinue}
-          />
+          <PartnerSelection friends={friends} selectedPartnerId={selectedPartnerId} selectedPartnerIds={selectedPartnerIds} dateMode={dateMode} loading={false} onPartnerChange={setSelectedPartnerId} onPartnerIdsChange={setSelectedPartnerIds} onDateModeChange={setDateMode} onContinue={handlePartnerSelectionContinue} />
         </div>
-      </main>
-    );
+      </main>;
   }
-
-  return (
-    <main className="p-6">
+  return <main className="p-6">
       <div className="max-w-md mx-auto space-y-6">
         {/* Date Proposals Section */}
         <DateProposalsList onProposalAccepted={handleProposalAccepted} />
@@ -148,8 +132,7 @@ const HomeContent: React.FC = () => {
           
           <div className="grid grid-cols-1 gap-4">
             {/* Collaborative Planning Card */}
-            <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer"
-                  onClick={handleCollaborativePlanning}>
+            <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
               <CardHeader className="text-center pb-3">
                 <div className="mx-auto mb-2 p-2 rounded-full bg-secondary/10">
                   <Users className="h-6 w-6 text-secondary" />
@@ -168,7 +151,6 @@ const HomeContent: React.FC = () => {
           </div>
         </div>
       </div>
-    </main>
-  );
+    </main>;
 };
 export default HomeContent;
