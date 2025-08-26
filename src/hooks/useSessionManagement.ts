@@ -159,15 +159,16 @@ export const useSessionManagement = () => {
 
   // Update session preferences
   const updateSessionPreferences = useCallback(async (sessionId: string, preferences: DatePreferences) => {
-    if (!user || !currentSession) return;
+    if (!user) {
+      console.error('🚫 SESSION: Cannot update preferences - no user');
+      return;
+    }
 
     setLoading(true);
     try {
       console.log('🔄 SESSION: Updating session preferences for user:', user.id, 'session:', sessionId);
       console.log('📋 SESSION: Preferences being set:', preferences);
-      
-      // Determine which preference completion flag to update
-      const isInitiator = currentSession.initiator_id === user.id;
+      console.log('🔍 SESSION: Current session state:', currentSession?.id);
       
       // First fetch current session to avoid overwriting
       const { data: currentSessionData, error: fetchError } = await supabase
@@ -177,6 +178,9 @@ export const useSessionManagement = () => {
         .single();
 
       if (fetchError) throw fetchError;
+
+      // Determine which preference completion flag to update based on fresh session data
+      const isInitiator = currentSessionData.initiator_id === user.id;
 
       console.log('📊 SESSION: Current session data:', {
         id: currentSessionData.id,
