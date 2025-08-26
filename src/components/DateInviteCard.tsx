@@ -178,8 +178,8 @@ const DateInviteCard = ({
                   </div>
                 </div>
 
-                {/* Quick Actions for pending invitations */}
-                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-1.5 pt-2">
+{/* Quick Actions for pending invitations */}
+                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-1.5 pt-2 pr-1">
                     <Button size="sm" onClick={e => {
                   e.stopPropagation();
                   onAccept(invitation.id);
@@ -190,7 +190,7 @@ const DateInviteCard = ({
                     <Button size="sm" variant="outline" onClick={e => {
                   e.stopPropagation();
                   onDecline(invitation.id);
-                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-2 text-xs h-7 min-w-0">
+                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-2 text-xs h-7 w-8 flex-shrink-0">
                       <X className="w-3 h-3" />
                     </Button>
                   </div>}
