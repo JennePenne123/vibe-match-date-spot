@@ -187,39 +187,10 @@ useEffect(() => {
     }
   ];
 
-  // Load existing preferences
+  // Load partner preferences for compatibility
   useEffect(() => {
-    loadUserPreferences();
     loadPartnerPreferences();
   }, [user?.id, partnerId]);
-
-  const loadUserPreferences = async () => {
-    if (!user?.id) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('user_preferences')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error loading user preferences:', error);
-        return;
-      }
-
-      if (data) {
-        setSelectedCuisines(data.preferred_cuisines || []);
-        setSelectedVibes(data.preferred_vibes || []);
-        setSelectedPriceRange(data.preferred_price_range || []);
-        setSelectedTimePreferences(data.preferred_times || []);
-        setMaxDistance(data.max_distance || 15);
-        setSelectedDietary(data.dietary_restrictions || []);
-      }
-    } catch (error) {
-      console.error('Error loading user preferences:', error);
-    }
-  };
 
   const loadPartnerPreferences = async () => {
     try {
