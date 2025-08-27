@@ -215,21 +215,26 @@ export const useSessionManagement = () => {
 
       console.log('🎯 SESSION: Preferences updated successfully');
 
-      // Update local state with new preference data
-      setCurrentSession(prev => prev ? { 
-        ...prev, 
-        updated_at: new Date().toISOString(),
-        ...(isInitiator 
-          ? { 
-              initiator_preferences: preferences,
-              initiator_preferences_complete: true 
-            } 
-          : { 
-              partner_preferences: preferences,
-              partner_preferences_complete: true 
-            }
-        )
-      } : null);
+      // Fetch the updated session to get the latest both_preferences_complete flag
+      const { data: updatedSession, error: fetchUpdatedError } = await supabase
+        .from('date_planning_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (fetchUpdatedError) throw fetchUpdatedError;
+
+      console.log('📊 SESSION: Updated session data after preferences update:', {
+        id: updatedSession.id,
+        initiator_complete: updatedSession.initiator_preferences_complete,
+        partner_complete: updatedSession.partner_preferences_complete,
+        both_complete: updatedSession.both_preferences_complete,
+        hasInitiatorPrefs: !!updatedSession.initiator_preferences,
+        hasPartnerPrefs: !!updatedSession.partner_preferences
+      });
+
+      // Update local state with the fresh session data from database
+      setCurrentSession(updatedSession);
       
     } catch (error) {
       console.error('❌ SESSION: Error updating preferences:', error);
