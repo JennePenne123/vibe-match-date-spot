@@ -7,13 +7,11 @@ import { Heading, Text } from '@/design-system/components';
 
 interface PlanningActionCenterProps {
   onCollaborativePlanning: () => void;
-  onSoloPlanning: () => void;
   hasFriends: boolean;
 }
 
 const PlanningActionCenter: React.FC<PlanningActionCenterProps> = ({
   onCollaborativePlanning,
-  onSoloPlanning,
   hasFriends
 }) => {
   const getTimeBasedSuggestion = () => {

@@ -28,13 +28,6 @@ const HomeContent: React.FC = () => {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
   const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
-  const handleSoloPlanning = () => {
-    navigate('/plan-date', {
-      state: {
-        planningMode: 'solo'
-      }
-    });
-  };
   const handleCollaborativePlanning = () => {
     setSelectedMode('collaborative');
     setShowPartnerSelection(true);
@@ -176,7 +169,6 @@ const HomeContent: React.FC = () => {
         {/* Planning Action Center */}
         <PlanningActionCenter
           onCollaborativePlanning={handleCollaborativePlanning}
-          onSoloPlanning={handleSoloPlanning}
           hasFriends={hasFriends}
         />
       </div>
