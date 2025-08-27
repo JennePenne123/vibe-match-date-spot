@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useFriends } from '@/hooks/useFriends';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useDateProposals } from '@/hooks/useDateProposals';
+import { useInvitations } from '@/hooks/useInvitations';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Users, User } from 'lucide-react';
-import { Heading, Text } from '@/design-system/components';
-import RecentReceivedInvitationsCard from '@/components/home/RecentReceivedInvitationsCard';
-import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
+import HeroSection from '@/components/home/HeroSection';
+import ActivityFeed from '@/components/home/ActivityFeed';
+import StatusDashboard from '@/components/home/StatusDashboard';
+import PlanningActionCenter from '@/components/home/PlanningActionCenter';
 import { useToast } from '@/hooks/use-toast';
 const HomeContent: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    toast
-  } = useToast();
-  const {
-    friends
-  } = useFriends();
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const { friends } = useFriends();
+  const { proposals, getMyProposals, acceptProposal, updateProposalStatus } = useDateProposals();
+  const { invitations, acceptInvitation, declineInvitation } = useInvitations();
 
   // State for managing different flows
   const [selectedMode, setSelectedMode] = useState<'solo' | 'collaborative' | null>(null);
@@ -71,26 +72,51 @@ const HomeContent: React.FC = () => {
   };
   const hasFriends = friends.length > 0;
 
+  // Load data on mount
+  useEffect(() => {
+    getMyProposals();
+  }, []);
+
   // Show success toast when returning from successful invitation sending
   useEffect(() => {
     if (location.state?.toastData) {
-      const {
-        title,
-        description,
-        duration
-      } = location.state.toastData;
-      toast({
-        title,
-        description,
-        duration
-      });
-      // Clear the state to prevent showing the toast again
-      navigate('/home', {
-        replace: true,
-        state: {}
-      });
+      const { title, description, duration } = location.state.toastData;
+      toast({ title, description, duration });
+      navigate('/home', { replace: true, state: {} });
     }
   }, [location.state, toast, navigate]);
+
+  // Calculate stats for dashboard
+  const pendingProposals = proposals.filter(p => p.status === 'pending').length;
+  const receivedInvitations = invitations?.filter(inv => 'direction' in inv && inv.direction === 'received') || [];
+  const pendingInvitations = receivedInvitations.filter(inv => inv.status === 'pending').length;
+  const acceptedCount = [...proposals, ...receivedInvitations].filter(item => item.status === 'accepted').length;
+  const totalPending = pendingProposals + pendingInvitations;
+
+  // Handle actions
+  const handleProposalAction = async (proposalId: string, action: 'accept' | 'decline') => {
+    if (action === 'accept') {
+      const sessionId = await acceptProposal(proposalId);
+      if (sessionId) {
+        handleProposalAccepted(sessionId);
+      }
+    } else {
+      await updateProposalStatus(proposalId, 'declined');
+      getMyProposals(); // Refresh
+    }
+  };
+
+  const handleInvitationAction = async (invitationId: string, action: 'accept' | 'decline') => {
+    if (action === 'accept') {
+      await acceptInvitation(invitationId);
+    } else {
+      await declineInvitation(invitationId);
+    }
+  };
+
+  const handleViewAllActivity = () => {
+    navigate('/invitations');
+  };
 
   // Show proposal creation flow
   if (showProposalCreation && selectedPartnerId) {
@@ -113,44 +139,48 @@ const HomeContent: React.FC = () => {
         </div>
       </main>;
   }
-  return <main className="p-6">
+  if (!user) return null;
+
+  const firstName = user.name?.split(' ')[0] || user.email?.split('@')[0] || 'there';
+
+  return (
+    <main className="p-6">
       <div className="max-w-md mx-auto space-y-6">
-        {/* Date Proposals Section */}
-        <DateProposalsList onProposalAccepted={handleProposalAccepted} />
+        {/* Hero Section with personalized greeting */}
+        <HeroSection 
+          user={user}
+          firstName={firstName}
+          pendingProposals={pendingProposals}
+          pendingInvitations={pendingInvitations}
+        />
         
-        {/* Recent Invitations */}
-        <RecentReceivedInvitationsCard />
+        {/* Status Dashboard */}
+        {(proposals.length > 0 || receivedInvitations.length > 0) && (
+          <StatusDashboard
+            totalProposals={proposals.length}
+            totalInvitations={receivedInvitations.length}
+            acceptedCount={acceptedCount}
+            pendingCount={totalPending}
+          />
+        )}
         
-        {/* Planning Mode Selection */}
-        <div className="space-y-4">
-          <div className="text-center">
-            <Heading size="h1" className="mb-2">Plan a New Date</Heading>
-            <Text size="sm" className="text-muted-foreground">
-              Choose how you'd like to plan your date
-            </Text>
-          </div>
-          
-          <div className="grid grid-cols-1 gap-4">
-            {/* Collaborative Planning Card */}
-            <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
-              <CardHeader className="text-center pb-3">
-                <div className="mx-auto mb-2 p-2 rounded-full bg-secondary/10">
-                  <Users className="h-6 w-6 text-secondary" />
-                </div>
-                <CardTitle className="text-lg">Collaborative Planning</CardTitle>
-                <CardDescription className="text-sm">
-                  Send a proposal and plan together
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <Button className="w-full" variant="default">
-                  Send Date Proposal
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+        {/* Activity Feed */}
+        <ActivityFeed
+          proposals={proposals}
+          invitations={receivedInvitations as any}
+          onProposalAction={handleProposalAction}
+          onInvitationAction={handleInvitationAction}
+          onViewAll={handleViewAllActivity}
+        />
+        
+        {/* Planning Action Center */}
+        <PlanningActionCenter
+          onCollaborativePlanning={handleCollaborativePlanning}
+          onSoloPlanning={handleSoloPlanning}
+          hasFriends={hasFriends}
+        />
       </div>
-    </main>;
+    </main>
+  );
 };
 export default HomeContent;
