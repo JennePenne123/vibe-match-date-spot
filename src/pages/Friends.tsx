@@ -195,7 +195,7 @@ const Friends = () => {
                 <div className="text-center py-8">
                   <div className="text-4xl mb-4">👥</div>
                   <h3 className="text-gray-900 font-semibold mb-2">No friends found</h3>
-                  <p className="text-gray-600">Invite your friends to join DateSpot!</p>
+                  <p className="text-gray-600">Invite your friends to join VybePulse!</p>
                 </div>
 
                 {/* Referral Link Section */}
@@ -204,7 +204,7 @@ const Friends = () => {
                     <div className="bg-datespot-light-pink rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                       <Share2 className="w-8 h-8 text-datespot-pink" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Invite Friends to DateSpot</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Invite Friends to VybePulse</h3>
                     <p className="text-sm text-gray-600">Share your referral link and discover amazing dates together</p>
                   </div>
 
