@@ -48,7 +48,7 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
         </Button>
         <Button
           onClick={() => navigate('/home')}
-          className="w-full bg-gradient-primary text-white hover:opacity-90"
+          className="w-full bg-datespot-gradient text-white hover:opacity-90"
         >
           Find New Date Spots
         </Button>

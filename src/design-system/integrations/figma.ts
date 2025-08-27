@@ -79,7 +79,7 @@ export function exportTokensForFigma() {
   const dataStr = JSON.stringify(figmaTokens, null, 2);
   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
   
-  const exportFileDefaultName = 'vybepulse-design-tokens.json';
+  const exportFileDefaultName = 'datespot-design-tokens.json';
   
   const linkElement = document.createElement('a');
   linkElement.setAttribute('href', dataUri);

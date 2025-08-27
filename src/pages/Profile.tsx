@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Zap, MapPin } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import ProfileHeader from '@/components/ProfileHeader';
 import ProfileStats from '@/components/ProfileStats';
 import ProfileActions from '@/components/ProfileActions';
@@ -87,30 +87,9 @@ const Profile = () => {
         />
 
         {/* Content */}
-        <div className="p-4 -mt-8 space-y-6">
+        <div className="p-4 -mt-8">
           {/* Stats */}
           <ProfileStats />
-
-          {/* AI Preferences Section */}
-          <div className="bg-white rounded-xl p-4 shadow-sm border">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-full bg-secondary/10">
-                <Zap className="h-5 w-5 text-secondary" />
-              </div>
-              <div>
-                <h3 className="font-semibold">AI Date Preferences</h3>
-                <p className="text-sm text-muted-foreground">Set your general preferences for AI recommendations</p>
-              </div>
-            </div>
-            <Button 
-              variant="secondary" 
-              className="w-full"
-              onClick={() => navigate('/preferences')}
-            >
-              <MapPin className="h-4 w-4 mr-2" />
-              Configure AI Preferences
-            </Button>
-          </div>
 
           {/* Actions */}
           <ProfileActions onLogout={logout} />

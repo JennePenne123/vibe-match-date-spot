@@ -48,9 +48,9 @@ const ProfileHeader = ({
 
       {/* Profile Header */}
       <div className="text-center">
-        <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary/20">
+        <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-datespot-light-pink">
           <AvatarImage src={user.profile?.avatar_url} alt={displayName} />
-          <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+          <AvatarFallback className="bg-datespot-light-pink text-datespot-dark-pink text-2xl">
             {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
           </AvatarFallback>
         </Avatar>
@@ -73,7 +73,7 @@ const ProfileHeader = ({
             <div className="flex gap-2 justify-center">
               <Button
                 onClick={onSave}
-                className="bg-gradient-primary text-white hover:opacity-90"
+                className="bg-datespot-gradient text-white hover:opacity-90"
               >
                 <Save className="w-4 h-4 mr-2" />
                 Save
