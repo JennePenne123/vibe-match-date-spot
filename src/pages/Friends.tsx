@@ -87,8 +87,8 @@ const Friends = () => {
 
   const shareViaEmail = () => {
     const link = generateReferralLink();
-    const subject = "Join me on DateSpot - Find Amazing Date Ideas!";
-    const body = `Hey! I've been using DateSpot to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
+    const subject = "Join me on VybePulse - Find Amazing Date Ideas!";
+    const body = `Hey! I've been using VybePulse to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 
