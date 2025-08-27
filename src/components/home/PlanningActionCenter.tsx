@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Sparkles, Zap, Clock, MapPin } from 'lucide-react';
+import { Users, Sparkles, Clock } from 'lucide-react';
 import { Heading, Text } from '@/design-system/components';
 
 interface PlanningActionCenterProps {
@@ -43,79 +43,45 @@ const PlanningActionCenter: React.FC<PlanningActionCenterProps> = ({
         </div>
       </div>
 
-      {/* Action Cards */}
-      <div className="grid grid-cols-1 gap-3">
-        {/* Collaborative Planning */}
-        <Card 
-          className="border-border hover:border-primary/50 transition-all duration-200 cursor-pointer hover:shadow-md" 
-          onClick={hasFriends ? onCollaborativePlanning : undefined}
-        >
-          <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Users className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">Plan Together</CardTitle>
-                  <Text size="sm" className="text-muted-foreground">
-                    Send proposal & collaborate
-                  </Text>
-                </div>
+      {/* Collaborative Planning Card */}
+      <Card 
+        className="border-border hover:border-primary/50 transition-all duration-200 cursor-pointer hover:shadow-md" 
+        onClick={hasFriends ? onCollaborativePlanning : undefined}
+      >
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-primary/10">
+                <Users className="h-5 w-5 text-primary" />
               </div>
-              <Badge variant="outline" className="text-xs">
-                <Clock className="h-2 w-2 mr-1" />
-                Most Fun
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <Button 
-              className="w-full" 
-              disabled={!hasFriends}
-              onClick={hasFriends ? onCollaborativePlanning : undefined}
-            >
-              {hasFriends ? 'Send Date Proposal' : 'Add Friends First'}
-            </Button>
-            {!hasFriends && (
-              <Text size="xs" className="text-muted-foreground text-center mt-2">
-                You need friends to send proposals
-              </Text>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Solo Planning */}
-        <Card 
-          className="border-border hover:border-secondary/50 transition-all duration-200 cursor-pointer hover:shadow-md"
-          onClick={onSoloPlanning}
-        >
-          <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-secondary/10">
-                  <Zap className="h-5 w-5 text-secondary" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">AI-Powered Planning</CardTitle>
-                  <Text size="sm" className="text-muted-foreground">
-                    Quick, smart recommendations
-                  </Text>
-                </div>
+              <div>
+                <CardTitle className="text-base">Plan Together</CardTitle>
+                <Text size="sm" className="text-muted-foreground">
+                  Send proposal & collaborate
+                </Text>
               </div>
-              <Badge variant="secondary" className="text-xs">
-                <MapPin className="h-2 w-2 mr-1" />
-                Instant
-              </Badge>
             </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <Button variant="secondary" className="w-full" onClick={onSoloPlanning}>
-              Plan with AI
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+            <Badge variant="outline" className="text-xs">
+              <Clock className="h-2 w-2 mr-1" />
+              Most Fun
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <Button 
+            className="w-full" 
+            disabled={!hasFriends}
+            onClick={hasFriends ? onCollaborativePlanning : undefined}
+          >
+            {hasFriends ? 'Send Date Proposal' : 'Add Friends First'}
+          </Button>
+          {!hasFriends && (
+            <Text size="xs" className="text-muted-foreground text-center mt-2">
+              You need friends to send proposals
+            </Text>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Quick Tips */}
       <div className="p-3 rounded-lg bg-muted/30 border">
