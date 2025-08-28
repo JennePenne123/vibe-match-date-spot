@@ -7,7 +7,7 @@ export const createDiverseTestUsers = async () => {
     
     const testUsers = [
       {
-        id: '11111111-1111-1111-1111-111111111111',
+        id: '11111111-2222-3333-4444-555555555551',
         email: 'romantic@example.com',
         name: 'Romantic Rose',
         preferences: {
@@ -20,7 +20,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: '22222222-2222-2222-2222-222222222222',
+        id: '11111111-2222-3333-4444-555555555552',
         email: 'casual@example.com',
         name: 'Casual Casey',
         preferences: {
@@ -33,7 +33,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: '33333333-3333-3333-3333-333333333333',
+        id: '11111111-2222-3333-4444-555555555553',
         email: 'trendy@example.com',
         name: 'Trendy Taylor',
         preferences: {
@@ -46,7 +46,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: '44444444-4444-4444-4444-444444444444',
+        id: '11111111-2222-3333-4444-555555555554',
         email: 'healthy@example.com',
         name: 'Healthy Hannah',
         preferences: {
@@ -59,7 +59,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: '55555555-5555-5555-5555-555555555555',
+        id: '11111111-2222-3333-4444-555555555555',
         email: 'luxury@example.com',
         name: 'Luxury Louis',
         preferences: {
@@ -72,7 +72,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: '66666666-6666-6666-6666-666666666666',
+        id: '11111111-2222-3333-4444-555555555556',
         email: 'adventure@example.com',
         name: 'Adventure Alex',
         preferences: {
@@ -88,6 +88,8 @@ export const createDiverseTestUsers = async () => {
 
     // Create profiles and preferences for each test user
     for (const user of testUsers) {
+      console.log(`Creating test user: ${user.name}...`);
+      
       // Create profile
       const { error: profileError } = await supabase
         .from('profiles')
@@ -133,11 +135,11 @@ export const createDiverseTestUsers = async () => {
 // Get test user information for collaborative testing
 export const getTestUserInfo = () => {
   return [
-    { id: '11111111-1111-1111-1111-111111111111', name: 'Romantic Rose', type: 'Romantic dates, Italian/French cuisine' },
-    { id: '22222222-2222-2222-2222-222222222222', name: 'Casual Casey', type: 'Casual dining, American/Mexican food' },
-    { id: '33333333-3333-3333-3333-333333333333', name: 'Trendy Taylor', type: 'Trendy spots, Asian cuisine' },
-    { id: '44444444-4444-4444-4444-444444444444', name: 'Healthy Hannah', type: 'Healthy eating, vegetarian/vegan' },
-    { id: '55555555-5555-5555-5555-555555555555', name: 'Luxury Louis', type: 'High-end dining, steakhouses' },
-    { id: '66666666-6666-6666-6666-666666666666', name: 'Adventure Alex', type: 'Adventurous flavors, spicy food' }
+    { id: '11111111-2222-3333-4444-555555555551', name: 'Romantic Rose', type: 'Romantic dates, Italian/French cuisine' },
+    { id: '11111111-2222-3333-4444-555555555552', name: 'Casual Casey', type: 'Casual dining, American/Mexican food' },
+    { id: '11111111-2222-3333-4444-555555555553', name: 'Trendy Taylor', type: 'Trendy spots, Asian cuisine' },
+    { id: '11111111-2222-3333-4444-555555555554', name: 'Healthy Hannah', type: 'Healthy eating, vegetarian/vegan' },
+    { id: '11111111-2222-3333-4444-555555555555', name: 'Luxury Louis', type: 'High-end dining, steakhouses' },
+    { id: '11111111-2222-3333-4444-555555555556', name: 'Adventure Alex', type: 'Adventurous flavors, spicy food' }
   ];
 };

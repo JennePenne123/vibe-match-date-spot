@@ -8,10 +8,12 @@ import { createEnhancedTestVenues } from '@/services/testData/enhancedVenueServi
 import { createDiverseTestUsers, getTestUserInfo } from '@/services/testData/userPreferencesSetup';
 import { getAIVenueRecommendations } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { RefreshCw, Database, Users, User, Heart, TestTube } from 'lucide-react';
 
 export const VenueMatchingDebug: React.FC = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [testMode, setTestMode] = useState<'solo' | 'collaborative'>('solo');
@@ -23,22 +25,33 @@ export const VenueMatchingDebug: React.FC = () => {
     setLoading(true);
     setSetupComplete(false);
     try {
-      console.log('🧪 Starting comprehensive test data setup...');
+      console.log('🚀 Setting up comprehensive test data...');
       
-      // Create diverse test users
-      console.log('📝 Creating test users with diverse preferences...');
-      await createDiverseTestUsers();
-      console.log('✅ Test users created successfully');
+      // Create diverse test users with different preferences
+      console.log('📝 Creating test users...');
+      const users = await createDiverseTestUsers();
+      console.log(`✅ Created ${users.length} test users`);
       
-      // Create enhanced venue dataset  
-      console.log('🏪 Creating enhanced venue dataset...');
+      // Create enhanced venue dataset
+      console.log('🏪 Creating test venues...');
       await createEnhancedTestVenues();
-      console.log('✅ Test venues created successfully');
+      console.log('✅ Created comprehensive venue database');
       
       setSetupComplete(true);
-      console.log('🎉 Test data setup complete - ready for testing!');
+      
+      toast({
+        title: "Test Environment Ready",
+        description: `Created ${users.length} diverse users and 25+ test venues for comprehensive testing`,
+      });
+      
     } catch (error) {
       console.error('❌ Setup failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast({
+        title: "Setup Failed", 
+        description: `Failed to setup test environment: ${errorMessage}`,
+        variant: "destructive",
+      });
       setSetupComplete(false);
     } finally {
       setLoading(false);
@@ -46,16 +59,46 @@ export const VenueMatchingDebug: React.FC = () => {
   };
 
   const handleTestMatching = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You need to be logged in to test venue matching",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (testMode === 'collaborative' && !testPartner) {
+      toast({
+        title: "Partner Required",
+        description: "Please select a test partner for collaborative matching",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setLoading(true);
     try {
       const partnerId = testMode === 'collaborative' ? testPartner : undefined;
+      console.log(`🔍 Testing ${testMode} venue matching...`);
+      
       const recs = await getAIVenueRecommendations(user.id, partnerId, 10);
       setRecommendations(recs);
+      
+      toast({
+        title: "Matching Complete",
+        description: `Found ${recs.length} venue recommendations for ${testMode} mode`,
+      });
+      
       console.log('✅ Venue matching test completed');
     } catch (error) {
       console.error('❌ Error testing matching:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast({
+        title: "Matching Failed",
+        description: `Failed to generate recommendations: ${errorMessage}`,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

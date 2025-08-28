@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const createEnhancedTestVenues = async () => {
   try {
-    console.log('Creating enhanced test venue dataset (50+ venues)...');
+    console.log('Creating enhanced test venue dataset (25+ venues)...');
     
     // Hamburg coordinates for location-based testing
     const hamburgLat = 53.5511;
@@ -203,34 +203,6 @@ export const createEnhancedTestVenues = async () => {
         is_active: true
       },
 
-      // GERMAN CUISINE ($$ - $$$)
-      {
-        id: 'german-01',
-        name: 'Hamburger Ratskeller',
-        address: 'Große Johannisstraße 2, 20457 Hamburg',
-        cuisine_type: 'German',
-        price_range: '$$$',
-        rating: 4.5,
-        tags: ['traditional', 'historic', 'beer', 'authentic'],
-        description: 'Traditional German cuisine in historic setting',
-        latitude: hamburgLat + 0.001,
-        longitude: hamburgLng + 0.003,
-        is_active: true
-      },
-      {
-        id: 'german-02',
-        name: 'Brauhaus Zum Löwen',
-        address: 'Neuer Wall 13, 20354 Hamburg',
-        cuisine_type: 'German',
-        price_range: '$$',
-        rating: 4.2,
-        tags: ['casual', 'beer', 'traditional', 'hearty'],
-        description: 'Local brewery with hearty German fare',
-        latitude: hamburgLat - 0.001,
-        longitude: hamburgLng - 0.001,
-        is_active: true
-      },
-
       // THAI CUISINE ($$ - $$$)
       {
         id: 'thai-01',
@@ -287,34 +259,6 @@ export const createEnhancedTestVenues = async () => {
         is_active: true
       },
 
-      // CAFÉS AND BAKERIES ($ - $$)
-      {
-        id: 'cafe-01',
-        name: 'Coffee & Stories',
-        address: 'Isestraße 67, 20144 Hamburg',
-        cuisine_type: 'Cafe',
-        price_range: '$',
-        rating: 4.3,
-        tags: ['casual', 'cozy', 'coffee', 'relaxed'],
-        description: 'Cozy café perfect for casual coffee dates',
-        latitude: hamburgLat + 0.003,
-        longitude: hamburgLng + 0.003,
-        is_active: true
-      },
-      {
-        id: 'cafe-02',
-        name: 'The Breakfast Club',
-        address: 'Schanzenviertel 44, 20357 Hamburg',
-        cuisine_type: 'Cafe',
-        price_range: '$$',
-        rating: 4.4,
-        tags: ['breakfast', 'brunch', 'casual', 'friendly'],
-        description: 'All-day breakfast and brunch spot',
-        latitude: hamburgLat - 0.001,
-        longitude: hamburgLng - 0.004,
-        is_active: true
-      },
-
       // INDIAN CUISINE ($$ - $$$)
       {
         id: 'indian-01',
@@ -340,34 +284,6 @@ export const createEnhancedTestVenues = async () => {
         description: 'Upscale Indian dining experience',
         latitude: hamburgLat - 0.002,
         longitude: hamburgLng + 0.001,
-        is_active: true
-      },
-
-      // MEDITERRANEAN ($$ - $$$)
-      {
-        id: 'mediterranean-01',
-        name: 'Olive Branch',
-        address: 'Mittelweg 122, 20148 Hamburg',
-        cuisine_type: 'Mediterranean',
-        price_range: '$$',
-        rating: 4.4,
-        tags: ['healthy', 'fresh', 'olive-oil', 'casual'],
-        description: 'Fresh Mediterranean flavors and ingredients',
-        latitude: hamburgLat + 0.002,
-        longitude: hamburgLng + 0.002,
-        is_active: true
-      },
-      {
-        id: 'mediterranean-02',
-        name: 'Santorini Dreams',
-        address: 'Palmaille 67, 22767 Hamburg',
-        cuisine_type: 'Greek',
-        price_range: '$$$',
-        rating: 4.7,
-        tags: ['romantic', 'mediterranean', 'wine', 'intimate'],
-        description: 'Greek island atmosphere with romantic setting',
-        latitude: hamburgLat - 0.003,
-        longitude: hamburgLng - 0.001,
         is_active: true
       },
 
@@ -428,6 +344,8 @@ export const createEnhancedTestVenues = async () => {
       }
     ];
 
+    console.log(`Preparing to create ${venues.length} test venues...`);
+    
     // Use security definer function to create venues (bypasses RLS)
     const { error } = await supabase.rpc('create_test_venues', {
       venues_data: venues
