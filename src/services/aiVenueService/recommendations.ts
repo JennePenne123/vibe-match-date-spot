@@ -43,15 +43,15 @@ export const getAIVenueRecommendations = async (
   try {
     console.log('🎯 RECOMMENDATIONS: Starting DATABASE-ONLY mode for user:', userId, 'partner:', partnerId);
 
-    // Skip Google Places API entirely - use database venues only
-    console.log('🗄️ RECOMMENDATIONS: Getting venues from database (Google Places API disabled)');
-    let venues = await getActiveVenues(50);
+    // DATABASE-ONLY MODE: Skip all location validation and Google Places API
+    console.log('🗄️ RECOMMENDATIONS: Getting venues from database (location validation disabled)');
+    let venues = await getActiveVenues(100); // Get more venues for better testing
     console.log('🗄️ RECOMMENDATIONS: Database returned:', venues?.length || 0, 'venues');
 
-    // If no database venues, throw error suggesting venue creation
+    // If no database venues, suggest creating them
     if (!venues || venues.length === 0) {
       console.error('❌ RECOMMENDATIONS: No venues in database!');
-      throw new Error('No venues available. Please contact support to populate venue database.');
+      throw new Error('No venues in database. Please use the debug tools to create test venues first.');
     }
 
     // Filter venues by preferences (collaborative if partner exists)
