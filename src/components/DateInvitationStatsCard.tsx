@@ -42,7 +42,7 @@ const DateInvitationStatsCard: React.FC = () => {
   };
 
   const handlePlanDate = () => {
-    navigate('/plan-date');
+    navigate('/home'); // Redirect to home for collaborative planning
   };
 
   if (loading) {

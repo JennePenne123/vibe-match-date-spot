@@ -21,22 +21,13 @@ const HomeContent: React.FC = () => {
     friends
   } = useFriends();
 
-  // State for managing different flows
-  const [selectedMode, setSelectedMode] = useState<'solo' | 'collaborative' | null>(null);
+  // State for managing collaborative planning flow
   const [showPartnerSelection, setShowPartnerSelection] = useState(false);
   const [showProposalCreation, setShowProposalCreation] = useState(false);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
   const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
-  const handleSoloPlanning = () => {
-    navigate('/plan-date', {
-      state: {
-        planningMode: 'solo'
-      }
-    });
-  };
   const handleCollaborativePlanning = () => {
-    setSelectedMode('collaborative');
     setShowPartnerSelection(true);
   };
   const handlePartnerSelectionContinue = () => {
@@ -47,7 +38,6 @@ const HomeContent: React.FC = () => {
   };
   const handleProposalSent = () => {
     setShowProposalCreation(false);
-    setSelectedMode(null);
     setSelectedPartnerId('');
     toast({
       title: "Proposal Sent!",
@@ -65,7 +55,6 @@ const HomeContent: React.FC = () => {
     });
   };
   const handleBackToModeSelection = () => {
-    setSelectedMode(null);
     setShowPartnerSelection(false);
     setShowProposalCreation(false);
     setSelectedPartnerId('');

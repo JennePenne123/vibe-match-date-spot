@@ -28,8 +28,7 @@ interface SmartDatePlannerProps {
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }) => {
   const location = useLocation();
   
-  // Get planning mode and session from navigation state
-  const planningMode = location.state?.planningMode || 'solo';
+  // Get session ID from navigation state (collaborative mode only)
   const sessionId = location.state?.sessionId;
   const fromProposal = location.state?.fromProposal;
   
@@ -71,10 +70,10 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   
   const state = useSmartDatePlannerState({ 
     preselectedFriend: effectivePreselectedFriend,
-    planningMode: planningMode as 'solo' | 'collaborative'
+    planningMode: 'collaborative' // Force collaborative mode only
   });
   
-console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'planningMode:', planningMode, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
+console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
   const handlers = createSmartDatePlannerHandlers(state);
 
   // Prefill proposed date/time from linked proposal when coming from a proposal
@@ -171,8 +170,8 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
         {/* Header */}
         {(() => {
           const progressValue = getStepProgress();
-          console.log('🔍 SmartDatePlanner progress value:', progressValue, 'currentStep:', currentStep, 'planningMode:', planningMode);
-          return <PlanningHeader progress={progressValue} planningMode={planningMode as 'solo' | 'collaborative'} />;
+          console.log('🔍 SmartDatePlanner progress value:', progressValue, 'currentStep:', currentStep);
+          return <PlanningHeader progress={progressValue} planningMode={'collaborative'} />;
         })()}
 
         {/* Location Display */}
@@ -197,13 +196,13 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
         </div>
 
         {/* Step 1: Select Partner - Skip for collaborative mode with preselected friend */}
-        {currentStep === 'select-partner' && !(planningMode === 'collaborative' && effectivePreselectedFriend) && (
+        {currentStep === 'select-partner' && !effectivePreselectedFriend && (
           <div className="animate-fade-in">
             <PartnerSelection
               friends={friends}
               selectedPartnerId={selectedPartnerId}
               selectedPartnerIds={selectedPartnerIds}
-              dateMode={planningMode === 'collaborative' ? 'single' : dateMode}
+              dateMode={'single'} // Always single for collaborative mode
               loading={loading}
               onPartnerChange={setSelectedPartnerId}
               onPartnerIdsChange={setSelectedPartnerIds}
@@ -214,9 +213,9 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
         )}
 
         {/* Step 2: Set Preferences - Show for collaborative mode with preselected friend OR normal flow */}
-        {(currentStep === 'set-preferences' || (planningMode === 'collaborative' && effectivePreselectedFriend)) && (
+        {(currentStep === 'set-preferences' || effectivePreselectedFriend) && (
           // For collaborative sessions from proposals, show preferences if we have partner info
-          (planningMode === 'collaborative' && effectivePreselectedFriend) || 
+          effectivePreselectedFriend || 
           // For other cases, require both session and partner
           (currentSession && selectedPartner)
         ) && (
@@ -229,7 +228,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
               aiAnalyzing={aiAnalyzing}
               onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
               initialProposedDate={proposalDateISO}
-              planningMode={planningMode}
+              planningMode={'collaborative'}
               collaborativeSession={collaborativeSession ? {
                 hasUserSetPreferences,
                 hasPartnerSetPreferences,
@@ -256,9 +255,9 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                 state.userLocation
               )}
               sessionId={currentSession?.id}
-              isCollaborative={planningMode === 'collaborative'}
+              isCollaborative={true} // Always collaborative mode
               hasPartnerSetPreferences={currentSession?.partner_preferences_complete || false}
-              isWaitingForPartner={planningMode === 'collaborative' && !currentSession?.both_preferences_complete}
+              isWaitingForPartner={!currentSession?.both_preferences_complete}
             />
           </div>
         )}

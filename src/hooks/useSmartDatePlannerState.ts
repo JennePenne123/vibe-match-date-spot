@@ -8,10 +8,10 @@ import { useApp } from '@/contexts/AppContext';
 
 interface UseSmartDatePlannerStateProps {
   preselectedFriend?: { id: string; name: string } | null;
-  planningMode?: 'solo' | 'collaborative';
+  planningMode?: 'collaborative'; // Only collaborative mode supported
 }
 
-export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'solo' }: UseSmartDatePlannerStateProps) => {
+export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'collaborative' }: UseSmartDatePlannerStateProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { appState, requestLocation } = useApp();
@@ -111,29 +111,7 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'so
 
   // Remove automatic step advancement - let user manually proceed with "Continue" button
 
-  // Monitor compatibility score - only auto-advance for solo mode
-  useEffect(() => {
-    if (compatibilityScore !== null && currentStep === 'set-preferences' && planningMode === 'solo') {
-      console.log('SmartDatePlanner - AI analysis complete, advancing to review step (solo mode)');
-      setAiAnalyzing(false);
-      setCurrentStep('review-matches');
-    }
-  }, [compatibilityScore, currentStep, setCurrentStep, planningMode]);
-
-  // Add timeout for AI analysis - only for solo mode
-  useEffect(() => {
-    if (aiAnalyzing && planningMode === 'solo') {
-      const timeoutId = setTimeout(() => {
-        if (currentStep === 'set-preferences' && aiAnalyzing) {
-          console.log('SmartDatePlanner - AI analysis timeout, advancing anyway (solo mode)');
-          setAiAnalyzing(false);
-          setCurrentStep('review-matches');
-        }
-      }, 35000); // 35 second timeout
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [aiAnalyzing, currentStep, setCurrentStep, planningMode]);
+  // Remove automatic step advancement for collaborative mode - user must manually proceed
 
   // Firefox-optimized location request to prevent flickering
   const handleLocationRequest = useCallback(async () => {

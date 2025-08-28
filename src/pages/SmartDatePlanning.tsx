@@ -14,6 +14,14 @@ const SmartDatePlanning: React.FC = () => {
   
   // Get pre-selected friend from navigation state
   const preselectedFriend = location.state?.preselectedFriend || null;
+  
+  // Block solo planning mode - redirect to home if attempted
+  const planningMode = location.state?.planningMode;
+  if (planningMode === 'solo') {
+    console.log('SmartDatePlanning - Solo mode blocked, redirecting to home');
+    window.location.href = '/home';
+    return null;
+  }
 
   console.log('SmartDatePlanning - Auth state:', { user: user?.id, loading });
   console.log('SmartDatePlanning - Preselected friend:', preselectedFriend);

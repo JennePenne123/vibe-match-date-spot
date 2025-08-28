@@ -6,13 +6,13 @@ export type PlanningStep = 'select-partner' | 'set-preferences' | 'review-matche
 
 interface UsePlanningStepsProps {
   preselectedFriend?: { id: string; name: string } | null;
-  planningMode?: 'solo' | 'collaborative';
+  planningMode?: 'collaborative'; // Only collaborative mode supported
 }
 
-export const usePlanningSteps = ({ preselectedFriend, planningMode = 'solo' }: UsePlanningStepsProps) => {
+export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborative' }: UsePlanningStepsProps) => {
   const { friends } = useFriends();
   // For collaborative mode with preselected friend, start at preferences
-  const initialStep = (planningMode === 'collaborative' && preselectedFriend) ? 'set-preferences' : 'select-partner';
+  const initialStep = preselectedFriend ? 'set-preferences' : 'select-partner';
   
   console.log('🔧 Planning Steps - Initialization:', {
     preselectedFriend: preselectedFriend?.name,
@@ -27,7 +27,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'solo' }: U
 
   // Sync currentStep with initialStep changes (for cases when props change after initial render)
   useEffect(() => {
-    const expectedStep = (planningMode === 'collaborative' && preselectedFriend) ? 'set-preferences' : 'select-partner';
+    const expectedStep = preselectedFriend ? 'set-preferences' : 'select-partner';
     
     console.log('🔧 Planning Steps - Sync Effect:', {
       currentStep,
@@ -50,35 +50,14 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'solo' }: U
   }, [planningMode, preselectedFriend, currentStep, selectedPartnerId, hasManuallyNavigated]);
   const hasAutoAdvanced = useRef(false);
 
-  // Auto-advance if friend is pre-selected (only for solo mode)
-  useEffect(() => {
-    console.log('Planning steps - Auto-advance check:', { 
-      preselectedFriend, 
-      friendsLength: friends.length, 
-      hasAutoAdvanced: hasAutoAdvanced.current,
-      hasManuallyNavigated,
-      currentStep,
-      planningMode
-    });
-    
-    // Only auto-advance for solo mode - collaborative should start at preferences
-    if (preselectedFriend && friends.length > 0 && !hasAutoAdvanced.current && !hasManuallyNavigated && currentStep === 'select-partner' && planningMode === 'solo') {
-      const friend = friends.find(f => f.id === preselectedFriend.id);
-      if (friend) {
-        console.log('Planning steps - Auto-advancing for preselected friend (solo mode):', friend.name);
-        setSelectedPartnerId(friend.id);
-        setCurrentStep('set-preferences');
-        hasAutoAdvanced.current = true;
-      }
-    }
-  }, [preselectedFriend, friends, hasManuallyNavigated, currentStep, planningMode]);
+  // Remove auto-advance logic - collaborative mode handles this differently
 
   const getStepProgress = () => {
-    const progress = planningMode === 'collaborative' 
+    // Collaborative mode only: skip partner selection if preselected, so 3 steps: preferences -> review -> invitation
+    const progress = preselectedFriend
       ? (() => {
-          // Collaborative mode: skip partner selection, so 3 steps: preferences -> review -> invitation
           switch (currentStep) {
-            case 'select-partner': return 0; // Should not be shown
+            case 'select-partner': return 0; // Should not be shown with preselected friend
             case 'set-preferences': return 33;
             case 'review-matches': return 66;
             case 'create-invitation': return 100;
@@ -86,7 +65,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'solo' }: U
           }
         })()
       : (() => {
-          // Solo mode: 4 steps: select -> preferences -> review -> invitation
+          // No preselected friend: 4 steps: select -> preferences -> review -> invitation
           switch (currentStep) {
             case 'select-partner': return 25;
             case 'set-preferences': return 50;
