@@ -428,21 +428,14 @@ export const createEnhancedTestVenues = async () => {
       }
     ];
 
-    // Insert venues in batches to avoid potential size limits
-    const batchSize = 10;
-    for (let i = 0; i < venues.length; i += batchSize) {
-      const batch = venues.slice(i, i + batchSize);
-      
-      const { error } = await supabase
-        .from('venues')
-        .upsert(batch, { onConflict: 'id' });
+    // Use security definer function to create venues (bypasses RLS)
+    const { error } = await supabase.rpc('create_test_venues', {
+      venues_data: venues
+    });
 
-      if (error) {
-        console.error(`Error creating venue batch ${i / batchSize + 1}:`, error);
-        throw error;
-      }
-      
-      console.log(`✅ Created venue batch ${i / batchSize + 1}/${Math.ceil(venues.length / batchSize)}`);
+    if (error) {
+      console.error('Error creating test venues:', error);
+      throw error;
     }
 
     console.log(`🎉 Successfully created ${venues.length} enhanced test venues`);

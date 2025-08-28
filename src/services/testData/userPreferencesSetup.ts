@@ -7,7 +7,7 @@ export const createDiverseTestUsers = async () => {
     
     const testUsers = [
       {
-        id: 'test-romantic-user',
+        id: '11111111-1111-1111-1111-111111111111',
         email: 'romantic@example.com',
         name: 'Romantic Rose',
         preferences: {
@@ -20,7 +20,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: 'test-casual-user',
+        id: '22222222-2222-2222-2222-222222222222',
         email: 'casual@example.com',
         name: 'Casual Casey',
         preferences: {
@@ -33,7 +33,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: 'test-trendy-user',
+        id: '33333333-3333-3333-3333-333333333333',
         email: 'trendy@example.com',
         name: 'Trendy Taylor',
         preferences: {
@@ -46,7 +46,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: 'test-healthy-user',
+        id: '44444444-4444-4444-4444-444444444444',
         email: 'healthy@example.com',
         name: 'Healthy Hannah',
         preferences: {
@@ -59,7 +59,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: 'test-luxury-user',
+        id: '55555555-5555-5555-5555-555555555555',
         email: 'luxury@example.com',
         name: 'Luxury Louis',
         preferences: {
@@ -72,7 +72,7 @@ export const createDiverseTestUsers = async () => {
         }
       },
       {
-        id: 'test-adventure-user',
+        id: '66666666-6666-6666-6666-666666666666',
         email: 'adventure@example.com',
         name: 'Adventure Alex',
         preferences: {
@@ -133,11 +133,11 @@ export const createDiverseTestUsers = async () => {
 // Get test user information for collaborative testing
 export const getTestUserInfo = () => {
   return [
-    { id: 'test-romantic-user', name: 'Romantic Rose', type: 'Romantic dates, Italian/French cuisine' },
-    { id: 'test-casual-user', name: 'Casual Casey', type: 'Casual dining, American/Mexican food' },
-    { id: 'test-trendy-user', name: 'Trendy Taylor', type: 'Trendy spots, Asian cuisine' },
-    { id: 'test-healthy-user', name: 'Healthy Hannah', type: 'Healthy eating, vegetarian/vegan' },
-    { id: 'test-luxury-user', name: 'Luxury Louis', type: 'High-end dining, steakhouses' },
-    { id: 'test-adventure-user', name: 'Adventure Alex', type: 'Adventurous flavors, spicy food' }
+    { id: '11111111-1111-1111-1111-111111111111', name: 'Romantic Rose', type: 'Romantic dates, Italian/French cuisine' },
+    { id: '22222222-2222-2222-2222-222222222222', name: 'Casual Casey', type: 'Casual dining, American/Mexican food' },
+    { id: '33333333-3333-3333-3333-333333333333', name: 'Trendy Taylor', type: 'Trendy spots, Asian cuisine' },
+    { id: '44444444-4444-4444-4444-444444444444', name: 'Healthy Hannah', type: 'Healthy eating, vegetarian/vegan' },
+    { id: '55555555-5555-5555-5555-555555555555', name: 'Luxury Louis', type: 'High-end dining, steakhouses' },
+    { id: '66666666-6666-6666-6666-666666666666', name: 'Adventure Alex', type: 'Adventurous flavors, spicy food' }
   ];
 };

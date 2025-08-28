@@ -644,6 +644,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_test_venues: {
+        Args: { venues_data: Json }
+        Returns: boolean
+      }
       reset_user_preferences_to_default: {
         Args: { target_user_id: string }
         Returns: boolean

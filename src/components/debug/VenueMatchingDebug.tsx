@@ -21,21 +21,25 @@ export const VenueMatchingDebug: React.FC = () => {
 
   const handleSetupTestData = async () => {
     setLoading(true);
+    setSetupComplete(false);
     try {
-      console.log('🧪 Setting up comprehensive test data...');
+      console.log('🧪 Starting comprehensive test data setup...');
       
       // Create diverse test users
+      console.log('📝 Creating test users with diverse preferences...');
       await createDiverseTestUsers();
       console.log('✅ Test users created successfully');
       
-      // Create enhanced venues
+      // Create enhanced venue dataset  
+      console.log('🏪 Creating enhanced venue dataset...');
       await createEnhancedTestVenues();
-      console.log('✅ Enhanced venues created successfully');
+      console.log('✅ Test venues created successfully');
       
       setSetupComplete(true);
-      console.log('🎉 Complete test environment ready!');
+      console.log('🎉 Test data setup complete - ready for testing!');
     } catch (error) {
-      console.error('❌ Error setting up test data:', error);
+      console.error('❌ Setup failed:', error);
+      setSetupComplete(false);
     } finally {
       setLoading(false);
     }
