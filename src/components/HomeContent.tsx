@@ -9,6 +9,7 @@ import RecentReceivedInvitationsCard from '@/components/home/RecentReceivedInvit
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
+import { VenueMatchingDebug } from '@/components/debug/VenueMatchingDebug';
 import { useToast } from '@/hooks/use-toast';
 const HomeContent: React.FC = () => {
   const navigate = useNavigate();
@@ -120,6 +121,9 @@ const HomeContent: React.FC = () => {
         
         {/* Recent Invitations */}
         <RecentReceivedInvitationsCard />
+        
+        {/* Debug Tools for Development */}
+        <VenueMatchingDebug />
         
         {/* Planning Mode Selection */}
         <div className="space-y-4">

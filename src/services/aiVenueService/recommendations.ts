@@ -1,6 +1,8 @@
 
 import { calculateVenueAIScore, calculateConfidenceLevel } from './scoring';
 import { getActiveVenues, getStoredAIScore } from './fetching';
+import { filterVenuesByPreferences, filterVenuesByCollaborativePreferences } from './preferenceFiltering';
+import { calculateDistanceFromHamburg } from './helperFunctions';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
 
@@ -39,37 +41,32 @@ export const getAIVenueRecommendations = async (
   userLocation?: { latitude: number; longitude: number; address?: string }
 ): Promise<AIVenueRecommendation[]> => {
   try {
-    console.log('🎯 RECOMMENDATIONS: Starting for user:', userId, 'partner:', partnerId, 'location:', userLocation);
+    console.log('🎯 RECOMMENDATIONS: Starting DATABASE-ONLY mode for user:', userId, 'partner:', partnerId);
 
-    // Validate user location using comprehensive validation
-    const locationValidation = validateLocation(userLocation);
-    if (!locationValidation.isValid) {
-      console.error('❌ RECOMMENDATIONS: Location validation failed:', locationValidation.error);
-      throw new Error(locationValidation.error || 'Invalid user location provided');
+    // Skip Google Places API entirely - use database venues only
+    console.log('🗄️ RECOMMENDATIONS: Getting venues from database (Google Places API disabled)');
+    let venues = await getActiveVenues(50);
+    console.log('🗄️ RECOMMENDATIONS: Database returned:', venues?.length || 0, 'venues');
+
+    // If no database venues, throw error suggesting venue creation
+    if (!venues || venues.length === 0) {
+      console.error('❌ RECOMMENDATIONS: No venues in database!');
+      throw new Error('No venues available. Please contact support to populate venue database.');
     }
 
-    // Only use Google Places API with real user location
-    console.log('🌐 RECOMMENDATIONS: Getting venues from Google Places with real location:', userLocation);
-    let venues = await getVenuesFromGooglePlaces(userId, limit, userLocation);
-    console.log('🌐 RECOMMENDATIONS: Google Places returned:', venues?.length || 0, 'venues');
-    
-    // Only fallback to database venues if Google Places fails (no mock data)
-    if (!venues || venues.length === 0) {
-      console.log('🔄 RECOMMENDATIONS: Google Places failed, trying database venues');
-      venues = await getActiveVenues(50);
-      console.log('🗄️ RECOMMENDATIONS: Database returned:', venues?.length || 0, 'venues');
-    }
-
-    // If still no venues, return empty array with clear error
-    if (!venues || venues.length === 0) {
-      console.error('❌ RECOMMENDATIONS: No venues found! Google Places and database both empty.');
-      throw new Error('No venues found in your area. Please try a different location or check your internet connection.');
+    // Filter venues by preferences (collaborative if partner exists)
+    if (partnerId) {
+      venues = await filterVenuesByCollaborativePreferences(userId, partnerId, venues);
+      console.log('🤝 RECOMMENDATIONS: After collaborative filtering:', venues?.length || 0, 'venues');
+    } else {
+      venues = await filterVenuesByPreferences(userId, venues);
+      console.log('🎯 RECOMMENDATIONS: After preference filtering:', venues?.length || 0, 'venues');
     }
 
     const recommendations: AIVenueRecommendation[] = [];
 
-    // Calculate AI scores for each venue
-    console.log('🧮 RECOMMENDATIONS: Calculating AI scores for', venues.length, 'venues');
+    // Calculate AI scores for each venue using real preference matching
+    console.log('🧮 RECOMMENDATIONS: Calculating REAL AI scores for', venues.length, 'venues');
     for (const venue of venues) {
       console.log(`📊 RECOMMENDATIONS: Scoring venue: ${venue.name} (${venue.cuisine_type || 'unknown cuisine'})`);
       const aiScore = await calculateVenueAIScore(venue.id, userId, partnerId);
@@ -88,7 +85,7 @@ export const getAIVenueRecommendations = async (
         contextual_score: scoreData?.contextual_score || 0,
         ai_reasoning: generateAIReasoning(venue, scoreData?.match_factors, aiScore),
         confidence_level: calculateConfidenceLevel(aiScore, scoreData?.match_factors),
-        distance: userLocation ? calculateDistanceFromUser(venue, userLocation) : undefined,
+        distance: calculateDistanceFromHamburg(venue),
         neighborhood: extractNeighborhood(venue.address || venue.location || venue.vicinity),
         isOpen: determineOpenStatus(venue.opening_hours || venue.openNow),
         operatingHours: formatOperatingHours(venue.opening_hours),
