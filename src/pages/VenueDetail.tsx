@@ -168,7 +168,7 @@ const VenueDetail = () => {
                     href={appVenue.website} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-datespot-pink hover:underline flex items-center gap-1"
+                    className="text-primary hover:underline flex items-center gap-1"
                   >
                     Visit Website
                     <ExternalLink className="w-3 h-3" />
@@ -194,7 +194,7 @@ const VenueDetail = () => {
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            <Button className="w-full h-12 bg-datespot-gradient text-white hover:opacity-90 font-semibold">
+            <Button className="w-full h-12 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold">
               Make Reservation
             </Button>
             <div className="grid grid-cols-2 gap-3">
