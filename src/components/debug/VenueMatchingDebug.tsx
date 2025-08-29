@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,12 +11,14 @@ import { getAIVenueRecommendations } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
-import { RefreshCw, Database, Users, User, Heart, TestTube, MapPin } from 'lucide-react';
+import { RefreshCw, Database, Users, User, Heart, TestTube, MapPin, ExternalLink } from 'lucide-react';
+import { Venue } from '@/types';
 
 export const VenueMatchingDebug: React.FC = () => {
   const { user } = useAuth();
-  const { appState, requestLocation } = useApp();
+  const { appState, requestLocation, updateVenues } = useApp();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [testMode, setTestMode] = useState<'solo' | 'collaborative'>('solo');
@@ -97,6 +100,17 @@ export const VenueMatchingDebug: React.FC = () => {
       const recs = await getAIVenueRecommendations(user.id, partnerId, 10, testLocation);
       setRecommendations(recs);
       
+      // Convert recommendations to venues and store in app context
+      const venues: Venue[] = recs.map(rec => ({
+        id: rec.venue_id,
+        name: rec.venue_name,
+        address: rec.venue_address || '',
+        image_url: rec.venue_image,
+        tags: []
+      }));
+      
+      updateVenues(venues);
+      
       toast({
         title: "Matching Complete",
         description: `Found ${recs.length} venue recommendations for ${testMode} mode`,
@@ -114,6 +128,10 @@ export const VenueMatchingDebug: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleVenueClick = (rec: any) => {
+    navigate(`/venue/${rec.venue_id}`);
   };
 
   return (
@@ -257,10 +275,19 @@ export const VenueMatchingDebug: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               {recommendations.slice(0, 8).map((rec, index) => (
-                <div key={rec.venue_id || index} className="border rounded-lg p-4">
+                <div 
+                  key={rec.venue_id || index} 
+                  className="border rounded-lg p-4 cursor-pointer hover:shadow-md hover:border-primary/20 transition-all duration-200 group"
+                  onClick={() => handleVenueClick(rec)}
+                >
                   <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="font-semibold">{rec.venue_name}</h4>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold group-hover:text-primary transition-colors">
+                          {rec.venue_name}
+                        </h4>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
                       <p className="text-sm text-muted-foreground">{rec.venue_address}</p>
                     </div>
                     <Badge variant="default">{rec.ai_score}% Match</Badge>
@@ -289,6 +316,9 @@ export const VenueMatchingDebug: React.FC = () => {
                         )}
                       </div>
                     )}
+                    <div className="text-primary/60 text-xs font-medium mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Click to view details →
+                    </div>
                   </div>
                 </div>
               ))}

@@ -11,7 +11,7 @@ interface UserLocation {
 interface Venue {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   address: string;
   latitude?: number;
   longitude?: number;
@@ -41,6 +41,7 @@ interface AppContextType {
   updateVibes: (vibes: string[]) => void;
   updateArea: (area: string) => void;
   updateInvitedFriends: (friends: string[]) => void;
+  updateVenues: (venues: Venue[]) => void;
   generateRecommendations: () => Promise<void>;
   resetState: () => void;
   requestLocation: () => Promise<void>;
@@ -76,6 +77,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateInvitedFriends = (friends: string[]) => {
     setAppState(prev => ({ ...prev, invitedFriends: friends }));
+  };
+
+  const updateVenues = (venues: Venue[]) => {
+    setAppState(prev => ({ ...prev, venues }));
   };
 
   const requestLocation = async () => {
@@ -262,6 +267,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateVibes,
       updateArea,
       updateInvitedFriends,
+      updateVenues,
       generateRecommendations,
       resetState,
       requestLocation
