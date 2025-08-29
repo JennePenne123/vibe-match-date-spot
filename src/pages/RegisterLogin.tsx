@@ -21,12 +21,15 @@ const RegisterLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Input validation
-  const { errors, validateField, validateAll, clearErrors } = useInputValidation({
-    name: validationRules.name,
+  // Dynamic validation configuration based on mode
+  const validationConfig = React.useMemo(() => ({
     email: validationRules.email,
-    password: { required: true, minLength: 6, maxLength: 128 }
-  });
+    password: { required: true, minLength: 6, maxLength: 128 },
+    ...(isLogin ? {} : { name: validationRules.name })
+  }), [isLogin]);
+
+  // Input validation
+  const { errors, validateField, validateAll, clearErrors } = useInputValidation(validationConfig);
 
   React.useEffect(() => {
     if (user) {
@@ -205,6 +208,10 @@ const RegisterLogin = () => {
                   setIsLogin(!isLogin);
                   setError('');
                   clearErrors();
+                  // Clear form fields when switching modes to prevent stale data
+                  setName('');
+                  setEmail('');
+                  setPassword('');
                 }}
                 className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
                 disabled={loading}
