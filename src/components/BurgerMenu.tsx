@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { Menu, User, Users, MapPin, LogOut, X, Heart } from 'lucide-react';
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers';
-import VybePulseLogo from '@/components/VybePulseLogo';
 
 const BurgerMenu = () => {
   const navigate = useNavigate();
@@ -76,10 +75,7 @@ const BurgerMenu = () => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-semibold text-gray-900">{displayName}</h2>
-                  <VybePulseLogo size="sm" className="opacity-40" />
-                </div>
+                <h2 className="font-semibold text-gray-900">{displayName}</h2>
                 <p className="text-sm text-gray-600">{user?.email}</p>
               </div>
             </div>

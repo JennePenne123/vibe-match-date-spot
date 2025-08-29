@@ -1,7 +1,6 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import BurgerMenu from '@/components/BurgerMenu';
-import VybePulseLogo from '@/components/VybePulseLogo';
 import { AppUser } from '@/types/app';
 import { getUserAvatar } from '@/utils/typeHelpers';
 import { Heading } from '@/design-system/components';
@@ -34,10 +33,7 @@ const HomeHeader = ({
           <Heading size="h2" className="text-foreground">{getTimeBasedGreeting()} {firstName}! 👋</Heading>
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <VybePulseLogo size="sm" className="opacity-60" />
-        <BurgerMenu />
-      </div>
+      <BurgerMenu />
     </div>;
 };
 export default HomeHeader;

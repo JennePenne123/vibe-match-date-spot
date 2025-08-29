@@ -5,9 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle } from 'lucide-react';
+import { Heart, Sparkles, AlertCircle } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import VybePulseLogo from '@/components/VybePulseLogo';
 import { useInputValidation, validationRules } from '@/hooks/useInputValidation';
 import { sanitizeName, sanitizeEmail } from '@/utils/inputSanitization';
 
@@ -98,9 +97,11 @@ const RegisterLogin = () => {
         {/* Logo and Header */}
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <VybePulseLogo size="xl" className="shadow-lg" />
+            <div className="bg-gradient-to-r from-pink-400 to-rose-500 rounded-full p-4 shadow-lg">
+              <Heart className="w-12 h-12 text-white" fill="currentColor" />
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900">VybePulse</h1>
+          <h1 className="text-4xl font-bold text-gray-900">DateSpot</h1>
           <p className="text-lg text-gray-700">
             Ready to Create Unforgettable Memories?
           </p>
