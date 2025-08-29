@@ -151,7 +151,7 @@ serve(async (req) => {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'DateSpot-App/1.0'
+        'User-Agent': 'VybePulse-App/1.0'
       }
     });
     
