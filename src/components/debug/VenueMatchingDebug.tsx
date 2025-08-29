@@ -8,11 +8,13 @@ import { createEnhancedTestVenues } from '@/services/testData/enhancedVenueServi
 import { createDiverseTestUsers, getTestUserInfo } from '@/services/testData/userPreferencesSetup';
 import { getAIVenueRecommendations } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useApp } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
-import { RefreshCw, Database, Users, User, Heart, TestTube } from 'lucide-react';
+import { RefreshCw, Database, Users, User, Heart, TestTube, MapPin } from 'lucide-react';
 
 export const VenueMatchingDebug: React.FC = () => {
   const { user } = useAuth();
+  const { appState, requestLocation } = useApp();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
@@ -20,6 +22,13 @@ export const VenueMatchingDebug: React.FC = () => {
   const [testPartner, setTestPartner] = useState<string>('');
   const [setupComplete, setSetupComplete] = useState(false);
   const testUsers = getTestUserInfo();
+
+  // Hamburg test location fallback
+  const hamburgLocation = {
+    latitude: 53.5511,
+    longitude: 9.9937,
+    address: 'Hamburg, Germany'
+  };
 
   const handleSetupTestData = async () => {
     setLoading(true);
@@ -77,12 +86,15 @@ export const VenueMatchingDebug: React.FC = () => {
       return;
     }
     
+    // Use app location or fallback to Hamburg for testing
+    const testLocation = appState.userLocation || hamburgLocation;
+    
     setLoading(true);
     try {
       const partnerId = testMode === 'collaborative' ? testPartner : undefined;
       console.log(`🔍 Testing ${testMode} venue matching...`);
       
-      const recs = await getAIVenueRecommendations(user.id, partnerId, 10);
+      const recs = await getAIVenueRecommendations(user.id, partnerId, 10, testLocation);
       setRecommendations(recs);
       
       toast({
@@ -124,6 +136,37 @@ export const VenueMatchingDebug: React.FC = () => {
               <TestTube className="h-4 w-4" />
               {loading ? 'Setting up...' : setupComplete ? 'Test Data Ready ✅' : 'Setup Test Environment'}
             </Button>
+
+            {/* Location Status and Request */}
+            <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-sm font-medium">Location:</span>
+                </div>
+                <Badge variant={appState.userLocation ? "default" : "secondary"}>
+                  {appState.userLocation ? "Available" : "Using Hamburg Test"}
+                </Badge>
+              </div>
+              
+              {appState.userLocation ? (
+                <p className="text-xs text-muted-foreground">
+                  {appState.userLocation.address || `${appState.userLocation.latitude}, ${appState.userLocation.longitude}`}
+                </p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs text-muted-foreground">Using Hamburg, Germany as test location</p>
+                  <Button 
+                    onClick={requestLocation} 
+                    variant="outline" 
+                    size="sm"
+                    className="text-xs"
+                  >
+                    Request Real Location
+                  </Button>
+                </div>
+              )}
+            </div>
 
             <div className="space-y-3">
               <div className="flex gap-2 justify-center">
