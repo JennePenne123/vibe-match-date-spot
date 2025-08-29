@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Heart, MapPin, Users, ArrowRight, ArrowLeft } from 'lucide-react';
+import VybePulseLogo from '@/components/VybePulseLogo';
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const Onboarding = () => {
       icon: Heart,
       title: "Discover Perfect Date Spots",
       description: "Let AI find the ideal romantic locations tailored to your preferences and mood. From cozy cafés to scenic viewpoints.",
-      image: "❤️",
+      showLogo: true,
       gradient: "from-pink-400 to-rose-500"
     },
     {
@@ -71,7 +72,11 @@ const Onboarding = () => {
         <div className="bg-white rounded-3xl shadow-xl p-8 text-center animate-fade-in">
           {/* Icon/Image */}
           <div className={`mx-auto w-32 h-32 rounded-full bg-gradient-to-r ${currentScreenData.gradient} flex items-center justify-center mb-8 shadow-lg`}>
-            <div className="text-6xl">{currentScreenData.image}</div>
+            {currentScreenData.showLogo ? (
+              <VybePulseLogo size="lg" className="brightness-0 invert" />
+            ) : (
+              <div className="text-6xl">{currentScreenData.image}</div>
+            )}
           </div>
 
           {/* Title */}
