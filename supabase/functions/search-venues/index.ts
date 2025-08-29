@@ -1,6 +1,26 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 
+// Rate limiting store (in-memory for this example)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+const checkRateLimit = (identifier: string, limit = 60, windowMs = 60000): boolean => {
+  const now = Date.now();
+  const record = rateLimitStore.get(identifier);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs });
+    return true;
+  }
+  
+  if (record.count >= limit) {
+    return false;
+  }
+  
+  record.count++;
+  return true;
+};
+
 serve(async (req) => {
   console.log('🔍 SEARCH VENUES: ===== FUNCTION START =====');
   console.log('🔍 SEARCH VENUES: Request method:', req.method);
@@ -11,7 +31,24 @@ serve(async (req) => {
   }
 
   try {
-    // 1. Parse Request Body
+    // Rate limiting - use IP or user ID
+    const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const authHeader = req.headers.get('authorization');
+    const identifier = authHeader ? `user-${authHeader.substring(0, 20)}` : `ip-${clientIP}`;
+    
+    if (!checkRateLimit(identifier)) {
+      console.log('🚫 SEARCH VENUES: Rate limit exceeded for', identifier.substring(0, 20));
+      return Response.json({
+        success: false,
+        error: 'Rate limit exceeded. Please try again later.',
+        details: 'Too many requests',
+        venues: []
+      }, { 
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
+    // 1. Parse and validate Request Body
     const requestBody = await req.json();
     console.log('📥 SEARCH VENUES: Request body received:', JSON.stringify(requestBody, null, 2));
 
@@ -25,6 +62,33 @@ serve(async (req) => {
       types = ['restaurant'],
       minRating = 3.0 
     } = requestBody;
+
+    // Input validation and sanitization
+    const validLatitude = parseFloat(latitude);
+    const validLongitude = parseFloat(longitude);
+    const validRadius = Math.min(Math.max(parseInt(radius) || 5000, 1000), 50000); // Limit radius between 1km-50km
+    const validTypes = Array.isArray(types) ? types.slice(0, 5) : ['restaurant']; // Limit to 5 types max
+    const validMinRating = Math.min(Math.max(parseFloat(minRating) || 3.0, 1.0), 5.0);
+    
+    // Validate coordinates
+    if (isNaN(validLatitude) || isNaN(validLongitude) || 
+        validLatitude < -90 || validLatitude > 90 || 
+        validLongitude < -180 || validLongitude > 180) {
+      console.error('❌ SEARCH VENUES: Invalid coordinates:', { latitude: validLatitude, longitude: validLongitude });
+      return Response.json({
+        success: false,
+        error: 'Invalid coordinates provided',
+        details: 'Latitude must be between -90 and 90, longitude between -180 and 180',
+        venues: []
+      }, { 
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Sanitize cuisine inputs
+    const sanitizedCuisines = Array.isArray(originalCuisines) ? 
+      originalCuisines.slice(0, 10).map(c => String(c).replace(/[<>]/g, '').trim().substring(0, 50)) : [];
 
     // 2. Validate API Key
     const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
@@ -47,8 +111,8 @@ serve(async (req) => {
     }
 
     // 3. Validate Location
-    if (!latitude || !longitude || typeof latitude !== 'number' || typeof longitude !== 'number') {
-      console.error('❌ SEARCH VENUES: Invalid location:', { latitude, longitude });
+    if (!validLatitude || !validLongitude || typeof validLatitude !== 'number' || typeof validLongitude !== 'number') {
+      console.error('❌ SEARCH VENUES: Invalid location:', { latitude: validLatitude, longitude: validLongitude });
       return Response.json({
         success: false,
         error: 'Valid latitude and longitude required',
@@ -59,19 +123,19 @@ serve(async (req) => {
       });
     }
 
-    // 4. Build Google Places Request
+    // 4. Build Google Places Request with validated inputs
     const baseUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
     const searchParams = new URLSearchParams({
-      location: `${latitude},${longitude}`,
-      radius: radius.toString(),
+      location: `${validLatitude},${validLongitude}`,
+      radius: validRadius.toString(),
       type: 'restaurant',
       key: apiKey,
       language: 'de'
     });
 
-    // Add cuisine-based keyword search
-    if (originalCuisines && originalCuisines.length > 0) {
-      const keywords = originalCuisines.join(' OR ');
+    // Add cuisine-based keyword search with sanitized inputs
+    if (sanitizedCuisines && sanitizedCuisines.length > 0) {
+      const keywords = sanitizedCuisines.join(' OR ');
       searchParams.append('keyword', keywords);
       console.log('🔍 SEARCH VENUES: Using keyword search:', keywords);
     }
@@ -192,7 +256,7 @@ serve(async (req) => {
             image: place.photos?.[0] ? 
               `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${place.photos[0].photo_reference}&key=${apiKey}` :
               'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
-            cuisineType: determineCuisineType(place, originalCuisines),
+            cuisineType: determineCuisineType(place, sanitizedCuisines),
             tags: place.types || ['restaurant'],
             openNow: place.opening_hours?.open_now,
             phone: null,
@@ -222,13 +286,13 @@ serve(async (req) => {
     return Response.json({
       success: true,
       venues: venues,
-      metadata: {
-        total_found: placesData.results?.length || 0,
-        search_location: `${latitude}, ${longitude}`,
-        search_radius: radius,
-        search_cuisines: originalCuisines,
-        response_time_ms: requestDuration
-      }
+        metadata: {
+          total_found: placesData.results?.length || 0,
+          search_location: `${validLatitude}, ${validLongitude}`,
+          search_radius: validRadius,
+          search_cuisines: sanitizedCuisines,
+          response_time_ms: requestDuration
+        }
     }, { 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -240,14 +304,22 @@ serve(async (req) => {
       name: error.name
     });
     
+    // Don't expose internal error details in production
+    const isDevelopment = Deno.env.get('ENVIRONMENT') === 'development';
+    
     return Response.json({
       success: false,
       error: 'Internal server error',
-      details: error.message,
+      details: isDevelopment ? error.message : 'An unexpected error occurred',
       venues: []
     }, { 
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { 
+        ...corsHeaders, 
+        'Content-Type': 'application/json',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY'
+      }
     });
   }
 });
@@ -267,11 +339,12 @@ function cleanAttribution(attribution: string): string {
 
 function determineCuisineType(place: any, preferredCuisines: string[]): string {
   const types = place.types || [];
-  const name = place.name.toLowerCase();
+  const name = (place.name || '').toLowerCase();
   
   for (const cuisine of preferredCuisines || []) {
-    if (name.includes(cuisine.toLowerCase()) || 
-        types.some(type => type.includes(cuisine.toLowerCase()))) {
+    const sanitizedCuisine = String(cuisine).toLowerCase();
+    if (name.includes(sanitizedCuisine) || 
+        types.some(type => type.includes(sanitizedCuisine))) {
       return cuisine;
     }
   }

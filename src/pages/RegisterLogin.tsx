@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Sparkles, AlertCircle } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useInputValidation, validationRules } from '@/hooks/useInputValidation';
+import { sanitizeName, sanitizeEmail } from '@/utils/inputSanitization';
 
 const RegisterLogin = () => {
   const navigate = useNavigate();
@@ -19,6 +21,13 @@ const RegisterLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Input validation
+  const { errors, validateField, validateAll, clearErrors } = useInputValidation({
+    name: validationRules.name,
+    email: validationRules.email,
+    password: { required: true, minLength: 6, maxLength: 128 }
+  });
+
   React.useEffect(() => {
     if (user) {
       navigate('/home');
@@ -30,21 +39,32 @@ const RegisterLogin = () => {
     setLoading(true);
     setError('');
     
+    // Sanitize inputs
+    const sanitizedEmail = sanitizeEmail(email);
+    const sanitizedName = sanitizeName(name);
+    
+    // Validate inputs
+    const values = { 
+      email: sanitizedEmail, 
+      password,
+      ...(isLogin ? {} : { name: sanitizedName })
+    };
+    
+    if (!validateAll(values)) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       if (isLogin) {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(sanitizedEmail, password);
         if (error) {
           setError(error.message || 'Login failed');
         } else {
           navigate('/home');
         }
       } else {
-        if (!name.trim()) {
-          setError('Name is required');
-          setLoading(false);
-          return;
-        }
-        const { error } = await signUp(email, password, { name });
+        const { error } = await signUp(sanitizedEmail, password, { name: sanitizedName });
         if (error) {
           setError(error.message || 'Signup failed');
         } else {
@@ -102,10 +122,10 @@ const RegisterLogin = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
+              {(error || Object.keys(errors).length > 0) && (
                 <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
                   <AlertCircle className="w-4 h-4" />
-                  {error}
+                  {error || Object.values(errors)[0]}
                 </div>
               )}
               
@@ -115,11 +135,18 @@ const RegisterLogin = () => {
                     type="text"
                     placeholder="Full Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      validateField('name', e.target.value);
+                    }}
                     required
-                    className="h-12"
+                    className={`h-12 ${errors.name ? 'border-red-300' : ''}`}
                     disabled={loading}
+                    maxLength={100}
                   />
+                  {errors.name && (
+                    <p className="text-sm text-red-600 mt-1">{errors.name}</p>
+                  )}
                 </div>
               )}
               <div>
@@ -127,23 +154,37 @@ const RegisterLogin = () => {
                   type="email"
                   placeholder="Email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    validateField('email', e.target.value);
+                  }}
                   required
-                  className="h-12"
+                  className={`h-12 ${errors.email ? 'border-red-300' : ''}`}
                   disabled={loading}
+                  maxLength={254}
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+                )}
               </div>
               <div>
                 <Input
                   type="password"
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    validateField('password', e.target.value);
+                  }}
                   required
-                  className="h-12"
+                  className={`h-12 ${errors.password ? 'border-red-300' : ''}`}
                   minLength={6}
+                  maxLength={128}
                   disabled={loading}
                 />
+                {errors.password && (
+                  <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+                )}
               </div>
               <Button 
                 type="submit" 
@@ -163,6 +204,7 @@ const RegisterLogin = () => {
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setError('');
+                  clearErrors();
                 }}
                 className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
                 disabled={loading}
