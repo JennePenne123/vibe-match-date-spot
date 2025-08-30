@@ -104,8 +104,11 @@ export function AppSidebar() {
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className={getNavClasses(isActive(item.url))}>
-                    <NavLink to={item.url} className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors">
+                  <SidebarMenuButton asChild>
+                    <NavLink 
+                      to={item.url} 
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${getNavClasses(isActive(item.url))}`}
+                    >
                       <item.icon className="w-4 h-4 flex-shrink-0" />
                       {!isCollapsed && (
                         <div className="flex-1 min-w-0">
