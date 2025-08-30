@@ -11,15 +11,14 @@ import DateProposalCreation from '@/components/date-planning/DateProposalCreatio
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import { VenueMatchingDebug } from '@/components/debug/VenueMatchingDebug';
 import { useToast } from '@/hooks/use-toast';
+import { useBreakpoint } from '@/hooks/use-mobile';
+
 const HomeContent: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    toast
-  } = useToast();
-  const {
-    friends
-  } = useFriends();
+  const { toast } = useToast();
+  const { friends } = useFriends();
+  const { isMobile, isDesktop } = useBreakpoint();
 
   // State for managing collaborative planning flow
   const [showPartnerSelection, setShowPartnerSelection] = useState(false);
@@ -85,65 +84,142 @@ const HomeContent: React.FC = () => {
   // Show proposal creation flow
   if (showProposalCreation && selectedPartnerId) {
     const selectedFriend = friends.find(f => f.id === selectedPartnerId);
-    return <main className="p-6">
-        <div className="max-w-md mx-auto space-y-6">
-          <DateProposalCreation recipientId={selectedPartnerId} recipientName={selectedFriend?.name || 'Friend'} onProposalSent={handleProposalSent} onBack={handleBackToModeSelection} />
+    return (
+      <main className="p-6">
+        <div className={isMobile ? "max-w-md mx-auto space-y-6" : "max-w-4xl mx-auto space-y-6"}>
+          <DateProposalCreation 
+            recipientId={selectedPartnerId} 
+            recipientName={selectedFriend?.name || 'Friend'} 
+            onProposalSent={handleProposalSent} 
+            onBack={handleBackToModeSelection} 
+          />
         </div>
-      </main>;
+      </main>
+    );
   }
 
   // Show partner selection for collaborative mode
   if (showPartnerSelection) {
-    return <main className="p-6">
-        <div className="max-w-md mx-auto space-y-6">
+    return (
+      <main className="p-6">
+        <div className={isMobile ? "max-w-md mx-auto space-y-6" : "max-w-4xl mx-auto space-y-6"}>
           <div className="flex justify-start mb-4">
             <Button variant="outline" onClick={handleBackToModeSelection}>Back to the Start</Button>
           </div>
-          <PartnerSelection friends={friends} selectedPartnerId={selectedPartnerId} selectedPartnerIds={selectedPartnerIds} dateMode={dateMode} loading={false} onPartnerChange={setSelectedPartnerId} onPartnerIdsChange={setSelectedPartnerIds} onDateModeChange={setDateMode} onContinue={handlePartnerSelectionContinue} />
+          <PartnerSelection 
+            friends={friends} 
+            selectedPartnerId={selectedPartnerId} 
+            selectedPartnerIds={selectedPartnerIds} 
+            dateMode={dateMode} 
+            loading={false} 
+            onPartnerChange={setSelectedPartnerId} 
+            onPartnerIdsChange={setSelectedPartnerIds} 
+            onDateModeChange={setDateMode} 
+            onContinue={handlePartnerSelectionContinue} 
+          />
         </div>
-      </main>;
+      </main>
+    );
   }
-  return <main className="p-6">
-      <div className="max-w-md mx-auto space-y-6">
-        {/* Date Proposals Section */}
-        <DateProposalsList onProposalAccepted={handleProposalAccepted} />
-        
-        {/* Recent Invitations */}
-        <RecentReceivedInvitationsCard />
-        
-        {/* Debug Tools for Development */}
-        <VenueMatchingDebug />
-        
-        {/* Planning Mode Selection */}
-        <div className="space-y-4">
-          <div className="text-center">
-            <Heading size="h1" className="mb-2">Plan a New Date</Heading>
-            <Text size="sm" className="text-muted-foreground">
-              Choose how you'd like to plan your date
-            </Text>
-          </div>
-          
-          <div className="grid grid-cols-1 gap-4">
-            {/* Collaborative Planning Card */}
-            <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
-              <CardHeader className="text-center pb-3">
-                <div className="mx-auto mb-2 p-2 rounded-full bg-secondary/10">
-                  <Users className="h-6 w-6 text-secondary" />
+
+  return (
+    <main className="p-6">
+      <div className={isMobile ? "max-w-md mx-auto space-y-6" : "max-w-6xl mx-auto"}>
+        {isDesktop ? (
+          // Desktop layout: Grid layout with multiple columns
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {/* Date Proposals Section */}
+            <div className="lg:col-span-1">
+              <DateProposalsList onProposalAccepted={handleProposalAccepted} />
+            </div>
+            
+            {/* Recent Invitations */}
+            <div className="lg:col-span-1">
+              <RecentReceivedInvitationsCard />
+            </div>
+            
+            {/* Planning Mode Selection */}
+            <div className="lg:col-span-1 xl:col-span-1">
+              <div className="space-y-4">
+                <div className="text-center">
+                  <Heading size="h1" className="mb-2">Plan a New Date</Heading>
+                  <Text size="sm" className="text-muted-foreground">
+                    Choose how you'd like to plan your date
+                  </Text>
                 </div>
-                <CardTitle className="text-lg">Collaborative Planning</CardTitle>
-                <CardDescription className="text-sm">
-                  Send a proposal and plan together
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <Button className="w-full" variant="default">
-                  Send Date Proposal
-                </Button>
-              </CardContent>
-            </Card>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  {/* Collaborative Planning Card */}
+                  <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
+                    <CardHeader className="text-center pb-3">
+                      <div className="mx-auto mb-2 p-2 rounded-full bg-secondary/10">
+                        <Users className="h-6 w-6 text-secondary" />
+                      </div>
+                      <CardTitle className="text-lg">Collaborative Planning</CardTitle>
+                      <CardDescription className="text-sm">
+                        Send a proposal and plan together
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <Button className="w-full" variant="default">
+                        Send Date Proposal
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+            
+            {/* Debug Tools for Development - Full width on desktop */}
+            <div className="lg:col-span-2 xl:col-span-3">
+              <VenueMatchingDebug />
+            </div>
           </div>
-        </div>
+        ) : (
+          // Mobile layout: Single column
+          <div className="space-y-6">
+            {/* Date Proposals Section */}
+            <DateProposalsList onProposalAccepted={handleProposalAccepted} />
+            
+            {/* Recent Invitations */}
+            <RecentReceivedInvitationsCard />
+            
+            {/* Debug Tools for Development */}
+            <VenueMatchingDebug />
+            
+            {/* Planning Mode Selection */}
+            <div className="space-y-4">
+              <div className="text-center">
+                <Heading size="h1" className="mb-2">Plan a New Date</Heading>
+                <Text size="sm" className="text-muted-foreground">
+                  Choose how you'd like to plan your date
+                </Text>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4">
+                {/* Collaborative Planning Card */}
+                <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
+                  <CardHeader className="text-center pb-3">
+                    <div className="mx-auto mb-2 p-2 rounded-full bg-secondary/10">
+                      <Users className="h-6 w-6 text-secondary" />
+                    </div>
+                    <CardTitle className="text-lg">Collaborative Planning</CardTitle>
+                    <CardDescription className="text-sm">
+                      Send a proposal and plan together
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <Button className="w-full" variant="default">
+                      Send Date Proposal
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </main>;
+    </main>
+  );
 };
 export default HomeContent;

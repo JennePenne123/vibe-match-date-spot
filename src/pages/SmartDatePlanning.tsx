@@ -7,10 +7,12 @@ import HomeHeader from '@/components/HomeHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { getUserName } from '@/utils/typeHelpers';
+import { useBreakpoint } from '@/hooks/use-mobile';
 
 const SmartDatePlanning: React.FC = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const { isMobile } = useBreakpoint();
   
   // Get pre-selected friend from navigation state
   const preselectedFriend = location.state?.preselectedFriend || null;
@@ -36,13 +38,13 @@ const SmartDatePlanning: React.FC = () => {
   if (!user) {
     console.log('SmartDatePlanning - No user, redirecting to login');
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-md mx-auto text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h1>
-          <p className="text-gray-600 mb-6">Please sign in to use the Smart Date Planner.</p>
+      <div className="min-h-screen bg-background p-6">
+        <div className={isMobile ? "max-w-md mx-auto text-center" : "max-w-lg mx-auto text-center"}>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Authentication Required</h1>
+          <p className="text-muted-foreground mb-6">Please sign in to use the Smart Date Planner.</p>
           <button 
             onClick={() => window.location.href = '/register-login'}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            className="bg-primary text-primary-foreground px-6 py-2 rounded hover:bg-primary/90"
           >
             Sign In
           </button>
@@ -70,13 +72,15 @@ const SmartDatePlanning: React.FC = () => {
 
   return (
     <ErrorBoundary level="page">
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-md mx-auto">
-          <HomeHeader 
-            user={user}
-            displayName={displayName}
-            firstName={firstName}
-          />
+      <div className="min-h-screen bg-background">
+        <div className={isMobile ? "max-w-md mx-auto" : "max-w-none"}>
+          {isMobile && (
+            <HomeHeader 
+              user={user}
+              displayName={displayName}
+              firstName={firstName}
+            />
+          )}
           
           <ErrorBoundary level="component">
             <SmartDatePlanner preselectedFriend={preselectedFriend} />

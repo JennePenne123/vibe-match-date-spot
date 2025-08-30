@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationSystem from "./components/NotificationSystem";
+import AppLayout from "./components/AppLayout";
 import Onboarding from "./pages/Onboarding";
 import RegisterLogin from "./pages/RegisterLogin";
 import Home from "./pages/Home";
@@ -61,21 +62,26 @@ const App = () => (
               <NotificationSystem>
                 <ErrorBoundary level="page">
                   <Routes>
+                    {/* Public routes without layout */}
                     <Route path="/" element={<Onboarding />} />
                     <Route path="/register-login" element={<RegisterLogin />} />
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/preferences" element={<Preferences />} />
-                    <Route path="/friends" element={<Friends />} />
-                    <Route path="/area" element={<Area />} />
-                    <Route path="/results" element={<Results />} />
-                    <Route path="/venue/:id" element={<VenueDetail />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/venues" element={<Venues />} />
-                    <Route path="/my-friends" element={<MyFriends />} />
-                    <Route path="/my-venues" element={<MyVenues />} />
-                    <Route path="/invitations" element={<Invitations />} />
-                    <Route path="/ai-recommendations" element={<AIRecommendations />} />
-                    <Route path="/plan-date" element={<SmartDatePlanning />} />
+                    
+                    {/* Protected routes with responsive layout */}
+                    <Route path="/home" element={<AppLayout><Home /></AppLayout>} />
+                    <Route path="/preferences" element={<AppLayout><Preferences /></AppLayout>} />
+                    <Route path="/friends" element={<AppLayout><Friends /></AppLayout>} />
+                    <Route path="/area" element={<AppLayout><Area /></AppLayout>} />
+                    <Route path="/results" element={<AppLayout><Results /></AppLayout>} />
+                    <Route path="/venue/:id" element={<AppLayout><VenueDetail /></AppLayout>} />
+                    <Route path="/profile" element={<AppLayout><Profile /></AppLayout>} />
+                    <Route path="/venues" element={<AppLayout><Venues /></AppLayout>} />
+                    <Route path="/my-friends" element={<AppLayout><MyFriends /></AppLayout>} />
+                    <Route path="/my-venues" element={<AppLayout><MyVenues /></AppLayout>} />
+                    <Route path="/invitations" element={<AppLayout><Invitations /></AppLayout>} />
+                    <Route path="/ai-recommendations" element={<AppLayout><AIRecommendations /></AppLayout>} />
+                    <Route path="/plan-date" element={<AppLayout><SmartDatePlanning /></AppLayout>} />
+                    
+                    {/* Demo routes without layout */}
                     <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
                     <Route path="/demo/premium-design-system" element={<PremiumDesignSystemDemo />} />
                     <Route path="*" element={<NotFound />} />

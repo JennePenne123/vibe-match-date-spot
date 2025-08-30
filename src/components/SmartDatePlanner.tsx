@@ -25,8 +25,11 @@ interface SmartDatePlannerProps {
   preselectedFriend?: { id: string; name: string } | null;
 }
 
+import { useBreakpoint } from '@/hooks/use-mobile';
+
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }) => {
   const location = useLocation();
+  const { isMobile, isDesktop } = useBreakpoint();
   
   // Get session ID from navigation state (collaborative mode only)
   const sessionId = location.state?.sessionId;
@@ -166,7 +169,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 animate-fade-in">
-      <div className="max-w-md mx-auto p-6 space-y-8">
+      <div className={isMobile ? "max-w-md mx-auto p-6 space-y-8" : "max-w-6xl mx-auto p-6"}>
         {/* Header */}
         {(() => {
           const progressValue = getStepProgress();
@@ -182,142 +185,133 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
           onRequestLocation={requestLocation}
         />
 
-        {/* Navigation */}
-        <div className="flex justify-start animate-slide-in-right">
-          <Button 
-            onClick={() => goBack(effectivePreselectedFriend, navigate)} 
-            variant="outline" 
-            size="sm"
-            className="hover-scale transition-all duration-200 hover:shadow-md"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2 transition-transform group-hover:-translate-x-1" />
-            Back
-          </Button>
-        </div>
-
-        {/* Step 1: Select Partner - Skip for collaborative mode with preselected friend */}
-        {currentStep === 'select-partner' && !effectivePreselectedFriend && (
-          <div className="animate-fade-in">
-            <PartnerSelection
-              friends={friends}
-              selectedPartnerId={selectedPartnerId}
-              selectedPartnerIds={selectedPartnerIds}
-              dateMode={'single'} // Always single for collaborative mode
-              loading={loading}
-              onPartnerChange={setSelectedPartnerId}
-              onPartnerIdsChange={setSelectedPartnerIds}
-              onDateModeChange={setDateMode}
-              onContinue={() => handlePartnerSelection()}
-            />
-          </div>
-        )}
-
-        {/* Step 2: Set Preferences - Show for collaborative mode with preselected friend OR normal flow */}
-        {(currentStep === 'set-preferences' || effectivePreselectedFriend) && (
-          // For collaborative sessions from proposals, show preferences if we have partner info
-          effectivePreselectedFriend || 
-          // For other cases, require both session and partner
-          (currentSession && selectedPartner)
-        ) && (
-          <div className="animate-fade-in">
-            <PreferencesStep
-              sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
-              partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
-              partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
-              compatibilityScore={compatibilityScore}
-              aiAnalyzing={aiAnalyzing}
-              onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
-              initialProposedDate={proposalDateISO}
-              planningMode={'collaborative'}
-              collaborativeSession={collaborativeSession ? {
-                hasUserSetPreferences,
-                hasPartnerSetPreferences,
-                canShowResults
-              } : undefined}
-            />
-          </div>
-        )}
-
-        {/* Step 3: Review Matches */}
-        {currentStep === 'review-matches' && selectedPartner && (
-          <div className="animate-fade-in">
-            <MatchReview
-              compatibilityScore={compatibilityScore || 0}
-              partnerName={selectedPartner.name}
-              partnerId={selectedPartnerId}
-              venueRecommendations={venueRecommendations || []}
-              onVenueSelect={handleVenueSelection}
-              error={state.venueSearchError || undefined}
-              onRetrySearch={() => state.analyzeCompatibilityAndVenues?.(
-                state.currentSession?.id || '',
-                state.selectedPartnerId || '',
-                {},
-                state.userLocation
-              )}
-              sessionId={currentSession?.id}
-              isCollaborative={true} // Always collaborative mode
-              hasPartnerSetPreferences={currentSession?.partner_preferences_complete || false}
-              isWaitingForPartner={!currentSession?.both_preferences_complete}
-            />
-          </div>
-        )}
-
-        {/* Step 4: Create Invitation */}
-        {currentStep === 'create-invitation' && selectedPartner && (() => {
-          // Enhanced venue resolution with better debugging
-          const venueFromState = selectedVenue;
-          const venueFromId = selectedVenueId ? venueRecommendations?.find(v => v.venue_id === selectedVenueId) : null;
-          const venueToUse = venueFromState || venueFromId;
-          
-          console.log('🎯 INVITATION STEP - Enhanced venue resolution:', {
-            currentStep,
-            hasSelectedPartner: !!selectedPartner,
-            selectedVenueId,
-            hasSelectedVenue: !!selectedVenue,
-            hasVenueRecommendations: !!venueRecommendations?.length,
-            venueFromState: venueFromState?.venue_name,
-            venueFromId: venueFromId?.venue_name,
-            venueToUse: venueToUse?.venue_name,
-            allVenueIds: venueRecommendations?.map(v => ({ id: v.venue_id, name: v.venue_name })) || []
-          });
-          
-          if (!venueToUse) {
-            console.error('🎯 INVITATION STEP - ERROR: No venue found for invitation creation');
-            return (
-              <div className="text-center p-6 text-red-600 bg-red-50 rounded-lg">
-                <h3 className="font-semibold mb-2">No Venue Selected</h3>
-                <p className="mb-4">Please go back and select a venue for your date invitation.</p>
+        {isDesktop ? (
+          // Desktop Layout: Split screen for collaborative planning
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              {/* Navigation */}
+              <div className="flex justify-start animate-slide-in-right">
                 <Button 
-                  onClick={() => state.setCurrentStep('review-matches')}
-                  variant="outline"
+                  onClick={() => goBack(effectivePreselectedFriend, navigate)} 
+                  variant="outline" 
+                  size="sm"
+                  className="flex items-center gap-2"
                 >
-                  Back to Venue Selection
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
                 </Button>
               </div>
-            );
-          }
-          
-          return (
-            <div className="animate-fade-in">
-              <InvitationCreation
-                partnerName={selectedPartner.name}
-                selectedVenue={venueToUse}
-                invitationMessage={invitationMessage}
-                loading={loading}
-                onMessageChange={setInvitationMessage}
-                onSendInvitation={handleSendInvitation}
-              />
-            </div>
-          );
-        })()}
 
-        {/* Start from Scratch CTA - Show on all steps except first */}
-        {currentStep !== 'select-partner' && (
-          <div className="pt-8 border-t border-border/50 animate-fade-in">
+              {/* Step Content */}
+              {currentStep === 'partner' && (
+                <PartnerSelection
+                  friends={friends}
+                  selectedPartnerId={selectedPartnerId}
+                  selectedPartnerIds={selectedPartnerIds}
+                  dateMode={dateMode}
+                  loading={friendsLoading}
+                  onPartnerChange={setSelectedPartnerId}
+                  onPartnerIdsChange={setSelectedPartnerIds}
+                  onDateModeChange={setDateMode}
+                  onContinue={handlePartnerContinue}
+                />
+              )}
+            </div>
+
+            {/* Right side content for additional info */}
+            <div className="space-y-4">
+              {effectivePreselectedFriend && (
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <h3 className="font-semibold text-foreground mb-2">Planning with</h3>
+                  <p className="text-muted-foreground">{effectivePreselectedFriend.name}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          // Mobile Layout: Single column
+          <div className="space-y-6">
+            {/* Navigation */}
+            <div className="flex justify-start animate-slide-in-right">
+              <Button 
+                onClick={() => goBack(effectivePreselectedFriend, navigate)} 
+                variant="outline" 
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </Button>
+            </div>
+
+            {/* Step Content */}
+            {currentStep === 'partner' && (
+              <PartnerSelection
+                friends={friends}
+                selectedPartnerId={selectedPartnerId}
+                selectedPartnerIds={selectedPartnerIds}
+                dateMode={dateMode}
+                loading={friendsLoading}
+                onPartnerChange={setSelectedPartnerId}
+                onPartnerIdsChange={setSelectedPartnerIds}
+                onDateModeChange={setDateMode}
+                onContinue={handlePartnerContinue}
+              />
+            )}
+
+            {currentStep === 'preferences' && (
+              <PreferencesStep
+                initialPreferences={userPreferences}
+                isCollaborative={isCollaborativeMode}
+                collaborativeSession={collaborativeSession}
+                isUserInitiator={isUserInitiator}
+                hasUserSetPreferences={hasUserSetPreferences}
+                hasPartnerSetPreferences={hasPartnerSetPreferences}
+                canShowResults={canShowResults}
+                onNext={handlePreferencesNext}
+                onSkip={handlePreferencesSkip}
+                partnerName={effectivePreselectedFriend?.name}
+              />
+            )}
+
+            {currentStep === 'match' && (
+              <MatchReview
+                isLoading={venuesLoading}
+                venues={venues}
+                preferences={userPreferences}
+                onCreateInvitation={handleCreateInvitation}
+                onRefresh={handleRefreshVenues}
+                matchData={matchData}
+                currentStep={currentStep}
+                selectedPartnerId={selectedPartnerId}
+                hasNext={currentStep !== 'invitation'}
+                onNext={handleMatchNext}
+                collaborativeSession={collaborativeSession}
+                isCollaborativeMode={isCollaborativeMode}
+              />
+            )}
+
+            {currentStep === 'invitation' && (
+              <InvitationCreation
+                matchData={matchData}
+                partnerName={effectivePreselectedFriend?.name || 'Your date partner'}
+                onBack={() => setCurrentStep('match')}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Start from Scratch option */}
+        {effectivePreselectedFriend && (
+          <div className="text-center pt-4 border-t border-border">
             <Button 
-              onClick={handleStartFromScratch}
-              variant="outline"
-              className="w-full text-muted-foreground hover:text-foreground hover-scale transition-all duration-200 hover:shadow-sm"
+              onClick={() => {
+                setSelectedPartnerId('');
+                setCurrentStep('partner');
+              }}
+              variant="ghost" 
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
             >
               Start from Scratch
             </Button>
@@ -327,5 +321,4 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
     </div>
   );
 };
-
 export default SmartDatePlanner;

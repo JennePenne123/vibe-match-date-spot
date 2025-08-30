@@ -6,10 +6,12 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { getUserName } from '@/utils/typeHelpers';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBreakpoint } from '@/hooks/use-mobile';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { isMobile } = useBreakpoint();
 
   // Handle authentication redirect
   React.useEffect(() => {
@@ -36,7 +38,7 @@ const Home: React.FC = () => {
   // Early returns for loading and unauthenticated states
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <LoadingSpinner size="lg" text="Loading your dashboard..." />
       </div>
     );
@@ -44,9 +46,9 @@ const Home: React.FC = () => {
 
   if (!user || !userInfo) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">Redirecting to login...</p>
+          <p className="text-muted-foreground mb-4">Redirecting to login...</p>
           <LoadingSpinner size="md" />
         </div>
       </div>
@@ -56,13 +58,15 @@ const Home: React.FC = () => {
   const { displayName, firstName } = userInfo;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-md mx-auto">
-        <HomeHeader 
-          user={user} 
-          displayName={displayName} 
-          firstName={firstName} 
-        />
+    <div className="min-h-screen bg-background">
+      <div className={isMobile ? "max-w-md mx-auto" : "max-w-none"}>
+        {isMobile && (
+          <HomeHeader 
+            user={user} 
+            displayName={displayName} 
+            firstName={firstName} 
+          />
+        )}
         <HomeContent />
       </div>
     </div>
