@@ -3,6 +3,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useBreakpoint } from '@/hooks/use-mobile';
 
 // Import step components
 import PlanningHeader from '@/components/date-planning/PlanningHeader';
@@ -24,8 +25,6 @@ import { supabase } from '@/integrations/supabase/client';
 interface SmartDatePlannerProps {
   preselectedFriend?: { id: string; name: string } | null;
 }
-
-import { useBreakpoint } from '@/hooks/use-mobile';
 
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }) => {
   const location = useLocation();
@@ -209,11 +208,59 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                   selectedPartnerId={selectedPartnerId}
                   selectedPartnerIds={selectedPartnerIds}
                   dateMode={dateMode}
-                  loading={friendsLoading}
+                  loading={loading}
                   onPartnerChange={setSelectedPartnerId}
                   onPartnerIdsChange={setSelectedPartnerIds}
                   onDateModeChange={setDateMode}
-                  onContinue={handlePartnerContinue}
+                  onContinue={handlePartnerSelection}
+                />
+              )}
+
+              {currentStep === 'preferences' && (
+                <PreferencesStep
+                  sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
+                  partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
+                  partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
+                  compatibilityScore={compatibilityScore}
+                  aiAnalyzing={aiAnalyzing}
+                  onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
+                  initialProposedDate={proposalDateISO}
+                  planningMode={'collaborative'}
+                  collaborativeSession={collaborativeSession ? {
+                    hasUserSetPreferences,
+                    hasPartnerSetPreferences,
+                    canShowResults
+                  } : undefined}
+                />
+              )}
+
+              {currentStep === 'match' && selectedPartner && (
+                <MatchReview
+                  compatibilityScore={compatibilityScore || 0}
+                  partnerName={selectedPartner.name}
+                  partnerId={selectedPartnerId}
+                  venueRecommendations={venueRecommendations || []}
+                  onVenueSelect={handleVenueSelection}
+                  error={datePlanningError || undefined}
+                  onRetrySearch={() => {
+                    // Retry search functionality
+                    console.log('Retrying venue search...');
+                  }}
+                  sessionId={currentSession?.id}
+                  isCollaborative={true}
+                  hasPartnerSetPreferences={currentSession?.partner_preferences_complete || false}
+                  isWaitingForPartner={!currentSession?.both_preferences_complete}
+                />
+              )}
+
+              {currentStep === 'invitation' && selectedPartner && selectedVenue && (
+                <InvitationCreation
+                  partnerName={selectedPartner.name}
+                  selectedVenue={selectedVenue}
+                  invitationMessage={invitationMessage}
+                  loading={loading}
+                  onMessageChange={setInvitationMessage}
+                  onSendInvitation={handleSendInvitation}
                 />
               )}
             </div>
@@ -226,10 +273,17 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                   <p className="text-muted-foreground">{effectivePreselectedFriend.name}</p>
                 </div>
               )}
+              
+              {compatibilityScore && (
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <h3 className="font-semibold text-foreground mb-2">Compatibility</h3>
+                  <p className="text-2xl font-bold text-primary">{compatibilityScore}%</p>
+                </div>
+              )}
             </div>
           </div>
         ) : (
-          // Mobile Layout: Single column
+          // Mobile Layout: Single column  
           <div className="space-y-6">
             {/* Navigation */}
             <div className="flex justify-start animate-slide-in-right">
@@ -244,60 +298,101 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
               </Button>
             </div>
 
-            {/* Step Content */}
-            {currentStep === 'partner' && (
-              <PartnerSelection
-                friends={friends}
-                selectedPartnerId={selectedPartnerId}
-                selectedPartnerIds={selectedPartnerIds}
-                dateMode={dateMode}
-                loading={friendsLoading}
-                onPartnerChange={setSelectedPartnerId}
-                onPartnerIdsChange={setSelectedPartnerIds}
-                onDateModeChange={setDateMode}
-                onContinue={handlePartnerContinue}
-              />
+            {/* Step Content - Original mobile flow */}
+            {currentStep === 'select-partner' && !effectivePreselectedFriend && (
+              <div className="animate-fade-in">
+                <PartnerSelection
+                  friends={friends}
+                  selectedPartnerId={selectedPartnerId}
+                  selectedPartnerIds={selectedPartnerIds}
+                  dateMode={'single'}
+                  loading={loading}
+                  onPartnerChange={setSelectedPartnerId}
+                  onPartnerIdsChange={setSelectedPartnerIds}
+                  onDateModeChange={setDateMode}
+                  onContinue={() => handlePartnerSelection()}
+                />
+              </div>
             )}
 
-            {currentStep === 'preferences' && (
-              <PreferencesStep
-                initialPreferences={userPreferences}
-                isCollaborative={isCollaborativeMode}
-                collaborativeSession={collaborativeSession}
-                isUserInitiator={isUserInitiator}
-                hasUserSetPreferences={hasUserSetPreferences}
-                hasPartnerSetPreferences={hasPartnerSetPreferences}
-                canShowResults={canShowResults}
-                onNext={handlePreferencesNext}
-                onSkip={handlePreferencesSkip}
-                partnerName={effectivePreselectedFriend?.name}
-              />
+            {(currentStep === 'set-preferences' || effectivePreselectedFriend) && (
+              effectivePreselectedFriend || (currentSession && selectedPartner)
+            ) && (
+              <div className="animate-fade-in">
+                <PreferencesStep
+                  sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
+                  partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
+                  partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
+                  compatibilityScore={compatibilityScore}
+                  aiAnalyzing={aiAnalyzing}
+                  onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
+                  initialProposedDate={proposalDateISO}
+                  planningMode={'collaborative'}
+                  collaborativeSession={collaborativeSession ? {
+                    hasUserSetPreferences,
+                    hasPartnerSetPreferences,
+                    canShowResults
+                  } : undefined}
+                />
+              </div>
             )}
 
-            {currentStep === 'match' && (
-              <MatchReview
-                isLoading={venuesLoading}
-                venues={venues}
-                preferences={userPreferences}
-                onCreateInvitation={handleCreateInvitation}
-                onRefresh={handleRefreshVenues}
-                matchData={matchData}
-                currentStep={currentStep}
-                selectedPartnerId={selectedPartnerId}
-                hasNext={currentStep !== 'invitation'}
-                onNext={handleMatchNext}
-                collaborativeSession={collaborativeSession}
-                isCollaborativeMode={isCollaborativeMode}
-              />
+            {currentStep === 'review-matches' && selectedPartner && (
+              <div className="animate-fade-in">
+                <MatchReview
+                  compatibilityScore={compatibilityScore || 0}
+                  partnerName={selectedPartner.name}
+                  partnerId={selectedPartnerId}
+                  venueRecommendations={venueRecommendations || []}
+                  onVenueSelect={handleVenueSelection}
+                  error={datePlanningError || undefined}
+                  onRetrySearch={() => {
+                    console.log('Retrying venue search...');
+                  }}
+                  sessionId={currentSession?.id}
+                  isCollaborative={true}
+                  hasPartnerSetPreferences={currentSession?.partner_preferences_complete || false}
+                  isWaitingForPartner={!currentSession?.both_preferences_complete}
+                />
+              </div>
             )}
 
-            {currentStep === 'invitation' && (
-              <InvitationCreation
-                matchData={matchData}
-                partnerName={effectivePreselectedFriend?.name || 'Your date partner'}
-                onBack={() => setCurrentStep('match')}
-              />
-            )}
+            {currentStep === 'create-invitation' && selectedPartner && (() => {
+              const venueFromState = selectedVenue;
+              const venueFromId = selectedVenueId ? venueRecommendations?.find(v => v.venue_id === selectedVenueId) : null;
+              const venueToUse = venueFromState || venueFromId;
+              
+              if (!venueToUse) {
+                return (
+                  <div className="text-center p-6 text-destructive bg-destructive/10 rounded-lg">
+                    <h3 className="font-semibold mb-2">No Venue Selected</h3>
+                    <p className="mb-4">Please go back and select a venue for your date invitation.</p>
+                    <Button 
+                      onClick={() => {
+                        // Go back to venue selection
+                        console.log('Going back to venue selection...');
+                      }}
+                      variant="outline"
+                    >
+                      Back to Venue Selection
+                    </Button>
+                  </div>
+                );
+              }
+              
+              return (
+                <div className="animate-fade-in">
+                  <InvitationCreation
+                    partnerName={selectedPartner.name}
+                    selectedVenue={venueToUse}
+                    invitationMessage={invitationMessage}
+                    loading={loading}
+                    onMessageChange={setInvitationMessage}
+                    onSendInvitation={handleSendInvitation}
+                  />
+                </div>
+              );
+            })()}
           </div>
         )}
 
@@ -305,10 +400,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
         {effectivePreselectedFriend && (
           <div className="text-center pt-4 border-t border-border">
             <Button 
-              onClick={() => {
-                setSelectedPartnerId('');
-                setCurrentStep('partner');
-              }}
+              onClick={handleStartFromScratch}
               variant="ghost" 
               size="sm"
               className="text-muted-foreground hover:text-foreground"
