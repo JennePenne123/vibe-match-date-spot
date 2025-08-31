@@ -30,10 +30,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header with sidebar trigger */}
           <header className="h-12 flex items-center border-b border-border bg-card px-4">
-            <SidebarTrigger asChild>
-              <Button variant="ghost" size="icon" className="mr-2">
-                <Menu className="w-4 h-4" />
-              </Button>
+            <SidebarTrigger className="mr-2">
+              <Menu className="w-4 h-4" />
             </SidebarTrigger>
             <h1 className="font-semibold text-foreground">VybePulse</h1>
           </header>
