@@ -11,6 +11,7 @@ import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import PreferencesStep from '@/components/date-planning/PreferencesStep';
 import MatchReview from '@/components/date-planning/MatchReview';
 import InvitationCreation from '@/components/date-planning/InvitationCreation';
+import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
 
 // Import refactored components and hooks
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
@@ -200,6 +201,20 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                   Back
                 </Button>
               </div>
+
+              {/* Debug Panel - Show when needed */}
+              {process.env.NODE_ENV === 'development' && (
+                <AIAnalysisDebugPanel
+                  sessionId={sessionId}
+                  partnerId={selectedPartnerId || selectedPartnerIds[0]}
+                  currentStep={currentStep}
+                  sessionData={collaborativeSession}
+                  userLocation={userLocation}
+                  onAnalysisComplete={() => {
+                    window.location.reload();
+                  }}
+                />
+              )}
 
               {/* Step Content */}
               {currentStep === 'partner' && (
