@@ -287,6 +287,35 @@ useEffect(() => {
         throw prefError;
       }
 
+      // Update session flags for collaborative mode
+      if (planningMode === 'collaborative' && sessionId) {
+        // First get session to determine if current user is initiator
+        const { data: sessionData } = await supabase
+          .from('date_planning_sessions')
+          .select('initiator_id')
+          .eq('id', sessionId)
+          .single();
+        
+        if (sessionData) {
+          const isInitiator = sessionData.initiator_id === user.id;
+          const updateField = isInitiator ? 'initiator_preferences_complete' : 'partner_preferences_complete';
+          
+          const { error: sessionError } = await supabase
+            .from('date_planning_sessions')
+            .update({
+              [updateField]: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', sessionId);
+
+          if (sessionError) {
+            console.error('Error updating session flags:', sessionError);
+          } else {
+            console.log(`Session ${updateField} flag updated successfully`);
+          }
+        }
+      }
+
       // Show appropriate toast based on planning mode and collaborative session
       if (planningMode === 'collaborative' && collaborativeSession) {
         const { hasPartnerSetPreferences } = collaborativeSession;
