@@ -10,6 +10,7 @@ import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import { VenueMatchingDebug } from '@/components/debug/VenueMatchingDebug';
+import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
@@ -123,45 +124,45 @@ const HomeContent: React.FC = () => {
   }
 
   return (
-    <main className="p-6">
-      <div className={isMobile ? "max-w-md mx-auto space-y-6" : "max-w-6xl mx-auto"}>
+    <main className="px-4 py-6 md:px-6 lg:px-8">
+      <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto"}>
         {isDesktop ? (
-          // Desktop layout: Grid layout with multiple columns
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {/* Date Proposals Section */}
-            <div className="lg:col-span-1">
-              <DateProposalsList onProposalAccepted={handleProposalAccepted} />
-            </div>
-            
-            {/* Recent Invitations */}
-            <div className="lg:col-span-1">
-              <RecentReceivedInvitationsCard />
-            </div>
-            
-            {/* Planning Mode Selection */}
-            <div className="lg:col-span-1 xl:col-span-1">
-              <div className="space-y-4">
-                <div className="text-center">
-                  <Heading size="h1" className="mb-2">Plan a New Date</Heading>
-                  <Text size="sm" className="text-muted-foreground">
-                    Choose how you'd like to plan your date
-                  </Text>
-                </div>
-                
-                <div className="grid grid-cols-1 gap-4">
+          // Desktop layout: Optimized 5-column asymmetric grid (2-2-1 ratio)
+          <div className="space-y-5">
+            <div className="grid grid-cols-5 gap-4 lg:gap-5">
+              {/* Date Proposals Section - 2 columns */}
+              <div className="col-span-2">
+                <DateProposalsList onProposalAccepted={handleProposalAccepted} />
+              </div>
+              
+              {/* Recent Invitations - 2 columns */}
+              <div className="col-span-2">
+                <RecentReceivedInvitationsCard />
+              </div>
+              
+              {/* Planning Mode Selection - 1 column */}
+              <div className="col-span-1">
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <Heading size="h3" className="mb-2">Plan a New Date</Heading>
+                    <Text size="xs" className="text-muted-foreground leading-tight">
+                      Choose how you'd like to plan your date
+                    </Text>
+                  </div>
+                  
                   {/* Collaborative Planning Card */}
-                  <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
-                    <CardHeader className="text-center pb-3">
-                      <div className="mx-auto mb-2 p-2 rounded-full bg-secondary/10">
-                        <Users className="h-6 w-6 text-secondary" />
+                  <Card className="border-border hover:border-primary/50 transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-muted/10" onClick={handleCollaborativePlanning}>
+                    <CardHeader className="text-center pb-2 pt-4">
+                      <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
+                        <Users className="h-5 w-5 text-primary" />
                       </div>
-                      <CardTitle className="text-lg">Collaborative Planning</CardTitle>
-                      <CardDescription className="text-sm">
+                      <CardTitle className="text-base">Collaborative Planning</CardTitle>
+                      <CardDescription className="text-xs leading-tight">
                         Send a proposal and plan together
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-0">
-                      <Button className="w-full" variant="default">
+                    <CardContent className="pt-0 pb-4">
+                      <Button className="w-full" variant="default" size="sm">
                         Send Date Proposal
                       </Button>
                     </CardContent>
@@ -170,52 +171,52 @@ const HomeContent: React.FC = () => {
               </div>
             </div>
             
-            {/* Debug Tools for Development - Full width on desktop */}
-            <div className="lg:col-span-2 xl:col-span-3">
+            {/* Debug Tools - Collapsible section at bottom */}
+            <CollapsibleDebugSection title="Development Tools" defaultOpen={false}>
               <VenueMatchingDebug />
-            </div>
+            </CollapsibleDebugSection>
           </div>
         ) : (
-          // Mobile layout: Single column
-          <div className="space-y-6">
+          // Mobile layout: Single column with optimized spacing
+          <div className="space-y-5">
             {/* Date Proposals Section */}
             <DateProposalsList onProposalAccepted={handleProposalAccepted} />
             
             {/* Recent Invitations */}
             <RecentReceivedInvitationsCard />
             
-            {/* Debug Tools for Development */}
-            <VenueMatchingDebug />
-            
             {/* Planning Mode Selection */}
             <div className="space-y-4">
               <div className="text-center">
-                <Heading size="h1" className="mb-2">Plan a New Date</Heading>
+                <Heading size="h2" className="mb-2">Plan a New Date</Heading>
                 <Text size="sm" className="text-muted-foreground">
                   Choose how you'd like to plan your date
                 </Text>
               </div>
               
-              <div className="grid grid-cols-1 gap-4">
-                {/* Collaborative Planning Card */}
-                <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
-                  <CardHeader className="text-center pb-3">
-                    <div className="mx-auto mb-2 p-2 rounded-full bg-secondary/10">
-                      <Users className="h-6 w-6 text-secondary" />
-                    </div>
-                    <CardTitle className="text-lg">Collaborative Planning</CardTitle>
-                    <CardDescription className="text-sm">
-                      Send a proposal and plan together
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <Button className="w-full" variant="default">
-                      Send Date Proposal
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
+              {/* Collaborative Planning Card */}
+              <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
+                <CardHeader className="text-center pb-3">
+                  <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">Collaborative Planning</CardTitle>
+                  <CardDescription className="text-sm">
+                    Send a proposal and plan together
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <Button className="w-full" variant="default">
+                    Send Date Proposal
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
+            
+            {/* Debug Tools - Collapsible section */}
+            <CollapsibleDebugSection title="Development Tools" defaultOpen={false}>
+              <VenueMatchingDebug />
+            </CollapsibleDebugSection>
           </div>
         )}
       </div>

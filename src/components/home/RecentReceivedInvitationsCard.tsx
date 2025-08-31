@@ -91,17 +91,30 @@ const RecentReceivedInvitationsCard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-2">
-      {recentReceivedInvitations.map((invitation) => (
-        <DateInviteCard
-          key={invitation.id}
-          invitation={invitation}
-          direction="received"
-          onAccept={acceptInvitation}
-          onDecline={declineInvitation}
-        />
-      ))}
-    </div>
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Heart className="h-5 w-5 text-pink-500" />
+          Recent Invitations
+          {pendingCount > 0 && (
+            <Badge variant="destructive" className="text-xs">
+              {pendingCount}
+            </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3 pt-0">
+        {recentReceivedInvitations.map((invitation) => (
+          <DateInviteCard
+            key={invitation.id}
+            invitation={invitation}
+            direction="received"
+            onAccept={acceptInvitation}
+            onDecline={declineInvitation}
+          />
+        ))}
+      </CardContent>
+    </Card>
   );
 };
 

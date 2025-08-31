@@ -102,20 +102,20 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {pendingProposals.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Pending Proposals</h3>
-          <div className="space-y-4">
+          <h3 className="text-base font-semibold text-foreground mb-3">Pending Proposals</h3>
+          <div className="space-y-3">
             {pendingProposals.map((proposal) => (
               <Card key={proposal.id} className="border-primary/20">
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{proposal.title}</CardTitle>
+                    <CardTitle className="text-base">{proposal.title}</CardTitle>
                     {getStatusBadge(proposal.status)}
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 pt-0">
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <User className="h-4 w-4" />
@@ -184,17 +184,17 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
 
       {acceptedProposals.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Accepted Proposals</h3>
-          <div className="space-y-4">
+          <h3 className="text-base font-semibold text-foreground mb-3">Accepted Proposals</h3>
+          <div className="space-y-3">
             {acceptedProposals.map((proposal) => (
-              <Card key={proposal.id} className="border-green-200 bg-green-50">
-                <CardHeader>
+              <Card key={proposal.id} className="border-success/30 bg-success/5">
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{proposal.title}</CardTitle>
+                    <CardTitle className="text-base">{proposal.title}</CardTitle>
                     {getStatusBadge(proposal.status)}
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 pt-0">
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <User className="h-4 w-4" />
@@ -239,17 +239,17 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
 
       {otherProposals.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Previous Proposals</h3>
-          <div className="space-y-4">
+          <h3 className="text-base font-semibold text-foreground mb-3">Previous Proposals</h3>
+          <div className="space-y-3">
             {otherProposals.map((proposal) => (
               <Card key={proposal.id} className="opacity-75">
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{proposal.title}</CardTitle>
+                    <CardTitle className="text-base">{proposal.title}</CardTitle>
                     {getStatusBadge(proposal.status)}
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <User className="h-4 w-4" />
