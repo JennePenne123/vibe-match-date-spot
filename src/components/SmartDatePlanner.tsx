@@ -12,6 +12,7 @@ import PreferencesStep from '@/components/date-planning/PreferencesStep';
 import MatchReview from '@/components/date-planning/MatchReview';
 import InvitationCreation from '@/components/date-planning/InvitationCreation';
 import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
+import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
 
 // Import refactored components and hooks
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
@@ -202,19 +203,6 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                 </Button>
               </div>
 
-              {/* Debug Panel - Show when needed */}
-              {process.env.NODE_ENV === 'development' && (
-                <AIAnalysisDebugPanel
-                  sessionId={sessionId}
-                  partnerId={selectedPartnerId || selectedPartnerIds[0]}
-                  currentStep={currentStep}
-                  sessionData={collaborativeSession}
-                  userLocation={userLocation}
-                  onAnalysisComplete={() => {
-                    window.location.reload();
-                  }}
-                />
-              )}
 
               {/* Step Content */}
               {currentStep === 'partner' && (
@@ -410,6 +398,20 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
             })()}
           </div>
         )}
+
+        {/* Debug Panel - Show when needed */}
+        <CollapsibleDebugSection title="AI Analysis Debug" defaultOpen={false}>
+          <AIAnalysisDebugPanel
+            sessionId={sessionId}
+            partnerId={selectedPartnerId || selectedPartnerIds[0]}
+            currentStep={currentStep}
+            sessionData={collaborativeSession}
+            userLocation={userLocation}
+            onAnalysisComplete={() => {
+              window.location.reload();
+            }}
+          />
+        </CollapsibleDebugSection>
 
         {/* Start from Scratch option */}
         {effectivePreselectedFriend && (
