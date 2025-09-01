@@ -203,9 +203,8 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                 </Button>
               </div>
 
-
-              {/* Step Content */}
-              {currentStep === 'partner' && (
+              {/* Step Content - Using consistent step names */}
+              {(currentStep === 'select-partner' || currentStep === 'partner') && !effectivePreselectedFriend && (
                 <PartnerSelection
                   friends={friends}
                   selectedPartnerId={selectedPartnerId}
@@ -237,7 +236,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                 />
               )}
 
-              {currentStep === 'match' && selectedPartner && (
+              {(currentStep === 'review-matches' || currentStep === 'match') && selectedPartner && (
                 <MatchReview
                   compatibilityScore={compatibilityScore || 0}
                   partnerName={selectedPartner.name}
@@ -256,16 +255,39 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                 />
               )}
 
-              {currentStep === 'invitation' && selectedPartner && selectedVenue && (
-                <InvitationCreation
-                  partnerName={selectedPartner.name}
-                  selectedVenue={selectedVenue}
-                  invitationMessage={invitationMessage}
-                  loading={loading}
-                  onMessageChange={setInvitationMessage}
-                  onSendInvitation={handleSendInvitation}
-                />
-              )}
+              {(currentStep === 'create-invitation' || currentStep === 'invitation') && selectedPartner && (() => {
+                const venueFromState = selectedVenue;
+                const venueFromId = selectedVenueId ? venueRecommendations?.find(v => v.venue_id === selectedVenueId) : null;
+                const venueToUse = venueFromState || venueFromId;
+                
+                if (!venueToUse) {
+                  return (
+                    <div className="text-center p-6 text-destructive bg-destructive/10 rounded-lg">
+                      <h3 className="font-semibold mb-2">No Venue Selected</h3>
+                      <p className="mb-4">Please go back and select a venue for your date invitation.</p>
+                      <Button 
+                        onClick={() => {
+                          console.log('Going back to venue selection...');
+                        }}
+                        variant="outline"
+                      >
+                        Back to Venue Selection
+                      </Button>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <InvitationCreation
+                    partnerName={selectedPartner.name}
+                    selectedVenue={venueToUse}
+                    invitationMessage={invitationMessage}
+                    loading={loading}
+                    onMessageChange={setInvitationMessage}
+                    onSendInvitation={handleSendInvitation}
+                  />
+                );
+              })()}
             </div>
 
             {/* Right side content for additional info */}
@@ -301,7 +323,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
               </Button>
             </div>
 
-            {/* Step Content - Original mobile flow */}
+            {/* Step Content - Simplified mobile flow */}
             {currentStep === 'select-partner' && !effectivePreselectedFriend && (
               <div className="animate-fade-in">
                 <PartnerSelection
@@ -318,9 +340,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
               </div>
             )}
 
-            {(currentStep === 'set-preferences' || effectivePreselectedFriend) && (
-              effectivePreselectedFriend || (currentSession && selectedPartner)
-            ) && (
+            {currentStep === 'set-preferences' && (
               <div className="animate-fade-in">
                 <PreferencesStep
                   sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
@@ -372,7 +392,6 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                     <p className="mb-4">Please go back and select a venue for your date invitation.</p>
                     <Button 
                       onClick={() => {
-                        // Go back to venue selection
                         console.log('Going back to venue selection...');
                       }}
                       variant="outline"
