@@ -219,7 +219,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                 />
               )}
 
-              {currentStep === 'preferences' && (
+              {currentStep === 'set-preferences' && (
                 <PreferencesStep
                   sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
                   partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
