@@ -141,6 +141,41 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
     handleStartFromScratch
   } = handlers;
 
+  // Function to render invitation step without IIFE anti-pattern
+  const renderInvitationStep = () => {
+    const venueFromState = selectedVenue;
+    const venueFromId = selectedVenueId ? venueRecommendations?.find(v => v.venue_id === selectedVenueId) : null;
+    const venueToUse = venueFromState || venueFromId;
+    
+    if (!venueToUse) {
+      return (
+        <div className="text-center p-6 text-destructive bg-destructive/10 rounded-lg">
+          <h3 className="font-semibold mb-2">No Venue Selected</h3>
+          <p className="mb-4">Please go back and select a venue for your date invitation.</p>
+          <Button 
+            onClick={() => {
+              console.log('Going back to venue selection...');
+            }}
+            variant="outline"
+          >
+            Back to Venue Selection
+          </Button>
+        </div>
+      );
+    }
+    
+    return (
+      <InvitationCreation
+        partnerName={selectedPartner?.name || ''}
+        selectedVenue={venueToUse}
+        invitationMessage={invitationMessage}
+        loading={loading}
+        onMessageChange={setInvitationMessage}
+        onSendInvitation={handleSendInvitation}
+      />
+    );
+  };
+
   // Show error if any critical hooks failed
   if (friendsError || datePlanningError || planningStepsError) {
     console.error('SmartDatePlanner - Critical errors detected:', {
@@ -255,39 +290,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                 />
               )}
 
-              {(currentStep === 'create-invitation' || currentStep === 'invitation') && selectedPartner && (() => {
-                const venueFromState = selectedVenue;
-                const venueFromId = selectedVenueId ? venueRecommendations?.find(v => v.venue_id === selectedVenueId) : null;
-                const venueToUse = venueFromState || venueFromId;
-                
-                if (!venueToUse) {
-                  return (
-                    <div className="text-center p-6 text-destructive bg-destructive/10 rounded-lg">
-                      <h3 className="font-semibold mb-2">No Venue Selected</h3>
-                      <p className="mb-4">Please go back and select a venue for your date invitation.</p>
-                      <Button 
-                        onClick={() => {
-                          console.log('Going back to venue selection...');
-                        }}
-                        variant="outline"
-                      >
-                        Back to Venue Selection
-                      </Button>
-                    </div>
-                  );
-                }
-                
-                return (
-                  <InvitationCreation
-                    partnerName={selectedPartner.name}
-                    selectedVenue={venueToUse}
-                    invitationMessage={invitationMessage}
-                    loading={loading}
-                    onMessageChange={setInvitationMessage}
-                    onSendInvitation={handleSendInvitation}
-                  />
-                );
-              })()}
+              {(currentStep === 'create-invitation' || currentStep === 'invitation') && selectedPartner && renderInvitationStep()}
             </div>
 
             {/* Right side content for additional info */}
@@ -380,41 +383,11 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
               </div>
             )}
 
-            {currentStep === 'create-invitation' && selectedPartner && (() => {
-              const venueFromState = selectedVenue;
-              const venueFromId = selectedVenueId ? venueRecommendations?.find(v => v.venue_id === selectedVenueId) : null;
-              const venueToUse = venueFromState || venueFromId;
-              
-              if (!venueToUse) {
-                return (
-                  <div className="text-center p-6 text-destructive bg-destructive/10 rounded-lg">
-                    <h3 className="font-semibold mb-2">No Venue Selected</h3>
-                    <p className="mb-4">Please go back and select a venue for your date invitation.</p>
-                    <Button 
-                      onClick={() => {
-                        console.log('Going back to venue selection...');
-                      }}
-                      variant="outline"
-                    >
-                      Back to Venue Selection
-                    </Button>
-                  </div>
-                );
-              }
-              
-              return (
-                <div className="animate-fade-in">
-                  <InvitationCreation
-                    partnerName={selectedPartner.name}
-                    selectedVenue={venueToUse}
-                    invitationMessage={invitationMessage}
-                    loading={loading}
-                    onMessageChange={setInvitationMessage}
-                    onSendInvitation={handleSendInvitation}
-                  />
-                </div>
-              );
-            })()}
+            {currentStep === 'create-invitation' && selectedPartner && (
+              <div className="animate-fade-in">
+                {renderInvitationStep()}
+              </div>
+            )}
           </div>
         )}
 
