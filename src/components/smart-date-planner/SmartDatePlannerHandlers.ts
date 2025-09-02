@@ -122,34 +122,49 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     
     // Run AI analysis only if we have all required data and (solo mode OR both partners have set preferences)
     if (effectiveSessionId && selectedPartnerId && state.userLocation) {
-      console.log('SmartDatePlanner - Starting AI analysis with:', {
+      console.log('🚀 SmartDatePlanner - Starting AI analysis with:', {
         sessionId: effectiveSessionId,
         partnerId: selectedPartnerId,
         preferences,
-        userLocation: state.userLocation
+        userLocation: state.userLocation,
+        hasAnalyzeFunction: typeof state.analyzeCompatibilityAndVenues === 'function'
       });
       
       setAiAnalyzing(true);
       
-      state.analyzeCompatibilityAndVenues(
-        effectiveSessionId,
-        selectedPartnerId,
-        preferences,
-        state.userLocation
-      ).then(() => {
-        console.log('SmartDatePlanner - AI analysis completed successfully');
-        setAiAnalyzing(false);
-        // Advance to review-matches after AI analysis for both solo and collaborative modes
-        setCurrentStep('review-matches');
-      }).catch(error => {
-        console.error('SmartDatePlanner - AI analysis error:', error);
+      try {
+        const analysisPromise = state.analyzeCompatibilityAndVenues(
+          effectiveSessionId,
+          selectedPartnerId,
+          preferences,
+          state.userLocation
+        );
+        
+        console.log('🔄 SmartDatePlanner - Analysis promise created:', !!analysisPromise);
+        
+        analysisPromise.then(() => {
+          console.log('✅ SmartDatePlanner - AI analysis completed successfully');
+          setAiAnalyzing(false);
+          // Advance to review-matches after AI analysis for both solo and collaborative modes
+          setCurrentStep('review-matches');
+        }).catch(error => {
+          console.error('❌ SmartDatePlanner - AI analysis error:', error);
+          setAiAnalyzing(false);
+          toast({
+            variant: 'destructive',
+            title: 'AI Analysis Failed',
+            description: `Unable to analyze compatibility: ${error.message || 'Unknown error'}`
+          });
+        });
+      } catch (syncError) {
+        console.error('❌ SmartDatePlanner - Synchronous error in AI analysis:', syncError);
         setAiAnalyzing(false);
         toast({
           variant: 'destructive',
           title: 'AI Analysis Failed',
-          description: 'Unable to analyze compatibility. Please try again.'
+          description: `Analysis setup failed: ${syncError.message || 'Unknown error'}`
         });
-      });
+      }
     } else {
       console.error('SmartDatePlanner - Missing required data for AI analysis:', {
         hasSession: !!effectiveSessionId,

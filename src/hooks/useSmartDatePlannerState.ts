@@ -38,9 +38,10 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'co
   
   try {
     datePlanningState = useDatePlanning(appState.userLocation);
-    console.log('SmartDatePlanner - Date planning state loaded with location:', appState.userLocation);
+    console.log('✅ SmartDatePlanner - Date planning state loaded with location:', appState.userLocation);
+    console.log('✅ SmartDatePlanner - analyzeCompatibilityAndVenues function available:', typeof datePlanningState?.analyzeCompatibilityAndVenues);
   } catch (error) {
-    console.error('SmartDatePlanner - Error loading date planning state:', error);
+    console.error('❌ SmartDatePlanner - Error loading date planning state:', error);
     datePlanningError = error;
   }
 

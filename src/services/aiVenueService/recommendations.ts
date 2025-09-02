@@ -40,6 +40,9 @@ export const getAIVenueRecommendations = async (
   limit: number = 10,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ): Promise<AIVenueRecommendation[]> => {
+  console.log('🚀 RECOMMENDATIONS: ===== STARTING VENUE RECOMMENDATIONS =====');
+  console.log('🚀 RECOMMENDATIONS: Parameters:', { userId, partnerId, limit, userLocation });
+  
   try {
     console.log('🎯 RECOMMENDATIONS: Starting DATABASE-ONLY mode for user:', userId, 'partner:', partnerId);
 
