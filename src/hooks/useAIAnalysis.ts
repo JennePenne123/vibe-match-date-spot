@@ -165,8 +165,15 @@ export const useAIAnalysis = () => {
         setVenueRecommendations([]);
       } else {
         console.log('🎉 AI ANALYSIS: Successfully got venues:', venues.map(v => `${v.venue_name} (${v.ai_score}%)`));
+        console.log('🎉 AI ANALYSIS: Setting venue recommendations in state, count:', venues.length);
+        console.log('🎉 AI ANALYSIS: First venue details:', venues[0]);
         setVenueRecommendations(venues);
         setVenueSearchError(null);
+        
+        // Add a small delay to check if state was set correctly
+        setTimeout(() => {
+          console.log('🔍 AI ANALYSIS: Venue recommendations state check - should have venues now');
+        }, 100);
       }
 
       setCurrentStep('Analysis complete!');

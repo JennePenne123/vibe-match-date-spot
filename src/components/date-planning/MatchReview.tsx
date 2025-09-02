@@ -40,6 +40,16 @@ const MatchReview: React.FC<MatchReviewProps> = ({
   isWaitingForPartner = false
 }) => {
   const { user } = useAuth();
+  
+  // Debug log to see what venues are actually received
+  console.log('🔍 MATCH REVIEW: Rendering with venue recommendations:', {
+    count: venueRecommendations?.length || 0,
+    venues: venueRecommendations?.map(v => ({
+      name: v.venue_name,
+      id: v.venue_id,  
+      score: v.ai_score
+    })) || []
+  });
   const handleVenueSelect = (venue: AIVenueRecommendation) => {
     console.log('🎯 MATCH REVIEW - Venue selected:', {
       venueName: venue.venue_name,
