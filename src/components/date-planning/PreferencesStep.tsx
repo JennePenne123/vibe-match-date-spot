@@ -299,11 +299,23 @@ useEffect(() => {
         if (sessionData) {
           const isInitiator = sessionData.initiator_id === user.id;
           const updateField = isInitiator ? 'initiator_preferences_complete' : 'partner_preferences_complete';
+          const preferencesJsonField = isInitiator ? 'initiator_preferences' : 'partner_preferences';
+          
+          // Create the preferences JSON object
+          const preferencesData = {
+            preferred_cuisines: selectedCuisines,
+            preferred_vibes: selectedVibes,
+            preferred_price_range: selectedPriceRange,
+            preferred_times: selectedTimePreferences,
+            max_distance: maxDistance,
+            dietary_restrictions: selectedDietary
+          };
           
           const { error: sessionError } = await supabase
             .from('date_planning_sessions')
             .update({
               [updateField]: true,
+              [preferencesJsonField]: preferencesData,
               updated_at: new Date().toISOString()
             })
             .eq('id', sessionId);
@@ -311,7 +323,12 @@ useEffect(() => {
           if (sessionError) {
             console.error('Error updating session flags:', sessionError);
           } else {
-            console.log(`Session ${updateField} flag updated successfully`);
+            console.log(`✅ Session ${updateField} flag and ${preferencesJsonField} data updated successfully`);
+            console.log('🔧 PREFERENCES FIXED: Updated session with both completion flag and JSON data:', {
+              updateField,
+              preferencesJsonField,
+              preferencesData
+            });
           }
         }
       }
