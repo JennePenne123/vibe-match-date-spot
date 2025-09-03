@@ -796,20 +796,14 @@ useEffect(() => {
             userHasCompletedPrefs,
             partnerHasCompletedPrefs,
             canShowResults,
-            collaborativeSession
+            aiAnalyzing,
+            collaborativeSession,
+            onManualContinueExists: typeof onManualContinue === 'function'
           });
           
-          console.log('PreferencesStep - Collaborative state check:', {
-            userHasCompletedPrefs,
-            partnerHasCompletedPrefs,
-            canShowResults,
-            currentStep,
-            hasCompatibilityScore: !!compatibilityScore
-          });
-          
-          // If both users have completed preferences but analysis hasn't started, show continue button
-          if (userHasCompletedPrefs && partnerHasCompletedPrefs && typeof onManualContinue === 'function') {
-            console.log('🔧 SHOWING READY STATE: Both users have completed preferences');
+          // If both users have completed preferences, show ready state
+          if (userHasCompletedPrefs && partnerHasCompletedPrefs) {
+            console.log('🔧 SHOWING READY STATE: Both users have completed preferences, aiAnalyzing:', aiAnalyzing);
             return (
               <div className="space-y-4">
                 <CollaborativeWaitingState

@@ -14,19 +14,33 @@ const SmartDatePlanning: React.FC = () => {
   const location = useLocation();
   const { isMobile } = useBreakpoint();
   
+  // Get user display info - MUST be called before any conditional returns
+  const userInfo = React.useMemo(() => {
+    if (!user) return { displayName: 'User', firstName: 'User' };
+    
+    try {
+      const displayName = getUserName(user);
+      const firstName = displayName.split(' ')[0];
+      return { displayName, firstName };
+    } catch (error) {
+      console.error('Error getting user name:', error);
+      return { displayName: 'User', firstName: 'User' };
+    }
+  }, [user]);
+  
   // Get pre-selected friend from navigation state
   const preselectedFriend = location.state?.preselectedFriend || null;
+  const planningMode = location.state?.planningMode;
+  
+  console.log('SmartDatePlanning - Auth state:', { user: user?.id, loading });
+  console.log('SmartDatePlanning - Preselected friend:', preselectedFriend);
   
   // Block solo planning mode - redirect to home if attempted
-  const planningMode = location.state?.planningMode;
   if (planningMode === 'solo') {
     console.log('SmartDatePlanning - Solo mode blocked, redirecting to home');
     window.location.href = '/home';
     return null;
   }
-
-  console.log('SmartDatePlanning - Auth state:', { user: user?.id, loading });
-  console.log('SmartDatePlanning - Preselected friend:', preselectedFriend);
 
   // Show loading spinner while auth is loading
   if (loading) {
@@ -52,19 +66,6 @@ const SmartDatePlanning: React.FC = () => {
       </div>
     );
   }
-
-  // Get user display info
-  const userInfo = React.useMemo(() => {
-    try {
-      const displayName = getUserName(user);
-      const firstName = displayName.split(' ')[0];
-      
-      return { displayName, firstName };
-    } catch (error) {
-      console.error('Error getting user name:', error);
-      return { displayName: 'User', firstName: 'User' };
-    }
-  }, [user]);
 
   const { displayName, firstName } = userInfo;
 
