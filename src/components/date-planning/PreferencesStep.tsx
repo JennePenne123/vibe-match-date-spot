@@ -755,6 +755,17 @@ useEffect(() => {
     </div>
   );
 
+  // Top-level debug logging to understand why collaborative section isn't executing
+  console.log('🔧 PREFERENCES STEP TOP-LEVEL DEBUG:', {
+    planningMode,
+    hasCollaborativeSession: !!collaborativeSession,
+    collaborativeSession,
+    aiAnalyzing,
+    sessionId,
+    partnerName,
+    shouldShowCollaborative: planningMode === 'collaborative' && collaborativeSession && !aiAnalyzing
+  });
+
   return (
     <SafeComponent>
       {aiAnalyzing && (
