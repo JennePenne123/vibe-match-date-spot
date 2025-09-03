@@ -806,6 +806,22 @@ useEffect(() => {
             hasCompatibilityScore: !!compatibilityScore
           });
           
+          // If both users have completed preferences but analysis hasn't started, show continue button
+          if (userHasCompletedPrefs && partnerHasCompletedPrefs && onManualContinue) {
+            return (
+              <div className="space-y-4">
+                <CollaborativeWaitingState
+                  partnerName={partnerName}
+                  sessionId={sessionId}
+                  hasPartnerSetPreferences={partnerHasCompletedPrefs}
+                  isWaitingForPartner={false}
+                  bothPreferencesComplete={true}
+                  onManualContinue={onManualContinue}
+                />
+              </div>
+            );
+          }
+          
           // If user has completed but partner hasn't, show waiting state
           if (userHasCompletedPrefs && !partnerHasCompletedPrefs) {
             return (

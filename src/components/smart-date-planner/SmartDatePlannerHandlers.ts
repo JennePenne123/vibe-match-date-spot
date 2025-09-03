@@ -336,11 +336,60 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     navigate('/home');
   }
 
+  async function handleManualContinue() {
+    console.log('🔄 MANUAL TRIGGER - Manual continue triggered');
+    
+    if (!currentSession?.id || !selectedPartnerId || !state.userLocation) {
+      console.error('❌ MANUAL TRIGGER - Missing required data:', {
+        hasSession: !!currentSession?.id,
+        hasPartnerId: !!selectedPartnerId,
+        hasLocation: !!state.userLocation
+      });
+      toast({
+        variant: 'destructive',
+        title: 'Missing Information',
+        description: 'Session or location data missing. Please try refreshing the page.'
+      });
+      return;
+    }
+
+    setAiAnalyzing(true);
+    
+    try {
+      console.log('🚀 MANUAL TRIGGER - Starting AI analysis with session:', currentSession.id);
+      
+      await state.analyzeCompatibilityAndVenues(
+        currentSession.id,
+        selectedPartnerId,
+        currentPreferences,
+        state.userLocation
+      );
+      
+      console.log('✅ MANUAL TRIGGER - AI analysis completed successfully');
+      setAiAnalyzing(false);
+      setCurrentStep('review-matches');
+      
+      toast({
+        title: 'Analysis Complete!',
+        description: 'Found perfect venues based on your preferences.'
+      });
+    } catch (error) {
+      console.error('❌ MANUAL TRIGGER - AI analysis error:', error);
+      setAiAnalyzing(false);
+      toast({
+        variant: 'destructive',
+        title: 'Analysis Failed',
+        description: `Unable to analyze compatibility: ${error.message || 'Unknown error'}`
+      });
+    }
+  }
+
   return {
     handlePartnerSelection,
     handlePreferencesComplete,
     handleVenueSelection,
     handleSendInvitation,
-    handleStartFromScratch
+    handleStartFromScratch,
+    handleManualContinue
   };
 };

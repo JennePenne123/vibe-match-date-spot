@@ -268,6 +268,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                     hasPartnerSetPreferences,
                     canShowResults
                   } : undefined}
+                  onManualContinue={handleManualContinue}
                 />
               )}
 
