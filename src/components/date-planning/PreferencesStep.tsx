@@ -782,8 +782,8 @@ useEffect(() => {
         </Card>
       )}
       
-      {/* Show collaborative waiting state if user has completed preferences but partner hasn't */}
-      {planningMode === 'collaborative' && collaborativeSession && !aiAnalyzing && (
+      {/* Show collaborative waiting state - prioritize over AI analyzing state when both prefs complete */}
+      {planningMode === 'collaborative' && collaborativeSession && (
         (() => {
           const userHasCompletedPrefs = collaborativeSession.hasUserSetPreferences;
           const partnerHasCompletedPrefs = collaborativeSession.hasPartnerSetPreferences;
