@@ -23,7 +23,9 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     navigate,
     currentPreferences,
     setCurrentPreferences,
-    updateSessionPreferences
+    updateSessionPreferences,
+    collaborativeSession,
+    sessionId
   } = state;
 
   async function handlePartnerSelection(partnerId?: string) {
@@ -339,9 +341,21 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   async function handleManualContinue() {
     console.log('🔄 MANUAL TRIGGER - Manual continue triggered');
     
-    if (!currentSession?.id || !selectedPartnerId || !state.userLocation) {
+    // Resolve session ID from multiple sources (collaborative session, current session, or URL param)
+    const effectiveSessionId = collaborativeSession?.id || currentSession?.id || sessionId;
+    
+    console.log('🔄 MANUAL TRIGGER - Session resolution:', {
+      collaborativeSessionId: collaborativeSession?.id,
+      currentSessionId: currentSession?.id,
+      urlSessionId: sessionId,
+      effectiveSessionId,
+      hasPartnerId: !!selectedPartnerId,
+      hasLocation: !!state.userLocation
+    });
+    
+    if (!effectiveSessionId || !selectedPartnerId || !state.userLocation) {
       console.error('❌ MANUAL TRIGGER - Missing required data:', {
-        hasSession: !!currentSession?.id,
+        hasSession: !!effectiveSessionId,
         hasPartnerId: !!selectedPartnerId,
         hasLocation: !!state.userLocation
       });
@@ -356,10 +370,10 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     setAiAnalyzing(true);
     
     try {
-      console.log('🚀 MANUAL TRIGGER - Starting AI analysis with session:', currentSession.id);
+      console.log('🚀 MANUAL TRIGGER - Starting AI analysis with session:', effectiveSessionId);
       
       await state.analyzeCompatibilityAndVenues(
-        currentSession.id,
+        effectiveSessionId,
         selectedPartnerId,
         currentPreferences,
         state.userLocation

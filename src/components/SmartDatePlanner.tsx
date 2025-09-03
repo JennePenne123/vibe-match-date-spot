@@ -78,7 +78,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   });
   
 console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
-  const handlers = createSmartDatePlannerHandlers(state);
+  const handlers = createSmartDatePlannerHandlers({
+    ...state,
+    collaborativeSession,
+    sessionId
+  });
 
   // Prefill proposed date/time from linked proposal when coming from a proposal
   const [proposalDateISO, setProposalDateISO] = useState<string | undefined>();
