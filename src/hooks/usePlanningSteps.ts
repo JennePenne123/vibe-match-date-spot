@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useFriends } from '@/hooks/useFriends';
 
@@ -21,11 +20,23 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     willStartAtPreferences: planningMode === 'collaborative' && !!preselectedFriend
   });
   
-  const [currentStep, setCurrentStep] = useState<PlanningStep>(initialStep);
+  const [currentStep, setCurrentStepInternal] = useState<PlanningStep>(initialStep);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
   const [hasManuallyNavigated, setHasManuallyNavigated] = useState(false);
 
-  // Sync currentStep with initialStep changes (for cases when props change after initial render)
+  // Custom setter that tracks manual navigation
+  const setCurrentStep = (step: PlanningStep) => {
+    console.log('🔧 Planning Steps - setCurrentStep called:', {
+      from: currentStep,
+      to: step,
+      hasManuallyNavigated,
+      planningMode
+    });
+    setHasManuallyNavigated(true);
+    setCurrentStepInternal(step);
+  };
+
+  // Sync currentStep with initialStep changes, but don't force regression from advanced steps
   useEffect(() => {
     const expectedStep = preselectedFriend ? 'set-preferences' : 'select-partner';
     
@@ -37,17 +48,28 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
       hasManuallyNavigated
     });
     
-    // Only sync if we haven't manually navigated and the expected step is different
+    // Only sync if we haven't manually navigated and need to move forward (not backward)
+    // Don't force regression from review-matches to set-preferences when venues might be available
     if (!hasManuallyNavigated && currentStep !== expectedStep) {
-      console.log('🔧 Planning Steps - SYNCING currentStep from', currentStep, 'to', expectedStep);
-      setCurrentStep(expectedStep);
+      const stepOrder = ['select-partner', 'set-preferences', 'review-matches', 'create-invitation'];
+      const currentIndex = stepOrder.indexOf(currentStep);
+      const expectedIndex = stepOrder.indexOf(expectedStep);
       
-      // Also update selected partner ID if we have a preselected friend
-      if (preselectedFriend && selectedPartnerId !== preselectedFriend.id) {
-        setSelectedPartnerId(preselectedFriend.id);
+      // Only sync if expected step is later than current (moving forward), not backward
+      if (expectedIndex > currentIndex) {
+        console.log('🔧 Planning Steps - SYNCING currentStep from', currentStep, 'to', expectedStep);
+        setCurrentStepInternal(expectedStep);
+        
+        // Also update selected partner ID if we have a preselected friend
+        if (preselectedFriend && selectedPartnerId !== preselectedFriend.id) {
+          setSelectedPartnerId(preselectedFriend.id);
+        }
+      } else {
+        console.log('🔧 Planning Steps - SKIPPING sync to prevent regression from', currentStep, 'to', expectedStep);
       }
     }
   }, [planningMode, preselectedFriend, currentStep, selectedPartnerId, hasManuallyNavigated]);
+  
   const hasAutoAdvanced = useRef(false);
 
   // Remove auto-advance logic - collaborative mode handles this differently
@@ -103,15 +125,15 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
           }
         } else {
           console.log('Planning steps - Navigating back to select-partner');
-          setCurrentStep('select-partner');
+          setCurrentStepInternal('select-partner');
           setSelectedPartnerId('');
         }
         break;
       case 'review-matches': 
-        setCurrentStep('set-preferences'); 
+        setCurrentStepInternal('set-preferences'); 
         break;
       case 'create-invitation': 
-        setCurrentStep('review-matches'); 
+        setCurrentStepInternal('review-matches'); 
         break;
     }
   };
