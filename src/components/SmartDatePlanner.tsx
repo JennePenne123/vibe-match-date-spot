@@ -25,18 +25,15 @@ import { useFriends } from '@/hooks/useFriends';
 import { supabase } from '@/integrations/supabase/client';
 
 interface SmartDatePlannerProps {
-  preselectedFriend?: { id: string; name: string } | null;
+  sessionId: string;
+  fromProposal: boolean;
 }
 
-const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }) => {
-  const location = useLocation();
+const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal }) => {
   const { isMobile, isDesktop } = useBreakpoint();
+  const { friends: allFriends } = useFriends();
   
-  // Get session ID from navigation state (collaborative mode only)
-  const sessionId = location.state?.sessionId;
-  const fromProposal = location.state?.fromProposal;
-  
-  // Use collaborative session hook if coming from a proposal
+  // Use collaborative session hook
   const { 
     session: collaborativeSession, 
     isUserInitiator, 
@@ -44,10 +41,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     hasUserSetPreferences,
     hasPartnerSetPreferences,
     canShowResults
-  } = useCollaborativeSession(
-    fromProposal ? sessionId : null
-  );
-  const { friends: allFriends } = useFriends();
+  } = useCollaborativeSession(sessionId);
   
   // Extract partner information from session when coming from proposal
   const sessionPartner = useMemo(() => {
@@ -61,8 +55,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     return partner ? { id: partner.id, name: partner.name } : null;
   }, [collaborativeSession, allFriends, isUserInitiator]);
   
-  // Determine which friend to use (session partner takes priority over preselected)
-  const effectivePreselectedFriend = sessionPartner || preselectedFriend;
+  // Use session partner as the preselected friend
+  const effectivePreselectedFriend = sessionPartner;
   
   console.log('🔍 SmartDatePlanner - Session and Partner Debug:', {
     fromProposal,
@@ -76,7 +70,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     } : null,
     isUserInitiator,
     sessionPartner,
-    preselectedFriend,
     effectivePreselectedFriend,
     allFriendsCount: allFriends.length
   });

@@ -28,16 +28,17 @@ const SmartDatePlanning: React.FC = () => {
     }
   }, [user]);
   
-  // Get pre-selected friend from navigation state
-  const preselectedFriend = location.state?.preselectedFriend || null;
+  // Get navigation state for collaborative sessions
+  const sessionId = location.state?.sessionId;
+  const fromProposal = location.state?.fromProposal;
   const planningMode = location.state?.planningMode;
   
-  console.log('SmartDatePlanning - Auth state:', { user: user?.id, loading });
-  console.log('SmartDatePlanning - Preselected friend:', preselectedFriend);
+  console.log('SmartDatePlanning - Navigation state:', { sessionId, fromProposal, planningMode });
   
-  // Block solo planning mode - redirect to home if attempted
-  if (planningMode === 'solo') {
-    console.log('SmartDatePlanning - Solo mode blocked, redirecting to home');
+  // CRITICAL: Collaborative planning requires coming from an accepted proposal
+  // If accessed directly without session data, redirect to home
+  if (!fromProposal || !sessionId) {
+    console.log('SmartDatePlanning - No collaborative session found, redirecting to home');
     window.location.href = '/home';
     return null;
   }
@@ -84,7 +85,7 @@ const SmartDatePlanning: React.FC = () => {
           )}
           
           <ErrorBoundary level="component">
-            <SmartDatePlanner preselectedFriend={preselectedFriend} />
+            <SmartDatePlanner sessionId={sessionId} fromProposal={fromProposal} />
           </ErrorBoundary>
         </div>
       </div>
