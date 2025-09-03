@@ -90,6 +90,15 @@ const MatchReview: React.FC<MatchReviewProps> = ({
     );
   }
 
+  // Debug collaborative session state
+  console.log('🔍 MATCH REVIEW - Collaborative state check:', {
+    isCollaborative,
+    hasPartnerSetPreferences,
+    isWaitingForPartner,
+    sessionId,
+    shouldShowWaiting: isCollaborative && (!hasPartnerSetPreferences || isWaitingForPartner)
+  });
+
   // Show waiting state for collaborative planning when partner hasn't set preferences
   if (isCollaborative && (!hasPartnerSetPreferences || isWaitingForPartner)) {
     return (

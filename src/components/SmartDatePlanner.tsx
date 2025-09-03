@@ -316,10 +316,10 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
                     // Retry search functionality
                     console.log('Retrying venue search...');
                   }}
-                  sessionId={currentSession?.id}
+                  sessionId={collaborativeSession?.id || currentSession?.id}
                   isCollaborative={true}
-                  hasPartnerSetPreferences={currentSession?.partner_preferences_complete || false}
-                  isWaitingForPartner={!currentSession?.both_preferences_complete}
+                  hasPartnerSetPreferences={collaborativeSession ? hasPartnerSetPreferences : (currentSession?.partner_preferences_complete || false)}
+                  isWaitingForPartner={collaborativeSession ? !canShowResults : !currentSession?.both_preferences_complete}
                 />
               )}
 
@@ -428,10 +428,10 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
                   onRetrySearch={() => {
                     console.log('Retrying venue search...');
                   }}
-                  sessionId={currentSession?.id}
+                  sessionId={collaborativeSession?.id || currentSession?.id}
                   isCollaborative={true}
-                  hasPartnerSetPreferences={currentSession?.partner_preferences_complete || false}
-                  isWaitingForPartner={!currentSession?.both_preferences_complete}
+                  hasPartnerSetPreferences={collaborativeSession ? hasPartnerSetPreferences : (currentSession?.partner_preferences_complete || false)}
+                  isWaitingForPartner={collaborativeSession ? !canShowResults : !currentSession?.both_preferences_complete}
                 />
               </div>
             )}
