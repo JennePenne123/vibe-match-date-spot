@@ -13,16 +13,28 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
   // For collaborative mode with preselected friend, start at preferences
   const initialStep = preselectedFriend ? 'set-preferences' : 'select-partner';
   
-  console.log('🔧 Planning Steps - Initialization:', {
-    preselectedFriend: preselectedFriend?.name,
+  console.log('🔧 Planning Steps - Initialization DEBUG:', {
+    preselectedFriend: preselectedFriend ? {
+      id: preselectedFriend.id,
+      name: preselectedFriend.name,
+      exists: !!preselectedFriend
+    } : null,
     planningMode,
     initialStep,
-    willStartAtPreferences: planningMode === 'collaborative' && !!preselectedFriend
+    willStartAtPreferences: planningMode === 'collaborative' && !!preselectedFriend,
+    friendsAvailable: friends?.length || 0
   });
   
   const [currentStep, setCurrentStepInternal] = useState<PlanningStep>(initialStep);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
   const [hasManuallyNavigated, setHasManuallyNavigated] = useState(false);
+
+  console.log('🔧 Planning Steps - State after initialization:', {
+    currentStep,
+    selectedPartnerId,
+    hasManuallyNavigated,
+    preselectedFriendId: preselectedFriend?.id
+  });
 
   // Custom setter that tracks manual navigation
   const setCurrentStep = (step: PlanningStep) => {

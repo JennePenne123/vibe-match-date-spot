@@ -77,7 +77,13 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   }
 
   async function handlePreferencesComplete(preferences: any, sessionId?: string) {
-    console.log('SmartDatePlanner - Preferences submitted', preferences);
+    console.log('🔧 PREFERENCES COMPLETE - Function called with:', {
+      preferences: preferences ? 'provided' : 'missing',
+      sessionId: sessionId || 'from-state',
+      currentStep: state.currentStep,
+      collaborativeSessionExists: !!state.collaborativeSession,
+      currentSessionExists: !!currentSession
+    });
     
     // Store preferences for later use when completing session
     setCurrentPreferences(preferences);
@@ -87,11 +93,11 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     // First, save preferences to the session to trigger completion flags
     if (effectiveSessionId) {
       try {
-        console.log('SmartDatePlanner - Updating session preferences for session:', effectiveSessionId);
+        console.log('🔧 PREFERENCES COMPLETE - Updating session preferences for session:', effectiveSessionId);
         await updateSessionPreferences(effectiveSessionId, preferences);
-        console.log('SmartDatePlanner - Session preferences updated successfully');
+        console.log('🔧 PREFERENCES COMPLETE - Session preferences updated successfully');
       } catch (error) {
-        console.error('SmartDatePlanner - Error updating session preferences:', error);
+        console.error('🔧 PREFERENCES COMPLETE - Error updating session preferences:', error);
         toast({
           variant: 'destructive',
           title: 'Error',
@@ -105,30 +111,40 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     if (state.planningMode === 'collaborative') {
       // Refresh collaborative session to get latest state after preference update
       if (state.collaborativeSession && state.collaborativeSession.refetchSession) {
-        console.log('SmartDatePlanner - Refreshing collaborative session to get latest state...');
+        console.log('🔧 PREFERENCES COMPLETE - Refreshing collaborative session to get latest state...');
         await state.collaborativeSession.refetchSession();
       }
       
       // Check if both users have completed preferences
       const bothComplete = currentSession?.both_preferences_complete || state.collaborativeSession?.canShowResults;
       
+      console.log('🔧 PREFERENCES COMPLETE - Both complete check:', {
+        bothComplete,
+        currentSessionBothComplete: currentSession?.both_preferences_complete,
+        collaborativeSessionCanShow: state.collaborativeSession?.canShowResults,
+        collaborativeSessionData: state.collaborativeSession ? {
+          id: state.collaborativeSession.id,
+          bothPreferencesComplete: state.collaborativeSession.both_preferences_complete,
+          initiatorPrefsComplete: state.collaborativeSession.initiator_preferences_complete,
+          partnerPrefsComplete: state.collaborativeSession.partner_preferences_complete
+        } : null
+      });
+      
       if (!bothComplete) {
-        console.log('SmartDatePlanner - Not all preferences complete yet, staying on preferences step...');
-        console.log('SmartDatePlanner - Current session both_complete:', currentSession?.both_preferences_complete);
-        console.log('SmartDatePlanner - Collaborative session canShowResults:', state.collaborativeSession?.canShowResults);
+        console.log('🔧 PREFERENCES COMPLETE - Not all preferences complete yet, staying on preferences step...');
         return;
       }
       
-      console.log('SmartDatePlanner - Both partners have set preferences, proceeding with AI analysis...');
+      console.log('🔧 PREFERENCES COMPLETE - Both partners have set preferences, proceeding with AI analysis...');
     }
     
     // Run AI analysis only if we have all required data and (solo mode OR both partners have set preferences)
     if (effectiveSessionId && selectedPartnerId && state.userLocation) {
-      console.log('🚀 SmartDatePlanner - Starting AI analysis with:', {
+      console.log('🚀 PREFERENCES COMPLETE - Starting AI analysis with:', {
         sessionId: effectiveSessionId,
         partnerId: selectedPartnerId,
-        preferences,
-        userLocation: state.userLocation,
+        preferences: preferences ? 'provided' : 'missing',
+        userLocation: state.userLocation ? 'provided' : 'missing',
         hasAnalyzeFunction: typeof state.analyzeCompatibilityAndVenues === 'function'
       });
       
@@ -142,29 +158,30 @@ export const createSmartDatePlannerHandlers = (state: any) => {
           state.userLocation
         );
         
-        console.log('🔄 SmartDatePlanner - Analysis promise created:', !!analysisPromise);
+        console.log('🔄 PREFERENCES COMPLETE - Analysis promise created:', !!analysisPromise);
         
         const analysisResult = await analysisPromise;
         
-        console.log('✅ SmartDatePlanner - AI analysis completed successfully', analysisResult);
-        console.log('✅ SmartDatePlanner - Venue recommendations available:', state.venueRecommendations?.length || 0);
+        console.log('✅ PREFERENCES COMPLETE - AI analysis completed successfully', analysisResult);
+        console.log('✅ PREFERENCES COMPLETE - Venue recommendations available:', state.venueRecommendations?.length || 0);
         
         setAiAnalyzing(false);
         
         // Force step transition after AI analysis completes
-        console.log('🎯 SmartDatePlanner - FORCING step transition to review-matches');
+        console.log('🎯 PREFERENCES COMPLETE - FORCING step transition to review-matches');
         setCurrentStep('review-matches');
         
-        // Add small delay to ensure state is updated
+        // Add debugging to verify state after transition
         setTimeout(() => {
-          console.log('🔍 SmartDatePlanner - Step transition verification:', {
+          console.log('🔍 PREFERENCES COMPLETE - Post-transition state check:', {
             currentStep: state.currentStep,
             venueCount: state.venueRecommendations?.length || 0,
-            hasVenues: (state.venueRecommendations?.length || 0) > 0
+            hasVenues: (state.venueRecommendations?.length || 0) > 0,
+            compatibilityScore: state.compatibilityScore
           });
         }, 100);
       } catch (analysisError) {
-        console.error('❌ SmartDatePlanner - AI analysis error:', analysisError);
+        console.error('❌ PREFERENCES COMPLETE - AI analysis error:', analysisError);
         setAiAnalyzing(false);
         toast({
           variant: 'destructive',
@@ -173,10 +190,13 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         });
       }
     } else {
-      console.error('SmartDatePlanner - Missing required data for AI analysis:', {
+      console.error('🔧 PREFERENCES COMPLETE - Missing required data for AI analysis:', {
         hasSession: !!effectiveSessionId,
         hasPartnerId: !!selectedPartnerId,
-        hasLocation: !!state.userLocation
+        hasLocation: !!state.userLocation,
+        effectiveSessionId,
+        selectedPartnerId,
+        locationData: state.userLocation
       });
       toast({
         variant: 'destructive',
