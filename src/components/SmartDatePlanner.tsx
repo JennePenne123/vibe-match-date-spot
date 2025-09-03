@@ -64,12 +64,21 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
   // Determine which friend to use (session partner takes priority over preselected)
   const effectivePreselectedFriend = sessionPartner || preselectedFriend;
   
-  console.log('SmartDatePlanner - Session data:', {
+  console.log('🔍 SmartDatePlanner - Session and Partner Debug:', {
     fromProposal,
     sessionId,
     hasCollaborativeSession: !!collaborativeSession,
+    collaborativeSession: collaborativeSession ? {
+      id: collaborativeSession.id,
+      initiator_id: collaborativeSession.initiator_id,
+      partner_id: collaborativeSession.partner_id,
+      both_preferences_complete: collaborativeSession.both_preferences_complete
+    } : null,
+    isUserInitiator,
     sessionPartner,
-    effectivePreselectedFriend
+    preselectedFriend,
+    effectivePreselectedFriend,
+    allFriendsCount: allFriends.length
   });
   
   const state = useSmartDatePlannerState({ 
