@@ -71,7 +71,14 @@ export const getAIVenueRecommendations = async (
     // Calculate AI scores for each venue using real preference matching
     console.log('🧮 RECOMMENDATIONS: Calculating REAL AI scores for', venues.length, 'venues');
     for (const venue of venues) {
-      console.log(`📊 RECOMMENDATIONS: Scoring venue: ${venue.name} (${venue.cuisine_type || 'unknown cuisine'})`);
+      // Ensure venue has a valid ID - critical fix for venue selection
+      if (!venue.id) {
+        const fallbackId = `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        console.warn(`⚠️ RECOMMENDATIONS: Venue "${venue.name}" missing ID, generated fallback: ${fallbackId}`);
+        venue.id = fallbackId;
+      }
+      
+      console.log(`📊 RECOMMENDATIONS: Scoring venue: ${venue.name} (ID: ${venue.id}) (${venue.cuisine_type || 'unknown cuisine'})`);
       const aiScore = await calculateVenueAIScore(venue.id, userId, partnerId);
       
       // Get stored AI score data for additional context
@@ -98,7 +105,13 @@ export const getAIVenueRecommendations = async (
         amenities: venue.tags || []
       };
 
-      console.log(`✅ RECOMMENDATIONS: ${venue.name} scored ${aiScore}% (confidence: ${Math.round(recommendation.confidence_level * 100)}%)`);
+      // Validate the recommendation has a proper venue_id before adding
+      if (!recommendation.venue_id) {
+        console.error(`❌ RECOMMENDATIONS: Critical error - recommendation for ${venue.name} has no venue_id!`);
+        continue; // Skip this venue
+      }
+      
+      console.log(`✅ RECOMMENDATIONS: ${venue.name} (ID: ${recommendation.venue_id}) scored ${aiScore}% (confidence: ${Math.round(recommendation.confidence_level * 100)}%)`);
       recommendations.push(recommendation);
     }
 
@@ -301,8 +314,13 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
           }
         }
 
-        // Always create a venue ID - use database ID if available, otherwise generate fallback
-        const finalVenueId = venueId || `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // Always create a venue ID - use database ID if available, otherwise generate fallback from place_id
+        const finalVenueId = venueId || venue.placeId || `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Validate we have a proper place_id for venue selection
+        if (!venue.placeId) {
+          console.warn(`⚠️ GOOGLE PLACES: Venue "${venue.name}" missing placeId - using generated ID: ${finalVenueId}`);
+        }
         
         transformedVenues.push({
           id: finalVenueId,

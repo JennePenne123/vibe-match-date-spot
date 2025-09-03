@@ -57,15 +57,15 @@ const MatchReview: React.FC<MatchReviewProps> = ({
       hasVenueId: !!venue.venue_id
     });
     
-    // Ensure we have a valid venue ID before proceeding
+    // Validate venue ID before proceeding
     if (!venue.venue_id) {
-      console.error('🎯 MATCH REVIEW - ERROR: Venue missing ID, using fallback');
-      // Create a fallback ID if missing
-      const fallbackId = `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      venue.venue_id = fallbackId;
-      console.log('🎯 MATCH REVIEW - Generated fallback ID:', fallbackId);
+      console.error('🎯 MATCH REVIEW - CRITICAL ERROR: Venue missing ID!', venue);
+      // Show user-friendly error instead of creating fallback
+      alert('Error: This venue cannot be selected due to missing data. Please try another venue or refresh the page.');
+      return;
     }
     
+    console.log('🎯 MATCH REVIEW - Proceeding with venue selection:', venue.venue_id);
     onVenueSelect(venue.venue_id);
   };
 
@@ -144,14 +144,26 @@ const MatchReview: React.FC<MatchReviewProps> = ({
               )}
             </div>
           ) : (
-            venueRecommendations.map((venue, index) => (
-              <div key={venue.venue_id || `venue-${index}`} className="border rounded-lg p-4">
-                <AIVenueCard
-                  recommendation={venue}
-                  onSelect={() => handleVenueSelect(venue)}
-                />
-              </div>
-            ))
+            venueRecommendations.map((venue, index) => {
+              // Additional validation to ensure venue has required data
+              if (!venue.venue_id) {
+                console.error('🚨 MATCH REVIEW - Skipping venue without ID:', venue);
+                return null;
+              }
+              
+              return (
+                <div key={venue.venue_id} className="border rounded-lg p-4">
+                  <AIVenueCard
+                    recommendation={venue}
+                    onSelect={() => handleVenueSelect(venue)}
+                    sessionContext={{
+                      sessionId: sessionId,
+                      partnerId: partnerId
+                    }}
+                  />
+                </div>
+              );
+            }).filter(Boolean) // Remove null entries
           )}
         </CardContent>
       </Card>
