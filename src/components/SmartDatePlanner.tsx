@@ -77,7 +77,14 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ preselectedFriend }
     planningMode: 'collaborative' // Force collaborative mode only
   });
   
-console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
+        console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
+        console.log('🔍 SmartDatePlanner - RENDER STATE CHECK:', {
+          currentStep: state.currentStep,
+          hasVenueRecommendations: !!(state.venueRecommendations && state.venueRecommendations.length > 0),
+          venueCount: state.venueRecommendations?.length || 0,
+          aiAnalyzing: state.aiAnalyzing,
+          compatibilityScore: state.compatibilityScore
+        });
   const handlers = createSmartDatePlannerHandlers({
     ...state,
     collaborativeSession,
@@ -118,6 +125,7 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
     currentStep,
     selectedPartnerId,
     setSelectedPartnerId,
+    setCurrentStep,
     getStepProgress,
     goBack,
     selectedVenueId,
@@ -277,6 +285,25 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                 />
               )}
 
+              {/* Desktop Fallback: If we have venues but step hasn't transitioned */}
+              {currentStep === 'set-preferences' && venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && (
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-yellow-800">🎉 Venues Found!</h3>
+                    <Button 
+                      onClick={() => setCurrentStep('review-matches')}
+                      size="sm"
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                    >
+                      View Results
+                    </Button>
+                  </div>
+                  <p className="text-sm text-yellow-700">
+                    AI analysis completed and found {venueRecommendations.length} venues. Click "View Results" to see your matches!
+                  </p>
+                </div>
+              )}
+
               {(currentStep === 'review-matches' || currentStep === 'match') && selectedPartner && (
                 <MatchReview
                   compatibilityScore={compatibilityScore || 0}
@@ -367,6 +394,25 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
                   } : undefined}
                   onManualContinue={handleManualContinue}
                 />
+                
+                {/* Mobile Fallback: If we have venues but step hasn't transitioned */}
+                {venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && (
+                  <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-yellow-800">🎉 Venues Found!</h3>
+                      <Button 
+                        onClick={() => setCurrentStep('review-matches')}
+                        size="sm"
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                      >
+                        View Results
+                      </Button>
+                    </div>
+                    <p className="text-sm text-yellow-700">
+                      AI analysis completed and found {venueRecommendations.length} venues. Click "View Results" to see your matches!
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 

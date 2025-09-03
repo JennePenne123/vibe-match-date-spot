@@ -144,27 +144,32 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         
         console.log('🔄 SmartDatePlanner - Analysis promise created:', !!analysisPromise);
         
-        analysisPromise.then(() => {
-          console.log('✅ SmartDatePlanner - AI analysis completed successfully');
-          setAiAnalyzing(false);
-          // Advance to review-matches after AI analysis for both solo and collaborative modes
-          setCurrentStep('review-matches');
-        }).catch(error => {
-          console.error('❌ SmartDatePlanner - AI analysis error:', error);
-          setAiAnalyzing(false);
-          toast({
-            variant: 'destructive',
-            title: 'AI Analysis Failed',
-            description: `Unable to analyze compatibility: ${error.message || 'Unknown error'}`
+        const analysisResult = await analysisPromise;
+        
+        console.log('✅ SmartDatePlanner - AI analysis completed successfully', analysisResult);
+        console.log('✅ SmartDatePlanner - Venue recommendations available:', state.venueRecommendations?.length || 0);
+        
+        setAiAnalyzing(false);
+        
+        // Force step transition after AI analysis completes
+        console.log('🎯 SmartDatePlanner - FORCING step transition to review-matches');
+        setCurrentStep('review-matches');
+        
+        // Add small delay to ensure state is updated
+        setTimeout(() => {
+          console.log('🔍 SmartDatePlanner - Step transition verification:', {
+            currentStep: state.currentStep,
+            venueCount: state.venueRecommendations?.length || 0,
+            hasVenues: (state.venueRecommendations?.length || 0) > 0
           });
-        });
-      } catch (syncError) {
-        console.error('❌ SmartDatePlanner - Synchronous error in AI analysis:', syncError);
+        }, 100);
+      } catch (analysisError) {
+        console.error('❌ SmartDatePlanner - AI analysis error:', analysisError);
         setAiAnalyzing(false);
         toast({
           variant: 'destructive',
           title: 'AI Analysis Failed',
-          description: `Analysis setup failed: ${syncError.message || 'Unknown error'}`
+          description: `Unable to analyze compatibility: ${analysisError.message || 'Unknown error'}`
         });
       }
     } else {
@@ -380,7 +385,12 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       );
       
       console.log('✅ MANUAL TRIGGER - AI analysis completed successfully');
+      console.log('✅ MANUAL TRIGGER - Venue recommendations:', state.venueRecommendations?.length || 0);
+      
       setAiAnalyzing(false);
+      
+      // Ensure step transition happens
+      console.log('🎯 MANUAL TRIGGER - FORCING step transition to review-matches');
       setCurrentStep('review-matches');
       
       toast({

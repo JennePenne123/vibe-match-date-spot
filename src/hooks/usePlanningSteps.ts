@@ -48,8 +48,14 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
       hasManuallyNavigated
     });
     
-    // Only sync if we haven't manually navigated and need to move forward (not backward)
-    // Don't force regression from review-matches to set-preferences when venues might be available
+    // CRITICAL: Don't interfere with manual step transitions during AI analysis and results phases
+    const advancedSteps = ['review-matches', 'create-invitation'];
+    if (advancedSteps.includes(currentStep)) {
+      console.log('🔧 Planning Steps - SKIPPING sync for advanced step:', currentStep);
+      return;
+    }
+    
+    // Only sync if we haven't manually navigated and need to move forward (not backward)  
     if (!hasManuallyNavigated && currentStep !== expectedStep) {
       const stepOrder = ['select-partner', 'set-preferences', 'review-matches', 'create-invitation'];
       const currentIndex = stepOrder.indexOf(currentStep);

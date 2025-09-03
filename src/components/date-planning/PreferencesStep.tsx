@@ -804,6 +804,22 @@ useEffect(() => {
           // If both users have completed preferences, show ready state
           if (userHasCompletedPrefs && partnerHasCompletedPrefs) {
             console.log('🔧 SHOWING READY STATE: Both users have completed preferences, aiAnalyzing:', aiAnalyzing);
+            
+            // If AI is analyzing, show analyzing state
+            if (aiAnalyzing) {
+              return (
+                <div className="space-y-4">
+                  <div className="text-center p-6 bg-primary/5 rounded-lg border border-primary/20">
+                    <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <h3 className="font-semibold text-foreground mb-2">🤖 AI Analysis in Progress</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Analyzing your compatibility and finding the perfect venues...
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+            
             return (
               <div className="space-y-4">
                 <CollaborativeWaitingState
