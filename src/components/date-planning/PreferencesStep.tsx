@@ -55,6 +55,7 @@ interface PreferencesStepProps {
     hasPartnerSetPreferences: boolean;
     canShowResults: boolean;
   };
+  onManualContinue?: () => void;
 }
 
 interface DatePreferences {
@@ -77,7 +78,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
   onPreferencesComplete,
   initialProposedDate,
   planningMode = 'solo',
-  collaborativeSession
+  collaborativeSession,
+  onManualContinue
 }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);

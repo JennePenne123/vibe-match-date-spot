@@ -138,7 +138,8 @@ console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentS
     handlePreferencesComplete,
     handleVenueSelection,
     handleSendInvitation,
-    handleStartFromScratch
+    handleStartFromScratch,
+    handleManualContinue
   } = handlers;
 
   // Function to render invitation step without IIFE anti-pattern
