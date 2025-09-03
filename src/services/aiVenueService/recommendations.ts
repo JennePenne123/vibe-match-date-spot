@@ -44,12 +44,22 @@ export const getAIVenueRecommendations = async (
   console.log('🚀 RECOMMENDATIONS: Parameters:', { userId, partnerId, limit, userLocation });
   
   try {
-    console.log('🎯 RECOMMENDATIONS: Starting DATABASE-ONLY mode for user:', userId, 'partner:', partnerId);
+    console.log('🎯 RECOMMENDATIONS: Starting venue search for user:', userId, 'partner:', partnerId);
 
-    // DATABASE-ONLY MODE: Skip all location validation and Google Places API
-    console.log('🗄️ RECOMMENDATIONS: Getting venues from database (location validation disabled)');
-    let venues = await getActiveVenues(100); // Get more venues for better testing
-    console.log('🗄️ RECOMMENDATIONS: Database returned:', venues?.length || 0, 'venues');
+    // Try Google Places API first if user location is available
+    let venues = [];
+    if (userLocation?.latitude && userLocation?.longitude) {
+      console.log('🌐 RECOMMENDATIONS: Using Google Places API with user location');
+      venues = await getVenuesFromGooglePlaces(userId, limit * 2, userLocation);
+      console.log('🌐 RECOMMENDATIONS: Google Places returned:', venues?.length || 0, 'venues');
+    }
+    
+    // Fallback to database venues if Google Places fails or no location
+    if (!venues || venues.length === 0) {
+      console.log('🗄️ RECOMMENDATIONS: Falling back to database venues');
+      venues = await getActiveVenues(100);
+      console.log('🗄️ RECOMMENDATIONS: Database returned:', venues?.length || 0, 'venues');
+    }
 
     // If no database venues, suggest creating them
     if (!venues || venues.length === 0) {
