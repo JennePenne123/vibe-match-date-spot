@@ -778,6 +778,16 @@ useEffect(() => {
           const partnerHasCompletedPrefs = collaborativeSession.hasPartnerSetPreferences;
           const canShowResults = collaborativeSession.canShowResults;
           
+          // Debug logging for preferences step state
+          console.log('🔧 PREFERENCES STEP DEBUG:', {
+            sessionId,
+            partnerName,
+            userHasCompletedPrefs,
+            partnerHasCompletedPrefs,
+            canShowResults,
+            collaborativeSession
+          });
+          
           console.log('PreferencesStep - Collaborative state check:', {
             userHasCompletedPrefs,
             partnerHasCompletedPrefs,
@@ -788,6 +798,7 @@ useEffect(() => {
           
           // If both users have completed preferences but analysis hasn't started, show continue button
           if (userHasCompletedPrefs && partnerHasCompletedPrefs && typeof onManualContinue === 'function') {
+            console.log('🔧 SHOWING READY STATE: Both users have completed preferences');
             return (
               <div className="space-y-4">
                 <CollaborativeWaitingState
@@ -804,6 +815,7 @@ useEffect(() => {
           
           // If user has completed but partner hasn't, show waiting state
           if (userHasCompletedPrefs && !partnerHasCompletedPrefs) {
+            console.log('🔧 SHOWING WAITING STATE: User completed, waiting for partner');
             return (
               <div className="space-y-4">
                 <CollaborativeWaitingState

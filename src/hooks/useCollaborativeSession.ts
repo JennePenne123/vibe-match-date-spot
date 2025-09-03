@@ -80,6 +80,25 @@ export const useCollaborativeSession = (sessionId: string | null) => {
     (isUserInitiator ? session.partner_preferences_complete : session.initiator_preferences_complete) : false;
   const canShowResults = session?.both_preferences_complete || false;
 
+  // Debug logging for state synchronization
+  console.log('🔧 COLLABORATIVE SESSION DEBUG:', {
+    sessionId: session?.id,
+    userId: user?.id,
+    isUserInitiator,
+    isUserPartner,
+    initiatorPrefsComplete: session?.initiator_preferences_complete,
+    partnerPrefsComplete: session?.partner_preferences_complete,
+    bothPrefsComplete: session?.both_preferences_complete,
+    hasUserSetPreferences,
+    hasPartnerSetPreferences,
+    canShowResults,
+    databaseFlags: {
+      initiator_preferences_complete: session?.initiator_preferences_complete,
+      partner_preferences_complete: session?.partner_preferences_complete,
+      both_preferences_complete: session?.both_preferences_complete
+    }
+  });
+
   return {
     session,
     loading,
