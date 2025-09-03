@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -41,14 +40,14 @@ interface CompatibilityScore {
   compatibility_factors: string[];
 }
 
-interface PreferencesStepProps {
+export interface PreferencesStepProps {
   sessionId: string;
   partnerId: string;
   partnerName: string;
   compatibilityScore: CompatibilityScore | number | null;
   aiAnalyzing: boolean;
   onPreferencesComplete: (preferences: DatePreferences) => void;
-  initialProposedDate?: string; // ISO string from proposal, optional
+  initialProposedDate?: string;
   planningMode?: 'solo' | 'collaborative';
   collaborativeSession?: {
     hasUserSetPreferences: boolean;
@@ -69,18 +68,20 @@ interface DatePreferences {
   preferred_time?: string;
 }
 
-const PreferencesStep: React.FC<PreferencesStepProps> = ({
-  sessionId,
-  partnerId,
-  partnerName,
-  compatibilityScore,
-  aiAnalyzing,
-  onPreferencesComplete,
-  initialProposedDate,
-  planningMode = 'solo',
-  collaborativeSession,
-  onManualContinue
-}) => {
+const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
+  const {
+    sessionId,
+    partnerId,
+    partnerName,
+    compatibilityScore,
+    aiAnalyzing,
+    onPreferencesComplete,
+    initialProposedDate,
+    planningMode = 'solo',
+    collaborativeSession,
+    onManualContinue
+  } = props;
+
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -492,11 +493,11 @@ useEffect(() => {
               onClick={() => applyQuickStartTemplate(template)}
               className="p-4 rounded-lg border border-border text-left transition-all hover:bg-muted hover:border-primary/20"
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-center gap-3">
                 <div className="text-2xl">{template.emoji}</div>
                 <div className="flex-1">
-                  <div className="font-medium text-sm">{template.title}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{template.description}</div>
+                  <h3 className="font-semibold text-sm">{template.title}</h3>
+                  <p className="text-xs text-muted-foreground">{template.description}</p>
                 </div>
               </div>
             </button>
@@ -504,55 +505,60 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">What are you craving?</h2>
-        <p className="text-muted-foreground mb-6">Choose your favorite cuisines</p>
-        {renderPreferenceGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines')}
-      </div>
+      {/* Cuisine Selection */}
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-lg font-bold mb-2">What type of food are you in the mood for?</h2>
+          <p className="text-muted-foreground mb-4">Select all cuisines that interest you</p>
+          {renderPreferenceGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines', 'grid-cols-2')}
+        </div>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">What vibe are you going for?</h2>
-        <p className="text-muted-foreground mb-6">Choose the perfect atmosphere for your date</p>
-        {renderPreferenceGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes', 'grid-cols-1')}
+        {/* Vibe Selection */}
+        <div>
+          <h2 className="text-lg font-bold mb-2">What's the vibe you're going for?</h2>
+          <p className="text-muted-foreground mb-4">Choose the atmosphere you want</p>
+          {renderPreferenceGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes', 'grid-cols-2')}
+        </div>
       </div>
     </>
   );
 
   const renderStep2 = () => (
-    <>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">What's your budget?</h2>
-        <p className="text-muted-foreground mb-6">Select your preferred price range</p>
-        {renderPreferenceGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range', 'grid-cols-1')}
+    <div className="space-y-6">
+      {/* Price Range */}
+      <div>
+        <h2 className="text-lg font-bold mb-2">What's your budget?</h2>
+        <p className="text-muted-foreground mb-4">Choose your preferred price range</p>
+        {renderPreferenceGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range', 'grid-cols-2')}
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">When works best?</h2>
-        <p className="text-muted-foreground mb-6">Choose your preferred timing</p>
-        {renderPreferenceGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times')}
+      {/* Time Preferences */}
+      <div>
+        <h2 className="text-lg font-bold mb-2">When do you prefer to go out?</h2>
+        <p className="text-muted-foreground mb-4">Select your preferred times</p>
+        {renderPreferenceGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times', 'grid-cols-2')}
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">{initialProposedDate ? 'Proposed Date & Time (adjustable)' : 'Specific Date & Time'}</h2>
-        <p className="text-muted-foreground mb-6">{initialProposedDate ? 'Pre-filled from the proposal. You can adjust below.' : 'When would you like to go on this date?'}</p>
-        
+      {/* Date & Time Selection */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold">When would you like to go?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Date Picker */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Preferred Date { !initialProposedDate && (<span className="text-destructive">*</span>) }
-            </label>
+          <div>
+            <label className="text-sm font-medium mb-2 block">Preferred Date</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    (!selectedDate && !initialProposedDate) && "text-muted-foreground border-destructive/50"
+                    !selectedDate && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                  {selectedDate ? format(selectedDate, "PPP") : 
+                   initialProposedDate ? format(new Date(initialProposedDate), "PPP") : 
+                   "Pick a date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -562,223 +568,195 @@ useEffect(() => {
                   onSelect={setSelectedDate}
                   disabled={(date) => date < new Date()}
                   initialFocus
-                  className="p-3 pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
-            {(!selectedDate && !initialProposedDate) && (
-              <p className="text-sm text-destructive">Date is required to continue</p>
-            )}
           </div>
 
           {/* Time Picker */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Preferred Time { !initialProposedDate && (<span className="text-destructive">*</span>) }
-            </label>
+          <div>
+            <label className="text-sm font-medium mb-2 block">Preferred Time</label>
             <Select value={selectedTime} onValueChange={setSelectedTime}>
-              <SelectTrigger className={cn(
-                "w-full",
-                (!selectedTime && !initialProposedDate) && "border-destructive/50"
-              )}>
-                <SelectValue placeholder="Select time" />
+              <SelectTrigger>
+                <SelectValue placeholder={initialProposedDate ? format(new Date(initialProposedDate), "HH:mm") : "Select time"} />
               </SelectTrigger>
               <SelectContent>
-                {initialProposedDate && (() => {
-                  const dt = new Date(initialProposedDate);
-                  if (isNaN(dt.getTime())) return null;
-                  const hhmm = format(dt, 'H:mm');
-                  const label = format(dt, 'p');
-                  const exists = ['9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'].includes(hhmm);
-                  return !exists ? (
-                    <SelectItem value={hhmm}>Proposed {label}</SelectItem>
-                  ) : null;
-                })()}
-                <SelectItem value="9:00">9:00 AM</SelectItem>
-                <SelectItem value="10:00">10:00 AM</SelectItem>
-                <SelectItem value="11:00">11:00 AM</SelectItem>
-                <SelectItem value="12:00">12:00 PM</SelectItem>
-                <SelectItem value="13:00">1:00 PM</SelectItem>
-                <SelectItem value="14:00">2:00 PM</SelectItem>
-                <SelectItem value="15:00">3:00 PM</SelectItem>
-                <SelectItem value="16:00">4:00 PM</SelectItem>
-                <SelectItem value="17:00">5:00 PM</SelectItem>
-                <SelectItem value="18:00">6:00 PM</SelectItem>
-                <SelectItem value="19:00">7:00 PM</SelectItem>
-                <SelectItem value="20:00">8:00 PM</SelectItem>
-                <SelectItem value="21:00">9:00 PM</SelectItem>
-                <SelectItem value="22:00">10:00 PM</SelectItem>
+                {Array.from({ length: 24 }, (_, i) => {
+                  const hour = i.toString().padStart(2, '0');
+                  return (
+                    <SelectItem key={`${hour}:00`} value={`${hour}:00`}>
+                      {hour}:00
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
-            {(!selectedTime && !initialProposedDate) && (
-              <p className="text-sm text-destructive">Time is required to continue</p>
-            )}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 
   const renderStep3 = () => (
-    <>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">Maximum Distance</h2>
-        <p className="text-muted-foreground mb-6">How far are you willing to travel?</p>
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-primary" />
-            <h3 className="font-medium">Maximum Distance</h3>
-          </div>
-          <div className="space-y-2">
-            <Slider
-              value={[maxDistance]}
-              onValueChange={(value) => setMaxDistance(value[0])}
-              max={50}
-              min={1}
-              step={1}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>1 mile</span>
-              <span className="font-medium">{maxDistance} miles</span>
-              <span>50 miles</span>
-            </div>
+    <div className="space-y-6">
+      {/* Distance Slider */}
+      <div>
+        <h2 className="text-lg font-bold mb-2">How far are you willing to travel?</h2>
+        <p className="text-muted-foreground mb-4">Maximum distance from your location</p>
+        <div className="space-y-4">
+          <Slider
+            value={[maxDistance]}
+            onValueChange={(value) => setMaxDistance(value[0])}
+            max={50}
+            min={1}
+            step={1}
+            className="w-full"
+          />
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>1 km</span>
+            <span className="font-medium text-foreground">{maxDistance} km</span>
+            <span>50 km</span>
           </div>
         </div>
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">Dietary Requirements</h2>
-        <p className="text-muted-foreground mb-6">Any dietary restrictions or preferences?</p>
-        {renderPreferenceGrid(dietaryRequirements, selectedDietary, setSelectedDietary, 'dietary_restrictions')}
+      {/* Dietary Requirements */}
+      <div>
+        <h2 className="text-lg font-bold mb-2">Any dietary requirements?</h2>
+        <p className="text-muted-foreground mb-4">Select any dietary restrictions (optional)</p>
+        {renderPreferenceGrid(dietaryRequirements, selectedDietary, setSelectedDietary, 'dietary_restrictions', 'grid-cols-2')}
       </div>
-    </>
+    </div>
   );
 
   const renderStep4 = () => (
     <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold mb-2">Review Your Preferences</h2>
-        <p className="text-muted-foreground">Make sure everything looks good before submitting</p>
-      </div>
-
-      <div className="grid gap-4">
+      <h2 className="text-lg font-bold mb-4">Review Your Preferences</h2>
+      
+      <div className="space-y-4">
+        {/* Cuisines */}
         {selectedCuisines.length > 0 && (
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-2">Cuisines</h3>
-              <div className="flex flex-wrap gap-2">
-                {selectedCuisines.map(cuisine => (
-                  <Badge key={cuisine} variant="secondary">{cuisine}</Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <div>
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <Coffee className="w-4 h-4" />
+              Cuisines
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {selectedCuisines.map((cuisine) => (
+                <Badge key={cuisine} variant="secondary">
+                  {cuisines.find(c => c.id === cuisine)?.emoji} {cuisine}
+                </Badge>
+              ))}
+            </div>
+          </div>
         )}
 
+        {/* Vibes */}
         {selectedVibes.length > 0 && (
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-2">Vibes</h3>
-              <div className="flex flex-wrap gap-2">
-                {selectedVibes.map(vibe => (
-                  <Badge key={vibe} variant="secondary">{vibe}</Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <div>
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Vibes
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {selectedVibes.map((vibe) => (
+                <Badge key={vibe} variant="secondary">
+                  {vibes.find(v => v.id === vibe)?.emoji} {vibe}
+                </Badge>
+              ))}
+            </div>
+          </div>
         )}
 
+        {/* Price Range */}
         {selectedPriceRange.length > 0 && (
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-2">Price Range</h3>
-              <div className="flex flex-wrap gap-2">
-                {selectedPriceRange.map(price => (
-                  <Badge key={price} variant="secondary">{price}</Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <div>
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <DollarSign className="w-4 h-4" />
+              Budget
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {selectedPriceRange.map((range) => (
+                <Badge key={range} variant="secondary">
+                  {range}
+                </Badge>
+              ))}
+            </div>
+          </div>
         )}
 
+        {/* Time Preferences */}
         {selectedTimePreferences.length > 0 && (
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-2">Times</h3>
-              <div className="flex flex-wrap gap-2">
-                {selectedTimePreferences.map(time => (
-                  <Badge key={time} variant="secondary">{time}</Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <div>
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Preferred Times
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {selectedTimePreferences.map((time) => (
+                <Badge key={time} variant="secondary">
+                  {timePreferences.find(t => t.id === time)?.emoji} {time}
+                </Badge>
+              ))}
+            </div>
+          </div>
         )}
 
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-2">Maximum Distance</h3>
-            <Badge variant="secondary">{maxDistance} miles</Badge>
-          </CardContent>
-        </Card>
-
-        {selectedDietary.length > 0 && (
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-2">Dietary Requirements</h3>
-              <div className="flex flex-wrap gap-2">
-                {selectedDietary.map(diet => (
-                  <Badge key={diet} variant="secondary">{diet}</Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
+        {/* Date & Time */}
         {(selectedDate || selectedTime) && (
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-2">Preferred Date & Time</h3>
-              <div className="space-y-2">
-                {selectedDate && (
-                  <Badge variant="secondary">📅 {format(selectedDate, "PPP")}</Badge>
-                )}
-                {selectedTime && (
-                  <Badge variant="secondary">🕐 {selectedTime}</Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <div>
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <CalendarIcon className="w-4 h-4" />
+              Date & Time
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {selectedDate && (
+                <Badge variant="secondary">
+                  📅 {format(selectedDate, "PPP")}
+                </Badge>
+              )}
+              {selectedTime && (
+                <Badge variant="secondary">
+                  🕐 {selectedTime}
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Distance */}
+        <div>
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            Travel Distance
+          </h3>
+          <Badge variant="secondary">
+            📍 Up to {maxDistance} km
+          </Badge>
+        </div>
+
+        {/* Dietary */}
+        {selectedDietary.length > 0 && (
+          <div>
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Dietary Requirements
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {selectedDietary.map((diet) => (
+                <Badge key={diet} variant="secondary">
+                  {dietaryRequirements.find(d => d.id === diet)?.emoji} {diet}
+                </Badge>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>
   );
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Heart className="h-5 w-5" />
-            Planning Date with {partnerName}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary">
-              <Clock className="h-3 w-3 mr-1" />
-              Session expires in 24h
-            </Badge>
-            {compatibilityScore !== null && (
-              <Badge className="bg-purple-100 text-purple-700">
-                <Sparkles className="h-3 w-3 mr-1" />
-                {typeof compatibilityScore === 'number' 
-                  ? Math.round(compatibilityScore * 100) 
-                  : Math.round(compatibilityScore.overall_score * 100)}% Compatible
-              </Badge>
-            )}
-          </div>
-        </CardHeader>
-      </Card>
-
+    <SafeComponent>
       {aiAnalyzing && (
         <Card className="border-blue-200 bg-blue-50">
           <CardContent className="p-6 text-center">
@@ -809,7 +787,7 @@ useEffect(() => {
           });
           
           // If both users have completed preferences but analysis hasn't started, show continue button
-          if (userHasCompletedPrefs && partnerHasCompletedPrefs && onManualContinue) {
+          if (userHasCompletedPrefs && partnerHasCompletedPrefs && typeof onManualContinue === 'function') {
             return (
               <div className="space-y-4">
                 <CollaborativeWaitingState
@@ -846,8 +824,7 @@ useEffect(() => {
                     </p>
                     <div className="bg-white/60 rounded-lg p-3 border border-green-200">
                       <p className="text-sm text-green-700">
-                        <strong>What happens next:</strong> Once {partnerName} sets their preferences, 
-                        you'll both see AI-curated venue recommendations based on your combined compatibility.
+                        <strong>Next step:</strong> Our AI will analyze your compatibility and suggest perfect venues when both partners are ready.
                       </p>
                     </div>
                   </CardContent>
@@ -898,18 +875,18 @@ useEffect(() => {
               <Button onClick={submitPreferences} disabled={loading}>
                 {loading ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Saving...
                   </>
                 ) : (
-                  'Send Invite'
+                  'Save Preferences'
                 )}
               </Button>
             )}
           </div>
         </CardContent>
       </Card>
-    </div>
+    </SafeComponent>
   );
 };
 
