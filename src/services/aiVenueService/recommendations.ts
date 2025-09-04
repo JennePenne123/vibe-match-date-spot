@@ -95,10 +95,24 @@ export const getAIVenueRecommendations = async (
       const scoreData = await getStoredAIScore(venue.id, userId);
 
       // Ensure clean venue_id - critical fix for venue display issue
-      const cleanVenueId = typeof venue.id === 'string' ? venue.id.trim() : String(venue.id || '').trim();
+      let cleanVenueId = '';
       
-      if (!cleanVenueId) {
-        console.error(`❌ RECOMMENDATIONS: Venue "${venue.name}" has invalid ID:`, venue.id);
+      // Handle different ID formats and ensure we get a valid string
+      if (typeof venue.id === 'string' && venue.id.trim()) {
+        cleanVenueId = venue.id.trim();
+      } else if (venue.id && typeof venue.id === 'object' && venue.id.value) {
+        cleanVenueId = String(venue.id.value).trim();
+      } else if (venue.id) {
+        cleanVenueId = String(venue.id).trim();
+      }
+      
+      // Final validation - skip venues without valid IDs
+      if (!cleanVenueId || cleanVenueId === 'undefined' || cleanVenueId === 'null') {
+        console.error(`❌ RECOMMENDATIONS: Venue "${venue.name}" has invalid ID:`, {
+          originalId: venue.id,
+          cleanId: cleanVenueId,
+          type: typeof venue.id
+        });
         continue; // Skip venues without valid IDs
       }
 
@@ -334,12 +348,18 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
           }
         }
 
-        // Always create a venue ID - use database ID if available, otherwise generate fallback from place_id
-        const finalVenueId = venueId || venue.placeId || `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // Always use Google Place ID as primary ID - this ensures venues can be selected
+        const finalVenueId = venue.placeId || venueId || `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        console.log(`🆔 GOOGLE PLACES: Venue "${venue.name}" ID assignment:`, {
+          placeId: venue.placeId,
+          dbVenueId: venueId,
+          finalId: finalVenueId
+        });
         
         // Validate we have a proper place_id for venue selection
         if (!venue.placeId) {
-          console.warn(`⚠️ GOOGLE PLACES: Venue "${venue.name}" missing placeId - using generated ID: ${finalVenueId}`);
+          console.warn(`⚠️ GOOGLE PLACES: Venue "${venue.name}" missing placeId - using fallback: ${finalVenueId}`);
         }
         
         transformedVenues.push({
