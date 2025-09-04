@@ -147,6 +147,20 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Temporary Debug Info */}
+          <div className="bg-muted p-4 rounded-lg text-sm">
+            <p className="font-semibold mb-2">🔍 DEBUG: Component received {venueRecommendations.length} venues</p>
+            <p>Valid venues (getVenueId): {venueRecommendations.filter(v => getVenueId(v)).length}</p>
+            {venueRecommendations.length > 0 && (
+              <details className="mt-2">
+                <summary className="cursor-pointer">Show first venue raw data</summary>
+                <pre className="mt-2 text-xs bg-background p-2 rounded overflow-auto max-h-48">
+                  {JSON.stringify(venueRecommendations[0], null, 2)}
+                </pre>
+              </details>
+            )}
+          </div>
+          
           {venueRecommendations.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground mb-4">No venue recommendations found.</p>

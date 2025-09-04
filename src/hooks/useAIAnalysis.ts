@@ -167,6 +167,12 @@ export const useAIAnalysis = () => {
         console.log('🎉 AI ANALYSIS: Successfully got venues:', venues.map(v => `${v.venue_name} (${v.ai_score}%)`));
         console.log('🎉 AI ANALYSIS: Setting venue recommendations in state, count:', venues.length);
         console.log('🎉 AI ANALYSIS: First venue details:', venues[0]);
+        console.log('🔍 AI ANALYSIS: First venue venue_id debug:', {
+          venue_id: venues[0]?.venue_id,
+          venue_id_type: typeof venues[0]?.venue_id,
+          venue_id_serialized: JSON.stringify(venues[0]?.venue_id),
+          full_venue_keys: venues[0] ? Object.keys(venues[0]) : []
+        });
         setVenueRecommendations(venues);
         setVenueSearchError(null);
         

@@ -171,6 +171,15 @@ export const getAIVenueRecommendations = async (
     for (let i = 0; i < sortedRecommendations.length; i++) {
       const rec = sortedRecommendations[i];
       
+      console.log(`🔍 FINAL VALIDATION DEBUG: Venue ${i}:`, {
+        venue_name: rec.venue_name,
+        venue_id: rec.venue_id,
+        venue_id_type: typeof rec.venue_id,
+        venue_id_full_object: JSON.stringify(rec.venue_id),
+        has_venue_id_property: 'venue_id' in rec,
+        rec_keys: Object.keys(rec)
+      });
+      
       // Critical check - venue_id MUST exist and be a valid string
       if (!rec.venue_id || typeof rec.venue_id !== 'string' || rec.venue_id.trim().length === 0) {
         console.error(`🚨 RECOMMENDATIONS: CRITICAL FAILURE - Venue being returned without valid venue_id:`, {
@@ -206,7 +215,8 @@ export const getAIVenueRecommendations = async (
         venue_name: validatedRecommendations[0].venue_name,
         has_venue_id_field: 'venue_id' in validatedRecommendations[0],
         venue_id_type: typeof validatedRecommendations[0].venue_id,
-        all_keys: Object.keys(validatedRecommendations[0])
+        all_keys: Object.keys(validatedRecommendations[0]),
+        full_first_venue: JSON.stringify(validatedRecommendations[0])
       });
     }
       
