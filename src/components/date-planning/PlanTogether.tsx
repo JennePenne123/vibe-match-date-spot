@@ -36,16 +36,42 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
     venuesSample: venueRecommendations?.slice(0, 2)
   });
 
-  // Helper function to extract venue ID from various formats
+  // Enhanced helper function to extract venue ID from various formats
   const getVenueId = (venue: AIVenueRecommendation): string | null => {
+    console.log('🔍 VENUE ID EXTRACTION: Processing venue:', {
+      venue_name: venue.venue_name,
+      venue_id: venue.venue_id,
+      venue_id_type: typeof venue.venue_id,
+      raw_venue_id: JSON.stringify(venue.venue_id)
+    });
+
     // Handle venue_id as an object with value property (data transformation issue)
-    if (venue.venue_id && typeof venue.venue_id === 'object' && 'value' in (venue.venue_id as any)) {
-      return (venue.venue_id as any).value || null;
+    if (venue.venue_id && typeof venue.venue_id === 'object') {
+      if ('value' in (venue.venue_id as any)) {
+        const extractedValue = (venue.venue_id as any).value;
+        console.log('🔍 VENUE ID EXTRACTION: Extracted from object.value:', extractedValue);
+        if (typeof extractedValue === 'string' && extractedValue.trim() && extractedValue !== 'undefined') {
+          return extractedValue.trim();
+        }
+      }
+      console.warn('⚠️ VENUE ID EXTRACTION: Invalid object venue_id:', venue.venue_id);
+      return null;
     }
+    
     // Handle venue_id as a string
-    if (typeof venue.venue_id === 'string' && venue.venue_id.trim()) {
-      return venue.venue_id;
+    if (typeof venue.venue_id === 'string' && venue.venue_id.trim() && venue.venue_id !== 'undefined') {
+      console.log('🔍 VENUE ID EXTRACTION: Valid string venue_id:', venue.venue_id);
+      return venue.venue_id.trim();
     }
+    
+    // Fallback: try to use any available ID field
+    const fallbackId = (venue as any).id || (venue as any).place_id || (venue as any).google_place_id;
+    if (fallbackId && typeof fallbackId === 'string' && fallbackId.trim()) {
+      console.log('🔍 VENUE ID EXTRACTION: Using fallback ID:', fallbackId);
+      return fallbackId.trim();
+    }
+    
+    console.error('❌ VENUE ID EXTRACTION: No valid ID found for venue:', venue.venue_name);
     return null;
   };
 

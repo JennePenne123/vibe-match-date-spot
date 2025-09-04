@@ -94,8 +94,18 @@ export const getAIVenueRecommendations = async (
       // Get stored AI score data for additional context
       const scoreData = await getStoredAIScore(venue.id, userId);
 
+      // Ensure clean venue_id - critical fix for venue display issue
+      const cleanVenueId = typeof venue.id === 'string' ? venue.id.trim() : String(venue.id || '').trim();
+      
+      if (!cleanVenueId) {
+        console.error(`❌ RECOMMENDATIONS: Venue "${venue.name}" has invalid ID:`, venue.id);
+        continue; // Skip venues without valid IDs
+      }
+
+      console.log(`🔍 RECOMMENDATIONS: Processing venue ${venue.name} with clean ID: "${cleanVenueId}"`);
+
       const recommendation: AIVenueRecommendation = {
-        venue_id: venue.id,
+        venue_id: cleanVenueId, // Always ensure this is a clean string
         venue_name: venue.name,
         venue_address: venue.address || venue.location || venue.vicinity || 'Address not available',
         venue_image: venue.image_url || venue.image,
@@ -115,9 +125,9 @@ export const getAIVenueRecommendations = async (
         amenities: venue.tags || []
       };
 
-      // Validate the recommendation has a proper venue_id before adding
-      if (!recommendation.venue_id) {
-        console.error(`❌ RECOMMENDATIONS: Critical error - recommendation for ${venue.name} has no venue_id!`);
+      // Final validation - ensure venue_id is never an object or undefined
+      if (typeof recommendation.venue_id !== 'string' || !recommendation.venue_id.trim()) {
+        console.error(`❌ RECOMMENDATIONS: Critical error - recommendation for ${venue.name} has invalid venue_id:`, recommendation.venue_id);
         continue; // Skip this venue
       }
       
