@@ -139,6 +139,15 @@ export const getAIVenueRecommendations = async (
         amenities: venue.tags || []
       };
 
+      console.log(`✅ RECOMMENDATIONS: Created venue recommendation for "${venue.name}" with ID: "${cleanVenueId}"`);
+      console.log(`🔍 RECOMMENDATIONS: Venue data structure:`, {
+        venue_id: recommendation.venue_id,
+        venue_name: recommendation.venue_name,
+        ai_score: recommendation.ai_score,
+        hasValidId: !!recommendation.venue_id,
+        idType: typeof recommendation.venue_id
+      });
+
       // Final validation - ensure venue_id is never an object or undefined
       if (typeof recommendation.venue_id !== 'string' || !recommendation.venue_id.trim()) {
         console.error(`❌ RECOMMENDATIONS: Critical error - recommendation for ${venue.name} has invalid venue_id:`, recommendation.venue_id);

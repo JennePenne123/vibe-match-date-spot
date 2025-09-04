@@ -38,30 +38,46 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
 
   // Enhanced helper function to extract venue ID from various formats
   const getVenueId = (venue: AIVenueRecommendation): string | null => {
+    console.log('🔍 VENUE ID EXTRACTION: Processing venue:', {
+      venue_name: venue.venue_name,
+      venue_id: venue.venue_id,
+      venue_id_type: typeof venue.venue_id,
+      hasVenueId: !!venue.venue_id,
+      fallbackId: (venue as any).id,
+      placeId: (venue as any).place_id
+    });
+
+    // Primary: Handle venue_id as a string (expected format)
+    if (typeof venue.venue_id === 'string' && venue.venue_id.trim() && venue.venue_id !== 'undefined') {
+      console.log('✅ Using primary venue_id:', venue.venue_id);
+      return venue.venue_id.trim();
+    }
+    
     // Handle venue_id as an object with value property (data transformation issue)
     if (venue.venue_id && typeof venue.venue_id === 'object') {
       if ('value' in (venue.venue_id as any)) {
         const extractedValue = (venue.venue_id as any).value;
         if (typeof extractedValue === 'string' && extractedValue.trim() && extractedValue !== 'undefined') {
+          console.log('✅ Using extracted venue_id.value:', extractedValue);
           return extractedValue.trim();
         }
       }
       console.warn('⚠️ VENUE ID EXTRACTION: Invalid object venue_id for', venue.venue_name, venue.venue_id);
-      return null;
-    }
-    
-    // Handle venue_id as a string
-    if (typeof venue.venue_id === 'string' && venue.venue_id.trim() && venue.venue_id !== 'undefined') {
-      return venue.venue_id.trim();
     }
     
     // Fallback: try to use any available ID field
     const fallbackId = (venue as any).id || (venue as any).place_id || (venue as any).google_place_id;
     if (fallbackId && typeof fallbackId === 'string' && fallbackId.trim()) {
+      console.log('✅ Using fallback ID:', fallbackId);
       return fallbackId.trim();
     }
     
-    console.error('❌ VENUE ID EXTRACTION: No valid ID found for venue:', venue.venue_name);
+    console.error('❌ VENUE ID EXTRACTION: No valid ID found for venue:', {
+      venue_name: venue.venue_name,
+      venue_id: venue.venue_id,
+      allKeys: Object.keys(venue),
+      venue: venue
+    });
     return null;
   };
 
@@ -131,6 +147,21 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Debug Info - Temporary */}
+          <div className="bg-muted p-4 rounded-lg text-sm">
+            <p className="font-semibold mb-2">🔍 Debug Info:</p>
+            <p>Total venues received: {venueRecommendations.length}</p>
+            <p>Valid venues after filtering: {venueRecommendations.filter(v => getVenueId(v)).length}</p>
+            {venueRecommendations.length > 0 && (
+              <details className="mt-2">
+                <summary className="cursor-pointer">Show first venue structure</summary>
+                <pre className="mt-2 text-xs bg-background p-2 rounded overflow-auto max-h-32">
+                  {JSON.stringify(venueRecommendations[0], null, 2)}
+                </pre>
+              </details>
+            )}
+          </div>
+          
           {venueRecommendations.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground mb-4">No venue recommendations found.</p>
@@ -148,10 +179,13 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
                 console.error('🚨 PLAN TOGETHER - Skipping venue without valid ID:', {
                   venue_name: venue.venue_name,
                   venue_id: venue.venue_id,
-                  index
+                  index,
+                  fullVenue: venue
                 });
                 return null;
               }
+
+              console.log(`✅ PLAN TOGETHER - Rendering venue: ${venue.venue_name} with ID: ${venueId}`);
 
               return (
                 <div key={`${venueId}-${index}`} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
