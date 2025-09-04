@@ -27,14 +27,17 @@ const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress, planningMode 
         <div className="flex justify-between px-2">
           {planningMode === 'collaborative' ? (
             <>
-              <Caption className={`tracking-tight transition-colors duration-300 ${progress >= 33 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                Both Set Preferences
+              <Caption className={`tracking-tight transition-colors duration-300 ${progress >= 25 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                Set Preferences
               </Caption>
-              <Caption className={`tracking-tight transition-colors duration-300 ${progress >= 66 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+              <Caption className={`tracking-tight transition-colors duration-300 ${progress >= 50 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
                 AI Match Analysis
               </Caption>
-              <Caption className={`tracking-tight transition-colors duration-300 ${progress >= 100 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+              <Caption className={`tracking-tight transition-colors duration-300 ${progress >= 75 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
                 Plan Together
+              </Caption>
+              <Caption className={`tracking-tight transition-colors duration-300 ${progress >= 100 ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                Send Invitation
               </Caption>
             </>
           ) : (

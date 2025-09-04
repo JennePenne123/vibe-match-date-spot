@@ -434,6 +434,10 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     handleVenueSelection,
     handleSendInvitation,
     handleStartFromScratch,
-    handleManualContinue
+    handleManualContinue,
+    handleContinueToPlanning: () => {
+      console.log('🚀 Handler - Continuing from AI analysis to plan together step');
+      setCurrentStep('plan-together');
+    }
   };
 };

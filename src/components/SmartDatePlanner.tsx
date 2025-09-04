@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
-// Import step components
+import PlanTogether from '@/components/date-planning/PlanTogether';
+import InvitationCreation from '@/components/date-planning/InvitationCreation';
 import PlanningHeader from '@/components/date-planning/PlanningHeader';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import PreferencesStep from '@/components/date-planning/PreferencesStep';
 import MatchReview from '@/components/date-planning/MatchReview';
-import InvitationCreation from '@/components/date-planning/InvitationCreation';
 import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
 import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
 
@@ -153,7 +153,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     handleVenueSelection,
     handleSendInvitation,
     handleStartFromScratch,
-    handleManualContinue
+    handleManualContinue,
+    handleContinueToPlanning
   } = handlers;
 
   // Function to render invitation step without IIFE anti-pattern
@@ -311,8 +312,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   compatibilityScore={compatibilityScore || 0}
                   partnerName={selectedPartner.name}
                   partnerId={selectedPartnerId}
-                  venueRecommendations={venueRecommendations || []}
-                  onVenueSelect={handleVenueSelection}
+                  venueCount={venueRecommendations?.length || 0}
+                  onContinueToPlanning={handleContinueToPlanning}
                   error={datePlanningError || undefined}
                   onRetrySearch={() => {
                     // Retry search functionality
@@ -322,6 +323,22 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   isCollaborative={true}
                   hasPartnerSetPreferences={collaborativeSession ? hasPartnerSetPreferences : (currentSession?.partner_preferences_complete || false)}
                   isWaitingForPartner={collaborativeSession ? !canShowResults : !currentSession?.both_preferences_complete}
+                />
+              )}
+
+              {(currentStep === 'plan-together') && selectedPartner && (
+                <PlanTogether
+                  partnerName={selectedPartner.name}
+                  partnerId={selectedPartnerId}
+                  venueRecommendations={venueRecommendations || []}
+                  onVenueSelect={handleVenueSelection}
+                  error={datePlanningError || undefined}
+                  onRetrySearch={() => {
+                    // Retry search functionality
+                    console.log('Retrying venue search...');
+                  }}
+                  sessionId={collaborativeSession?.id || currentSession?.id}
+                  isCollaborative={true}
                 />
               )}
 
@@ -424,8 +441,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   compatibilityScore={compatibilityScore || 0}
                   partnerName={selectedPartner.name}
                   partnerId={selectedPartnerId}
-                  venueRecommendations={venueRecommendations || []}
-                  onVenueSelect={handleVenueSelection}
+                  venueCount={venueRecommendations?.length || 0}
+                  onContinueToPlanning={handleContinueToPlanning}
                   error={datePlanningError || undefined}
                   onRetrySearch={() => {
                     console.log('Retrying venue search...');
@@ -434,6 +451,23 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   isCollaborative={true}
                   hasPartnerSetPreferences={collaborativeSession ? hasPartnerSetPreferences : (currentSession?.partner_preferences_complete || false)}
                   isWaitingForPartner={collaborativeSession ? !canShowResults : !currentSession?.both_preferences_complete}
+                />
+              </div>
+            )}
+
+            {currentStep === 'plan-together' && selectedPartner && (
+              <div className="animate-fade-in">
+                <PlanTogether
+                  partnerName={selectedPartner.name}
+                  partnerId={selectedPartnerId}
+                  venueRecommendations={venueRecommendations || []}
+                  onVenueSelect={handleVenueSelection}
+                  error={datePlanningError || undefined}
+                  onRetrySearch={() => {
+                    console.log('Retrying venue search...');
+                  }}
+                  sessionId={collaborativeSession?.id || currentSession?.id}
+                  isCollaborative={true}
                 />
               </div>
             )}
