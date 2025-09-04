@@ -26,6 +26,14 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[]) =
 
     // Score venues based on preference matches
     const scoredVenues = venues.map(venue => {
+      console.log(`🎯 PREFERENCE FILTER: Processing venue:`, {
+        name: venue.name || venue.venue_name,
+        id: venue.id,
+        venue_id: venue.venue_id,
+        placeId: venue.placeId,
+        all_keys: Object.keys(venue)
+      });
+
       let score = 0;
       let maxScore = 0;
 
@@ -71,10 +79,25 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[]) =
 
       const matchPercentage = maxScore > 0 ? (score / maxScore) * 100 : 50;
       
-      return {
+      // CRITICAL: Preserve the venue ID field explicitly
+      const scoredVenue = {
         ...venue,
         preferenceScore: matchPercentage
       };
+
+      // Ensure venue_id is preserved - try multiple ID sources
+      if (!scoredVenue.venue_id && (venue.id || venue.placeId)) {
+        scoredVenue.venue_id = venue.id || venue.placeId;
+        console.log(`🔧 PREFERENCE FILTER: Assigned venue_id from fallback:`, scoredVenue.venue_id);
+      }
+
+      console.log(`🎯 PREFERENCE FILTER: Scored venue result:`, {
+        name: scoredVenue.name || scoredVenue.venue_name,
+        venue_id: scoredVenue.venue_id,
+        preferenceScore: scoredVenue.preferenceScore
+      });
+
+      return scoredVenue;
     });
 
     // Sort by preference score and return venues with at least some match
@@ -126,6 +149,14 @@ export const filterVenuesByCollaborativePreferences = async (
 
     // Score venues based on combined preferences
     const collaborativeScoredVenues = venues.map(venue => {
+      console.log(`🤝 COLLABORATIVE FILTER: Processing venue:`, {
+        name: venue.name || venue.venue_name,
+        id: venue.id,
+        venue_id: venue.venue_id,
+        placeId: venue.placeId,
+        all_keys: Object.keys(venue)
+      });
+
       let userScore = 0;
       let partnerScore = 0;
       let sharedScore = 0;
@@ -168,13 +199,28 @@ export const filterVenuesByCollaborativePreferences = async (
       // Heavily weight shared preferences, moderately weight individual
       const collaborativeScore = (sharedScore * 1.5 + (userScore + partnerScore) * 0.5) / 2;
       
-      return {
+      // CRITICAL: Preserve the venue ID field explicitly
+      const collaborativeVenue = {
         ...venue,
         collaborativeScore,
         userScore,
         partnerScore,
         sharedScore
       };
+
+      // Ensure venue_id is preserved - try multiple ID sources
+      if (!collaborativeVenue.venue_id && (venue.id || venue.placeId)) {
+        collaborativeVenue.venue_id = venue.id || venue.placeId;
+        console.log(`🔧 COLLABORATIVE FILTER: Assigned venue_id from fallback:`, collaborativeVenue.venue_id);
+      }
+
+      console.log(`🤝 COLLABORATIVE FILTER: Scored venue result:`, {
+        name: collaborativeVenue.name || collaborativeVenue.venue_name,
+        venue_id: collaborativeVenue.venue_id,
+        collaborativeScore: collaborativeVenue.collaborativeScore
+      });
+
+      return collaborativeVenue;
     });
 
     // Sort by collaborative score

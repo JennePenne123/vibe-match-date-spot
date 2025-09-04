@@ -147,18 +147,41 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Temporary Debug Info */}
-          <div className="bg-muted p-4 rounded-lg text-sm">
-            <p className="font-semibold mb-2">🔍 DEBUG: Component received {venueRecommendations.length} venues</p>
-            <p>Valid venues (getVenueId): {venueRecommendations.filter(v => getVenueId(v)).length}</p>
-            {venueRecommendations.length > 0 && (
-              <details className="mt-2">
-                <summary className="cursor-pointer">Show first venue raw data</summary>
-                <pre className="mt-2 text-xs bg-background p-2 rounded overflow-auto max-h-48">
-                  {JSON.stringify(venueRecommendations[0], null, 2)}
-                </pre>
-              </details>
-            )}
+          {/* Debug Info and Preferences Reset */}
+          <div className="bg-muted p-4 rounded-lg text-sm space-y-3">
+            <div>
+              <p className="font-semibold mb-2">🔍 DEBUG: Component received {venueRecommendations.length} venues</p>
+              <p>Valid venues (has venue_id): {venueRecommendations.filter(v => getVenueId(v)).length}</p>
+              {venueRecommendations.length > 0 && (
+                <details className="mt-2">
+                  <summary className="cursor-pointer">Show first venue raw data</summary>
+                  <pre className="mt-2 text-xs bg-background p-2 rounded overflow-auto max-h-48">
+                    {JSON.stringify(venueRecommendations[0], null, 2)}
+                  </pre>
+                </details>
+              )}
+            </div>
+            
+            <div className="border-t pt-3">
+              <p className="font-semibold mb-2">🔧 Quick Fix Options:</p>
+              <div className="flex gap-2">
+                <button 
+                  onClick={async () => {
+                    try {
+                      const { data, error } = await import('@/integrations/supabase/client').then(m => 
+                        m.supabase.from('user_preferences').delete().eq('user_id', 'current-user-id')
+                      );
+                      alert('Preferences cleared! Try setting them again.');
+                    } catch (e) {
+                      alert('Clear failed: ' + e);
+                    }
+                  }}
+                  className="px-3 py-1 bg-destructive text-destructive-foreground rounded text-xs"
+                >
+                  Clear My Preferences
+                </button>
+              </div>
+            </div>
           </div>
           
           {venueRecommendations.length === 0 ? (
