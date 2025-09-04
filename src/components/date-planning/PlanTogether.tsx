@@ -32,24 +32,40 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
   console.log('🤝 PLAN TOGETHER: Rendering collaborative venue selection:', {
     count: venueRecommendations?.length || 0,
     partnerName,
-    sessionId
+    sessionId,
+    venuesSample: venueRecommendations?.slice(0, 2)
   });
 
+  // Helper function to extract venue ID from various formats
+  const getVenueId = (venue: AIVenueRecommendation): string | null => {
+    // Handle venue_id as an object with value property (data transformation issue)
+    if (venue.venue_id && typeof venue.venue_id === 'object' && 'value' in (venue.venue_id as any)) {
+      return (venue.venue_id as any).value || null;
+    }
+    // Handle venue_id as a string
+    if (typeof venue.venue_id === 'string' && venue.venue_id.trim()) {
+      return venue.venue_id;
+    }
+    return null;
+  };
+
   const handleVenueSelect = (venue: AIVenueRecommendation) => {
+    const venueId = getVenueId(venue);
+    
     console.log('🎯 PLAN TOGETHER - Venue selected:', {
       venueName: venue.venue_name,
-      venueId: venue.venue_id,
-      hasVenueId: !!venue.venue_id
+      extractedVenueId: venueId,
+      rawVenueId: venue.venue_id
     });
 
-    if (!venue.venue_id) {
-      console.error('🎯 PLAN TOGETHER - CRITICAL ERROR: Venue missing ID!', venue);
+    if (!venueId) {
+      console.error('🎯 PLAN TOGETHER - CRITICAL ERROR: Venue missing valid ID!', venue);
       alert('Error: This venue cannot be selected due to missing data. Please try another venue or refresh the page.');
       return;
     }
 
-    console.log('🎯 PLAN TOGETHER - Proceeding with venue selection:', venue.venue_id);
-    onVenueSelect(venue.venue_id);
+    console.log('🎯 PLAN TOGETHER - Proceeding with venue selection:', venueId);
+    onVenueSelect(venueId);
   };
 
   if (error) {
@@ -110,13 +126,19 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
             </div>
           ) : (
             venueRecommendations.map((venue, index) => {
-              if (!venue.venue_id) {
-                console.error('🚨 PLAN TOGETHER - Skipping venue without ID:', venue);
+              const venueId = getVenueId(venue);
+              
+              if (!venueId) {
+                console.error('🚨 PLAN TOGETHER - Skipping venue without valid ID:', {
+                  venue_name: venue.venue_name,
+                  venue_id: venue.venue_id,
+                  index
+                });
                 return null;
               }
 
               return (
-                <div key={venue.venue_id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div key={`${venueId}-${index}`} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                   <AIVenueCard
                     recommendation={venue}
                     onSelect={() => handleVenueSelect(venue)}
