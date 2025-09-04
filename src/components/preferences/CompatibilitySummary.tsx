@@ -24,6 +24,48 @@ const CompatibilitySummary: React.FC<CompatibilitySummaryProps> = ({
     return myItems.filter(item => partnerItems.includes(item));
   };
 
+  const hasMyPreferences = 
+    (myPreferences.preferred_cuisines?.length > 0) ||
+    (myPreferences.preferred_vibes?.length > 0) ||
+    (myPreferences.preferred_times?.length > 0) ||
+    (myPreferences.preferred_price_range?.length > 0);
+
+  const hasPartnerPreferences = 
+    (partnerPreferences.preferred_cuisines?.length > 0) ||
+    (partnerPreferences.preferred_vibes?.length > 0) ||
+    (partnerPreferences.preferred_times?.length > 0) ||
+    (partnerPreferences.preferred_price_range?.length > 0);
+
+  if (!hasMyPreferences && !hasPartnerPreferences) {
+    return (
+      <Card className="bg-gray-50 border-gray-200">
+        <CardHeader>
+          <CardTitle className="text-gray-600">Compatibility Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-gray-500">
+            No preferences set for either user - please set preferences to see compatibility
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!hasMyPreferences || !hasPartnerPreferences) {
+    return (
+      <Card className="bg-yellow-50 border-yellow-200">
+        <CardHeader>
+          <CardTitle className="text-yellow-800">Compatibility Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-yellow-700">
+            {!hasMyPreferences ? "You haven't" : "Your partner hasn't"} set preferences yet - compatibility cannot be calculated
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="bg-green-50 border-green-200">
       <CardHeader>

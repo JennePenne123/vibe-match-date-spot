@@ -156,8 +156,11 @@ export const calculateCompatibilityScore = async (
 };
 
 const calculateArrayCompatibility = (arr1: string[], arr2: string[]): number => {
-  if (arr1.length === 0 && arr2.length === 0) return 1.0;
-  if (arr1.length === 0 || arr2.length === 0) return 0.5;
+  // Both have empty preferences - no data for compatibility
+  if (arr1.length === 0 && arr2.length === 0) return 0.0;
+  
+  // One has empty preferences - can't calculate meaningful compatibility
+  if (arr1.length === 0 || arr2.length === 0) return 0.0;
 
   const shared = getSharedItems(arr1, arr2);
   const total = new Set([...arr1, ...arr2]).size;

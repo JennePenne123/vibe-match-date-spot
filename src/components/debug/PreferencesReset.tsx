@@ -65,6 +65,61 @@ export const PreferencesReset: React.FC = () => {
     }
   };
 
+  const clearAllPreferences = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to clear preferences",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      console.log('🔄 PREFERENCES CLEAR: Starting complete clear for user:', user.id);
+
+      // Delete existing preferences
+      const { error: deleteError } = await supabase
+        .from('user_preferences')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (deleteError) throw deleteError;
+
+      // Insert completely empty preferences
+      const { error: insertError } = await supabase
+        .from('user_preferences')
+        .insert({
+          user_id: user.id,
+          preferred_cuisines: [],
+          preferred_price_range: [],
+          preferred_vibes: [],
+          preferred_times: [],
+          dietary_restrictions: [],
+          max_distance: null
+        });
+
+      if (insertError) throw insertError;
+
+      console.log('✅ PREFERENCES CLEAR: Successfully cleared all preferences');
+      toast({
+        title: "Success",
+        description: "All preferences have been completely cleared",
+      });
+
+    } catch (error) {
+      console.error('❌ PREFERENCES CLEAR: Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to clear preferences. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const clearAllSessions = async () => {
     if (!user) return;
 
@@ -122,10 +177,10 @@ export const PreferencesReset: React.FC = () => {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">
-            Reset your preferences to eliminate any cached state that might be causing filtering issues.
+            Control your preferences to test different scenarios and eliminate cached state issues.
           </p>
           
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               onClick={resetUserPreferences}
               disabled={isResetting}
@@ -133,7 +188,17 @@ export const PreferencesReset: React.FC = () => {
               size="sm"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Reset Preferences
+              Reset to Defaults
+            </Button>
+
+            <Button
+              onClick={clearAllPreferences}
+              disabled={isResetting}
+              variant="outline"
+              size="sm"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Clear All Preferences
             </Button>
 
             <Button
@@ -149,7 +214,8 @@ export const PreferencesReset: React.FC = () => {
         </div>
 
         <div className="text-xs text-muted-foreground">
-          <p><strong>Reset Preferences:</strong> Clears and recreates your user preferences with Italian/International cuisine defaults</p>
+          <p><strong>Reset to Defaults:</strong> Sets Italian/International cuisine defaults with standard preferences</p>
+          <p><strong>Clear All Preferences:</strong> Completely empties all preference arrays (for testing no-preference scenarios)</p>
           <p><strong>Clear Sessions:</strong> Removes all your planning sessions to start fresh</p>
         </div>
       </CardContent>

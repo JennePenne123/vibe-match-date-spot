@@ -270,13 +270,24 @@ const getVenuesFromGooglePlaces = async (userId: string, limit: number, userLoca
       throw new Error('User preferences not found. Please set your preferences first.');
     }
 
-    // Validate and fix preferences
+    // Handle empty preferences without forcing defaults
+    const hasValidPreferences = 
+      (userPrefs.preferred_cuisines?.length > 0) ||
+      (userPrefs.preferred_vibes?.length > 0) ||
+      (userPrefs.preferred_times?.length > 0) ||
+      (userPrefs.preferred_price_range?.length > 0);
+
+    if (!hasValidPreferences) {
+      console.warn('⚠️ GOOGLE PLACES: User has no preferences set, will return generic results');
+    }
+
     const fixedPrefs = {
-      preferred_cuisines: userPrefs.preferred_cuisines?.length ? userPrefs.preferred_cuisines : ['Italian'],
-      preferred_vibes: userPrefs.preferred_vibes?.length ? userPrefs.preferred_vibes : ['romantic'],
-      preferred_times: userPrefs.preferred_times?.length ? userPrefs.preferred_times : ['lunch'],
-      preferred_price_range: userPrefs.preferred_price_range?.length ? userPrefs.preferred_price_range : ['$$'],
-      max_distance: userPrefs.max_distance || 10
+      preferred_cuisines: userPrefs.preferred_cuisines || [],
+      preferred_vibes: userPrefs.preferred_vibes || [],
+      preferred_times: userPrefs.preferred_times || [],
+      preferred_price_range: userPrefs.preferred_price_range || [],
+      max_distance: userPrefs.max_distance || 10,
+      hasValidPreferences
     };
 
     console.log('✅ PREFERENCES VALIDATED:', fixedPrefs);
