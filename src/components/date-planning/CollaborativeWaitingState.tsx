@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, User, AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-
 interface CollaborativeWaitingStateProps {
   partnerName: string;
   sessionId: string;
@@ -12,7 +11,6 @@ interface CollaborativeWaitingStateProps {
   bothPreferencesComplete?: boolean;
   onManualContinue?: () => void;
 }
-
 const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
   partnerName,
   sessionId,
@@ -23,47 +21,10 @@ const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
 }) => {
   // New state: Both users have set preferences, ready to continue
   if (bothPreferencesComplete && onManualContinue) {
-    return (
-      <Card className="border-green-200 bg-green-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-green-800">
-            <CheckCircle className="h-5 w-5" />
-            Ready to Continue!
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="h-8 w-8 text-green-500" />
-            <div>
-              <p className="text-sm text-green-700 font-medium">
-                Both you and {partnerName} have set your preferences
-              </p>
-              <p className="text-xs text-green-600">
-                Ready to start AI analysis and find perfect venues for your date!
-              </p>
-            </div>
-          </div>
-          
-          <div className="bg-white/60 rounded-lg p-3 border border-green-200">
-            <p className="text-xs text-green-700 mb-3">
-              <strong>🎯 Next:</strong> Our AI will analyze your compatibility and recommend venues that match both of your preferences.
-            </p>
-            <Button 
-              onClick={onManualContinue}
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-            >
-              Continue to AI Analysis
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return;
   }
-
   if (isWaitingForPartner) {
-    return (
-      <Card className="border-amber-200 bg-amber-50">
+    return <Card className="border-amber-200 bg-amber-50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-amber-800">
             <Clock className="h-5 w-5" />
@@ -90,13 +51,10 @@ const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
             </p>
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
-
   if (!hasPartnerSetPreferences) {
-    return (
-      <Card className="border-gray-200 bg-gray-50">
+    return <Card className="border-gray-200 bg-gray-50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-gray-700">
             <AlertCircle className="h-5 w-5" />
@@ -125,11 +83,8 @@ const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
             </p>
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
-
   return null;
 };
-
 export default CollaborativeWaitingState;
