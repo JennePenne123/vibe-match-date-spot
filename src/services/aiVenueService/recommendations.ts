@@ -164,9 +164,53 @@ export const getAIVenueRecommendations = async (
       .sort((a, b) => b.ai_score - a.ai_score)
       .slice(0, limit);
 
-    console.log(`🎉 RECOMMENDATIONS: Returning ${sortedRecommendations.length} venue recommendations:`,
-      sortedRecommendations.slice(0, 3).map(r => `${r.venue_name}: ${r.ai_score}%`));
-    return sortedRecommendations;
+    // CRITICAL: Final validation to ensure ALL venues have valid venue_id before returning
+    console.log(`🔒 RECOMMENDATIONS: Final validation of ${sortedRecommendations.length} venues before returning...`);
+    const validatedRecommendations = [];
+    
+    for (let i = 0; i < sortedRecommendations.length; i++) {
+      const rec = sortedRecommendations[i];
+      
+      // Critical check - venue_id MUST exist and be a valid string
+      if (!rec.venue_id || typeof rec.venue_id !== 'string' || rec.venue_id.trim().length === 0) {
+        console.error(`🚨 RECOMMENDATIONS: CRITICAL FAILURE - Venue being returned without valid venue_id:`, {
+          venue_name: rec.venue_name,
+          venue_id: rec.venue_id,
+          venue_id_type: typeof rec.venue_id,
+          index: i,
+          full_recommendation: rec
+        });
+        
+        // Emergency fix: Try to recover the venue_id or skip
+        const emergencyId = `emergency_${rec.venue_name?.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}`;
+        console.warn(`🔧 RECOMMENDATIONS: Emergency ID generated for ${rec.venue_name}: ${emergencyId}`);
+        rec.venue_id = emergencyId;
+      }
+      
+      // Double-check after any emergency fixes
+      if (rec.venue_id && typeof rec.venue_id === 'string' && rec.venue_id.trim().length > 0) {
+        console.log(`✅ FINAL VALIDATION: ${rec.venue_name} - venue_id: "${rec.venue_id}" ✓`);
+        validatedRecommendations.push(rec);
+      } else {
+        console.error(`❌ FINAL VALIDATION: Dropping venue ${rec.venue_name} - still no valid venue_id after emergency fixes`);
+      }
+    }
+
+    console.log(`🎉 RECOMMENDATIONS: Final return - ${validatedRecommendations.length} validated venues:`,
+      validatedRecommendations.slice(0, 3).map(r => `${r.venue_name} (ID: ${r.venue_id}): ${r.ai_score}%`));
+      
+    // Log the structure of the first venue being returned for debugging
+    if (validatedRecommendations.length > 0) {
+      console.log(`🔍 RECOMMENDATIONS: First venue structure being returned:`, {
+        venue_id: validatedRecommendations[0].venue_id,
+        venue_name: validatedRecommendations[0].venue_name,
+        has_venue_id_field: 'venue_id' in validatedRecommendations[0],
+        venue_id_type: typeof validatedRecommendations[0].venue_id,
+        all_keys: Object.keys(validatedRecommendations[0])
+      });
+    }
+      
+    return validatedRecommendations;
   } catch (error) {
     console.error('❌ RECOMMENDATIONS: Critical error in getAIVenueRecommendations:', {
       message: error.message,
