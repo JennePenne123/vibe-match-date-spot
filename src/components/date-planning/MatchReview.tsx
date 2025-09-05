@@ -123,7 +123,16 @@ const MatchReview: React.FC<MatchReviewProps> = ({
                   </p>
                 </div>
                 <Button 
-                  onClick={onContinueToPlanning}
+                  onClick={() => {
+                    console.log('🎯 MATCH REVIEW - "Continue to Plan Together" button clicked');
+                    console.log('🎯 MATCH REVIEW - Current state before transition:', {
+                      venueCount,
+                      compatibilityScore: typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore,
+                      partnerName
+                    });
+                    onContinueToPlanning();
+                    console.log('🎯 MATCH REVIEW - onContinueToPlanning() called successfully');
+                  }}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2"
                 >
                   Continue to Plan Together

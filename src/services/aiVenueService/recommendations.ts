@@ -119,7 +119,7 @@ export const getAIVenueRecommendations = async (
       console.log(`🔍 RECOMMENDATIONS: Processing venue ${venue.name} with clean ID: "${cleanVenueId}"`);
 
       const recommendation: AIVenueRecommendation = {
-        venue_id: cleanVenueId, // Always ensure this is a clean string
+        venue_id: cleanVenueId, // CRITICAL FIX: Always use the validated clean ID
         venue_name: venue.name,
         venue_address: venue.address || venue.location || venue.vicinity || 'Address not available',
         venue_image: venue.image_url || venue.image,
@@ -139,22 +139,13 @@ export const getAIVenueRecommendations = async (
         amenities: venue.tags || []
       };
 
-      console.log(`✅ RECOMMENDATIONS: Created venue recommendation for "${venue.name}" with ID: "${cleanVenueId}"`);
-      console.log(`🔍 RECOMMENDATIONS: Venue data structure:`, {
-        venue_id: recommendation.venue_id,
-        venue_name: recommendation.venue_name,
-        ai_score: recommendation.ai_score,
-        hasValidId: !!recommendation.venue_id,
-        idType: typeof recommendation.venue_id
-      });
-
-      // Final validation - ensure venue_id is never an object or undefined
+      // CRITICAL: Final validation - venue_id MUST be a valid string
       if (typeof recommendation.venue_id !== 'string' || !recommendation.venue_id.trim()) {
-        console.error(`❌ RECOMMENDATIONS: Critical error - recommendation for ${venue.name} has invalid venue_id:`, recommendation.venue_id);
+        console.error(`🚨 RECOMMENDATIONS: CRITICAL ERROR - Invalid venue_id for ${venue.name}:`, recommendation.venue_id);
         continue; // Skip this venue
       }
-      
-      console.log(`✅ RECOMMENDATIONS: ${venue.name} (ID: ${recommendation.venue_id}) scored ${aiScore}% (confidence: ${Math.round(recommendation.confidence_level * 100)}%)`);
+
+      console.log(`✅ RECOMMENDATIONS: Successfully created recommendation for "${venue.name}" with ID: "${recommendation.venue_id}"`);
       recommendations.push(recommendation);
     }
 

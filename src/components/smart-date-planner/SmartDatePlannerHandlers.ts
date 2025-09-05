@@ -436,8 +436,24 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     handleStartFromScratch,
     handleManualContinue,
     handleContinueToPlanning: () => {
-      console.log('🚀 Handler - Continuing from AI analysis to plan together step');
+      console.log('🚀 CONTINUE TO PLANNING - Button clicked, transitioning from review-matches to plan-together');
+      console.log('🚀 CONTINUE TO PLANNING - Current state:', {
+        currentStep: state.currentStep,
+        venueCount: state.venueRecommendations?.length || 0,
+        hasValidVenues: (state.venueRecommendations || []).some(v => v.venue_id && typeof v.venue_id === 'string'),
+        compatibilityScore: state.compatibilityScore
+      });
+      
       setCurrentStep('plan-together');
+      
+      // Add debugging to verify step transition
+      setTimeout(() => {
+        console.log('🔍 CONTINUE TO PLANNING - Post-transition check:', {
+          newStep: state.currentStep,
+          shouldShowPlanTogether: state.currentStep === 'plan-together',
+          venueRecommendations: state.venueRecommendations?.length || 0
+        });
+      }, 100);
     }
   };
 };

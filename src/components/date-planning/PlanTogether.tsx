@@ -204,7 +204,7 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
                   index,
                   fullVenue: venue
                 });
-                return null;
+                return null; // Skip venues without valid IDs - render nothing for invalid venues
               }
 
               console.log(`✅ PLAN TOGETHER - Rendering venue: ${venue.venue_name} with ID: ${venueId}`);
