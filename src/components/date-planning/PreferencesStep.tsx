@@ -825,18 +825,8 @@ useEffect(() => {
               );
             }
             
-            return (
-              <div className="space-y-4">
-                <CollaborativeWaitingState
-                  partnerName={partnerName}
-                  sessionId={sessionId}
-                  hasPartnerSetPreferences={partnerHasCompletedPrefs}
-                  isWaitingForPartner={false}
-                  bothPreferencesComplete={true}
-                  onManualContinue={onManualContinue}
-                />
-              </div>
-            );
+            // Both preferences complete - show subtle ready indicator but keep preferences editable
+            // Don't show the "Both Preferences Complete!" card as it's misleading on the preferences page
           }
           
           // If user has completed but partner hasn't, show waiting state
