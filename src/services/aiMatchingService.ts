@@ -184,11 +184,33 @@ const getSharedItems = (arr1: string[], arr2: string[]): string[] => {
   return arr1.filter(item => arr2.includes(item));
 };
 
+export const clearCachedCompatibilityScores = async (userId: string): Promise<void> => {
+  try {
+    console.log('🧹 COMPATIBILITY: Clearing cached compatibility scores for user:', userId);
+    
+    const { error } = await supabase
+      .from('ai_compatibility_scores')
+      .delete()
+      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
+
+    if (error) {
+      console.error('🚨 COMPATIBILITY: Error clearing cached scores:', error);
+      throw error;
+    }
+
+    console.log('✅ COMPATIBILITY: Cached compatibility scores cleared successfully');
+  } catch (error) {
+    console.error('❌ COMPATIBILITY: Failed to clear cached scores:', error);
+  }
+};
+
 export const getCompatibilityScore = async (
   user1Id: string,
   user2Id: string
 ): Promise<CompatibilityScore | null> => {
   try {
+    console.log('🔍 COMPATIBILITY: Checking for cached compatibility score between users:', user1Id, user2Id);
+    
     const { data, error } = await supabase
       .from('ai_compatibility_scores')
       .select('*')
@@ -200,10 +222,12 @@ export const getCompatibilityScore = async (
     }
 
     if (!data) {
+      console.log('💫 COMPATIBILITY: No cached score found, calculating fresh compatibility');
       // Calculate new compatibility if not exists
       return await calculateCompatibilityScore(user1Id, user2Id);
     }
 
+    console.log('📋 COMPATIBILITY: Using cached compatibility score from:', data.created_at);
     return {
       overall_score: data.overall_score,
       cuisine_score: data.cuisine_score,

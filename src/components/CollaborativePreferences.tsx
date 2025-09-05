@@ -156,6 +156,11 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
         throw prefsError;
       }
 
+      // Clear cached compatibility scores since preferences have changed
+      console.log('🧹 PREFS: Clearing cached compatibility scores after preference update');
+      const { clearCachedCompatibilityScores } = await import('@/services/aiMatchingService');
+      await clearCachedCompatibilityScores(user.id);
+
       // Then update the session preferences (this triggers AI analysis)
       await updateSessionPreferences(sessionId, preferences);
       
