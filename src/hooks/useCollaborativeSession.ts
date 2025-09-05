@@ -28,10 +28,14 @@ export const useCollaborativeSession = (sessionId: string | null) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get session details
-  const fetchSession = async (id: string) => {
-    if (!user) return;
+  // Get session details with validation
+  const fetchSession = async (id: string, forceRefresh = false) => {
+    if (!user) {
+      console.log('🔧 SESSION: No user found, skipping fetch');
+      return;
+    }
     
+    console.log('🔧 SESSION: Fetching session', { id, userId: user.id, forceRefresh });
     setLoading(true);
     setError(null);
     
@@ -42,10 +46,79 @@ export const useCollaborativeSession = (sessionId: string | null) => {
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('🔧 SESSION: Database error:', error);
+        throw error;
+      }
+
+      console.log('🔧 SESSION: Raw data from database:', {
+        sessionId: data.id,
+        initiator_id: data.initiator_id,
+        partner_id: data.partner_id,
+        initiator_preferences_complete: data.initiator_preferences_complete,
+        partner_preferences_complete: data.partner_preferences_complete,
+        both_preferences_complete: data.both_preferences_complete,
+        has_initiator_prefs: !!data.initiator_preferences,
+        has_partner_prefs: !!data.partner_preferences,
+        session_status: data.session_status
+      });
+
+      // Validate and fix inconsistent preference flags
+      const hasInitiatorPrefsData = !!data.initiator_preferences;
+      const hasPartnerPrefsData = !!data.partner_preferences;
+      
+      let needsUpdate = false;
+      const updates: any = {};
+
+      // Fix initiator flag if inconsistent
+      if (data.initiator_preferences_complete && !hasInitiatorPrefsData) {
+        console.warn('🔧 SESSION: Initiator flag inconsistent, fixing...');
+        updates.initiator_preferences_complete = false;
+        needsUpdate = true;
+      }
+
+      // Fix partner flag if inconsistent  
+      if (data.partner_preferences_complete && !hasPartnerPrefsData) {
+        console.warn('🔧 SESSION: Partner flag inconsistent, fixing...');
+        updates.partner_preferences_complete = false;
+        needsUpdate = true;
+      }
+
+      // Recalculate both_preferences_complete
+      const correctBothComplete = 
+        (data.initiator_preferences_complete && hasInitiatorPrefsData) &&
+        (data.partner_preferences_complete && hasPartnerPrefsData);
+
+      if (data.both_preferences_complete !== correctBothComplete) {
+        console.warn('🔧 SESSION: Both preferences flag inconsistent, fixing...', {
+          current: data.both_preferences_complete,
+          correct: correctBothComplete
+        });
+        updates.both_preferences_complete = correctBothComplete;
+        needsUpdate = true;
+      }
+
+      // Apply fixes if needed
+      if (needsUpdate) {
+        console.log('🔧 SESSION: Applying consistency fixes:', updates);
+        const { error: updateError } = await supabase
+          .from('date_planning_sessions')
+          .update({ ...updates, updated_at: new Date().toISOString() })
+          .eq('id', id);
+
+        if (updateError) {
+          console.error('🔧 SESSION: Failed to apply fixes:', updateError);
+        } else {
+          // Update local data with fixes
+          Object.assign(data, updates);
+          console.log('🔧 SESSION: Consistency fixes applied successfully');
+        }
+      }
+
       setSession(data);
+      console.log('🔧 SESSION: Session set successfully:', data.id);
     } catch (err) {
-      console.error('Error fetching session:', err);
+      console.error('🔧 SESSION: Error fetching session:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch session');
     } finally {
       setLoading(false);
@@ -71,13 +144,58 @@ export const useCollaborativeSession = (sessionId: string | null) => {
     }
   }, [sessionId, user]);
 
-  // Helper functions
+  // Enhanced helper functions with detailed logging
   const isUserInitiator = session ? session.initiator_id === user?.id : false;
   const isUserPartner = session ? session.partner_id === user?.id : false;
-  const hasUserSetPreferences = session ? 
-    (isUserInitiator ? session.initiator_preferences_complete : session.partner_preferences_complete) : false;
-  const hasPartnerSetPreferences = session ? 
-    (isUserInitiator ? session.partner_preferences_complete : session.initiator_preferences_complete) : false;
+  
+  // Key fix: Ensure we have proper user identification before checking preferences
+  const hasUserSetPreferences = (() => {
+    if (!session || !user?.id) return false;
+    
+    const isInitiator = session.initiator_id === user.id;
+    const isPartner = session.partner_id === user.id;
+    
+    if (!isInitiator && !isPartner) {
+      console.warn('🔧 SESSION: User is neither initiator nor partner!', {
+        userId: user.id,
+        initiatorId: session.initiator_id,
+        partnerId: session.partner_id
+      });
+      return false;
+    }
+    
+    const userPrefsComplete = isInitiator 
+      ? session.initiator_preferences_complete 
+      : session.partner_preferences_complete;
+      
+    console.log('🔧 SESSION: User preferences check:', {
+      userId: user.id,
+      isInitiator,
+      isPartner,
+      userPrefsComplete,
+      initiatorComplete: session.initiator_preferences_complete,
+      partnerComplete: session.partner_preferences_complete
+    });
+    
+    return userPrefsComplete;
+  })();
+  
+  const hasPartnerSetPreferences = (() => {
+    if (!session || !user?.id) return false;
+    
+    const isInitiator = session.initiator_id === user.id;
+    const partnerPrefsComplete = isInitiator 
+      ? session.partner_preferences_complete 
+      : session.initiator_preferences_complete;
+      
+    console.log('🔧 SESSION: Partner preferences check:', {
+      partnerPrefsComplete,
+      isUserInitiator: isInitiator
+    });
+    
+    return partnerPrefsComplete;
+  })();
+  
   const canShowResults = session?.both_preferences_complete || false;
 
   // Debug logging for state synchronization
@@ -99,6 +217,13 @@ export const useCollaborativeSession = (sessionId: string | null) => {
     }
   });
 
+  // Force refresh function for debugging
+  const forceRefreshSession = async () => {
+    if (!sessionId) return;
+    console.log('🔧 SESSION: Force refreshing session data...');
+    await fetchSession(sessionId, true);
+  };
+
   return {
     session,
     loading,
@@ -108,6 +233,7 @@ export const useCollaborativeSession = (sessionId: string | null) => {
     hasUserSetPreferences,
     hasPartnerSetPreferences,
     canShowResults,
-    refetchSession: () => sessionId ? fetchSession(sessionId) : Promise.resolve()
+    refetchSession: () => sessionId ? fetchSession(sessionId) : Promise.resolve(),
+    forceRefreshSession
   };
 };

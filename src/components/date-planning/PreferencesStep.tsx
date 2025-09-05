@@ -755,15 +755,20 @@ useEffect(() => {
     </div>
   );
 
-  // Top-level debug logging to understand why collaborative section isn't executing
-  console.log('🔧 PREFERENCES STEP TOP-LEVEL DEBUG:', {
+  // Enhanced debug logging for collaborative preferences state
+  console.log('🔧 PREFERENCES STEP COMPREHENSIVE DEBUG:', {
     planningMode,
     hasCollaborativeSession: !!collaborativeSession,
-    collaborativeSession,
+    collaborativeSessionDetails: {
+      hasUserSetPreferences: collaborativeSession?.hasUserSetPreferences,
+      hasPartnerSetPreferences: collaborativeSession?.hasPartnerSetPreferences,
+      canShowResults: collaborativeSession?.canShowResults
+    },
     aiAnalyzing,
     sessionId,
     partnerName,
-    shouldShowCollaborative: planningMode === 'collaborative' && collaborativeSession && !aiAnalyzing
+    shouldShowCollaborative: planningMode === 'collaborative' && collaborativeSession && !aiAnalyzing,
+    renderingPath: planningMode === 'collaborative' && collaborativeSession ? 'collaborative' : 'regular'
   });
 
   return (
