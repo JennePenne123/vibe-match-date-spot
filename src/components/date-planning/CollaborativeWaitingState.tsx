@@ -21,7 +21,39 @@ const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
 }) => {
   // New state: Both users have set preferences, ready to continue
   if (bothPreferencesComplete && onManualContinue) {
-    return;
+    return (
+      <Card className="border-green-200 bg-green-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-green-800">
+            <CheckCircle className="h-5 w-5" />
+            Both Preferences Complete!
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="h-8 w-8 text-green-500" />
+            <div>
+              <p className="text-sm text-green-700 font-medium">
+                You and {partnerName} have both set your date preferences
+              </p>
+              <p className="text-xs text-green-600">
+                Ready to start AI analysis and find perfect venues!
+              </p>
+            </div>
+          </div>
+          
+          <div className="bg-white/60 rounded-lg p-3 border border-green-200">
+            <Button 
+              onClick={onManualContinue}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              Start AI Analysis & Find Venues
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
   if (isWaitingForPartner) {
     return <Card className="border-amber-200 bg-amber-50">

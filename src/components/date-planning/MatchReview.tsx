@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, ArrowRight } from 'lucide-react';
+import { AlertCircle, ArrowRight, CheckCircle } from 'lucide-react';
 import { CompatibilityScore as CompatibilityScoreType } from '@/services/aiMatchingService';
 import AIMatchSummary from '@/components/AIMatchSummary';
 import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
@@ -96,12 +96,43 @@ const MatchReview: React.FC<MatchReviewProps> = ({
         userId={user?.id}
       />
       
+      {/* Single consolidated analysis card */}
       {(typeof compatibilityScore === 'object' && compatibilityScore !== null) || typeof compatibilityScore === 'number' ? (
-        <AIMatchSummary 
-          compatibilityScore={compatibilityScore}
-          partnerName={partnerName}
-          venueCount={venueCount}
-        />
+        <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-primary">
+              <CheckCircle className="h-5 w-5" />
+              AI Compatibility Analysis Complete
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* AI Match Summary Content */}
+            <AIMatchSummary 
+              compatibilityScore={compatibilityScore}
+              partnerName={partnerName}
+              venueCount={venueCount}
+            />
+            
+            {/* Continue Action */}
+            <div className="text-center pt-4 border-t border-primary/20">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Ready to Plan Together! 🎉</h3>
+                  <p className="text-muted-foreground">
+                    Found {venueCount} perfect venues based on your compatibility. Let's choose the perfect spot!
+                  </p>
+                </div>
+                <Button 
+                  onClick={onContinueToPlanning}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2"
+                >
+                  Continue to Plan Together
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       ) : (
         <Card>
           <CardContent className="text-center py-6">
@@ -109,27 +140,6 @@ const MatchReview: React.FC<MatchReviewProps> = ({
           </CardContent>
         </Card>
       )}
-
-      {/* Continue to Planning Button */}
-      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-        <CardContent className="text-center py-6">
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Analysis Complete! 🎉</h3>
-              <p className="text-muted-foreground">
-                Found {venueCount} perfect venues for your date. Ready to plan together?
-              </p>
-            </div>
-            <Button 
-              onClick={onContinueToPlanning}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2"
-            >
-              Continue to Plan Together
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

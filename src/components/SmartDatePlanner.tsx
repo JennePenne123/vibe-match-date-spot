@@ -288,8 +288,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                 />
               )}
 
-              {/* Desktop Fallback: If we have venues but step hasn't transitioned */}
-              {currentStep === 'set-preferences' && venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && (
+              {/* Only show venues found card when both collaborative users are ready */}
+              {currentStep === 'set-preferences' && venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && canShowResults && (
                 <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-yellow-800">🎉 Venues Found!</h3>
@@ -414,8 +414,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   onManualContinue={handleManualContinue}
                 />
                 
-                {/* Mobile Fallback: If we have venues but step hasn't transitioned */}
-                {venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && (
+                {/* Only show venues found card when both collaborative users are ready */}
+                {venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && canShowResults && (
                   <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold text-yellow-800">🎉 Venues Found!</h3>
