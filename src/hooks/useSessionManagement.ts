@@ -61,7 +61,11 @@ export const useSessionManagement = () => {
         initiator_id: user.id,
         partner_id: partnerId,
         session_status: 'active',
-        planning_mode: planningMode
+        planning_mode: planningMode,
+        // Explicitly initialize preference flags to false for new sessions
+        initiator_preferences_complete: false,
+        partner_preferences_complete: false,
+        both_preferences_complete: false
       };
 
       // Add participant_ids for group planning
@@ -126,7 +130,11 @@ export const useSessionManagement = () => {
           created: data.created_at,
           expires: data.expires_at,
           hasPreferences: !!data.preferences_data,
-          compatibilityScore: data.ai_compatibility_score
+          compatibilityScore: data.ai_compatibility_score,
+          initiator_complete: data.initiator_preferences_complete,
+          partner_complete: data.partner_preferences_complete,
+          hasInitiatorPrefs: !!data.initiator_preferences,
+          hasPartnerPrefs: !!data.partner_preferences
         });
         
         // Check if session is expired
@@ -140,6 +148,48 @@ export const useSessionManagement = () => {
             .eq('id', data.id);
           setCurrentSession(null);
           return null;
+        }
+
+        // Validate preference flags consistency and fix if needed
+        const shouldResetFlags = 
+          (data.initiator_preferences_complete && !data.initiator_preferences) ||
+          (data.partner_preferences_complete && !data.partner_preferences);
+
+        if (shouldResetFlags) {
+          console.warn('⚠️ SESSION: Inconsistent preference flags detected, resetting...');
+          const resetData: any = { updated_at: new Date().toISOString() };
+          
+          if (data.initiator_preferences_complete && !data.initiator_preferences) {
+            resetData.initiator_preferences_complete = false;
+          }
+          if (data.partner_preferences_complete && !data.partner_preferences) {
+            resetData.partner_preferences_complete = false;
+          }
+          
+          // Always recalculate both_preferences_complete
+          resetData.both_preferences_complete = 
+            (data.initiator_preferences_complete && !!data.initiator_preferences) &&
+            (data.partner_preferences_complete && !!data.partner_preferences);
+
+          const { error: resetError } = await supabase
+            .from('date_planning_sessions')
+            .update(resetData)
+            .eq('id', data.id);
+
+          if (!resetError) {
+            // Refetch the updated session data
+            const { data: updatedData, error: refetchError } = await supabase
+              .from('date_planning_sessions')
+              .select('*')
+              .eq('id', data.id)
+              .single();
+            
+            if (!refetchError && updatedData) {
+              console.log('✅ SESSION: Preference flags reset successfully');
+              setCurrentSession(updatedData);
+              return updatedData;
+            }
+          }
         }
       } else {
         console.log('📭 SESSION: No active session found');
