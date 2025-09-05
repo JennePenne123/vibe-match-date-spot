@@ -94,12 +94,16 @@ export const getAIVenueRecommendations = async (
       // Get stored AI score data for additional context
       const scoreData = await getStoredAIScore(venue.id, userId);
 
-      // Ensure clean venue_id - critical fix for venue display issue
+      // CRITICAL FIX: Enhanced venue ID extraction for Google Places + Database venues
       let cleanVenueId = '';
       
-      // Handle different ID formats and ensure we get a valid string
-      if (typeof venue.id === 'string' && venue.id.trim()) {
+      // Priority order: venue.id (transformed Google Places) > placeId > google_place_id > fallback
+      if (venue.id && typeof venue.id === 'string' && venue.id.trim()) {
         cleanVenueId = venue.id.trim();
+      } else if (venue.placeId && typeof venue.placeId === 'string' && venue.placeId.trim()) {
+        cleanVenueId = venue.placeId.trim();
+      } else if (venue.google_place_id && typeof venue.google_place_id === 'string' && venue.google_place_id.trim()) {
+        cleanVenueId = venue.google_place_id.trim();
       } else if (venue.id && typeof venue.id === 'object' && venue.id.value) {
         cleanVenueId = String(venue.id.value).trim();
       } else if (venue.id) {
@@ -107,11 +111,13 @@ export const getAIVenueRecommendations = async (
       }
       
       // Final validation - skip venues without valid IDs
-      if (!cleanVenueId || cleanVenueId === 'undefined' || cleanVenueId === 'null') {
-        console.error(`❌ RECOMMENDATIONS: Venue "${venue.name}" has invalid ID:`, {
-          originalId: venue.id,
+      if (!cleanVenueId || cleanVenueId === 'undefined' || cleanVenueId === 'null' || cleanVenueId.length === 0) {
+        console.error(`🚨 RECOMMENDATIONS: Venue "${venue.name}" has NO VALID ID - SKIPPING:`, {
+          venueId: venue.id,
+          placeId: venue.placeId,
+          googlePlaceId: venue.google_place_id,
           cleanId: cleanVenueId,
-          type: typeof venue.id
+          idType: typeof venue.id
         });
         continue; // Skip venues without valid IDs
       }
