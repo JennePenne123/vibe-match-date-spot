@@ -74,8 +74,14 @@ const MatchReview: React.FC<MatchReviewProps> = ({
     shouldShowWaiting: isCollaborative && (!hasPartnerSetPreferences || isWaitingForPartner)
   });
 
-  // Show waiting state for collaborative planning when partner hasn't set preferences
+  // Enhanced validation: Show waiting state for collaborative planning when partner hasn't genuinely set preferences
   if (isCollaborative && (!hasPartnerSetPreferences || isWaitingForPartner)) {
+    console.log('🔍 MATCH REVIEW - Showing collaborative waiting state because:', {
+      hasPartnerSetPreferences,
+      isWaitingForPartner,
+      reason: !hasPartnerSetPreferences ? 'Partner has not set preferences' : 'Still waiting for partner'
+    });
+    
     return (
       <div className="space-y-6">
         <CollaborativeWaitingState
@@ -83,6 +89,23 @@ const MatchReview: React.FC<MatchReviewProps> = ({
           sessionId={sessionId || ''}
           hasPartnerSetPreferences={hasPartnerSetPreferences}
           isWaitingForPartner={isWaitingForPartner}
+        />
+      </div>
+    );
+  }
+
+  // Additional check: If this is collaborative but we're getting 100% compatibility, it might be preference duplication
+  if (isCollaborative && typeof compatibilityScore === 'number' && compatibilityScore >= 1.0) {
+    console.warn('🚨 MATCH REVIEW - Suspicious 100% compatibility in collaborative mode - possible preference duplication');
+    console.log('🔍 MATCH REVIEW - Showing waiting state to prevent false positive');
+    
+    return (
+      <div className="space-y-6">
+        <CollaborativeWaitingState
+          partnerName={partnerName}
+          sessionId={sessionId || ''}
+          hasPartnerSetPreferences={false} // Force waiting state
+          isWaitingForPartner={true}
         />
       </div>
     );

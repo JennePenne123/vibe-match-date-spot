@@ -63,12 +63,32 @@ export const useCollaborativeSession = (sessionId: string | null) => {
         session_status: data.session_status
       });
 
-      // Validate and fix inconsistent preference flags
+      // Enhanced validation: Check for preference data consistency AND duplication
       const hasInitiatorPrefsData = !!data.initiator_preferences;
       const hasPartnerPrefsData = !!data.partner_preferences;
       
       let needsUpdate = false;
       const updates: any = {};
+
+      // Import preference duplication detection
+      const { detectPreferenceDuplication } = await import('@/services/testUserService');
+      
+      // Check for suspicious preference duplication
+      if (hasInitiatorPrefsData && hasPartnerPrefsData) {
+        const isDuplicated = detectPreferenceDuplication(data.initiator_preferences, data.partner_preferences);
+        
+        if (isDuplicated) {
+          console.error('🚨 SESSION: PREFERENCE DUPLICATION DETECTED - Resetting session');
+          // Reset all preference data and flags when duplication detected
+          updates.initiator_preferences = null;
+          updates.partner_preferences = null;
+          updates.initiator_preferences_complete = false;
+          updates.partner_preferences_complete = false;
+          updates.both_preferences_complete = false;
+          updates.ai_compatibility_score = null;
+          needsUpdate = true;
+        }
+      }
 
       // Fix initiator flag if inconsistent
       if (data.initiator_preferences_complete && !hasInitiatorPrefsData) {
@@ -84,18 +104,20 @@ export const useCollaborativeSession = (sessionId: string | null) => {
         needsUpdate = true;
       }
 
-      // Recalculate both_preferences_complete
-      const correctBothComplete = 
-        (data.initiator_preferences_complete && hasInitiatorPrefsData) &&
-        (data.partner_preferences_complete && hasPartnerPrefsData);
+      // Recalculate both_preferences_complete (only if no duplication detected)
+      if (!updates.hasOwnProperty('both_preferences_complete')) {
+        const correctBothComplete = 
+          (data.initiator_preferences_complete && hasInitiatorPrefsData) &&
+          (data.partner_preferences_complete && hasPartnerPrefsData);
 
-      if (data.both_preferences_complete !== correctBothComplete) {
-        console.warn('🔧 SESSION: Both preferences flag inconsistent, fixing...', {
-          current: data.both_preferences_complete,
-          correct: correctBothComplete
-        });
-        updates.both_preferences_complete = correctBothComplete;
-        needsUpdate = true;
+        if (data.both_preferences_complete !== correctBothComplete) {
+          console.warn('🔧 SESSION: Both preferences flag inconsistent, fixing...', {
+            current: data.both_preferences_complete,
+            correct: correctBothComplete
+          });
+          updates.both_preferences_complete = correctBothComplete;
+          needsUpdate = true;
+        }
       }
 
       // Apply fixes if needed

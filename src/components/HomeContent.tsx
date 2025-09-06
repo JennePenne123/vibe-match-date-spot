@@ -11,6 +11,7 @@ import DateProposalCreation from '@/components/date-planning/DateProposalCreatio
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import { VenueMatchingDebug } from '@/components/debug/VenueMatchingDebug';
 import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
+import TestUserDebugPanel from '@/components/debug/TestUserDebugPanel';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
@@ -173,7 +174,10 @@ const HomeContent: React.FC = () => {
             
             {/* Debug Tools - Collapsible section at bottom */}
             <CollapsibleDebugSection title="Development Tools" defaultOpen={false}>
-              <VenueMatchingDebug />
+              <div className="space-y-4">
+                <TestUserDebugPanel />
+                <VenueMatchingDebug />
+              </div>
             </CollapsibleDebugSection>
           </div>
         ) : (
@@ -215,7 +219,10 @@ const HomeContent: React.FC = () => {
             
             {/* Debug Tools - Collapsible section */}
             <CollapsibleDebugSection title="Development Tools" defaultOpen={false}>
-              <VenueMatchingDebug />
+              <div className="space-y-4">
+                <TestUserDebugPanel />
+                <VenueMatchingDebug />
+              </div>
             </CollapsibleDebugSection>
           </div>
         )}
