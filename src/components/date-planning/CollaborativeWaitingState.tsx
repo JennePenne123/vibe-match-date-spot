@@ -10,6 +10,9 @@ interface CollaborativeWaitingStateProps {
   isWaitingForPartner: boolean;
   bothPreferencesComplete?: boolean;
   onManualContinue?: () => void;
+  // New props to clarify the user's own status
+  hasCurrentUserSetPreferences?: boolean;
+  currentUserName?: string;
 }
 const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
   partnerName,
@@ -17,8 +20,51 @@ const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
   hasPartnerSetPreferences,
   isWaitingForPartner,
   bothPreferencesComplete = false,
-  onManualContinue
+  onManualContinue,
+  hasCurrentUserSetPreferences = true,
+  currentUserName = 'You'
 }) => {
+  console.log('🔍 WAITING STATE: Rendering with props:', {
+    partnerName,
+    hasPartnerSetPreferences,
+    isWaitingForPartner,
+    bothPreferencesComplete,
+    hasCurrentUserSetPreferences,
+    currentUserName
+  });
+
+  // Priority 1: If current user hasn't set preferences, show that first
+  if (!hasCurrentUserSetPreferences) {
+    return (
+      <Card className="border-blue-200 bg-blue-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-blue-800">
+            <User className="h-5 w-5" />
+            Set Your Preferences First
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="h-8 w-8 text-blue-500" />
+            <div>
+              <p className="text-sm text-blue-700 font-medium">
+                You need to complete your date preferences
+              </p>
+              <p className="text-xs text-blue-600">
+                Set your preferences first, then wait for {partnerName} to complete theirs
+              </p>
+            </div>
+          </div>
+          
+          <div className="bg-white/60 rounded-lg p-3 border border-blue-200">
+            <p className="text-xs text-blue-700">
+              <strong>Next steps:</strong> Complete the preferences form above to proceed with collaborative planning.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
   // New state: Both users have set preferences, ready to continue
   if (bothPreferencesComplete && onManualContinue) {
     return (

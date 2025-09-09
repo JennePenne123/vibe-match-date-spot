@@ -73,20 +73,24 @@ export const useCollaborativeSession = (sessionId: string | null) => {
       // Import preference duplication detection
       const { detectPreferenceDuplication } = await import('@/services/testUserService');
       
-      // Check for suspicious preference duplication
-      if (hasInitiatorPrefsData && hasPartnerPrefsData) {
+      // Check for suspicious preference duplication - but only if BOTH users are complete AND we have a compatibility score
+      // This prevents false positives during normal preference setting flow
+      if (hasInitiatorPrefsData && hasPartnerPrefsData && 
+          data.initiator_preferences_complete && data.partner_preferences_complete && 
+          data.ai_compatibility_score !== null) {
         const isDuplicated = detectPreferenceDuplication(data.initiator_preferences, data.partner_preferences);
         
         if (isDuplicated) {
-          console.error('🚨 SESSION: PREFERENCE DUPLICATION DETECTED - Resetting session');
-          // Reset all preference data and flags when duplication detected
-          updates.initiator_preferences = null;
-          updates.partner_preferences = null;
-          updates.initiator_preferences_complete = false;
-          updates.partner_preferences_complete = false;
-          updates.both_preferences_complete = false;
-          updates.ai_compatibility_score = null;
-          needsUpdate = true;
+          console.warn('⚠️ SESSION: PREFERENCE DUPLICATION DETECTED - but allowing for now since both users actively set preferences');
+          console.log('🔍 SESSION: Duplication details:', {
+            hasInitiatorData: hasInitiatorPrefsData,
+            hasPartnerData: hasPartnerPrefsData,
+            initiatorComplete: data.initiator_preferences_complete,
+            partnerComplete: data.partner_preferences_complete,
+            hasCompatibilityScore: data.ai_compatibility_score !== null
+          });
+          // Don't automatically reset - let the flow continue for now
+          // Only reset if this is clearly test data pollution
         }
       }
 

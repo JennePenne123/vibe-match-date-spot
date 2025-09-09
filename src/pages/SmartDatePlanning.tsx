@@ -9,6 +9,8 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { getUserName } from '@/utils/typeHelpers';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
+import SessionStatusDebug from '@/components/debug/SessionStatusDebug';
+
 const SmartDatePlanning: React.FC = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -85,6 +87,7 @@ const SmartDatePlanning: React.FC = () => {
           )}
           
           <ErrorBoundary level="component">
+            <SessionStatusDebug sessionId={sessionId} />
             <SmartDatePlanner sessionId={sessionId} fromProposal={fromProposal} />
           </ErrorBoundary>
         </div>

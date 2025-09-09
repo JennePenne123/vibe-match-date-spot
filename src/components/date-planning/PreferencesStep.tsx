@@ -839,6 +839,8 @@ useEffect(() => {
                   sessionId={sessionId}
                   hasPartnerSetPreferences={partnerHasCompletedPrefs}
                   isWaitingForPartner={true}
+                  hasCurrentUserSetPreferences={userHasCompletedPrefs}
+                  currentUserName={user?.name || 'You'}
                 />
                 
                 <Card className="border-green-200 bg-green-50">
