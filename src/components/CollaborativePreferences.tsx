@@ -50,6 +50,7 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
   // Load existing preferences
   useEffect(() => {
     if (user) {
+      console.log('🔄 COLLAB PREFS: Loading user preferences for user:', user.id);
       loadUserPreferences();
     }
   }, [user]);
@@ -57,6 +58,7 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
   // Load partner preferences if they exist
   useEffect(() => {
     if (partnerId) {
+      console.log('🔄 COLLAB PREFS: Loading partner preferences for partner:', partnerId);
       loadPartnerPreferences();
     }
   }, [partnerId]);
@@ -140,7 +142,15 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
     setIsSubmitting(true);
     
     try {
+      console.log('🎯 COLLAB PREFS: Starting preference submission...', {
+        userId: user.id,
+        sessionId,
+        preferences,
+        hasUpdateFunction: !!updateSessionPreferences
+      });
+
       // First update user preferences with proper conflict handling
+      console.log('📝 COLLAB PREFS: Step 1 - Updating user_preferences table...');
       const { error: prefsError } = await supabase
         .from('user_preferences')
         .upsert({
@@ -152,27 +162,33 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
         });
 
       if (prefsError) {
-        console.error('Error updating user preferences:', prefsError);
+        console.error('❌ COLLAB PREFS: Error updating user preferences:', prefsError);
         throw prefsError;
       }
+      console.log('✅ COLLAB PREFS: User preferences saved to database');
 
       // Clear cached compatibility scores since preferences have changed
-      console.log('🧹 PREFS: Clearing cached compatibility scores after preference update');
+      console.log('🧹 COLLAB PREFS: Clearing cached compatibility scores after preference update');
       const { clearCachedCompatibilityScores } = await import('@/services/aiMatchingService');
       await clearCachedCompatibilityScores(user.id);
 
       // Then update the session preferences (this triggers AI analysis)
+      console.log('🎯 COLLAB PREFS: Step 2 - Updating session preferences and triggering AI analysis...');
       await updateSessionPreferences(sessionId, preferences);
+      console.log('✅ COLLAB PREFS: Session preferences updated successfully');
       
       setHasSubmitted(true);
       
       // Trigger the callback to notify parent component
       setTimeout(() => {
+        console.log('📞 COLLAB PREFS: Calling onPreferencesUpdated callback');
         onPreferencesUpdated();
       }, 1000);
       
     } catch (error) {
-      console.error('Error submitting preferences:', error);
+      console.error('❌ COLLAB PREFS: Error submitting preferences:', error);
+      // Add user-visible error feedback
+      alert('Failed to save preferences. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

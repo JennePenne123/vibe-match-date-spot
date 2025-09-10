@@ -217,7 +217,7 @@ export const useSessionManagement = () => {
     setLoading(true);
     try {
       console.log('🔄 SESSION: Updating session preferences for user:', user.id, 'session:', sessionId);
-      console.log('📋 SESSION: Preferences being set:', preferences);
+      console.log('📋 SESSION: Preferences being set:', JSON.stringify(preferences, null, 2));
       console.log('🔍 SESSION: Current session state:', currentSession?.id);
       
       // First fetch current session to avoid overwriting
@@ -249,13 +249,14 @@ export const useSessionManagement = () => {
       if (isInitiator) {
         updateData.initiator_preferences = preferences;
         updateData.initiator_preferences_complete = true;
-        console.log('✅ SESSION: Setting initiator preferences and flag');
+        console.log('✅ SESSION: Setting initiator preferences and flag to true');
       } else {
         updateData.partner_preferences = preferences;
         updateData.partner_preferences_complete = true;
-        console.log('✅ SESSION: Setting partner preferences and flag');
+        console.log('✅ SESSION: Setting partner preferences and flag to true');
       }
       
+      console.log('📤 SESSION: About to update session with data:', JSON.stringify(updateData, null, 2));
       const { error: updateError } = await supabase
         .from('date_planning_sessions')
         .update(updateData)

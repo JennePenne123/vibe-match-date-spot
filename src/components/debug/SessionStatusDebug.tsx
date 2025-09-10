@@ -33,7 +33,7 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
     setError(null);
     
     try {
-      const { data, error } = await supabase
+      const { data: sessionData, error } = await supabase
         .from('date_planning_sessions')
         .select(`
           id,
@@ -43,14 +43,26 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
           partner_preferences_complete,
           both_preferences_complete,
           initiator_preferences,
-          partner_preferences,
-          initiator_profile:profiles!date_planning_sessions_initiator_id_fkey(name),
-          partner_profile:profiles!date_planning_sessions_partner_id_fkey(name)
+          partner_preferences
         `)
         .eq('id', sessionId)
         .single();
 
       if (error) throw error;
+
+      // Fetch profile names separately with error handling
+      const [initiatorResult, partnerResult] = await Promise.all([
+        supabase.from('profiles').select('name').eq('id', sessionData.initiator_id).single(),
+        supabase.from('profiles').select('name').eq('id', sessionData.partner_id).single()
+      ]);
+
+      const data = {
+        ...sessionData,
+        initiator_profile: initiatorResult.data || { name: 'Unknown' },
+        partner_profile: partnerResult.data || { name: 'Unknown' }
+      };
+
+      // Error handling is now above
 
       const isInitiator = data.initiator_id === user.id;
       
