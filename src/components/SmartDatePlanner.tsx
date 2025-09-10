@@ -449,8 +449,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   }}
                   sessionId={collaborativeSession?.id || currentSession?.id}
                   isCollaborative={true}
-                  hasPartnerSetPreferences={collaborativeSession ? hasPartnerSetPreferences : (currentSession?.partner_preferences_complete || false)}
-                  isWaitingForPartner={collaborativeSession ? !canShowResults : !currentSession?.both_preferences_complete}
+                  hasPartnerSetPreferences={currentSession?.both_preferences_complete || false}
+                  isWaitingForPartner={!(currentSession?.both_preferences_complete || false)}
                 />
               </div>
             )}

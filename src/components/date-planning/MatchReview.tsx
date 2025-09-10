@@ -74,12 +74,14 @@ const MatchReview: React.FC<MatchReviewProps> = ({
     shouldShowWaiting: isCollaborative && (!hasPartnerSetPreferences || isWaitingForPartner)
   });
 
-  // Enhanced validation: Show waiting state for collaborative planning when partner hasn't genuinely set preferences
-  if (isCollaborative && (!hasPartnerSetPreferences || isWaitingForPartner)) {
+  // FIXED: Only show waiting state if BOTH preferences are NOT complete in database
+  // If we have venue count > 0, preferences are definitely complete - show results
+  if (isCollaborative && venueCount === 0 && (!hasPartnerSetPreferences || isWaitingForPartner)) {
     console.log('🔍 MATCH REVIEW - Showing collaborative waiting state because:', {
       hasPartnerSetPreferences,
       isWaitingForPartner,
-      reason: !hasPartnerSetPreferences ? 'Partner has not set preferences' : 'Still waiting for partner'
+      venueCount,
+      reason: venueCount === 0 ? 'No venues found yet' : 'Unknown reason'
     });
     
     return (
