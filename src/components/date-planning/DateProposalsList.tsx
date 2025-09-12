@@ -7,6 +7,7 @@ import { useDateProposals, DateProposal } from '@/hooks/useDateProposals';
 import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useSessionManagement } from '@/hooks/useSessionManagement';
 import { format } from 'date-fns';
 
 interface DateProposalsListProps {
@@ -20,6 +21,7 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   const { proposals, getMyProposals, acceptProposal, updateProposalStatus, cancelProposal, loading } = useDateProposals();
   const { friends } = useFriends();
   const { toast } = useToast();
+  const { createPlanningSession } = useSessionManagement();
   const [hiddenProposals, setHiddenProposals] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -222,7 +224,34 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
                   {proposal.planning_session_id && (
                     <div className="flex gap-2 pt-2">
                       <Button
-                        onClick={() => onProposalAccepted?.(proposal.planning_session_id!)}
+                        onClick={async () => {
+                          // Create a fresh session to ensure clean state
+                          const partnerId = proposal.proposer_id === user?.id 
+                            ? proposal.recipient_id 
+                            : proposal.proposer_id;
+                          
+                          try {
+                            const newSession = await createPlanningSession(
+                              partnerId, 
+                              undefined, 
+                              'collaborative', 
+                              true // forceNew = true for clean state
+                            );
+                            
+                            if (newSession?.id) {
+                              toast({
+                                title: "Fresh Session Created",
+                                description: "Starting with clean preferences...",
+                                variant: "default"
+                              });
+                              onProposalAccepted?.(newSession.id);
+                            }
+                          } catch (error) {
+                            console.error('Error creating fresh session:', error);
+                            // Fallback to existing session
+                            onProposalAccepted?.(proposal.planning_session_id!);
+                          }
+                        }}
                         className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                       >
                         <Play className="h-4 w-4 mr-2" />

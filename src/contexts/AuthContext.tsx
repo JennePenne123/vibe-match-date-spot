@@ -6,7 +6,7 @@ import { useAuthState } from '@/hooks/useAuthState';
 import { signUpUser, signInUser, signOutUser } from '@/services/authService';
 import { updateUserProfile } from '@/utils/userProfileHelpers';
 import { inviteFriendById } from '@/services/friendshipService';
-import { expireUserSessions } from '@/services/sessionCleanupService';
+import { expireUserSessions, clearUserPreferenceFields } from '@/services/sessionCleanupService';
 
 interface AuthContextType {
   user: AppUser | null;
@@ -37,10 +37,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Clean up sessions before signing out
     if (user) {
       try {
+        // First clear user's preferences from all sessions
+        await clearUserPreferenceFields(user.id);
+        console.log('✅ AUTH: User preferences cleared on logout');
+        
+        // Then expire all sessions
         await expireUserSessions(user.id);
         console.log('✅ AUTH: Sessions expired on logout');
       } catch (error) {
-        console.error('❌ AUTH: Failed to expire sessions on logout:', error);
+        console.error('❌ AUTH: Failed to clean up sessions on logout:', error);
         // Continue with logout even if session cleanup fails
       }
     }

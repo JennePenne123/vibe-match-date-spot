@@ -1,8 +1,10 @@
 
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import SmartDatePlanner from '@/components/SmartDatePlanner';
+import { useCollaborativeSession } from '@/hooks/useCollaborativeSession';
+import { useSessionManagement } from '@/hooks/useSessionManagement';
 import HomeHeader from '@/components/HomeHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -14,6 +16,7 @@ import SessionStatusDebug from '@/components/debug/SessionStatusDebug';
 const SmartDatePlanning: React.FC = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const { isMobile } = useBreakpoint();
   
   // Get user display info - MUST be called before any conditional returns
@@ -35,7 +38,53 @@ const SmartDatePlanning: React.FC = () => {
   const fromProposal = location.state?.fromProposal;
   const planningMode = location.state?.planningMode;
   
+  // Get session data to check if it needs reset
+  const { session: collaborativeSession } = useCollaborativeSession(sessionId);
+  const { createPlanningSession } = useSessionManagement();
+  
   console.log('SmartDatePlanning - Navigation state:', { sessionId, fromProposal, planningMode });
+  
+  // Guardrail: Redirect to fresh session if current session has stale data
+  useEffect(() => {
+    if (!user || !collaborativeSession || !sessionId) return;
+    
+    const sessionHasPreferences = (
+      collaborativeSession.initiator_preferences ||
+      collaborativeSession.partner_preferences ||
+      collaborativeSession.initiator_preferences_complete ||
+      collaborativeSession.partner_preferences_complete
+    );
+    
+    const sessionInactive = collaborativeSession.session_status !== 'active';
+    
+    if (sessionHasPreferences || sessionInactive) {
+      console.log('🔄 SESSION GUARDRAIL: Detected stale session data, creating fresh session');
+      
+      // Create a fresh session
+      const partnerId = collaborativeSession.initiator_id === user.id 
+        ? collaborativeSession.partner_id 
+        : collaborativeSession.initiator_id;
+      
+      createPlanningSession(partnerId, undefined, 'collaborative', true)
+        .then((newSession) => {
+          if (newSession?.id) {
+            console.log('✅ SESSION GUARDRAIL: Created fresh session:', newSession.id);
+            // Navigate to the new session
+            navigate('/plan-date', {
+              state: {
+                sessionId: newSession.id,
+                fromProposal: true,
+                planningMode: 'collaborative'
+              },
+              replace: true
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('❌ SESSION GUARDRAIL: Failed to create fresh session:', error);
+        });
+    }
+  }, [user, collaborativeSession, sessionId, createPlanningSession, navigate]);
   
   // CRITICAL: Collaborative planning requires coming from an accepted proposal
   // If accessed directly without session data, redirect to home

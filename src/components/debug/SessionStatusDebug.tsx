@@ -6,6 +6,7 @@ import { RefreshCw, User, Users, AlertCircle, CheckCircle, RotateCcw } from 'luc
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { resetSessionToCleanState } from '@/services/sessionValidationService';
+import { clearUserPreferenceFields } from '@/services/sessionCleanupService';
 import { useToast } from '@/hooks/use-toast';
 
 interface SessionStatus {
@@ -122,6 +123,30 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
     }
   };
 
+  const handleResetMyPreferences = async () => {
+    if (!user || !sessionId) return;
+    
+    setResetting(true);
+    try {
+      await clearUserPreferenceFields(user.id);
+      toast({
+        title: "My Preferences Cleared",
+        description: "Your preferences have been cleared from all sessions",
+        variant: "default"
+      });
+      fetchSessionStatus(); // Refresh the status
+    } catch (error) {
+      console.error('Error clearing my preferences:', error);
+      toast({
+        title: "Clear Failed",
+        description: "Failed to clear your preferences",
+        variant: "destructive"
+      });
+    } finally {
+      setResetting(false);
+    }
+  };
+
   useEffect(() => {
     fetchSessionStatus();
   }, [sessionId, user]);
@@ -136,7 +161,7 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
             <Users className="h-5 w-5" />
             Session Status Debug
           </span>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button
               variant="outline"
               size="sm"
@@ -145,7 +170,17 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
               className="text-orange-600 hover:text-orange-700"
             >
               <RotateCcw className={`h-4 w-4 ${resetting ? 'animate-spin' : ''}`} />
-              Reset
+              Reset Session
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetMyPreferences}
+              disabled={resetting || !user}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              <User className="h-4 w-4" />
+              Reset My Preferences
             </Button>
             <Button
               variant="outline"
