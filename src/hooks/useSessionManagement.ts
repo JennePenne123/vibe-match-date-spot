@@ -40,7 +40,7 @@ export const useSessionManagement = () => {
   const [loading, setLoading] = useState(false);
 
   // Create a new planning session
-  const createPlanningSession = useCallback(async (partnerId: string, participantIds?: string[], planningMode: 'solo' | 'collaborative' = 'solo') => {
+  const createPlanningSession = useCallback(async (partnerId: string, participantIds?: string[], planningMode: 'solo' | 'collaborative' = 'solo', forceNew: boolean = false) => {
     if (!user) {
       console.error('🚫 SESSION: Cannot create session - no user');
       return null;
@@ -50,11 +50,21 @@ export const useSessionManagement = () => {
     try {
       console.log('🆕 SESSION: Creating planning session for partner:', partnerId, 'participants:', participantIds);
       
-      // First check if there's already an active session
-      const existingSession = await getActiveSession(partnerId);
-      if (existingSession) {
-        console.log('♻️ SESSION: Found existing active session:', existingSession.id);
-        return existingSession;
+      // First check if there's already an active session (unless forcing new)
+      if (!forceNew) {
+        const existingSession = await getActiveSession(partnerId);
+        if (existingSession) {
+          console.log('♻️ SESSION: Found existing active session:', existingSession.id);
+          return existingSession;
+        }
+      } else {
+        console.log('🆕 SESSION: Force creating new session, expiring any existing ones');
+        // Expire any existing active sessions when forcing new
+        await supabase
+          .from('date_planning_sessions')
+          .update({ session_status: 'expired', updated_at: new Date().toISOString() })
+          .or(`and(initiator_id.eq.${user.id},partner_id.eq.${partnerId}),and(initiator_id.eq.${partnerId},partner_id.eq.${user.id})`)
+          .eq('session_status', 'active');
       }
       
       const sessionData: any = {
@@ -332,6 +342,54 @@ export const useSessionManagement = () => {
     }
   }, [user, currentSession, handleError]);
 
+  // Reset session to clean state
+  const resetSession = useCallback(async (sessionId: string) => {
+    if (!user) return false;
+
+    setLoading(true);
+    try {
+      console.log('🔄 SESSION: Resetting session to clean state:', sessionId);
+      
+      const { error } = await supabase
+        .from('date_planning_sessions')
+        .update({
+          initiator_preferences: null,
+          partner_preferences: null,
+          initiator_preferences_complete: false,
+          partner_preferences_complete: false,
+          both_preferences_complete: false,
+          ai_compatibility_score: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', sessionId);
+
+      if (error) throw error;
+
+      // Refresh current session data
+      const { data: refreshedSession } = await supabase
+        .from('date_planning_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (refreshedSession) {
+        setCurrentSession(refreshedSession);
+      }
+
+      console.log('✅ SESSION: Session reset successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ SESSION: Error resetting session:', error);
+      handleError(error, {
+        toastTitle: 'Failed to reset session',
+        toastDescription: 'Please try again'
+      });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [user, handleError]);
+
   return {
     currentSession,
     setCurrentSession,
@@ -339,6 +397,7 @@ export const useSessionManagement = () => {
     createPlanningSession,
     getActiveSession,
     updateSessionPreferences,
-    completePlanningSession
+    completePlanningSession,
+    resetSession
   };
 };

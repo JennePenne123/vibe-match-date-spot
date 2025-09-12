@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, User, Users, AlertCircle, CheckCircle } from 'lucide-react';
+import { RefreshCw, User, Users, AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { resetSessionToCleanState } from '@/services/sessionValidationService';
+import { useToast } from '@/hooks/use-toast';
 
 interface SessionStatus {
   session_id: string;
@@ -22,8 +24,10 @@ interface SessionStatus {
 
 const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [status, setStatus] = useState<SessionStatus | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSessionStatus = async () => {
@@ -86,6 +90,38 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
     }
   };
 
+  const handleResetSession = async () => {
+    if (!sessionId) return;
+
+    setResetting(true);
+    try {
+      const success = await resetSessionToCleanState(sessionId);
+      if (success) {
+        toast({
+          title: "Session Reset",
+          description: "Session preferences have been cleared successfully",
+        });
+        // Refresh the status after reset
+        await fetchSessionStatus();
+      } else {
+        toast({
+          title: "Reset Failed",
+          description: "Failed to reset session preferences",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Reset session error:', error);
+      toast({
+        title: "Reset Error",
+        description: "An error occurred while resetting the session",
+        variant: "destructive",
+      });
+    } finally {
+      setResetting(false);
+    }
+  };
+
   useEffect(() => {
     fetchSessionStatus();
   }, [sessionId, user]);
@@ -100,14 +136,26 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
             <Users className="h-5 w-5" />
             Session Status Debug
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchSessionStatus}
-            disabled={loading}
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetSession}
+              disabled={resetting || !sessionId}
+              className="text-orange-600 hover:text-orange-700"
+            >
+              <RotateCcw className={`h-4 w-4 ${resetting ? 'animate-spin' : ''}`} />
+              Reset
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchSessionStatus}
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
