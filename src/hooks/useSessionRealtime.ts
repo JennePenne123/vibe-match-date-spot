@@ -29,10 +29,14 @@ export const useSessionRealtime = (
   useEffect(() => {
     if (!currentSession) return;
 
-    console.log('Setting up real-time subscription for session:', currentSession.id);
+    // Create unique channel name to prevent conflicts
+    const channelName = `planning-session-${currentSession.id}-${Date.now()}`;
+    console.log('Setting up real-time subscription for session:', currentSession.id, 'with channel:', channelName);
+    
+    let isSubscribed = true; // Flag to prevent updates after unmount
     
     const channel = supabase
-      .channel(`planning-session-${currentSession.id}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -42,21 +46,39 @@ export const useSessionRealtime = (
           filter: `id=eq.${currentSession.id}`,
         },
         (payload) => {
-          console.log('Planning session updated via realtime:', payload);
-          const updatedSession = payload.new as DatePlanningSession;
-          onSessionUpdate(updatedSession);
-          
-          // Update compatibility score if changed
-          if (updatedSession.ai_compatibility_score) {
-            onCompatibilityUpdate(updatedSession.ai_compatibility_score);
+          try {
+            if (!isSubscribed) {
+              console.log('Ignoring real-time update - component unmounted');
+              return;
+            }
+            
+            console.log('Planning session updated via realtime:', payload);
+            const updatedSession = payload.new as DatePlanningSession;
+            
+            // Defensive update calls
+            if (onSessionUpdate && typeof onSessionUpdate === 'function') {
+              onSessionUpdate(updatedSession);
+            }
+            
+            // Update compatibility score if changed
+            if (updatedSession.ai_compatibility_score && onCompatibilityUpdate && typeof onCompatibilityUpdate === 'function') {
+              onCompatibilityUpdate(updatedSession.ai_compatibility_score);
+            }
+          } catch (error) {
+            console.error('Error handling real-time session update:', error);
           }
         }
       )
       .subscribe();
 
     return () => {
-      console.log('Removing real-time subscription');
-      supabase.removeChannel(channel);
+      console.log('Removing real-time subscription:', channelName);
+      isSubscribed = false;
+      try {
+        supabase.removeChannel(channel);
+      } catch (error) {
+        console.error('Error removing real-time channel:', error);
+      }
     };
-  }, [currentSession?.id, onSessionUpdate, onCompatibilityUpdate]);
+  }, [currentSession?.id]); // Simplified dependencies
 };

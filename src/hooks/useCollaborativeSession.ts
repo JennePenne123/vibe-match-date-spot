@@ -151,18 +151,7 @@ export const useCollaborativeSession = (sessionId: string | null) => {
     }
   };
 
-  // Real-time updates
-  useSessionRealtime(
-    session,
-    (updatedSession) => {
-      setSession(updatedSession as DatePlanningSession);
-    },
-    (score) => {
-      if (session) {
-        setSession(prev => prev ? { ...prev, ai_compatibility_score: score } : null);
-      }
-    }
-  );
+  // Note: Real-time updates are handled by useDatePlanning hook to avoid duplicate subscriptions
 
   useEffect(() => {
     if (sessionId) {

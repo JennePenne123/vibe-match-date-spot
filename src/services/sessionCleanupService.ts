@@ -11,6 +11,8 @@ export const clearUserPreferenceFields = async (userId: string): Promise<void> =
       .update({
         initiator_preferences: null,
         initiator_preferences_complete: false,
+        both_preferences_complete: false,
+        ai_compatibility_score: null,
         updated_at: new Date().toISOString()
       })
       .eq('initiator_id', userId)
@@ -27,6 +29,8 @@ export const clearUserPreferenceFields = async (userId: string): Promise<void> =
       .update({
         partner_preferences: null,
         partner_preferences_complete: false,
+        both_preferences_complete: false,
+        ai_compatibility_score: null,
         updated_at: new Date().toISOString()
       })
       .eq('partner_id', userId)
