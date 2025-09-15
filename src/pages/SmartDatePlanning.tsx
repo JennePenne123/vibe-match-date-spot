@@ -42,11 +42,28 @@ const SmartDatePlanning: React.FC = () => {
   const { session: collaborativeSession } = useCollaborativeSession(sessionId);
   const { createPlanningSession } = useSessionManagement();
   
-  console.log('SmartDatePlanning - Navigation state:', { sessionId, fromProposal, planningMode });
+  console.log('SmartDatePlanning - Navigation state:', { 
+    sessionId, 
+    fromProposal, 
+    planningMode,
+    sessionExists: !!collaborativeSession,
+    sessionStatus: collaborativeSession?.session_status,
+    userRole: collaborativeSession ? (collaborativeSession.initiator_id === user?.id ? 'initiator' : 'partner') : 'unknown'
+  });
   
   // Guardrail: Redirect to fresh session if current session has stale data
   useEffect(() => {
     if (!user || !collaborativeSession || !sessionId) return;
+    
+    console.log('🔄 SESSION GUARDRAIL: Checking session validity:', {
+      sessionId,
+      sessionStatus: collaborativeSession.session_status,
+      hasInitiatorPrefs: !!collaborativeSession.initiator_preferences,
+      hasPartnerPrefs: !!collaborativeSession.partner_preferences,
+      initiatorComplete: collaborativeSession.initiator_preferences_complete,
+      partnerComplete: collaborativeSession.partner_preferences_complete,
+      bothComplete: collaborativeSession.both_preferences_complete
+    });
     
     const sessionHasPreferences = (
       collaborativeSession.initiator_preferences ||
@@ -57,8 +74,13 @@ const SmartDatePlanning: React.FC = () => {
     
     const sessionInactive = collaborativeSession.session_status !== 'active';
     
-    if (sessionHasPreferences || sessionInactive) {
+    // Only create fresh session if the current one is truly stale or inactive
+    // AND we haven't already created a fresh session recently
+    if ((sessionHasPreferences || sessionInactive) && !sessionStorage.getItem(`guardrail-${sessionId}`)) {
       console.log('🔄 SESSION GUARDRAIL: Detected stale session data, creating fresh session');
+      
+      // Mark this session as processed to prevent loops
+      sessionStorage.setItem(`guardrail-${sessionId}`, 'processed');
       
       // Create a fresh session
       const partnerId = collaborativeSession.initiator_id === user.id 
@@ -82,6 +104,8 @@ const SmartDatePlanning: React.FC = () => {
         })
         .catch((error) => {
           console.error('❌ SESSION GUARDRAIL: Failed to create fresh session:', error);
+          // Remove the guard to allow retry
+          sessionStorage.removeItem(`guardrail-${sessionId}`);
         });
     }
   }, [user, collaborativeSession, sessionId, createPlanningSession, navigate]);

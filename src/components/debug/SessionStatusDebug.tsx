@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, User, Users, AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
+import { RefreshCw, User, Users, AlertCircle, CheckCircle, RotateCcw, Clock, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { resetSessionToCleanState } from '@/services/sessionValidationService';
@@ -11,6 +11,11 @@ import { useToast } from '@/hooks/use-toast';
 
 interface SessionStatus {
   session_id: string;
+  session_status: string;
+  created_at: string;
+  expires_at: string;
+  initiator_id: string;
+  partner_id: string;
   initiator_name: string;
   partner_name: string;
   initiator_complete: boolean;
@@ -21,6 +26,9 @@ interface SessionStatus {
   current_user_is_initiator: boolean;
   current_user_completed: boolean;
   partner_completed: boolean;
+  is_session_valid: boolean;
+  is_user_part_of_session: boolean;
+  session_age_minutes: number;
 }
 
 const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => {
@@ -31,29 +39,83 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
   const [resetting, setResetting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSessionStatus = async () => {
-    if (!sessionId || !user) return;
+  const fetchSessionStatus = useCallback(async (forceRefresh = false) => {
+    if (!sessionId || !user) {
+      console.log('🔍 SESSION DEBUG: Missing sessionId or user', { sessionId: !!sessionId, user: !!user });
+      return;
+    }
 
+    console.log('🔍 SESSION DEBUG: Fetching session status for:', sessionId, 'Force refresh:', forceRefresh);
     setLoading(true);
     setError(null);
     
     try {
-      const { data: sessionData, error } = await supabase
+      // First, check if this session exists and get full details
+      const { data: sessionData, error: sessionError } = await supabase
         .from('date_planning_sessions')
         .select(`
           id,
+          session_status,
+          created_at,
+          expires_at,
           initiator_id,
           partner_id,
           initiator_preferences_complete,
           partner_preferences_complete,
           both_preferences_complete,
           initiator_preferences,
-          partner_preferences
+          partner_preferences,
+          ai_compatibility_score
         `)
         .eq('id', sessionId)
         .single();
 
-      if (error) throw error;
+      if (sessionError) {
+        console.error('🔍 SESSION DEBUG: Session not found:', sessionError);
+        throw new Error(`Session not found: ${sessionError.message}`);
+      }
+
+      console.log('🔍 SESSION DEBUG: Raw session data:', sessionData);
+
+      // Validate session and user participation
+      const isUserPartOfSession = (
+        sessionData.initiator_id === user.id || 
+        sessionData.partner_id === user.id
+      );
+
+      if (!isUserPartOfSession) {
+        console.warn('🔍 SESSION DEBUG: User is not part of this session');
+        setError('You are not a participant in this session');
+        return;
+      }
+
+      // Check if session is active
+      const isSessionActive = sessionData.session_status === 'active';
+      const isSessionExpired = new Date(sessionData.expires_at) < new Date();
+      
+      // Calculate session age
+      const sessionAge = Math.floor((Date.now() - new Date(sessionData.created_at).getTime()) / (1000 * 60));
+
+      // Also check for currently active sessions for this user pair
+      const partnerId = sessionData.initiator_id === user.id 
+        ? sessionData.partner_id 
+        : sessionData.initiator_id;
+
+      const { data: activeSessionCheck } = await supabase
+        .from('date_planning_sessions')
+        .select('id, created_at')
+        .eq('session_status', 'active')
+        .or(`and(initiator_id.eq.${user.id},partner_id.eq.${partnerId}),and(initiator_id.eq.${partnerId},partner_id.eq.${user.id})`)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      const hasNewerActiveSession = activeSessionCheck && 
+        activeSessionCheck.length > 0 && 
+        activeSessionCheck[0].id !== sessionId;
+
+      if (hasNewerActiveSession) {
+        console.warn('🔍 SESSION DEBUG: Found newer active session:', activeSessionCheck[0].id);
+      }
 
       // Fetch profile names separately with error handling
       const [initiatorResult, partnerResult] = await Promise.all([
@@ -61,35 +123,49 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
         supabase.from('profiles').select('name').eq('id', sessionData.partner_id).single()
       ]);
 
-      const data = {
-        ...sessionData,
-        initiator_profile: initiatorResult.data || { name: 'Unknown' },
-        partner_profile: partnerResult.data || { name: 'Unknown' }
+      const isInitiator = sessionData.initiator_id === user.id;
+      
+      const status: SessionStatus = {
+        session_id: sessionData.id,
+        session_status: sessionData.session_status,
+        created_at: sessionData.created_at,
+        expires_at: sessionData.expires_at,
+        initiator_id: sessionData.initiator_id,
+        partner_id: sessionData.partner_id,
+        initiator_name: initiatorResult.data?.name || 'Unknown',
+        partner_name: partnerResult.data?.name || 'Unknown',
+        initiator_complete: sessionData.initiator_preferences_complete,
+        partner_complete: sessionData.partner_preferences_complete,
+        both_complete: sessionData.both_preferences_complete,
+        has_initiator_prefs: !!sessionData.initiator_preferences,
+        has_partner_prefs: !!sessionData.partner_preferences,
+        current_user_is_initiator: isInitiator,
+        current_user_completed: isInitiator ? sessionData.initiator_preferences_complete : sessionData.partner_preferences_complete,
+        partner_completed: isInitiator ? sessionData.partner_preferences_complete : sessionData.initiator_preferences_complete,
+        is_session_valid: isSessionActive && !isSessionExpired && !hasNewerActiveSession,
+        is_user_part_of_session: isUserPartOfSession,
+        session_age_minutes: sessionAge
       };
 
-      // Error handling is now above
+      console.log('🔍 SESSION DEBUG: Processed status:', status);
+      setStatus(status);
 
-      const isInitiator = data.initiator_id === user.id;
-      
-      setStatus({
-        session_id: data.id,
-        initiator_name: (data.initiator_profile as any)?.name || 'Unknown',
-        partner_name: (data.partner_profile as any)?.name || 'Unknown',
-        initiator_complete: data.initiator_preferences_complete,
-        partner_complete: data.partner_preferences_complete,
-        both_complete: data.both_preferences_complete,
-        has_initiator_prefs: !!data.initiator_preferences,
-        has_partner_prefs: !!data.partner_preferences,
-        current_user_is_initiator: isInitiator,
-        current_user_completed: isInitiator ? data.initiator_preferences_complete : data.partner_preferences_complete,
-        partner_completed: isInitiator ? data.partner_preferences_complete : data.initiator_preferences_complete
-      });
+      // Set warnings for invalid sessions
+      if (!status.is_session_valid) {
+        const reasons = [];
+        if (!isSessionActive) reasons.push('session is not active');
+        if (isSessionExpired) reasons.push('session has expired');
+        if (hasNewerActiveSession) reasons.push('newer session exists');
+        
+        setError(`Warning: This session may not be current (${reasons.join(', ')})`);
+      }
     } catch (err) {
+      console.error('🔍 SESSION DEBUG: Error fetching session:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch session status');
     } finally {
       setLoading(false);
     }
-  };
+  }, [sessionId, user]);
 
   const handleResetSession = async () => {
     if (!sessionId) return;
@@ -149,7 +225,36 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
 
   useEffect(() => {
     fetchSessionStatus();
-  }, [sessionId, user]);
+  }, [fetchSessionStatus]);
+
+  // Set up real-time updates for session changes
+  useEffect(() => {
+    if (!sessionId || !user) return;
+
+    console.log('🔄 SESSION DEBUG: Setting up real-time updates for session:', sessionId);
+    
+    const channel = supabase
+      .channel(`session-debug-${sessionId}-${Date.now()}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'date_planning_sessions',
+          filter: `id=eq.${sessionId}`,
+        },
+        (payload) => {
+          console.log('🔄 SESSION DEBUG: Real-time session update:', payload);
+          fetchSessionStatus(true); // Force refresh
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('🔄 SESSION DEBUG: Cleaning up real-time subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [sessionId, user, fetchSessionStatus]);
 
   if (!sessionId || !user) return null;
 
@@ -185,10 +290,12 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
             <Button
               variant="outline"
               size="sm"
-              onClick={fetchSessionStatus}
+              onClick={() => fetchSessionStatus(true)}
               disabled={loading}
+              title="Force refresh session data"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
             </Button>
           </div>
         </CardTitle>
@@ -203,6 +310,18 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
 
         {status && (
           <div className="space-y-3">
+            {/* Session Validity Warning */}
+            {!status.is_session_valid && (
+              <div className="flex items-center gap-2 text-orange-600 bg-orange-100 p-3 rounded-lg border border-orange-200">
+                <AlertTriangle className="h-4 w-4" />
+                <div className="text-sm">
+                  <strong>Session Status Warning:</strong> This session may not be current.
+                  {status.session_status !== 'active' && ' Session is not active.'}
+                  {status.session_age_minutes > 60 && ` Session is ${Math.floor(status.session_age_minutes / 60)} hours old.`}
+                </div>
+              </div>
+            )}
+
             {/* Session Info */}
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
@@ -210,6 +329,16 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
               </div>
               <div>
                 <strong>Your Role:</strong> {status.current_user_is_initiator ? 'Initiator' : 'Partner'}
+              </div>
+              <div>
+                <strong>Status:</strong> 
+                <Badge variant={status.session_status === 'active' ? 'default' : 'secondary'} className="ml-1">
+                  {status.session_status}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                <span><strong>Age:</strong> {status.session_age_minutes}m</span>
               </div>
             </div>
 
@@ -269,6 +398,14 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
                   🎉 <strong>Ready:</strong> Both users completed, ready for AI analysis
                 </div>
               )}
+              
+              {/* Session validity status */}
+              <div className="mt-2 pt-2 border-t border-blue-200">
+                <div className="text-xs text-gray-600">
+                  Session Valid: {status.is_session_valid ? '✅ Yes' : '❌ No'} |
+                  Part of Session: {status.is_user_part_of_session ? '✅ Yes' : '❌ No'}
+                </div>
+              </div>
             </div>
           </div>
         )}
