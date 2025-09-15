@@ -1,18 +1,18 @@
 import { supabase } from '@/integrations/supabase/client';
 
-// Clear user's preference fields from all active sessions (preserves partner data)
+// Clear ONLY the logging out user's preferences (preserves partner data and session integrity)
 export const clearUserPreferenceFields = async (userId: string): Promise<void> => {
   try {
-    console.log('🧹 SESSION CLEANUP: Clearing user preference fields for user:', userId);
+    console.log('🧹 SESSION CLEANUP: Clearing ONLY user preferences for user:', userId);
     
-    // Clear initiator preferences where user is the initiator
+    // For sessions where user is initiator, clear only initiator fields
     const { error: initiatorError } = await supabase
       .from('date_planning_sessions')
       .update({
         initiator_preferences: null,
         initiator_preferences_complete: false,
-        both_preferences_complete: false,
-        ai_compatibility_score: null,
+        // Don't touch both_preferences_complete - let trigger handle it
+        // Don't clear ai_compatibility_score - preserve for partner
         updated_at: new Date().toISOString()
       })
       .eq('initiator_id', userId)
@@ -23,14 +23,14 @@ export const clearUserPreferenceFields = async (userId: string): Promise<void> =
       throw initiatorError;
     }
 
-    // Clear partner preferences where user is the partner
+    // For sessions where user is partner, clear only partner fields  
     const { error: partnerError } = await supabase
       .from('date_planning_sessions')
       .update({
         partner_preferences: null,
         partner_preferences_complete: false,
-        both_preferences_complete: false,
-        ai_compatibility_score: null,
+        // Don't touch both_preferences_complete - let trigger handle it
+        // Don't clear ai_compatibility_score - preserve for initiator
         updated_at: new Date().toISOString()
       })
       .eq('partner_id', userId)
@@ -41,7 +41,7 @@ export const clearUserPreferenceFields = async (userId: string): Promise<void> =
       throw partnerError;
     }
 
-    console.log('✅ SESSION CLEANUP: Successfully cleared user preference fields');
+    console.log('✅ SESSION CLEANUP: Successfully cleared ONLY user preference fields, preserved partner data');
   } catch (error) {
     console.error('❌ SESSION CLEANUP: Failed to clear user preference fields:', error);
     throw error;

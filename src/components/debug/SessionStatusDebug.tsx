@@ -31,7 +31,7 @@ interface SessionStatus {
   session_age_minutes: number;
 }
 
-const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => {
+const SessionStatusDebug: React.FC<{ sessionId?: string; expectedPartnerId?: string }> = ({ sessionId, expectedPartnerId }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [status, setStatus] = useState<SessionStatus | null>(null);
@@ -96,11 +96,18 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
       // Calculate session age
       const sessionAge = Math.floor((Date.now() - new Date(sessionData.created_at).getTime()) / (1000 * 60));
 
-      // Also check for currently active sessions for this user pair
       const partnerId = sessionData.initiator_id === user.id 
         ? sessionData.partner_id 
         : sessionData.initiator_id;
 
+      // Check if this matches the expected partner
+      const isCorrectPartner = !expectedPartnerId || partnerId === expectedPartnerId;
+      
+      if (expectedPartnerId && !isCorrectPartner) {
+        console.warn('🔍 SESSION DEBUG: Partner mismatch - expected:', expectedPartnerId, 'got:', partnerId);
+      }
+
+      // Also check for currently active sessions for this user pair
       const { data: activeSessionCheck } = await supabase
         .from('date_planning_sessions')
         .select('id, created_at')
@@ -142,7 +149,7 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
         current_user_is_initiator: isInitiator,
         current_user_completed: isInitiator ? sessionData.initiator_preferences_complete : sessionData.partner_preferences_complete,
         partner_completed: isInitiator ? sessionData.partner_preferences_complete : sessionData.initiator_preferences_complete,
-        is_session_valid: isSessionActive && !isSessionExpired && !hasNewerActiveSession,
+        is_session_valid: isSessionActive && !isSessionExpired && !hasNewerActiveSession && isCorrectPartner,
         is_user_part_of_session: isUserPartOfSession,
         session_age_minutes: sessionAge
       };
@@ -156,6 +163,7 @@ const SessionStatusDebug: React.FC<{ sessionId?: string }> = ({ sessionId }) => 
         if (!isSessionActive) reasons.push('session is not active');
         if (isSessionExpired) reasons.push('session has expired');
         if (hasNewerActiveSession) reasons.push('newer session exists');
+        if (expectedPartnerId && !isCorrectPartner) reasons.push('partner mismatch detected');
         
         setError(`Warning: This session may not be current (${reasons.join(', ')})`);
       }

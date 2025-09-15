@@ -51,13 +51,22 @@ const SmartDatePlanning: React.FC = () => {
     userRole: collaborativeSession ? (collaborativeSession.initiator_id === user?.id ? 'initiator' : 'partner') : 'unknown'
   });
   
-  // Guardrail: Redirect to fresh session if current session has stale data
+  // Guardrail: Only create fresh session if current session is truly invalid
   useEffect(() => {
     if (!user || !collaborativeSession || !sessionId) return;
     
+    const userRole = collaborativeSession.initiator_id === user.id ? 'initiator' : 'partner';
+    const isExpired = new Date() > new Date(collaborativeSession.expires_at);
+    const isCompleted = collaborativeSession.session_status === 'completed';
+    const isInactive = collaborativeSession.session_status !== 'active';
+    
     console.log('🔄 SESSION GUARDRAIL: Checking session validity:', {
       sessionId,
+      userRole,
       sessionStatus: collaborativeSession.session_status,
+      isExpired,
+      isCompleted,
+      isInactive,
       hasInitiatorPrefs: !!collaborativeSession.initiator_preferences,
       hasPartnerPrefs: !!collaborativeSession.partner_preferences,
       initiatorComplete: collaborativeSession.initiator_preferences_complete,
@@ -65,19 +74,15 @@ const SmartDatePlanning: React.FC = () => {
       bothComplete: collaborativeSession.both_preferences_complete
     });
     
-    const sessionHasPreferences = (
-      collaborativeSession.initiator_preferences ||
-      collaborativeSession.partner_preferences ||
-      collaborativeSession.initiator_preferences_complete ||
-      collaborativeSession.partner_preferences_complete
-    );
+    // Only create fresh session if session is truly invalid (expired, completed, or corrupted)
+    const needsFreshSession = isExpired || isCompleted || isInactive;
     
-    const sessionInactive = collaborativeSession.session_status !== 'active';
-    
-    // Only create fresh session if the current one is truly stale or inactive
-    // AND we haven't already created a fresh session recently
-    if ((sessionHasPreferences || sessionInactive) && !sessionStorage.getItem(`guardrail-${sessionId}`)) {
-      console.log('🔄 SESSION GUARDRAIL: Detected stale session data, creating fresh session');
+    if (needsFreshSession && !sessionStorage.getItem(`guardrail-${sessionId}`)) {
+      console.log('🔄 SESSION GUARDRAIL: Session is invalid, creating fresh session', {
+        isExpired,
+        isCompleted, 
+        isInactive
+      });
       
       // Mark this session as processed to prevent loops
       sessionStorage.setItem(`guardrail-${sessionId}`, 'processed');
@@ -107,6 +112,8 @@ const SmartDatePlanning: React.FC = () => {
           // Remove the guard to allow retry
           sessionStorage.removeItem(`guardrail-${sessionId}`);
         });
+    } else if (!needsFreshSession) {
+      console.log('✅ SESSION GUARDRAIL: Session is valid, allowing user to join');
     }
   }, [user, collaborativeSession, sessionId, createPlanningSession, navigate]);
   
@@ -160,7 +167,10 @@ const SmartDatePlanning: React.FC = () => {
           )}
           
           <ErrorBoundary level="component">
-            <SessionStatusDebug sessionId={sessionId} />
+          <SessionStatusDebug 
+            sessionId={sessionId} 
+            expectedPartnerId={collaborativeSession?.initiator_id === user?.id ? collaborativeSession?.partner_id : collaborativeSession?.initiator_id}
+          />
             <SmartDatePlanner sessionId={sessionId} fromProposal={fromProposal} />
           </ErrorBoundary>
         </div>

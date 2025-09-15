@@ -34,19 +34,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    // Clean up sessions before signing out
+    // Clean up only user's own data on logout (preserve collaborative sessions)
     if (user) {
       try {
-        // First clear user's preferences from all sessions
+        // Clear only user's own preferences from active sessions (preserve partner data)
         await clearUserPreferenceFields(user.id);
-        console.log('✅ AUTH: User preferences cleared on logout');
+        console.log('✅ AUTH: User preferences cleared on logout (partner data preserved)');
         
-        // Then expire all sessions
-        await expireUserSessions(user.id);
-        console.log('✅ AUTH: Sessions expired on logout');
+        // Don't expire sessions - let them remain active for collaborative partners
+        console.log('✅ AUTH: Collaborative sessions preserved for partners');
       } catch (error) {
-        console.error('❌ AUTH: Failed to clean up sessions on logout:', error);
-        // Continue with logout even if session cleanup fails
+        console.error('❌ AUTH: Failed to clean up user data on logout:', error);
+        // Continue with logout even if cleanup fails
       }
     }
     await signOutUser();
