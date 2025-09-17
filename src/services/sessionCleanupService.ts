@@ -11,7 +11,7 @@ export const clearUserPreferenceFields = async (userId: string): Promise<void> =
       .update({
         initiator_preferences: null,
         initiator_preferences_complete: false,
-        // Don't touch both_preferences_complete - let trigger handle it
+        both_preferences_complete: false,
         // Don't clear ai_compatibility_score - preserve for partner
         updated_at: new Date().toISOString()
       })
@@ -29,7 +29,7 @@ export const clearUserPreferenceFields = async (userId: string): Promise<void> =
       .update({
         partner_preferences: null,
         partner_preferences_complete: false,
-        // Don't touch both_preferences_complete - let trigger handle it
+        both_preferences_complete: false,
         // Don't clear ai_compatibility_score - preserve for initiator
         updated_at: new Date().toISOString()
       })

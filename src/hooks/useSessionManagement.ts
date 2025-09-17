@@ -276,7 +276,45 @@ export const useSessionManagement = () => {
 
       console.log('🎯 SESSION: Preferences updated successfully');
 
-      // Fetch the updated session to get the latest both_preferences_complete flag
+      // Now calculate and update both_preferences_complete based on current state
+      const { data: freshSession, error: fetchError2 } = await supabase
+        .from('date_planning_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (fetchError2) throw fetchError2;
+
+      // Calculate both_preferences_complete based on actual data
+      const bothComplete = 
+        freshSession.initiator_preferences_complete && 
+        freshSession.partner_preferences_complete &&
+        !!freshSession.initiator_preferences && 
+        !!freshSession.partner_preferences;
+
+      console.log('🧮 SESSION: Calculating both_preferences_complete:', {
+        initiator_complete: freshSession.initiator_preferences_complete,
+        partner_complete: freshSession.partner_preferences_complete,
+        has_initiator_prefs: !!freshSession.initiator_preferences,
+        has_partner_prefs: !!freshSession.partner_preferences,
+        result: bothComplete
+      });
+
+      // Update both_preferences_complete if it needs to change
+      if (freshSession.both_preferences_complete !== bothComplete) {
+        console.log('📝 SESSION: Updating both_preferences_complete to:', bothComplete);
+        const { error: bothUpdateError } = await supabase
+          .from('date_planning_sessions')
+          .update({
+            both_preferences_complete: bothComplete,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', sessionId);
+
+        if (bothUpdateError) throw bothUpdateError;
+      }
+
+      // Fetch the final updated session
       const { data: updatedSession, error: fetchUpdatedError } = await supabase
         .from('date_planning_sessions')
         .select('*')
