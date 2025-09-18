@@ -248,20 +248,26 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   }
 
   async function handleSendInvitation() {
+    // Determine the active session (collaborative takes priority)
+    const activeSession = collaborativeSession || currentSession;
+    const activeSessionId = collaborativeSession?.id || currentSession?.id;
+    
     console.log('🚀 SEND INVITATION - Starting process with:', {
       hasCurrentSession: !!currentSession,
-      currentSessionId: currentSession?.id,
+      hasCollaborativeSession: !!collaborativeSession,
+      activeSessionId,
       selectedVenueId: state.selectedVenueId,
       selectedPartnerId,
       selectedPartner: selectedPartner?.name,
       selectedVenue: selectedVenue?.venue_name,
       invitationMessage: state.invitationMessage?.substring(0, 50) + '...',
-      venueRecommendationsCount: state.venueRecommendations?.length || 0
+      venueRecommendationsCount: state.venueRecommendations?.length || 0,
+      planningMode: state.planningMode
     });
 
     // Validation checks with user feedback
-    if (!currentSession) {
-      console.error('🚀 SEND INVITATION - ERROR: No current session');
+    if (!activeSession || !activeSessionId) {
+      console.error('🚀 SEND INVITATION - ERROR: No active session');
       toast({
         variant: 'destructive',
         title: 'Session Error',
@@ -314,7 +320,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       });
 
       const success = await completePlanningSession(
-        currentSession.id,
+        activeSessionId,
         venueIdToUse,
         state.invitationMessage,
         currentPreferences
