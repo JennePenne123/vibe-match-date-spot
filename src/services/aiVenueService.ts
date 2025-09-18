@@ -92,11 +92,21 @@ export const getAIVenueRecommendations = async (
     for (const venue of venues) {
       const aiScore = Math.floor(Math.random() * 40) + 60; // Mock scoring
       
+      // Handle venue ID from different sources (Google Places vs database)
+      const venueId = venue.placeId || venue.place_id || venue.id || venue.google_place_id;
+      
+      if (!venueId) {
+        console.warn('⚠️ VENUE SERVICE: Skipping venue without valid ID:', venue.name);
+        continue;
+      }
+      
+      console.log('🆔 VENUE SERVICE: Processing venue:', venue.name, 'with ID:', venueId);
+      
       const recommendation: AIVenueRecommendation = {
-        venue_id: venue.id,
+        venue_id: venueId,
         venue_name: venue.name,
         venue_address: venue.address,
-        venue_image: venue.image_url,
+        venue_image: venue.image_url || venue.photos?.[0]?.url,
         venue_photos: venue.photos || [],
         ai_score: aiScore,
         match_factors: {},
@@ -107,6 +117,8 @@ export const getAIVenueRecommendations = async (
 
       recommendations.push(recommendation);
     }
+    
+    console.log('✅ VENUE SERVICE: Created', recommendations.length, 'valid recommendations');
 
     return recommendations
       .sort((a, b) => b.ai_score - a.ai_score)
