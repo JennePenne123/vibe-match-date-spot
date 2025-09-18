@@ -31,7 +31,14 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
   const [aiAnalysisTriggered, setAiAnalysisTriggered] = useState(false);
   
   // AI Analysis hook for automatic triggering
-  const { analyzeCompatibilityAndVenues, resetAIState } = useAIAnalysis();
+  const { 
+    analyzeCompatibilityAndVenues, 
+    resetAIState, 
+    compatibilityScore: aiCompatibilityScore,
+    venueRecommendations: aiVenueRecommendations,
+    venueSearchError: aiVenueSearchError,
+    isAnalyzing 
+  } = useAIAnalysis();
 
   // Get session details with validation
   const fetchSession = async (id: string, forceRefresh = false) => {
@@ -356,6 +363,11 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     refetchSession: () => sessionId ? fetchSession(sessionId) : Promise.resolve(),
     forceRefreshSession,
     triggerAIAnalysisManually,
-    aiAnalysisTriggered
+    aiAnalysisTriggered,
+    // Expose AI analysis results
+    compatibilityScore: aiCompatibilityScore,
+    venueRecommendations: aiVenueRecommendations,
+    venueSearchError: aiVenueSearchError,
+    aiAnalyzing: isAnalyzing
   };
 };

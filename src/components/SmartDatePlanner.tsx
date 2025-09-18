@@ -79,7 +79,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   
   const state = useSmartDatePlannerState({ 
     preselectedFriend: effectivePreselectedFriend,
-    planningMode: 'collaborative' // Force collaborative mode only
+    planningMode: 'collaborative', // Force collaborative mode only
+    sessionId
   });
   
   console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
@@ -286,7 +287,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
               </div>
 
               {/* Step Content - Using consistent step names */}
-              {(currentStep === 'select-partner' || currentStep === 'partner') && !effectivePreselectedFriend && (
+              {currentStep === 'select-partner' && !effectivePreselectedFriend && (
                 <PartnerSelection
                   friends={friends}
                   selectedPartnerId={selectedPartnerId}
@@ -338,7 +339,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                 </div>
               )}
 
-              {(currentStep === 'review-matches' || currentStep === 'match') && selectedPartner && (
+              {currentStep === 'review-matches' && selectedPartner && (
                 <MatchReview
                   compatibilityScore={compatibilityScore || 0}
                   partnerName={selectedPartner.name}
@@ -373,7 +374,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                 />
               )}
 
-              {(currentStep === 'create-invitation' || currentStep === 'invitation') && selectedPartner && renderInvitationStep()}
+              {currentStep === 'create-invitation' && selectedPartner && renderInvitationStep()}
             </div>
 
             {/* Right side content for additional info */}
@@ -388,7 +389,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
               {compatibilityScore && (
                 <div className="p-4 rounded-lg bg-muted/50">
                   <h3 className="font-semibold text-foreground mb-2">Compatibility</h3>
-                  <p className="text-2xl font-bold text-primary">{compatibilityScore}%</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {typeof compatibilityScore === 'object' ? compatibilityScore?.overall_score : compatibilityScore}%
+                  </p>
                 </div>
               )}
             </div>
@@ -531,7 +534,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             currentUser={user}
             selectedPartner={selectedPartner}
             currentSession={collaborativeSession}
-            compatibilityScore={compatibilityScore}
+            compatibilityScore={typeof compatibilityScore === 'object' ? compatibilityScore?.overall_score : compatibilityScore}
             venueRecommendations={venueRecommendations}
             currentStep={currentStep}
             onTriggerAIAnalysis={() => triggerAIAnalysisManually?.(state.userLocation)}

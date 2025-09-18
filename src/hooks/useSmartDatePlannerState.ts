@@ -5,13 +5,19 @@ import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlanningSteps } from '@/hooks/usePlanningSteps';
 import { useApp } from '@/contexts/AppContext';
+import { useCollaborativeSessionState } from '@/hooks/useCollaborativeSessionState';
 
 interface UseSmartDatePlannerStateProps {
   preselectedFriend?: { id: string; name: string } | null;
   planningMode?: 'collaborative'; // Only collaborative mode supported
+  sessionId?: string | null;
 }
 
-export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'collaborative' }: UseSmartDatePlannerStateProps) => {
+export const useSmartDatePlannerState = ({ 
+  preselectedFriend, 
+  planningMode = 'collaborative',
+  sessionId 
+}: UseSmartDatePlannerStateProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { appState, requestLocation } = useApp();
@@ -20,48 +26,38 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'co
   console.log('SmartDatePlanner - Preselected friend:', preselectedFriend);
   console.log('SmartDatePlanner - User location:', appState.userLocation);
 
-  // Initialize hooks with error handling
-  let friends = [];
-  let friendsError = null;
+  // Initialize hooks - must be called unconditionally (Rules of Hooks)
+  const friendsResult = useFriends();
+  const datePlanningState = useDatePlanning(appState.userLocation);
+  const planningStepsState = usePlanningSteps({ preselectedFriend, planningMode });
   
-  try {
-    const friendsResult = useFriends();
-    friends = friendsResult.friends || [];
-    console.log('SmartDatePlanner - Friends loaded:', friends.length);
-  } catch (error) {
-    console.error('SmartDatePlanner - Error loading friends:', error);
-    friendsError = error;
-  }
+  // Use collaborative session state when sessionId is provided
+  const collaborativeState = useCollaborativeSessionState({ 
+    sessionId, 
+    userLocation: appState.userLocation 
+  });
 
-  let datePlanningState = null;
-  let datePlanningError = null;
-  
-  try {
-    datePlanningState = useDatePlanning(appState.userLocation);
-    console.log('✅ SmartDatePlanner - Date planning state loaded with location:', appState.userLocation);
-    console.log('✅ SmartDatePlanner - analyzeCompatibilityAndVenues function available:', typeof datePlanningState?.analyzeCompatibilityAndVenues);
-  } catch (error) {
-    console.error('❌ SmartDatePlanner - Error loading date planning state:', error);
-    datePlanningError = error;
-  }
+  // Extract data with error handling after hooks are called
+  const friends = friendsResult.friends || [];
+  const friendsError = null; // Remove try-catch error handling for hooks
+  const datePlanningError = null; // Remove try-catch error handling for hooks  
+  const planningStepsError = null; // Remove try-catch error handling for hooks
 
-  let planningStepsState = null;
-  let planningStepsError = null;
-  
-  try {
-    planningStepsState = usePlanningSteps({ preselectedFriend, planningMode });
-    console.log('SmartDatePlanner - Planning steps loaded');
-  } catch (error) {
-    console.error('SmartDatePlanner - Error loading planning steps:', error);
-    planningStepsError = error;
-  }
+  console.log('SmartDatePlanner - Friends loaded:', friends.length);
+  console.log('✅ SmartDatePlanner - Date planning state loaded with location:', appState.userLocation);
+  console.log('✅ SmartDatePlanner - analyzeCompatibilityAndVenues function available:', typeof datePlanningState?.analyzeCompatibilityAndVenues);
+  console.log('🔧 SmartDatePlanner - Collaborative state:', {
+    hasCollaborativeSession: !!collaborativeState.collaborativeSession,
+    collaborativeVenueCount: collaborativeState.collaborativeVenueRecommendations?.length || 0,
+    collaborativeCompatibilityScore: collaborativeState.collaborativeCompatibilityScore
+  });
 
-  // Extract states from hooks (with defaults if null)
+  // Extract states from hooks (with defaults if null) - prioritize collaborative session data
   const {
     currentSession,
     loading,
-    compatibilityScore,
-    venueRecommendations,
+    compatibilityScore: singleUserCompatibilityScore,
+    venueRecommendations: singleUserVenueRecommendations,
     venueSearchError,
     analyzeCompatibilityAndVenues,
     createPlanningSession,
@@ -81,6 +77,20 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'co
     updateSessionPreferences: async () => {}
   };
 
+  // Prioritize collaborative session data when available
+  const compatibilityScore = collaborativeState.collaborativeCompatibilityScore ?? singleUserCompatibilityScore;
+  const venueRecommendations = collaborativeState.collaborativeVenueRecommendations?.length > 0 
+    ? collaborativeState.collaborativeVenueRecommendations 
+    : singleUserVenueRecommendations || [];
+  const aiAnalyzing = collaborativeState.collaborativeAiAnalyzing || loading;
+  
+  console.log('🔧 VENUE RECOMMENDATIONS STATE CHECK:', {
+    collaborativeVenues: collaborativeState.collaborativeVenueRecommendations?.length || 0,
+    singleUserVenues: singleUserVenueRecommendations?.length || 0,
+    finalVenues: venueRecommendations?.length || 0,
+    usingCollaborative: (collaborativeState.collaborativeVenueRecommendations?.length || 0) > 0
+  });
+
   const {
     currentStep,
     setCurrentStep,
@@ -99,7 +109,6 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'co
 
   const [selectedVenueId, setSelectedVenueId] = useState<string>('');
   const [invitationMessage, setInvitationMessage] = useState<string>('');
-  const [aiAnalyzing, setAiAnalyzing] = useState(false);
   const [locationRequested, setLocationRequested] = useState(false);
   const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
@@ -188,7 +197,6 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'co
     invitationMessage,
     setInvitationMessage,
     aiAnalyzing,
-    setAiAnalyzing,
     selectedPartner,
     selectedVenue,
     navigate,
@@ -201,6 +209,8 @@ export const useSmartDatePlannerState = ({ preselectedFriend, planningMode = 'co
     selectedPartnerIds,
     setSelectedPartnerIds,
     currentPreferences,
-    setCurrentPreferences
+    setCurrentPreferences,
+    // Include collaborative session state
+    ...collaborativeState
   };
 };
