@@ -5,43 +5,60 @@ export const clearUserPreferenceFields = async (userId: string): Promise<void> =
   try {
     console.log('🧹 SESSION CLEANUP: Clearing ONLY user preferences for user:', userId);
     
-    // For sessions where user is initiator, clear only initiator fields
-    const { error: initiatorError } = await supabase
+    // Get all active sessions for this user to determine which role they have
+    const { data: sessions, error: fetchError } = await supabase
       .from('date_planning_sessions')
-      .update({
-        initiator_preferences: null,
-        initiator_preferences_complete: false,
-        both_preferences_complete: false,
-        // Don't clear ai_compatibility_score - preserve for partner
-        updated_at: new Date().toISOString()
-      })
-      .eq('initiator_id', userId)
+      .select('*')
+      .or(`initiator_id.eq.${userId},partner_id.eq.${userId}`)
       .eq('session_status', 'active');
 
-    if (initiatorError) {
-      console.error('❌ SESSION CLEANUP: Error clearing initiator preferences:', initiatorError);
-      throw initiatorError;
+    if (fetchError) {
+      console.error('❌ SESSION CLEANUP: Error fetching user sessions:', fetchError);
+      throw fetchError;
     }
 
-    // For sessions where user is partner, clear only partner fields  
-    const { error: partnerError } = await supabase
-      .from('date_planning_sessions')
-      .update({
-        partner_preferences: null,
-        partner_preferences_complete: false,
-        both_preferences_complete: false,
-        // Don't clear ai_compatibility_score - preserve for initiator
-        updated_at: new Date().toISOString()
-      })
-      .eq('partner_id', userId)
-      .eq('session_status', 'active');
-
-    if (partnerError) {
-      console.error('❌ SESSION CLEANUP: Error clearing partner preferences:', partnerError);
-      throw partnerError;
+    if (!sessions || sessions.length === 0) {
+      console.log('✅ SESSION CLEANUP: No active sessions found for user');
+      return;
     }
 
-    console.log('✅ SESSION CLEANUP: Successfully cleared ONLY user preference fields, preserved partner data');
+    // Process each session individually to calculate both_preferences_complete correctly
+    for (const session of sessions) {
+      const isInitiator = session.initiator_id === userId;
+      let updateData: any = { updated_at: new Date().toISOString() };
+
+      if (isInitiator) {
+        // User is initiator - clear initiator preferences
+        updateData.initiator_preferences = null;
+        updateData.initiator_preferences_complete = false;
+        // both_preferences_complete = partner still has preferences
+        updateData.both_preferences_complete = session.partner_preferences_complete && !!session.partner_preferences;
+      } else {
+        // User is partner - clear partner preferences  
+        updateData.partner_preferences = null;
+        updateData.partner_preferences_complete = false;
+        // both_preferences_complete = initiator still has preferences
+        updateData.both_preferences_complete = session.initiator_preferences_complete && !!session.initiator_preferences;
+      }
+
+      console.log(`🔄 SESSION CLEANUP: Updating session ${session.id}:`, {
+        userRole: isInitiator ? 'initiator' : 'partner',
+        bothComplete: updateData.both_preferences_complete,
+        partnerStillHasPrefs: isInitiator ? (session.partner_preferences_complete && !!session.partner_preferences) : (session.initiator_preferences_complete && !!session.initiator_preferences)
+      });
+
+      const { error: updateError } = await supabase
+        .from('date_planning_sessions')
+        .update(updateData)
+        .eq('id', session.id);
+
+      if (updateError) {
+        console.error('❌ SESSION CLEANUP: Error updating session:', updateError);
+        throw updateError;
+      }
+    }
+
+    console.log('✅ SESSION CLEANUP: Successfully cleared user preferences, preserved partner data and session state');
   } catch (error) {
     console.error('❌ SESSION CLEANUP: Failed to clear user preference fields:', error);
     throw error;

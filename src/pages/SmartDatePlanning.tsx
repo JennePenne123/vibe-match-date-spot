@@ -40,7 +40,7 @@ const SmartDatePlanning: React.FC = () => {
   
   // Get session data to check if it needs reset
   const { session: collaborativeSession } = useCollaborativeSession(sessionId);
-  const { createPlanningSession } = useSessionManagement();
+  const { createPlanningSession, getActiveSession } = useSessionManagement();
   
   console.log('SmartDatePlanning - Navigation state:', { 
     sessionId, 
@@ -51,7 +51,7 @@ const SmartDatePlanning: React.FC = () => {
     userRole: collaborativeSession ? (collaborativeSession.initiator_id === user?.id ? 'initiator' : 'partner') : 'unknown'
   });
   
-  // Guardrail: Only create fresh session if current session is truly invalid
+  // Enhanced guardrail: Join existing session or inherit preferences 
   useEffect(() => {
     if (!user || !collaborativeSession || !sessionId) return;
     
@@ -74,29 +74,57 @@ const SmartDatePlanning: React.FC = () => {
       bothComplete: collaborativeSession.both_preferences_complete
     });
     
+    // Check if user needs to inherit preferences when joining existing session
+    const userHasNoPreferences = userRole === 'initiator' 
+      ? !collaborativeSession.initiator_preferences_complete || !collaborativeSession.initiator_preferences
+      : !collaborativeSession.partner_preferences_complete || !collaborativeSession.partner_preferences;
+
+    const sessionIsValid = !isExpired && !isCompleted && !isInactive;
+    
+    if (sessionIsValid && userHasNoPreferences && !sessionStorage.getItem(`inherit-${sessionId}-${user.id}`)) {
+      console.log('🔄 SESSION GUARDRAIL: Valid session but user needs preferences, attempting inheritance');
+      sessionStorage.setItem(`inherit-${sessionId}-${user.id}`, 'attempted');
+      
+      // Reload to trigger preference sync
+      window.location.reload();
+      return;
+    }
+    
     // Only create fresh session if session is truly invalid (expired, completed, or corrupted)
     const needsFreshSession = isExpired || isCompleted || isInactive;
     
     if (needsFreshSession && !sessionStorage.getItem(`guardrail-${sessionId}`)) {
-      console.log('🔄 SESSION GUARDRAIL: Session is invalid, creating fresh session', {
-        isExpired,
-        isCompleted, 
-        isInactive
-      });
+      console.log('🔄 SESSION GUARDRAIL: Session is invalid, looking for existing active session first');
       
       // Mark this session as processed to prevent loops
       sessionStorage.setItem(`guardrail-${sessionId}`, 'processed');
       
-      // Create a fresh session
       const partnerId = collaborativeSession.initiator_id === user.id 
         ? collaborativeSession.partner_id 
         : collaborativeSession.initiator_id;
       
-      createPlanningSession(partnerId, undefined, 'collaborative', true)
+      // First try to find existing active session with this partner
+      getActiveSession(partnerId)
+        .then((existingSession) => {
+          if (existingSession && existingSession.id !== sessionId) {
+            console.log('✅ SESSION GUARDRAIL: Found existing active session, joining:', existingSession.id);
+            navigate('/plan-date', {
+              state: {
+                sessionId: existingSession.id,
+                fromProposal: true,
+                planningMode: 'collaborative'
+              },
+              replace: true
+            });
+          } else {
+            // No existing session, create new one
+            console.log('🔄 SESSION GUARDRAIL: No active session found, creating fresh session');
+            return createPlanningSession(partnerId, undefined, 'collaborative', true);
+          }
+        })
         .then((newSession) => {
           if (newSession?.id) {
             console.log('✅ SESSION GUARDRAIL: Created fresh session:', newSession.id);
-            // Navigate to the new session
             navigate('/plan-date', {
               state: {
                 sessionId: newSession.id,
@@ -108,14 +136,13 @@ const SmartDatePlanning: React.FC = () => {
           }
         })
         .catch((error) => {
-          console.error('❌ SESSION GUARDRAIL: Failed to create fresh session:', error);
-          // Remove the guard to allow retry
+          console.error('❌ SESSION GUARDRAIL: Failed to handle session:', error);
           sessionStorage.removeItem(`guardrail-${sessionId}`);
         });
-    } else if (!needsFreshSession) {
+    } else if (sessionIsValid) {
       console.log('✅ SESSION GUARDRAIL: Session is valid, allowing user to join');
     }
-  }, [user, collaborativeSession, sessionId, createPlanningSession, navigate]);
+  }, [user, collaborativeSession, sessionId, createPlanningSession, navigate, getActiveSession]);
   
   // CRITICAL: Collaborative planning requires coming from an accepted proposal
   // If accessed directly without session data, redirect to home

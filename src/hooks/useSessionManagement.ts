@@ -519,6 +519,44 @@ export const useSessionManagement = () => {
     }
   }, [user, handleError]);
 
+  // Enhanced session recovery - rejoin active sessions on login
+  const recoverUserSessions = useCallback(async (): Promise<DatePlanningSession | null> => {
+    if (!user) return null;
+    
+    try {
+      console.log('🔍 SESSION RECOVERY: Looking for active sessions for user:', user.id);
+      
+      const { data: sessions, error } = await supabase
+        .from('date_planning_sessions')
+        .select('*')
+        .or(`initiator_id.eq.${user.id},partner_id.eq.${user.id}`)
+        .eq('session_status', 'active')
+        .gt('expires_at', new Date().toISOString())
+        .order('updated_at', { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+
+      if (sessions && sessions.length > 0) {
+        const session = sessions[0];
+        console.log('✅ SESSION RECOVERY: Found active session to rejoin:', session.id);
+        
+        // Sync user preferences to this session if needed
+        const partnerId = session.initiator_id === user.id ? session.partner_id : session.initiator_id;
+        await syncUserPreferencesToSession(session.id, user.id, partnerId);
+        
+        setCurrentSession(session);
+        return session;
+      }
+
+      console.log('ℹ️ SESSION RECOVERY: No active sessions found');
+      return null;
+    } catch (error) {
+      console.error('❌ SESSION RECOVERY: Error recovering sessions:', error);
+      return null;
+    }
+  }, [user, syncUserPreferencesToSession]);
+
   return {
     currentSession,
     setCurrentSession,
@@ -528,6 +566,7 @@ export const useSessionManagement = () => {
     updateSessionPreferences,
     completePlanningSession,
     resetSession,
-    syncUserPreferencesToSession
+    syncUserPreferencesToSession,
+    recoverUserSessions
   };
 };
