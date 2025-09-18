@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSessionRealtime } from '@/hooks/useSessionRealtime';
+import { useAIAnalysis } from '@/hooks/useAIAnalysis';
 
 interface DatePlanningSession {
   id: string;
@@ -27,6 +28,10 @@ export const useCollaborativeSession = (sessionId: string | null) => {
   const [session, setSession] = useState<DatePlanningSession | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aiAnalysisTriggered, setAiAnalysisTriggered] = useState(false);
+  
+  // AI Analysis hook for automatic triggering
+  const { analyzeCompatibilityAndVenues, resetAIState } = useAIAnalysis();
 
   // Get session details with validation
   const fetchSession = async (id: string, forceRefresh = false) => {
@@ -143,6 +148,9 @@ export const useCollaborativeSession = (sessionId: string | null) => {
 
       setSession(data);
       console.log('🔧 SESSION: Session set successfully:', data.id);
+      
+      // Trigger AI analysis if conditions are met
+      await triggerAIAnalysisIfReady(data);
     } catch (err) {
       console.error('🔧 SESSION: Error fetching session:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch session');
@@ -150,6 +158,65 @@ export const useCollaborativeSession = (sessionId: string | null) => {
       setLoading(false);
     }
   };
+
+  // Automatic AI Analysis Trigger Function
+  const triggerAIAnalysisIfReady = async (sessionData: DatePlanningSession) => {
+    if (!user || !sessionData) return;
+    
+    const shouldTriggerAI = 
+      sessionData.both_preferences_complete && 
+      !sessionData.ai_compatibility_score && 
+      !aiAnalysisTriggered;
+    
+    console.log('🤖 SESSION: AI Analysis Check:', {
+      sessionId: sessionData.id,
+      both_preferences_complete: sessionData.both_preferences_complete,
+      has_ai_score: !!sessionData.ai_compatibility_score,
+      already_triggered: aiAnalysisTriggered,
+      should_trigger: shouldTriggerAI
+    });
+    
+    if (shouldTriggerAI) {
+      console.log('🚀 SESSION: AUTO-TRIGGERING AI ANALYSIS for session:', sessionData.id);
+      setAiAnalysisTriggered(true);
+      
+      try {
+        const partnerId = sessionData.initiator_id === user.id 
+          ? sessionData.partner_id 
+          : sessionData.initiator_id;
+        
+        // Get user preferences for analysis
+        const { data: userPrefs } = await supabase
+          .from('user_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (userPrefs) {
+          await analyzeCompatibilityAndVenues(
+            sessionData.id,
+            partnerId,
+            userPrefs,
+            undefined // userLocation - can be added later
+          );
+          console.log('✅ SESSION: AI Analysis triggered successfully');
+        } else {
+          console.warn('⚠️ SESSION: No user preferences found for AI analysis');
+        }
+      } catch (error) {
+        console.error('❌ SESSION: AI Analysis failed:', error);
+        setAiAnalysisTriggered(false); // Reset to allow retry
+      }
+    }
+  };
+
+  // Reset AI trigger state when session changes
+  useEffect(() => {
+    if (sessionId) {
+      setAiAnalysisTriggered(false);
+      resetAIState();
+    }
+  }, [sessionId, resetAIState]);
 
   // Note: Real-time updates are handled by useDatePlanning hook to avoid duplicate subscriptions
 
@@ -239,6 +306,15 @@ export const useCollaborativeSession = (sessionId: string | null) => {
     await fetchSession(sessionId, true);
   };
 
+  // Manual AI Analysis Trigger for debugging/recovery
+  const triggerAIAnalysisManually = async () => {
+    if (!session || !user) return;
+    
+    console.log('🔧 SESSION: Manual AI Analysis trigger requested');
+    setAiAnalysisTriggered(false); // Reset state
+    await triggerAIAnalysisIfReady(session);
+  };
+
   return {
     session,
     loading,
@@ -249,6 +325,8 @@ export const useCollaborativeSession = (sessionId: string | null) => {
     hasPartnerSetPreferences,
     canShowResults,
     refetchSession: () => sessionId ? fetchSession(sessionId) : Promise.resolve(),
-    forceRefreshSession
+    forceRefreshSession,
+    triggerAIAnalysisManually,
+    aiAnalysisTriggered
   };
 };

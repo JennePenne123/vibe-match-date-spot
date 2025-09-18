@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 interface SmartPlannerDebugProps {
@@ -10,6 +11,8 @@ interface SmartPlannerDebugProps {
   compatibilityScore?: number | null;
   venueRecommendations?: any[];
   currentStep: string;
+  onTriggerAIAnalysis?: () => void;
+  aiAnalysisTriggered?: boolean;
 }
 
 export const SmartPlannerDebug: React.FC<SmartPlannerDebugProps> = ({
@@ -18,7 +21,9 @@ export const SmartPlannerDebug: React.FC<SmartPlannerDebugProps> = ({
   currentSession,
   compatibilityScore,
   venueRecommendations = [],
-  currentStep
+  currentStep,
+  onTriggerAIAnalysis,
+  aiAnalysisTriggered
 }) => {
   if (process.env.NODE_ENV === 'production') return null;
 
@@ -60,6 +65,31 @@ export const SmartPlannerDebug: React.FC<SmartPlannerDebugProps> = ({
               <span className="font-medium">Session Status:</span>
               <Badge variant="outline" className="ml-2">{currentSession.session_status}</Badge>
             </div>
+            <div>
+              <span className="font-medium">Both Prefs Complete:</span>
+              <Badge variant={currentSession.both_preferences_complete ? "default" : "outline"} className="ml-2">
+                {currentSession.both_preferences_complete ? "Yes" : "No"}
+              </Badge>
+            </div>
+            <div>
+              <span className="font-medium">AI Score:</span>
+              <Badge variant={currentSession.ai_compatibility_score ? "default" : "outline"} className="ml-2">
+                {currentSession.ai_compatibility_score ? `${currentSession.ai_compatibility_score}%` : "None"}
+              </Badge>
+            </div>
+            {onTriggerAIAnalysis && (
+              <div className="mt-2">
+                <Button 
+                  onClick={onTriggerAIAnalysis} 
+                  size="sm" 
+                  variant="outline"
+                  disabled={aiAnalysisTriggered}
+                  className="text-xs"
+                >
+                  {aiAnalysisTriggered ? "AI Analysis Running..." : "🤖 Trigger AI Analysis"}
+                </Button>
+              </div>
+            )}
             {currentSession.preferences_data && (
               <div>
                 <span className="font-medium">Session Preferences:</span>

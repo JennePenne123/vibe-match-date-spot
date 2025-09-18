@@ -12,6 +12,7 @@ import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import PreferencesStep from '@/components/date-planning/PreferencesStep';
 import MatchReview from '@/components/date-planning/MatchReview';
 import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
+import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
 
 // Import refactored components and hooks
@@ -40,7 +41,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     loading: sessionLoading,
     hasUserSetPreferences,
     hasPartnerSetPreferences,
-    canShowResults
+    canShowResults,
+    triggerAIAnalysisManually,
+    aiAnalysisTriggered
   } = useCollaborativeSession(sessionId);
   
   // Extract partner information from session when coming from proposal
@@ -156,6 +159,32 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     handleManualContinue,
     handleContinueToPlanning
   } = handlers;
+
+  // Session Recovery Logic - Auto-trigger AI analysis when joining complete session
+  useEffect(() => {
+    if (!collaborativeSession || !user || sessionLoading) return;
+    
+    const shouldAutoTriggerRecovery = 
+      collaborativeSession.both_preferences_complete && 
+      !collaborativeSession.ai_compatibility_score &&
+      currentStep === 'set-preferences';
+    
+    console.log('🔧 SMART PLANNER: Session Recovery Check:', {
+      sessionId: collaborativeSession.id,
+      both_complete: collaborativeSession.both_preferences_complete,
+      has_ai_score: !!collaborativeSession.ai_compatibility_score,
+      current_step: currentStep,
+      should_auto_trigger: shouldAutoTriggerRecovery
+    });
+    
+    if (shouldAutoTriggerRecovery && triggerAIAnalysisManually) {
+      console.log('🚀 SMART PLANNER: AUTO-TRIGGERING AI ANALYSIS for session recovery');
+      // Small delay to ensure all state is settled
+      setTimeout(() => {
+        triggerAIAnalysisManually();
+      }, 1000);
+    }
+  }, [collaborativeSession, user, sessionLoading, currentStep, triggerAIAnalysisManually]);
 
   // Function to render invitation step without IIFE anti-pattern
   const renderInvitationStep = () => {
@@ -491,6 +520,20 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             onAnalysisComplete={() => {
               window.location.reload();
             }}
+          />
+        </CollapsibleDebugSection>
+
+        {/* Smart Planner Debug Panel with Manual Trigger */}
+        <CollapsibleDebugSection title="Smart Planner Debug" defaultOpen={false}>
+          <SmartPlannerDebug
+            currentUser={user}
+            selectedPartner={selectedPartner}
+            currentSession={collaborativeSession}
+            compatibilityScore={compatibilityScore}
+            venueRecommendations={venueRecommendations}
+            currentStep={currentStep}
+            onTriggerAIAnalysis={triggerAIAnalysisManually}
+            aiAnalysisTriggered={aiAnalysisTriggered}
           />
         </CollapsibleDebugSection>
 
