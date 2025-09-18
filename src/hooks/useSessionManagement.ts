@@ -39,6 +39,79 @@ export const useSessionManagement = () => {
   const [currentSession, setCurrentSession] = useState<DatePlanningSession | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Helper function to sync user preferences to session
+  const syncUserPreferencesToSession = useCallback(async (sessionId: string, userId: string, partnerId: string) => {
+    try {
+      console.log('🔄 SESSION: Syncing user preferences to session', { sessionId, userId, partnerId });
+      
+      // Fetch both users' preferences
+      const { data: userPrefs, error: userError } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .in('user_id', [userId, partnerId]);
+
+      if (userError) throw userError;
+
+      const initiatorPrefs = userPrefs?.find(p => p.user_id === userId);
+      const partnerPrefs = userPrefs?.find(p => p.user_id === partnerId);
+
+      console.log('📋 SESSION: Found preferences:', {
+        initiator: !!initiatorPrefs,
+        partner: !!partnerPrefs
+      });
+
+      // Prepare session update data
+      const updateData: any = {};
+      
+      if (initiatorPrefs) {
+        updateData.initiator_preferences = {
+          cuisines: initiatorPrefs.preferred_cuisines || [],
+          vibes: initiatorPrefs.preferred_vibes || [],
+          price: initiatorPrefs.preferred_price_range || [],
+          times: initiatorPrefs.preferred_times || [],
+          distance: initiatorPrefs.max_distance || 15,
+          dietaryRestrictions: initiatorPrefs.dietary_restrictions || []
+        };
+        updateData.initiator_preferences_complete = true;
+      }
+
+      if (partnerPrefs) {
+        updateData.partner_preferences = {
+          cuisines: partnerPrefs.preferred_cuisines || [],
+          vibes: partnerPrefs.preferred_vibes || [],
+          price: partnerPrefs.preferred_price_range || [],
+          times: partnerPrefs.preferred_times || [],
+          distance: partnerPrefs.max_distance || 15,
+          dietaryRestrictions: partnerPrefs.dietary_restrictions || []
+        };
+        updateData.partner_preferences_complete = true;
+      }
+
+      // Calculate both_preferences_complete
+      updateData.both_preferences_complete = !!initiatorPrefs && !!partnerPrefs;
+      updateData.updated_at = new Date().toISOString();
+
+      // Update the session with inherited preferences
+      const { error: updateError } = await supabase
+        .from('date_planning_sessions')
+        .update(updateData)
+        .eq('id', sessionId);
+
+      if (updateError) throw updateError;
+
+      console.log('✅ SESSION: Successfully synced preferences to session', {
+        inheritedInitiator: !!initiatorPrefs,
+        inheritedPartner: !!partnerPrefs,
+        bothComplete: updateData.both_preferences_complete
+      });
+
+      return { initiatorInherited: !!initiatorPrefs, partnerInherited: !!partnerPrefs };
+    } catch (error) {
+      console.error('❌ SESSION: Error syncing user preferences:', error);
+      return { initiatorInherited: false, partnerInherited: false };
+    }
+  }, []);
+
   // Create a new planning session
   const createPlanningSession = useCallback(async (partnerId: string, participantIds?: string[], planningMode: 'solo' | 'collaborative' = 'solo', forceNew: boolean = false) => {
     if (!user) {
@@ -97,9 +170,27 @@ export const useSessionManagement = () => {
         partner: data.partner_id,
         status: data.session_status
       });
+
+      // Sync existing user preferences to the session
+      const inheritanceResult = await syncUserPreferencesToSession(data.id, user.id, partnerId);
       
-      setCurrentSession(data);
-      return data;
+      // Fetch the updated session with inherited preferences
+      const { data: updatedSession, error: fetchError } = await supabase
+        .from('date_planning_sessions')
+        .select('*')
+        .eq('id', data.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      console.log('🎯 SESSION: Session created with preference inheritance:', {
+        initiatorInherited: inheritanceResult.initiatorInherited,
+        partnerInherited: inheritanceResult.partnerInherited,
+        bothComplete: updatedSession.both_preferences_complete
+      });
+      
+      setCurrentSession(updatedSession);
+      return updatedSession;
     } catch (error) {
       console.error('❌ SESSION: Error creating planning session:', error);
       handleError(error, {
@@ -436,6 +527,7 @@ export const useSessionManagement = () => {
     getActiveSession,
     updateSessionPreferences,
     completePlanningSession,
-    resetSession
+    resetSession,
+    syncUserPreferencesToSession
   };
 };

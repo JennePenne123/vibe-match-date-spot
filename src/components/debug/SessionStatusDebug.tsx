@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { resetSessionToCleanState } from '@/services/sessionValidationService';
 import { clearUserPreferenceFields } from '@/services/sessionCleanupService';
+import { useSessionManagement } from '@/hooks/useSessionManagement';
 import { useToast } from '@/hooks/use-toast';
 
 interface SessionStatus {
@@ -33,6 +34,7 @@ interface SessionStatus {
 
 const SessionStatusDebug: React.FC<{ sessionId?: string; expectedPartnerId?: string }> = ({ sessionId, expectedPartnerId }) => {
   const { user } = useAuth();
+  const { syncUserPreferencesToSession } = useSessionManagement();
   const { toast } = useToast();
   const [status, setStatus] = useState<SessionStatus | null>(null);
   const [loading, setLoading] = useState(false);
@@ -231,6 +233,30 @@ const SessionStatusDebug: React.FC<{ sessionId?: string; expectedPartnerId?: str
     }
   };
 
+  const handleSyncPreferences = async () => {
+    if (!user || !sessionId || !status) return;
+    
+    setResetting(true);
+    try {
+      const partnerId = status.initiator_id === user.id ? status.partner_id : status.initiator_id;
+      await syncUserPreferencesToSession(sessionId, user.id, partnerId);
+      toast({
+        title: "Preferences Synced",
+        description: "User preferences have been synced to the session",
+      });
+      fetchSessionStatus(); // Refresh the status
+    } catch (error) {
+      console.error('Error syncing preferences:', error);
+      toast({
+        title: "Sync Failed",
+        description: "Failed to sync user preferences",
+        variant: "destructive"
+      });
+    } finally {
+      setResetting(false);
+    }
+  };
+
   useEffect(() => {
     fetchSessionStatus();
   }, [fetchSessionStatus]);
@@ -294,6 +320,16 @@ const SessionStatusDebug: React.FC<{ sessionId?: string; expectedPartnerId?: str
             >
               <User className="h-4 w-4" />
               Reset My Preferences
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSyncPreferences}
+              disabled={resetting || !sessionId}
+              className="text-green-600 hover:text-green-700"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Sync User Preferences
             </Button>
             <Button
               variant="outline"
