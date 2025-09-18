@@ -23,7 +23,7 @@ interface DatePlanningSession {
   planning_mode: string;
 }
 
-export const useCollaborativeSession = (sessionId: string | null) => {
+export const useCollaborativeSession = (sessionId: string | null, userLocation?: { latitude: number; longitude: number; address?: string } | null) => {
   const { user } = useAuth();
   const [session, setSession] = useState<DatePlanningSession | null>(null);
   const [loading, setLoading] = useState(false);
@@ -193,11 +193,12 @@ export const useCollaborativeSession = (sessionId: string | null) => {
           .single();
         
         if (userPrefs) {
+          console.log('🤖 SESSION: Using location for AI analysis:', userLocation);
           await analyzeCompatibilityAndVenues(
             sessionData.id,
             partnerId,
             userPrefs,
-            undefined // userLocation - can be added later
+            userLocation
           );
           console.log('✅ SESSION: AI Analysis triggered successfully');
         } else {
@@ -307,12 +308,40 @@ export const useCollaborativeSession = (sessionId: string | null) => {
   };
 
   // Manual AI Analysis Trigger for debugging/recovery
-  const triggerAIAnalysisManually = async () => {
+  const triggerAIAnalysisManually = async (userLocation?: { latitude: number; longitude: number; address?: string } | null) => {
     if (!session || !user) return;
     
-    console.log('🔧 SESSION: Manual AI Analysis trigger requested');
+    console.log('🔧 SESSION: Manual AI Analysis trigger requested with location:', userLocation);
     setAiAnalysisTriggered(false); // Reset state
-    await triggerAIAnalysisIfReady(session);
+    
+    try {
+      const partnerId = session.initiator_id === user.id 
+        ? session.partner_id 
+        : session.initiator_id;
+      
+      // Get user preferences for analysis
+      const { data: userPrefs } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (userPrefs) {
+        console.log('🤖 SESSION: Manual trigger - Using location:', userLocation);
+        await analyzeCompatibilityAndVenues(
+          session.id,
+          partnerId,
+          userPrefs,
+          userLocation
+        );
+        console.log('✅ SESSION: Manual AI Analysis triggered successfully');
+      } else {
+        console.warn('⚠️ SESSION: No user preferences found for manual AI analysis');
+      }
+    } catch (error) {
+      console.error('❌ SESSION: Manual AI Analysis failed:', error);
+      setAiAnalysisTriggered(false); // Reset to allow retry
+    }
   };
 
   return {

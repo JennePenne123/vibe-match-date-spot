@@ -34,7 +34,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   const { isMobile, isDesktop } = useBreakpoint();
   const { friends: allFriends } = useFriends();
   
-  // Use collaborative session hook
+  // First get collaborative session to extract partner info
   const { 
     session: collaborativeSession, 
     isUserInitiator, 
@@ -82,14 +82,14 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     planningMode: 'collaborative' // Force collaborative mode only
   });
   
-        console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
-        console.log('🔍 SmartDatePlanner - RENDER STATE CHECK:', {
-          currentStep: state.currentStep,
-          hasVenueRecommendations: !!(state.venueRecommendations && state.venueRecommendations.length > 0),
-          venueCount: state.venueRecommendations?.length || 0,
-          aiAnalyzing: state.aiAnalyzing,
-          compatibilityScore: state.compatibilityScore
-        });
+  console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
+  console.log('🔍 SmartDatePlanner - RENDER STATE CHECK:', {
+    currentStep: state.currentStep,
+    hasVenueRecommendations: !!(state.venueRecommendations && state.venueRecommendations.length > 0),
+    venueCount: state.venueRecommendations?.length || 0,
+    aiAnalyzing: state.aiAnalyzing,
+    compatibilityScore: state.compatibilityScore
+  });
   const handlers = createSmartDatePlannerHandlers({
     ...state,
     collaborativeSession,
@@ -160,31 +160,33 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     handleContinueToPlanning
   } = handlers;
 
-  // Session Recovery Logic - Auto-trigger AI analysis when joining complete session
+  // Enhanced Session Recovery Logic with Location
   useEffect(() => {
-    if (!collaborativeSession || !user || sessionLoading) return;
+    if (!collaborativeSession || !state.user || sessionLoading) return;
     
     const shouldAutoTriggerRecovery = 
       collaborativeSession.both_preferences_complete && 
       !collaborativeSession.ai_compatibility_score &&
-      currentStep === 'set-preferences';
+      state.currentStep === 'set-preferences';
     
     console.log('🔧 SMART PLANNER: Session Recovery Check:', {
       sessionId: collaborativeSession.id,
       both_complete: collaborativeSession.both_preferences_complete,
       has_ai_score: !!collaborativeSession.ai_compatibility_score,
-      current_step: currentStep,
+      current_step: state.currentStep,
+      has_location: !!state.userLocation,
       should_auto_trigger: shouldAutoTriggerRecovery
     });
     
-    if (shouldAutoTriggerRecovery && triggerAIAnalysisManually) {
-      console.log('🚀 SMART PLANNER: AUTO-TRIGGERING AI ANALYSIS for session recovery');
+    // Enhanced recovery with location - use manual trigger with location
+    if (shouldAutoTriggerRecovery && state.userLocation && triggerAIAnalysisManually) {
+      console.log('🚀 SMART PLANNER: AUTO-TRIGGERING AI ANALYSIS for session recovery with location');
       // Small delay to ensure all state is settled
       setTimeout(() => {
-        triggerAIAnalysisManually();
+        triggerAIAnalysisManually(state.userLocation);
       }, 1000);
     }
-  }, [collaborativeSession, user, sessionLoading, currentStep, triggerAIAnalysisManually]);
+  }, [collaborativeSession, state.user, sessionLoading, state.currentStep, state.userLocation, triggerAIAnalysisManually]);
 
   // Function to render invitation step without IIFE anti-pattern
   const renderInvitationStep = () => {
@@ -532,7 +534,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             compatibilityScore={compatibilityScore}
             venueRecommendations={venueRecommendations}
             currentStep={currentStep}
-            onTriggerAIAnalysis={triggerAIAnalysisManually}
+            onTriggerAIAnalysis={() => triggerAIAnalysisManually?.(state.userLocation)}
             aiAnalysisTriggered={aiAnalysisTriggered}
           />
         </CollapsibleDebugSection>
