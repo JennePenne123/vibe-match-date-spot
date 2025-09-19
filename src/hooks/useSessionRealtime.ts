@@ -29,9 +29,9 @@ export const useSessionRealtime = (
   useEffect(() => {
     if (!currentSession) return;
 
-    // Create unique channel name to prevent conflicts
-    const channelName = `planning-session-${currentSession.id}-${Date.now()}`;
-    console.log('Setting up real-time subscription for session:', currentSession.id, 'with channel:', channelName);
+    // Create unique channel name to prevent conflicts with collaborative session
+    const channelName = `session-realtime-${currentSession.id}`;
+    console.log('Setting up session realtime subscription for session:', currentSession.id, 'with channel:', channelName);
     
     let isSubscribed = true; // Flag to prevent updates after unmount
     

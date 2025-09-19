@@ -16,7 +16,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
 
     // Listen for invitation responses (for senders)
     const senderChannel = supabase
-      .channel('invitation-responses')
+      .channel(`invitation-responses-${user.id}`)
       .on(
         'postgres_changes',
         {
@@ -59,7 +59,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
 
     // Listen for new invitations (for recipients)
     const recipientChannel = supabase
-      .channel('new-invitations')
+      .channel(`new-invitations-${user.id}`)
       .on(
         'postgres_changes',
         {

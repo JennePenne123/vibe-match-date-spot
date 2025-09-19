@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
 
 import PlanTogether from '@/components/date-planning/PlanTogether';
 import InvitationCreation from '@/components/date-planning/InvitationCreation';
@@ -14,6 +15,7 @@ import MatchReview from '@/components/date-planning/MatchReview';
 import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
 import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
+import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
 
 // Import refactored components and hooks
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
@@ -252,22 +254,37 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 animate-fade-in">
-      <div className={isMobile ? "max-w-md mx-auto p-6 space-y-8" : "max-w-6xl mx-auto p-6"}>
-        {/* Header */}
-        {(() => {
-          const progressValue = getStepProgress();
-          console.log('🔍 SmartDatePlanner progress value:', progressValue, 'currentStep:', currentStep);
-          return <PlanningHeader progress={progressValue} planningMode={'collaborative'} />;
-        })()}
+    <ErrorBoundaryWrapper>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 animate-fade-in">
+        <div className={isMobile ? "max-w-md mx-auto p-6 space-y-8" : "max-w-6xl mx-auto p-6"}>
+          {/* Header */}
+          <ErrorBoundaryWrapper>
+            {(() => {
+              const progressValue = getStepProgress();
+              console.log('🔍 SmartDatePlanner progress value:', progressValue, 'currentStep:', currentStep);
+              return <PlanningHeader progress={progressValue} planningMode={'collaborative'} />;
+            })()}
+          </ErrorBoundaryWrapper>
 
-        {/* Location Display */}
-        <LocationDisplay 
-          userLocation={userLocation}
-          locationError={locationError}
-          locationRequested={locationRequested}
-          onRequestLocation={requestLocation}
-        />
+          {/* Location Display */}
+          <ErrorBoundaryWrapper>
+            <LocationDisplay 
+              userLocation={userLocation}
+              locationError={locationError}
+              locationRequested={locationRequested}
+              onRequestLocation={requestLocation}
+            />
+          </ErrorBoundaryWrapper>
+
+          {/* AI Analysis Test Button for debugging */}
+          {process.env.NODE_ENV === 'development' && (
+            <ErrorBoundaryWrapper>
+              <AIAnalysisTestButton 
+                sessionId={collaborativeSession?.id || sessionId}
+                userLocation={userLocation}
+              />
+            </ErrorBoundaryWrapper>
+          )}
 
         {isDesktop ? (
           // Desktop Layout: Split screen for collaborative planning
@@ -287,38 +304,42 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
               </div>
 
               {/* Step Content - Using consistent step names */}
-              {currentStep === 'select-partner' && !effectivePreselectedFriend && (
-                <PartnerSelection
-                  friends={friends}
-                  selectedPartnerId={selectedPartnerId}
-                  selectedPartnerIds={selectedPartnerIds}
-                  dateMode={dateMode}
-                  loading={loading}
-                  onPartnerChange={setSelectedPartnerId}
-                  onPartnerIdsChange={setSelectedPartnerIds}
-                  onDateModeChange={setDateMode}
-                  onContinue={handlePartnerSelection}
-                />
-              )}
+              <ErrorBoundaryWrapper>
+                {currentStep === 'select-partner' && !effectivePreselectedFriend && (
+                  <PartnerSelection
+                    friends={friends}
+                    selectedPartnerId={selectedPartnerId}
+                    selectedPartnerIds={selectedPartnerIds}
+                    dateMode={dateMode}
+                    loading={loading}
+                    onPartnerChange={setSelectedPartnerId}
+                    onPartnerIdsChange={setSelectedPartnerIds}
+                    onDateModeChange={setDateMode}
+                    onContinue={handlePartnerSelection}
+                  />
+                )}
+              </ErrorBoundaryWrapper>
 
-              {currentStep === 'set-preferences' && (
-                <PreferencesStep
-                  sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
-                  partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
-                  partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
-                  compatibilityScore={compatibilityScore}
-                  aiAnalyzing={aiAnalyzing}
-                  onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
-                  initialProposedDate={proposalDateISO}
-                  planningMode={'collaborative'}
-                  collaborativeSession={collaborativeSession ? {
-                    hasUserSetPreferences,
-                    hasPartnerSetPreferences,
-                    canShowResults
-                  } : undefined}
-                  onManualContinue={handleManualContinue}
-                />
-              )}
+              <ErrorBoundaryWrapper>
+                {currentStep === 'set-preferences' && (
+                  <PreferencesStep
+                    sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
+                    partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
+                    partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
+                    compatibilityScore={compatibilityScore}
+                    aiAnalyzing={aiAnalyzing}
+                    onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
+                    initialProposedDate={proposalDateISO}
+                    planningMode={'collaborative'}
+                    collaborativeSession={collaborativeSession ? {
+                      hasUserSetPreferences,
+                      hasPartnerSetPreferences,
+                      canShowResults
+                    } : undefined}
+                    onManualContinue={handleManualContinue}
+                  />
+                )}
+              </ErrorBoundaryWrapper>
 
               {/* Only show venues found card when both collaborative users are ready */}
               {currentStep === 'set-preferences' && venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && canShowResults && (
@@ -555,8 +576,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             </Button>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </ErrorBoundaryWrapper>
   );
 };
 export default SmartDatePlanner;

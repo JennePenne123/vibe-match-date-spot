@@ -201,11 +201,21 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
         
         if (userPrefs) {
           console.log('🤖 SESSION: Using location for AI analysis:', userLocation);
+          
+          // Ensure we have a valid location or use fallback
+          const locationForAnalysis = userLocation || {
+            latitude: 37.7749,
+            longitude: -122.4194,
+            address: 'San Francisco, CA (fallback)'
+          };
+          
+          console.log('📍 SESSION: Location for AI analysis:', locationForAnalysis);
+          
           await analyzeCompatibilityAndVenues(
             sessionData.id,
             partnerId,
             userPrefs,
-            userLocation
+            locationForAnalysis
           );
           console.log('✅ SESSION: AI Analysis triggered successfully');
         } else {
@@ -226,14 +236,18 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     }
   }, [sessionId, resetAIState]);
 
-  // Set up real-time subscription for session updates
+  // Set up real-time subscription for session updates with deduplication
   useEffect(() => {
     if (!sessionId || !session) return;
     
-    console.log('🔄 COLLAB SESSION: Setting up real-time subscription for session:', sessionId);
+    // Create unique channel name to avoid conflicts
+    const channelName = `collab-session-${sessionId}-${user?.id}`;
+    console.log('🔄 COLLAB SESSION: Setting up real-time subscription:', channelName);
+    
+    let isActive = true;
     
     const channel = supabase
-      .channel(`session-${sessionId}`)
+      .channel(channelName)
       .on('postgres_changes', 
         { 
           event: 'UPDATE', 
@@ -242,19 +256,29 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
           filter: `id=eq.${sessionId}`
         }, 
         (payload) => {
+          if (!isActive) return;
+          
           console.log('🔄 COLLAB SESSION: Real-time session update received:', payload);
           if (payload.new) {
-            setSession(payload.new as DatePlanningSession);
+            const updatedSession = payload.new as DatePlanningSession;
+            setSession(updatedSession);
+            
+            // Check if we need to trigger AI analysis after update
+            if (updatedSession.both_preferences_complete && !updatedSession.ai_compatibility_score && !aiAnalysisTriggered) {
+              console.log('🤖 COLLAB SESSION: Session update shows both preferences complete, may trigger AI analysis');
+              triggerAIAnalysisIfReady(updatedSession);
+            }
           }
         }
       )
       .subscribe();
 
     return () => {
-      console.log('🔄 COLLAB SESSION: Cleaning up real-time subscription');
+      console.log('🔄 COLLAB SESSION: Cleaning up real-time subscription:', channelName);
+      isActive = false;
       supabase.removeChannel(channel);
     };
-  }, [sessionId, session?.id]);
+  }, [sessionId, user?.id]);
 
   useEffect(() => {
     if (sessionId) {
@@ -363,11 +387,21 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
       
       if (userPrefs) {
         console.log('🤖 SESSION: Manual trigger - Using location:', userLocation);
+        
+        // Ensure we have a valid location or use fallback
+        const locationForAnalysis = userLocation || {
+          latitude: 37.7749,
+          longitude: -122.4194,
+          address: 'San Francisco, CA (fallback)'
+        };
+        
+        console.log('📍 SESSION: Manual trigger location:', locationForAnalysis);
+        
         await analyzeCompatibilityAndVenues(
           session.id,
           partnerId,
           userPrefs,
-          userLocation
+          locationForAnalysis
         );
         console.log('✅ SESSION: Manual AI Analysis triggered successfully');
       } else {
