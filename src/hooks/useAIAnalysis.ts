@@ -163,23 +163,42 @@ export const useAIAnalysis = () => {
           : 'Venue search temporarily unavailable. Please try again later.';
         setVenueSearchError(errorMessage);
         setVenueRecommendations([]);
+        
+        // Store empty venues in session
+        await supabase
+          .from('date_planning_sessions')
+          .update({ 
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', sessionId);
       } else {
         console.log('🎉 AI ANALYSIS: Successfully got venues:', venues.map(v => `${v.venue_name} (${v.ai_score}%)`));
         console.log('🎉 AI ANALYSIS: Setting venue recommendations in state, count:', venues.length);
-        console.log('🎉 AI ANALYSIS: First venue details:', venues[0]);
-        console.log('🔍 AI ANALYSIS: First venue venue_id debug:', {
-          venue_id: venues[0]?.venue_id,
-          venue_id_type: typeof venues[0]?.venue_id,
-          venue_id_serialized: JSON.stringify(venues[0]?.venue_id),
-          full_venue_keys: venues[0] ? Object.keys(venues[0]) : []
-        });
         setVenueRecommendations(venues);
         setVenueSearchError(null);
         
-        // Add a small delay to check if state was set correctly
-        setTimeout(() => {
-          console.log('🔍 AI ANALYSIS: Venue recommendations state check - should have venues now');
-        }, 100);
+        // CRITICAL: Store venue recommendations in session table
+        console.log('💾 AI ANALYSIS: Storing venue recommendations in session table...');
+        const venueData = venues.map(v => ({
+          venue_id: v.venue_id,
+          venue_name: v.venue_name,
+          ai_score: v.ai_score,
+          reasoning: v.reasoning,
+          address: v.address,
+          cuisine_type: v.cuisine_type,
+          price_range: v.price_range,
+          rating: v.rating
+        }));
+        
+        await supabase
+          .from('date_planning_sessions')
+          .update({ 
+            preferences_data: venueData, // Store venues in preferences_data field
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', sessionId);
+          
+        console.log('✅ AI ANALYSIS: Venue recommendations stored in session table');
       }
 
       setCurrentStep('Analysis complete!');

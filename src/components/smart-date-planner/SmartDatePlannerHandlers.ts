@@ -110,10 +110,26 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     // Check if we're in collaborative mode and need to wait for partner
     if (state.planningMode === 'collaborative') {
       // Refresh collaborative session to get latest state after preference update
-      if (state.collaborativeSession && state.collaborativeSession.refetchSession) {
+      if (state.forceRefreshSession) {
         console.log('🔧 PREFERENCES COMPLETE - Refreshing collaborative session to get latest state...');
-        await state.collaborativeSession.refetchSession();
+        await state.forceRefreshSession();
       }
+      
+      // Set up a delayed refresh to pick up venue data after AI analysis completes
+      setTimeout(async () => {
+        console.log('🔄 PREFERENCES COMPLETE - Delayed refresh to pick up venue data...');
+        if (state.forceRefreshSession) {
+          await state.forceRefreshSession();
+          
+          // Check if venues were loaded, if not try one more time after another delay
+          setTimeout(async () => {
+            console.log('🔄 PREFERENCES COMPLETE - Final retry for venue data...');
+            if (state.forceRefreshSession) {
+              await state.forceRefreshSession();
+            }
+          }, 2000);
+        }
+      }, 3000); // Wait 3 seconds for AI analysis to complete and store venues
       
       // Check if both users have completed preferences
       const bothComplete = currentSession?.both_preferences_complete || state.collaborativeSession?.canShowResults;

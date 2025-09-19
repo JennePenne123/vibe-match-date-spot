@@ -49,7 +49,9 @@ export const useSmartDatePlannerState = ({
   console.log('🔧 SmartDatePlanner - Collaborative state:', {
     hasCollaborativeSession: !!collaborativeState.collaborativeSession,
     collaborativeVenueCount: collaborativeState.collaborativeVenueRecommendations?.length || 0,
-    collaborativeCompatibilityScore: collaborativeState.collaborativeCompatibilityScore
+    collaborativeCompatibilityScore: collaborativeState.collaborativeCompatibilityScore,
+    collaborativeVenueRecommendations: collaborativeState.collaborativeVenueRecommendations,
+    collaborativeSessionPreferencesData: collaborativeState.collaborativeSession?.preferences_data
   });
 
   // Extract states from hooks (with defaults if null) - prioritize collaborative session data

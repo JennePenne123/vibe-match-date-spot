@@ -20,9 +20,19 @@ export const useCollaborativeSessionState = ({ sessionId, userLocation }: UseCol
     triggerAIAnalysisManually: collaborativeSessionData.triggerAIAnalysisManually,
     forceRefreshSession: collaborativeSessionData.forceRefreshSession,
     aiAnalysisTriggered: collaborativeSessionData.aiAnalysisTriggered,
-    // Expose collaborative session AI results
+    // Expose collaborative session AI results with proper debugging
     collaborativeCompatibilityScore: collaborativeSessionData.compatibilityScore,
-    collaborativeVenueRecommendations: collaborativeSessionData.venueRecommendations,
+    collaborativeVenueRecommendations: (() => {
+      const venues = collaborativeSessionData.venueRecommendations;
+      console.log('🔍 COLLAB SESSION STATE: Venue recommendations debug:', {
+        venuesArray: venues,
+        venuesLength: venues?.length || 0,
+        venuesType: typeof venues,
+        isArray: Array.isArray(venues),
+        firstVenue: venues?.[0]
+      });
+      return venues || [];
+    })(),
     collaborativeVenueSearchError: collaborativeSessionData.venueSearchError,
     collaborativeAiAnalyzing: collaborativeSessionData.aiAnalyzing
   };

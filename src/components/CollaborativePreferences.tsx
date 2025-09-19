@@ -179,11 +179,13 @@ const CollaborativePreferences: React.FC<CollaborativePreferencesProps> = ({
       
       setHasSubmitted(true);
       
-      // Trigger the callback to notify parent component
-      setTimeout(() => {
-        console.log('📞 COLLAB PREFS: Calling onPreferencesUpdated callback');
-        onPreferencesUpdated();
-      }, 1000);
+      // Force refresh session data after a delay to pick up stored venues
+      setTimeout(async () => {
+        console.log('🔄 COLLAB PREFS: Force refreshing session to pick up venues...');
+        if (typeof onPreferencesUpdated === 'function') {
+          onPreferencesUpdated();
+        }
+      }, 2000); // Give AI analysis time to complete and store venues
       
     } catch (error) {
       console.error('❌ COLLAB PREFS: Error submitting preferences:', error);

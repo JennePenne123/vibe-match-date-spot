@@ -226,7 +226,35 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     }
   }, [sessionId, resetAIState]);
 
-  // Note: Real-time updates are handled by useDatePlanning hook to avoid duplicate subscriptions
+  // Set up real-time subscription for session updates
+  useEffect(() => {
+    if (!sessionId || !session) return;
+    
+    console.log('🔄 COLLAB SESSION: Setting up real-time subscription for session:', sessionId);
+    
+    const channel = supabase
+      .channel(`session-${sessionId}`)
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'date_planning_sessions',
+          filter: `id=eq.${sessionId}`
+        }, 
+        (payload) => {
+          console.log('🔄 COLLAB SESSION: Real-time session update received:', payload);
+          if (payload.new) {
+            setSession(payload.new as DatePlanningSession);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('🔄 COLLAB SESSION: Cleaning up real-time subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [sessionId, session?.id]);
 
   useEffect(() => {
     if (sessionId) {
@@ -351,6 +379,18 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     }
   };
 
+  // Get venue recommendations from session data
+  const sessionVenueRecommendations = session?.preferences_data && Array.isArray(session.preferences_data) 
+    ? session.preferences_data 
+    : [];
+
+  console.log('🔍 COLLAB SESSION: Venue recommendations check:', {
+    fromAI: aiVenueRecommendations?.length || 0,
+    fromSession: sessionVenueRecommendations?.length || 0,
+    sessionHasPrefsData: !!session?.preferences_data,
+    prefsDataType: typeof session?.preferences_data
+  });
+
   return {
     session,
     loading,
@@ -364,9 +404,9 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     forceRefreshSession,
     triggerAIAnalysisManually,
     aiAnalysisTriggered,
-    // Expose AI analysis results
-    compatibilityScore: aiCompatibilityScore,
-    venueRecommendations: aiVenueRecommendations,
+    // Expose AI analysis results - prioritize session data over AI state
+    compatibilityScore: session?.ai_compatibility_score || aiCompatibilityScore,
+    venueRecommendations: sessionVenueRecommendations.length > 0 ? sessionVenueRecommendations : aiVenueRecommendations,
     venueSearchError: aiVenueSearchError,
     aiAnalyzing: isAnalyzing
   };
