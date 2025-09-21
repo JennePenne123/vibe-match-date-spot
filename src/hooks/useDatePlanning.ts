@@ -78,13 +78,40 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
       actualVenueRecommendations: venueRecommendations
     });
 
-    if (!user) {
-      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No user');
+    // Enhanced validation with detailed error logging
+    if (!user?.id) {
+      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No authenticated user or user ID');
+      handleError(new Error('User authentication required'), {
+        toastTitle: 'Authentication Error',
+        toastDescription: 'Please sign in to send invitations'
+      });
       return false;
     }
     
-    if (!currentSession) {
-      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No current session');
+    if (!currentSession?.partner_id) {
+      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No current session or partner ID');
+      handleError(new Error('No active planning session'), {
+        toastTitle: 'Session Error', 
+        toastDescription: 'No active planning session found'
+      });
+      return false;
+    }
+
+    if (!venueId) {
+      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No venue ID provided');
+      handleError(new Error('No venue selected'), {
+        toastTitle: 'Venue Required',
+        toastDescription: 'Please select a venue for your invitation'
+      });
+      return false;
+    }
+
+    if (!message?.trim()) {
+      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No invitation message provided');
+      handleError(new Error('No invitation message'), {
+        toastTitle: 'Message Required',
+        toastDescription: 'Please add a message to your invitation'
+      });
       return false;
     }
 
@@ -96,6 +123,10 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
       
       if (!sessionCompleted) {
         console.error('💾 COMPLETE PLANNING SESSION - ERROR: Session completion failed');
+        handleError(new Error('Failed to complete planning session'), {
+          toastTitle: 'Session Error',
+          toastDescription: 'Unable to complete planning session'
+        });
         return false;
       }
 
@@ -196,13 +227,30 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         message: message,
         proposed_date: proposedDateTime?.toISOString(),
         planning_session_id: sessionId,
-        ai_compatibility_score: compatibilityScore,
-        ai_reasoning: selectedVenue?.ai_reasoning,
+        ai_compatibility_score: compatibilityScore || 0,
+        ai_reasoning: selectedVenue?.ai_reasoning || 'AI-powered venue recommendation',
         venue_match_factors: selectedVenue, // Store the entire venue data for fallback
         status: 'pending'
       };
       
-      console.log('💾 COMPLETE PLANNING SESSION - Invitation data to insert:', invitationData);
+      console.log('💾 COMPLETE PLANNING SESSION - Invitation data to insert:', {
+        ...invitationData,
+        venue_match_factors: 'object', // Don't log the full object
+        message: message.substring(0, 50) + '...'
+      });
+
+      // Verify user is authenticated before database insert
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      if (authError || !authUser) {
+        console.error('💾 COMPLETE PLANNING SESSION - AUTH ERROR:', authError);
+        handleError(new Error('Authentication failed during invitation creation'), {
+          toastTitle: 'Authentication Error',
+          toastDescription: 'Please sign in again and try again'
+        });
+        return false;
+      }
+
+      console.log('💾 COMPLETE PLANNING SESSION - Auth verified, inserting invitation...');
       
       const { data: insertedInvitation, error: inviteError } = await supabase
         .from('date_invitations')
@@ -211,7 +259,33 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         .single();
 
       if (inviteError) {
-        console.error('💾 COMPLETE PLANNING SESSION - DATABASE ERROR:', inviteError);
+        console.error('💾 COMPLETE PLANNING SESSION - DATABASE ERROR:', {
+          error: inviteError,
+          code: inviteError.code,
+          message: inviteError.message,
+          details: inviteError.details,
+          hint: inviteError.hint
+        });
+        
+        // Provide specific error messages based on error type
+        let errorTitle = 'Database Error';
+        let errorDescription = 'Failed to create invitation';
+        
+        if (inviteError.code === '23503') {
+          errorTitle = 'Invalid Data';
+          errorDescription = 'Invalid venue or user data';
+        } else if (inviteError.code === '42501') {
+          errorTitle = 'Permission Error';
+          errorDescription = 'Insufficient permissions to create invitation';
+        } else if (inviteError.message?.includes('RLS')) {
+          errorTitle = 'Access Error';
+          errorDescription = 'Unable to access invitation system';
+        }
+        
+        handleError(inviteError, {
+          toastTitle: errorTitle,
+          toastDescription: errorDescription
+        });
         throw inviteError;
       }
 

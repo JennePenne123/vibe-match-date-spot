@@ -302,26 +302,50 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       return;
     }
 
-    // Get venue ID with fallback logic
+    // Enhanced venue ID resolution with better fallback logic
     let venueIdToUse = state.selectedVenueId;
+    let selectedVenueData = null;
+    
+    console.log('🚀 SEND INVITATION - Venue ID resolution:', {
+      selectedVenueId: state.selectedVenueId,
+      hasSelectedVenue: !!selectedVenue,
+      selectedVenueId_field: selectedVenue?.venue_id,
+      selectedVenueIdField: selectedVenue?.id,
+      venueRecommendationsCount: state.venueRecommendations?.length || 0,
+      firstRecommendation: state.venueRecommendations?.[0]?.venue_id
+    });
     
     if (!venueIdToUse && selectedVenue) {
       console.log('🚀 SEND INVITATION - Using venue ID from selectedVenue object');
-      venueIdToUse = selectedVenue.venue_id;
+      venueIdToUse = selectedVenue.venue_id || selectedVenue.id;
+      selectedVenueData = selectedVenue;
     }
     
     if (!venueIdToUse && state.venueRecommendations?.length > 0) {
       console.log('🚀 SEND INVITATION - No venue selected, using first recommendation');
-      venueIdToUse = state.venueRecommendations[0].venue_id;
+      const firstVenue = state.venueRecommendations[0];
+      venueIdToUse = firstVenue.venue_id || firstVenue.id;
+      selectedVenueData = firstVenue;
       console.log('🚀 SEND INVITATION - Using first venue:', venueIdToUse);
     }
     
     if (!venueIdToUse) {
-      console.error('🚀 SEND INVITATION - ERROR: No venue selected');
+      console.error('🚀 SEND INVITATION - ERROR: No venue ID available after all fallbacks');
       toast({
         variant: 'destructive',
         title: 'Venue Required',
         description: 'Please select a venue for your date invitation.'
+      });
+      return;
+    }
+
+    // Validate that we have a proper message
+    if (!state.invitationMessage || state.invitationMessage.trim().length < 10) {
+      console.error('🚀 SEND INVITATION - ERROR: Invalid invitation message');
+      toast({
+        variant: 'destructive',
+        title: 'Message Required',
+        description: 'Please add a personalized message to your invitation.'
       });
       return;
     }

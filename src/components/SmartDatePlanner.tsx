@@ -16,6 +16,7 @@ import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebug
 import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
 import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
+import InvitationTestButton from '@/components/debug/InvitationTestButton';
 
 // Import refactored components and hooks
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
@@ -561,6 +562,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             onTriggerAIAnalysis={() => triggerAIAnalysisManually?.(state.userLocation)}
             aiAnalysisTriggered={aiAnalysisTriggered}
           />
+        </CollapsibleDebugSection>
+
+        {/* Invitation Testing Debug Panel */}
+        <CollapsibleDebugSection title="Invitation Test" defaultOpen={false}>
+          <InvitationTestButton />
         </CollapsibleDebugSection>
 
         {/* Start from Scratch option */}
