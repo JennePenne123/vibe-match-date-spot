@@ -123,6 +123,29 @@ export const useSmartDatePlannerState = ({
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
   const selectedVenue = venueRecommendations.find(v => v.venue_id === selectedVenueId);
 
+  // State synchronization: Reset selected venue when recommendations change
+  useEffect(() => {
+    if (selectedVenueId && venueRecommendations.length > 0) {
+      const venueStillExists = venueRecommendations.some(v => v.venue_id === selectedVenueId);
+      
+      if (!venueStillExists) {
+        console.log('🔄 VENUE SYNC: Selected venue no longer exists in recommendations, clearing selection:', {
+          selectedVenueId,
+          currentVenueIds: venueRecommendations.map(v => v.venue_id).slice(0, 3),
+          venueCount: venueRecommendations.length
+        });
+        
+        setSelectedVenueId('');
+        setInvitationMessage('');
+        
+        // If user was on invitation step, move them back to venue selection
+        if (currentStep === 'create-invitation') {
+          setCurrentStep('review-matches');
+        }
+      }
+    }
+  }, [venueRecommendations, selectedVenueId, currentStep, setCurrentStep]);
+
   // Remove automatic step advancement - let user manually proceed with "Continue" button
 
   // Remove automatic step advancement for collaborative mode - user must manually proceed

@@ -235,12 +235,24 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       return;
     }
     
+    // Validate that venue exists in current recommendations
+    const venue = state.venueRecommendations?.find(v => v.venue_id === venueId);
+    if (!venue) {
+      console.error('🎯 VENUE SELECTION - ERROR: Venue not found in current recommendations:', {
+        venueId,
+        availableVenues: state.venueRecommendations?.map(v => ({id: v.venue_id, name: v.venue_name})).slice(0, 3)
+      });
+      toast({
+        variant: 'destructive',
+        title: 'Venue Not Available',
+        description: 'This venue is no longer available. Please select another venue.'
+      });
+      return;
+    }
+    
     // Set selected venue ID immediately
     setSelectedVenueId(venueId);
     console.log('🎯 VENUE SELECTION - setSelectedVenueId called with:', venueId);
-    
-    // Find the venue from recommendations
-    const venue = state.venueRecommendations?.find(v => v.venue_id === venueId);
     console.log('🎯 VENUE SELECTION - Found venue for message:', venue?.venue_name);
     
     if (selectedPartner && venue) {
@@ -309,7 +321,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       return;
     }
 
-    // Enhanced venue ID resolution with better fallback logic
+    // Enhanced venue ID resolution with better validation
     let venueIdToUse = state.selectedVenueId;
     let selectedVenueData = null;
     
@@ -321,6 +333,18 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       venueRecommendationsCount: state.venueRecommendations?.length || 0,
       firstRecommendation: state.venueRecommendations?.[0]?.venue_id
     });
+    
+    // First, validate that selected venue exists in current recommendations
+    if (venueIdToUse) {
+      const venueInRecommendations = state.venueRecommendations?.find(v => v.venue_id === venueIdToUse);
+      if (!venueInRecommendations) {
+        console.warn('🚀 SEND INVITATION - Selected venue not in current recommendations, clearing selection');
+        venueIdToUse = '';
+        selectedVenueData = null;
+      } else {
+        selectedVenueData = venueInRecommendations;
+      }
+    }
     
     if (!venueIdToUse && selectedVenue) {
       console.log('🚀 SEND INVITATION - Using venue ID from selectedVenue object');
@@ -342,6 +366,21 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         variant: 'destructive',
         title: 'Venue Required',
         description: 'Please select a venue for your date invitation.'
+      });
+      return;
+    }
+    
+    // Final validation: ensure venue exists in recommendations
+    const finalVenueCheck = state.venueRecommendations?.find(v => v.venue_id === venueIdToUse);
+    if (!finalVenueCheck) {
+      console.error('🚀 SEND INVITATION - ERROR: Final venue validation failed:', {
+        venueId: venueIdToUse,
+        availableVenues: state.venueRecommendations?.map(v => v.venue_id).slice(0, 3)
+      });
+      toast({
+        variant: 'destructive',
+        title: 'Venue Validation Failed',
+        description: 'Selected venue is not available. Please select a venue from the current recommendations.'
       });
       return;
     }
