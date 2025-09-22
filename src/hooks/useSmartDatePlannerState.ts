@@ -90,7 +90,9 @@ export const useSmartDatePlannerState = ({
     collaborativeVenues: collaborativeState.collaborativeVenueRecommendations?.length || 0,
     singleUserVenues: singleUserVenueRecommendations?.length || 0,
     finalVenues: venueRecommendations?.length || 0,
-    usingCollaborative: (collaborativeState.collaborativeVenueRecommendations?.length || 0) > 0
+    usingCollaborative: (collaborativeState.collaborativeVenueRecommendations?.length || 0) > 0,
+    collaborativeVenueData: collaborativeState.collaborativeVenueRecommendations?.slice(0, 2),
+    sessionData: collaborativeState.collaborativeSession?.preferences_data?.slice(0, 2)
   });
 
   const {

@@ -413,16 +413,39 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     }
   };
 
-  // Get venue recommendations from session data
+  // Get venue recommendations from session data - transform to AIVenueRecommendation format
   const sessionVenueRecommendations = session?.preferences_data && Array.isArray(session.preferences_data) 
-    ? session.preferences_data 
+    ? session.preferences_data.map((venue: any) => ({
+        venue_id: venue.venue_id || venue.id,
+        venue_name: venue.venue_name || venue.name,
+        venue_address: venue.address || venue.venue_address || 'Address not available',
+        ai_score: venue.ai_score || 0,
+        match_factors: venue.match_factors || {},
+        contextual_score: venue.contextual_score || venue.ai_score || 0,
+        ai_reasoning: venue.ai_reasoning || 'AI analysis completed',
+        confidence_level: venue.confidence_level || 0.8,
+        distance: venue.distance,
+        neighborhood: venue.neighborhood,
+        isOpen: venue.isOpen,
+        operatingHours: venue.operatingHours || venue.opening_hours,
+        priceRange: venue.price_range || venue.priceRange,
+        rating: venue.rating,
+        cuisine_type: venue.cuisine_type,
+        amenities: venue.amenities || []
+      }))
     : [];
 
   console.log('🔍 COLLAB SESSION: Venue recommendations check:', {
     fromAI: aiVenueRecommendations?.length || 0,
     fromSession: sessionVenueRecommendations?.length || 0,
     sessionHasPrefsData: !!session?.preferences_data,
-    prefsDataType: typeof session?.preferences_data
+    prefsDataType: typeof session?.preferences_data,
+    sessionVenueData: sessionVenueRecommendations?.slice(0, 2)?.map(v => ({
+      venue_id: v.venue_id,
+      venue_name: v.venue_name,
+      venue_address: v.venue_address,
+      ai_score: v.ai_score
+    }))
   });
 
   return {
