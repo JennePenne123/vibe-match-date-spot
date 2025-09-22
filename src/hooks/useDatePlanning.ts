@@ -183,7 +183,80 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         proposedDateTime = preferences.preferred_date;
       }
       
+      // Enhanced venue resolution and saving
       let finalVenueId = venueId;
+      
+      if (venueId) {
+        // Check if venue exists in database first
+        const { data: existingVenue } = await supabase
+          .from('venues')
+          .select('id')
+          .eq('id', venueId)
+          .single();
+        
+        if (!existingVenue) {
+          // Find venue in recommendations (handles both AI and mock venues)
+          const venue = venueRecommendations?.find(v => 
+            v.venue_id === venueId || 
+            v.id === venueId ||
+            v.venue_name?.toLowerCase().includes(venueId.toLowerCase())
+          );
+          
+          if (venue) {
+            // Create venue record for both AI and mock venues
+            const venueRecord = {
+              id: venue.venue_id || venueId,
+              name: venue.venue_name || venue.name || 'Unknown Venue',
+              address: venue.location || venue.address || 'Unknown Location',
+              description: venue.description || venue.ai_reasoning || '',
+              cuisine_type: venue.cuisine_type || 'Mixed',
+              price_range: venue.price_range || '$$',
+              rating: venue.rating || 4.0,
+              latitude: venue.coordinates?.lat || venue.latitude,
+              longitude: venue.coordinates?.lng || venue.longitude,
+              is_active: true,
+              google_place_id: venue.google_place_id || venue.placeId
+            };
+            
+            console.log('💾 COMPLETE PLANNING SESSION - Creating venue record:', venueRecord);
+            
+            const { error: venueError } = await supabase
+              .from('venues')
+              .upsert(venueRecord);
+            
+            if (venueError) {
+              console.error('💾 COMPLETE PLANNING SESSION - Venue save error:', venueError);
+              // Don't fail the invitation if venue save fails
+            } else {
+              finalVenueId = venueRecord.id;
+              console.log('💾 COMPLETE PLANNING SESSION - Venue saved successfully:', finalVenueId);
+            }
+          } else {
+            console.warn('💾 COMPLETE PLANNING SESSION - Venue not found in recommendations:', venueId);
+            // Create a basic venue record to prevent foreign key errors
+            const basicVenue = {
+              id: venueId,
+              name: `Venue ${venueId}`,
+              address: 'Location TBD',
+              description: 'Venue details to be updated',
+              cuisine_type: 'Mixed',
+              price_range: '$$',
+              rating: 4.0,
+              is_active: true
+            };
+            
+            const { error: basicVenueError } = await supabase
+              .from('venues')
+              .upsert(basicVenue);
+            
+            if (basicVenueError) {
+              console.error('💾 COMPLETE PLANNING SESSION - Basic venue creation failed:', basicVenueError);
+            }
+          }
+        } else {
+          console.log('💾 COMPLETE PLANNING SESSION - Venue already exists in database:', venueId);
+        }
+      }
       
       // If we have venue data from AI recommendations, save it to database first
       if (selectedVenue && venueId.startsWith('venue_')) {
@@ -219,6 +292,19 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         }
       }
       
+      // Prepare invitation data with enhanced validation
+      const recommendedVenue = venueRecommendations?.find(v => 
+        v.venue_id === venueId || v.id === venueId
+      );
+      
+      // Extract compatibility score properly
+      let finalCompatibilityScore = null;
+      if (typeof compatibilityScore === 'object' && compatibilityScore?.overall_score) {
+        finalCompatibilityScore = compatibilityScore.overall_score;
+      } else if (typeof compatibilityScore === 'number') {
+        finalCompatibilityScore = compatibilityScore;
+      }
+      
       const invitationData = {
         sender_id: user.id,
         recipient_id: currentSession.partner_id,
@@ -227,9 +313,9 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         message: message,
         proposed_date: proposedDateTime?.toISOString(),
         planning_session_id: sessionId,
-        ai_compatibility_score: compatibilityScore || 0,
-        ai_reasoning: selectedVenue?.ai_reasoning || 'AI-powered venue recommendation',
-        venue_match_factors: selectedVenue, // Store the entire venue data for fallback
+        ai_compatibility_score: finalCompatibilityScore || 0,
+        ai_reasoning: recommendedVenue?.ai_reasoning || 'AI-powered venue recommendation',
+        venue_match_factors: recommendedVenue, // Store the entire venue data for fallback
         status: 'pending'
       };
       

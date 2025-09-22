@@ -244,7 +244,14 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     console.log('🎯 VENUE SELECTION - Found venue for message:', venue?.venue_name);
     
     if (selectedPartner && venue) {
-      const aiMessage = `Hi ${selectedPartner.name}! 🌟 Our AI compatibility score is ${compatibilityScore}% - we're a great match! I'd love to take you to ${venue.venue_name} based on our shared preferences. ${venue.ai_reasoning} What do you think?`;
+      // Extract percentage from compatibility score object
+      const scorePercentage = typeof compatibilityScore === 'object' && compatibilityScore?.overall_score 
+        ? Math.round(compatibilityScore.overall_score * 100)
+        : typeof compatibilityScore === 'number' 
+          ? Math.round(compatibilityScore * 100)
+          : 75; // fallback
+      
+      const aiMessage = `Hi ${selectedPartner.name}! 🌟 Our AI compatibility score is ${scorePercentage}% - we're a great match! I'd love to take you to ${venue.venue_name} based on our shared preferences. ${venue.ai_reasoning} What do you think?`;
       console.log('🎯 VENUE SELECTION - Generated AI message:', aiMessage.substring(0, 100) + '...');
       setInvitationMessage(aiMessage);
     } else {
