@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSessionRealtime } from '@/hooks/useSessionRealtime';
 import { useAIAnalysis } from '@/hooks/useAIAnalysis';
+import { AIVenueRecommendation } from '@/services/aiVenueService/recommendations';
 
 interface DatePlanningSession {
   id: string;
@@ -415,37 +416,35 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
 
   // Get venue recommendations from session data - transform to AIVenueRecommendation format
   const sessionVenueRecommendations = session?.preferences_data && Array.isArray(session.preferences_data) 
-    ? session.preferences_data.map((venue: any) => ({
-        venue_id: venue.venue_id || venue.id,
-        venue_name: venue.venue_name || venue.name,
-        venue_address: venue.address || venue.venue_address || 'Address not available',
-        ai_score: venue.ai_score || 0,
-        match_factors: venue.match_factors || {},
-        contextual_score: venue.contextual_score || venue.ai_score || 0,
-        ai_reasoning: venue.ai_reasoning || 'AI analysis completed',
-        confidence_level: venue.confidence_level || 0.8,
-        distance: venue.distance,
-        neighborhood: venue.neighborhood,
-        isOpen: venue.isOpen,
-        operatingHours: venue.operatingHours || venue.opening_hours,
-        priceRange: venue.price_range || venue.priceRange,
-        rating: venue.rating,
-        cuisine_type: venue.cuisine_type,
-        amenities: venue.amenities || []
-      }))
+    ? session.preferences_data
+        .map((venue: any) => {
+          const { transformToVenueRecommendation } = require('@/utils/venueDataHelpers');
+          return transformToVenueRecommendation(venue);
+        })
+        .filter(Boolean) as AIVenueRecommendation[]
     : [];
 
-  console.log('🔍 COLLAB SESSION: Venue recommendations check:', {
+  // Enhanced logging for venue data transformation
+  useEffect(() => {
+    if (session?.preferences_data) {
+      const { debugVenueData } = require('@/utils/venueDataHelpers');
+      debugVenueData(session.preferences_data, 'Collaborative Session');
+    }
+  }, [session?.preferences_data]);
+  
+  console.log('🔍 COLLAB SESSION: Final venue recommendations:', {
     fromAI: aiVenueRecommendations?.length || 0,
     fromSession: sessionVenueRecommendations?.length || 0,
     sessionHasPrefsData: !!session?.preferences_data,
     prefsDataType: typeof session?.preferences_data,
-    sessionVenueData: sessionVenueRecommendations?.slice(0, 2)?.map(v => ({
+    prefsDataLength: Array.isArray(session?.preferences_data) ? session.preferences_data.length : 0,
+    finalVenueData: sessionVenueRecommendations?.slice(0, 2)?.map(v => ({
       venue_id: v.venue_id,
       venue_name: v.venue_name,
-      venue_address: v.venue_address,
-      ai_score: v.ai_score
-    }))
+      ai_score: v.ai_score,
+      valid: Boolean(v.venue_id && v.venue_name && typeof v.ai_score === 'number')
+    })),
+    prioritizingSessionData: sessionVenueRecommendations.length > 0
   });
 
   return {

@@ -235,12 +235,15 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       return;
     }
     
-    // Validate that venue exists in current recommendations
-    const venue = state.venueRecommendations?.find(v => v.venue_id === venueId);
+    // Validate that venue exists in current recommendations using helper
+    const { findVenueInRecommendations } = require('@/utils/venueDataHelpers');
+    const venue = findVenueInRecommendations(venueId, state.venueRecommendations || []);
+    
     if (!venue) {
       console.error('🎯 VENUE SELECTION - ERROR: Venue not found in current recommendations:', {
         venueId,
-        availableVenues: state.venueRecommendations?.map(v => ({id: v.venue_id, name: v.venue_name})).slice(0, 3)
+        availableVenues: state.venueRecommendations?.map(v => ({id: v.venue_id, name: v.venue_name})).slice(0, 3),
+        totalVenues: state.venueRecommendations?.length || 0
       });
       toast({
         variant: 'destructive',
@@ -334,9 +337,11 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       firstRecommendation: state.venueRecommendations?.[0]?.venue_id
     });
     
-    // First, validate that selected venue exists in current recommendations
+    // First, validate that selected venue exists in current recommendations using helpers
     if (venueIdToUse) {
-      const venueInRecommendations = state.venueRecommendations?.find(v => v.venue_id === venueIdToUse);
+      const { findVenueInRecommendations } = require('@/utils/venueDataHelpers');
+      const venueInRecommendations = findVenueInRecommendations(venueIdToUse, state.venueRecommendations || []);
+      
       if (!venueInRecommendations) {
         console.warn('🚀 SEND INVITATION - Selected venue not in current recommendations, clearing selection');
         venueIdToUse = '';
@@ -370,12 +375,15 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       return;
     }
     
-    // Final validation: ensure venue exists in recommendations
-    const finalVenueCheck = state.venueRecommendations?.find(v => v.venue_id === venueIdToUse);
+    // Final validation: ensure venue exists in recommendations using helper
+    const { findVenueInRecommendations } = require('@/utils/venueDataHelpers');
+    const finalVenueCheck = findVenueInRecommendations(venueIdToUse, state.venueRecommendations || []);
+    
     if (!finalVenueCheck) {
       console.error('🚀 SEND INVITATION - ERROR: Final venue validation failed:', {
         venueId: venueIdToUse,
-        availableVenues: state.venueRecommendations?.map(v => v.venue_id).slice(0, 3)
+        availableVenues: state.venueRecommendations?.map(v => v.venue_id).slice(0, 3),
+        totalVenues: state.venueRecommendations?.length || 0
       });
       toast({
         variant: 'destructive',
