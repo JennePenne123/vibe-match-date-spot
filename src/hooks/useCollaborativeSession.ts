@@ -430,7 +430,14 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
         try {
           console.log('🔄 SESSION: Starting venue transformation for:', session.preferences_data.length, 'venues');
           
-          const { transformToVenueRecommendation } = await import('@/utils/venueDataHelpers');
+          // Import the transformation function
+          const venueHelpers = await import('@/utils/venueDataHelpers');
+          const transformToVenueRecommendation = venueHelpers.transformToVenueRecommendation;
+          
+          if (!transformToVenueRecommendation) {
+            console.error('❌ SESSION: transformToVenueRecommendation not found in import');
+            return;
+          }
           
           // Process each venue with detailed logging
           const transformedVenues: AIVenueRecommendation[] = [];
@@ -463,6 +470,7 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
             }))
           });
           
+          console.log('🔄 SESSION: Setting sessionVenueRecommendations to:', transformedVenues.length, 'venues');
           setSessionVenueRecommendations(transformedVenues);
         } catch (error) {
           console.error('❌ SESSION: Error transforming venue data:', error);

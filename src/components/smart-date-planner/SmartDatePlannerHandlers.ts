@@ -1,5 +1,6 @@
 
 import { toast } from '@/hooks/use-toast';
+import { findVenueInRecommendations } from '@/utils/venueDataHelpers';
 
 export const createSmartDatePlannerHandlers = (state: any) => {
   const {
@@ -236,7 +237,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     }
     
     // Validate that venue exists in current recommendations using helper
-    const { findVenueInRecommendations } = require('@/utils/venueDataHelpers');
     const venue = findVenueInRecommendations(venueId, state.venueRecommendations || []);
     
     if (!venue) {
