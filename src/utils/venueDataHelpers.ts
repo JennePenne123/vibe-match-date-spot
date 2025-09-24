@@ -77,16 +77,39 @@ export const transformToVenueRecommendation = (venue: any): AIVenueRecommendatio
     return null;
   }
   
+  console.log('🔧 TRANSFORM: Processing venue:', {
+    venue_id: venue.venue_id || venue.id,
+    venue_name: venue.venue_name || venue.name,
+    ai_score: venue.ai_score,
+    hasId: !!(venue.venue_id || venue.id),
+    hasName: !!(venue.venue_name || venue.name),
+    hasScore: typeof venue.ai_score === 'number'
+  });
+  
   try {
+    // Ensure we have essential fields with robust fallbacks
+    const venueId = normalizeVenueId(venue.venue_id || venue.id);
+    const venueName = venue.venue_name || venue.name;
+    const aiScore = typeof venue.ai_score === 'number' ? venue.ai_score : 
+                   typeof venue.score === 'number' ? venue.score : 0;
+    
+    if (!venueId) {
+      console.warn('🚫 TRANSFORM: No valid venue ID found, generating fallback');
+    }
+    
+    if (!venueName) {
+      console.warn('🚫 TRANSFORM: No valid venue name found');
+    }
+
     const transformed: AIVenueRecommendation = {
-      venue_id: normalizeVenueId(venue.venue_id || venue.id) || `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      venue_name: venue.venue_name || venue.name || 'Unnamed Venue',
+      venue_id: venueId || `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      venue_name: venueName || 'Unnamed Venue',
       venue_address: venue.address || venue.venue_address || 'Address not available',
       venue_image: venue.venue_image || venue.image || venue.image_url,
       venue_photos: venue.venue_photos || venue.photos || [],
-      ai_score: typeof venue.ai_score === 'number' ? venue.ai_score : 0,
+      ai_score: aiScore,
       match_factors: venue.match_factors || {},
-      contextual_score: venue.contextual_score || venue.ai_score || 0,
+      contextual_score: venue.contextual_score || aiScore,
       ai_reasoning: venue.ai_reasoning || 'AI analysis completed',
       confidence_level: typeof venue.confidence_level === 'number' ? venue.confidence_level : 0.8,
       distance: venue.distance,
@@ -99,8 +122,15 @@ export const transformToVenueRecommendation = (venue: any): AIVenueRecommendatio
       amenities: venue.amenities || []
     };
     
+    console.log('🔧 TRANSFORM: Created transformed venue:', {
+      venue_id: transformed.venue_id,
+      venue_name: transformed.venue_name,
+      ai_score: transformed.ai_score
+    });
+    
     // Validate the transformed result
     if (validateVenueRecommendation(transformed)) {
+      console.log('✅ TRANSFORM: Venue passed validation:', transformed.venue_id);
       return transformed;
     } else {
       console.error('🚫 TRANSFORM: Validation failed after transformation:', transformed);

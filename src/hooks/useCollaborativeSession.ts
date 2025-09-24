@@ -417,15 +417,43 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
 
   // Process venue data when session preferences_data changes
   useEffect(() => {
+    console.log('🔄 SESSION: useEffect running for venue data processing:', {
+      hasSession: !!session,
+      hasPrefsData: !!session?.preferences_data,
+      isArray: Array.isArray(session?.preferences_data),
+      dataLength: Array.isArray(session?.preferences_data) ? session.preferences_data.length : 0,
+      rawData: session?.preferences_data
+    });
+
     const processVenueData = async () => {
       if (session?.preferences_data && Array.isArray(session.preferences_data)) {
         try {
-          const { transformToVenueRecommendation } = await import('@/utils/venueDataHelpers');
-          const transformedVenues = session.preferences_data
-            .map((venue: any) => transformToVenueRecommendation(venue))
-            .filter(Boolean) as AIVenueRecommendation[];
+          console.log('🔄 SESSION: Starting venue transformation for:', session.preferences_data.length, 'venues');
           
-          console.log('🔄 SESSION: Transformed venues from session data:', {
+          const { transformToVenueRecommendation } = await import('@/utils/venueDataHelpers');
+          
+          // Process each venue with detailed logging
+          const transformedVenues: AIVenueRecommendation[] = [];
+          
+          for (let i = 0; i < session.preferences_data.length; i++) {
+            const venue = session.preferences_data[i];
+            console.log(`🔄 SESSION: Processing venue ${i + 1}:`, {
+              venue_id: venue.venue_id || venue.id,
+              venue_name: venue.venue_name || venue.name,
+              ai_score: venue.ai_score,
+              hasAllFields: !!(venue.venue_id || venue.id) && !!(venue.venue_name || venue.name) && typeof venue.ai_score === 'number'
+            });
+            
+            const transformed = transformToVenueRecommendation(venue);
+            if (transformed) {
+              transformedVenues.push(transformed);
+              console.log(`✅ SESSION: Successfully transformed venue ${i + 1}:`, transformed.venue_id);
+            } else {
+              console.warn(`❌ SESSION: Failed to transform venue ${i + 1}:`, venue);
+            }
+          }
+          
+          console.log('🔄 SESSION: Final transformation results:', {
             originalCount: session.preferences_data.length,
             transformedCount: transformedVenues.length,
             venues: transformedVenues.slice(0, 2).map(v => ({
@@ -441,6 +469,7 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
           setSessionVenueRecommendations([]);
         }
       } else {
+        console.log('🔄 SESSION: No valid venue data to process');
         setSessionVenueRecommendations([]);
       }
     };
