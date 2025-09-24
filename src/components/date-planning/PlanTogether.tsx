@@ -81,24 +81,6 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
     return null;
   };
 
-  const handleVenueSelect = (venue: AIVenueRecommendation) => {
-    const venueId = getVenueId(venue);
-    
-    console.log('🎯 PLAN TOGETHER - Venue selected:', {
-      venueName: venue.venue_name,
-      extractedVenueId: venueId,
-      rawVenueId: venue.venue_id
-    });
-
-    if (!venueId) {
-      console.error('🎯 PLAN TOGETHER - CRITICAL ERROR: Venue missing valid ID!', venue);
-      alert('Error: This venue cannot be selected due to missing data. Please try another venue or refresh the page.');
-      return;
-    }
-
-    console.log('🎯 PLAN TOGETHER - Proceeding with venue selection:', venueId);
-    onVenueSelect(venueId);
-  };
 
   if (error) {
     return (
@@ -213,7 +195,10 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
                 <div key={`${venueId}-${index}`} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                   <AIVenueCard
                     recommendation={venue}
-                    onSelect={() => handleVenueSelect(venue)}
+                    onSelect={(venueId) => {
+                      console.log('🎯 PLAN TOGETHER - Venue selected:', venueId);
+                      onVenueSelect(venueId);
+                    }}
                     sessionContext={{
                       sessionId: sessionId,
                       partnerId: partnerId
