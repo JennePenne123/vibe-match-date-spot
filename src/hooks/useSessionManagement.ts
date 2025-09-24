@@ -439,13 +439,51 @@ export const useSessionManagement = () => {
 
   // Complete planning session
   const completePlanningSession = useCallback(async (sessionId: string, venueId: string) => {
-    if (!user || !currentSession) return false;
+    if (!user) {
+      console.error('❌ COMPLETE PLANNING SESSION - ERROR: No authenticated user');
+      return false;
+    }
 
     setLoading(true);
     try {
-      console.log('Completing planning session...');
+      console.log('💾 COMPLETE PLANNING SESSION - Completing session:', sessionId);
       
-      await supabase
+      // First validate the session exists and user has permission
+      const { data: sessionCheck, error: checkError } = await supabase
+        .from('date_planning_sessions')
+        .select('id, initiator_id, partner_id')
+        .eq('id', sessionId)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('❌ COMPLETE PLANNING SESSION - Error checking session:', checkError);
+        handleError(checkError, {
+          toastTitle: 'Session Error',
+          toastDescription: 'Could not validate session'
+        });
+        return false;
+      }
+
+      if (!sessionCheck) {
+        console.error('❌ COMPLETE PLANNING SESSION - Session not found:', sessionId);
+        handleError(new Error('Session not found'), {
+          toastTitle: 'Session Error',
+          toastDescription: 'Planning session not found'
+        });
+        return false;
+      }
+
+      // Check if user has permission to complete this session
+      if (sessionCheck.initiator_id !== user.id && sessionCheck.partner_id !== user.id) {
+        console.error('❌ COMPLETE PLANNING SESSION - User not authorized for session:', sessionId);
+        handleError(new Error('Unauthorized'), {
+          toastTitle: 'Permission Error',
+          toastDescription: 'You are not authorized to complete this session'
+        });
+        return false;
+      }
+      
+      const { error: updateError } = await supabase
         .from('date_planning_sessions')
         .update({ 
           session_status: 'completed',
@@ -453,6 +491,15 @@ export const useSessionManagement = () => {
           updated_at: new Date().toISOString()
         })
         .eq('id', sessionId);
+
+      if (updateError) {
+        console.error('❌ COMPLETE PLANNING SESSION - Error updating session:', updateError);
+        handleError(updateError, {
+          toastTitle: 'Update Error',
+          toastDescription: 'Failed to complete session'
+        });
+        return false;
+      }
 
       // Reset state
       setCurrentSession(null);
