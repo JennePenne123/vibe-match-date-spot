@@ -339,7 +339,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     
     // First, validate that selected venue exists in current recommendations using helpers
     if (venueIdToUse) {
-      const { findVenueInRecommendations } = require('@/utils/venueDataHelpers');
       const venueInRecommendations = findVenueInRecommendations(venueIdToUse, state.venueRecommendations || []);
       
       if (!venueInRecommendations) {
@@ -376,7 +375,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     }
     
     // Final validation: ensure venue exists in recommendations using helper
-    const { findVenueInRecommendations } = require('@/utils/venueDataHelpers');
     const finalVenueCheck = findVenueInRecommendations(venueIdToUse, state.venueRecommendations || []);
     
     if (!finalVenueCheck) {
