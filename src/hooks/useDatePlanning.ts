@@ -52,16 +52,38 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
 
   // Enhanced update session preferences with AI analysis
   const updateSessionPreferencesWithAI = useCallback(async (sessionId: string, preferences: DatePreferences) => {
-    if (!currentSession) return;
-
     console.log('🎯 DATE PLANNING: Starting session preferences update with location:', userLocation);
 
     // Update preferences first
     await updateSessionPreferences(sessionId, preferences);
     
-    // Then trigger AI analysis with user location
-    await analyzeCompatibilityAndVenues(sessionId, currentSession.partner_id, preferences, userLocation);
-  }, [currentSession, updateSessionPreferences, analyzeCompatibilityAndVenues, userLocation]);
+    // Fetch session data to get partner ID for AI analysis
+    try {
+      const { data: sessionData, error } = await supabase
+        .from('date_planning_sessions')
+        .select('partner_id, initiator_id')
+        .eq('id', sessionId)
+        .single();
+      
+      if (error || !sessionData) {
+        console.error('🎯 DATE PLANNING: Could not fetch session data for AI analysis:', error);
+        return;
+      }
+      
+      // Determine partner ID based on current user role
+      const partnerId = sessionData.initiator_id === user?.id ? sessionData.partner_id : sessionData.initiator_id;
+      
+      if (!partnerId) {
+        console.error('🎯 DATE PLANNING: Could not determine partner ID for AI analysis');
+        return;
+      }
+      
+      // Then trigger AI analysis with user location
+      await analyzeCompatibilityAndVenues(sessionId, partnerId, preferences, userLocation);
+    } catch (error) {
+      console.error('🎯 DATE PLANNING: Error in session preferences update with AI:', error);
+    }
+  }, [updateSessionPreferences, analyzeCompatibilityAndVenues, userLocation, user?.id]);
 
   // Enhanced complete planning session with invitation creation
   const completePlanningSession = useCallback(async (sessionId: string, venueId: string, message: string, preferences?: DatePreferences) => {
@@ -346,9 +368,39 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         finalCompatibilityScore = compatibilityScore;
       }
       
+      // Determine recipient ID based on user role in the session
+      let recipientId;
+      if (sessionData.initiator_id === user.id) {
+        recipientId = sessionData.partner_id;
+      } else if (sessionData.partner_id === user.id) {
+        recipientId = sessionData.initiator_id;
+      } else {
+        console.error('💾 COMPLETE PLANNING SESSION - ERROR: User is not a participant in this session');
+        handleError(new Error('User not authorized for this session'), {
+          toastTitle: 'Authorization Error',
+          toastDescription: 'You are not authorized to create invitations for this session'
+        });
+        return false;
+      }
+      
+      if (!recipientId) {
+        console.error('💾 COMPLETE PLANNING SESSION - ERROR: Could not determine recipient ID');
+        handleError(new Error('Could not determine invitation recipient'), {
+          toastTitle: 'Recipient Error',
+          toastDescription: 'Unable to determine who should receive the invitation'
+        });
+        return false;
+      }
+      
+      console.log('💾 COMPLETE PLANNING SESSION - Determined recipient:', {
+        senderId: user.id,
+        recipientId,
+        userRole: sessionData.initiator_id === user.id ? 'initiator' : 'partner'
+      });
+      
       const invitationData = {
         sender_id: user.id,
-        recipient_id: currentSession.partner_id,
+        recipient_id: recipientId,
         venue_id: finalVenueId,
         title: 'AI-Matched Date Invitation',
         message: message,
