@@ -88,11 +88,52 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
       return false;
     }
     
-    if (!currentSession?.partner_id) {
-      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No current session or partner ID');
-      handleError(new Error('No active planning session'), {
+    // Fetch session data based on sessionId to handle both solo and collaborative modes
+    let sessionData = currentSession;
+    if (!sessionData || sessionData.id !== sessionId) {
+      console.log('💾 COMPLETE PLANNING SESSION - Fetching session data for sessionId:', sessionId);
+      try {
+        const { data: fetchedSession, error } = await supabase
+          .from('date_planning_sessions')
+          .select('*')
+          .eq('id', sessionId)
+          .maybeSingle();
+          
+        if (error) {
+          console.error('💾 COMPLETE PLANNING SESSION - ERROR fetching session:', error);
+          handleError(new Error('Failed to fetch session data'), {
+            toastTitle: 'Session Error',
+            toastDescription: 'Could not retrieve session information'
+          });
+          return false;
+        }
+        
+        if (!fetchedSession) {
+          console.error('💾 COMPLETE PLANNING SESSION - ERROR: Session not found for ID:', sessionId);
+          handleError(new Error('Session not found'), {
+            toastTitle: 'Session Error',
+            toastDescription: 'Planning session not found'
+          });
+          return false;
+        }
+        
+        sessionData = fetchedSession;
+      } catch (error) {
+        console.error('💾 COMPLETE PLANNING SESSION - ERROR fetching session:', error);
+        handleError(new Error('Failed to fetch session data'), {
+          toastTitle: 'Session Error',
+          toastDescription: 'Could not retrieve session information'
+        });
+        return false;
+      }
+    }
+    
+    // Validate session has partner data
+    if (!sessionData.partner_id && !sessionData.initiator_id) {
+      console.error('💾 COMPLETE PLANNING SESSION - ERROR: No partner or initiator ID in session');
+      handleError(new Error('Invalid session data'), {
         toastTitle: 'Session Error', 
-        toastDescription: 'No active planning session found'
+        toastDescription: 'Session is missing required participant information'
       });
       return false;
     }
