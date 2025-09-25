@@ -134,13 +134,14 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('❌ VALIDATE GOOGLE PLACES: Validation error:', error);
+    const errorObj = error instanceof Error ? error : new Error(String(error));
     
     return Response.json({
       isValid: false,
       error: 'Validation failed with exception',
       details: {
-        message: error.message,
-        stack: error.stack
+        message: errorObj.message,
+        stack: errorObj.stack
       }
     }, { 
       status: 500,

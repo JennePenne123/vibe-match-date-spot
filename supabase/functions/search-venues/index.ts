@@ -276,7 +276,8 @@ serve(async (req) => {
           }
           
         } catch (venueError) {
-          console.warn('⚠️ SEARCH VENUES: Error processing venue:', place.name, venueError.message);
+          const errorMessage = venueError instanceof Error ? venueError.message : 'Unknown error';
+          console.warn('⚠️ SEARCH VENUES: Error processing venue:', place.name, errorMessage);
         }
       }
     }
@@ -298,10 +299,11 @@ serve(async (req) => {
     });
 
   } catch (error) {
+    const errorObj = error instanceof Error ? error : new Error(String(error));
     console.error('❌ SEARCH VENUES: Critical error:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
+      message: errorObj.message,
+      stack: errorObj.stack,
+      name: errorObj.name
     });
     
     // Don't expose internal error details in production
@@ -310,7 +312,7 @@ serve(async (req) => {
     return Response.json({
       success: false,
       error: 'Internal server error',
-      details: isDevelopment ? error.message : 'An unexpected error occurred',
+      details: isDevelopment ? errorObj.message : 'An unexpected error occurred',
       venues: []
     }, { 
       status: 500,
@@ -344,7 +346,7 @@ function determineCuisineType(place: any, preferredCuisines: string[]): string {
   for (const cuisine of preferredCuisines || []) {
     const sanitizedCuisine = String(cuisine).toLowerCase();
     if (name.includes(sanitizedCuisine) || 
-        types.some(type => type.includes(sanitizedCuisine))) {
+        types.some((type: string) => type.includes(sanitizedCuisine))) {
       return cuisine;
     }
   }
