@@ -10,7 +10,7 @@ export interface DateProposal {
   proposed_date: string;
   title: string;
   message?: string;
-  status: 'pending' | 'accepted' | 'declined' | 'expired';
+  status: 'pending' | 'accepted' | 'declined' | 'expired' | 'converted';
   expires_at: string;
   created_at: string;
   updated_at: string;
