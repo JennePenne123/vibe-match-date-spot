@@ -130,7 +130,7 @@ const DateInviteCard = ({
           <div className="absolute top-4 right-4 z-10">
             <Badge variant={statusConfig.variant} className="flex items-center gap-1.5 px-2.5 py-1">
               <StatusIcon className="w-3.5 h-3.5" />
-              <span className="text-xs font-medium">{statusConfig.label}</span>
+              <span className="text-sm sm:text-xs font-medium">{statusConfig.label}</span>
             </Badge>
           </div>
 
@@ -152,7 +152,7 @@ const DateInviteCard = ({
               <div className="flex-1 min-w-0 space-y-2">
                 {/* Header */}
                 <div>
-                  <div className="text-xs text-muted-foreground mb-0.5 truncate">
+                  <div className="text-sm sm:text-xs text-muted-foreground mb-0.5 truncate sm:truncate-none">
                     {direction === 'received' ? 'From: ' : 'To: '}{displayData.friendName}
                   </div>
                 </div>
@@ -161,13 +161,13 @@ const DateInviteCard = ({
                 <div className="space-y-1.5">
                   <div className="flex items-start gap-2">
                     <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground mt-0.5" />
-                    <span className={`font-medium text-sm leading-tight truncate ${statusConfig.textColor}`}>
+                    <span className={`font-medium text-sm leading-tight truncate sm:truncate-none ${statusConfig.textColor}`}>
                       {displayData.location}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground truncate">
+                    <span className="text-sm sm:text-xs text-muted-foreground truncate sm:truncate-none">
                       {displayData.timeProposed !== 'Time TBD' ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -179,25 +179,26 @@ const DateInviteCard = ({
                 </div>
 
 {/* Quick Actions for pending invitations */}
-                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-1.5 pt-2 pr-1">
+                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-2 pt-3 pr-1">
                     <Button size="sm" onClick={e => {
                   e.stopPropagation();
                   onAccept(invitation.id);
-                }} className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0 text-xs h-7 px-2">
-                      <Check className="w-3 h-3 mr-1" />
+                }} className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0 text-sm sm:text-xs h-9 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-[28px]">
+                      <Check className="w-4 h-4 sm:w-3 sm:h-3 mr-1.5 sm:mr-1" />
                       Accept
                     </Button>
                     <Button size="sm" variant="outline" onClick={e => {
                   e.stopPropagation();
                   onDecline(invitation.id);
-                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-2 text-xs h-7 w-8 flex-shrink-0">
-                      <X className="w-3 h-3" />
+                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-3 sm:px-2 text-sm sm:text-xs h-9 sm:h-7 w-auto sm:w-8 flex-shrink-0 min-h-[44px] sm:min-h-[28px]">
+                      <X className="w-4 h-4 sm:w-3 sm:h-3" />
+                      <span className="sm:hidden ml-1.5">Decline</span>
                     </Button>
                   </div>}
               </div>
 
               {/* Enhanced Venue Image */}
-              <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-border shadow-md flex-shrink-0 bg-muted transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+              <div className="w-20 h-20 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 border-border shadow-md flex-shrink-0 bg-muted transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
                 <img src={displayData.venueImage.includes('undefined') ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80' : displayData.venueImage} alt={displayData.venueName} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
               </div>
             </div>
