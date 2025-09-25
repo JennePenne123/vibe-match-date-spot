@@ -179,7 +179,7 @@ const DateInviteCard = ({
                 </div>
 
 {/* Quick Actions for pending invitations */}
-                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex gap-2 pt-3 pr-1">
+                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex justify-center gap-2 pt-3 pr-1">
                     <Button size="sm" onClick={e => {
                   e.stopPropagation();
                   onAccept(invitation.id);
