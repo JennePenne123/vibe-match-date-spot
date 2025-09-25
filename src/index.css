@@ -68,12 +68,14 @@
     --gradient-cosmic: radial-gradient(circle at 30% 20%, hsl(330, 81%, 60% / 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(351, 86%, 55% / 0.2) 0%, transparent 50%);
     --gradient-shimmer: linear-gradient(45deg, transparent 30%, hsl(330, 81%, 60% / 0.1) 50%, transparent 70%);
 
-    /* Component-Specific Gradients */
-    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
-    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    --gradient-card-elegant: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
-    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.05) 0%, hsl(351, 86%, 55% / 0.08) 100%);
-    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+     /* Component-Specific Gradients */
+     --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
+     --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+     --gradient-success: linear-gradient(135deg, hsl(142, 76%, 48%) 0%, hsl(142, 78%, 42%) 100%);
+     --gradient-success-hover: linear-gradient(135deg, hsl(142, 78%, 42%) 0%, hsl(142, 80%, 38%) 100%);
+     --gradient-card-elegant: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
+     --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.05) 0%, hsl(351, 86%, 55% / 0.08) 100%);
+     --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
 
     /* Premium Shadows */
     --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.3);
@@ -149,12 +151,14 @@
     --gradient-surface-rich: linear-gradient(135deg, hsl(330, 81%, 60% / 0.25) 0%, hsl(351, 86%, 55% / 0.35) 100%);
     --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
 
-    /* Dark Mode Component Gradients */
-    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
-    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-    --gradient-card-elegant: linear-gradient(135deg, hsl(330, 16%, 18%) 0%, hsl(330, 12%, 22%) 100%);
-    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
-    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+     /* Dark Mode Component Gradients */
+     --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
+     --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+     --gradient-success: linear-gradient(135deg, hsl(142, 76%, 48%) 0%, hsl(142, 78%, 42%) 100%);
+     --gradient-success-hover: linear-gradient(135deg, hsl(142, 78%, 42%) 0%, hsl(142, 80%, 38%) 100%);
+     --gradient-card-elegant: linear-gradient(135deg, hsl(330, 16%, 18%) 0%, hsl(330, 12%, 22%) 100%);
+     --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
+     --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
 
     /* Dark Mode Premium Shadows */
     --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.4);
