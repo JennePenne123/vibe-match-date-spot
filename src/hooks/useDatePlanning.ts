@@ -470,6 +470,24 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
 
       console.log('💾 COMPLETE PLANNING SESSION - Invitation created successfully:', insertedInvitation);
 
+      // Mark related proposal as converted (if exists)
+      try {
+        const { error: proposalUpdateError } = await supabase
+          .from('date_proposals')
+          .update({ status: 'converted' })
+          .eq('planning_session_id', sessionId);
+        
+        if (proposalUpdateError) {
+          console.error('💾 COMPLETE PLANNING SESSION - Warning: Failed to update proposal status:', proposalUpdateError);
+          // Don't fail the entire operation if proposal update fails
+        } else {
+          console.log('💾 COMPLETE PLANNING SESSION - Successfully marked proposal as converted');
+        }
+      } catch (error) {
+        console.error('💾 COMPLETE PLANNING SESSION - Warning: Error updating proposal status:', error);
+        // Don't fail the entire operation if proposal update fails
+      }
+
       // Reset AI state
       resetAIState();
       
