@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Filter, Sparkles, Users } from 'lucide-react';
+import { ArrowLeft, Sparkles, Users } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 
@@ -10,7 +10,6 @@ const Results = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { appState } = useApp();
-  const [filter, setFilter] = useState('all');
 
   // Check if coming from Smart Date Planning
   const smartPlanningState = location.state as {
@@ -46,21 +45,6 @@ const Results = () => {
         ai_reasoning: `This venue matches your preferences for ${venue.cuisine_type || 'great'} cuisine and ${venue.tags?.[0] || 'romantic'} atmosphere. Perfect for your date style!`,
         confidence_level: Math.random() * 0.3 + 0.7 // 70-100% confidence
       }));
-
-  const filters = [
-    { id: 'all', name: 'All Spots', icon: '📍' },
-    { id: 'romantic', name: 'Romantic', icon: '💕' },
-    { id: 'outdoor', name: 'Outdoor', icon: '🌳' },
-    { id: 'nightlife', name: 'Nightlife', icon: '🌃' },
-    { id: 'casual', name: 'Casual', icon: '😊' }
-  ];
-
-  const filteredRecommendations = filter === 'all' 
-    ? recommendations 
-    : recommendations.filter(rec => 
-        rec.match_factors.vibe_matches?.includes(filter) ||
-        rec.venue_name.toLowerCase().includes(filter)
-      );
 
   const handleVenueSelect = (venueId: string) => {
     if (isFromSmartPlanning) {
@@ -108,41 +92,16 @@ const Results = () => {
                 {isFromSmartPlanning ? (
                   <>
                     <Users className="w-4 h-4 text-blue-500" />
-                    {filteredRecommendations.length} collaborative matches
+                    {recommendations.length} collaborative matches
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 text-purple-500" />
-                    {filteredRecommendations.length} perfect matches
+                    {recommendations.length} perfect matches
                   </>
                 )}
               </p>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-gray-600 hover:bg-gray-100"
-            >
-              <Filter className="w-6 h-6" />
-            </Button>
-          </div>
-
-          {/* Filter Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {filters.map((filterOption) => (
-              <button
-                key={filterOption.id}
-                onClick={() => setFilter(filterOption.id)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  filter === filterOption.id
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <span className="mr-2">{filterOption.icon}</span>
-                {filterOption.name}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -162,7 +121,7 @@ const Results = () => {
 
           {/* AIVenueCard Components */}
           <div className="space-y-6">
-            {filteredRecommendations.map((recommendation, index) => (
+            {recommendations.map((recommendation, index) => (
               <AIVenueCard
                 key={recommendation.venue_id}
                 recommendation={recommendation}
@@ -178,21 +137,15 @@ const Results = () => {
           </div>
 
           {/* No Results */}
-          {filteredRecommendations.length === 0 && (
+          {recommendations.length === 0 && (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                No matches found
+                No recommendations found
               </h3>
-              <p className="text-gray-500 mb-4">
-                Try adjusting your filters or preferences
+              <p className="text-gray-500">
+                Try updating your preferences for better matches
               </p>
-              <Button
-                onClick={() => setFilter('all')}
-                variant="outline"
-              >
-                Show All Results
-              </Button>
             </div>
           )}
 
