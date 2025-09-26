@@ -12,7 +12,7 @@ const Onboarding = () => {
     {
       icon: Heart,
       title: "Discover Perfect Date Spots",
-      description: "Let AI find the ideal romantic locations tailored to your preferences and mood. From cozy cafés to scenic viewpoints.",
+      description: "Let AI find the ideal locations tailored to your preferences and mood. From cozy cafés to scenic viewpoints.",
       image: "❤️",
       gradient: "from-pink-400 to-rose-500"
     },
