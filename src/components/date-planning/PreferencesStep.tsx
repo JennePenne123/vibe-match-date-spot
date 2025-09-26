@@ -775,144 +775,56 @@ useEffect(() => {
     renderingPath: planningMode === 'collaborative' && collaborativeSession ? 'collaborative' : 'regular'
   });
 
+  // Get completion status for status indicators
+  const getCompletionStatus = () => {
+    if (planningMode === 'collaborative' && collaborativeSession) {
+      const userCompleted = collaborativeSession.hasUserSetPreferences;
+      const partnerCompleted = collaborativeSession.hasPartnerSetPreferences;
+      const bothCompleted = userCompleted && partnerCompleted;
+      
+      return {
+        userCompleted,
+        partnerCompleted,
+        bothCompleted,
+        analysisComplete: bothCompleted && !aiAnalyzing && venueRecommendations.length > 0
+      };
+    }
+    return { userCompleted: false, partnerCompleted: false, bothCompleted: false, analysisComplete: false };
+  };
+
+  const status = getCompletionStatus();
+
   return (
     <SafeComponent>
-      {aiAnalyzing && (
-        <Card className="border-blue-200 bg-blue-50">
-          <CardContent className="p-6 text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
-              <h3 className="text-lg font-semibold text-blue-800">AI Analysis in Progress</h3>
-            </div>
-            <p className="text-blue-700">
-              Analyzing compatibility and finding perfect venues...
-            </p>
-          </CardContent>
-        </Card>
-      )}
-      
-      {/* Show collaborative waiting state - prioritize over AI analyzing state when both prefs complete */}
-      {planningMode === 'collaborative' && collaborativeSession && (
-        (() => {
-          const userHasCompletedPrefs = collaborativeSession.hasUserSetPreferences;
-          const partnerHasCompletedPrefs = collaborativeSession.hasPartnerSetPreferences;
-          const canShowResults = collaborativeSession.canShowResults;
-          
-          // Debug logging for preferences step state
-          console.log('🔧 PREFERENCES STEP DEBUG:', {
-            sessionId,
-            partnerName,
-            userHasCompletedPrefs,
-            partnerHasCompletedPrefs,
-            canShowResults,
-            aiAnalyzing,
-            collaborativeSession,
-            onManualContinueExists: typeof onManualContinue === 'function'
-          });
-          
-          // If both users have completed preferences, show ready state
-          if (userHasCompletedPrefs && partnerHasCompletedPrefs) {
-            console.log('🔧 SHOWING READY STATE: Both users have completed preferences, aiAnalyzing:', aiAnalyzing);
-            
-            // If AI is analyzing, show analyzing state
-            if (aiAnalyzing) {
-              return (
-                <div className="space-y-4">
-                  <div className="text-center p-6 bg-primary/5 rounded-lg border border-primary/20">
-                    <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <h3 className="font-semibold text-foreground mb-2">🤖 AI Analysis in Progress</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Analyzing your compatibility and finding the perfect venues...
-                    </p>
-                  </div>
-                </div>
-              );
-            }
-            
-            // Both preferences complete and AI analysis done - show "Display Venues" button if venues available
-            if (!aiAnalyzing && venueRecommendations.length > 0) {
-              return (
-                <div className="space-y-4">
-                  <Card className="border-green-200 bg-green-50">
-                    <CardContent className="p-6 text-center">
-                      <div className="flex items-center justify-center gap-3 mb-4">
-                        <CheckCircle className="h-6 w-6 text-green-600" />
-                        <h3 className="text-lg font-semibold text-green-800">AI Analysis Complete!</h3>
-                      </div>
-                      <p className="text-green-700 mb-4">
-                        Found {venueRecommendations.length} perfect venues for you and {partnerName}
-                      </p>
-                      {compatibilityScore && (
-                        <p className="text-sm text-green-600 mb-4">
-                          Compatibility Score: {typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore}%
-                        </p>
-                      )}
-                      <Button 
-                        onClick={onDisplayVenues}
-                        className="bg-primary text-primary-foreground hover:bg-primary/90"
-                        size="lg"
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Display Venues
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            }
-            
-            // Both preferences complete - show subtle ready indicator but keep preferences editable
-            // Don't show the "Both Preferences Complete!" card as it's misleading on the preferences page
-          }
-          
-          // If user has completed but partner hasn't, show waiting state
-          if (userHasCompletedPrefs && !partnerHasCompletedPrefs) {
-            console.log('🔧 SHOWING WAITING STATE: User completed, waiting for partner');
-            return (
-              <div className="space-y-4">
-                <CollaborativeWaitingState
-                  partnerName={partnerName}
-                  sessionId={sessionId}
-                  hasPartnerSetPreferences={partnerHasCompletedPrefs}
-                  isWaitingForPartner={true}
-                  hasCurrentUserSetPreferences={userHasCompletedPrefs}
-                  currentUserName={user?.name || 'You'}
-                />
-                
-                <Card className="border-green-200 bg-green-50">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <CheckCircle className="h-6 w-6 text-green-600" />
-                      <h3 className="text-lg font-semibold text-green-800">Your Preferences Saved!</h3>
-                    </div>
-                    <p className="text-green-700 mb-4">
-                      Your date preferences have been successfully saved. We'll show AI-matched venues once {partnerName} completes their preferences.
-                    </p>
-                    <div className="bg-white/60 rounded-lg p-3 border border-green-200">
-                      <p className="text-sm text-green-700">
-                        <strong>Next step:</strong> Our AI will analyze your compatibility and suggest perfect venues when both partners are ready.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            );
-          }
-          
-          return null;
-        })()
-      )}
-
+      {/* Main Preferences Setting Interface */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               {getStepIcon()}
               {getStepTitle()}
+              {/* Status indicator for collaborative mode */}
+              {planningMode === 'collaborative' && status.userCompleted && (
+                <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Saved
+                </Badge>
+              )}
             </CardTitle>
-            <Badge variant="outline">
-              Step {currentStep} of {totalSteps}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline">
+                Step {currentStep} of {totalSteps}
+              </Badge>
+              {/* Collaborative progress indicators */}
+              {planningMode === 'collaborative' && (
+                <div className="flex items-center gap-1">
+                  <div className={`w-2 h-2 rounded-full ${status.userCompleted ? 'bg-green-500' : 'bg-gray-300'}`} 
+                       title="Your preferences" />
+                  <div className={`w-2 h-2 rounded-full ${status.partnerCompleted ? 'bg-green-500' : 'bg-gray-300'}`} 
+                       title={`${partnerName}'s preferences`} />
+                </div>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -952,6 +864,126 @@ useEffect(() => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Separator for visual hierarchy */}
+      {planningMode === 'collaborative' && (status.userCompleted || status.partnerCompleted) && (
+        <div className="my-6 border-t border-border"></div>
+      )}
+
+      {/* AI Analysis Status Section - appears after preferences form */}
+      {planningMode === 'collaborative' && collaborativeSession && (
+        (() => {
+          const userHasCompletedPrefs = collaborativeSession.hasUserSetPreferences;
+          const partnerHasCompletedPrefs = collaborativeSession.hasPartnerSetPreferences;
+          
+          // Debug logging for preferences step state
+          console.log('🔧 PREFERENCES STEP DEBUG:', {
+            sessionId,
+            partnerName,
+            userHasCompletedPrefs,
+            partnerHasCompletedPrefs,
+            aiAnalyzing,
+            venueRecommendationsLength: venueRecommendations.length
+          });
+          
+          // Show AI analysis in progress
+          if (userHasCompletedPrefs && partnerHasCompletedPrefs && aiAnalyzing) {
+            return (
+              <Card className="border-blue-200 bg-blue-50">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+                    <h3 className="text-lg font-semibold text-blue-800">AI Analysis in Progress</h3>
+                  </div>
+                  <p className="text-blue-700">
+                    Analyzing your compatibility and finding perfect venues...
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          }
+          
+          // Show analysis complete with action button
+          if (userHasCompletedPrefs && partnerHasCompletedPrefs && !aiAnalyzing && venueRecommendations.length > 0) {
+            return (
+              <Card className="border-green-200 bg-green-50">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <CheckCircle className="h-6 w-6 text-green-600" />
+                    <h3 className="text-lg font-semibold text-green-800">AI Analysis Complete!</h3>
+                  </div>
+                  <p className="text-green-700 mb-4">
+                    Found {venueRecommendations.length} perfect venues for you and {partnerName}
+                  </p>
+                  {compatibilityScore && (
+                    <p className="text-sm text-green-600 mb-4">
+                      Compatibility Score: {typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore}%
+                    </p>
+                  )}
+                  <Button 
+                    onClick={onDisplayVenues}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    size="lg"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Display Venues
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          }
+          
+          // Show waiting state for partner
+          if (userHasCompletedPrefs && !partnerHasCompletedPrefs) {
+            return (
+              <div className="space-y-4">
+                <CollaborativeWaitingState
+                  partnerName={partnerName}
+                  sessionId={sessionId}
+                  hasPartnerSetPreferences={partnerHasCompletedPrefs}
+                  isWaitingForPartner={true}
+                  hasCurrentUserSetPreferences={userHasCompletedPrefs}
+                  currentUserName={user?.name || 'You'}
+                />
+                
+                <Card className="border-blue-200 bg-blue-50">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <CheckCircle className="h-6 w-6 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-blue-800">Your Preferences Saved!</h3>
+                    </div>
+                    <p className="text-blue-700 mb-4">
+                      Your date preferences have been successfully saved. Waiting for {partnerName} to complete their preferences.
+                    </p>
+                    <div className="bg-white/60 rounded-lg p-3 border border-blue-200">
+                      <p className="text-sm text-blue-700">
+                        <strong>Next step:</strong> Our AI will analyze your compatibility and suggest perfect venues when both partners are ready.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          }
+          
+          return null;
+        })()
+      )}
+
+      {/* Solo mode AI analysis status */}
+      {planningMode !== 'collaborative' && aiAnalyzing && (
+        <Card className="border-blue-200 bg-blue-50 mt-6">
+          <CardContent className="p-6 text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+              <h3 className="text-lg font-semibold text-blue-800">AI Analysis in Progress</h3>
+            </div>
+            <p className="text-blue-700">
+              Analyzing your preferences and finding perfect venues...
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </SafeComponent>
   );
 };
