@@ -277,15 +277,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             />
           </ErrorBoundaryWrapper>
 
-          {/* AI Analysis Test Button for debugging */}
-          {process.env.NODE_ENV === 'development' && (
-            <ErrorBoundaryWrapper>
-              <AIAnalysisTestButton 
-                sessionId={collaborativeSession?.id || sessionId}
-                userLocation={userLocation}
-              />
-            </ErrorBoundaryWrapper>
-          )}
 
         {isDesktop ? (
           // Desktop Layout: Split screen for collaborative planning
@@ -567,6 +558,14 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
         {/* Invitation Testing Debug Panel */}
         <CollapsibleDebugSection title="Invitation Test" defaultOpen={false}>
           <InvitationTestButton />
+        </CollapsibleDebugSection>
+
+        {/* AI Analysis Test Debug Panel */}
+        <CollapsibleDebugSection title="AI Analysis Test" defaultOpen={false}>
+          <AIAnalysisTestButton 
+            sessionId={collaborativeSession?.id || sessionId}
+            userLocation={userLocation}
+          />
         </CollapsibleDebugSection>
 
         {/* Start from Scratch option */}
