@@ -55,6 +55,8 @@ export interface PreferencesStepProps {
     canShowResults: boolean;
   };
   onManualContinue?: () => void;
+  onDisplayVenues?: () => void;
+  venueRecommendations?: any[];
 }
 
 interface DatePreferences {
@@ -79,7 +81,9 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     initialProposedDate,
     planningMode = 'solo',
     collaborativeSession,
-    onManualContinue
+    onManualContinue,
+    onDisplayVenues,
+    venueRecommendations = []
   } = props;
 
   const { user } = useAuth();
@@ -821,6 +825,38 @@ useEffect(() => {
                       Analyzing your compatibility and finding the perfect venues...
                     </p>
                   </div>
+                </div>
+              );
+            }
+            
+            // Both preferences complete and AI analysis done - show "Display Venues" button if venues available
+            if (!aiAnalyzing && venueRecommendations.length > 0) {
+              return (
+                <div className="space-y-4">
+                  <Card className="border-green-200 bg-green-50">
+                    <CardContent className="p-6 text-center">
+                      <div className="flex items-center justify-center gap-3 mb-4">
+                        <CheckCircle className="h-6 w-6 text-green-600" />
+                        <h3 className="text-lg font-semibold text-green-800">AI Analysis Complete!</h3>
+                      </div>
+                      <p className="text-green-700 mb-4">
+                        Found {venueRecommendations.length} perfect venues for you and {partnerName}
+                      </p>
+                      {compatibilityScore && (
+                        <p className="text-sm text-green-600 mb-4">
+                          Compatibility Score: {typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore}%
+                        </p>
+                      )}
+                      <Button 
+                        onClick={onDisplayVenues}
+                        className="bg-primary text-primary-foreground hover:bg-primary/90"
+                        size="lg"
+                      >
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Display Venues
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </div>
               );
             }

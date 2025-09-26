@@ -146,11 +146,10 @@ export const useSmartDatePlannerState = ({
     }
   }, [venueRecommendations, selectedVenueId, currentStep, setCurrentStep]);
 
-  // Auto-navigate to Results page when venues are found
-  useEffect(() => {
-    if (venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && currentStep === 'set-preferences') {
-      // Store venues in app context for Results page
-      console.log('🎯 Auto-navigating to Results page with', venueRecommendations.length, 'venues');
+  // Manual navigation helper function for Display Venues button
+  const navigateToResults = useCallback(() => {
+    if (venueRecommendations && venueRecommendations.length > 0) {
+      console.log('🎯 Manually navigating to Results page with', venueRecommendations.length, 'venues');
       
       // Convert AI venue recommendations to app venues format
       const appVenues = venueRecommendations.map(rec => ({
@@ -165,21 +164,19 @@ export const useSmartDatePlannerState = ({
         tags: rec.match_factors?.vibe_matches || []
       }));
       
-      // Update app context and navigate to results
-      setTimeout(() => {
-        navigate('/results', { 
-          state: { 
-            fromSmartDatePlanning: true,
-            sessionId: collaborativeState.collaborativeSession?.id || sessionId,
-            partnerId: selectedPartnerId,
-            compatibilityScore: compatibilityScore,
-            venues: appVenues,
-            venueRecommendations: venueRecommendations
-          }
-        });
-      }, 500); // Small delay to ensure smooth transition
+      // Navigate to results
+      navigate('/results', { 
+        state: { 
+          fromSmartDatePlanning: true,
+          sessionId: collaborativeState.collaborativeSession?.id || sessionId,
+          partnerId: selectedPartnerId,
+          compatibilityScore: compatibilityScore,
+          venues: appVenues,
+          venueRecommendations: venueRecommendations
+        }
+      });
     }
-  }, [venueRecommendations, aiAnalyzing, currentStep, navigate, collaborativeState.collaborativeSession?.id, sessionId, selectedPartnerId, compatibilityScore]);
+  }, [venueRecommendations, navigate, collaborativeState.collaborativeSession?.id, sessionId, selectedPartnerId, compatibilityScore]);
 
   // Firefox-optimized location request to prevent flickering
   const handleLocationRequest = useCallback(async () => {
@@ -268,6 +265,8 @@ export const useSmartDatePlannerState = ({
     setSelectedPartnerIds,
     currentPreferences,
     setCurrentPreferences,
+    // Navigation helper for Display Venues button
+    navigateToResults,
     // Include collaborative session state
     ...collaborativeState
   };

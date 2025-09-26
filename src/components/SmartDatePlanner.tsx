@@ -314,22 +314,24 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
 
               <ErrorBoundaryWrapper>
                 {currentStep === 'set-preferences' && (
-                  <PreferencesStep
-                    sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
-                    partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
-                    partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
-                    compatibilityScore={compatibilityScore}
-                    aiAnalyzing={aiAnalyzing}
-                    onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
-                    initialProposedDate={proposalDateISO}
-                    planningMode={'collaborative'}
-                    collaborativeSession={collaborativeSession ? {
-                      hasUserSetPreferences,
-                      hasPartnerSetPreferences,
-                      canShowResults
-                    } : undefined}
-                    onManualContinue={handleManualContinue}
-                  />
+                <PreferencesStep
+                  sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
+                  partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
+                  partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
+                  compatibilityScore={compatibilityScore}
+                  aiAnalyzing={aiAnalyzing}
+                  onPreferencesComplete={(preferences) => handlePreferencesComplete(preferences, collaborativeSession?.id || sessionId)}
+                  initialProposedDate={proposalDateISO}
+                  planningMode={'collaborative'}
+                  collaborativeSession={collaborativeSession ? {
+                    hasUserSetPreferences,
+                    hasPartnerSetPreferences,
+                    canShowResults
+                  } : undefined}
+                  onManualContinue={handleManualContinue}
+                  onDisplayVenues={state.navigateToResults}
+                  venueRecommendations={venueRecommendations}
+                />
                 )}
               </ErrorBoundaryWrapper>
 
@@ -441,8 +443,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                     canShowResults
                   } : undefined}
                   onManualContinue={handleManualContinue}
+                  onDisplayVenues={state.navigateToResults}
+                  venueRecommendations={venueRecommendations}
                 />
-                
               </div>
             )}
 
