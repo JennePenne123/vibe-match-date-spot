@@ -9,9 +9,6 @@ import RecentReceivedInvitationsCard from '@/components/home/RecentReceivedInvit
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
-import { VenueMatchingDebug } from '@/components/debug/VenueMatchingDebug';
-import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
-import TestUserDebugPanel from '@/components/debug/TestUserDebugPanel';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
@@ -171,14 +168,6 @@ const HomeContent: React.FC = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Debug Tools - Collapsible section at bottom */}
-            <CollapsibleDebugSection title="Development Tools" defaultOpen={false}>
-              <div className="space-y-4">
-                <TestUserDebugPanel />
-                <VenueMatchingDebug />
-              </div>
-            </CollapsibleDebugSection>
           </div>
         ) : (
           // Mobile layout: Single column with optimized spacing
@@ -216,14 +205,6 @@ const HomeContent: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
-            
-            {/* Debug Tools - Collapsible section */}
-            <CollapsibleDebugSection title="Development Tools" defaultOpen={false}>
-              <div className="space-y-4">
-                <TestUserDebugPanel />
-                <VenueMatchingDebug />
-              </div>
-            </CollapsibleDebugSection>
           </div>
         )}
       </div>

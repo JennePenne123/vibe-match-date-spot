@@ -27,6 +27,7 @@ import AIRecommendations from "./pages/AIRecommendations";
 import SmartDatePlanning from "./pages/SmartDatePlanning";
 import AIVenueCardDemo from "./pages/AIVenueCardDemo";
 import PremiumDesignSystemDemo from "./pages/PremiumDesignSystemDemo";
+import Debug from "./pages/Debug";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -80,6 +81,9 @@ const App = () => (
                     <Route path="/invitations" element={<AppLayout><Invitations /></AppLayout>} />
                     <Route path="/ai-recommendations" element={<AppLayout><AIRecommendations /></AppLayout>} />
                     <Route path="/plan-date" element={<AppLayout><SmartDatePlanning /></AppLayout>} />
+                    
+                    {/* Debug route */}
+                    <Route path="/debug" element={<AppLayout><Debug /></AppLayout>} />
                     
                     {/* Demo routes without layout */}
                     <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
