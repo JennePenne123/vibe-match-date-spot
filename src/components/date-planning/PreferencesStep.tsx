@@ -443,7 +443,7 @@ useEffect(() => {
     selectedItems: string[], 
     setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>,
     category: keyof UserPreferences,
-    gridCols = "grid-cols-2"
+    gridCols = "grid-cols-1 sm:grid-cols-2"
   ) => {
     // Only show matches in collaborative mode when partner has set preferences
     const shouldShowMatches = planningMode === 'collaborative' && 
@@ -451,7 +451,7 @@ useEffect(() => {
     const sharedItems = shouldShowMatches ? getSharedPreferences(category) : [];
 
     return (
-      <div className={`grid ${gridCols} gap-3`}>
+      <div className={`grid ${gridCols} gap-3 md:gap-4`}>
         {items.map((item) => {
           const isSelected = selectedItems.includes(item.id);
           const isShared = sharedItems.includes(item.id);
@@ -460,24 +460,24 @@ useEffect(() => {
             <button
               key={item.id}
               onClick={() => toggleSelection(item.id, selectedItems, setSelectedItems)}
-              className={`p-4 rounded-xl border-2 transition-all relative ${
+              className={`p-3 md:p-4 rounded-xl border-2 transition-all relative min-h-[80px] ${
                 isSelected
                   ? 'bg-primary/10 border-primary text-primary'
                   : 'bg-card border-border text-foreground hover:bg-muted'
               }`}
             >
-              <div className="text-2xl mb-1">{item.emoji}</div>
-              <div className="font-medium text-sm">{item.name}</div>
+              <div className="text-xl md:text-2xl mb-1">{item.emoji}</div>
+              <div className="font-medium text-sm md:text-base">{item.name}</div>
               {item.desc && (
-                <div className={`text-xs mt-1 ${isSelected ? 'text-primary/70' : 'text-muted-foreground'}`}>
+                <div className={`text-xs mt-1 leading-tight ${isSelected ? 'text-primary/70' : 'text-muted-foreground'}`}>
                   {item.desc}
                 </div>
               )}
               {isSelected && (
-                <Check className="w-4 h-4 absolute top-2 right-2" />
+                <Check className="w-3 h-3 md:w-4 md:h-4 absolute top-2 right-2" />
               )}
               {isShared && (
-                <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full text-xs px-1">
+                <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full text-xs px-1.5 py-0.5">
                   Match!
                 </div>
               )}
@@ -491,21 +491,21 @@ useEffect(() => {
   const renderStep1 = () => (
     <>
       {/* Quick Start Section */}
-      <div className="mb-8">
-        <h2 className="text-lg font-bold mb-2">Quick Start</h2>
-        <p className="text-muted-foreground mb-4">Or choose a ready-made template</p>
-        <div className="grid grid-cols-1 gap-3">
+      <div className="mb-6 md:mb-8">
+        <h2 className="text-base md:text-lg font-bold mb-2">Quick Start</h2>
+        <p className="text-muted-foreground text-sm mb-3 md:mb-4">Or choose a ready-made template</p>
+        <div className="grid grid-cols-1 gap-2 md:gap-3">
           {quickStartTemplates.map((template) => (
             <button
               key={template.id}
               onClick={() => applyQuickStartTemplate(template)}
-              className="p-4 rounded-lg border border-border text-left transition-all hover:bg-muted hover:border-primary/20"
+              className="p-3 md:p-4 rounded-lg border border-border text-left transition-all hover:bg-muted hover:border-primary/20"
             >
               <div className="flex items-center gap-3">
-                <div className="text-2xl">{template.emoji}</div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sm">{template.title}</h3>
-                  <p className="text-xs text-muted-foreground">{template.description}</p>
+                <div className="text-xl md:text-2xl flex-shrink-0">{template.emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm md:text-base">{template.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground leading-tight">{template.description}</p>
                 </div>
               </div>
             </button>
@@ -514,43 +514,43 @@ useEffect(() => {
       </div>
 
       {/* Cuisine Selection */}
-      <div className="space-y-4">
+      <div className="space-y-4 md:space-y-6">
         <div>
-          <h2 className="text-lg font-bold mb-2">What type of food are you in the mood for?</h2>
-          <p className="text-muted-foreground mb-4">Select all cuisines that interest you</p>
-          {renderPreferenceGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines', 'grid-cols-2')}
+          <h2 className="text-base md:text-lg font-bold mb-2">What type of food are you in the mood for?</h2>
+          <p className="text-muted-foreground text-sm mb-3 md:mb-4">Select all cuisines that interest you</p>
+          {renderPreferenceGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines')}
         </div>
 
         {/* Vibe Selection */}
         <div>
-          <h2 className="text-lg font-bold mb-2">What's the vibe you're going for?</h2>
-          <p className="text-muted-foreground mb-4">Choose the atmosphere you want</p>
-          {renderPreferenceGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes', 'grid-cols-2')}
+          <h2 className="text-base md:text-lg font-bold mb-2">What's the vibe you're going for?</h2>
+          <p className="text-muted-foreground text-sm mb-3 md:mb-4">Choose the atmosphere you want</p>
+          {renderPreferenceGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
         </div>
       </div>
     </>
   );
 
   const renderStep2 = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Price Range */}
       <div>
-        <h2 className="text-lg font-bold mb-2">What's your budget?</h2>
-        <p className="text-muted-foreground mb-4">Choose your preferred price range</p>
-        {renderPreferenceGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range', 'grid-cols-2')}
+        <h2 className="text-base md:text-lg font-bold mb-2">What's your budget?</h2>
+        <p className="text-muted-foreground text-sm mb-3 md:mb-4">Choose your preferred price range</p>
+        {renderPreferenceGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range')}
       </div>
 
       {/* Time Preferences */}
       <div>
-        <h2 className="text-lg font-bold mb-2">When do you prefer to go out?</h2>
-        <p className="text-muted-foreground mb-4">Select your preferred times</p>
-        {renderPreferenceGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times', 'grid-cols-2')}
+        <h2 className="text-base md:text-lg font-bold mb-2">When do you prefer to go out?</h2>
+        <p className="text-muted-foreground text-sm mb-3 md:mb-4">Select your preferred times</p>
+        {renderPreferenceGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times', 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3')}
       </div>
 
       {/* Date & Time Selection */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold">When would you like to go?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-3 md:space-y-4">
+        <h2 className="text-base md:text-lg font-bold">When would you like to go?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           {/* Date Picker */}
           <div>
             <label className="text-sm font-medium mb-2 block">Preferred Date</label>
@@ -559,14 +559,16 @@ useEffect(() => {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal h-10 md:h-11",
                     !selectedDate && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "PPP") : 
-                   initialProposedDate ? format(new Date(initialProposedDate), "PPP") : 
-                   "Pick a date"}
+                  <span className="truncate">
+                    {selectedDate ? format(selectedDate, "PPP") : 
+                     initialProposedDate ? format(new Date(initialProposedDate), "PPP") : 
+                     "Pick a date"}
+                  </span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -576,6 +578,7 @@ useEffect(() => {
                   onSelect={setSelectedDate}
                   disabled={(date) => date < new Date()}
                   initialFocus
+                  className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
@@ -585,7 +588,7 @@ useEffect(() => {
           <div>
             <label className="text-sm font-medium mb-2 block">Preferred Time</label>
             <Select value={selectedTime} onValueChange={setSelectedTime}>
-              <SelectTrigger>
+              <SelectTrigger className="h-10 md:h-11">
                 <SelectValue placeholder={initialProposedDate ? format(new Date(initialProposedDate), "HH:mm") : "Select time"} />
               </SelectTrigger>
               <SelectContent>
@@ -802,26 +805,26 @@ useEffect(() => {
     <SafeComponent>
       {/* Main Preferences Setting Interface */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
+        <CardHeader className="px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
+          <div className="space-y-3 md:space-y-0 md:flex md:items-center md:justify-between">
+            <CardTitle className="flex flex-wrap items-center gap-2 text-lg md:text-xl">
               {getStepIcon()}
-              {getStepTitle()}
+              <span className="font-bold">{getStepTitle()}</span>
               {/* Status indicator for collaborative mode */}
               {planningMode === 'collaborative' && status.userCompleted && (
-                <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">
+                <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Saved
                 </Badge>
               )}
             </CardTitle>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <Badge variant="outline" className="text-xs">
                 Step {currentStep} of {totalSteps}
               </Badge>
               {/* Collaborative progress indicators */}
               {planningMode === 'collaborative' && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1" title="Progress status">
                   <div className={`w-2 h-2 rounded-full ${status.userCompleted ? 'bg-green-500' : 'bg-gray-300'}`} 
                        title="Your preferences" />
                   <div className={`w-2 h-2 rounded-full ${status.partnerCompleted ? 'bg-green-500' : 'bg-gray-300'}`} 
@@ -831,17 +834,18 @@ useEffect(() => {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="px-4 md:px-6 pb-4 md:pb-6 space-y-4 md:space-y-6">
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep2()}
           {currentStep === 3 && renderStep3()}
           {currentStep === 4 && renderStep4()}
 
-          <div className="flex justify-between pt-6">
+          <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
             <Button
               onClick={prevStep}
               variant="outline"
               disabled={currentStep === 1}
+              className="w-full sm:w-auto"
             >
               Previous
             </Button>
@@ -850,11 +854,16 @@ useEffect(() => {
               <Button 
                 onClick={nextStep}
                 disabled={currentStep === 2 && !canProceedFromStep2()}
+                className="w-full sm:w-auto"
               >
                 Next
               </Button>
             ) : (
-              <Button onClick={submitPreferences} disabled={loading}>
+              <Button 
+                onClick={submitPreferences} 
+                disabled={loading}
+                className="w-full sm:w-auto"
+              >
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
