@@ -89,6 +89,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [hasCompletedAllSteps, setHasCompletedAllSteps] = useState(false);
   const totalSteps = 4;
 
   // State for all preferences
@@ -375,6 +376,9 @@ useEffect(() => {
       };
 
       onPreferencesComplete(preferences);
+      
+      // Mark that user has completed all steps
+      setHasCompletedAllSteps(true);
     } catch (error) {
       console.error('Error saving preferences:', error);
       toast({
@@ -904,7 +908,7 @@ useEffect(() => {
           }
           
           // Show analysis complete with action button
-          if (userHasCompletedPrefs && partnerHasCompletedPrefs && !aiAnalyzing && venueRecommendations.length > 0) {
+          if (userHasCompletedPrefs && partnerHasCompletedPrefs && hasCompletedAllSteps && !aiAnalyzing && venueRecommendations.length > 0) {
             return (
               <Card className="border-green-200 bg-green-50">
                 <CardContent className="p-6 text-center">
@@ -934,7 +938,7 @@ useEffect(() => {
           }
           
           // Show waiting state for partner
-          if (userHasCompletedPrefs && !partnerHasCompletedPrefs) {
+          if (userHasCompletedPrefs && hasCompletedAllSteps && !partnerHasCompletedPrefs) {
             return (
               <div className="space-y-4">
                 <CollaborativeWaitingState
