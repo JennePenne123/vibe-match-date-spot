@@ -146,9 +146,40 @@ export const useSmartDatePlannerState = ({
     }
   }, [venueRecommendations, selectedVenueId, currentStep, setCurrentStep]);
 
-  // Remove automatic step advancement - let user manually proceed with "Continue" button
-
-  // Remove automatic step advancement for collaborative mode - user must manually proceed
+  // Auto-navigate to Results page when venues are found
+  useEffect(() => {
+    if (venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && currentStep === 'set-preferences') {
+      // Store venues in app context for Results page
+      console.log('🎯 Auto-navigating to Results page with', venueRecommendations.length, 'venues');
+      
+      // Convert AI venue recommendations to app venues format
+      const appVenues = venueRecommendations.map(rec => ({
+        id: rec.venue_id,
+        name: rec.venue_name,
+        address: rec.venue_address,
+        image_url: rec.venue_image,
+        rating: rec.match_factors?.rating || 4.5,
+        price_range: rec.match_factors?.price_range || '$$',
+        cuisine_type: 'unknown',
+        matchScore: Math.round(rec.ai_score * 100), // Convert to percentage
+        tags: rec.match_factors?.vibe_matches || []
+      }));
+      
+      // Update app context and navigate to results
+      setTimeout(() => {
+        navigate('/results', { 
+          state: { 
+            fromSmartDatePlanning: true,
+            sessionId: collaborativeState.collaborativeSession?.id || sessionId,
+            partnerId: selectedPartnerId,
+            compatibilityScore: compatibilityScore,
+            venues: appVenues,
+            venueRecommendations: venueRecommendations
+          }
+        });
+      }, 500); // Small delay to ensure smooth transition
+    }
+  }, [venueRecommendations, aiAnalyzing, currentStep, navigate, collaborativeState.collaborativeSession?.id, sessionId, selectedPartnerId, compatibilityScore]);
 
   // Firefox-optimized location request to prevent flickering
   const handleLocationRequest = useCallback(async () => {

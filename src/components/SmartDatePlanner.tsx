@@ -333,24 +333,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                 )}
               </ErrorBoundaryWrapper>
 
-              {/* Only show venues found card when both collaborative users are ready */}
-              {currentStep === 'set-preferences' && venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && canShowResults && (
-                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-yellow-800">🎉 Venues Found!</h3>
-                    <Button 
-                      onClick={() => setCurrentStep('review-matches')}
-                      size="sm"
-                      className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                    >
-                      View Results
-                    </Button>
-                  </div>
-                  <p className="text-sm text-yellow-700">
-                    AI analysis completed and found {venueRecommendations.length} venues. Click "View Results" to see your matches!
-                  </p>
-                </div>
-              )}
 
               {currentStep === 'review-matches' && selectedPartner && (
                 <MatchReview
@@ -461,24 +443,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   onManualContinue={handleManualContinue}
                 />
                 
-                {/* Only show venues found card when both collaborative users are ready */}
-                {venueRecommendations && venueRecommendations.length > 0 && !aiAnalyzing && canShowResults && (
-                  <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-yellow-800">🎉 Venues Found!</h3>
-                      <Button 
-                        onClick={() => setCurrentStep('review-matches')}
-                        size="sm"
-                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                      >
-                        View Results
-                      </Button>
-                    </div>
-                    <p className="text-sm text-yellow-700">
-                      AI analysis completed and found {venueRecommendations.length} venues. Click "View Results" to see your matches!
-                    </p>
-                  </div>
-                )}
               </div>
             )}
 
