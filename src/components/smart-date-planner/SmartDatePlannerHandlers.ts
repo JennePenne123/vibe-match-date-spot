@@ -13,7 +13,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     setDateMode,
     getActiveSession,
     createPlanningSession,
-    setAiAnalyzing,
     compatibilityScore,
     selectedPartner,
     selectedVenue,
@@ -165,8 +164,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         hasAnalyzeFunction: typeof state.analyzeCompatibilityAndVenues === 'function'
       });
       
-      setAiAnalyzing(true);
-      
       try {
         const analysisPromise = state.analyzeCompatibilityAndVenues(
           effectiveSessionId,
@@ -181,8 +178,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         
         console.log('✅ PREFERENCES COMPLETE - AI analysis completed successfully', analysisResult);
         console.log('✅ PREFERENCES COMPLETE - Venue recommendations available:', state.venueRecommendations?.length || 0);
-        
-        setAiAnalyzing(false);
         
         // Force step transition after AI analysis completes
         console.log('🎯 PREFERENCES COMPLETE - FORCING step transition to review-matches');
@@ -199,7 +194,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         }, 100);
       } catch (analysisError) {
         console.error('❌ PREFERENCES COMPLETE - AI analysis error:', analysisError);
-        setAiAnalyzing(false);
         toast({
           variant: 'destructive',
           title: 'AI Analysis Failed',
@@ -490,8 +484,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       return;
     }
 
-    setAiAnalyzing(true);
-    
     try {
       console.log('🚀 MANUAL TRIGGER - Starting AI analysis with session:', effectiveSessionId);
       
@@ -505,8 +497,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       console.log('✅ MANUAL TRIGGER - AI analysis completed successfully');
       console.log('✅ MANUAL TRIGGER - Venue recommendations:', state.venueRecommendations?.length || 0);
       
-      setAiAnalyzing(false);
-      
       // Ensure step transition happens
       console.log('🎯 MANUAL TRIGGER - FORCING step transition to review-matches');
       setCurrentStep('review-matches');
@@ -517,7 +507,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       });
     } catch (error) {
       console.error('❌ MANUAL TRIGGER - AI analysis error:', error);
-      setAiAnalyzing(false);
       toast({
         variant: 'destructive',
         title: 'Analysis Failed',
