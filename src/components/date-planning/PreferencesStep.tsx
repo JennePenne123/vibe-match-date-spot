@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -102,6 +102,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [partnerPreferences, setPartnerPreferences] = useState<UserPreferences | null>(null);
+  const [autoNavigating, setAutoNavigating] = useState(false);
+  const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
 
 // Prefill date & time from proposal when provided
 useEffect(() => {
@@ -114,6 +116,48 @@ useEffect(() => {
     }
   }
 }, [initialProposedDate]);
+
+// Auto-navigation effect for collaborative mode
+useEffect(() => {
+  if (planningMode === 'collaborative' && 
+      collaborativeSession && 
+      onDisplayVenues && 
+      !hasAutoNavigated && 
+      !autoNavigating) {
+    
+    const userHasCompletedPrefs = collaborativeSession.hasUserSetPreferences;
+    const partnerHasCompletedPrefs = collaborativeSession.hasPartnerSetPreferences;
+    
+    // Check if all conditions are met for auto-navigation
+    const shouldAutoNavigate = userHasCompletedPrefs && 
+                              partnerHasCompletedPrefs && 
+                              hasCompletedAllSteps && 
+                              !aiAnalyzing && 
+                              venueRecommendations.length > 0;
+    
+    if (shouldAutoNavigate) {
+      console.log('🚀 Auto-navigating to results...');
+      setAutoNavigating(true);
+      setHasAutoNavigated(true);
+      
+      // Brief delay to let users see the success message
+      const timer = setTimeout(() => {
+        onDisplayVenues();
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }
+}, [
+  planningMode, 
+  collaborativeSession, 
+  hasCompletedAllSteps, 
+  aiAnalyzing, 
+  venueRecommendations.length, 
+  onDisplayVenues, 
+  hasAutoNavigated, 
+  autoNavigating
+]);
 
 // Data definitions
   const cuisines: Preference[] = [
@@ -916,14 +960,20 @@ useEffect(() => {
             );
           }
           
-          // Show analysis complete with action button
+          // Show analysis complete with auto-navigation
           if (userHasCompletedPrefs && partnerHasCompletedPrefs && hasCompletedAllSteps && !aiAnalyzing && venueRecommendations.length > 0) {
             return (
               <Card className="border-green-200 bg-green-50">
                 <CardContent className="p-6 text-center">
                   <div className="flex items-center justify-center gap-3 mb-4">
-                    <CheckCircle className="h-6 w-6 text-green-600" />
-                    <h3 className="text-lg font-semibold text-green-800">AI Analysis Complete!</h3>
+                    {autoNavigating ? (
+                      <Loader2 className="h-6 w-6 text-green-600 animate-spin" />
+                    ) : (
+                      <CheckCircle className="h-6 w-6 text-green-600" />
+                    )}
+                    <h3 className="text-lg font-semibold text-green-800">
+                      {autoNavigating ? 'Redirecting to your matches...' : 'AI Analysis Complete!'}
+                    </h3>
                   </div>
                   <p className="text-green-700 mb-4">
                     Found {venueRecommendations.length} perfect venues for you and {partnerName}
@@ -933,14 +983,23 @@ useEffect(() => {
                       Compatibility Score: {typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore}%
                     </p>
                   )}
-                  <Button 
-                    onClick={onDisplayVenues}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                    size="lg"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Display Venues
-                  </Button>
+                  {!autoNavigating && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-green-600">
+                        Automatically showing your matches in a moment...
+                      </p>
+                      <Button 
+                        onClick={() => {
+                          setHasAutoNavigated(true);
+                          onDisplayVenues();
+                        }}
+                        variant="outline"
+                        size="sm"
+                      >
+                        View Now
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );
