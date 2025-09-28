@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,21 +12,38 @@ import { format } from 'date-fns';
 
 interface DateProposalsListProps {
   onProposalAccepted?: (sessionId: string) => void;
+  onInvitationSent?: () => void; // New callback for when an invitation is sent
 }
 
 const DateProposalsList: React.FC<DateProposalsListProps> = ({
-  onProposalAccepted
+  onProposalAccepted,
+  onInvitationSent
 }) => {
   const { user } = useAuth();
-  const { proposals, getMyProposals, acceptProposal, updateProposalStatus, cancelProposal, loading } = useDateProposals();
+  const { proposals, loading, getMyProposals, acceptProposal, cancelProposal } = useDateProposals();
   const { friends } = useFriends();
-  const { toast } = useToast();
   const { createPlanningSession } = useSessionManagement();
-  const [hiddenProposals, setHiddenProposals] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
+  const [hiddenProposals, setHiddenProposals] = useState(new Set<string>());
 
-  useEffect(() => {
+  // Refresh proposals function
+  const refreshProposals = useCallback(() => {
     getMyProposals();
-  }, []);
+  }, [getMyProposals]);
+
+  // Fetch proposals on component mount
+  useEffect(() => {
+    refreshProposals();
+  }, [refreshProposals]);
+
+  // Listen for invitation sent events to refresh proposals
+  useEffect(() => {
+    if (onInvitationSent) {
+      // Set up a timer to refresh proposals shortly after invitation is sent
+      const timeoutId = setTimeout(refreshProposals, 1000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [onInvitationSent, refreshProposals]);
 
   const getFriendName = (userId: string) => {
     const friend = friends.find(f => f.id === userId);
@@ -46,7 +63,7 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   };
 
   const handleDeclineProposal = async (proposalId: string) => {
-    const success = await updateProposalStatus(proposalId, 'declined');
+    const success = await cancelProposal(proposalId);
     if (success) {
       // Hide the proposal card immediately
       setHiddenProposals(prev => new Set([...prev, proposalId]));

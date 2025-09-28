@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useFriends } from '@/hooks/useFriends';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -25,6 +25,7 @@ const HomeContent: React.FC = () => {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
   const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
+  const [invitationSentTrigger, setInvitationSentTrigger] = useState(0);
   const handleCollaborativePlanning = () => {
     setShowPartnerSelection(true);
   };
@@ -52,6 +53,11 @@ const HomeContent: React.FC = () => {
       }
     });
   };
+
+  const handleInvitationSent = useCallback(() => {
+    // Trigger a refresh of proposals list by incrementing the trigger
+    setInvitationSentTrigger(prev => prev + 1);
+  }, []);
   const handleBackToModeSelection = () => {
     setShowPartnerSelection(false);
     setShowProposalCreation(false);
@@ -72,13 +78,19 @@ const HomeContent: React.FC = () => {
         description,
         duration
       });
+      
+      // If returning from successful invitation, trigger proposal refresh
+      if (title?.includes('Invitation') || title?.includes('sent')) {
+        handleInvitationSent();
+      }
+      
       // Clear the state to prevent showing the toast again
       navigate('/home', {
         replace: true,
         state: {}
       });
     }
-  }, [location.state, toast, navigate]);
+  }, [location.state, toast, navigate, handleInvitationSent]);
 
   // Show proposal creation flow
   if (showProposalCreation && selectedPartnerId) {
@@ -130,7 +142,11 @@ const HomeContent: React.FC = () => {
             <div className="grid grid-cols-5 gap-4 lg:gap-5">
               {/* Date Proposals Section - 2 columns */}
               <div className="col-span-2">
-                <DateProposalsList onProposalAccepted={handleProposalAccepted} />
+                <DateProposalsList 
+                  onProposalAccepted={handleProposalAccepted}
+                  onInvitationSent={handleInvitationSent}
+                  key={invitationSentTrigger} // Force re-render when invitation is sent
+                />
               </div>
               
               {/* Recent Invitations - 2 columns */}
@@ -173,7 +189,11 @@ const HomeContent: React.FC = () => {
           // Mobile layout: Single column with optimized spacing
           <div className="space-y-5">
             {/* Date Proposals Section */}
-            <DateProposalsList onProposalAccepted={handleProposalAccepted} />
+            <DateProposalsList 
+              onProposalAccepted={handleProposalAccepted}
+              onInvitationSent={handleInvitationSent}
+              key={invitationSentTrigger} // Force re-render when invitation is sent
+            />
             
             {/* Recent Invitations */}
             <RecentReceivedInvitationsCard />

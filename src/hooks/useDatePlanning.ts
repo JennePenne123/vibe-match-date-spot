@@ -470,19 +470,50 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
 
       console.log('💾 COMPLETE PLANNING SESSION - Invitation created successfully:', insertedInvitation);
 
-      // Mark related proposal as converted (if exists)
+      // Mark related proposal as converted (if exists) - Enhanced logic
       try {
-        const { error: proposalUpdateError } = await supabase
+        // First, try to update by planning_session_id
+        let proposalUpdated = false;
+        
+        const { data: sessionProposals, error: sessionUpdateError } = await supabase
           .from('date_proposals')
           .update({ status: 'converted' })
-          .eq('planning_session_id', sessionId);
+          .eq('planning_session_id', sessionId)
+          .select();
         
-        if (proposalUpdateError) {
-          console.error('💾 COMPLETE PLANNING SESSION - Warning: Failed to update proposal status:', proposalUpdateError);
-          // Don't fail the entire operation if proposal update fails
-        } else {
-          console.log('💾 COMPLETE PLANNING SESSION - Successfully marked proposal as converted');
+        if (sessionUpdateError) {
+          console.error('💾 COMPLETE PLANNING SESSION - Session ID update error:', sessionUpdateError);
+        } else if (sessionProposals && sessionProposals.length > 0) {
+          console.log('💾 COMPLETE PLANNING SESSION - Successfully marked proposal as converted via session ID:', sessionProposals.length);
+          proposalUpdated = true;
         }
+
+        // If no proposal was found by session ID, try to find and update by participants
+        if (!proposalUpdated) {
+          console.log('💾 COMPLETE PLANNING SESSION - No proposal found by session ID, trying participant match...');
+          
+          const { data: participantProposals, error: participantUpdateError } = await supabase
+            .from('date_proposals')
+            .update({ 
+              status: 'converted',
+              planning_session_id: sessionId // Also link it for future reference
+            })
+            .eq('status', 'accepted')
+            .or(`and(proposer_id.eq.${sessionData.initiator_id},recipient_id.eq.${sessionData.partner_id}),and(proposer_id.eq.${sessionData.partner_id},recipient_id.eq.${sessionData.initiator_id})`)
+            .select();
+          
+          if (participantUpdateError) {
+            console.error('💾 COMPLETE PLANNING SESSION - Participant update error:', participantUpdateError);
+          } else if (participantProposals && participantProposals.length > 0) {
+            console.log('💾 COMPLETE PLANNING SESSION - Successfully marked proposal as converted via participants:', participantProposals.length);
+            proposalUpdated = true;
+          }
+        }
+
+        if (!proposalUpdated) {
+          console.log('💾 COMPLETE PLANNING SESSION - No matching proposal found to convert');
+        }
+        
       } catch (error) {
         console.error('💾 COMPLETE PLANNING SESSION - Warning: Error updating proposal status:', error);
         // Don't fail the entire operation if proposal update fails
