@@ -85,7 +85,17 @@ export const useDateProposals = () => {
   };
 
   const getMyProposals = async (): Promise<DateProposal[]> => {
-    if (!user) return [];
+    if (!user?.id) {
+      console.log('No authenticated user, skipping proposals fetch');
+      setLoading(false);
+      return [];
+    }
+
+    // Prevent multiple concurrent calls
+    if (loading) {
+      console.log('Already loading proposals, skipping duplicate request');
+      return proposals;
+    }
 
     setLoading(true);
     try {
@@ -100,7 +110,11 @@ export const useDateProposals = () => {
       setProposals(proposalsData);
       return proposalsData;
     } catch (error) {
-      handleError(error);
+      console.error('Error fetching proposals:', error);
+      handleError(error, {
+        toastTitle: 'Failed to load proposals',
+        toastDescription: 'Please try refreshing the page'
+      });
       return [];
     } finally {
       setLoading(false);

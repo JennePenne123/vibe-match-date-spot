@@ -26,24 +26,35 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   const { toast } = useToast();
   const [hiddenProposals, setHiddenProposals] = useState(new Set<string>());
 
-  // Refresh proposals function
-  const refreshProposals = useCallback(() => {
-    getMyProposals();
-  }, [getMyProposals]);
+  // Refresh proposals function with error handling
+  const refreshProposals = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      await getMyProposals();
+    } catch (error) {
+      console.error('Failed to refresh proposals:', error);
+    }
+  }, [getMyProposals, user?.id]);
 
-  // Fetch proposals on component mount
+  // Fetch proposals on component mount - only once when user is available
   useEffect(() => {
-    refreshProposals();
-  }, [refreshProposals]);
+    if (user?.id) {
+      refreshProposals();
+    }
+  }, [user?.id]); // Only depend on user.id, not the refresh function
 
   // Listen for invitation sent events to refresh proposals
   useEffect(() => {
     if (onInvitationSent) {
       // Set up a timer to refresh proposals shortly after invitation is sent
-      const timeoutId = setTimeout(refreshProposals, 1000);
+      const timeoutId = setTimeout(() => {
+        if (user?.id) {
+          refreshProposals();
+        }
+      }, 1000);
       return () => clearTimeout(timeoutId);
     }
-  }, [onInvitationSent, refreshProposals]);
+  }, [onInvitationSent, user?.id]); // Remove refreshProposals from dependencies
 
   const getFriendName = (userId: string) => {
     const friend = friends.find(f => f.id === userId);
