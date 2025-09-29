@@ -15,6 +15,7 @@ import MatchReview from '@/components/date-planning/MatchReview';
 import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
 import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
+import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
 import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
 import InvitationTestButton from '@/components/debug/InvitationTestButton';
 
@@ -532,6 +533,15 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
           <AIAnalysisTestButton 
             sessionId={collaborativeSession?.id || sessionId}
             userLocation={userLocation}
+          />
+        </CollapsibleDebugSection>
+
+        {/* Compatibility Debug Panel */}
+        <CollapsibleDebugSection title="Compatibility Debug Info" defaultOpen={false}>
+          <CompatibilityDebug 
+            compatibilityScore={compatibilityScore}
+            partnerId={selectedPartnerId}
+            userId={user?.id}
           />
         </CollapsibleDebugSection>
 

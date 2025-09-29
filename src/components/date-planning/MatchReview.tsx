@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, ArrowRight, CheckCircle } from 'lucide-react';
 import { CompatibilityScore as CompatibilityScoreType } from '@/services/aiMatchingService';
 import AIMatchSummary from '@/components/AIMatchSummary';
-import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
 import CollaborativeWaitingState from '@/components/date-planning/CollaborativeWaitingState';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -111,12 +110,6 @@ const MatchReview: React.FC<MatchReviewProps> = ({
 
   return (
     <div className="space-y-6">
-      <CompatibilityDebug 
-        compatibilityScore={compatibilityScore}
-        partnerId={partnerId}
-        userId={user?.id}
-      />
-      
       {/* Single consolidated analysis card */}
       {(typeof compatibilityScore === 'object' && compatibilityScore !== null) || typeof compatibilityScore === 'number' ? (
         <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
