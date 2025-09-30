@@ -65,67 +65,32 @@ export const calculateCompatibilityScore = async (
       return null;
     }
 
-    console.log('✅ COMPATIBILITY: Found preferences for both users, calculating scores...');
+    console.log('✅ COMPATIBILITY: Found preferences for both users, calling AI analysis...');
 
-    // Calculate compatibility scores for each dimension
-    const cuisineScore = calculateArrayCompatibility(
-      user1Prefs.preferred_cuisines || [],
-      user2Prefs.preferred_cuisines || []
-    );
-
-    const vibeScore = calculateArrayCompatibility(
-      user1Prefs.preferred_vibes || [],
-      user2Prefs.preferred_vibes || []
-    );
-
-    const priceScore = calculateArrayCompatibility(
-      user1Prefs.preferred_price_range || [],
-      user2Prefs.preferred_price_range || []
-    );
-
-    const timingScore = calculateArrayCompatibility(
-      user1Prefs.preferred_times || [],
-      user2Prefs.preferred_times || []
-    );
-
-    // Activity score based on dietary restrictions compatibility
-    const activityScore = calculateDietaryCompatibility(
-      user1Prefs.dietary_restrictions || [],
-      user2Prefs.dietary_restrictions || []
-    );
-
-    console.log('📊 COMPATIBILITY: Individual scores calculated:', {
-      cuisine: Math.round(cuisineScore * 100),
-      vibe: Math.round(vibeScore * 100),
-      price: Math.round(priceScore * 100),
-      timing: Math.round(timingScore * 100),
-      activity: Math.round(activityScore * 100)
+    // Call AI edge function for intelligent compatibility analysis
+    const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-compatibility', {
+      body: {
+        user1Preferences: user1Prefs,
+        user2Preferences: user2Prefs
+      }
     });
 
-    // Calculate weighted overall score
-    const overallScore = (
-      cuisineScore * 0.3 +
-      vibeScore * 0.25 +
-      priceScore * 0.2 +
-      timingScore * 0.15 +
-      activityScore * 0.1
-    );
+    if (aiError) {
+      console.error('🚨 COMPATIBILITY: AI analysis error:', aiError);
+      // Fallback to rule-based calculation if AI fails
+      return calculateCompatibilityFallback(user1Prefs, user2Prefs);
+    }
 
-    console.log('🎯 COMPATIBILITY: Overall score calculated:', Math.round(overallScore * 100));
+    console.log('🤖 COMPATIBILITY: AI analysis complete:', aiResult);
 
     const compatibilityData: CompatibilityScore = {
-      overall_score: Math.round(overallScore * 100) / 100,
-      cuisine_score: Math.round(cuisineScore * 100) / 100,
-      vibe_score: Math.round(vibeScore * 100) / 100,
-      price_score: Math.round(priceScore * 100) / 100,
-      timing_score: Math.round(timingScore * 100) / 100,
-      activity_score: Math.round(activityScore * 100) / 100,
-      compatibility_factors: {
-        shared_cuisines: getSharedItems(user1Prefs.preferred_cuisines || [], user2Prefs.preferred_cuisines || []),
-        shared_vibes: getSharedItems(user1Prefs.preferred_vibes || [], user2Prefs.preferred_vibes || []),
-        shared_price_ranges: getSharedItems(user1Prefs.preferred_price_range || [], user2Prefs.preferred_price_range || []),
-        shared_times: getSharedItems(user1Prefs.preferred_times || [], user2Prefs.preferred_times || [])
-      }
+      overall_score: aiResult.overall_score,
+      cuisine_score: aiResult.cuisine_score,
+      vibe_score: aiResult.vibe_score,
+      price_score: aiResult.price_score,
+      timing_score: aiResult.timing_score,
+      activity_score: aiResult.activity_score,
+      compatibility_factors: aiResult.compatibility_factors
     };
 
     console.log('💾 COMPATIBILITY: Storing compatibility data:', compatibilityData);
@@ -153,6 +118,60 @@ export const calculateCompatibilityScore = async (
     console.error('Error calculating compatibility:', error);
     return null;
   }
+};
+
+// Fallback function for rule-based calculation when AI is unavailable
+const calculateCompatibilityFallback = (user1Prefs: any, user2Prefs: any): CompatibilityScore => {
+  console.log('🔄 COMPATIBILITY: Using fallback rule-based calculation');
+
+  const cuisineScore = calculateArrayCompatibility(
+    user1Prefs.preferred_cuisines || [],
+    user2Prefs.preferred_cuisines || []
+  );
+
+  const vibeScore = calculateArrayCompatibility(
+    user1Prefs.preferred_vibes || [],
+    user2Prefs.preferred_vibes || []
+  );
+
+  const priceScore = calculateArrayCompatibility(
+    user1Prefs.preferred_price_range || [],
+    user2Prefs.preferred_price_range || []
+  );
+
+  const timingScore = calculateArrayCompatibility(
+    user1Prefs.preferred_times || [],
+    user2Prefs.preferred_times || []
+  );
+
+  const activityScore = calculateDietaryCompatibility(
+    user1Prefs.dietary_restrictions || [],
+    user2Prefs.dietary_restrictions || []
+  );
+
+  const overallScore = (
+    cuisineScore * 0.3 +
+    vibeScore * 0.25 +
+    priceScore * 0.2 +
+    timingScore * 0.15 +
+    activityScore * 0.1
+  );
+
+  return {
+    overall_score: Math.round(overallScore * 100) / 100,
+    cuisine_score: Math.round(cuisineScore * 100) / 100,
+    vibe_score: Math.round(vibeScore * 100) / 100,
+    price_score: Math.round(priceScore * 100) / 100,
+    timing_score: Math.round(timingScore * 100) / 100,
+    activity_score: Math.round(activityScore * 100) / 100,
+    compatibility_factors: {
+      shared_cuisines: getSharedItems(user1Prefs.preferred_cuisines || [], user2Prefs.preferred_cuisines || []),
+      shared_vibes: getSharedItems(user1Prefs.preferred_vibes || [], user2Prefs.preferred_vibes || []),
+      shared_price_ranges: getSharedItems(user1Prefs.preferred_price_range || [], user2Prefs.preferred_price_range || []),
+      shared_times: getSharedItems(user1Prefs.preferred_times || [], user2Prefs.preferred_times || []),
+      reasoning: 'Fallback rule-based calculation'
+    }
+  };
 };
 
 const calculateArrayCompatibility = (arr1: string[], arr2: string[]): number => {

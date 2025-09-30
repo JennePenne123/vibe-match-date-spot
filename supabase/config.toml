@@ -1,1 +1,13 @@
 project_id = "dfjwubatslzblagthbdw"
+
+[functions.analyze-compatibility]
+verify_jwt = true
+
+[functions.ai-venue-recommendations]
+verify_jwt = true
+
+[functions.generate-invitation-message]
+verify_jwt = true
+
+[functions.suggest-date-ideas]
+verify_jwt = true
