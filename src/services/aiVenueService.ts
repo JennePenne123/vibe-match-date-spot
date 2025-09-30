@@ -89,9 +89,25 @@ export const getAIVenueRecommendations = async (
 
     const recommendations: AIVenueRecommendation[] = [];
 
+    // Get user preferences for AI analysis
+    const { data: userPrefs } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    // Get partner preferences if available
+    let partnerPrefs = null;
+    if (partnerId) {
+      const { data: partnerPreferences } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', partnerId)
+        .single();
+      partnerPrefs = partnerPreferences;
+    }
+
     for (const venue of venues) {
-      const aiScore = Math.floor(Math.random() * 40) + 60; // Mock scoring
-      
       // Handle venue ID from different sources (Google Places vs database)
       const venueId = venue.placeId || venue.place_id || venue.id || venue.google_place_id;
       
@@ -102,20 +118,55 @@ export const getAIVenueRecommendations = async (
       
       console.log('🆔 VENUE SERVICE: Processing venue:', venue.name, 'with ID:', venueId);
       
-      const recommendation: AIVenueRecommendation = {
-        venue_id: venueId,
-        venue_name: venue.name,
-        venue_address: venue.address,
-        venue_image: venue.image_url || venue.photos?.[0]?.url,
-        venue_photos: venue.photos || [],
-        ai_score: aiScore,
-        match_factors: {},
-        contextual_score: aiScore * 0.8,
-        ai_reasoning: generateAIReasoning(venue, {}, aiScore),
-        confidence_level: aiScore > 80 ? 0.9 : 0.7
-      };
+      try {
+        // Call AI edge function for intelligent venue analysis
+        const { data: aiAnalysis, error: aiError } = await supabase.functions.invoke('ai-venue-recommendations', {
+          body: {
+            venue,
+            userPreferences: userPrefs,
+            partnerPreferences: partnerPrefs
+          }
+        });
 
-      recommendations.push(recommendation);
+        if (aiError) {
+          console.warn('⚠️ VENUE SERVICE: AI analysis failed for', venue.name, '- using fallback');
+          // Fallback to mock scoring
+          const aiScore = Math.floor(Math.random() * 40) + 60;
+          recommendations.push({
+            venue_id: venueId,
+            venue_name: venue.name,
+            venue_address: venue.address,
+            venue_image: venue.image_url || venue.photos?.[0]?.url,
+            venue_photos: venue.photos || [],
+            ai_score: aiScore,
+            match_factors: {},
+            contextual_score: aiScore * 0.8,
+            ai_reasoning: generateAIReasoning(venue, {}, aiScore),
+            confidence_level: aiScore > 80 ? 0.9 : 0.7
+          });
+          continue;
+        }
+
+        console.log('🤖 VENUE SERVICE: AI analysis complete for', venue.name, 'Score:', aiAnalysis.ai_score);
+
+        const recommendation: AIVenueRecommendation = {
+          venue_id: venueId,
+          venue_name: venue.name,
+          venue_address: venue.address,
+          venue_image: venue.image_url || venue.photos?.[0]?.url,
+          venue_photos: venue.photos || [],
+          ai_score: aiAnalysis.ai_score,
+          match_factors: aiAnalysis.match_factors,
+          contextual_score: aiAnalysis.ai_score * 0.8,
+          ai_reasoning: aiAnalysis.ai_reasoning,
+          confidence_level: aiAnalysis.confidence_level
+        };
+
+        recommendations.push(recommendation);
+      } catch (error) {
+        console.error('❌ VENUE SERVICE: Error analyzing venue', venue.name, error);
+        // Continue with next venue
+      }
     }
     
     console.log('✅ VENUE SERVICE: Created', recommendations.length, 'valid recommendations');

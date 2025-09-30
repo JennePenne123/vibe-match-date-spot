@@ -234,7 +234,7 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         aiReasoning: selectedVenue?.ai_reasoning?.substring(0, 50) + '...'
       });
       
-      console.log('💾 COMPLETE PLANNING SESSION - Step 3: Creating invitation in database...');
+      console.log('💾 COMPLETE PLANNING SESSION - Step 3: Preparing invitation data...');
       
       // Combine selected date and time if available
       let proposedDateTime = null;
@@ -245,6 +245,55 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
       } else if (preferences?.preferred_date) {
         proposedDateTime = preferences.preferred_date;
       }
+      
+      console.log('💾 COMPLETE PLANNING SESSION - Step 4: Generating AI invitation message...');
+      
+      // Generate AI-powered invitation message
+      let finalMessage = message;
+      if (selectedVenue && sessionData.partner_id) {
+        try {
+          // Get partner name
+          const { data: partnerProfile } = await supabase
+            .from('profiles')
+            .select('name')
+            .eq('id', sessionData.partner_id === user.id ? sessionData.initiator_id : sessionData.partner_id)
+            .single();
+          
+          const { data: senderProfile } = await supabase
+            .from('profiles')
+            .select('name')
+            .eq('id', user.id)
+            .single();
+          
+          console.log('🤖 AI MESSAGE: Generating personalized invitation...');
+          
+          const { data: aiMessage, error: messageError } = await supabase.functions.invoke('generate-invitation-message', {
+            body: {
+              senderName: senderProfile?.name || 'Your friend',
+              recipientName: partnerProfile?.name || 'Friend',
+              venue: {
+                name: selectedVenue.venue_name || selectedVenue.name,
+                cuisine_type: selectedVenue.cuisine_type,
+                tags: selectedVenue.tags
+              },
+              compatibilityScore: typeof compatibilityScore === 'object' ? compatibilityScore?.overall_score : compatibilityScore,
+              proposedDate: proposedDateTime
+            }
+          });
+          
+          if (!messageError && aiMessage?.message) {
+            finalMessage = aiMessage.message;
+            console.log('✅ AI MESSAGE: Generated personalized message');
+          } else {
+            console.warn('⚠️ AI MESSAGE: Using user-provided message as fallback');
+          }
+        } catch (error) {
+          console.error('❌ AI MESSAGE: Error generating message:', error);
+          // Continue with user-provided message
+        }
+      }
+      
+      console.log('💾 COMPLETE PLANNING SESSION - Step 5: Creating invitation in database...');
       
       // Enhanced venue resolution and saving
       let finalVenueId = venueId;
@@ -403,7 +452,8 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
         recipient_id: recipientId,
         venue_id: finalVenueId,
         title: 'AI-Matched Date Invitation',
-        message: message,
+        message: finalMessage, // Use AI-generated message
+        ai_generated_message: finalMessage, // Store AI-generated message separately
         proposed_date: proposedDateTime?.toISOString(),
         planning_session_id: sessionId,
         ai_compatibility_score: finalCompatibilityScore || 0,
