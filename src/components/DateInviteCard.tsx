@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin, Check, X, DollarSign, Calendar, Info, User, Heart, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { DateInvitation } from '@/types/index';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
+import { useBreakpoint } from '@/hooks/use-mobile';
 interface DateInviteCardProps {
   invitation: DateInvitation;
   direction: 'received' | 'sent';
@@ -20,6 +21,7 @@ const DateInviteCard = ({
   onDecline
 }: DateInviteCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { isMobile } = useBreakpoint();
 
   // Status configuration
   const getStatusConfig = (status: string) => {
@@ -135,72 +137,83 @@ const DateInviteCard = ({
           </div>
 
           <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              {/* Enhanced Avatar */}
-              <div className="relative flex-shrink-0">
-                <Avatar className="w-12 h-12 border-2 border-background shadow-lg ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-primary/40">
-                  <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/30 text-primary font-bold text-sm">
-                    {displayData.friendName.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                {direction === 'received' && <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center border-2 border-background">
-                    <Heart className="w-2.5 h-2.5 text-primary-foreground fill-current" />
-                  </div>}
-              </div>
-              
-              <div className="flex-1 min-w-0 space-y-2">
-                {/* Header */}
-                <div>
-                  <div className="text-sm sm:text-xs text-muted-foreground mb-0.5 truncate sm:truncate-none">
-                    {direction === 'received' ? 'From: ' : 'To: '}{displayData.friendName}
-                  </div>
+            <div className="flex flex-col gap-3">
+              {/* Header with Avatar and Friend Info */}
+              <div className="flex items-start gap-3">
+                <div className="relative flex-shrink-0">
+                  <Avatar className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} border-2 border-background shadow-lg ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-primary/40`}>
+                    <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/30 text-primary font-bold text-sm">
+                      {displayData.friendName.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  {direction === 'received' && <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center border-2 border-background">
+                      <Heart className="w-2.5 h-2.5 text-primary-foreground fill-current" />
+                    </div>}
                 </div>
                 
-                {/* Venue and Time Info */}
-                <div className="space-y-1.5">
-                  <div className="flex items-start gap-2">
-                    <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground mt-0.5" />
-                    <span className={`font-medium text-sm leading-tight truncate sm:truncate-none ${statusConfig.textColor}`}>
-                      {displayData.location}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
-                    <span className="text-sm sm:text-xs text-muted-foreground truncate sm:truncate-none">
-                      {displayData.timeProposed !== 'Time TBD' ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }) : 'Time TBD'}
-                    </span>
+                <div className="flex-1 min-w-0">
+                  <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground mb-1`}>
+                    {direction === 'received' ? 'From: ' : 'To: '}
+                    <span className="font-medium">{displayData.friendName}</span>
                   </div>
                 </div>
 
-{/* Quick Actions for pending invitations */}
-                {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex justify-center gap-2 pt-3 pr-1">
-                    <Button size="sm" onClick={e => {
-                  e.stopPropagation();
-                  onAccept(invitation.id);
-                }} className="[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white flex-1 border-0 text-sm sm:text-xs h-9 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-[28px]">
-                      <Check className="w-4 h-4 sm:w-3 sm:h-3 mr-1.5 sm:mr-1" />
-                      Accept
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={e => {
-                  e.stopPropagation();
-                  onDecline(invitation.id);
-                }} className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-3 sm:px-2 text-sm sm:text-xs h-9 sm:h-7 w-auto sm:w-8 flex-shrink-0 min-h-[44px] sm:min-h-[28px]">
-                      <X className="w-4 h-4 sm:w-3 sm:h-3" />
-                      <span className="sm:hidden ml-1.5">Decline</span>
-                    </Button>
-                  </div>}
+                {/* Venue Image */}
+                <div className={`${isMobile ? 'w-16 h-16' : 'w-20 h-20'} rounded-lg overflow-hidden border-2 border-border shadow-md flex-shrink-0 bg-muted transition-all duration-300 group-hover:shadow-lg group-hover:scale-105`}>
+                  <img src={displayData.venueImage.includes('undefined') ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80' : displayData.venueImage} alt={displayData.venueName} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                </div>
+              </div>
+              
+              {/* Venue and Time Info */}
+              <div className="space-y-1.5 pl-1">
+                <div className="flex items-start gap-2">
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground mt-0.5" />
+                  <span className={`font-medium ${isMobile ? 'text-sm' : 'text-base'} leading-tight break-words ${statusConfig.textColor}`}>
+                    {displayData.location}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
+                  <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+                    {displayData.timeProposed !== 'Time TBD' ? new Date(displayData.timeProposed).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : 'Time TBD'}
+                  </span>
+                </div>
               </div>
 
-              {/* Enhanced Venue Image */}
-              <div className="w-20 h-20 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 border-border shadow-md flex-shrink-0 bg-muted transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
-                <img src={displayData.venueImage.includes('undefined') ? 'https://images.unsplash.com/photo-1497604401993-f2e922e5cb0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80' : displayData.venueImage} alt={displayData.venueName} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
-              </div>
+              {/* Quick Actions for pending invitations */}
+              {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && (
+                <div className={`flex gap-2 pt-2 ${isMobile ? 'flex-col' : 'flex-row'}`}>
+                  <Button 
+                    size={isMobile ? "default" : "sm"}
+                    onClick={e => {
+                      e.stopPropagation();
+                      onAccept(invitation.id);
+                    }} 
+                    className={`[background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white border-0 ${isMobile ? 'w-full min-h-[44px] text-base' : 'flex-1 h-9 text-sm'}`}
+                  >
+                    <Check className={`${isMobile ? 'w-4 h-4 mr-2' : 'w-3.5 h-3.5 mr-1.5'}`} />
+                    Accept
+                  </Button>
+                  <Button 
+                    size={isMobile ? "default" : "sm"}
+                    variant="outline" 
+                    onClick={e => {
+                      e.stopPropagation();
+                      onDecline(invitation.id);
+                    }} 
+                    className={`border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 ${isMobile ? 'w-full min-h-[44px] text-base' : 'flex-1 h-9 text-sm'}`}
+                  >
+                    <X className={`${isMobile ? 'w-4 h-4 mr-2' : 'w-3.5 h-3.5 mr-1.5'}`} />
+                    Decline
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

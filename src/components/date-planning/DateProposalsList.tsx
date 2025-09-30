@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useSessionManagement } from '@/hooks/useSessionManagement';
 import { format } from 'date-fns';
+import { useBreakpoint } from '@/hooks/use-mobile';
 
 interface DateProposalsListProps {
   onProposalAccepted?: (sessionId: string) => void;
@@ -25,6 +26,7 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   const { createPlanningSession } = useSessionManagement();
   const { toast } = useToast();
   const [hiddenProposals, setHiddenProposals] = useState(new Set<string>());
+  const { isMobile } = useBreakpoint();
 
   // Refresh proposals function with error handling
   const refreshProposals = useCallback(async () => {
@@ -146,45 +148,49 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 pt-0">
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
-                      {proposal.proposer_id === user?.id 
-                        ? `To: ${getFriendName(proposal.recipient_id)}`
-                        : `From: ${getFriendName(proposal.proposer_id)}`
-                      }
+                  <div className={`${isMobile ? 'flex-col space-y-2' : 'flex items-center gap-4'} text-sm text-muted-foreground`}>
+                    <div className="flex items-center gap-1.5">
+                      <User className="h-4 w-4 flex-shrink-0" />
+                      <span className="break-words">
+                        {proposal.proposer_id === user?.id 
+                          ? `To: ${getFriendName(proposal.recipient_id)}`
+                          : `From: ${getFriendName(proposal.proposer_id)}`
+                        }
+                      </span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {format(new Date(proposal.proposed_date), 'MMM dd, yyyy')}
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-4 w-4 flex-shrink-0" />
+                      <span>{format(new Date(proposal.proposed_date), 'MMM dd, yyyy')}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {format(new Date(proposal.proposed_date), 'HH:mm')}
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="h-4 w-4 flex-shrink-0" />
+                      <span>{format(new Date(proposal.proposed_date), 'HH:mm')}</span>
                     </div>
                   </div>
 
                   {proposal.message && (
-                    <p className="text-sm text-muted-foreground italic">
+                    <p className="text-sm text-muted-foreground italic break-words">
                       "{proposal.message}"
                     </p>
                   )}
 
                   {proposal.recipient_id === user?.id && (
-                    <div className="flex gap-2 pt-2">
+                    <div className={`${isMobile ? 'flex-col space-y-2' : 'flex gap-2'} pt-2`}>
                       <Button
                         onClick={() => handleAcceptProposal(proposal)}
                         disabled={loading}
-                        className="flex-1"
+                        className={`${isMobile ? 'w-full min-h-[44px]' : 'flex-1'}`}
+                        size={isMobile ? "default" : "sm"}
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
-                        Accept & Start Planning
+                        {isMobile ? 'Accept' : 'Accept & Start Planning'}
                       </Button>
                       <Button
                         onClick={() => handleDeclineProposal(proposal.id)}
                         disabled={loading}
                         variant="outline"
-                        className="flex-1"
+                        className={`${isMobile ? 'w-full min-h-[44px]' : 'flex-1'}`}
+                        size={isMobile ? "default" : "sm"}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
                         Decline
@@ -193,12 +199,13 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
                   )}
 
                   {proposal.proposer_id === user?.id && (
-                    <div className="flex gap-2 pt-2">
+                    <div className="pt-2">
                       <Button
                         onClick={() => handleCancelProposal(proposal.id)}
                         disabled={loading}
                         variant="destructive"
-                        className="flex-1"
+                        className={`${isMobile ? 'w-full min-h-[44px]' : 'w-full'}`}
+                        size={isMobile ? "default" : "sm"}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
                         Cancel Proposal
@@ -225,32 +232,34 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 pt-0">
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
-                      {proposal.proposer_id === user?.id 
-                        ? `To: ${getFriendName(proposal.recipient_id)}`
-                        : `From: ${getFriendName(proposal.proposer_id)}`
-                      }
+                  <div className={`${isMobile ? 'flex-col space-y-2' : 'flex items-center gap-4'} text-sm text-muted-foreground`}>
+                    <div className="flex items-center gap-1.5">
+                      <User className="h-4 w-4 flex-shrink-0" />
+                      <span className="break-words">
+                        {proposal.proposer_id === user?.id 
+                          ? `To: ${getFriendName(proposal.recipient_id)}`
+                          : `From: ${getFriendName(proposal.proposer_id)}`
+                        }
+                      </span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {format(new Date(proposal.proposed_date), 'MMM dd, yyyy')}
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-4 w-4 flex-shrink-0" />
+                      <span>{format(new Date(proposal.proposed_date), 'MMM dd, yyyy')}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {format(new Date(proposal.proposed_date), 'HH:mm')}
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="h-4 w-4 flex-shrink-0" />
+                      <span>{format(new Date(proposal.proposed_date), 'HH:mm')}</span>
                     </div>
                   </div>
 
                   {proposal.message && (
-                    <p className="text-sm text-muted-foreground italic">
+                    <p className="text-sm text-muted-foreground italic break-words">
                       "{proposal.message}"
                     </p>
                   )}
 
                   {proposal.planning_session_id && (
-                    <div className="flex gap-2 pt-2">
+                    <div className="pt-2">
                       <Button
                         onClick={async () => {
                           // Create a fresh session to ensure clean state
@@ -280,7 +289,8 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
                             onProposalAccepted?.(proposal.planning_session_id!);
                           }
                         }}
-                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                        className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full min-h-[44px]' : 'w-full'}`}
+                        size={isMobile ? "default" : "sm"}
                       >
                         <Play className="h-4 w-4 mr-2" />
                         Start AI Planning
