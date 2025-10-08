@@ -1013,107 +1013,7 @@ useEffect(() => {
             shouldShowAICard: userHasCompletedPrefs && partnerHasCompletedPrefs && hasCompletedAllSteps && aiAnalyzing
           });
           
-          // Show AI analysis in progress - only after user completes all local steps
-          if (userHasCompletedPrefs && partnerHasCompletedPrefs && hasCompletedAllSteps && aiAnalyzing) {
-            return (
-              <Card className="border-blue-200 bg-blue-50">
-                <CardContent className="p-6 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-4">
-                    <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
-                    <h3 className="text-lg font-semibold text-blue-800">AI Analysis in Progress</h3>
-                  </div>
-                  <p className="text-blue-700">
-                    Analyzing your compatibility and finding perfect venues...
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          }
-          
-          // Show ready state - either with venues or waiting for venues with timeout
-          if (userHasCompletedPrefs && partnerHasCompletedPrefs && hasCompletedAllSteps && !aiAnalyzing) {
-            const hasVenues = venueRecommendations.length > 0;
-            const timeElapsed = aiAnalysisStartTime ? Date.now() - aiAnalysisStartTime : 0;
-            const timeRemaining = Math.max(0, NAVIGATION_TIMEOUT_MS - timeElapsed);
-            const secondsRemaining = Math.ceil(timeRemaining / 1000);
-            
-            return (
-              <Card className={hasVenues ? "border-green-200 bg-green-50" : "border-yellow-200 bg-yellow-50"}>
-                <CardContent className="p-6 text-center">
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    {autoNavigating ? (
-                      <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                    ) : hasVenues ? (
-                      <CheckCircle className="h-6 w-6 text-green-600" />
-                    ) : (
-                      <Clock className="h-6 w-6 text-yellow-600" />
-                    )}
-                    <h3 className="text-lg font-semibold">
-                      {autoNavigating 
-                        ? 'Redirecting to your matches...' 
-                        : hasVenues 
-                          ? 'AI Analysis Complete!' 
-                          : 'Almost Ready...'}
-                    </h3>
-                  </div>
-                  
-                  {hasVenues ? (
-                    <>
-                      <p className="text-green-700 mb-2">
-                        Found {venueRecommendations.length} perfect venues for you and {partnerName}!
-                      </p>
-                      {compatibilityScore && (
-                        <p className="text-sm text-green-600 mb-4">
-                          Compatibility Score: {typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore}%
-                        </p>
-                      )}
-                      {!autoNavigating && (
-                        <Button 
-                          onClick={() => {
-                            setHasAutoNavigated(true);
-                            onDisplayVenues();
-                          }}
-                          className="mt-2"
-                        >
-                          View Matches Now
-                        </Button>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-yellow-700 mb-2">
-                        Preparing your results...
-                        {timeRemaining > 0 && secondsRemaining > 0 && (
-                          <span className="block text-sm mt-1">Auto-continuing in {secondsRemaining}s</span>
-                        )}
-                      </p>
-                      <p className="text-sm text-yellow-600 mb-4">
-                        We're finding the best venues in your area. This may take a moment.
-                      </p>
-                      <Button 
-                        onClick={() => {
-                          console.log('👆 User clicked Continue Anyway');
-                          if (timeoutRef.current) {
-                            clearTimeout(timeoutRef.current);
-                            timeoutRef.current = null;
-                          }
-                          setHasAutoNavigated(true);
-                          onDisplayVenues();
-                        }}
-                        variant="outline"
-                        className="gap-2"
-                      >
-                        <AlertCircle className="h-4 w-4" />
-                        Continue Anyway
-                      </Button>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          }
-          
-          // Show waiting state for partner
+          // Show waiting state for partner (still inline, not overlay)
           if (userHasCompletedPrefs && hasCompletedAllSteps && !partnerHasCompletedPrefs) {
             return (
               <div className="space-y-4">
@@ -1147,6 +1047,114 @@ useEffect(() => {
           }
           
           return null;
+        })()
+      )}
+
+      {/* AI Analysis Overlay - appears on top when analyzing */}
+      {planningMode === 'collaborative' && collaborativeSession?.hasUserSetPreferences && collaborativeSession?.hasPartnerSetPreferences && hasCompletedAllSteps && aiAnalyzing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="w-full max-w-md mx-4">
+            <Card className="border-primary/20 bg-card shadow-lg">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                  <h3 className="text-lg font-semibold">AI Analysis in Progress</h3>
+                </div>
+                <p className="text-muted-foreground">
+                  Analyzing your compatibility and finding perfect venues...
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Redirecting Overlay - appears on top when ready */}
+      {planningMode === 'collaborative' && collaborativeSession?.hasUserSetPreferences && collaborativeSession?.hasPartnerSetPreferences && hasCompletedAllSteps && !aiAnalyzing && (
+        (() => {
+          const hasVenues = venueRecommendations.length > 0;
+          const timeElapsed = aiAnalysisStartTime ? Date.now() - aiAnalysisStartTime : 0;
+          const timeRemaining = Math.max(0, NAVIGATION_TIMEOUT_MS - timeElapsed);
+          const secondsRemaining = Math.ceil(timeRemaining / 1000);
+          
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+              <div className="w-full max-w-md mx-4">
+                <Card className={hasVenues ? "border-green-500/20 bg-card shadow-lg" : "border-yellow-500/20 bg-card shadow-lg"}>
+                  <CardContent className="p-6 text-center">
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                      {autoNavigating ? (
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      ) : hasVenues ? (
+                        <CheckCircle className="h-6 w-6 text-green-600" />
+                      ) : (
+                        <Clock className="h-6 w-6 text-yellow-600" />
+                      )}
+                      <h3 className="text-lg font-semibold">
+                        {autoNavigating 
+                          ? 'Redirecting to your matches...' 
+                          : hasVenues 
+                            ? 'AI Analysis Complete!' 
+                            : 'Almost Ready...'}
+                      </h3>
+                    </div>
+                    
+                    {hasVenues ? (
+                      <>
+                        <p className="text-foreground mb-2">
+                          Found {venueRecommendations.length} perfect venues for you and {partnerName}!
+                        </p>
+                        {compatibilityScore && (
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Compatibility Score: {typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore}%
+                          </p>
+                        )}
+                        {!autoNavigating && (
+                          <Button 
+                            onClick={() => {
+                              setHasAutoNavigated(true);
+                              onDisplayVenues();
+                            }}
+                            className="mt-2"
+                          >
+                            View Matches Now
+                          </Button>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-foreground mb-2">
+                          Preparing your results...
+                          {timeRemaining > 0 && secondsRemaining > 0 && (
+                            <span className="block text-sm mt-1 text-muted-foreground">Auto-continuing in {secondsRemaining}s</span>
+                          )}
+                        </p>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          We're finding the best venues in your area. This may take a moment.
+                        </p>
+                        <Button 
+                          onClick={() => {
+                            console.log('👆 User clicked Continue Anyway');
+                            if (timeoutRef.current) {
+                              clearTimeout(timeoutRef.current);
+                              timeoutRef.current = null;
+                            }
+                            setHasAutoNavigated(true);
+                            onDisplayVenues();
+                          }}
+                          variant="outline"
+                          className="gap-2"
+                        >
+                          <AlertCircle className="h-4 w-4" />
+                          Continue Anyway
+                        </Button>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          );
         })()
       )}
 
