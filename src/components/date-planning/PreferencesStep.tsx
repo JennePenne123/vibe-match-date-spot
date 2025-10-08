@@ -1007,12 +1007,14 @@ useEffect(() => {
             partnerName,
             userHasCompletedPrefs,
             partnerHasCompletedPrefs,
+            hasCompletedAllSteps,
             aiAnalyzing,
-            venueRecommendationsLength: venueRecommendations.length
+            venueRecommendationsLength: venueRecommendations.length,
+            shouldShowAICard: userHasCompletedPrefs && partnerHasCompletedPrefs && hasCompletedAllSteps && aiAnalyzing
           });
           
-          // Show AI analysis in progress
-          if (userHasCompletedPrefs && partnerHasCompletedPrefs && aiAnalyzing) {
+          // Show AI analysis in progress - only after user completes all local steps
+          if (userHasCompletedPrefs && partnerHasCompletedPrefs && hasCompletedAllSteps && aiAnalyzing) {
             return (
               <Card className="border-blue-200 bg-blue-50">
                 <CardContent className="p-6 text-center">
