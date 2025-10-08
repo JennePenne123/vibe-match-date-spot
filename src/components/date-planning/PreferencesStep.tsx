@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Heart, Clock, Sparkles, Loader2, Check, DollarSign, MapPin, Coffee, Settings, CalendarIcon, CheckCircle } from 'lucide-react';
+import { Heart, Clock, Sparkles, Loader2, Check, DollarSign, MapPin, Coffee, Settings, CalendarIcon, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -91,6 +91,11 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [hasCompletedAllSteps, setHasCompletedAllSteps] = useState(false);
   const totalSteps = 4;
+  
+  // Timeout fallback state
+  const [aiAnalysisStartTime, setAiAnalysisStartTime] = useState<number | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const NAVIGATION_TIMEOUT_MS = 10000; // 10 seconds
 
   // State for all preferences
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
@@ -117,7 +122,19 @@ useEffect(() => {
   }
 }, [initialProposedDate]);
 
-// Auto-navigation effect for collaborative mode
+// Track when AI analysis starts/stops
+useEffect(() => {
+  if (aiAnalyzing && !aiAnalysisStartTime) {
+    const startTime = Date.now();
+    setAiAnalysisStartTime(startTime);
+    console.log('⏱️ AI Analysis started at:', new Date(startTime).toISOString());
+  } else if (!aiAnalyzing && aiAnalysisStartTime) {
+    console.log('✅ AI Analysis completed after:', (Date.now() - aiAnalysisStartTime) / 1000, 'seconds');
+    setAiAnalysisStartTime(null);
+  }
+}, [aiAnalyzing, aiAnalysisStartTime]);
+
+// Auto-navigation effect for collaborative mode with timeout fallback
 useEffect(() => {
   if (planningMode === 'collaborative' && 
       collaborativeSession && 
@@ -128,6 +145,18 @@ useEffect(() => {
     const userHasCompletedPrefs = collaborativeSession.hasUserSetPreferences;
     const partnerHasCompletedPrefs = collaborativeSession.hasPartnerSetPreferences;
     
+    // Comprehensive logging for navigation state
+    console.log('🚦 NAVIGATION CHECK:', {
+      userComplete: userHasCompletedPrefs,
+      partnerComplete: partnerHasCompletedPrefs,
+      stepsComplete: hasCompletedAllSteps,
+      aiAnalyzing,
+      venueCount: venueRecommendations.length,
+      hasAutoNavigated,
+      autoNavigating,
+      timeElapsed: aiAnalysisStartTime ? (Date.now() - aiAnalysisStartTime) / 1000 : 0
+    });
+    
     // Check if all conditions are met for auto-navigation
     const shouldAutoNavigate = userHasCompletedPrefs && 
                               partnerHasCompletedPrefs && 
@@ -136,9 +165,15 @@ useEffect(() => {
                               venueRecommendations.length > 0;
     
     if (shouldAutoNavigate) {
-      console.log('🚀 Auto-navigating to results...');
+      console.log('🚀 Auto-navigating to results with', venueRecommendations.length, 'venues');
       setAutoNavigating(true);
       setHasAutoNavigated(true);
+      
+      // Clear any pending timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       
       // Brief delay to let users see the success message
       const timer = setTimeout(() => {
@@ -147,6 +182,37 @@ useEffect(() => {
       
       return () => clearTimeout(timer);
     }
+    
+    // Set timeout fallback if both users ready but waiting for venues
+    if (userHasCompletedPrefs && 
+        partnerHasCompletedPrefs && 
+        hasCompletedAllSteps && 
+        !timeoutRef.current) {
+      
+      console.log('⏰ Setting navigation timeout fallback');
+      timeoutRef.current = setTimeout(() => {
+        console.warn('⚠️ Navigation timeout triggered - proceeding with', venueRecommendations.length, 'venues');
+        
+        if (!hasAutoNavigated) {
+          toast({
+            title: "Taking a while?",
+            description: "We're showing you the best available results now.",
+            variant: "default"
+          });
+          
+          setAutoNavigating(true);
+          setHasAutoNavigated(true);
+          onDisplayVenues();
+        }
+      }, NAVIGATION_TIMEOUT_MS);
+    }
+    
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
   }
 }, [
   planningMode, 
@@ -156,7 +222,9 @@ useEffect(() => {
   venueRecommendations.length, 
   onDisplayVenues, 
   hasAutoNavigated, 
-  autoNavigating
+  autoNavigating,
+  aiAnalysisStartTime,
+  NAVIGATION_TIMEOUT_MS
 ]);
 
 // Data definitions
@@ -960,45 +1028,83 @@ useEffect(() => {
             );
           }
           
-          // Show analysis complete with auto-navigation
-          if (userHasCompletedPrefs && partnerHasCompletedPrefs && hasCompletedAllSteps && !aiAnalyzing && venueRecommendations.length > 0) {
+          // Show ready state - either with venues or waiting for venues with timeout
+          if (userHasCompletedPrefs && partnerHasCompletedPrefs && hasCompletedAllSteps && !aiAnalyzing) {
+            const hasVenues = venueRecommendations.length > 0;
+            const timeElapsed = aiAnalysisStartTime ? Date.now() - aiAnalysisStartTime : 0;
+            const timeRemaining = Math.max(0, NAVIGATION_TIMEOUT_MS - timeElapsed);
+            const secondsRemaining = Math.ceil(timeRemaining / 1000);
+            
             return (
-              <Card className="border-green-200 bg-green-50">
+              <Card className={hasVenues ? "border-green-200 bg-green-50" : "border-yellow-200 bg-yellow-50"}>
                 <CardContent className="p-6 text-center">
                   <div className="flex items-center justify-center gap-3 mb-4">
                     {autoNavigating ? (
-                      <Loader2 className="h-6 w-6 text-green-600 animate-spin" />
-                    ) : (
+                      <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                    ) : hasVenues ? (
                       <CheckCircle className="h-6 w-6 text-green-600" />
+                    ) : (
+                      <Clock className="h-6 w-6 text-yellow-600" />
                     )}
-                    <h3 className="text-lg font-semibold text-green-800">
-                      {autoNavigating ? 'Redirecting to your matches...' : 'AI Analysis Complete!'}
+                    <h3 className="text-lg font-semibold">
+                      {autoNavigating 
+                        ? 'Redirecting to your matches...' 
+                        : hasVenues 
+                          ? 'AI Analysis Complete!' 
+                          : 'Almost Ready...'}
                     </h3>
                   </div>
-                  <p className="text-green-700 mb-4">
-                    Found {venueRecommendations.length} perfect venues for you and {partnerName}
-                  </p>
-                  {compatibilityScore && (
-                    <p className="text-sm text-green-600 mb-4">
-                      Compatibility Score: {typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore}%
-                    </p>
-                  )}
-                  {!autoNavigating && (
-                    <div className="space-y-2">
-                      <p className="text-sm text-green-600">
-                        Automatically showing your matches in a moment...
+                  
+                  {hasVenues ? (
+                    <>
+                      <p className="text-green-700 mb-2">
+                        Found {venueRecommendations.length} perfect venues for you and {partnerName}!
+                      </p>
+                      {compatibilityScore && (
+                        <p className="text-sm text-green-600 mb-4">
+                          Compatibility Score: {typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore}%
+                        </p>
+                      )}
+                      {!autoNavigating && (
+                        <Button 
+                          onClick={() => {
+                            setHasAutoNavigated(true);
+                            onDisplayVenues();
+                          }}
+                          className="mt-2"
+                        >
+                          View Matches Now
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-yellow-700 mb-2">
+                        Preparing your results...
+                        {timeRemaining > 0 && secondsRemaining > 0 && (
+                          <span className="block text-sm mt-1">Auto-continuing in {secondsRemaining}s</span>
+                        )}
+                      </p>
+                      <p className="text-sm text-yellow-600 mb-4">
+                        We're finding the best venues in your area. This may take a moment.
                       </p>
                       <Button 
                         onClick={() => {
+                          console.log('👆 User clicked Continue Anyway');
+                          if (timeoutRef.current) {
+                            clearTimeout(timeoutRef.current);
+                            timeoutRef.current = null;
+                          }
                           setHasAutoNavigated(true);
                           onDisplayVenues();
                         }}
                         variant="outline"
-                        size="sm"
+                        className="gap-2"
                       >
-                        View Now
+                        <AlertCircle className="h-4 w-4" />
+                        Continue Anyway
                       </Button>
-                    </div>
+                    </>
                   )}
                 </CardContent>
               </Card>
