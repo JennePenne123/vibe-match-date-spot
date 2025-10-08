@@ -6,7 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Heart, Clock, Sparkles, Loader2, Check, DollarSign, MapPin, Coffee, Settings, CalendarIcon, CheckCircle, AlertCircle } from 'lucide-react';
+import { Heart, Clock, Sparkles, Loader2, Check, DollarSign, MapPin, Coffee, Settings, CalendarIcon, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -1053,7 +1053,26 @@ useEffect(() => {
       {/* AI Analysis Overlay - appears on top when analyzing */}
       {planningMode === 'collaborative' && collaborativeSession?.hasUserSetPreferences && collaborativeSession?.hasPartnerSetPreferences && hasCompletedAllSteps && aiAnalyzing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <div className="w-full max-w-md mx-4">
+          <div className="w-full max-w-md mx-4 relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute -top-2 -right-2 h-8 w-8 rounded-full bg-background shadow-md hover:bg-destructive hover:text-destructive-foreground z-10"
+              onClick={() => {
+                console.log('❌ User cancelled AI analysis');
+                if (timeoutRef.current) {
+                  clearTimeout(timeoutRef.current);
+                  timeoutRef.current = null;
+                }
+                setAiAnalysisStartTime(null);
+                toast({
+                  title: "Analysis Cancelled",
+                  description: "You can review your preferences or start again.",
+                });
+              }}
+            >
+              <X className="h-4 w-4" />
+            </Button>
             <Card className="border-primary/20 bg-card shadow-lg">
               <CardContent className="p-6 text-center">
                 <div className="flex items-center justify-center gap-2 mb-4">
@@ -1079,7 +1098,28 @@ useEffect(() => {
           
           return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-              <div className="w-full max-w-md mx-4">
+              <div className="w-full max-w-md mx-4 relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute -top-2 -right-2 h-8 w-8 rounded-full bg-background shadow-md hover:bg-destructive hover:text-destructive-foreground z-10"
+                  onClick={() => {
+                    console.log('❌ User cancelled redirect overlay');
+                    if (timeoutRef.current) {
+                      clearTimeout(timeoutRef.current);
+                      timeoutRef.current = null;
+                    }
+                    setAutoNavigating(false);
+                    setHasAutoNavigated(false);
+                    setAiAnalysisStartTime(null);
+                    toast({
+                      title: "Auto-redirect Cancelled",
+                      description: "You can manually view your matches using the 'View Matches' button when ready.",
+                    });
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
                 <Card className={hasVenues ? "border-green-500/20 bg-card shadow-lg" : "border-yellow-500/20 bg-card shadow-lg"}>
                   <CardContent className="p-6 text-center">
                     <div className="flex items-center justify-center gap-3 mb-4">
