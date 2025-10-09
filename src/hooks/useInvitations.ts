@@ -413,6 +413,60 @@ export const useInvitations = () => {
     }
   };
 
+  const cancelInvitation = async (invitationId: string) => {
+    console.log('🚫 CANCEL INVITATION - Starting for ID:', invitationId);
+    try {
+      const invitation = invitations.find(inv => inv.id === invitationId);
+      console.log('🚫 CANCEL INVITATION - Found invitation:', !!invitation);
+      
+      const { error } = await supabase
+        .from('date_invitations')
+        .update({ status: 'cancelled' })
+        .eq('id', invitationId);
+
+      if (error) {
+        console.error('🚨 CANCEL INVITATION - Database error:', error);
+        handleError(error, {
+          toastTitle: 'Failed to cancel date',
+          toastDescription: 'Please try again',
+        });
+        return;
+      }
+
+      console.log('🚫 CANCEL INVITATION - Database update successful');
+
+      // Update local state optimistically
+      setInvitations(prev => 
+        prev.map(inv => 
+          inv.id === invitationId 
+            ? { ...inv, status: 'cancelled' as const }
+            : inv
+        )
+      );
+
+      // Notify the other person about cancellation
+      const otherPersonId = invitation?.sender_id === user?.id 
+        ? invitation?.recipient_id 
+        : invitation?.sender_id;
+      
+      if (otherPersonId) {
+        await createNotificationForSender(otherPersonId, {
+          type: 'invitation_cancelled',
+          message: `The date at ${invitation?.venue?.name || 'the venue'} has been cancelled.`,
+          invitationId,
+          venueName: invitation?.venue?.name
+        });
+      }
+    } catch (error) {
+      console.error('🚨 CANCEL INVITATION - Catch error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      handleError(new Error(`Failed to cancel date: ${errorMessage}`), {
+        toastTitle: 'Failed to cancel date',
+        toastDescription: 'Please try again',
+      });
+    }
+  };
+
   const sendInvitation = async (
     recipientId: string, 
     venueId: string, 
@@ -582,6 +636,7 @@ export const useInvitations = () => {
     loading,
     acceptInvitation,
     declineInvitation,
+    cancelInvitation,
     sendInvitation,
     submitDateFeedback,
     fetchInvitations

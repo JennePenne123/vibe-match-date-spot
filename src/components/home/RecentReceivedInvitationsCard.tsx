@@ -11,7 +11,7 @@ import { DateInvitation } from '@/types/index';
 
 const RecentReceivedInvitationsCard: React.FC = () => {
   const navigate = useNavigate();
-  const { invitations, loading, acceptInvitation, declineInvitation } = useInvitations();
+  const { invitations, loading, acceptInvitation, declineInvitation, cancelInvitation } = useInvitations();
 
   // Filter and get the 3 most recent received invitations (exclude declined)
   const recentReceivedInvitations = React.useMemo(() => {
@@ -111,6 +111,7 @@ const RecentReceivedInvitationsCard: React.FC = () => {
             direction="received"
             onAccept={acceptInvitation}
             onDecline={declineInvitation}
+            onCancel={invitation.status === 'accepted' ? cancelInvitation : undefined}
           />
         ))}
       </CardContent>

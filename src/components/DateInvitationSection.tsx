@@ -11,7 +11,7 @@ import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const DateInvitationSection: React.FC = () => {
-  const { invitations, loading, acceptInvitation, declineInvitation, fetchInvitations } = useInvitations();
+  const { invitations, loading, acceptInvitation, declineInvitation, cancelInvitation, fetchInvitations } = useInvitations();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('pending');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -24,10 +24,12 @@ const DateInvitationSection: React.FC = () => {
   const receivedPending = receivedInvitations.filter(inv => inv.status === 'pending');
   const receivedAccepted = receivedInvitations.filter(inv => inv.status === 'accepted');
   const receivedDeclined = receivedInvitations.filter(inv => inv.status === 'declined');
+  const receivedCancelled = receivedInvitations.filter(inv => inv.status === 'cancelled');
   
   const sentPending = sentInvitations.filter(inv => inv.status === 'pending');
   const sentAccepted = sentInvitations.filter(inv => inv.status === 'accepted');
   const sentDeclined = sentInvitations.filter(inv => inv.status === 'declined');
+  const sentCancelled = sentInvitations.filter(inv => inv.status === 'cancelled');
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -62,6 +64,25 @@ const DateInvitationSection: React.FC = () => {
       });
     } else {
       console.error('🚨 DECLINE INVITATION - Invitation not found for ID:', id);
+    }
+  };
+
+  const handleCancel = async (id: string) => {
+    console.log('🎯 CANCEL INVITATION - ID:', id, 'Type:', typeof id);
+    const invitation = invitations.find(inv => inv.id === id);
+    if (invitation) {
+      await cancelInvitation(invitation.id);
+      const partnerName = invitation.direction === 'received' 
+        ? invitation.sender?.name 
+        : invitation.recipient?.name;
+      toast({
+        title: "Date Cancelled",
+        description: `Your date has been cancelled. ${partnerName || 'Your partner'} has been notified.`,
+        duration: 4000,
+        variant: "destructive"
+      });
+    } else {
+      console.error('🚨 CANCEL INVITATION - Invitation not found for ID:', id);
     }
   };
 
@@ -159,6 +180,7 @@ const DateInvitationSection: React.FC = () => {
         direction={direction}
         onAccept={direction === 'received' ? handleAccept : undefined}
         onDecline={direction === 'received' ? handleDecline : undefined}
+        onCancel={invitation.status === 'accepted' ? handleCancel : undefined}
       />
     ));
   };
@@ -204,7 +226,7 @@ const DateInvitationSection: React.FC = () => {
 
         <TabsContent value="received" className="space-y-6 mt-6">
           <Tabs defaultValue="pending" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="pending">
                 Pending ({receivedPending.length})
               </TabsTrigger>
@@ -213,6 +235,9 @@ const DateInvitationSection: React.FC = () => {
               </TabsTrigger>
               <TabsTrigger value="declined">
                 Declined ({receivedDeclined.length})
+              </TabsTrigger>
+              <TabsTrigger value="cancelled">
+                Cancelled ({receivedCancelled.length})
               </TabsTrigger>
             </TabsList>
             
@@ -225,12 +250,15 @@ const DateInvitationSection: React.FC = () => {
             <TabsContent value="declined" className="space-y-4 mt-4">
               {renderInvitationList(receivedDeclined, 'received')}
             </TabsContent>
+            <TabsContent value="cancelled" className="space-y-4 mt-4">
+              {renderInvitationList(receivedCancelled, 'received')}
+            </TabsContent>
           </Tabs>
         </TabsContent>
 
         <TabsContent value="sent" className="space-y-6 mt-6">
           <Tabs defaultValue="pending" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="pending">
                 Pending ({sentPending.length})
               </TabsTrigger>
@@ -239,6 +267,9 @@ const DateInvitationSection: React.FC = () => {
               </TabsTrigger>
               <TabsTrigger value="declined">
                 Declined ({sentDeclined.length})
+              </TabsTrigger>
+              <TabsTrigger value="cancelled">
+                Cancelled ({sentCancelled.length})
               </TabsTrigger>
             </TabsList>
             
@@ -250,6 +281,9 @@ const DateInvitationSection: React.FC = () => {
             </TabsContent>
             <TabsContent value="declined" className="space-y-4 mt-4">
               {renderInvitationList(sentDeclined, 'sent')}
+            </TabsContent>
+            <TabsContent value="cancelled" className="space-y-4 mt-4">
+              {renderInvitationList(sentCancelled, 'sent')}
             </TabsContent>
           </Tabs>
         </TabsContent>

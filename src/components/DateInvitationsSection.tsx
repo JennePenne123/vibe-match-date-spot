@@ -12,10 +12,11 @@ interface DateInvitationsSectionProps {
   invitations: DateInvitation[];
   onAccept: (id: string) => void;
   onDecline: (id: string) => void;
+  onCancel?: (id: string) => void;
   isLoading?: boolean;
 }
 
-const DateInvitationsSection = ({ invitations, onAccept, onDecline, isLoading = false }: DateInvitationsSectionProps) => {
+const DateInvitationsSection = ({ invitations, onAccept, onDecline, onCancel, isLoading = false }: DateInvitationsSectionProps) => {
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -78,6 +79,7 @@ const DateInvitationsSection = ({ invitations, onAccept, onDecline, isLoading = 
           direction="received"
           onAccept={onAccept}
           onDecline={onDecline}
+          onCancel={invitation.status === 'accepted' ? onCancel : undefined}
         />
       ))}
     </div>

@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin, Check, X, DollarSign, Calendar, Info, User, Heart, CheckCircle, XCircle, AlertCircle, MessageCircle } from 'lucide-react';
@@ -18,15 +19,18 @@ interface DateInviteCardProps {
   direction: 'received' | 'sent';
   onAccept?: (id: string) => void;
   onDecline?: (id: string) => void;
+  onCancel?: (id: string) => void;
 }
 const DateInviteCard = ({
   invitation,
   direction,
   onAccept,
-  onDecline
+  onDecline,
+  onCancel
 }: DateInviteCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messengerOpen, setMessengerOpen] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const { isMobile } = useBreakpoint();
   const { user } = useAuth();
   const { unreadCount } = useInvitationMessages(invitation.id);
@@ -51,6 +55,15 @@ const DateInviteCard = ({
           textColor: 'text-red-700 dark:text-red-300',
           borderColor: 'border-red-200 dark:border-red-800',
           label: 'Declined'
+        };
+      case 'cancelled':
+        return {
+          icon: XCircle,
+          variant: 'destructive' as const,
+          bgGradient: 'bg-red-50 dark:bg-red-950',
+          textColor: 'text-red-700 dark:text-red-300',
+          borderColor: 'border-red-200 dark:border-red-800',
+          label: 'Cancelled'
         };
       default:
         return {
@@ -334,7 +347,35 @@ const DateInviteCard = ({
               </Button>
             </div>}
           
-          {direction === 'sent' && <div className="mt-6 p-3 bg-muted rounded-lg">
+          {invitation.status === 'accepted' && (
+            <div className="space-y-3 mt-6">
+              <div className="text-center py-3 bg-green-50 rounded-lg">
+                <p className="text-sm text-green-700">
+                  ✅ Date Confirmed! See you there!
+                </p>
+              </div>
+              {onCancel && (
+                <Button 
+                  onClick={() => setCancelDialogOpen(true)}
+                  variant="outline" 
+                  className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Cancel Date
+                </Button>
+              )}
+            </div>
+          )}
+
+          {invitation.status === 'cancelled' && (
+            <div className="text-center py-3 bg-red-50 rounded-lg mt-6">
+              <p className="text-sm text-red-600">
+                🚫 This date has been cancelled
+              </p>
+            </div>
+          )}
+          
+          {direction === 'sent' && invitation.status === 'pending' && <div className="mt-6 p-3 bg-muted rounded-lg">
               <p className="text-sm text-muted-foreground">
                 Invitation sent • Status: <span className="capitalize font-medium">{invitation.status}</span>
               </p>
@@ -342,6 +383,35 @@ const DateInviteCard = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Cancel Confirmation Dialog */}
+    <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Cancel this date?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to cancel your date at {displayData.venueName}? 
+            {direction === 'received' ? ` ${displayData.friendName}` : ' Your partner'} will be notified about the cancellation.
+            This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>No, keep date</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              if (onCancel) {
+                onCancel(invitation.id);
+                setIsOpen(false);
+                setCancelDialogOpen(false);
+              }
+            }}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            Yes, cancel date
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     
     {/* Messenger Sheet */}
     <Sheet open={messengerOpen} onOpenChange={setMessengerOpen}>
