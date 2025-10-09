@@ -359,7 +359,7 @@ const DateInviteCard = ({
         </SheetHeader>
           <div className="h-[calc(100%-4rem)] mt-4">
             {user && (
-              <ErrorBoundaryWrapper>
+              <ErrorBoundaryWrapper key={invitation.id}>
                 <InvitationMessenger
                   invitationId={invitation.id}
                   currentUserId={user.id}

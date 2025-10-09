@@ -130,13 +130,20 @@ export const useInvitationMessages = (invitationId: string) => {
       return;
     }
 
-    fetchMessages();
-
     const channelName = `invitation_messages:${invitationId}`;
     console.log('🔌 Setting up real-time channel:', channelName);
 
-    const channel = supabase
-      .channel(channelName)
+    // Create channel
+    const channel = supabase.channel(channelName);
+    
+    // STORE REFERENCE IMMEDIATELY before subscribing to prevent race conditions
+    channelRef.current = channel;
+
+    // Fetch messages
+    fetchMessages();
+
+    // Add event listeners and subscribe
+    channel
       .on(
         'postgres_changes',
         {
@@ -181,9 +188,11 @@ export const useInvitationMessages = (invitationId: string) => {
       )
       .subscribe((status) => {
         console.log('📡 Channel status:', status);
+        if (status === 'CHANNEL_ERROR') {
+          console.error('❌ Channel subscription failed');
+          channelRef.current = null; // Clear ref on error
+        }
       });
-
-    channelRef.current = channel;
 
     return () => {
       console.log('🔌 Cleaning up channel:', channelName);
