@@ -23,6 +23,7 @@ export const useInvitationMessages = (invitationId: string) => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const isSubscribingRef = useRef(false);
 
   // Fetch messages
   const fetchMessages = async () => {
@@ -122,13 +123,17 @@ export const useInvitationMessages = (invitationId: string) => {
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!invitationId || !user) return;
+    const userId = user?.id;
+    if (!invitationId || !userId) return;
 
-    // Prevent duplicate subscriptions
-    if (channelRef.current) {
-      console.log('⚠️ Channel already exists, skipping subscription');
+    // Prevent duplicate subscriptions - check BOTH channel exists AND not currently subscribing
+    if (channelRef.current || isSubscribingRef.current) {
+      console.log('⚠️ Already subscribed or subscribing, skipping');
       return;
     }
+
+    // Set flag IMMEDIATELY to prevent concurrent subscriptions
+    isSubscribingRef.current = true;
 
     const channelName = `invitation_messages:${invitationId}`;
     console.log('🔌 Setting up real-time channel:', channelName);
@@ -188,20 +193,25 @@ export const useInvitationMessages = (invitationId: string) => {
       )
       .subscribe((status) => {
         console.log('📡 Channel status:', status);
-        if (status === 'CHANNEL_ERROR') {
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Channel subscription successful');
+          isSubscribingRef.current = false; // Subscription complete
+        } else if (status === 'CHANNEL_ERROR') {
           console.error('❌ Channel subscription failed');
-          channelRef.current = null; // Clear ref on error
+          channelRef.current = null;
+          isSubscribingRef.current = false; // Reset on error
         }
       });
 
     return () => {
       console.log('🔌 Cleaning up channel:', channelName);
+      isSubscribingRef.current = false; // Reset flag
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
     };
-  }, [invitationId, user]);
+  }, [invitationId, user?.id]);
 
   // Mark as read when messages change
   useEffect(() => {
