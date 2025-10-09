@@ -3,11 +3,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { Clock, MapPin, Check, X, DollarSign, Calendar, Info, User, Heart, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Clock, MapPin, Check, X, DollarSign, Calendar, Info, User, Heart, CheckCircle, XCircle, AlertCircle, MessageCircle } from 'lucide-react';
 import { DateInvitation } from '@/types/index';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import InvitationMessenger from '@/components/InvitationMessenger';
+import { useInvitationMessages } from '@/hooks/useInvitationMessages';
+import { useAuth } from '@/contexts/AuthContext';
 interface DateInviteCardProps {
   invitation: DateInvitation;
   direction: 'received' | 'sent';
@@ -21,7 +25,10 @@ const DateInviteCard = ({
   onDecline
 }: DateInviteCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [messengerOpen, setMessengerOpen] = useState(false);
   const { isMobile } = useBreakpoint();
+  const { user } = useAuth();
+  const { unreadCount } = useInvitationMessages(invitation.id);
 
   // Status configuration
   const getStatusConfig = (status: string) => {
@@ -120,7 +127,8 @@ const DateInviteCard = ({
     estimatedCost: '$$',
     specialNotes: ''
   };
-  return <Dialog open={isOpen} onOpenChange={setIsOpen}>
+  return <>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Card className={`group relative transition-all duration-300 cursor-pointer rounded-xl overflow-hidden border border-border/20 shadow-sm hover:shadow-md ${statusConfig.bgGradient} hover:scale-[1.02] active:scale-[0.98]`} role="button" tabIndex={0} aria-label={`View date invitation from ${displayData.friendName}`} onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -291,6 +299,23 @@ const DateInviteCard = ({
               </div>}
           </div>
 
+          {/* Message Button */}
+          <div className="mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setMessengerOpen(true)}
+              className="w-full"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Message {displayData.friendName}
+              {unreadCount > 0 && (
+                <Badge variant="destructive" className="ml-2">
+                  {unreadCount}
+                </Badge>
+              )}
+            </Button>
+          </div>
+
           {direction === 'received' && invitation.status === 'pending' && onAccept && onDecline && <div className="flex space-x-2 mt-6">
               <Button onClick={() => {
             onAccept(invitation.id);
@@ -315,6 +340,37 @@ const DateInviteCard = ({
             </div>}
         </div>
       </DialogContent>
-    </Dialog>;
+    </Dialog>
+    
+    {/* Messenger Sheet */}
+    <Sheet open={messengerOpen} onOpenChange={setMessengerOpen}>
+      <SheetContent side="bottom" className="h-[85vh]">
+        <SheetHeader>
+          <SheetTitle className="flex items-center gap-2">
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={displayData.friendAvatar} />
+              <AvatarFallback>
+                {displayData.friendName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            {displayData.friendName}
+          </SheetTitle>
+        </SheetHeader>
+        <div className="h-[calc(100%-4rem)] mt-4">
+          {user && (
+            <InvitationMessenger
+              invitationId={invitation.id}
+              currentUserId={user.id}
+              otherUser={{
+                id: direction === 'received' ? invitation.sender_id : invitation.recipient_id,
+                name: displayData.friendName,
+                avatar_url: displayData.friendAvatar
+              }}
+            />
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  </>;
 };
 export default DateInviteCard;

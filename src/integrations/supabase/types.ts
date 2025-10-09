@@ -430,6 +430,51 @@ export type Database = {
           },
         ]
       }
+      invitation_messages: {
+        Row: {
+          created_at: string | null
+          id: string
+          invitation_id: string
+          message: string
+          read_at: string | null
+          sender_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          invitation_id: string
+          message: string
+          read_at?: string | null
+          sender_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          invitation_id?: string
+          message?: string
+          read_at?: string | null
+          sender_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitation_messages_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "date_invitations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitation_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
