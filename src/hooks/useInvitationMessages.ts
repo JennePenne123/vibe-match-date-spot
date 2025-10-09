@@ -122,12 +122,21 @@ export const useInvitationMessages = (invitationId: string) => {
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!invitationId) return;
+    if (!invitationId || !user) return;
+
+    // Prevent duplicate subscriptions
+    if (channelRef.current) {
+      console.log('⚠️ Channel already exists, skipping subscription');
+      return;
+    }
 
     fetchMessages();
 
+    const channelName = `invitation_messages:${invitationId}`;
+    console.log('🔌 Setting up real-time channel:', channelName);
+
     const channel = supabase
-      .channel(`invitation_messages:${invitationId}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -137,6 +146,7 @@ export const useInvitationMessages = (invitationId: string) => {
           filter: `invitation_id=eq.${invitationId}`
         },
         async (payload) => {
+          console.log('📨 New message received:', payload.new.id);
           // Fetch full message with sender info
           const { data } = await supabase
             .from('invitation_messages')
@@ -161,6 +171,7 @@ export const useInvitationMessages = (invitationId: string) => {
           filter: `invitation_id=eq.${invitationId}`
         },
         (payload) => {
+          console.log('📝 Message updated:', payload.new.id);
           setMessages(prev =>
             prev.map(msg =>
               msg.id === payload.new.id ? { ...msg, ...payload.new } : msg
@@ -168,24 +179,27 @@ export const useInvitationMessages = (invitationId: string) => {
           );
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📡 Channel status:', status);
+      });
 
     channelRef.current = channel;
 
     return () => {
+      console.log('🔌 Cleaning up channel:', channelName);
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
     };
-  }, [invitationId]);
+  }, [invitationId, user]);
 
-  // Mark as read when component mounts or messages change
+  // Mark as read when messages change
   useEffect(() => {
-    if (messages.length > 0) {
+    if (messages.length > 0 && user) {
       markAsRead();
     }
-  }, [messages.length]);
+  }, [messages.length, user?.id]);
 
   return {
     messages,

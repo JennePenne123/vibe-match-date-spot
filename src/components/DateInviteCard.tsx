@@ -11,6 +11,7 @@ import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { useBreakpoint } from '@/hooks/use-mobile';
 import InvitationMessenger from '@/components/InvitationMessenger';
 import { useInvitationMessages } from '@/hooks/useInvitationMessages';
+import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
 import { useAuth } from '@/contexts/AuthContext';
 interface DateInviteCardProps {
   invitation: DateInvitation;
@@ -356,19 +357,21 @@ const DateInviteCard = ({
             {displayData.friendName}
           </SheetTitle>
         </SheetHeader>
-        <div className="h-[calc(100%-4rem)] mt-4">
-          {user && (
-            <InvitationMessenger
-              invitationId={invitation.id}
-              currentUserId={user.id}
-              otherUser={{
-                id: direction === 'received' ? invitation.sender_id : invitation.recipient_id,
-                name: displayData.friendName,
-                avatar_url: displayData.friendAvatar
-              }}
-            />
-          )}
-        </div>
+          <div className="h-[calc(100%-4rem)] mt-4">
+            {user && (
+              <ErrorBoundaryWrapper>
+                <InvitationMessenger
+                  invitationId={invitation.id}
+                  currentUserId={user.id}
+                  otherUser={{
+                    id: direction === 'received' ? invitation.sender_id : invitation.recipient_id,
+                    name: displayData.friendName,
+                    avatar_url: displayData.friendAvatar
+                  }}
+                />
+              </ErrorBoundaryWrapper>
+            )}
+          </div>
       </SheetContent>
     </Sheet>
   </>;
