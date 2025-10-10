@@ -10,7 +10,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log('🔍 Check Completed Dates - Starting scan...');
+  // Check if this is a manual trigger (for testing)
+  const url = new URL(req.url);
+  const isManualTrigger = url.searchParams.get('manual') === 'true';
+  
+  console.log(`🔍 Check Completed Dates - Starting scan... ${isManualTrigger ? '[MANUAL TRIGGER]' : '[SCHEDULED]'}`);
 
   try {
     // Create Supabase client with service role for elevated privileges

@@ -12,7 +12,8 @@ import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import { TestDataControls } from '@/components/debug/TestDataControls';
 import { VenueSearchTester } from '@/components/debug/VenueSearchTester';
 import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
-import { Settings, Code, Database, Users, MapPin } from 'lucide-react';
+import { Settings, Code, Database, Users, MapPin, Trophy } from 'lucide-react';
+import { GamificationTester } from '@/components/debug/GamificationTester';
 
 const Debug: React.FC = () => {
   // Only show in development
@@ -83,6 +84,19 @@ const Debug: React.FC = () => {
         <CardContent className="space-y-4">
           <AIAnalysisTestButton />
           <SmartPlannerDebug currentStep="preferences" />
+        </CardContent>
+      </Card>
+
+      {/* Gamification Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5" />
+            Gamification & Rewards
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <GamificationTester />
         </CardContent>
       </Card>
 

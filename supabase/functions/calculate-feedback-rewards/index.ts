@@ -13,7 +13,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log('🎁 Calculate Feedback Rewards - Starting...');
+  // Check if this is a manual trigger (for testing)
+  const url = new URL(req.url);
+  const isManualTrigger = url.searchParams.get('manual') === 'true';
+  
+  console.log(`🎁 Calculate Feedback Rewards - Starting... ${isManualTrigger ? '[MANUAL TRIGGER]' : '[SCHEDULED]'}`);
 
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
