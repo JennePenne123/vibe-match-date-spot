@@ -4,21 +4,42 @@ import { Badge } from '@/components/ui/badge';
 import { useUserPoints } from '@/hooks/useUserPoints';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
+import { useBreakpoint } from '@/hooks/use-mobile';
 
 export const PointsIndicator: React.FC = () => {
   const { points, loading } = useUserPoints();
   const navigate = useNavigate();
+  const { isMobile } = useBreakpoint();
 
   if (loading) {
     return (
       <div className="flex items-center gap-2">
-        <Skeleton className="h-8 w-20" />
+        <Skeleton className="h-8 w-16" />
       </div>
     );
   }
 
   if (!points) return null;
 
+  // Compact mobile version
+  if (isMobile) {
+    return (
+      <button
+        onClick={() => navigate('/profile')}
+        className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 border border-primary/20 transition-all hover:shadow-md group"
+      >
+        <Trophy className="h-3.5 w-3.5 text-primary group-hover:scale-110 transition-transform" />
+        <span className="text-xs font-semibold text-primary">
+          {points.total_points.toLocaleString()}
+        </span>
+        {points.streak_count > 0 && (
+          <span className="text-xs">🔥</span>
+        )}
+      </button>
+    );
+  }
+
+  // Full desktop version
   return (
     <button
       onClick={() => navigate('/profile')}

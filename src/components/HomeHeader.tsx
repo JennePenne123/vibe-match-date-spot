@@ -23,18 +23,18 @@ const HomeHeader = ({
   };
 
   return <div className="flex justify-between items-center p-4 pt-12 bg-white shadow-sm">
-      <div className="flex items-center gap-3">
-        <Avatar className="w-10 h-10 border-2 border-pink-200">
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <Avatar className="w-10 h-10 border-2 border-pink-200 shrink-0">
           <AvatarImage src={getUserAvatar(user)} alt={displayName} />
           <AvatarFallback className="bg-pink-100 text-pink-600 text-sm">
             {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
           </AvatarFallback>
         </Avatar>
-        <div>
-          <Heading size="h2" className="text-foreground">{getTimeBasedGreeting()} {firstName}! 👋</Heading>
+        <div className="min-w-0 flex-1">
+          <Heading size="h2" className="text-foreground text-sm sm:text-base truncate">{getTimeBasedGreeting()} {firstName}! 👋</Heading>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <PointsIndicator />
         <BurgerMenu />
       </div>
