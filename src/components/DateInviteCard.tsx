@@ -14,6 +14,7 @@ import InvitationMessenger from '@/components/InvitationMessenger';
 import { useInvitationMessages } from '@/hooks/useInvitationMessages';
 import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
 import { useAuth } from '@/contexts/AuthContext';
+import { DateRatingPrompt } from '@/components/DateRatingPrompt';
 interface DateInviteCardProps {
   invitation: DateInvitation;
   direction: 'received' | 'sent';
@@ -349,11 +350,20 @@ const DateInviteCard = ({
           
           {invitation.status === 'accepted' && (
             <div className="space-y-3 mt-6">
-              <div className="text-center py-3 bg-green-50 rounded-lg">
-                <p className="text-sm text-green-700">
-                  ✅ Date Confirmed! See you there!
-                </p>
-              </div>
+              {/* Show rating prompt if date is completed */}
+              {invitation.date_status === 'completed' && (
+                <DateRatingPrompt invitationId={invitation.id} />
+              )}
+              
+              {/* Show confirmation message if date is still scheduled */}
+              {invitation.date_status !== 'completed' && (
+                <div className="text-center py-3 bg-green-50 rounded-lg">
+                  <p className="text-sm text-green-700">
+                    ✅ Date Confirmed! See you there!
+                  </p>
+                </div>
+              )}
+              
               {onCancel && (
                 <Button 
                   onClick={() => setCancelDialogOpen(true)}

@@ -27,8 +27,10 @@ const RecentReceivedInvitationsCard: React.FC = () => {
           id: inv.sender_id,
           name: inv.sender.name,
           email: inv.sender.email,
-          avatar_url: inv.sender.avatar_url
+          avatar_url: inv.sender.avatar_url,
+          created_at: inv.created_at
         } : undefined,
+        recipient: undefined,
         venue: inv.venue ? {
           id: inv.venue_id || '',
           name: inv.venue.name,

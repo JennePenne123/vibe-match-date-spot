@@ -5,20 +5,15 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Trophy, Clock, CheckCheck } from 'lucide-react';
 import { DateRatingModal } from './rating/DateRatingModal';
 import { checkDateFeedbackStatus } from '@/services/feedbackService';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DateRatingPromptProps {
   invitationId: string;
-  partnerName: string;
-  venueName: string;
-  dateTime: string;
   onRatingComplete?: () => void;
 }
 
 export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
   invitationId,
-  partnerName,
-  venueName,
-  dateTime,
   onRatingComplete,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -26,25 +21,58 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
     hasRated: boolean;
     partnerHasRated: boolean;
   } | null>(null);
+  const [invitationData, setInvitationData] = useState<{
+    partnerName: string;
+    venueName: string;
+    dateTime: string;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadFeedbackStatus();
+    loadData();
   }, [invitationId]);
 
-  const loadFeedbackStatus = async () => {
+  const loadData = async () => {
     setLoading(true);
+    
+    // Load feedback status
     const status = await checkDateFeedbackStatus(invitationId);
     setFeedbackStatus(status);
+    
+    // Load invitation data for display
+    const { data: invitation } = await supabase
+      .from('date_invitations')
+      .select(`
+        *,
+        sender:profiles!sender_id(name),
+        recipient:profiles!recipient_id(name),
+        venue:venues(name)
+      `)
+      .eq('id', invitationId)
+      .single();
+    
+    if (invitation) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const partnerName = user?.id === invitation.sender_id 
+        ? invitation.recipient?.name || 'Your partner'
+        : invitation.sender?.name || 'Your partner';
+      
+      setInvitationData({
+        partnerName,
+        venueName: invitation.venue?.name || 'the venue',
+        dateTime: invitation.actual_date_time || invitation.proposed_date || '',
+      });
+    }
+    
     setLoading(false);
   };
 
   const handleSuccess = () => {
-    loadFeedbackStatus();
+    loadData();
     onRatingComplete?.();
   };
 
-  if (loading) {
+  if (loading || !invitationData) {
     return (
       <Card className="animate-pulse">
         <CardContent className="p-4">
@@ -68,8 +96,8 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
                 <p className="font-semibold text-sm">You rated this date</p>
                 <p className="text-xs text-muted-foreground">
                   {feedbackStatus.partnerHasRated 
-                    ? `${partnerName} also rated - Both reviews complete!` 
-                    : `Waiting for ${partnerName} to rate`}
+                    ? `${invitationData.partnerName} also rated - Both reviews complete!` 
+                    : `Waiting for ${invitationData.partnerName} to rate`}
                 </p>
               </div>
             </div>
@@ -86,7 +114,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
   }
 
   // Calculate time since date
-  const dateObj = new Date(dateTime);
+  const dateObj = new Date(invitationData.dateTime);
   const now = new Date();
   const hoursSince = Math.floor((now.getTime() - dateObj.getTime()) / (1000 * 60 * 60));
   const isWithin24h = hoursSince < 24;
@@ -103,8 +131,8 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
               </div>
               
               <p className="text-sm text-muted-foreground mb-3">
-                How was your date with <span className="font-medium text-foreground">{partnerName}</span> at{' '}
-                <span className="font-medium text-foreground">{venueName}</span>?
+                How was your date with <span className="font-medium text-foreground">{invitationData.partnerName}</span> at{' '}
+                <span className="font-medium text-foreground">{invitationData.venueName}</span>?
               </p>
 
               <div className="flex flex-wrap gap-2 mb-3">
@@ -117,7 +145,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
                 {feedbackStatus?.partnerHasRated && (
                   <Badge variant="secondary" className="gap-1">
                     <Trophy className="h-3 w-3" />
-                    {partnerName} already rated!
+                    {invitationData.partnerName} already rated!
                   </Badge>
                 )}
                 <Badge variant="outline" className="gap-1">
@@ -145,8 +173,8 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
         open={modalOpen}
         onOpenChange={setModalOpen}
         invitationId={invitationId}
-        partnerName={partnerName}
-        venueName={venueName}
+        partnerName={invitationData.partnerName}
+        venueName={invitationData.venueName}
         onSuccess={handleSuccess}
       />
     </>

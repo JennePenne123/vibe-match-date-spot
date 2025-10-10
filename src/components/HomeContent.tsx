@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, Users, User } from 'lucide-react';
 import { Heading, Text } from '@/design-system/components';
 import RecentReceivedInvitationsCard from '@/components/home/RecentReceivedInvitationsCard';
+import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
@@ -139,6 +140,9 @@ const HomeContent: React.FC = () => {
         {isDesktop ? (
           // Desktop layout: Optimized 5-column asymmetric grid (2-2-1 ratio)
           <div className="space-y-5">
+            {/* Pending Ratings Card - Full Width */}
+            <PendingRatingsCard />
+            
             <div className="grid grid-cols-5 gap-4 lg:gap-5">
               {/* Date Proposals Section - 2 columns */}
               <div className="col-span-2">
@@ -188,6 +192,9 @@ const HomeContent: React.FC = () => {
         ) : (
           // Mobile layout: Single column with optimized spacing
           <div className="space-y-5">
+            {/* Pending Ratings Card */}
+            <PendingRatingsCard />
+            
             {/* Date Proposals Section */}
             <DateProposalsList 
               onProposalAccepted={handleProposalAccepted}

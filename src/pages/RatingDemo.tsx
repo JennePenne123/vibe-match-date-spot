@@ -67,9 +67,6 @@ const RatingDemo: React.FC = () => {
           <CardContent>
             <DateRatingPrompt
               invitationId="demo-invitation-id"
-              partnerName="Alex Johnson"
-              venueName="Il Siciliano"
-              dateTime={new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()}
               onRatingComplete={() => console.log('Rating completed!')}
             />
           </CardContent>

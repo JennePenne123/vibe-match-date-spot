@@ -146,9 +146,12 @@ export interface DateInvitation {
   title: string;
   message?: string;
   proposed_date?: string;
+  actual_date_time?: string;
+  date_status?: 'scheduled' | 'completed' | 'cancelled';
   status: 'pending' | 'accepted' | 'declined' | 'cancelled';
   created_at: string;
   sender?: Profile;
+  recipient?: Profile;
   venue?: Venue;
   
   // UI compatibility properties
