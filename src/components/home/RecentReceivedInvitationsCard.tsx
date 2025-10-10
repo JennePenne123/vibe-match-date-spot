@@ -18,7 +18,7 @@ const RecentReceivedInvitationsCard: React.FC = () => {
     if (!invitations || invitations.length === 0) return [];
     
     const received = invitations
-      .filter(inv => inv.direction === 'received' && inv.status !== 'declined')
+      .filter(inv => inv.direction === 'received' && inv.status !== 'declined' && inv.status !== 'cancelled')
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 3)
       .map(inv => ({
