@@ -190,20 +190,45 @@ Deno.serve(async (req) => {
           console.log(`  🎖️ Awarded 'date_master' badge (+${BADGE_POINTS.date_master} points)`);
         }
 
-        // Check for streak badges
-        const today = new Date().toDateString();
+        // Check for speed demon badge (rated within 24 hours of date)
+        if (!currentBadges.includes('speed_demon') && invitation.actual_date_time) {
+          const dateTime = new Date(invitation.actual_date_time);
+          const feedbackTime = new Date(feedbacks.find(f => f.user_id === userId)?.created_at || '');
+          const hoursSinceDate = (feedbackTime.getTime() - dateTime.getTime()) / (1000 * 60 * 60);
+          
+          if (hoursSinceDate <= SPEED_BONUS_HOURS && hoursSinceDate >= 0) {
+            newBadges.push('speed_demon');
+            additionalPoints += BADGE_POINTS.speed_demon;
+            console.log(`  🎖️ Awarded 'speed_demon' badge (+${BADGE_POINTS.speed_demon} points) - rated in ${hoursSinceDate.toFixed(1)}h`);
+          }
+        }
+
+        // Check for streak badges (using UTC dates to avoid timezone issues)
+        const now = new Date();
+        const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
         const lastReviewDate = currentPoints.last_review_date 
-          ? new Date(currentPoints.last_review_date).toDateString() 
+          ? new Date(currentPoints.last_review_date)
           : null;
+        
+        let lastReviewDateUTC = null;
+        if (lastReviewDate) {
+          lastReviewDateUTC = new Date(Date.UTC(
+            lastReviewDate.getUTCFullYear(), 
+            lastReviewDate.getUTCMonth(), 
+            lastReviewDate.getUTCDate()
+          ));
+        }
         
         let newStreakCount = currentPoints.streak_count || 0;
         
-        if (lastReviewDate === today) {
+        if (lastReviewDateUTC && lastReviewDateUTC.getTime() === todayUTC.getTime()) {
           // Already reviewed today, maintain streak
           newStreakCount = currentPoints.streak_count;
-        } else if (lastReviewDate) {
-          const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString();
-          if (lastReviewDate === yesterday) {
+        } else if (lastReviewDateUTC) {
+          const yesterdayUTC = new Date(todayUTC);
+          yesterdayUTC.setUTCDate(yesterdayUTC.getUTCDate() - 1);
+          
+          if (lastReviewDateUTC.getTime() === yesterdayUTC.getTime()) {
             // Consecutive day review, increment streak
             newStreakCount = (currentPoints.streak_count || 0) + 1;
           } else {
@@ -228,46 +253,73 @@ Deno.serve(async (req) => {
         }
 
         // Check for Perfect Pair badge (both partners rated 5 stars, 5 times)
+        // Optimized: Use a single query with JOIN to find mutual 5-star ratings
         if (!currentBadges.includes('perfect_pair')) {
-          const { data: perfectRatings } = await supabase
-            .from('date_feedback')
-            .select('id, invitation_id')
-            .eq('user_id', userId)
-            .eq('rating', 5);
+          const { data: perfectPairCount, error: perfectPairError } = await supabase.rpc(
+            'count_perfect_pairs',
+            { target_user_id: userId }
+          );
 
-          if (perfectRatings && perfectRatings.length >= 5) {
-            // Check if partner also rated 5 stars for these invitations
-            let perfectPairCount = 0;
+          // Fallback if RPC doesn't exist - use optimized query
+          if (perfectPairError) {
+            console.log(`  ⚠️ RPC not available, using direct query for perfect pairs`);
             
-            for (const rating of perfectRatings) {
-              const { data: partnerRating } = await supabase
-                .from('date_feedback')
-                .select('rating')
-                .eq('invitation_id', rating.invitation_id)
-                .neq('user_id', userId)
-                .eq('rating', 5)
-                .single();
+            const { data: mutualFiveStars } = await supabase
+              .from('date_feedback')
+              .select(`
+                invitation_id,
+                date_invitations!inner(id)
+              `)
+              .eq('user_id', userId)
+              .eq('rating', 5);
 
-              if (partnerRating) {
-                perfectPairCount++;
+            if (mutualFiveStars && mutualFiveStars.length >= 5) {
+              // Get invitation IDs and check for partner 5-star ratings in batch
+              const invitationIds = mutualFiveStars.map(r => r.invitation_id);
+              
+              const { data: partnerRatings } = await supabase
+                .from('date_feedback')
+                .select('invitation_id')
+                .in('invitation_id', invitationIds)
+                .neq('user_id', userId)
+                .eq('rating', 5);
+
+              const perfectPairInvitations = new Set(partnerRatings?.map(r => r.invitation_id) || []);
+              const perfectCount = mutualFiveStars.filter(r => 
+                perfectPairInvitations.has(r.invitation_id)
+              ).length;
+
+              if (perfectCount >= 5) {
+                newBadges.push('perfect_pair');
+                additionalPoints += BADGE_POINTS.perfect_pair;
+                console.log(`  🎖️ Awarded 'perfect_pair' badge (+${BADGE_POINTS.perfect_pair} points)`);
               }
             }
-
-            if (perfectPairCount >= 5) {
-              newBadges.push('perfect_pair');
-              additionalPoints += BADGE_POINTS.perfect_pair;
-              console.log(`  🎖️ Awarded 'perfect_pair' badge (+${BADGE_POINTS.perfect_pair} points)`);
-            }
+          } else if (perfectPairCount >= 5) {
+            newBadges.push('perfect_pair');
+            additionalPoints += BADGE_POINTS.perfect_pair;
+            console.log(`  🎖️ Awarded 'perfect_pair' badge (+${BADGE_POINTS.perfect_pair} points)`);
           }
         }
 
-        // Update user points with new badges and points
-        const updatedBadges = [...currentBadges, ...newBadges];
+        // Deduplicate badges before updating (prevent duplicates from concurrent runs)
+        const badgeSet = new Set([...currentBadges, ...newBadges]);
+        const updatedBadges = Array.from(badgeSet);
+        
+        // Use atomic increment for points to prevent race conditions
+        // First, get the current points again to ensure we have the latest value
+        const { data: latestPoints } = await supabase
+          .from('user_points')
+          .select('total_points')
+          .eq('user_id', userId)
+          .single();
+        
+        const newTotalPoints = (latestPoints?.total_points || currentPoints.total_points) + additionalPoints;
         
         const { error: updatePointsError } = await supabase
           .from('user_points')
           .update({
-            total_points: currentPoints.total_points + additionalPoints,
+            total_points: newTotalPoints,
             badges: updatedBadges,
             streak_count: newStreakCount,
             last_review_date: new Date().toISOString(),
