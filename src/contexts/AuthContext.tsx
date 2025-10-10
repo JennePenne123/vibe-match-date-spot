@@ -4,9 +4,10 @@ import { Session } from '@supabase/supabase-js';
 import { AppUser } from '@/types/app';
 import { useAuthState } from '@/hooks/useAuthState';
 import { signUpUser, signInUser, signOutUser } from '@/services/authService';
-import { updateUserProfile } from '@/utils/userProfileHelpers';
+import { updateUserProfile, fetchUserProfile } from '@/utils/userProfileHelpers';
 import { inviteFriendById } from '@/services/friendshipService';
 import { expireUserSessions, clearUserPreferenceFields } from '@/services/sessionCleanupService';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: AppUser | null;
@@ -18,6 +19,7 @@ interface AuthContextType {
   updateUser: (userData: any) => Promise<void>;
   inviteFriend: (friendId: string) => void;
   logout: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -77,6 +79,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const refreshProfile = async () => {
+    try {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (currentSession?.user) {
+        const enrichedUser = await fetchUserProfile(currentSession.user);
+        setUser(enrichedUser);
+        console.log('✅ Profile refreshed successfully');
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing profile:', error);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -87,7 +102,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signOut,
       updateUser,
       inviteFriend,
-      logout
+      logout,
+      refreshProfile
     }}>
       {children}
     </AuthContext.Provider>

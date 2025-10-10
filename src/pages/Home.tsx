@@ -10,8 +10,15 @@ import { useBreakpoint } from '@/hooks/use-mobile';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, refreshProfile } = useAuth();
   const { isMobile } = useBreakpoint();
+
+  // Refresh profile on mount to get latest avatar
+  React.useEffect(() => {
+    if (user && !authLoading) {
+      refreshProfile();
+    }
+  }, []);
 
   // Handle authentication redirect
   React.useEffect(() => {
