@@ -80,6 +80,99 @@ export interface VenuePopularityStats {
 // DATE FEEDBACK FUNCTIONS
 // =============================================================================
 
+/**
+ * Check if a date invitation has been rated by the current user
+ */
+export const checkDateFeedbackStatus = async (
+  invitationId: string
+): Promise<{ hasRated: boolean; partnerHasRated: boolean } | null> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    // Get the invitation to find the partner
+    const { data: invitation } = await supabase
+      .from('date_invitations')
+      .select('sender_id, recipient_id')
+      .eq('id', invitationId)
+      .single();
+
+    if (!invitation) return null;
+
+    const partnerId = invitation.sender_id === user.id 
+      ? invitation.recipient_id 
+      : invitation.sender_id;
+
+    // Check if current user has rated
+    const { data: userFeedback } = await supabase
+      .from('date_feedback')
+      .select('id')
+      .eq('invitation_id', invitationId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    // Check if partner has rated
+    const { data: partnerFeedback } = await supabase
+      .from('date_feedback')
+      .select('id')
+      .eq('invitation_id', invitationId)
+      .eq('user_id', partnerId)
+      .maybeSingle();
+
+    return {
+      hasRated: !!userFeedback,
+      partnerHasRated: !!partnerFeedback,
+    };
+  } catch (error) {
+    console.error('Error checking feedback status:', error);
+    return null;
+  }
+};
+
+/**
+ * Get pending date invitations that need rating (completed dates without feedback)
+ */
+export const getPendingRatings = async (): Promise<any[]> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    // Get completed invitations
+    const { data: invitations, error } = await supabase
+      .from('date_invitations')
+      .select(`
+        *,
+        sender:profiles!date_invitations_sender_id_fkey(id, name, avatar_url),
+        recipient:profiles!date_invitations_recipient_id_fkey(id, name, avatar_url)
+      `)
+      .eq('date_status', 'completed')
+      .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+      .order('proposed_date', { ascending: false });
+
+    if (error) throw error;
+
+    // Filter out invitations that already have feedback from current user
+    const pending = [];
+    for (const invitation of invitations || []) {
+      const { data: feedback } = await supabase
+        .from('date_feedback')
+        .select('id')
+        .eq('invitation_id', invitation.id)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!feedback) {
+        pending.push(invitation);
+      }
+    }
+
+    return pending;
+  } catch (error) {
+    console.error('Error getting pending ratings:', error);
+    return [];
+  }
+};
+
 export const createDateFeedback = async (
   feedbackData: DateFeedbackData
 ): Promise<DateFeedback | null> => {
