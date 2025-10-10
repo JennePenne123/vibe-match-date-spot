@@ -11,3 +11,9 @@ verify_jwt = true
 
 [functions.suggest-date-ideas]
 verify_jwt = true
+
+[functions.check-completed-dates]
+verify_jwt = false
+
+[functions.calculate-feedback-rewards]
+verify_jwt = false
