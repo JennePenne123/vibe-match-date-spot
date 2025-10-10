@@ -15,7 +15,7 @@ export const useUserPoints = () => {
       
       // Set up realtime subscription for points updates
       const channel = supabase
-        .channel('user-points-changes')
+        .channel(`user-points-${user.id}-${Date.now()}`)
         .on(
           'postgres_changes',
           {
