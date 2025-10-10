@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Trophy, Calendar, Gift, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, Trophy, Calendar, Gift, CheckCircle2, XCircle, Sparkles } from 'lucide-react';
 import { 
-  createGamificationTestData, 
+  createGamificationTestData,
+  createComprehensiveTestData,
   triggerCheckCompletedDates, 
   triggerCalculateRewards 
 } from '@/services/testData/gamificationTestData';
@@ -19,6 +20,16 @@ export const GamificationTester: React.FC = () => {
     
     const result = await createGamificationTestData();
     setResults({ type: 'test-data', ...result });
+    
+    setLoading(false);
+  };
+
+  const handleCreateComprehensiveData = async () => {
+    setLoading(true);
+    setResults(null);
+    
+    const result = await createComprehensiveTestData();
+    setResults({ type: 'comprehensive-data', ...result });
     
     setLoading(false);
   };
@@ -57,7 +68,7 @@ export const GamificationTester: React.FC = () => {
       <CardContent className="space-y-4">
         {/* Test Data Setup */}
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold">Step 1: Create Test Data</h3>
+          <h3 className="text-sm font-semibold">Step 1A: Create Basic Test Data</h3>
           <Button
             onClick={handleCreateTestData}
             disabled={loading}
@@ -72,12 +83,38 @@ export const GamificationTester: React.FC = () => {
             ) : (
               <>
                 <Calendar className="mr-2 h-4 w-4" />
-                Create Test Completed Dates
+                Create Basic Test Data
               </>
             )}
           </Button>
           <p className="text-xs text-muted-foreground">
-            Creates past dates with your friends that should be marked as completed
+            Creates 3 simple completed dates for basic testing
+          </p>
+        </div>
+
+        {/* Comprehensive Test Data */}
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold">Step 1B: Create Comprehensive Test Data ⭐</h3>
+          <Button
+            onClick={handleCreateComprehensiveData}
+            disabled={loading}
+            className="w-full"
+            variant="default"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Create Comprehensive Test Data
+              </>
+            )}
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Creates 25+ dates covering all badge scenarios: streaks, milestones, perfect pairs, speed bonuses
           </p>
         </div>
 
@@ -171,6 +208,34 @@ export const GamificationTester: React.FC = () => {
                         <div className="text-muted-foreground truncate">ID: {date.id}</div>
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {/* Show comprehensive data results */}
+                {results.results && (
+                  <div className="mt-2 space-y-2">
+                    <div className="text-xs font-semibold">Test Data Summary:</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="text-xs bg-muted/50 p-2 rounded">
+                        <div className="font-medium">🔥 Streak Dates</div>
+                        <div className="text-muted-foreground">{results.results.streakDates.length} dates</div>
+                      </div>
+                      <div className="text-xs bg-muted/50 p-2 rounded">
+                        <div className="font-medium">📊 Milestone Dates</div>
+                        <div className="text-muted-foreground">{results.results.milestoneDates.length} dates</div>
+                      </div>
+                      <div className="text-xs bg-muted/50 p-2 rounded">
+                        <div className="font-medium">⭐ Perfect Pairs</div>
+                        <div className="text-muted-foreground">{results.results.perfectPairDates.length} dates</div>
+                      </div>
+                      <div className="text-xs bg-muted/50 p-2 rounded">
+                        <div className="font-medium">⚡ Speed Bonus</div>
+                        <div className="text-muted-foreground">{results.results.speedBonusDates.length} dates</div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Total: {results.totalDates} test dates created
+                    </div>
                   </div>
                 )}
               </div>
