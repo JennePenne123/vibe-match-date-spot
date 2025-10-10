@@ -201,10 +201,12 @@ export type Database = {
       }
       date_invitations: {
         Row: {
+          actual_date_time: string | null
           ai_compatibility_score: number | null
           ai_generated_message: string | null
           ai_reasoning: string | null
           created_at: string
+          date_status: string | null
           id: string
           message: string | null
           planning_session_id: string | null
@@ -218,10 +220,12 @@ export type Database = {
           venue_match_factors: Json | null
         }
         Insert: {
+          actual_date_time?: string | null
           ai_compatibility_score?: number | null
           ai_generated_message?: string | null
           ai_reasoning?: string | null
           created_at?: string
+          date_status?: string | null
           id?: string
           message?: string | null
           planning_session_id?: string | null
@@ -235,10 +239,12 @@ export type Database = {
           venue_match_factors?: Json | null
         }
         Update: {
+          actual_date_time?: string | null
           ai_compatibility_score?: number | null
           ai_generated_message?: string | null
           ai_reasoning?: string | null
           created_at?: string
+          date_status?: string | null
           id?: string
           message?: string | null
           planning_session_id?: string | null
@@ -388,6 +394,50 @@ export type Database = {
           },
         ]
       }
+      feedback_rewards: {
+        Row: {
+          badges_earned: Json
+          both_rated_bonus: boolean | null
+          completion_level: string
+          created_at: string
+          feedback_id: string
+          id: string
+          points_earned: number
+          speed_bonus: boolean | null
+          user_id: string
+        }
+        Insert: {
+          badges_earned?: Json
+          both_rated_bonus?: boolean | null
+          completion_level: string
+          created_at?: string
+          feedback_id: string
+          id?: string
+          points_earned?: number
+          speed_bonus?: boolean | null
+          user_id: string
+        }
+        Update: {
+          badges_earned?: Json
+          both_rated_bonus?: boolean | null
+          completion_level?: string
+          created_at?: string
+          feedback_id?: string
+          id?: string
+          points_earned?: number
+          speed_bonus?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_feedback_rewards_feedback"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "date_feedback"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       friendships: {
         Row: {
           created_at: string
@@ -499,6 +549,42 @@ export type Database = {
           id?: string
           name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_points: {
+        Row: {
+          badges: Json
+          created_at: string
+          id: string
+          last_review_date: string | null
+          level: number
+          streak_count: number
+          total_points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          badges?: Json
+          created_at?: string
+          id?: string
+          last_review_date?: string | null
+          level?: number
+          streak_count?: number
+          total_points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          badges?: Json
+          created_at?: string
+          id?: string
+          last_review_date?: string | null
+          level?: number
+          streak_count?: number
+          total_points?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
