@@ -7,10 +7,15 @@ import { ArrowLeft } from 'lucide-react';
 import ProfileHeader from '@/components/ProfileHeader';
 import ProfileStats from '@/components/ProfileStats';
 import ProfileActions from '@/components/ProfileActions';
+import { PointsCard } from '@/components/profile/PointsCard';
+import { BadgesCard } from '@/components/profile/BadgesCard';
+import { LeaderboardCard } from '@/components/profile/LeaderboardCard';
+import { useUserPoints } from '@/hooks/useUserPoints';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, updateUser, logout, loading } = useAuth();
+  const { points, loading: pointsLoading } = useUserPoints();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
@@ -87,9 +92,26 @@ const Profile = () => {
         />
 
         {/* Content */}
-        <div className="p-4 -mt-8">
+        <div className="p-4 -mt-8 space-y-4">
           {/* Stats */}
           <ProfileStats />
+
+          {/* Points and Progress */}
+          {!pointsLoading && points && (
+            <PointsCard 
+              totalPoints={points.total_points}
+              level={points.level}
+              streakCount={points.streak_count}
+            />
+          )}
+
+          {/* Badges */}
+          {!pointsLoading && points && (
+            <BadgesCard badges={Array.isArray(points.badges) ? points.badges : []} />
+          )}
+
+          {/* Leaderboard */}
+          <LeaderboardCard />
 
           {/* Actions */}
           <ProfileActions onLogout={logout} />
