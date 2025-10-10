@@ -428,7 +428,7 @@ const DateInviteCard = ({
           </SheetTitle>
         </SheetHeader>
           <div className="h-[calc(100%-4rem)] mt-4">
-            {user && (
+            {user ? (
               <ErrorBoundaryWrapper key={invitation.id}>
                 <InvitationMessenger
                   invitationId={invitation.id}
@@ -440,6 +440,10 @@ const DateInviteCard = ({
                   }}
                 />
               </ErrorBoundaryWrapper>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-muted-foreground">Loading...</p>
+              </div>
             )}
           </div>
       </SheetContent>

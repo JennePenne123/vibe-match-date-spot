@@ -23,7 +23,7 @@ export const useInvitationMessages = (invitationId: string) => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-  const isSubscribingRef = useRef(false);
+  const subscriptionPromiseRef = useRef<Promise<void> | null>(null);
 
   // Fetch messages
   const fetchMessages = async () => {
@@ -121,91 +121,100 @@ export const useInvitationMessages = (invitationId: string) => {
     msg => user && msg.sender_id !== user.id && !msg.read_at
   ).length;
 
-  // Set up real-time subscription
+  // Set up real-time subscription with promise-based guard
   useEffect(() => {
     const userId = user?.id;
     if (!invitationId || !userId) return;
 
-    // Prevent duplicate subscriptions - check BOTH channel exists AND not currently subscribing
-    if (channelRef.current || isSubscribingRef.current) {
-      console.log('⚠️ Already subscribed or subscribing, skipping');
+    // If already subscribing or subscribed, skip
+    if (subscriptionPromiseRef.current || channelRef.current) {
+      console.log('⚠️ Subscription already in progress or exists');
       return;
     }
-
-    // Set flag IMMEDIATELY to prevent concurrent subscriptions
-    isSubscribingRef.current = true;
 
     const channelName = `invitation_messages:${invitationId}`;
     console.log('🔌 Setting up real-time channel:', channelName);
 
-    // Create channel
-    const channel = supabase.channel(channelName);
-    
-    // STORE REFERENCE IMMEDIATELY before subscribing to prevent race conditions
-    channelRef.current = channel;
+    // Create a promise to track subscription completion
+    const subscriptionPromise = (async () => {
+      try {
+        const channel = supabase.channel(channelName);
+        
+        // Fetch messages first
+        await fetchMessages();
 
-    // Fetch messages
-    fetchMessages();
+        // Set up event listeners
+        channel
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'invitation_messages',
+              filter: `invitation_id=eq.${invitationId}`
+            },
+            async (payload) => {
+              console.log('📨 New message received:', payload.new.id);
+              // Fetch full message with sender info
+              const { data } = await supabase
+                .from('invitation_messages')
+                .select(`
+                  *,
+                  sender:profiles!sender_id(name, avatar_url)
+                `)
+                .eq('id', payload.new.id)
+                .single();
 
-    // Add event listeners and subscribe
-    channel
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'invitation_messages',
-          filter: `invitation_id=eq.${invitationId}`
-        },
-        async (payload) => {
-          console.log('📨 New message received:', payload.new.id);
-          // Fetch full message with sender info
-          const { data } = await supabase
-            .from('invitation_messages')
-            .select(`
-              *,
-              sender:profiles!sender_id(name, avatar_url)
-            `)
-            .eq('id', payload.new.id)
-            .single();
-
-          if (data) {
-            setMessages(prev => [...prev, data]);
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'invitation_messages',
-          filter: `invitation_id=eq.${invitationId}`
-        },
-        (payload) => {
-          console.log('📝 Message updated:', payload.new.id);
-          setMessages(prev =>
-            prev.map(msg =>
-              msg.id === payload.new.id ? { ...msg, ...payload.new } : msg
-            )
+              if (data) {
+                setMessages(prev => [...prev, data]);
+              }
+            }
+          )
+          .on(
+            'postgres_changes',
+            {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'invitation_messages',
+              filter: `invitation_id=eq.${invitationId}`
+            },
+            (payload) => {
+              console.log('📝 Message updated:', payload.new.id);
+              setMessages(prev =>
+                prev.map(msg =>
+                  msg.id === payload.new.id ? { ...msg, ...payload.new } : msg
+                )
+              );
+            }
           );
-        }
-      )
-      .subscribe((status) => {
-        console.log('📡 Channel status:', status);
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Channel subscription successful');
-          isSubscribingRef.current = false; // Subscription complete
-        } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Channel subscription failed');
-          channelRef.current = null;
-          isSubscribingRef.current = false; // Reset on error
-        }
-      });
+
+        // Subscribe and wait for confirmation
+        await new Promise<void>((resolve, reject) => {
+          channel.subscribe((status) => {
+            console.log('📡 Channel status:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('✅ Subscription successful');
+              channelRef.current = channel; // Only set AFTER successful subscription
+              resolve();
+            } else if (status === 'CHANNEL_ERROR') {
+              console.error('❌ Subscription failed');
+              reject(new Error('Channel subscription failed'));
+            }
+          });
+        });
+      } catch (error) {
+        console.error('🚨 Subscription error:', error);
+        subscriptionPromiseRef.current = null;
+        channelRef.current = null;
+        throw error;
+      }
+    })();
+
+    subscriptionPromiseRef.current = subscriptionPromise;
 
     return () => {
       console.log('🔌 Cleaning up channel:', channelName);
-      isSubscribingRef.current = false; // Reset flag
+      subscriptionPromiseRef.current = null;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;

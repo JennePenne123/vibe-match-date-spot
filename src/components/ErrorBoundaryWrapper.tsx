@@ -7,24 +7,30 @@ interface ErrorBoundaryWrapperProps {
   error?: Error;
 }
 
-const DefaultErrorFallback: React.FC<{ error: Error }> = ({ error }) => (
-  <div className="flex items-center justify-center min-h-[200px] p-6">
-    <div className="text-center max-w-md">
-      <h3 className="text-lg font-semibold text-red-600 mb-2">
-        Something went wrong
-      </h3>
-      <p className="text-sm text-gray-600 mb-4">
-        {error.message || 'An unexpected error occurred'}
-      </p>
-      <button 
-        onClick={() => window.location.reload()} 
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-      >
-        Reload Page
-      </button>
+const DefaultErrorFallback: React.FC<{ error: Error }> = ({ error }) => {
+  const isSubscriptionError = error.message.includes('subscribe') || error.message.includes('channel');
+  
+  return (
+    <div className="flex items-center justify-center min-h-[200px] p-6">
+      <div className="text-center max-w-md">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">
+          {isSubscriptionError ? 'Connection Error' : 'Something went wrong'}
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          {isSubscriptionError 
+            ? 'Failed to connect to chat. Please close and try again.' 
+            : error.message || 'An unexpected error occurred'}
+        </p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        >
+          Reload Page
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const ErrorBoundaryWrapper: React.FC<ErrorBoundaryWrapperProps> = ({ 
   children, 
