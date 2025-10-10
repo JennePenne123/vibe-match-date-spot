@@ -13,6 +13,13 @@ const Home: React.FC = () => {
   const { user, loading: authLoading, refreshProfile } = useAuth();
   const { isMobile } = useBreakpoint();
 
+  // Refresh profile on mount to get latest avatar data
+  React.useEffect(() => {
+    if (user && !authLoading) {
+      refreshProfile();
+    }
+  }, []);
+
   // Handle authentication redirect
   React.useEffect(() => {
     const redirectTimer = setTimeout(() => {

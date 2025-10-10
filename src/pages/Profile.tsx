@@ -14,11 +14,18 @@ import { useUserPoints } from '@/hooks/useUserPoints';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, updateUser, logout, loading } = useAuth();
+  const { user, updateUser, logout, loading, refreshProfile } = useAuth();
   const { points, loading: pointsLoading } = useUserPoints();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
+
+  // Refresh profile on mount to get latest avatar data
+  React.useEffect(() => {
+    if (user && !loading) {
+      refreshProfile();
+    }
+  }, []);
 
   React.useEffect(() => {
     if (!loading && !user) {
