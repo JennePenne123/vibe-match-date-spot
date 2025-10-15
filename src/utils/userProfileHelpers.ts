@@ -23,11 +23,15 @@ export const fetchUserProfile = async (supabaseUser: SupabaseUser): Promise<AppU
       return supabaseUserToAppUser(supabaseUser)!;
     }
 
+    const avatarUrl = profile.avatar_url || supabaseUser.user_metadata?.avatar_url;
+    console.log('📸 PROFILE FETCH: Avatar URL from database:', profile.avatar_url);
+    console.log('📸 PROFILE FETCH: Final avatar_url:', avatarUrl);
+    
     return {
       id: supabaseUser.id,
       email: supabaseUser.email || '',
       name: profile.name || supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
-      avatar_url: profile.avatar_url || supabaseUser.user_metadata?.avatar_url
+      avatar_url: avatarUrl
     };
   } catch (error) {
     console.error('Error fetching user profile:', error);

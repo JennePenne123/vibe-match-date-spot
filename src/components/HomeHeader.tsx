@@ -15,6 +15,13 @@ const HomeHeader = ({
   displayName,
   firstName
 }: HomeHeaderProps) => {
+  const avatarUrl = getUserAvatar(user);
+  
+  console.log('🏠 HEADER: Rendering HomeHeader');
+  console.log('🏠 HEADER: User avatar_url:', user?.avatar_url);
+  console.log('🏠 HEADER: getUserAvatar result:', avatarUrl);
+  console.log('🏠 HEADER: Full user object:', user);
+  
   const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';
@@ -25,7 +32,19 @@ const HomeHeader = ({
   return <div className="flex justify-between items-center p-4 pt-12 bg-white shadow-sm">
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <Avatar className="w-10 h-10 border-2 border-pink-200 shrink-0">
-          <AvatarImage src={getUserAvatar(user)} alt={displayName} />
+          <AvatarImage 
+            src={avatarUrl} 
+            alt={displayName}
+            onError={(e) => {
+              console.error('❌ AVATAR: Image failed to load');
+              console.error('❌ AVATAR: Failed URL:', avatarUrl);
+              console.error('❌ AVATAR: Error event:', e);
+            }}
+            onLoad={() => {
+              console.log('✅ AVATAR: Image loaded successfully');
+              console.log('✅ AVATAR: Loaded URL:', avatarUrl);
+            }}
+          />
           <AvatarFallback className="bg-pink-100 text-pink-600 text-sm">
             {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
           </AvatarFallback>

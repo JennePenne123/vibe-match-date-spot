@@ -84,8 +84,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: { session: currentSession } } = await supabase.auth.getSession();
       if (currentSession?.user) {
         const enrichedUser = await fetchUserProfile(currentSession.user);
+        console.log('✅ REFRESH: Profile refreshed. Avatar URL:', enrichedUser.avatar_url);
+        console.log('✅ REFRESH: Full user object:', enrichedUser);
         setUser(enrichedUser);
-        console.log('✅ Profile refreshed successfully');
       }
     } catch (error) {
       console.error('❌ Error refreshing profile:', error);
