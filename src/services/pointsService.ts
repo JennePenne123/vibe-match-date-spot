@@ -106,32 +106,44 @@ export const getLevelProgress = (totalPoints: number, currentLevel: number): num
  * Fetch leaderboard data
  */
 export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEntry[]> => {
-  const { data, error } = await supabase
+  // First, get the top user_points entries
+  const { data: pointsData, error: pointsError } = await supabase
     .from('user_points')
-    .select(`
-      user_id,
-      total_points,
-      level,
-      streak_count,
-      profile:profiles!user_id(name, avatar_url)
-    `)
+    .select('user_id, total_points, level, streak_count')
     .order('total_points', { ascending: false })
     .limit(limit);
 
-  if (error) {
-    console.error('Error fetching leaderboard:', error);
+  if (pointsError) {
+    console.error('Error fetching leaderboard:', pointsError);
     return [];
   }
 
-  // Transform the data to match our interface
-  return (data || []).map(entry => ({
+  if (!pointsData || pointsData.length === 0) {
+    return [];
+  }
+
+  // Then, fetch profiles for these users
+  const userIds = pointsData.map(p => p.user_id);
+  const { data: profilesData, error: profilesError } = await supabase
+    .from('profiles')
+    .select('id, name, avatar_url')
+    .in('id', userIds);
+
+  if (profilesError) {
+    console.error('Error fetching profiles for leaderboard:', profilesError);
+  }
+
+  // Combine the data
+  const profilesMap = new Map(
+    (profilesData || []).map(p => [p.id, { name: p.name, avatar_url: p.avatar_url }])
+  );
+
+  return pointsData.map(entry => ({
     user_id: entry.user_id,
     total_points: entry.total_points,
     level: entry.level,
     streak_count: entry.streak_count,
-    profile: Array.isArray(entry.profile) 
-      ? entry.profile[0] 
-      : entry.profile as { name: string; avatar_url?: string }
+    profile: profilesMap.get(entry.user_id) || { name: 'Unknown User', avatar_url: undefined }
   }));
 };
 

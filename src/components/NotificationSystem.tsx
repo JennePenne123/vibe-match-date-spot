@@ -90,10 +90,11 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
       .subscribe();
 
     return () => {
+      console.log('🧹 Cleaning up notification channels');
       supabase.removeChannel(senderChannel);
       supabase.removeChannel(recipientChannel);
     };
-  }, [user, toast]);
+  }, [user?.id, toast]);
 
   return <>{children}</>;
 };
