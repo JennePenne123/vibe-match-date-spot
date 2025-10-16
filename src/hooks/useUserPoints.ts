@@ -38,7 +38,7 @@ export const useUserPoints = () => {
       setPoints(null);
       setLoading(false);
     }
-  }, [user]);
+  }, [user?.id]);
 
   const loadPoints = async () => {
     try {
