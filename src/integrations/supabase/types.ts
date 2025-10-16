@@ -152,6 +152,112 @@ export type Database = {
         }
         Relationships: []
       }
+      coding_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          title: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      coding_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coding_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "coding_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coding_task_logs: {
+        Row: {
+          completed_at: string | null
+          conversation_id: string
+          created_at: string | null
+          error_message: string | null
+          id: string
+          input_data: Json | null
+          output_data: Json | null
+          status: string
+          task_type: string
+        }
+        Insert: {
+          completed_at?: string | null
+          conversation_id: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          input_data?: Json | null
+          output_data?: Json | null
+          status: string
+          task_type: string
+        }
+        Update: {
+          completed_at?: string | null
+          conversation_id?: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          input_data?: Json | null
+          output_data?: Json | null
+          status?: string
+          task_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coding_task_logs_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "coding_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       date_feedback: {
         Row: {
           ai_accuracy_rating: number | null

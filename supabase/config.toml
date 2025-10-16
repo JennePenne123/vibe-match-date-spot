@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.calculate-feedback-rewards]
 verify_jwt = false
+
+[functions.coding-assistant]
+verify_jwt = true
