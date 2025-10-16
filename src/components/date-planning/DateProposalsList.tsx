@@ -114,8 +114,8 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
     }
   };
 
-  // Filter out hidden proposals, converted proposals, and separate by status
-  const visibleProposals = proposals.filter(p => !hiddenProposals.has(p.id) && p.status !== 'converted');
+  // Filter out hidden proposals, converted proposals, declined proposals, and separate by status
+  const visibleProposals = proposals.filter(p => !hiddenProposals.has(p.id) && p.status !== 'converted' && p.status !== 'declined');
   const pendingProposals = visibleProposals.filter(p => p.status === 'pending');
   const acceptedProposals = visibleProposals.filter(p => p.status === 'accepted');
   const otherProposals = visibleProposals.filter(p => p.status !== 'pending' && p.status !== 'accepted');
