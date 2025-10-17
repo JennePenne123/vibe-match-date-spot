@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Edit, Save, X } from 'lucide-react';
+import { Edit, Save, X, Camera, Loader2 } from 'lucide-react';
 import { getUserAvatar, getFallbackAvatar } from '@/utils/typeHelpers';
+import { uploadAvatar, deleteAvatar } from '@/utils/avatarUpload';
+import { updateUserProfile } from '@/utils/userProfileHelpers';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProfileHeaderProps {
   user: any;
@@ -17,6 +20,7 @@ interface ProfileHeaderProps {
   onEditToggle: () => void;
   onSave: () => void;
   onCancel: () => void;
+  onAvatarUpdate?: () => void;
 }
 
 const ProfileHeader = ({
@@ -30,14 +34,66 @@ const ProfileHeader = ({
   onEditedEmailChange,
   onEditToggle,
   onSave,
-  onCancel
+  onCancel,
+  onAvatarUpdate
 }: ProfileHeaderProps) => {
   const avatarUrl = getUserAvatar(user);
   const [imgError, setImgError] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fallbackUrl = getFallbackAvatar(displayName);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   
   console.log('👤 PROFILE HEADER: Avatar URL:', avatarUrl);
   console.log('👤 PROFILE HEADER: Fallback URL:', fallbackUrl);
+
+  const handleAvatarClick = () => {
+    if (isEditing && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    setIsUploading(true);
+    try {
+      // Delete old avatar if it exists and is from storage
+      if (avatarUrl && avatarUrl.includes('/avatars/')) {
+        await deleteAvatar(avatarUrl);
+      }
+
+      // Upload new avatar
+      const newAvatarUrl = await uploadAvatar(file, user.id);
+
+      // Update profile with new avatar URL
+      await updateUserProfile(user.id, { avatar_url: newAvatarUrl });
+
+      toast({
+        title: "Avatar updated!",
+        description: "Your profile picture has been updated successfully.",
+      });
+
+      // Trigger refresh if callback provided
+      if (onAvatarUpdate) {
+        onAvatarUpdate();
+      }
+    } catch (error: any) {
+      console.error('Avatar upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload avatar. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      // Reset input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
   
   return (
     <div className="bg-white p-4 pt-12 shadow-sm">
@@ -55,24 +111,50 @@ const ProfileHeader = ({
 
       {/* Profile Header */}
       <div className="text-center">
-        <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary/20">
-          <AvatarImage 
-            src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)}
-            alt={displayName}
-            onError={(e) => {
-              console.error('❌ PROFILE AVATAR: Image failed to load');
-              console.error('❌ PROFILE AVATAR: Failed URL:', avatarUrl);
-              setImgError(true);
-            }}
-            onLoad={() => {
-              console.log('✅ PROFILE AVATAR: Image loaded successfully');
-              console.log('✅ PROFILE AVATAR: Loaded URL:', imgError ? fallbackUrl : avatarUrl);
-            }}
-          />
-          <AvatarFallback className="bg-primary/10 text-primary text-2xl">
-            {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative inline-block mb-4">
+          <Avatar className="w-24 h-24 border-4 border-primary/20">
+            <AvatarImage 
+              src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)}
+              alt={displayName}
+              onError={(e) => {
+                console.error('❌ PROFILE AVATAR: Image failed to load');
+                console.error('❌ PROFILE AVATAR: Failed URL:', avatarUrl);
+                setImgError(true);
+              }}
+              onLoad={() => {
+                console.log('✅ PROFILE AVATAR: Image loaded successfully');
+                console.log('✅ PROFILE AVATAR: Loaded URL:', imgError ? fallbackUrl : avatarUrl);
+              }}
+            />
+            <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+              {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          
+          {isEditing && (
+            <>
+              <Button
+                onClick={handleAvatarClick}
+                disabled={isUploading}
+                size="icon"
+                className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary hover:bg-primary/90 shadow-lg"
+              >
+                {isUploading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4" />
+                )}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </>
+          )}
+        </div>
         
         {isEditing ? (
           <div className="space-y-3 max-w-xs mx-auto">

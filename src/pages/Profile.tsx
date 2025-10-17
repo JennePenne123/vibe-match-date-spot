@@ -96,6 +96,7 @@ const Profile = () => {
           onEditToggle={() => setIsEditing(!isEditing)}
           onSave={handleSave}
           onCancel={handleCancel}
+          onAvatarUpdate={refreshProfile}
         />
 
         {/* Content */}
