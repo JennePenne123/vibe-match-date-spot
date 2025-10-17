@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import BurgerMenu from '@/components/BurgerMenu';
 import { PointsIndicator } from '@/components/profile/PointsIndicator';
 import { AppUser } from '@/types/app';
-import { getUserAvatar } from '@/utils/typeHelpers';
+import { getUserAvatar, getFallbackAvatar } from '@/utils/typeHelpers';
 import { Heading } from '@/design-system/components';
 interface HomeHeaderProps {
   user: AppUser;
@@ -16,10 +16,13 @@ const HomeHeader = ({
   firstName
 }: HomeHeaderProps) => {
   const avatarUrl = getUserAvatar(user);
+  const [imgError, setImgError] = useState(false);
+  const fallbackUrl = getFallbackAvatar(displayName);
   
   console.log('🏠 HEADER: Rendering HomeHeader');
   console.log('🏠 HEADER: User avatar_url:', user?.avatar_url);
   console.log('🏠 HEADER: getUserAvatar result:', avatarUrl);
+  console.log('🏠 HEADER: Fallback URL:', fallbackUrl);
   console.log('🏠 HEADER: Full user object:', user);
   
   const getTimeBasedGreeting = () => {
@@ -33,16 +36,17 @@ const HomeHeader = ({
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <Avatar className="w-10 h-10 border-2 border-pink-200 shrink-0">
           <AvatarImage 
-            src={avatarUrl} 
+            src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)}
             alt={displayName}
             onError={(e) => {
               console.error('❌ AVATAR: Image failed to load');
               console.error('❌ AVATAR: Failed URL:', avatarUrl);
               console.error('❌ AVATAR: Error event:', e);
+              setImgError(true);
             }}
             onLoad={() => {
               console.log('✅ AVATAR: Image loaded successfully');
-              console.log('✅ AVATAR: Loaded URL:', avatarUrl);
+              console.log('✅ AVATAR: Loaded URL:', imgError ? fallbackUrl : avatarUrl);
             }}
           />
           <AvatarFallback className="bg-pink-100 text-pink-600 text-sm">

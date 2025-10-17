@@ -43,6 +43,12 @@ export const getUserAvatar = (user: any): string | undefined => {
   return user?.avatar_url || user?.user_metadata?.avatar_url;
 };
 
+export const getFallbackAvatar = (name: string): string => {
+  // Generate a fallback avatar using UI Avatars service
+  const encodedName = encodeURIComponent(name);
+  return `https://ui-avatars.com/api/?name=${encodedName}&background=ffc0cb&color=fff&size=128&bold=true`;
+};
+
 export const getVenueDistance = (venue: any): string => {
   return venue?.distance || '0.5 mi';
 };

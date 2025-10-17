@@ -1,9 +1,9 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Edit, Save, X } from 'lucide-react';
+import { getUserAvatar, getFallbackAvatar } from '@/utils/typeHelpers';
 
 interface ProfileHeaderProps {
   user: any;
@@ -32,6 +32,13 @@ const ProfileHeader = ({
   onSave,
   onCancel
 }: ProfileHeaderProps) => {
+  const avatarUrl = getUserAvatar(user);
+  const [imgError, setImgError] = useState(false);
+  const fallbackUrl = getFallbackAvatar(displayName);
+  
+  console.log('👤 PROFILE HEADER: Avatar URL:', avatarUrl);
+  console.log('👤 PROFILE HEADER: Fallback URL:', fallbackUrl);
+  
   return (
     <div className="bg-white p-4 pt-12 shadow-sm">
       <div className="flex items-center justify-between mb-6">
@@ -49,7 +56,19 @@ const ProfileHeader = ({
       {/* Profile Header */}
       <div className="text-center">
         <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary/20">
-          <AvatarImage src={user.avatar_url} alt={displayName} />
+          <AvatarImage 
+            src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)}
+            alt={displayName}
+            onError={(e) => {
+              console.error('❌ PROFILE AVATAR: Image failed to load');
+              console.error('❌ PROFILE AVATAR: Failed URL:', avatarUrl);
+              setImgError(true);
+            }}
+            onLoad={() => {
+              console.log('✅ PROFILE AVATAR: Image loaded successfully');
+              console.log('✅ PROFILE AVATAR: Loaded URL:', imgError ? fallbackUrl : avatarUrl);
+            }}
+          />
           <AvatarFallback className="bg-primary/10 text-primary text-2xl">
             {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
           </AvatarFallback>
