@@ -28,14 +28,14 @@ const Friends = () => {
 
   // Enhanced demo friends data for testing
   const demoFriends = [
-    { id: '1', name: 'Sarah Johnson', avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '2', name: 'Mike Chen', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '3', name: 'Emma Wilson', avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '4', name: 'David Rodriguez', avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '5', name: 'Jessica Lee', avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '6', name: 'Alex Thompson', avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '7', name: 'Maya Patel', avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face', isInvited: false },
-    { id: '8', name: 'Ryan Kim', avatar_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f52?w=150&h=150&fit=crop&crop=face', isInvited: false },
+    { id: '1', name: 'Sarah Johnson', avatar_url: 'https://ui-avatars.com/api/?name=Sarah+Johnson&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
+    { id: '2', name: 'Mike Chen', avatar_url: 'https://ui-avatars.com/api/?name=Mike+Chen&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
+    { id: '3', name: 'Emma Wilson', avatar_url: 'https://ui-avatars.com/api/?name=Emma+Wilson&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
+    { id: '4', name: 'David Rodriguez', avatar_url: 'https://ui-avatars.com/api/?name=David+Rodriguez&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
+    { id: '5', name: 'Jessica Lee', avatar_url: 'https://ui-avatars.com/api/?name=Jessica+Lee&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
+    { id: '6', name: 'Alex Thompson', avatar_url: 'https://ui-avatars.com/api/?name=Alex+Thompson&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
+    { id: '7', name: 'Maya Patel', avatar_url: 'https://ui-avatars.com/api/?name=Maya+Patel&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
+    { id: '8', name: 'Ryan Kim', avatar_url: 'https://ui-avatars.com/api/?name=Ryan+Kim&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
   ];
 
   const friendsList = isDemoMode ? demoFriends : friends;

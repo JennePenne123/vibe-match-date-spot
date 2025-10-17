@@ -20,7 +20,7 @@ export const mockFriendInvitations: DateInvite[] = [
   {
     id: '1',
     friendName: 'Sarah Chen',
-    friendAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    friendAvatar: 'https://ui-avatars.com/api/?name=Sarah+Chen&background=ffc0cb&color=fff&size=128&bold=true',
     dateType: 'Coffee & Brunch',
     location: 'Downtown',
     time: '2:00 PM Today',
@@ -36,7 +36,7 @@ export const mockFriendInvitations: DateInvite[] = [
   {
     id: '2',
     friendName: 'Mike Johnson',
-    friendAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    friendAvatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=ffc0cb&color=fff&size=128&bold=true',
     dateType: 'Dinner & Movies',
     location: 'Uptown',
     time: '7:30 PM Tomorrow',
@@ -52,7 +52,7 @@ export const mockFriendInvitations: DateInvite[] = [
   {
     id: '3',
     friendName: 'Emma Wilson',
-    friendAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    friendAvatar: 'https://ui-avatars.com/api/?name=Emma+Wilson&background=ffc0cb&color=fff&size=128&bold=true',
     dateType: 'Art Gallery',
     location: 'Arts District',
     time: '3:00 PM Saturday',

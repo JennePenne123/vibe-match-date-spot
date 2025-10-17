@@ -97,7 +97,7 @@ export const createDiverseTestUsers = async () => {
           id: user.id,
           name: user.name,
           email: user.email,
-          avatar_url: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`
+          avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=ffc0cb&color=fff&size=128&bold=true`
         }, { onConflict: 'id' });
 
       if (profileError) {
