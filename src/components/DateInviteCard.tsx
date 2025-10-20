@@ -126,8 +126,8 @@ const DateInviteCard = ({
     estimatedCost: '$$',
     specialNotes: ''
   } : {
-    friendName: 'Recipient',
-    friendAvatar: undefined,
+    friendName: invitation.recipient?.name || 'Recipient',
+    friendAvatar: invitation.recipient?.avatar_url,
     relationLabel: 'To',
     dateType: invitation.title || 'Date Invitation',
     timeProposed: invitation.proposed_date || 'Time TBD',
