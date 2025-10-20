@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Sparkles, Users, User } from 'lucide-react';
 import { Heading, Text } from '@/design-system/components';
-import RecentReceivedInvitationsCard from '@/components/home/RecentReceivedInvitationsCard';
+import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
@@ -155,7 +155,7 @@ const HomeContent: React.FC = () => {
               
               {/* Recent Invitations - 2 columns */}
               <div className="col-span-2">
-                <RecentReceivedInvitationsCard />
+                <UpcomingDatesCard />
               </div>
               
               {/* Planning Mode Selection - 1 column */}
@@ -203,7 +203,7 @@ const HomeContent: React.FC = () => {
             />
             
             {/* Recent Invitations */}
-            <RecentReceivedInvitationsCard />
+            <UpcomingDatesCard />
             
             {/* Planning Mode Selection */}
             <div className="space-y-4">
