@@ -108,11 +108,21 @@ const DateInviteCard = ({
     return 'https://images.unsplash.com/photo-1497644083578-611b798c60f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
   };
 
+  // Determine the relation label based on status
+  const getRelationLabel = () => {
+    // For accepted/scheduled dates, show "With" regardless of direction
+    if (invitation.status === 'accepted' || invitation.date_status === 'scheduled') {
+      return 'With';
+    }
+    // For pending/other statuses, show direction-based labels
+    return direction === 'received' ? 'From' : 'To';
+  };
+
   // Transform invitation data for display based on direction
   const displayData = direction === 'received' ? {
     friendName: invitation.sender?.name || 'Unknown',
     friendAvatar: invitation.sender?.avatar_url,
-    relationLabel: 'From',
+    relationLabel: getRelationLabel(),
     dateType: invitation.title || 'Date Invitation',
     timeProposed: invitation.proposed_date || 'Time TBD',
     location: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
@@ -128,7 +138,7 @@ const DateInviteCard = ({
   } : {
     friendName: invitation.recipient?.name || 'Recipient',
     friendAvatar: invitation.recipient?.avatar_url,
-    relationLabel: 'To',
+    relationLabel: getRelationLabel(),
     dateType: invitation.title || 'Date Invitation',
     timeProposed: invitation.proposed_date || 'Time TBD',
     location: extractVenueFromMessage(invitation.message || '', invitation.venue?.name || 'Venue TBD'),
