@@ -155,7 +155,7 @@ const HomeContent: React.FC = () => {
               
               {/* Recent Invitations - 2 columns */}
               <div className="col-span-2">
-                <UpcomingDatesCard />
+                <UpcomingDatesCard key="upcoming-dates-v2" />
               </div>
               
               {/* Planning Mode Selection - 1 column */}
@@ -203,7 +203,7 @@ const HomeContent: React.FC = () => {
             />
             
             {/* Recent Invitations */}
-            <UpcomingDatesCard />
+            <UpcomingDatesCard key="upcoming-dates-v2" />
             
             {/* Planning Mode Selection */}
             <div className="space-y-4">
