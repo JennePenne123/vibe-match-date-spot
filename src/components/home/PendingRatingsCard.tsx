@@ -84,7 +84,7 @@ export const PendingRatingsCard: React.FC = () => {
                 className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
               >
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={partner?.avatar_url} />
+                  <AvatarImage src={partner?.avatar_url} referrerPolicy="no-referrer" />
                   <AvatarFallback>
                     {partner?.name?.charAt(0).toUpperCase() || '?'}
                   </AvatarFallback>

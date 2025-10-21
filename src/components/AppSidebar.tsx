@@ -79,7 +79,7 @@ export function AppSidebar() {
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
             <Avatar className="w-8 h-8 border border-sidebar-border">
-              <AvatarImage src={userAvatar} alt={displayName} />
+              <AvatarImage src={userAvatar} alt={displayName} referrerPolicy="no-referrer" />
               <AvatarFallback className="bg-sidebar-accent text-sidebar-accent-foreground text-xs">
                 {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
               </AvatarFallback>

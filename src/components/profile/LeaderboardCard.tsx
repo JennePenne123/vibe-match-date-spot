@@ -108,7 +108,7 @@ export const LeaderboardCard: React.FC = () => {
 
                     {/* Avatar */}
                     <Avatar className="h-10 w-10 border-2 border-background">
-                      <AvatarImage src={entry.profile?.avatar_url} />
+                      <AvatarImage src={entry.profile?.avatar_url} referrerPolicy="no-referrer" />
                       <AvatarFallback className="bg-primary/10 text-primary text-sm">
                         {entry.profile?.name?.charAt(0) || '?'}
                       </AvatarFallback>

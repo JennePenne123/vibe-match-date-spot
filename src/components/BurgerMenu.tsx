@@ -69,7 +69,7 @@ const BurgerMenu = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Avatar className="w-12 h-12 border-2 border-pink-200">
-                <AvatarImage src={getUserAvatar(user)} alt={displayName} />
+                <AvatarImage src={getUserAvatar(user)} alt={displayName} referrerPolicy="no-referrer" />
                 <AvatarFallback className="bg-pink-100 text-pink-600">
                   {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>

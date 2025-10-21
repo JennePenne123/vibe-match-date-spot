@@ -175,7 +175,7 @@ const DateInviteCard = ({
               <div className="flex items-start gap-3">
                 <div className="relative flex-shrink-0">
                   <Avatar className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} border-2 border-background shadow-lg ring-2 ring-primary/20 transition-all duration-300 group-hover:ring-primary/40`}>
-                    <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
+                    <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} referrerPolicy="no-referrer" />
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/30 text-primary font-bold text-sm">
                       {displayData.friendName.charAt(0)}
                     </AvatarFallback>
@@ -256,7 +256,7 @@ const DateInviteCard = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <Avatar className="w-10 h-10 border-2 border-pink-200">
-              <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} />
+              <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} referrerPolicy="no-referrer" />
               <AvatarFallback className="bg-pink-100 text-pink-600">
                 {displayData.friendName.split(' ').map(n => n[0]).join('')}
               </AvatarFallback>
@@ -439,7 +439,7 @@ const DateInviteCard = ({
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <Avatar className="w-8 h-8">
-              <AvatarImage src={displayData.friendAvatar} />
+              <AvatarImage src={displayData.friendAvatar} referrerPolicy="no-referrer" />
               <AvatarFallback>
                 {displayData.friendName.charAt(0).toUpperCase()}
               </AvatarFallback>

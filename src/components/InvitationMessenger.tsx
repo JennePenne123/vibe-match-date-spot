@@ -88,7 +88,7 @@ const InvitationMessenger: React.FC<InvitationMessengerProps> = ({
                   {/* Avatar */}
                   {showAvatar ? (
                     <Avatar className="w-8 h-8">
-                      <AvatarImage src={isSender ? undefined : otherUser.avatar_url} />
+                      <AvatarImage src={isSender ? undefined : otherUser.avatar_url} referrerPolicy="no-referrer" />
                       <AvatarFallback>
                         {isSender ? 'You' : otherUser.name.charAt(0).toUpperCase()}
                       </AvatarFallback>

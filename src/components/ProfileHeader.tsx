@@ -116,6 +116,7 @@ const ProfileHeader = ({
             <AvatarImage 
               src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)}
               alt={displayName}
+              referrerPolicy="no-referrer"
               onError={(e) => {
                 console.error('❌ PROFILE AVATAR: Image failed to load');
                 console.error('❌ PROFILE AVATAR: Failed URL:', avatarUrl);

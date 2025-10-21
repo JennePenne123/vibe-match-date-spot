@@ -31,7 +31,7 @@ const FriendCard = ({
     return (
       <div className="flex items-center gap-3 p-2">
         <Avatar className="w-10 h-10 border-2 border-pink-200">
-          <AvatarImage src={friend.avatar_url} alt={friend.name} />
+          <AvatarImage src={friend.avatar_url} alt={friend.name} referrerPolicy="no-referrer" />
           <AvatarFallback className="bg-pink-100 text-pink-600">
             {getInitials(friend.name)}
           </AvatarFallback>
@@ -65,7 +65,7 @@ const FriendCard = ({
         <div className="flex items-center gap-4">
           <div className="relative">
             <Avatar className="w-14 h-14 border-2 border-pink-200">
-              <AvatarImage src={friend.avatar_url} alt={friend.name} />
+              <AvatarImage src={friend.avatar_url} alt={friend.name} referrerPolicy="no-referrer" />
               <AvatarFallback className="bg-pink-100 text-pink-600">
                 {getInitials(friend.name)}
               </AvatarFallback>

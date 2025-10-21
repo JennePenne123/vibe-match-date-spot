@@ -38,6 +38,7 @@ const HomeHeader = ({
           <AvatarImage 
             src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)}
             alt={displayName}
+            referrerPolicy="no-referrer"
             onError={(e) => {
               console.error('❌ AVATAR: Image failed to load');
               console.error('❌ AVATAR: Failed URL:', avatarUrl);

@@ -156,7 +156,7 @@ const Friends = () => {
                   >
                     <div className="flex items-center gap-4">
                       <Avatar className="w-12 h-12">
-                        <AvatarImage src={friend.avatar_url} alt={friend.name} />
+                        <AvatarImage src={friend.avatar_url} alt={friend.name} referrerPolicy="no-referrer" />
                         <AvatarFallback className="bg-primary/10 text-primary">
                           {friend.name.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>
