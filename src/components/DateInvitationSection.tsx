@@ -226,17 +226,17 @@ const DateInvitationSection: React.FC = () => {
 
         <TabsContent value="received" className="space-y-6 mt-6">
           <Tabs defaultValue="pending" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="pending">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
+              <TabsTrigger value="pending" className="text-xs md:text-sm">
                 Pending ({receivedPending.length})
               </TabsTrigger>
-              <TabsTrigger value="accepted">
+              <TabsTrigger value="accepted" className="text-xs md:text-sm">
                 Accepted ({receivedAccepted.length})
               </TabsTrigger>
-              <TabsTrigger value="declined">
+              <TabsTrigger value="declined" className="text-xs md:text-sm">
                 Declined ({receivedDeclined.length})
               </TabsTrigger>
-              <TabsTrigger value="cancelled">
+              <TabsTrigger value="cancelled" className="text-xs md:text-sm">
                 Cancelled ({receivedCancelled.length})
               </TabsTrigger>
             </TabsList>
@@ -258,17 +258,17 @@ const DateInvitationSection: React.FC = () => {
 
         <TabsContent value="sent" className="space-y-6 mt-6">
           <Tabs defaultValue="pending" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="pending">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
+              <TabsTrigger value="pending" className="text-xs md:text-sm">
                 Pending ({sentPending.length})
               </TabsTrigger>
-              <TabsTrigger value="accepted">
+              <TabsTrigger value="accepted" className="text-xs md:text-sm">
                 Accepted ({sentAccepted.length})
               </TabsTrigger>
-              <TabsTrigger value="declined">
+              <TabsTrigger value="declined" className="text-xs md:text-sm">
                 Declined ({sentDeclined.length})
               </TabsTrigger>
-              <TabsTrigger value="cancelled">
+              <TabsTrigger value="cancelled" className="text-xs md:text-sm">
                 Cancelled ({sentCancelled.length})
               </TabsTrigger>
             </TabsList>
