@@ -258,7 +258,12 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             {(() => {
               const progressValue = getStepProgress();
               console.log('🔍 SmartDatePlanner progress value:', progressValue, 'currentStep:', currentStep);
-              return <PlanningHeader progress={progressValue} planningMode={'collaborative'} />;
+              return <PlanningHeader 
+                progress={progressValue} 
+                planningMode={'collaborative'} 
+                showStartFromScratch={!!effectivePreselectedFriend}
+                onStartFromScratch={handleStartFromScratch}
+              />;
             })()}
           </ErrorBoundaryWrapper>
 

@@ -1,14 +1,17 @@
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
 import { Display, Text, Caption } from '@/design-system/components';
 
 interface PlanningHeaderProps {
   progress: number;
   planningMode?: 'solo' | 'collaborative';
+  showStartFromScratch?: boolean;
+  onStartFromScratch?: () => void;
 }
 
-const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress, planningMode = 'solo' }) => {
+const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress, planningMode = 'solo', showStartFromScratch, onStartFromScratch }) => {
   return (
     <div className="text-center space-y-6 animate-fade-in">
       <div className="flex items-center justify-center gap-3">
@@ -24,6 +27,21 @@ const PlanningHeader: React.FC<PlanningHeaderProps> = ({ progress, planningMode 
       {/* Progress Bar */}
       <div className="max-w-md mx-auto space-y-3">
         <Progress value={progress} className="h-3 animate-scale-in" />
+        
+        {/* Start from Scratch Button */}
+        {showStartFromScratch && onStartFromScratch && (
+          <div className="flex justify-end">
+            <Button 
+              onClick={onStartFromScratch}
+              variant="ghost" 
+              size="sm"
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              Start from Scratch
+            </Button>
+          </div>
+        )}
+        
         <div className="flex justify-between px-2">
           {planningMode === 'collaborative' ? (
             <>
