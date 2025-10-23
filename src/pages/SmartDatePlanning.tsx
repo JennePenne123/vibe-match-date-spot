@@ -11,8 +11,6 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { getUserName } from '@/utils/typeHelpers';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
-import SessionStatusDebug from '@/components/debug/SessionStatusDebug';
-import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
 
 const SmartDatePlanning: React.FC = () => {
   const { user, loading } = useAuth();
@@ -197,16 +195,6 @@ const SmartDatePlanning: React.FC = () => {
           <ErrorBoundary level="component">
             <SmartDatePlanner sessionId={sessionId} fromProposal={fromProposal} />
           </ErrorBoundary>
-          
-          <CollapsibleDebugSection 
-            title="Session Status Debug" 
-            defaultOpen={false}
-          >
-            <SessionStatusDebug 
-              sessionId={sessionId} 
-              expectedPartnerId={collaborativeSession?.initiator_id === user?.id ? collaborativeSession?.partner_id : collaborativeSession?.initiator_id}
-            />
-          </CollapsibleDebugSection>
         </div>
       </div>
     </ErrorBoundary>

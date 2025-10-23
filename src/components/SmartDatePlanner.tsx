@@ -12,12 +12,6 @@ import PlanningHeader from '@/components/date-planning/PlanningHeader';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import PreferencesStep from '@/components/date-planning/PreferencesStep';
 import MatchReview from '@/components/date-planning/MatchReview';
-import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
-import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
-import CollapsibleDebugSection from '@/components/debug/CollapsibleDebugSection';
-import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
-import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
-import InvitationTestButton from '@/components/debug/InvitationTestButton';
 
 // Import refactored components and hooks
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
@@ -495,55 +489,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
           </div>
         )}
 
-        {/* Debug Panel - Show when needed */}
-        <CollapsibleDebugSection title="AI Analysis Debug" defaultOpen={false}>
-          <AIAnalysisDebugPanel
-            sessionId={sessionId}
-            partnerId={selectedPartnerId || selectedPartnerIds[0]}
-            currentStep={currentStep}
-            sessionData={collaborativeSession}
-            userLocation={userLocation}
-            onAnalysisComplete={() => {
-              window.location.reload();
-            }}
-          />
-        </CollapsibleDebugSection>
-
-        {/* Smart Planner Debug Panel with Manual Trigger */}
-        <CollapsibleDebugSection title="Smart Planner Debug" defaultOpen={false}>
-          <SmartPlannerDebug
-            currentUser={user}
-            selectedPartner={selectedPartner}
-            currentSession={collaborativeSession}
-            compatibilityScore={typeof compatibilityScore === 'object' ? compatibilityScore?.overall_score : compatibilityScore}
-            venueRecommendations={venueRecommendations}
-            currentStep={currentStep}
-            onTriggerAIAnalysis={() => triggerAIAnalysisManually?.(state.userLocation)}
-            aiAnalysisTriggered={aiAnalysisTriggered}
-          />
-        </CollapsibleDebugSection>
-
-        {/* Invitation Testing Debug Panel */}
-        <CollapsibleDebugSection title="Invitation Test" defaultOpen={false}>
-          <InvitationTestButton />
-        </CollapsibleDebugSection>
-
-        {/* AI Analysis Test Debug Panel */}
-        <CollapsibleDebugSection title="AI Analysis Test" defaultOpen={false}>
-          <AIAnalysisTestButton 
-            sessionId={collaborativeSession?.id || sessionId}
-            userLocation={userLocation}
-          />
-        </CollapsibleDebugSection>
-
-        {/* Compatibility Debug Panel */}
-        <CollapsibleDebugSection title="Compatibility Debug Info" defaultOpen={false}>
-          <CompatibilityDebug 
-            compatibilityScore={compatibilityScore}
-            partnerId={selectedPartnerId}
-            userId={user?.id}
-          />
-        </CollapsibleDebugSection>
 
         {/* Start from Scratch option */}
         {effectivePreselectedFriend && (

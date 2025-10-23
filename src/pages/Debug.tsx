@@ -12,7 +12,9 @@ import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import { TestDataControls } from '@/components/debug/TestDataControls';
 import { VenueSearchTester } from '@/components/debug/VenueSearchTester';
 import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
-import { Settings, Code, Database, Users, MapPin, Trophy } from 'lucide-react';
+import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
+import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
+import { Settings, Code, Database, Users, MapPin, Trophy, Calendar } from 'lucide-react';
 import { GamificationTester } from '@/components/debug/GamificationTester';
 
 const Debug: React.FC = () => {
@@ -97,6 +99,35 @@ const Debug: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <GamificationTester />
+        </CardContent>
+      </Card>
+
+      {/* Smart Planning & Sessions Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Smart Planning & Collaborative Sessions
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <SessionStatusDebug />
+          <SmartPlannerDebug currentStep="preferences" />
+          <AIAnalysisDebugPanel 
+            sessionId={undefined}
+            partnerId={undefined}
+            currentStep="preferences"
+            sessionData={undefined}
+            userLocation={undefined}
+            onAnalysisComplete={() => {}}
+          />
+          <AIAnalysisTestButton />
+          <CompatibilityDebug 
+            compatibilityScore={null}
+            partnerId={undefined}
+            userId={undefined}
+          />
+          <InvitationTestButton />
         </CardContent>
       </Card>
 
