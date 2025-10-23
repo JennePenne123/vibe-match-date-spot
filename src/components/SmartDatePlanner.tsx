@@ -488,21 +488,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             )}
           </div>
         )}
-
-
-        {/* Start from Scratch option */}
-        {effectivePreselectedFriend && (
-          <div className="text-center pt-4 border-t border-border">
-            <Button 
-              onClick={handleStartFromScratch}
-              variant="ghost" 
-              size="sm"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Start from Scratch
-            </Button>
-          </div>
-        )}
         </div>
       </div>
     </ErrorBoundaryWrapper>
