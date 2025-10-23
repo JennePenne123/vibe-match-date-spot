@@ -20,7 +20,7 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
   // Extract scores from the compatibility object or use the number directly
   const detailedScore = typeof compatibilityScore === 'object' ? compatibilityScore : null;
   const overallScore = typeof compatibilityScore === 'number' 
-    ? compatibilityScore 
+    ? Math.round(compatibilityScore * 100) 
     : Math.round((compatibilityScore?.overall_score || 0) * 100);
 
   const cuisineScore = detailedScore ? Math.round(detailedScore.cuisine_score * 100) : 0;
