@@ -112,16 +112,22 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
 
 // Prefill date & time from proposal when provided
-useEffect(() => {
-  if (initialProposedDate) {
-    const dt = new Date(initialProposedDate);
-    if (!isNaN(dt.getTime())) {
-      setSelectedDate((prev) => prev ?? dt);
-      const hhmm = format(dt, 'H:mm');
-      setSelectedTime((prev) => prev || hhmm);
+  // Prefill date & time from proposal when provided
+  useEffect(() => {
+    if (initialProposedDate) {
+      const dt = new Date(initialProposedDate);
+      if (!isNaN(dt.getTime())) {
+        // Only set if not already set by user
+        if (!selectedDate) {
+          setSelectedDate(dt);
+        }
+        if (!selectedTime) {
+          const hhmm = format(dt, 'HH:mm'); // Use HH:mm for 24-hour format
+          setSelectedTime(hhmm);
+        }
+      }
     }
-  }
-}, [initialProposedDate]);
+  }, [initialProposedDate]);
 
 // Track when AI analysis starts/stops
 useEffect(() => {
@@ -675,9 +681,7 @@ useEffect(() => {
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   <span className="truncate">
-                    {selectedDate ? format(selectedDate, "PPP") : 
-                     initialProposedDate ? format(new Date(initialProposedDate), "PPP") : 
-                     "Pick a date"}
+                    {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
                   </span>
                 </Button>
               </PopoverTrigger>
@@ -689,6 +693,7 @@ useEffect(() => {
                   disabled={(date) => date < new Date()}
                   initialFocus
                   className="pointer-events-auto"
+                  defaultMonth={selectedDate || (initialProposedDate ? new Date(initialProposedDate) : undefined)}
                 />
               </PopoverContent>
             </Popover>
@@ -699,7 +704,7 @@ useEffect(() => {
             <label className="text-sm font-medium mb-2 block">Preferred Time</label>
             <Select value={selectedTime} onValueChange={setSelectedTime}>
               <SelectTrigger className="h-10 md:h-11">
-                <SelectValue placeholder={initialProposedDate ? format(new Date(initialProposedDate), "HH:mm") : "Select time"} />
+                <SelectValue placeholder="Select time" />
               </SelectTrigger>
               <SelectContent>
                 {Array.from({ length: 24 }, (_, i) => {
