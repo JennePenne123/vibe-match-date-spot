@@ -50,92 +50,82 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
   };
 
   return (
-    <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-6 w-6 text-purple-500" />
-          AI Compatibility Analysis
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        {/* Compatibility Score */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-4">
-            <Heart className="h-8 w-8 text-pink-500" />
-            <div>
-              <div className="text-3xl font-bold text-gray-900">
-                {overallScore}%
-              </div>
-              <div className="text-sm text-gray-600">
-                Compatibility with {partnerName}
-              </div>
+    <>
+      {/* Compatibility Score */}
+      <div className="text-center space-y-3">
+        <div className="flex items-center justify-center gap-3">
+          <Heart className="h-6 w-6 text-pink-500" />
+          <div>
+            <div className="text-4xl font-bold text-gray-900">
+              {overallScore}%
             </div>
-          </div>
-          
-          <Badge className={`${getScoreColor(overallScore)} border text-lg px-4 py-1`}>
-            {getScoreText(overallScore)}
-          </Badge>
-          
-          <Progress 
-            value={overallScore} 
-            className="w-full max-w-xs mx-auto h-3"
-          />
-        </div>
-
-        {/* AI Insights */}
-        <div className="bg-white p-4 rounded-lg border border-purple-100">
-          <div className="flex items-start gap-3">
-            <TrendingUp className="h-5 w-5 text-purple-500 mt-0.5" />
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">AI Insights</h4>
-              <p className="text-gray-700 text-sm leading-relaxed">
-                {getRecommendationText(overallScore)}
-              </p>
+            <div className="text-sm text-gray-600 mt-1">
+              Compatibility with {partnerName}
             </div>
           </div>
         </div>
+        
+        <Badge className={`${getScoreColor(overallScore)} border text-sm px-3 py-1.5 font-medium`}>
+          {getScoreText(overallScore)}
+        </Badge>
+        
+        <Progress 
+          value={overallScore} 
+          className="w-full max-w-xs mx-auto h-2.5 bg-pink-100"
+        />
+      </div>
 
-        {/* Venue Recommendations Summary */}
-        <div className="flex items-center justify-between bg-white p-4 rounded-lg border border-purple-100">
-          <div className="flex items-center gap-3">
-            <MapPin className="h-5 w-5 text-purple-500" />
-            <div>
-              <div className="font-medium text-gray-900">{venueCount} Perfect Venues Found</div>
-              <div className="text-sm text-gray-600">
-                Ranked by AI compatibility score
-              </div>
-            </div>
+      {/* AI Insights */}
+      <div className="bg-white p-3 rounded-lg border border-purple-100">
+        <div className="flex items-start gap-2.5">
+          <TrendingUp className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="font-semibold text-gray-900 mb-1.5 text-sm">AI Insights</h4>
+            <p className="text-gray-700 text-xs leading-relaxed">
+              {getRecommendationText(overallScore)}
+            </p>
           </div>
-          
-          <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-            AI Curated
-          </Badge>
         </div>
+      </div>
 
-        {/* Compatibility Breakdown */}
-        {detailedScore && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-3 bg-white rounded-lg border border-purple-100">
-              <div className="text-lg font-bold text-purple-600">{cuisineScore}%</div>
-              <div className="text-xs text-gray-600">Cuisine Match</div>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg border border-purple-100">
-              <div className="text-lg font-bold text-purple-600">{vibeScore}%</div>
-              <div className="text-xs text-gray-600">Vibe Match</div>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg border border-purple-100">
-              <div className="text-lg font-bold text-purple-600">{priceScore}%</div>
-              <div className="text-xs text-gray-600">Price Match</div>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg border border-purple-100">
-              <div className="text-lg font-bold text-purple-600">{timingScore}%</div>
-              <div className="text-xs text-gray-600">Time Match</div>
+      {/* Venue Recommendations Summary */}
+      <div className="flex items-center justify-center flex-col gap-2 bg-white p-3 rounded-lg border border-purple-100">
+        <div className="flex items-center gap-2.5">
+          <MapPin className="h-4 w-4 text-purple-500" />
+          <div className="text-center">
+            <div className="font-semibold text-gray-900 text-base">{venueCount} Perfect Venues Found</div>
+            <div className="text-xs text-gray-600">
+              Ranked by AI compatibility score
             </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+        <Badge variant="secondary" className="bg-purple-100 text-purple-700 text-xs px-2.5 py-0.5">
+          AI Curated
+        </Badge>
+      </div>
+
+      {/* Compatibility Breakdown */}
+      {detailedScore && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="text-center p-2.5 bg-white rounded-lg border border-purple-100">
+            <div className="text-base font-bold text-purple-600">{cuisineScore}%</div>
+            <div className="text-[10px] text-gray-600 mt-0.5">Cuisine Match</div>
+          </div>
+          <div className="text-center p-2.5 bg-white rounded-lg border border-purple-100">
+            <div className="text-base font-bold text-purple-600">{vibeScore}%</div>
+            <div className="text-[10px] text-gray-600 mt-0.5">Vibe Match</div>
+          </div>
+          <div className="text-center p-2.5 bg-white rounded-lg border border-purple-100">
+            <div className="text-base font-bold text-purple-600">{priceScore}%</div>
+            <div className="text-[10px] text-gray-600 mt-0.5">Price Match</div>
+          </div>
+          <div className="text-center p-2.5 bg-white rounded-lg border border-purple-100">
+            <div className="text-base font-bold text-purple-600">{timingScore}%</div>
+            <div className="text-[10px] text-gray-600 mt-0.5">Time Match</div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

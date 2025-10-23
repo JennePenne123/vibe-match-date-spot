@@ -112,14 +112,14 @@ const MatchReview: React.FC<MatchReviewProps> = ({
     <div className="space-y-6">
       {/* Single consolidated analysis card */}
       {(typeof compatibilityScore === 'object' && compatibilityScore !== null) || typeof compatibilityScore === 'number' ? (
-        <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-primary">
-              <CheckCircle className="h-5 w-5" />
+        <Card className="bg-gradient-to-br from-pink-50 via-purple-50 to-pink-50 border-pink-200/50">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2.5 text-lg">
+              <CheckCircle className="h-5 w-5 text-pink-500" />
               AI Compatibility Analysis Complete
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-5">
             {/* AI Match Summary Content */}
             <AIMatchSummary 
               compatibilityScore={compatibilityScore}
@@ -128,11 +128,11 @@ const MatchReview: React.FC<MatchReviewProps> = ({
             />
             
             {/* Continue Action */}
-            <div className="text-center pt-4 border-t border-primary/20">
+            <div className="text-center pt-5 border-t border-pink-200/30">
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Ready to Plan Together! 🎉</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="font-semibold text-lg mb-1.5">Ready to Plan Together! 🎉</h3>
+                  <p className="text-muted-foreground text-sm">
                     Found {venueCount} perfect venues based on your compatibility. Let's choose the perfect spot!
                   </p>
                 </div>
@@ -147,7 +147,7 @@ const MatchReview: React.FC<MatchReviewProps> = ({
                     onContinueToPlanning();
                     console.log('🎯 MATCH REVIEW - onContinueToPlanning() called successfully');
                   }}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2"
+                  className="w-full md:w-auto bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white px-8 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
                 >
                   Continue to Plan Together
                   <ArrowRight className="w-4 h-4 ml-2" />
