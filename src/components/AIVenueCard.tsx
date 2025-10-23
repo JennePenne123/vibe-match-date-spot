@@ -16,12 +16,12 @@ import {
   ChevronUp,
   Brain,
   TrendingUp,
-  Navigation,
-  Phone,
-  Globe,
-  Wifi,
-  Car,
-  TreePine
+  Heart,
+  ThumbsUp,
+  Eye,
+  Check,
+  PlayCircle,
+  X
 } from 'lucide-react';
 import VenueFeedbackButtons from '@/components/VenueFeedbackButtons';
 import { AIVenueRecommendation } from '@/services/aiVenueService/recommendations';
@@ -48,6 +48,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   sessionContext
 }) => {
   const [showFullInsights, setShowFullInsights] = useState(false);
+  const [showAIReasoning, setShowAIReasoning] = useState(false);
   const [userFeedback, setUserFeedback] = useState<FeedbackType | null>(null);
 
   const {
@@ -155,127 +156,70 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
       </div>
 
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <Heading size="h2" className="truncate">
-              {venue_name}
-            </Heading>
-            
-            <div className="flex items-center mt-1">
-              <MapPin className="w-4 h-4 mr-1 flex-shrink-0 text-muted-foreground" />
-              <Text size="sm" className="text-muted-foreground truncate">{formattedAddress}</Text>
-            </div>
-
-            {/* Distance and Neighborhood */}
-            <div className="flex items-center gap-3 mt-1">
-              {distance && (
-                <div className="flex items-center gap-1">
-                  <Navigation className="w-3 h-3 text-muted-foreground" />
-                  <Caption className="text-muted-foreground">{distance}</Caption>
-                </div>
-              )}
-              {venueNeighborhood && (
-                <Caption className="text-muted-foreground">• {venueNeighborhood}</Caption>
-              )}
-              {isOpen !== undefined && (
-                <span className={`flex items-center gap-1 ${isOpen ? 'text-green-600' : 'text-red-600'}`}>
-                  <Clock className="w-3 h-3" />
-                  <Caption className={isOpen ? 'text-green-600' : 'text-red-600'}>
-                    {isOpen ? 'Open' : 'Closed'}
-                  </Caption>
-                </span>
-              )}
-            </div>
+        <div className="flex-1 min-w-0">
+          <Heading size="h2" className="truncate">
+            {venue_name}
+          </Heading>
+          
+          <div className="flex items-center mt-1">
+            <MapPin className="w-4 h-4 mr-1 flex-shrink-0 text-muted-foreground" />
+            <Text size="sm" className="text-muted-foreground truncate">{formattedAddress}</Text>
           </div>
 
-          {/* Quick actions */}
-          <div className="flex flex-col items-end gap-2">
-            <Button
-              size="sm"
-              onClick={() => onSelect(venue_id)}
-              className="bg-purple-600 hover:bg-purple-700"
-            >
-              Select
-            </Button>
-          </div>
+          {/* Photo attribution */}
+          {processedPhotos[0]?.attribution && (
+            <Caption className="text-muted-foreground mt-1">
+              Photo by {processedPhotos[0].attribution}
+            </Caption>
+          )}
+
+          {/* Context Bonus Link */}
+          {contextual_score > 0 && (
+            <div className="mt-2">
+              <button
+                onClick={() => setShowFullInsights(true)}
+                className="text-sm text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
+              >
+                <TrendingUp className="w-3 h-3" />
+                Context Bonus
+              </button>
+            </div>
+          )}
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Venue Metrics */}
-        <div className="flex items-center gap-4 text-sm">
-          {(rating || match_factors?.rating) && (
-            <div className="flex items-center text-yellow-600">
-              <Star className="w-4 h-4 mr-1 fill-current" />
-              <span className="font-medium">{rating || match_factors.rating}</span>
-            </div>
-          )}
-          
-          {(priceRange || match_factors?.price_range) && (
-            <div className="flex items-center text-green-600">
-              <DollarSign className="w-4 h-4 mr-1" />
-              <span className="font-medium">{priceRange || match_factors.price_range}</span>
-            </div>
-          )}
-
-          {cuisine_type && (
-            <div className="flex items-center text-purple-600">
-              <span className="font-medium">{cuisine_type}</span>
-            </div>
-          )}
-          
-          {contextual_score > 0 && (
-            <div className="flex items-center text-blue-600">
-              <TrendingUp className="w-4 h-4 mr-1" />
-              <span className="font-medium">Context Bonus</span>
-            </div>
-          )}
-        </div>
-
-        {/* Amenities */}
-        {amenities && amenities.length > 0 && (
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-500">Amenities:</span>
-            <div className="flex flex-wrap gap-1">
-              {amenities.slice(0, 4).map((amenity, index) => (
-                <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
-                  {amenity}
-                </Badge>
-              ))}
-              {amenities.length > 4 && (
-                <Badge variant="outline" className="text-xs px-2 py-0.5">
-                  +{amenities.length - 4} more
-                </Badge>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Operating Hours (if available) */}
-        {operatingHours && operatingHours.length > 0 && (
-          <div className="text-xs text-gray-500">
-            <span className="font-medium">Hours:</span> {operatingHours[0]}
-          </div>
-        )}
-
-        {/* AI Reasoning */}
+        {/* AI Reasoning (Collapsible) */}
         {showAIInsights && ai_reasoning && (
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-            <div className="flex items-start gap-2">
-              <Sparkles className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <Text size="sm" weight="semibold" className="text-purple-900 mb-1">
-                  AI Reasoning
-                </Text>
+          <div className="space-y-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAIReasoning(!showAIReasoning)}
+              className="w-full justify-between p-2 h-auto"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-600" />
+                <Text size="sm" weight="semibold">AI Reasoning</Text>
+              </div>
+              {showAIReasoning ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </Button>
+
+            {showAIReasoning && (
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                 <Text size="sm" className="text-purple-800 leading-relaxed">
                   {ai_reasoning}
                 </Text>
               </div>
-            </div>
+            )}
           </div>
         )}
 
-        {/* Match Factors (Expandable) */}
+        {/* Match Details (Expandable) */}
         {showAIInsights && match_factors && (
           <div className="space-y-2">
             <Button
@@ -293,7 +237,67 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
             </Button>
 
             {showFullInsights && (
-              <div className="space-y-2 bg-gray-50 rounded-lg p-3">
+              <div className="space-y-3 bg-gray-50 rounded-lg p-3">
+                {/* Venue Metrics */}
+                <div className="flex items-center gap-4 text-sm pb-2 border-b">
+                  {(rating || match_factors?.rating) && (
+                    <div className="flex items-center text-yellow-600">
+                      <Star className="w-4 h-4 mr-1 fill-current" />
+                      <span className="font-medium">{rating || match_factors.rating}</span>
+                    </div>
+                  )}
+                  
+                  {(priceRange || match_factors?.price_range) && (
+                    <div className="flex items-center text-green-600">
+                      <DollarSign className="w-4 h-4 mr-1" />
+                      <span className="font-medium">{priceRange || match_factors.price_range}</span>
+                    </div>
+                  )}
+
+                  {cuisine_type && (
+                    <div className="flex items-center text-purple-600">
+                      <span className="font-medium">{cuisine_type}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Distance and Neighborhood */}
+                {(distance || venueNeighborhood) && (
+                  <div className="flex items-center gap-3 text-sm">
+                    {distance && (
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <MapPin className="w-3 h-3" />
+                        <span>{distance}</span>
+                      </div>
+                    )}
+                    {venueNeighborhood && (
+                      <span className="text-muted-foreground">• {venueNeighborhood}</span>
+                    )}
+                  </div>
+                )}
+
+                {/* Amenities */}
+                {amenities && amenities.length > 0 && (
+                  <div className="space-y-1">
+                    <span className="text-sm text-gray-600">Amenities</span>
+                    <div className="flex flex-wrap gap-1">
+                      {amenities.map((amenity, index) => (
+                        <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
+                          {amenity}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Operating Hours */}
+                {operatingHours && operatingHours.length > 0 && (
+                  <div className="text-sm">
+                    <span className="text-gray-600 font-medium">Hours:</span>{' '}
+                    <span className="text-gray-700">{operatingHours[0]}</span>
+                  </div>
+                )}
+                
                 {match_factors.cuisine_match && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Cuisine Match</span>
@@ -347,32 +351,71 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           </div>
         )}
 
-        {/* Feedback Buttons */}
-        <div className="border-t pt-4">
-          <VenueFeedbackButtons
-            venueId={venue_id}
-            venueType="recommendations"
-            context={{
-              source: 'recommendations',
-              session_id: sessionContext?.sessionId,
-              partner_id: sessionContext?.partnerId,
-              ai_score: ai_score,
-              confidence_level: confidence_level
-            }}
-            onFeedbackChange={handleFeedbackChange}
-            compact={compact}
-            showStats={!compact}
-            className="w-full"
-          />
+        {/* Feedback Buttons - Vertical List */}
+        <div className="border-t pt-4 space-y-2">
+          <Button
+            variant="ghost"
+            onClick={() => handleFeedbackChange('super_like')}
+            className={`w-full justify-start ${userFeedback === 'super_like' ? 'bg-purple-50 text-purple-700' : ''}`}
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            Super Like
+          </Button>
+          
+          <Button
+            variant="ghost"
+            onClick={() => handleFeedbackChange('like')}
+            className={`w-full justify-start ${userFeedback === 'like' ? 'bg-pink-50 text-pink-700' : ''}`}
+          >
+            <Heart className="w-4 h-4 mr-2" />
+            Like
+          </Button>
+          
+          <Button
+            variant="ghost"
+            onClick={() => handleFeedbackChange('interested')}
+            className={`w-full justify-start ${userFeedback === 'interested' ? 'bg-blue-50 text-blue-700' : ''}`}
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            Interested
+          </Button>
+          
+          <Button
+            variant="ghost"
+            onClick={() => handleFeedbackChange('visited')}
+            className={`w-full justify-start ${userFeedback === 'visited' ? 'bg-green-50 text-green-700' : ''}`}
+          >
+            <Check className="w-4 h-4 mr-2" />
+            Visited
+          </Button>
+          
+          <Button
+            variant="ghost"
+            onClick={() => handleFeedbackChange('skip')}
+            className={`w-full justify-start ${userFeedback === 'skip' ? 'bg-yellow-50 text-yellow-700' : ''}`}
+          >
+            <PlayCircle className="w-4 h-4 mr-2" />
+            Maybe Later
+          </Button>
+          
+          <Button
+            variant="ghost"
+            onClick={() => handleFeedbackChange('dislike')}
+            className={`w-full justify-start ${userFeedback === 'dislike' ? 'bg-red-50 text-red-700' : ''}`}
+          >
+            <X className="w-4 h-4 mr-2" />
+            Not for me
+          </Button>
         </div>
 
-        {/* AI Learning Note */}
-        {userFeedback && ['like', 'super_like', 'dislike'].includes(userFeedback) && (
-          <div className="text-xs text-center text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
-            <Sparkles className="w-3 h-3 inline mr-1" />
-            This feedback improves AI recommendations for future dates
-          </div>
-        )}
+        {/* Select Button - Prominent */}
+        <Button
+          onClick={() => onSelect(venue_id)}
+          className="w-full bg-purple-600 hover:bg-purple-700"
+          size="lg"
+        >
+          Select This Venue
+        </Button>
       </CardContent>
     </Card>
   );
