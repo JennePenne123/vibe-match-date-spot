@@ -94,6 +94,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   
   // Timeout fallback state
   const [aiAnalysisStartTime, setAiAnalysisStartTime] = useState<number | null>(null);
+  const [timeoutTriggered, setTimeoutTriggered] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const NAVIGATION_TIMEOUT_MS = 10000; // 10 seconds
 
@@ -194,11 +195,7 @@ useEffect(() => {
         console.warn('⚠️ Navigation timeout triggered - proceeding with', venueRecommendations.length, 'venues');
         
         if (!hasAutoNavigated) {
-          toast({
-            title: "Taking a while?",
-            description: "We're showing you the best available results now.",
-            variant: "default"
-          });
+          setTimeoutTriggered(true);
           
           setAutoNavigating(true);
           setHasAutoNavigated(true);
@@ -212,6 +209,7 @@ useEffect(() => {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
+      setTimeoutTriggered(false);
     };
   }
 }, [
@@ -1077,10 +1075,14 @@ useEffect(() => {
               <CardContent className="p-6 text-center">
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <Loader2 className="h-6 w-6 text-primary animate-spin" />
-                  <h3 className="text-lg font-semibold">AI Analysis in Progress</h3>
+                  <h3 className="text-lg font-semibold">
+                    {timeoutTriggered ? "Taking a while?" : "AI Analysis in Progress"}
+                  </h3>
                 </div>
                 <p className="text-muted-foreground">
-                  Analyzing your compatibility and finding perfect venues...
+                  {timeoutTriggered 
+                    ? "We're showing you the best available results now."
+                    : "Analyzing your compatibility and finding perfect venues..."}
                 </p>
               </CardContent>
             </Card>
