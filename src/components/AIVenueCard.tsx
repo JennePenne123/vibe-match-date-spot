@@ -352,40 +352,44 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
         )}
 
         {/* Feedback Buttons - Vertical List */}
-        <div className="border-t pt-4 space-y-2">
+        <div className="border-t pt-3 space-y-1.5">
           <Button
             variant="ghost"
+            size="sm"
             onClick={() => handleFeedbackChange('super_like')}
             className={`w-full justify-start ${userFeedback === 'super_like' ? 'bg-purple-50 text-purple-700' : ''}`}
           >
-            <Sparkles className="w-4 h-4 mr-2" />
+            <Sparkles className="w-3.5 h-3.5 mr-2" />
             Super Like
           </Button>
           
           <Button
             variant="ghost"
+            size="sm"
             onClick={() => handleFeedbackChange('like')}
             className={`w-full justify-start ${userFeedback === 'like' ? 'bg-pink-50 text-pink-700' : ''}`}
           >
-            <Heart className="w-4 h-4 mr-2" />
+            <Heart className="w-3.5 h-3.5 mr-2" />
             Like
           </Button>
           
           <Button
             variant="ghost"
+            size="sm"
             onClick={() => handleFeedbackChange('visited')}
             className={`w-full justify-start ${userFeedback === 'visited' ? 'bg-green-50 text-green-700' : ''}`}
           >
-            <Check className="w-4 h-4 mr-2" />
+            <Check className="w-3.5 h-3.5 mr-2" />
             Visited
           </Button>
           
           <Button
             variant="ghost"
+            size="sm"
             onClick={() => handleFeedbackChange('dislike')}
             className={`w-full justify-start ${userFeedback === 'dislike' ? 'bg-red-50 text-red-700' : ''}`}
           >
-            <X className="w-4 h-4 mr-2" />
+            <X className="w-3.5 h-3.5 mr-2" />
             Not for me
           </Button>
         </div>
