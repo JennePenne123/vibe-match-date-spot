@@ -165,12 +165,12 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
             <Text size="sm" className="text-muted-foreground truncate">{formattedAddress}</Text>
           </div>
 
-          {/* Photo attribution */}
-          {processedPhotos[0]?.attribution && (
-            <Caption className="text-muted-foreground mt-1">
-              Photo by {processedPhotos[0].attribution}
-            </Caption>
-          )}
+            {/* Photo attribution - hidden in compact mode */}
+            {!compact && processedPhotos[0]?.attribution && (
+              <Caption className="text-muted-foreground mt-1">
+                Photo by {processedPhotos[0].attribution}
+              </Caption>
+            )}
 
           {/* Context Bonus Link */}
           {contextual_score > 0 && (
