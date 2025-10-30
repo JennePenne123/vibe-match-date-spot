@@ -373,29 +373,11 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           
           <Button
             variant="ghost"
-            onClick={() => handleFeedbackChange('interested')}
-            className={`w-full justify-start ${userFeedback === 'interested' ? 'bg-blue-50 text-blue-700' : ''}`}
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            Interested
-          </Button>
-          
-          <Button
-            variant="ghost"
             onClick={() => handleFeedbackChange('visited')}
             className={`w-full justify-start ${userFeedback === 'visited' ? 'bg-green-50 text-green-700' : ''}`}
           >
             <Check className="w-4 h-4 mr-2" />
             Visited
-          </Button>
-          
-          <Button
-            variant="ghost"
-            onClick={() => handleFeedbackChange('skip')}
-            className={`w-full justify-start ${userFeedback === 'skip' ? 'bg-yellow-50 text-yellow-700' : ''}`}
-          >
-            <PlayCircle className="w-4 h-4 mr-2" />
-            Maybe Later
           </Button>
           
           <Button
