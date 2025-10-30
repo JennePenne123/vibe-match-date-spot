@@ -47,8 +47,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   compact = false,
   sessionContext
 }) => {
-  const [showFullInsights, setShowFullInsights] = useState(false);
-  const [showAIReasoning, setShowAIReasoning] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [userFeedback, setUserFeedback] = useState<FeedbackType | null>(null);
 
   const {
@@ -177,7 +176,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           {contextual_score > 0 && (
             <div className="mt-2">
               <button
-                onClick={() => setShowFullInsights(true)}
+                onClick={() => setShowDetails(true)}
                 className="text-sm text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
               >
                 <TrendingUp className="w-3 h-3" />
@@ -189,162 +188,158 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* AI Reasoning (Collapsible) */}
-        {showAIInsights && ai_reasoning && (
+        {/* Show Details (Combined AI Reasoning + Match Details) */}
+        {showAIInsights && (ai_reasoning || match_factors) && (
           <div className="space-y-2">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setShowAIReasoning(!showAIReasoning)}
+              onClick={() => setShowDetails(!showDetails)}
               className="w-full justify-between p-2 h-auto"
             >
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-purple-600" />
-                <Text size="sm" weight="semibold">AI Reasoning</Text>
+                <Text size="sm" weight="semibold">Show Details</Text>
               </div>
-              {showAIReasoning ? (
+              {showDetails ? (
                 <ChevronUp className="w-4 h-4" />
               ) : (
                 <ChevronDown className="w-4 h-4" />
               )}
             </Button>
 
-            {showAIReasoning && (
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                <Text size="sm" className="text-purple-800 leading-relaxed">
-                  {ai_reasoning}
-                </Text>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Match Details (Expandable) */}
-        {showAIInsights && match_factors && (
-          <div className="space-y-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowFullInsights(!showFullInsights)}
-              className="w-full justify-between p-2 h-auto"
-            >
-              <Text size="sm" weight="semibold">Match Details</Text>
-              {showFullInsights ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </Button>
-
-            {showFullInsights && (
+            {showDetails && (
               <div className="space-y-3 bg-gray-50 rounded-lg p-3">
-                {/* Venue Metrics */}
-                <div className="flex items-center gap-4 text-sm pb-2 border-b">
-                  {(rating || match_factors?.rating) && (
-                    <div className="flex items-center text-yellow-600">
-                      <Star className="w-4 h-4 mr-1 fill-current" />
-                      <span className="font-medium">{rating || match_factors.rating}</span>
+                {/* AI Reasoning Section */}
+                {ai_reasoning && (
+                  <>
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Brain className="w-4 h-4 text-purple-600" />
+                        <Text size="sm" weight="semibold" className="text-purple-800">
+                          AI Reasoning
+                        </Text>
+                      </div>
+                      <Text size="sm" className="text-purple-800 leading-relaxed">
+                        {ai_reasoning}
+                      </Text>
                     </div>
-                  )}
-                  
-                  {(priceRange || match_factors?.price_range) && (
-                    <div className="flex items-center text-green-600">
-                      <DollarSign className="w-4 h-4 mr-1" />
-                      <span className="font-medium">{priceRange || match_factors.price_range}</span>
-                    </div>
-                  )}
+                    {match_factors && <div className="border-t my-2" />}
+                  </>
+                )}
 
-                  {cuisine_type && (
-                    <div className="flex items-center text-purple-600">
-                      <span className="font-medium">{cuisine_type}</span>
-                    </div>
-                  )}
-                </div>
+                {/* Match Details Section */}
+                {match_factors && (
+                  <>
+                    {/* Venue Metrics */}
+                    <div className="flex items-center gap-4 text-sm pb-2 border-b">
+                      {(rating || match_factors?.rating) && (
+                        <div className="flex items-center text-yellow-600">
+                          <Star className="w-4 h-4 mr-1 fill-current" />
+                          <span className="font-medium">{rating || match_factors.rating}</span>
+                        </div>
+                      )}
+                      
+                      {(priceRange || match_factors?.price_range) && (
+                        <div className="flex items-center text-green-600">
+                          <DollarSign className="w-4 h-4 mr-1" />
+                          <span className="font-medium">{priceRange || match_factors.price_range}</span>
+                        </div>
+                      )}
 
-                {/* Distance and Neighborhood */}
-                {(distance || venueNeighborhood) && (
-                  <div className="flex items-center gap-3 text-sm">
-                    {distance && (
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <MapPin className="w-3 h-3" />
-                        <span>{distance}</span>
+                      {cuisine_type && (
+                        <div className="flex items-center text-purple-600">
+                          <span className="font-medium">{cuisine_type}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Distance and Neighborhood */}
+                    {(distance || venueNeighborhood) && (
+                      <div className="flex items-center gap-3 text-sm">
+                        {distance && (
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <MapPin className="w-3 h-3" />
+                            <span>{distance}</span>
+                          </div>
+                        )}
+                        {venueNeighborhood && (
+                          <span className="text-muted-foreground">• {venueNeighborhood}</span>
+                        )}
                       </div>
                     )}
-                    {venueNeighborhood && (
-                      <span className="text-muted-foreground">• {venueNeighborhood}</span>
+
+                    {/* Amenities */}
+                    {amenities && amenities.length > 0 && (
+                      <div className="space-y-1">
+                        <span className="text-sm text-gray-600">Amenities</span>
+                        <div className="flex flex-wrap gap-1">
+                          {amenities.map((amenity, index) => (
+                            <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
+                              {amenity}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
                     )}
-                  </div>
-                )}
 
-                {/* Amenities */}
-                {amenities && amenities.length > 0 && (
-                  <div className="space-y-1">
-                    <span className="text-sm text-gray-600">Amenities</span>
-                    <div className="flex flex-wrap gap-1">
-                      {amenities.map((amenity, index) => (
-                        <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
-                          {amenity}
+                    {/* Operating Hours */}
+                    {operatingHours && operatingHours.length > 0 && (
+                      <div className="text-sm">
+                        <span className="text-gray-600 font-medium">Hours:</span>{' '}
+                        <span className="text-gray-700">{operatingHours[0]}</span>
+                      </div>
+                    )}
+                    
+                    {match_factors.cuisine_match && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Cuisine Match</span>
+                        <Badge variant="secondary" className="bg-green-100 text-green-700">
+                          ✓ Perfect
                         </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Operating Hours */}
-                {operatingHours && operatingHours.length > 0 && (
-                  <div className="text-sm">
-                    <span className="text-gray-600 font-medium">Hours:</span>{' '}
-                    <span className="text-gray-700">{operatingHours[0]}</span>
-                  </div>
-                )}
-                
-                {match_factors.cuisine_match && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Cuisine Match</span>
-                    <Badge variant="secondary" className="bg-green-100 text-green-700">
-                      ✓ Perfect
-                    </Badge>
-                  </div>
-                )}
-                
-                {match_factors.price_match && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Price Match</span>
-                    <Badge variant="secondary" className="bg-green-100 text-green-700">
-                      ✓ In Budget
-                    </Badge>
-                  </div>
-                )}
-                
-                {match_factors.vibe_matches?.length > 0 && (
-                  <div className="space-y-1">
-                    <span className="text-sm text-gray-600">Vibe Matches</span>
-                    <div className="flex flex-wrap gap-1">
-                      {match_factors.vibe_matches.map((vibe: string, index: number) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {vibe}
+                      </div>
+                    )}
+                    
+                    {match_factors.price_match && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Price Match</span>
+                        <Badge variant="secondary" className="bg-green-100 text-green-700">
+                          ✓ In Budget
                         </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {match_factors.rating_bonus > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Quality Bonus</span>
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                      +{(match_factors.rating_bonus * 100).toFixed(0)}%
-                    </Badge>
-                  </div>
-                )}
+                      </div>
+                    )}
+                    
+                    {match_factors.vibe_matches?.length > 0 && (
+                      <div className="space-y-1">
+                        <span className="text-sm text-gray-600">Vibe Matches</span>
+                        <div className="flex flex-wrap gap-1">
+                          {match_factors.vibe_matches.map((vibe: string, index: number) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {vibe}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {match_factors.rating_bonus > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Quality Bonus</span>
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                          +{(match_factors.rating_bonus * 100).toFixed(0)}%
+                        </Badge>
+                      </div>
+                    )}
 
-                {contextual_score > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Context Score</span>
-                    <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                      +{(contextual_score * 100).toFixed(0)}%
-                    </Badge>
-                  </div>
+                    {contextual_score > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Context Score</span>
+                        <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                          +{(contextual_score * 100).toFixed(0)}%
+                        </Badge>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
