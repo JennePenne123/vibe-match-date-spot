@@ -47,7 +47,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   compact = false,
   sessionContext
 }) => {
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(false); // Collapsed by default for cleaner UI
   const [userFeedback, setUserFeedback] = useState<FeedbackType | null>(null);
 
   const {
@@ -102,11 +102,11 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
     return 'text-red-600 bg-red-100';
   };
 
-  // Get confidence level indicator
+  // Get confidence level indicator - optimized for shorter text
   const getConfidenceIndicator = (confidence: number) => {
-    if (confidence >= 0.8) return { text: 'High Confidence', color: 'bg-green-500' };
-    if (confidence >= 0.6) return { text: 'Medium Confidence', color: 'bg-yellow-500' };
-    return { text: 'Low Confidence', color: 'bg-red-500' };
+    if (confidence >= 0.8) return { text: 'High', color: 'bg-green-500' };
+    if (confidence >= 0.6) return { text: 'Med', color: 'bg-yellow-500' };
+    return { text: 'Low', color: 'bg-red-500' };
   };
 
   const confidenceInfo = getConfidenceIndicator(confidence_level);
@@ -123,12 +123,18 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           className="transition-transform duration-300 hover:scale-105"
         />
           
-        {/* AI Score Overlay */}
-        <div className="absolute top-3 right-3">
+        {/* AI Score Overlay with Context Bonus */}
+        <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
           <Badge className={`${getScoreColor(ai_score)} font-bold`}>
             <Brain className="w-3 h-3 mr-1" />
-            {Math.round(ai_score)}% AI Match
+            {Math.round(ai_score)}%
           </Badge>
+          {contextual_score > 0 && (
+            <Badge className="bg-purple-100 text-purple-700 text-xs">
+              <TrendingUp className="w-3 h-3 mr-0.5" />
+              +{(contextual_score * 100).toFixed(0)}%
+            </Badge>
+          )}
         </div>
 
         {/* Confidence Indicator */}
@@ -154,59 +160,32 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
         )}
       </div>
 
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <div className="flex-1 min-w-0">
           <Heading size="h2" className="truncate">
             {venue_name}
           </Heading>
           
+          {/* Compact address - show only neighborhood */}
           <div className="flex items-center mt-1">
             <MapPin className="w-4 h-4 mr-1 flex-shrink-0 text-muted-foreground" />
-            <Text size="sm" className="text-muted-foreground truncate">{formattedAddress}</Text>
+            <Text size="sm" className="text-muted-foreground truncate">
+              {venueNeighborhood || formattedAddress}
+            </Text>
           </div>
-
-            {/* Photo attribution - hidden in compact mode */}
-            {!compact && processedPhotos[0]?.attribution && (
-              <Caption className="text-muted-foreground mt-1">
-                Photo by {processedPhotos[0].attribution}
-              </Caption>
-            )}
-
-          {/* Context Bonus Link */}
-          {contextual_score > 0 && (
-            <div className="mt-2">
-              <button
-                onClick={() => setShowDetails(true)}
-                className="text-sm text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
-              >
-                <TrendingUp className="w-3 h-3" />
-                Context Bonus
-              </button>
-            </div>
-          )}
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-2">
         {/* Show Details (Combined AI Reasoning + Match Details) */}
         {showAIInsights && (ai_reasoning || match_factors) && (
           <div className="space-y-2">
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => setShowDetails(!showDetails)}
-              className="w-full justify-between p-2 h-auto"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto flex items-center gap-1"
             >
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-600" />
-                <Text size="sm" weight="semibold">Show Details</Text>
-              </div>
-              {showDetails ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </Button>
+              {showDetails ? 'Hide details ↑' : 'View details ↓'}
+            </button>
 
             {showDetails && (
               <div className="space-y-3 bg-gray-50 rounded-lg p-3">
@@ -346,54 +325,54 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           </div>
         )}
 
-        {/* Feedback Buttons - Icon Grid */}
-        <div className="border-t pt-3 grid grid-cols-4 gap-2">
+        {/* Feedback Buttons - Compact Icon Grid */}
+        <div className="pt-2 grid grid-cols-4 gap-1">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleFeedbackChange('super_like')}
-            className={`justify-center ${userFeedback === 'super_like' ? 'bg-purple-50 text-purple-700' : ''}`}
+            className={`justify-center p-2 h-auto ${userFeedback === 'super_like' ? 'bg-purple-50 text-purple-700' : ''}`}
             title="Super Like"
           >
-            <Sparkles className="w-5 h-5" />
+            <Sparkles className="w-4 h-4" />
           </Button>
           
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleFeedbackChange('like')}
-            className={`justify-center ${userFeedback === 'like' ? 'bg-pink-50 text-pink-700' : ''}`}
+            className={`justify-center p-2 h-auto ${userFeedback === 'like' ? 'bg-pink-50 text-pink-700' : ''}`}
             title="Like"
           >
-            <Heart className="w-5 h-5" />
+            <Heart className="w-4 h-4" />
           </Button>
           
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleFeedbackChange('visited')}
-            className={`justify-center ${userFeedback === 'visited' ? 'bg-green-50 text-green-700' : ''}`}
+            className={`justify-center p-2 h-auto ${userFeedback === 'visited' ? 'bg-green-50 text-green-700' : ''}`}
             title="Visited"
           >
-            <Check className="w-5 h-5" />
+            <Check className="w-4 h-4" />
           </Button>
           
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleFeedbackChange('dislike')}
-            className={`justify-center ${userFeedback === 'dislike' ? 'bg-red-50 text-red-700' : ''}`}
+            className={`justify-center p-2 h-auto ${userFeedback === 'dislike' ? 'bg-red-50 text-red-700' : ''}`}
             title="Not for me"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </Button>
         </div>
 
-        {/* Select Button - Prominent */}
+        {/* Select Button - Compact */}
         <Button
           onClick={() => onSelect(venue_id)}
           className="w-full bg-purple-600 hover:bg-purple-700"
-          size="lg"
+          size="default"
         >
           Select This Venue
         </Button>
