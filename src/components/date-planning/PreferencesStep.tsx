@@ -87,6 +87,12 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   } = props;
 
   const { user } = useAuth();
+  
+  // Debug: Log when initialProposedDate prop is received
+  useEffect(() => {
+    console.log('📥 PREFERENCES STEP: Received initialProposedDate:', initialProposedDate);
+  }, [initialProposedDate]);
+  
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [hasCompletedAllSteps, setHasCompletedAllSteps] = useState(false);
@@ -117,6 +123,21 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [userModifiedTimePrefs, setUserModifiedTimePrefs] = useState(false);
   const [prefilledFromProposal, setPrefilledFromProposal] = useState(false);
 
+  // Helper function to map time string to time preference ID
+  const getTimePreferenceFromTime = (timeString: string): string | null => {
+    if (!timeString) return null;
+    
+    const [hours] = timeString.split(':').map(Number);
+    
+    if (hours >= 9 && hours < 12) return 'morning';
+    if (hours >= 12 && hours < 15) return 'lunch';
+    if (hours >= 15 && hours < 18) return 'afternoon';
+    if (hours >= 18 && hours < 21) return 'evening';
+    if (hours >= 21 || hours < 9) return 'night';
+    
+    return null;
+  };
+
   // Prefill date, time, and time preferences from proposal when provided
   useEffect(() => {
     if (initialProposedDate && !prefilledFromProposal) {
@@ -136,23 +157,33 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         
         // Pre-fill time if user hasn't manually changed it
         if (!userModifiedTime) {
-          const hhmm = format(dt, 'HH:mm');
-          setSelectedTime(hhmm);
-          
-          // Auto-select matching time preference
-          if (!userModifiedTimePrefs) {
-            const timePref = getTimePreferenceFromTime(hhmm);
-            if (timePref && !selectedTimePreferences.includes(timePref)) {
-              setSelectedTimePreferences(prev => [...prev, timePref]);
-              console.log('🕐 Auto-selected time preference:', timePref, 'for time', hhmm);
+          try {
+            const hhmm = format(dt, 'HH:mm');
+            console.log('⏰ PREFILL: Formatted time as:', hhmm);
+            setSelectedTime(hhmm);
+            
+            // Auto-select matching time preference
+            if (!userModifiedTimePrefs) {
+              const timePref = getTimePreferenceFromTime(hhmm);
+              if (timePref && !selectedTimePreferences.includes(timePref)) {
+                setSelectedTimePreferences(prev => [...prev, timePref]);
+                console.log('🕐 Auto-selected time preference:', timePref, 'for time', hhmm);
+              }
             }
+          } catch (err) {
+            console.error('❌ PREFILL: Failed to format time:', err);
           }
         }
         
         setPrefilledFromProposal(true);
       }
     }
-  }, [initialProposedDate, prefilledFromProposal, userModifiedDate, userModifiedTime, userModifiedTimePrefs]);
+  }, [initialProposedDate, prefilledFromProposal, userModifiedDate, userModifiedTime, userModifiedTimePrefs, selectedTimePreferences]);
+
+  // Debug: Log when selectedTime changes
+  useEffect(() => {
+    console.log('🔄 SELECT STATE: selectedTime changed to:', selectedTime);
+  }, [selectedTime]);
 
 // Track when AI analysis starts/stops
 useEffect(() => {
@@ -302,21 +333,6 @@ useEffect(() => {
     { id: 'halal', name: 'Halal', emoji: '☪️' },
     { id: 'kosher', name: 'Kosher', emoji: '✡️' }
   ];
-
-  // Helper function to map time string to time preference ID
-  const getTimePreferenceFromTime = (timeString: string): string | null => {
-    if (!timeString) return null;
-    
-    const [hours] = timeString.split(':').map(Number);
-    
-    if (hours >= 9 && hours < 12) return 'morning';
-    if (hours >= 12 && hours < 15) return 'lunch';
-    if (hours >= 15 && hours < 18) return 'afternoon';
-    if (hours >= 18 && hours < 21) return 'evening';
-    if (hours >= 21 || hours < 9) return 'night';
-    
-    return null;
-  };
 
   const quickStartTemplates = [
     {
@@ -777,6 +793,20 @@ useEffect(() => {
             </Select>
           </div>
         </div>
+        
+        {/* Visual indicator when values are pre-filled from proposal */}
+        {prefilledFromProposal && (selectedDate || selectedTime) && (
+          <div className="flex items-center gap-2 text-xs text-purple-600 bg-purple-50 rounded-md p-2 border border-purple-200">
+            <Sparkles className="w-3 h-3" />
+            <span>
+              {selectedDate && selectedTime 
+                ? 'Date and time pre-filled from your accepted proposal' 
+                : selectedDate 
+                ? 'Date pre-filled from your accepted proposal'
+                : 'Time pre-filled from your accepted proposal'}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

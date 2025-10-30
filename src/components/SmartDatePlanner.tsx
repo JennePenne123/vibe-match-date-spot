@@ -99,18 +99,37 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   const [proposalDateISO, setProposalDateISO] = useState<string | undefined>();
   useEffect(() => {
     const loadProposalDate = async () => {
-      if (!fromProposal || !sessionId) return;
+      console.log('🔍 PROPOSAL DATE FETCH:', { fromProposal, sessionId });
+      
+      if (!fromProposal || !sessionId) {
+        console.log('⚠️ PROPOSAL DATE FETCH: Skipping - fromProposal:', fromProposal, 'sessionId:', sessionId);
+        return;
+      }
+      
       try {
+        console.log('📡 PROPOSAL DATE FETCH: Querying database...');
         const { data, error } = await supabase
           .from('date_proposals')
           .select('proposed_date')
           .eq('planning_session_id', sessionId)
           .limit(1);
+          
+        console.log('📊 PROPOSAL DATE FETCH: Query result:', { data, error });
+        
         if (error) throw error;
+        
         const row = Array.isArray(data) ? data?.[0] : (data as any);
-        if (row?.proposed_date) setProposalDateISO(row.proposed_date);
+        
+        console.log('📝 PROPOSAL DATE FETCH: Parsed row:', row);
+        
+        if (row?.proposed_date) {
+          console.log('✅ PROPOSAL DATE FETCH: Setting proposalDateISO to:', row.proposed_date);
+          setProposalDateISO(row.proposed_date);
+        } else {
+          console.warn('⚠️ PROPOSAL DATE FETCH: No proposed_date found in row');
+        }
       } catch (err) {
-        console.error('Failed to load proposal proposed_date:', err);
+        console.error('❌ PROPOSAL DATE FETCH: Failed to load proposal proposed_date:', err);
       }
     };
     loadProposalDate();
