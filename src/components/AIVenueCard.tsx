@@ -112,7 +112,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   const confidenceInfo = getConfidenceIndicator(confidence_level);
 
   return (
-    <Card className="venue-ai-card hover:border-purple-200/50">
+    <Card className="venue-ai-card border-0 shadow-md hover:shadow-lg transition-shadow">
       {/* Venue Image */}
       <div className="relative">
         <VenuePhotoGallery 
@@ -125,12 +125,12 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           
         {/* AI Score Overlay with Context Bonus */}
         <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
-          <Badge className={`${getScoreColor(ai_score)} font-bold`}>
-            <Brain className="w-3 h-3 mr-1" />
+          <Badge className="bg-white/95 backdrop-blur-sm text-gray-900 font-bold border-0 shadow-sm">
+            <Brain className="w-3 h-3 mr-1 text-purple-600" />
             {Math.round(ai_score)}%
           </Badge>
           {contextual_score > 0 && (
-            <Badge className="bg-purple-100 text-purple-700 text-xs">
+            <Badge className="bg-white/95 backdrop-blur-sm text-purple-700 text-xs border-0 shadow-sm">
               <TrendingUp className="w-3 h-3 mr-0.5" />
               +{(contextual_score * 100).toFixed(0)}%
             </Badge>
@@ -188,11 +188,11 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
             </button>
 
             {showDetails && (
-              <div className="space-y-3 bg-gray-50 rounded-lg p-3">
+              <div className="space-y-3 border-l-4 border-purple-200 pl-3 py-2">
                 {/* AI Reasoning Section */}
                 {ai_reasoning && (
                   <>
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                    <div className="bg-purple-50/50 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <Brain className="w-4 h-4 text-purple-600" />
                         <Text size="sm" weight="semibold" className="text-purple-800">
