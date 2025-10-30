@@ -19,19 +19,16 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
   if (locationError) {
     return (
       <Card className="border-destructive/20 bg-destructive/5">
-        <CardContent className="flex items-center space-x-3 p-4">
-          <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-destructive">Location Error</p>
-            <p className="text-xs text-destructive/80">{locationError}</p>
-          </div>
+        <CardContent className="flex items-center space-x-2 p-3">
+          <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0" />
+          <p className="text-xs text-destructive flex-1">{locationError}</p>
           <Button 
             size="sm" 
-            variant="outline"
+            variant="ghost"
             onClick={onRequestLocation}
-            className="border-destructive/20 text-destructive hover:bg-destructive/10"
+            className="h-7 w-7 p-0 hover:bg-destructive/10"
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="h-3.5 w-3.5" />
           </Button>
         </CardContent>
       </Card>
@@ -41,30 +38,22 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
   if (!userLocation) {
     return (
       <Card className="border-primary/20 bg-primary/5">
-        <CardContent className="flex items-center space-x-3 p-4">
-          <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-primary">
-              {locationRequested ? 'Requesting location access...' : 'Location access required'}
-            </p>
-            <p className="text-xs text-primary/80">
-              {locationRequested 
-                ? 'Please click "Allow" in the browser popup. For Firefox users: click quickly when prompted.' 
-                : 'Click the button below to enable location for venue recommendations'
-              }
-            </p>
-          </div>
+        <CardContent className="flex items-center space-x-2 p-3">
+          <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+          <p className="text-xs text-primary flex-1">
+            {locationRequested ? 'Requesting location access...' : 'Location access required'}
+          </p>
           <Button 
             size="sm" 
-            variant="outline"
+            variant="ghost"
             onClick={onRequestLocation}
             disabled={locationRequested}
-            className="border-primary/20 text-primary hover:bg-primary/10"
+            className="h-7 w-7 p-0 hover:bg-primary/10"
           >
             {locationRequested ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <MapPin className="h-4 w-4" />
+              <MapPin className="h-3.5 w-3.5" />
             )}
           </Button>
         </CardContent>
@@ -76,15 +65,10 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
   const displayLocation = userLocation.address || `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`;
   
   return (
-    <Card className="border-primary/20 bg-primary/5">
-      <CardContent className="flex items-center space-x-3 p-4">
-        <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
-        <div className="flex-1">
-          <p className="text-sm font-medium text-primary">Your Location</p>
-          <p className="text-xs text-primary/80">{displayLocation}</p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex items-center space-x-2 bg-primary/5 rounded-lg py-2 px-3 border border-primary/10">
+      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+      <p className="text-xs text-primary/90">{displayLocation}</p>
+    </div>
   );
 };
 
