@@ -346,46 +346,46 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           </div>
         )}
 
-        {/* Feedback Buttons - Vertical List */}
-        <div className="border-t pt-3 space-y-1.5">
+        {/* Feedback Buttons - Icon Grid */}
+        <div className="border-t pt-3 grid grid-cols-4 gap-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleFeedbackChange('super_like')}
-            className={`w-full justify-start ${userFeedback === 'super_like' ? 'bg-purple-50 text-purple-700' : ''}`}
+            className={`justify-center ${userFeedback === 'super_like' ? 'bg-purple-50 text-purple-700' : ''}`}
+            title="Super Like"
           >
-            <Sparkles className="w-3.5 h-3.5 mr-2" />
-            Super Like
+            <Sparkles className="w-5 h-5" />
           </Button>
           
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleFeedbackChange('like')}
-            className={`w-full justify-start ${userFeedback === 'like' ? 'bg-pink-50 text-pink-700' : ''}`}
+            className={`justify-center ${userFeedback === 'like' ? 'bg-pink-50 text-pink-700' : ''}`}
+            title="Like"
           >
-            <Heart className="w-3.5 h-3.5 mr-2" />
-            Like
+            <Heart className="w-5 h-5" />
           </Button>
           
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleFeedbackChange('visited')}
-            className={`w-full justify-start ${userFeedback === 'visited' ? 'bg-green-50 text-green-700' : ''}`}
+            className={`justify-center ${userFeedback === 'visited' ? 'bg-green-50 text-green-700' : ''}`}
+            title="Visited"
           >
-            <Check className="w-3.5 h-3.5 mr-2" />
-            Visited
+            <Check className="w-5 h-5" />
           </Button>
           
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleFeedbackChange('dislike')}
-            className={`w-full justify-start ${userFeedback === 'dislike' ? 'bg-red-50 text-red-700' : ''}`}
+            className={`justify-center ${userFeedback === 'dislike' ? 'bg-red-50 text-red-700' : ''}`}
+            title="Not for me"
           >
-            <X className="w-3.5 h-3.5 mr-2" />
-            Not for me
+            <X className="w-5 h-5" />
           </Button>
         </div>
 
