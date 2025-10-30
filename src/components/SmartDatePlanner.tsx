@@ -107,11 +107,32 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       }
       
       try {
-        console.log('📡 PROPOSAL DATE FETCH: Querying database...');
+        console.log('📡 PROPOSAL DATE FETCH: Step 1 - Fetching session participants...');
+        
+        // First, get the session to find out who the participants are
+        const { data: sessionData, error: sessionError } = await supabase
+          .from('date_planning_sessions')
+          .select('initiator_id, partner_id')
+          .eq('id', sessionId)
+          .single();
+        
+        if (sessionError) throw sessionError;
+        
+        if (!sessionData) {
+          console.warn('⚠️ PROPOSAL DATE FETCH: Session not found');
+          return;
+        }
+        
+        console.log('📡 PROPOSAL DATE FETCH: Step 2 - Session participants:', sessionData);
+        
+        // Now find the proposal between these two users
+        // Check both directions since we don't know who proposed
         const { data, error } = await supabase
           .from('date_proposals')
           .select('proposed_date')
-          .eq('planning_session_id', sessionId)
+          .or(`and(proposer_id.eq.${sessionData.initiator_id},recipient_id.eq.${sessionData.partner_id}),and(proposer_id.eq.${sessionData.partner_id},recipient_id.eq.${sessionData.initiator_id})`)
+          .eq('status', 'accepted')
+          .order('created_at', { ascending: false })
           .limit(1);
           
         console.log('📊 PROPOSAL DATE FETCH: Query result:', { data, error });
