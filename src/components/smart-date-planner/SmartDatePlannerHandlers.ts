@@ -179,9 +179,9 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         console.log('✅ PREFERENCES COMPLETE - AI analysis completed successfully', analysisResult);
         console.log('✅ PREFERENCES COMPLETE - Venue recommendations available:', state.venueRecommendations?.length || 0);
         
-        // Force step transition after AI analysis completes
-        console.log('🎯 PREFERENCES COMPLETE - FORCING step transition to review-matches');
-        setCurrentStep('review-matches');
+        // Skip match review and go directly to plan-together
+        console.log('🎯 PREFERENCES COMPLETE - Skipping match review, going directly to plan-together');
+        setCurrentStep('plan-together');
         
         // Add debugging to verify state after transition
         setTimeout(() => {

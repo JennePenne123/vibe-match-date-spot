@@ -368,6 +368,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   }}
                   sessionId={collaborativeSession?.id || currentSession?.id}
                   isCollaborative={true}
+                  compatibilityScore={compatibilityScore}
                 />
               )}
 
@@ -482,6 +483,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   }}
                   sessionId={collaborativeSession?.id || currentSession?.id}
                   isCollaborative={true}
+                  compatibilityScore={compatibilityScore}
                 />
               </div>
             )}

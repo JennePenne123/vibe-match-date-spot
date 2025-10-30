@@ -1,10 +1,17 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Users } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import AIVenueCard from '@/components/AIVenueCard';
 import { useAuth } from '@/contexts/AuthContext';
+import CompatibilitySummaryBanner from './CompatibilitySummaryBanner';
+
+interface CompatibilityScore {
+  overall_score?: number;
+  category_scores?: Record<string, number>;
+  reasoning?: string;
+}
 
 interface PlanTogetherProps {
   partnerName: string;
@@ -15,6 +22,7 @@ interface PlanTogetherProps {
   onRetrySearch?: () => void;
   sessionId?: string;
   isCollaborative?: boolean;
+  compatibilityScore?: number | CompatibilityScore;
 }
 
 const PlanTogether: React.FC<PlanTogetherProps> = ({
@@ -25,7 +33,8 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
   error,
   onRetrySearch,
   sessionId,
-  isCollaborative = true
+  isCollaborative = true,
+  compatibilityScore
 }) => {
   const { user } = useAuth();
 
@@ -105,20 +114,16 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-center">
-            <Users className="h-5 w-5 text-primary" />
-            Plan Together with {partnerName}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-muted-foreground">
-            Select a venue that you'd both love to visit. You can discuss your choices and decide together!
-          </p>
-        </CardContent>
-      </Card>
+      {/* Compact Compatibility Banner */}
+      {compatibilityScore !== undefined && (
+        <CompatibilitySummaryBanner
+          compatibilityScore={compatibilityScore}
+          partnerName={partnerName}
+          venueCount={venueRecommendations.length}
+          compact={true}
+          collapsible={false}
+        />
+      )}
 
       {/* Venues Section */}
       <Card>
