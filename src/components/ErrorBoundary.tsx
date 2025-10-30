@@ -9,6 +9,7 @@ interface Props {
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
   level?: 'app' | 'page' | 'component';
+  silent?: boolean;
 }
 
 interface State {
@@ -63,6 +64,12 @@ class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      // If silent mode is enabled, just log and render fallback or null
+      if (this.props.silent) {
+        console.warn('ErrorBoundary caught error (silent mode):', this.state.error);
+        return this.props.fallback || null;
+      }
+
       // Use custom fallback if provided
       if (this.props.fallback) {
         return this.props.fallback;

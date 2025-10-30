@@ -181,7 +181,7 @@ const SmartDatePlanning: React.FC = () => {
   console.log('SmartDatePlanning - Rendering with user:', { displayName, firstName });
 
   return (
-    <ErrorBoundary level="page">
+    <ErrorBoundary level="page" silent={true}>
       <div className="min-h-screen bg-background">
         <div className={isMobile ? "max-w-md mx-auto" : "max-w-none"}>
           {isMobile && (
@@ -192,7 +192,7 @@ const SmartDatePlanning: React.FC = () => {
             />
           )}
           
-          <ErrorBoundary level="component">
+          <ErrorBoundary level="component" silent={true}>
             <SmartDatePlanner sessionId={sessionId} fromProposal={fromProposal} />
           </ErrorBoundary>
         </div>

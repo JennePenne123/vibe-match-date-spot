@@ -62,7 +62,7 @@ const App = () => (
           <AuthProvider>
             <AppProvider>
               <NotificationSystem>
-                <ErrorBoundary level="page">
+                <ErrorBoundary level="page" silent={true}>
                   <Routes>
                     {/* Public routes without layout */}
                     <Route path="/" element={<Onboarding />} />
