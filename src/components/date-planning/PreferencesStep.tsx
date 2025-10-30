@@ -110,24 +110,49 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [partnerPreferences, setPartnerPreferences] = useState<UserPreferences | null>(null);
   const [autoNavigating, setAutoNavigating] = useState(false);
   const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
+  
+  // Track user modifications to prevent overwriting their choices
+  const [userModifiedDate, setUserModifiedDate] = useState(false);
+  const [userModifiedTime, setUserModifiedTime] = useState(false);
+  const [userModifiedTimePrefs, setUserModifiedTimePrefs] = useState(false);
+  const [prefilledFromProposal, setPrefilledFromProposal] = useState(false);
 
-// Prefill date & time from proposal when provided
-  // Prefill date & time from proposal when provided
+  // Prefill date, time, and time preferences from proposal when provided
   useEffect(() => {
-    if (initialProposedDate) {
+    if (initialProposedDate && !prefilledFromProposal) {
       const dt = new Date(initialProposedDate);
       if (!isNaN(dt.getTime())) {
-        // Only set if not already set by user
-        if (!selectedDate) {
+        console.log('📅 Pre-filling from proposal:', {
+          proposedDate: initialProposedDate,
+          parsedDate: dt,
+          userModifiedDate,
+          userModifiedTime
+        });
+        
+        // Pre-fill date if user hasn't manually changed it
+        if (!userModifiedDate) {
           setSelectedDate(dt);
         }
-        if (!selectedTime) {
-          const hhmm = format(dt, 'HH:mm'); // Use HH:mm for 24-hour format
+        
+        // Pre-fill time if user hasn't manually changed it
+        if (!userModifiedTime) {
+          const hhmm = format(dt, 'HH:mm');
           setSelectedTime(hhmm);
+          
+          // Auto-select matching time preference
+          if (!userModifiedTimePrefs) {
+            const timePref = getTimePreferenceFromTime(hhmm);
+            if (timePref && !selectedTimePreferences.includes(timePref)) {
+              setSelectedTimePreferences(prev => [...prev, timePref]);
+              console.log('🕐 Auto-selected time preference:', timePref, 'for time', hhmm);
+            }
+          }
         }
+        
+        setPrefilledFromProposal(true);
       }
     }
-  }, [initialProposedDate]);
+  }, [initialProposedDate, prefilledFromProposal, userModifiedDate, userModifiedTime, userModifiedTimePrefs]);
 
 // Track when AI analysis starts/stops
 useEffect(() => {
@@ -278,6 +303,21 @@ useEffect(() => {
     { id: 'kosher', name: 'Kosher', emoji: '✡️' }
   ];
 
+  // Helper function to map time string to time preference ID
+  const getTimePreferenceFromTime = (timeString: string): string | null => {
+    if (!timeString) return null;
+    
+    const [hours] = timeString.split(':').map(Number);
+    
+    if (hours >= 9 && hours < 12) return 'morning';
+    if (hours >= 12 && hours < 15) return 'lunch';
+    if (hours >= 15 && hours < 18) return 'afternoon';
+    if (hours >= 18 && hours < 21) return 'evening';
+    if (hours >= 21 || hours < 9) return 'night';
+    
+    return null;
+  };
+
   const quickStartTemplates = [
     {
       id: 'romantic-dinner',
@@ -345,12 +385,22 @@ useEffect(() => {
   };
 
   // Toggle functions
-  const toggleSelection = (item: string, selectedItems: string[], setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>) => {
+  const toggleSelection = (
+    item: string, 
+    selectedItems: string[], 
+    setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>,
+    category?: keyof UserPreferences
+  ) => {
     setSelectedItems(prev =>
       prev.includes(item)
         ? prev.filter(i => i !== item)
         : [...prev, item]
     );
+    
+    // Track if user manually changed time preferences
+    if (category === 'preferred_times') {
+      setUserModifiedTimePrefs(true);
+    }
   };
 
   const getSharedPreferences = (category: keyof UserPreferences): string[] => {
@@ -575,7 +625,7 @@ useEffect(() => {
           return (
             <button
               key={item.id}
-              onClick={() => toggleSelection(item.id, selectedItems, setSelectedItems)}
+              onClick={() => toggleSelection(item.id, selectedItems, setSelectedItems, category)}
               className={`p-3 md:p-4 rounded-xl border-2 transition-all relative min-h-[80px] ${
                 isSelected
                   ? 'bg-primary/10 border-primary text-primary'
@@ -689,7 +739,11 @@ useEffect(() => {
                 <Calendar
                   mode="single"
                   selected={selectedDate}
-                  onSelect={setSelectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date);
+                    setUserModifiedDate(true);
+                    console.log('👤 User manually selected date:', date);
+                  }}
                   disabled={(date) => date < new Date()}
                   initialFocus
                   className="pointer-events-auto"
@@ -702,7 +756,11 @@ useEffect(() => {
           {/* Time Picker */}
           <div>
             <label className="text-sm font-medium mb-2 block">Preferred Time</label>
-            <Select value={selectedTime} onValueChange={setSelectedTime}>
+            <Select value={selectedTime} onValueChange={(time) => {
+              setSelectedTime(time);
+              setUserModifiedTime(true);
+              console.log('👤 User manually selected time:', time);
+            }}>
               <SelectTrigger className="h-10 md:h-11">
                 <SelectValue placeholder="Select time" />
               </SelectTrigger>
