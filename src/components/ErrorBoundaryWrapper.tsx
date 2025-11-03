@@ -5,6 +5,7 @@ interface ErrorBoundaryWrapperProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
   error?: Error;
+  silent?: boolean;
 }
 
 const DefaultErrorFallback: React.FC<{ error: Error }> = ({ error }) => {
@@ -35,7 +36,8 @@ const DefaultErrorFallback: React.FC<{ error: Error }> = ({ error }) => {
 export const ErrorBoundaryWrapper: React.FC<ErrorBoundaryWrapperProps> = ({ 
   children, 
   fallback,
-  error
+  error,
+  silent
 }) => {
   const defaultFallback = error ? <DefaultErrorFallback error={error} /> : (
     <div className="flex items-center justify-center min-h-[200px] p-6">
@@ -57,7 +59,7 @@ export const ErrorBoundaryWrapper: React.FC<ErrorBoundaryWrapperProps> = ({
   );
   
   return (
-    <ErrorBoundary fallback={fallback || defaultFallback}>
+    <ErrorBoundary fallback={fallback || defaultFallback} silent={silent}>
       {children}
     </ErrorBoundary>
   );

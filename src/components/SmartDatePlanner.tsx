@@ -290,11 +290,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
 
 
   return (
-    <ErrorBoundaryWrapper>
+    <ErrorBoundaryWrapper silent={true}>
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 animate-fade-in">
         <div className={isMobile ? "max-w-md mx-auto p-6 space-y-8" : "max-w-6xl mx-auto p-6"}>
           {/* Header */}
-          <ErrorBoundaryWrapper>
+          <ErrorBoundaryWrapper silent={true}>
             {(() => {
               const progressValue = getStepProgress();
               console.log('🔍 SmartDatePlanner progress value:', progressValue, 'currentStep:', currentStep);
@@ -308,8 +308,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
           </ErrorBoundaryWrapper>
 
           {/* Location Display */}
-          <ErrorBoundaryWrapper>
-            <LocationDisplay 
+          <ErrorBoundaryWrapper silent={true}>
+            <LocationDisplay
               userLocation={userLocation}
               locationError={locationError}
               locationRequested={locationRequested}
@@ -336,7 +336,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
               </div>
 
               {/* Step Content - Using consistent step names */}
-              <ErrorBoundaryWrapper>
+              <ErrorBoundaryWrapper silent={true}>
                 {currentStep === 'select-partner' && !effectivePreselectedFriend && (
                   <PartnerSelection
                     friends={friends}
@@ -352,7 +352,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                 )}
               </ErrorBoundaryWrapper>
 
-              <ErrorBoundaryWrapper>
+              <ErrorBoundaryWrapper silent={true}>
                 {currentStep === 'set-preferences' && (
                 <PreferencesStep
                   sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
