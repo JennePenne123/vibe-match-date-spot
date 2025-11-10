@@ -29,7 +29,7 @@ import AIVenueCardDemo from "./pages/AIVenueCardDemo";
 import PremiumDesignSystemDemo from "./pages/PremiumDesignSystemDemo";
 import Debug from "./pages/Debug";
 import RatingDemo from "./pages/RatingDemo";
-import LandingDemo from "./pages/LandingDemo";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,7 +66,8 @@ const App = () => (
                 <ErrorBoundary level="page" silent={true}>
                   <Routes>
                     {/* Public routes without layout */}
-                    <Route path="/" element={<Onboarding />} />
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/welcome" element={<Onboarding />} />
                     <Route path="/register-login" element={<RegisterLogin />} />
                     
                     {/* Protected routes with responsive layout */}
@@ -91,7 +92,6 @@ const App = () => (
                     <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
                     <Route path="/demo/premium-design-system" element={<PremiumDesignSystemDemo />} />
                     <Route path="/demo/rating" element={<RatingDemo />} />
-                    <Route path="/demo/landing" element={<LandingDemo />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </ErrorBoundary>
