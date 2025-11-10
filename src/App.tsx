@@ -29,6 +29,7 @@ import AIVenueCardDemo from "./pages/AIVenueCardDemo";
 import PremiumDesignSystemDemo from "./pages/PremiumDesignSystemDemo";
 import Debug from "./pages/Debug";
 import RatingDemo from "./pages/RatingDemo";
+import LandingDemo from "./pages/LandingDemo";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,6 +91,7 @@ const App = () => (
                     <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
                     <Route path="/demo/premium-design-system" element={<PremiumDesignSystemDemo />} />
                     <Route path="/demo/rating" element={<RatingDemo />} />
+                    <Route path="/demo/landing" element={<LandingDemo />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </ErrorBoundary>
