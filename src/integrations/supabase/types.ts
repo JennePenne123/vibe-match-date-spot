@@ -816,6 +816,8 @@ export type Database = {
           created_at: string
           cuisine_type: string | null
           description: string | null
+          foursquare_data: Json | null
+          foursquare_id: string | null
           google_place_id: string | null
           id: string
           image_url: string | null
@@ -837,6 +839,8 @@ export type Database = {
           created_at?: string
           cuisine_type?: string | null
           description?: string | null
+          foursquare_data?: Json | null
+          foursquare_id?: string | null
           google_place_id?: string | null
           id?: string
           image_url?: string | null
@@ -858,6 +862,8 @@ export type Database = {
           created_at?: string
           cuisine_type?: string | null
           description?: string | null
+          foursquare_data?: Json | null
+          foursquare_id?: string | null
           google_place_id?: string | null
           id?: string
           image_url?: string | null
@@ -881,14 +887,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      count_perfect_pairs: {
-        Args: { target_user_id: string }
-        Returns: number
-      }
-      create_test_venues: {
-        Args: { venues_data: Json }
-        Returns: boolean
-      }
+      count_perfect_pairs: { Args: { target_user_id: string }; Returns: number }
+      create_test_venues: { Args: { venues_data: Json }; Returns: boolean }
       reset_user_preferences_to_default: {
         Args: { target_user_id: string }
         Returns: boolean
