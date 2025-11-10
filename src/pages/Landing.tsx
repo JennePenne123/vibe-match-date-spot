@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Sparkles, Users, Heart, ArrowRight, Menu, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AuthModal } from '@/components/landing/AuthModal';
 
 export default function LandingDemo() {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const featuresRef = useRef<HTMLDivElement>(null);
   const howItWorksRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +84,7 @@ export default function LandingDemo() {
                 How It Works
               </button>
               <Button 
-                onClick={() => navigate('/register-login')}
+                onClick={() => setIsAuthModalOpen(true)}
                 variant="default"
                 size="default"
                 className="shadow-glow-sm hover:shadow-glow-md transition-all duration-300"
@@ -122,7 +124,7 @@ export default function LandingDemo() {
                 How It Works
               </button>
               <Button 
-                onClick={() => navigate('/register-login')}
+                onClick={() => setIsAuthModalOpen(true)}
                 variant="default"
                 size="default"
                 className="w-full shadow-glow-sm"
@@ -159,7 +161,7 @@ export default function LandingDemo() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
               <Button 
-                onClick={() => navigate('/register-login')}
+                onClick={() => setIsAuthModalOpen(true)}
                 size="lg"
                 className="text-lg px-8 py-6 shadow-glow-lg hover:shadow-glow-xl hover:scale-105 transition-all duration-300 w-full sm:w-auto"
               >
@@ -368,7 +370,7 @@ export default function LandingDemo() {
               Join thousands of people creating unforgettable moments
             </p>
             <Button 
-              onClick={() => navigate('/register-login')}
+              onClick={() => setIsAuthModalOpen(true)}
               size="lg"
               variant="outline"
               className="text-lg px-8 py-6 bg-white text-primary border-0 hover:bg-white/90 hover:scale-105 shadow-2xl transition-all duration-300"
@@ -429,6 +431,9 @@ export default function LandingDemo() {
           </div>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }
