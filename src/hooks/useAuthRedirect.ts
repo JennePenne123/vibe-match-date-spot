@@ -12,7 +12,7 @@ export const useAuthRedirect = () => {
     const redirectTimer = setTimeout(() => {
       if (!authLoading && !user) {
         console.log('No authenticated user found, redirecting to login');
-        navigate('/register-login', { replace: true });
+        navigate('/?auth=required', { replace: true });
       }
     }, 100);
 
