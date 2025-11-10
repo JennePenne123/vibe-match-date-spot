@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -68,7 +68,7 @@ const App = () => (
                     {/* Public routes without layout */}
                     <Route path="/" element={<Landing />} />
                     <Route path="/welcome" element={<Onboarding />} />
-                    <Route path="/register-login" element={<RegisterLogin />} />
+                    <Route path="/register-login" element={<Navigate to="/?auth=required" replace />} />
                     
                     {/* Protected routes with responsive layout */}
                     <Route path="/home" element={<AppLayout><Home /></AppLayout>} />
