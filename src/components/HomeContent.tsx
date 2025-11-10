@@ -135,11 +135,11 @@ const HomeContent: React.FC = () => {
   }
 
   return (
-    <main className="px-4 py-6 md:px-6 lg:px-8">
+    <main className="min-h-screen bg-gradient-dreamy px-4 py-6 md:px-6 lg:px-8">
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto"}>
         {isDesktop ? (
           // Desktop layout: Optimized 5-column asymmetric grid (2-2-1 ratio)
-          <div className="space-y-5">
+          <div className="space-y-5 animate-fade-in">
             {/* Pending Ratings Card - Full Width */}
             <PendingRatingsCard />
             
@@ -149,7 +149,7 @@ const HomeContent: React.FC = () => {
                 <DateProposalsList 
                   onProposalAccepted={handleProposalAccepted}
                   onInvitationSent={handleInvitationSent}
-                  key={invitationSentTrigger} // Force re-render when invitation is sent
+                  key={invitationSentTrigger}
                 />
               </div>
               
@@ -162,17 +162,21 @@ const HomeContent: React.FC = () => {
               <div className="col-span-1">
                 <div className="space-y-4">
                   <div className="text-center">
-                    <Heading size="h3" className="mb-2">Plan a New Date</Heading>
+                    <Heading size="h3" className="mb-2 bg-gradient-text bg-clip-text text-transparent">Plan a New Date</Heading>
                     <Text size="xs" className="text-muted-foreground leading-tight">
                       Choose how you'd like to plan your date
                     </Text>
                   </div>
                   
                   {/* Collaborative Planning Card */}
-                  <Card className="border-border hover:border-primary/50 transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-muted/10" onClick={handleCollaborativePlanning}>
+                  <Card 
+                    variant="glass" 
+                    className="cursor-pointer hover:scale-105 transition-all duration-300 shadow-glow-sm hover:shadow-glow-md animate-scale-in" 
+                    onClick={handleCollaborativePlanning}
+                  >
                     <CardHeader className="text-center pb-2 pt-4">
-                      <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
-                        <Users className="h-5 w-5 text-primary" />
+                      <div className="mx-auto mb-2 p-3 rounded-full bg-gradient-romantic shadow-glow-sm">
+                        <Users className="h-5 w-5 text-white" />
                       </div>
                       <CardTitle className="text-base">Collaborative Planning</CardTitle>
                       <CardDescription className="text-xs leading-tight">
@@ -180,7 +184,8 @@ const HomeContent: React.FC = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0 pb-4">
-                      <Button className="w-full" variant="default" size="sm">
+                      <Button className="w-full shadow-glow-md hover:shadow-glow-lg transition-all" variant="default" size="sm">
+                        <Sparkles className="h-4 w-4 mr-2" />
                         Send Date Proposal
                       </Button>
                     </CardContent>
@@ -191,7 +196,7 @@ const HomeContent: React.FC = () => {
           </div>
         ) : (
           // Mobile layout: Single column with optimized spacing
-          <div className="space-y-5">
+          <div className="space-y-5 animate-fade-in">
             {/* Pending Ratings Card */}
             <PendingRatingsCard />
             
@@ -199,7 +204,7 @@ const HomeContent: React.FC = () => {
             <DateProposalsList 
               onProposalAccepted={handleProposalAccepted}
               onInvitationSent={handleInvitationSent}
-              key={invitationSentTrigger} // Force re-render when invitation is sent
+              key={invitationSentTrigger}
             />
             
             {/* Recent Invitations */}
@@ -208,17 +213,21 @@ const HomeContent: React.FC = () => {
             {/* Planning Mode Selection */}
             <div className="space-y-4">
               <div className="text-center">
-                <Heading size="h2" className="mb-2">Plan a New Date</Heading>
+                <Heading size="h2" className="mb-2 bg-gradient-text bg-clip-text text-transparent">Plan a New Date</Heading>
                 <Text size="sm" className="text-muted-foreground">
                   Choose how you'd like to plan your date
                 </Text>
               </div>
               
               {/* Collaborative Planning Card */}
-              <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
+              <Card 
+                variant="glass" 
+                className="cursor-pointer hover:scale-[1.02] transition-all duration-300 shadow-glow-md animate-scale-in" 
+                onClick={handleCollaborativePlanning}
+              >
                 <CardHeader className="text-center pb-3">
-                  <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
-                    <Users className="h-6 w-6 text-primary" />
+                  <div className="mx-auto mb-2 p-3 rounded-full bg-gradient-romantic shadow-glow-sm">
+                    <Users className="h-6 w-6 text-white" />
                   </div>
                   <CardTitle className="text-lg">Collaborative Planning</CardTitle>
                   <CardDescription className="text-sm">
@@ -226,7 +235,8 @@ const HomeContent: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <Button className="w-full" variant="default">
+                  <Button className="w-full shadow-glow-md hover:shadow-glow-lg transition-all" variant="default">
+                    <Sparkles className="h-4 w-4 mr-2" />
                     Send Date Proposal
                   </Button>
                 </CardContent>

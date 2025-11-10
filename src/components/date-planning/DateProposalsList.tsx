@@ -126,21 +126,31 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
 
   if (visibleProposals.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>No date proposals yet</p>
-      </div>
+      <Card variant="glass" className="animate-fade-in">
+        <CardContent className="text-center py-12">
+          <div className="mx-auto mb-4 p-4 rounded-full bg-gradient-romantic/10 w-fit">
+            <Calendar className="h-12 w-12 text-primary animate-pulse" />
+          </div>
+          <p className="text-muted-foreground font-medium">No date proposals yet</p>
+          <p className="text-sm text-muted-foreground/70 mt-2">Start planning your first date!</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-5">
       {pendingProposals.length > 0 && (
-        <div>
-          <h3 className="text-base font-semibold text-foreground mb-3">Pending Proposals</h3>
+        <div className="animate-fade-in">
+          <h3 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
+            <div className="h-8 w-8 rounded-full bg-gradient-romantic flex items-center justify-center shadow-glow-sm">
+              <Clock className="h-4 w-4 text-white" />
+            </div>
+            <span className="bg-gradient-text bg-clip-text text-transparent">Pending Proposals</span>
+          </h3>
           <div className="space-y-3">
             {pendingProposals.map((proposal) => (
-              <Card key={proposal.id} className="border-primary/20">
+              <Card key={proposal.id} variant="elegant" className="hover:shadow-premium-lg transition-all duration-300 hover:scale-[1.01]">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{proposal.title}</CardTitle>
@@ -220,11 +230,16 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
       )}
 
       {acceptedProposals.length > 0 && (
-        <div>
-          <h3 className="text-base font-semibold text-foreground mb-3">Accepted Proposals</h3>
+        <div className="animate-fade-in">
+          <h3 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
+            <div className="h-8 w-8 rounded-full bg-gradient-sunset flex items-center justify-center shadow-glow-sm">
+              <CheckCircle className="h-4 w-4 text-white" />
+            </div>
+            <span className="bg-gradient-text bg-clip-text text-transparent">Accepted Proposals</span>
+          </h3>
           <div className="space-y-3">
             {acceptedProposals.map((proposal) => (
-              <Card key={proposal.id} className="border-success/30 bg-success/5">
+              <Card key={proposal.id} variant="glow" className="border-green-500/30 hover:shadow-glow-lg transition-all duration-300 hover:scale-[1.01]">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{proposal.title}</CardTitle>
