@@ -135,17 +135,17 @@ const HomeContent: React.FC = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-dreamy px-4 py-6 md:px-6 lg:px-8">
+    <main className="min-h-screen bg-gradient-to-br from-pink-50/80 via-rose-50/60 to-amber-50/40 px-4 py-6 md:px-6 lg:px-8">
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto"}>
         {isDesktop ? (
-          // Desktop layout: Optimized 5-column asymmetric grid (2-2-1 ratio)
+          // Desktop layout: Balanced 3-column grid (1-1-1 ratio)
           <div className="space-y-5 animate-fade-in">
             {/* Pending Ratings Card - Full Width */}
             <PendingRatingsCard />
             
-            <div className="grid grid-cols-5 gap-4 lg:gap-5">
-              {/* Date Proposals Section - 2 columns */}
-              <div className="col-span-2">
+            <div className="grid grid-cols-3 gap-5">
+              {/* Date Proposals Section - 1 column */}
+              <div className="col-span-1">
                 <DateProposalsList 
                   onProposalAccepted={handleProposalAccepted}
                   onInvitationSent={handleInvitationSent}
@@ -153,8 +153,8 @@ const HomeContent: React.FC = () => {
                 />
               </div>
               
-              {/* Recent Invitations - 2 columns */}
-              <div className="col-span-2">
+              {/* Recent Invitations - 1 column */}
+              <div className="col-span-1">
                 <UpcomingDatesCard key="upcoming-dates-v2" />
               </div>
               

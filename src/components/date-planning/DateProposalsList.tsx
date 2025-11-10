@@ -102,9 +102,19 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="secondary">Pending</Badge>;
+        return (
+          <Badge className="bg-gradient-romantic text-white border-none shadow-glow-sm">
+            <Clock className="h-3 w-3 mr-1" />
+            Pending
+          </Badge>
+        );
       case 'accepted':
-        return <Badge variant="default">Accepted</Badge>;
+        return (
+          <Badge className="bg-gradient-sunset text-white border-none shadow-glow-sm">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Accepted
+          </Badge>
+        );
       case 'declined':
         return <Badge variant="destructive">Declined</Badge>;
       case 'expired':
@@ -126,13 +136,17 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
 
   if (visibleProposals.length === 0) {
     return (
-      <Card variant="glass" className="animate-fade-in">
-        <CardContent className="text-center py-12">
-          <div className="mx-auto mb-4 p-4 rounded-full bg-gradient-romantic/10 w-fit">
-            <Calendar className="h-12 w-12 text-primary animate-pulse" />
+      <Card variant="glass" className="animate-fade-in backdrop-blur-glass">
+        <CardContent className="text-center py-16">
+          <div className="mx-auto mb-6 p-6 rounded-full bg-gradient-romantic/10 w-fit shadow-glow-sm">
+            <Calendar className="h-16 w-16 text-primary animate-pulse" />
           </div>
-          <p className="text-muted-foreground font-medium">No date proposals yet</p>
-          <p className="text-sm text-muted-foreground/70 mt-2">Start planning your first date!</p>
+          <h3 className="text-xl font-semibold mb-2 bg-gradient-text bg-clip-text text-transparent">
+            No date proposals yet
+          </h3>
+          <p className="text-muted-foreground">
+            Start planning your first date!
+          </p>
         </CardContent>
       </Card>
     );
