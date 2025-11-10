@@ -135,26 +135,26 @@ const HomeContent: React.FC = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-pink-50/80 via-rose-50/60 to-amber-50/40 px-4 py-6 md:px-6 lg:px-8">
+    <main className="px-4 py-6 md:px-6 lg:px-8">
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto"}>
         {isDesktop ? (
-          // Desktop layout: Balanced 3-column grid (1-1-1 ratio)
-          <div className="space-y-5 animate-fade-in">
+          // Desktop layout: Optimized 5-column asymmetric grid (2-2-1 ratio)
+          <div className="space-y-5">
             {/* Pending Ratings Card - Full Width */}
             <PendingRatingsCard />
             
-            <div className="grid grid-cols-3 gap-5">
-              {/* Date Proposals Section - 1 column */}
-              <div className="col-span-1">
+            <div className="grid grid-cols-5 gap-4 lg:gap-5">
+              {/* Date Proposals Section - 2 columns */}
+              <div className="col-span-2">
                 <DateProposalsList 
                   onProposalAccepted={handleProposalAccepted}
                   onInvitationSent={handleInvitationSent}
-                  key={invitationSentTrigger}
+                  key={invitationSentTrigger} // Force re-render when invitation is sent
                 />
               </div>
               
-              {/* Recent Invitations - 1 column */}
-              <div className="col-span-1">
+              {/* Recent Invitations - 2 columns */}
+              <div className="col-span-2">
                 <UpcomingDatesCard key="upcoming-dates-v2" />
               </div>
               
@@ -162,21 +162,17 @@ const HomeContent: React.FC = () => {
               <div className="col-span-1">
                 <div className="space-y-4">
                   <div className="text-center">
-                    <Heading size="h3" className="mb-2 bg-gradient-text bg-clip-text text-transparent">Plan a New Date</Heading>
+                    <Heading size="h3" className="mb-2">Plan a New Date</Heading>
                     <Text size="xs" className="text-muted-foreground leading-tight">
                       Choose how you'd like to plan your date
                     </Text>
                   </div>
                   
                   {/* Collaborative Planning Card */}
-                  <Card 
-                    variant="glass" 
-                    className="cursor-pointer hover:scale-105 transition-all duration-300 shadow-glow-sm hover:shadow-glow-md animate-scale-in" 
-                    onClick={handleCollaborativePlanning}
-                  >
+                  <Card className="border-border hover:border-primary/50 transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-muted/10" onClick={handleCollaborativePlanning}>
                     <CardHeader className="text-center pb-2 pt-4">
-                      <div className="mx-auto mb-2 p-3 rounded-full bg-gradient-romantic shadow-glow-sm">
-                        <Users className="h-5 w-5 text-white" />
+                      <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
+                        <Users className="h-5 w-5 text-primary" />
                       </div>
                       <CardTitle className="text-base">Collaborative Planning</CardTitle>
                       <CardDescription className="text-xs leading-tight">
@@ -184,8 +180,7 @@ const HomeContent: React.FC = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0 pb-4">
-                      <Button className="w-full shadow-glow-md hover:shadow-glow-lg transition-all" variant="default" size="sm">
-                        <Sparkles className="h-4 w-4 mr-2" />
+                      <Button className="w-full" variant="default" size="sm">
                         Send Date Proposal
                       </Button>
                     </CardContent>
@@ -196,7 +191,7 @@ const HomeContent: React.FC = () => {
           </div>
         ) : (
           // Mobile layout: Single column with optimized spacing
-          <div className="space-y-5 animate-fade-in">
+          <div className="space-y-5">
             {/* Pending Ratings Card */}
             <PendingRatingsCard />
             
@@ -204,7 +199,7 @@ const HomeContent: React.FC = () => {
             <DateProposalsList 
               onProposalAccepted={handleProposalAccepted}
               onInvitationSent={handleInvitationSent}
-              key={invitationSentTrigger}
+              key={invitationSentTrigger} // Force re-render when invitation is sent
             />
             
             {/* Recent Invitations */}
@@ -213,21 +208,17 @@ const HomeContent: React.FC = () => {
             {/* Planning Mode Selection */}
             <div className="space-y-4">
               <div className="text-center">
-                <Heading size="h2" className="mb-2 bg-gradient-text bg-clip-text text-transparent">Plan a New Date</Heading>
+                <Heading size="h2" className="mb-2">Plan a New Date</Heading>
                 <Text size="sm" className="text-muted-foreground">
                   Choose how you'd like to plan your date
                 </Text>
               </div>
               
               {/* Collaborative Planning Card */}
-              <Card 
-                variant="glass" 
-                className="cursor-pointer hover:scale-[1.02] transition-all duration-300 shadow-glow-md animate-scale-in" 
-                onClick={handleCollaborativePlanning}
-              >
+              <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
                 <CardHeader className="text-center pb-3">
-                  <div className="mx-auto mb-2 p-3 rounded-full bg-gradient-romantic shadow-glow-sm">
-                    <Users className="h-6 w-6 text-white" />
+                  <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
+                    <Users className="h-6 w-6 text-primary" />
                   </div>
                   <CardTitle className="text-lg">Collaborative Planning</CardTitle>
                   <CardDescription className="text-sm">
@@ -235,8 +226,7 @@ const HomeContent: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <Button className="w-full shadow-glow-md hover:shadow-glow-lg transition-all" variant="default">
-                    <Sparkles className="h-4 w-4 mr-2" />
+                  <Button className="w-full" variant="default">
                     Send Date Proposal
                   </Button>
                 </CardContent>

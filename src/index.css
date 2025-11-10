@@ -46,27 +46,6 @@
     
     --radius: 0.5rem;
 
-    /* Glass morphism colors */
-    --glass-white: 330 85% 98% / 0.7;
-    --glass-neutral: 330 8% 36% / 0.1;
-    --glass-dark: 330 22% 12% / 0.8;
-    
-    /* Backdrop blur values */
-    --blur-glass: 10px;
-    --blur-glass-strong: 20px;
-    
-    /* Brand color scale */
-    --brand-50: 330 85% 98%;
-    --brand-100: 330 82% 95%;
-    --brand-200: 330 76% 88%;
-    --brand-300: 330 81% 70%;
-    --brand-400: 330 81% 65%;
-    --brand-500: 330 81% 60%;
-    --brand-600: 330 84% 52%;
-    --brand-700: 330 87% 45%;
-    --brand-800: 330 90% 38%;
-    --brand-900: 330 94% 28%;
-
     /* Premium Gradient System */
     --gradient-primary: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%);
     --gradient-secondary: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%);
@@ -102,29 +81,8 @@
     --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.3);
     --shadow-romantic: 0 12px 32px -8px hsl(330 81% 60% / 0.4), 0 4px 16px -4px hsl(330 81% 60% / 0.2);
     --shadow-glow: 0 0 24px hsl(330 81% 60% / 0.35), 0 0 48px hsl(330 81% 60% / 0.2);
-    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.15);
-    --shadow-glass-strong: 0 8px 32px rgba(31, 38, 135, 0.37);
+    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
     --shadow-dreamy: 0 0 40px hsl(330 85% 95% / 0.8), 0 8px 24px hsl(330 81% 60% / 0.25);
-    
-    /* Premium shadow system */
-    --shadow-premium-sm: 0 2px 8px -2px hsl(330 81% 60% / 0.15);
-    --shadow-premium-md: 0 4px 16px -4px hsl(330 81% 60% / 0.2);
-    --shadow-premium-lg: 0 8px 24px -6px hsl(330 81% 60% / 0.25);
-    --shadow-premium-xl: 0 12px 32px -8px hsl(330 81% 60% / 0.3);
-    
-    /* Glow shadow system */
-    --shadow-glow-sm: 0 0 12px hsl(330 81% 60% / 0.25);
-    --shadow-glow-md: 0 0 20px hsl(330 81% 60% / 0.35);
-    --shadow-glow-lg: 0 0 28px hsl(330 81% 60% / 0.45);
-    
-    /* Gradient backgrounds */
-    --gradient-surface-light: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
-    --gradient-surface-dark: linear-gradient(135deg, hsl(330, 16%, 18%) 0%, hsl(330, 12%, 22%) 100%);
-    --gradient-glass-light: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    --gradient-glass-dark: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-    
-    /* Text gradient */
-    --gradient-text: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
     
     /* Sidebar variables */
     --sidebar-background: 330 20% 99%;
@@ -209,24 +167,6 @@
     --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
     --shadow-dreamy: 0 0 40px hsl(330 81% 60% / 0.3), 0 8px 24px hsl(330 81% 60% / 0.35);
     
-    /* Dark mode overrides for glass and brand colors */
-    --glass-white: 330 22% 12% / 0.7;
-    --glass-neutral: 330 8% 68% / 0.1;
-    
-    --brand-50: 330 22% 12%;
-    --brand-100: 330 16% 18%;
-    
-    /* Premium shadow system for dark mode */
-    --shadow-premium-sm: 0 2px 8px -2px hsl(330 81% 60% / 0.2);
-    --shadow-premium-md: 0 4px 16px -4px hsl(330 81% 60% / 0.25);
-    --shadow-premium-lg: 0 8px 24px -6px hsl(330 81% 60% / 0.3);
-    --shadow-premium-xl: 0 12px 32px -8px hsl(330 81% 60% / 0.35);
-    
-    /* Glow shadow system for dark mode */
-    --shadow-glow-sm: 0 0 12px hsl(330 81% 60% / 0.3);
-    --shadow-glow-md: 0 0 20px hsl(330 81% 60% / 0.4);
-    --shadow-glow-lg: 0 0 28px hsl(330 81% 60% / 0.5);
-    
     /* Dark sidebar variables */
     --sidebar-background: 330 22% 12%;
     --sidebar-foreground: 330 20% 99%;
@@ -258,48 +198,5 @@
   .venue-ai-card {
     background: var(--gradient-venue-ai);
     @apply border border-border/20 overflow-hidden hover:shadow-lg transition-all duration-300;
-  }
-}
-
-@layer utilities {
-  .bg-gradient-text {
-    background: var(--gradient-text);
-  }
-  
-  .bg-glass-white {
-    background: rgba(255, 255, 255, 0.7);
-  }
-  
-  .backdrop-blur-glass {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-  
-  .shadow-premium-sm {
-    box-shadow: var(--shadow-premium-sm);
-  }
-  
-  .shadow-premium-md {
-    box-shadow: var(--shadow-premium-md);
-  }
-  
-  .shadow-premium-lg {
-    box-shadow: var(--shadow-premium-lg);
-  }
-  
-  .shadow-premium-xl {
-    box-shadow: var(--shadow-premium-xl);
-  }
-  
-  .shadow-glow-sm {
-    box-shadow: var(--shadow-glow-sm);
-  }
-  
-  .shadow-glow-md {
-    box-shadow: var(--shadow-glow-md);
-  }
-  
-  .shadow-glow-lg {
-    box-shadow: var(--shadow-glow-lg);
   }
 }

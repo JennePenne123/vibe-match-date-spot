@@ -102,19 +102,9 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return (
-          <Badge className="bg-gradient-romantic text-white border-none shadow-glow-sm">
-            <Clock className="h-3 w-3 mr-1" />
-            Pending
-          </Badge>
-        );
+        return <Badge variant="secondary">Pending</Badge>;
       case 'accepted':
-        return (
-          <Badge className="bg-gradient-sunset text-white border-none shadow-glow-sm">
-            <CheckCircle className="h-3 w-3 mr-1" />
-            Accepted
-          </Badge>
-        );
+        return <Badge variant="default">Accepted</Badge>;
       case 'declined':
         return <Badge variant="destructive">Declined</Badge>;
       case 'expired':
@@ -136,35 +126,21 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
 
   if (visibleProposals.length === 0) {
     return (
-      <Card variant="glass" className="animate-fade-in backdrop-blur-glass">
-        <CardContent className="text-center py-16">
-          <div className="mx-auto mb-6 p-6 rounded-full bg-gradient-romantic/10 w-fit shadow-glow-sm">
-            <Calendar className="h-16 w-16 text-primary animate-pulse" />
-          </div>
-          <h3 className="text-xl font-semibold mb-2 bg-gradient-text bg-clip-text text-transparent">
-            No date proposals yet
-          </h3>
-          <p className="text-muted-foreground">
-            Start planning your first date!
-          </p>
-        </CardContent>
-      </Card>
+      <div className="text-center py-8 text-muted-foreground">
+        <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+        <p>No date proposals yet</p>
+      </div>
     );
   }
 
   return (
     <div className="space-y-5">
       {pendingProposals.length > 0 && (
-        <div className="animate-fade-in">
-          <h3 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-gradient-romantic flex items-center justify-center shadow-glow-sm">
-              <Clock className="h-4 w-4 text-white" />
-            </div>
-            <span className="bg-gradient-text bg-clip-text text-transparent">Pending Proposals</span>
-          </h3>
+        <div>
+          <h3 className="text-base font-semibold text-foreground mb-3">Pending Proposals</h3>
           <div className="space-y-3">
             {pendingProposals.map((proposal) => (
-              <Card key={proposal.id} variant="elegant" className="hover:shadow-premium-lg transition-all duration-300 hover:scale-[1.01]">
+              <Card key={proposal.id} className="border-primary/20">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{proposal.title}</CardTitle>
@@ -244,16 +220,11 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
       )}
 
       {acceptedProposals.length > 0 && (
-        <div className="animate-fade-in">
-          <h3 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-gradient-sunset flex items-center justify-center shadow-glow-sm">
-              <CheckCircle className="h-4 w-4 text-white" />
-            </div>
-            <span className="bg-gradient-text bg-clip-text text-transparent">Accepted Proposals</span>
-          </h3>
+        <div>
+          <h3 className="text-base font-semibold text-foreground mb-3">Accepted Proposals</h3>
           <div className="space-y-3">
             {acceptedProposals.map((proposal) => (
-              <Card key={proposal.id} variant="glow" className="border-green-500/30 hover:shadow-glow-lg transition-all duration-300 hover:scale-[1.01]">
+              <Card key={proposal.id} className="border-success/30 bg-success/5">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{proposal.title}</CardTitle>

@@ -59,16 +59,14 @@ export const PendingRatingsCard: React.FC = () => {
 
   return (
     <>
-      <Card variant="glow" className="shadow-glow-lg animate-fade-in border-yellow-500/30">
-        <CardHeader className="bg-gradient-sunset">
-          <CardTitle className="flex items-center justify-between text-white">
+      <Card className="border-primary/20 shadow-md">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-full bg-white/20 shadow-glow-sm">
-                <Star className="h-5 w-5 fill-white" />
-              </div>
+              <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
               <span>Rate Your Dates</span>
             </div>
-            <Badge variant="secondary" className="gap-1 bg-white/20 text-white border-white/30">
+            <Badge variant="secondary" className="gap-1">
               <Trophy className="h-3 w-3" />
               {pendingRatings.length} pending
             </Badge>
@@ -83,7 +81,7 @@ export const PendingRatingsCard: React.FC = () => {
             return (
               <div
                 key={invitation.id}
-                className="flex items-center gap-3 p-3 rounded-lg bg-glass-white backdrop-blur-glass border-white/20 hover:shadow-glass hover:scale-[1.02] transition-all duration-300"
+                className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
               >
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={partner?.avatar_url} referrerPolicy="no-referrer" />
@@ -104,7 +102,7 @@ export const PendingRatingsCard: React.FC = () => {
                 <Button
                   size="sm"
                   onClick={() => handleRateClick(invitation)}
-                  className="gap-1 shadow-glow-sm hover:shadow-glow-md transition-all"
+                  className="gap-1"
                 >
                   <Star className="h-3 w-3" />
                   Rate

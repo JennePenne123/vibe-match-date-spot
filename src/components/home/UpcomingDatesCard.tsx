@@ -94,12 +94,10 @@ const UpcomingDatesCard: React.FC = () => {
 
   if (loading) {
     return (
-      <Card variant="elegant" className="animate-fade-in">
-        <CardHeader className="pb-3 bg-gradient-romantic">
-          <CardTitle className="flex items-center gap-2 text-white">
-            <div className="p-2 rounded-full bg-white/20 shadow-glow-sm">
-              <Heart className="h-5 w-5" />
-            </div>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5 text-pink-500" />
             Upcoming Dates
           </CardTitle>
         </CardHeader>
@@ -114,14 +112,22 @@ const UpcomingDatesCard: React.FC = () => {
 
   if (upcomingDates.length === 0) {
     return (
-      <Card variant="glass" className="animate-fade-in">
-        <CardContent className="py-12">
-          <div className="text-center">
-            <div className="mx-auto mb-4 p-4 rounded-full bg-gradient-romantic/10 w-fit">
-              <Calendar className="h-12 w-12 text-primary animate-pulse" />
-            </div>
-            <p className="text-sm font-medium text-muted-foreground">No upcoming dates yet</p>
-            <p className="text-xs mt-2 text-muted-foreground/70">Accept invitations to see them here</p>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5 text-pink-500" />
+            Upcoming Dates
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-center py-6">
+            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground mb-2">
+              No upcoming dates scheduled
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Accepted dates will appear here
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -129,12 +135,10 @@ const UpcomingDatesCard: React.FC = () => {
   }
 
   return (
-    <Card variant="elegant" className="shadow-premium-lg animate-fade-in">
-      <CardHeader className="pb-3 bg-gradient-romantic">
-        <CardTitle className="text-lg flex items-center gap-2 text-white">
-          <div className="p-2 rounded-full bg-white/20 shadow-glow-sm">
-            <Heart className="h-5 w-5" />
-          </div>
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Heart className="h-5 w-5 text-pink-500" />
           Upcoming Dates
         </CardTitle>
       </CardHeader>
