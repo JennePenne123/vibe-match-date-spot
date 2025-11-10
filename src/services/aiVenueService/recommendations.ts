@@ -5,6 +5,7 @@ import { filterVenuesByPreferences, filterVenuesByCollaborativePreferences } fro
 import { calculateDistanceFromHamburg } from './helperFunctions';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
+import { API_CONFIG } from '@/config/apiConfig';
 
 export interface AIVenueRecommendation {
   venue_id: string;
@@ -46,15 +47,15 @@ export const getAIVenueRecommendations = async (
   try {
     console.log('🎯 RECOMMENDATIONS: Starting venue search for user:', userId, 'partner:', partnerId);
 
-    // Try Google Places API first if user location is available
+    // Get venues using hybrid multi-source strategy
     let venues = [];
     if (userLocation?.latitude && userLocation?.longitude) {
-      console.log('🌐 RECOMMENDATIONS: Using Google Places API with user location');
-      venues = await getVenuesFromGooglePlaces(userId, limit * 2, userLocation);
-      console.log('🌐 RECOMMENDATIONS: Google Places returned:', venues?.length || 0, 'venues');
+      console.log(`🌐 RECOMMENDATIONS: Using ${API_CONFIG.venueSearchStrategy} search strategy`);
+      venues = await getVenuesFromMultipleSources(userId, limit * 2, userLocation);
+      console.log('🌐 RECOMMENDATIONS: Multi-source search returned:', venues?.length || 0, 'venues');
     }
     
-    // Fallback to database venues if Google Places fails or no location
+    // Fallback to database venues if all sources fail or no location
     if (!venues || venues.length === 0) {
       console.log('🗄️ RECOMMENDATIONS: Falling back to database venues');
       venues = await getActiveVenues(100);
@@ -229,6 +230,287 @@ export const getAIVenueRecommendations = async (
     
     // Re-throw error with user-friendly message to show in UI
     throw new Error(error.message || 'Failed to get venue recommendations. Please try again.');
+  }
+};
+
+/**
+ * Hybrid multi-source venue search - calls Google + Foursquare based on strategy
+ */
+const getVenuesFromMultipleSources = async (
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) => {
+  const strategy = API_CONFIG.venueSearchStrategy;
+  
+  if (strategy === 'parallel') {
+    return await getVenuesParallel(userId, limit, userLocation);
+  } else if (strategy === 'google-first') {
+    return await getVenuesGoogleFirst(userId, limit, userLocation);
+  } else if (strategy === 'foursquare-first') {
+    return await getVenuesFoursquareFirst(userId, limit, userLocation);
+  }
+  
+  return await getVenuesParallel(userId, limit, userLocation);
+};
+
+/**
+ * Parallel strategy: Call both APIs simultaneously
+ */
+const getVenuesParallel = async (
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) => {
+  console.log('🔄 HYBRID: Parallel strategy - calling Google + Foursquare');
+  
+  const promises = [];
+  
+  if (API_CONFIG.useGooglePlaces) {
+    promises.push(
+      getVenuesFromGooglePlaces(userId, limit, userLocation).catch(err => {
+        console.error('❌ Google Places failed:', err);
+        return [];
+      })
+    );
+  }
+  
+  if (API_CONFIG.useFoursquare && userLocation) {
+    promises.push(
+      getVenuesFromFoursquare(userId, limit, userLocation).catch(err => {
+        console.error('❌ Foursquare failed:', err);
+        return [];
+      })
+    );
+  }
+  
+  const [googleVenues, foursquareVenues] = await Promise.all(promises);
+  
+  console.log(`✅ HYBRID: Got ${googleVenues?.length || 0} from Google, ${foursquareVenues?.length || 0} from Foursquare`);
+  
+  return mergeAndDeduplicateVenues(googleVenues || [], foursquareVenues || []);
+};
+
+/**
+ * Google-first strategy: Try Google, supplement with Foursquare if needed
+ */
+const getVenuesGoogleFirst = async (
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) => {
+  console.log('🔄 HYBRID: Google-first strategy');
+  
+  let venues: any[] = [];
+  
+  if (API_CONFIG.useGooglePlaces) {
+    venues = await getVenuesFromGooglePlaces(userId, limit, userLocation).catch(() => []);
+  }
+  
+  if (venues.length >= API_CONFIG.minVenuesForSuccess) {
+    console.log(`✅ HYBRID: Google sufficient (${venues.length} venues)`);
+    return venues;
+  }
+  
+  console.log(`⚠️ HYBRID: Google returned ${venues.length}, supplementing with Foursquare`);
+  
+  if (API_CONFIG.useFoursquare && userLocation) {
+    const fsqVenues = await getVenuesFromFoursquare(userId, limit - venues.length, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
+  }
+  
+  return venues;
+};
+
+/**
+ * Foursquare-first strategy
+ */
+const getVenuesFoursquareFirst = async (
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) => {
+  console.log('🔄 HYBRID: Foursquare-first strategy');
+  
+  let venues: any[] = [];
+  
+  if (API_CONFIG.useFoursquare && userLocation) {
+    venues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
+  }
+  
+  if (venues.length >= API_CONFIG.minVenuesForSuccess) {
+    console.log(`✅ HYBRID: Foursquare sufficient (${venues.length} venues)`);
+    return venues;
+  }
+  
+  console.log(`⚠️ HYBRID: Foursquare returned ${venues.length}, supplementing with Google`);
+  
+  if (API_CONFIG.useGooglePlaces) {
+    const googleVenues = await getVenuesFromGooglePlaces(userId, limit - venues.length, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, googleVenues);
+  }
+  
+  return venues;
+};
+
+/**
+ * Merge and deduplicate venues from multiple sources
+ */
+function mergeAndDeduplicateVenues(googleVenues: any[], foursquareVenues: any[]): any[] {
+  if (!API_CONFIG.mergeVenueData) {
+    return [...googleVenues, ...foursquareVenues].slice(0, API_CONFIG.maxTotalVenues);
+  }
+  
+  const merged: any[] = [...googleVenues];
+  const addedIds = new Set(googleVenues.map(v => v.id || v.venue_id));
+  
+  for (const fsqVenue of foursquareVenues) {
+    const matchingVenue = googleVenues.find(gv => areVenuesDuplicates(gv, fsqVenue));
+    
+    if (matchingVenue) {
+      enrichVenueWithFoursquare(matchingVenue, fsqVenue);
+    } else {
+      const venueId = fsqVenue.id || fsqVenue.venue_id;
+      if (!addedIds.has(venueId)) {
+        merged.push(fsqVenue);
+        addedIds.add(venueId);
+      }
+    }
+  }
+  
+  return merged.slice(0, API_CONFIG.maxTotalVenues);
+}
+
+/**
+ * Check if two venues are duplicates
+ */
+function areVenuesDuplicates(v1: any, v2: any): boolean {
+  const name1 = (v1.name || '').toLowerCase().trim();
+  const name2 = (v2.name || '').toLowerCase().trim();
+  
+  if (name1 === name2) return true;
+  
+  if (v1.latitude && v1.longitude && v2.latitude && v2.longitude) {
+    const distance = calculateDistance(v1.latitude, v1.longitude, v2.latitude, v2.longitude);
+    if (distance < API_CONFIG.deduplicationThreshold) {
+      const similarity = calculateStringSimilarity(name1, name2);
+      if (similarity > API_CONFIG.nameSimilarityThreshold) return true;
+    }
+  }
+  
+  return false;
+}
+
+/**
+ * Calculate string similarity
+ */
+function calculateStringSimilarity(str1: string, str2: string): number {
+  const longer = str1.length > str2.length ? str1 : str2;
+  const shorter = str1.length > str2.length ? str2 : str1;
+  if (longer.length === 0) return 1.0;
+  const editDistance = levenshteinDistance(longer, shorter);
+  return (longer.length - editDistance) / longer.length;
+}
+
+/**
+ * Levenshtein distance
+ */
+function levenshteinDistance(str1: string, str2: string): number {
+  const matrix: number[][] = [];
+  for (let i = 0; i <= str2.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= str1.length; j++) matrix[0][j] = j;
+  
+  for (let i = 1; i <= str2.length; i++) {
+    for (let j = 1; j <= str1.length; j++) {
+      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  
+  return matrix[str2.length][str1.length];
+}
+
+/**
+ * Enrich Google venue with Foursquare data
+ */
+function enrichVenueWithFoursquare(googleVenue: any, fsqVenue: any): void {
+  console.log(`🔗 HYBRID: Enriching ${googleVenue.name} with Foursquare data`);
+  
+  if (fsqVenue.foursquare_id) googleVenue.foursquare_id = fsqVenue.foursquare_id;
+  
+  if (fsqVenue.photos?.length > 0) {
+    googleVenue.photos = googleVenue.photos || [];
+    const existingUrls = new Set(googleVenue.photos.map((p: any) => p.url));
+    for (const photo of fsqVenue.photos) {
+      if (!existingUrls.has(photo.url)) googleVenue.photos.push(photo);
+    }
+  }
+  
+  if (fsqVenue.foursquare_data) {
+    googleVenue.foursquare_data = { ...googleVenue.foursquare_data, ...fsqVenue.foursquare_data };
+  }
+  
+  if (!googleVenue.description && fsqVenue.description) {
+    googleVenue.description = fsqVenue.description;
+  }
+}
+
+/**
+ * Fetch venues from Foursquare
+ */
+const getVenuesFromFoursquare = async (
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) => {
+  try {
+    console.log('🔍 FOURSQUARE: Fetching venues for user:', userId);
+    
+    if (!userLocation?.latitude || !userLocation?.longitude) {
+      console.error('❌ FOURSQUARE: Invalid location');
+      return [];
+    }
+    
+    const { data: userPrefs } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (!userPrefs) {
+      console.warn('⚠️ FOURSQUARE: No user preferences');
+      return [];
+    }
+    
+    const { data, error } = await supabase.functions.invoke('search-venues-foursquare', {
+      body: {
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        cuisines: userPrefs.preferred_cuisines || [],
+        radius: (userPrefs.max_distance || 10) * 1000,
+        limit
+      }
+    });
+    
+    if (error) {
+      console.error('❌ FOURSQUARE: Edge function error', error);
+      return [];
+    }
+    
+    const venues = data?.venues || [];
+    console.log(`✅ FOURSQUARE: Received ${venues.length} venues`);
+    
+    return venues;
+  } catch (error) {
+    console.error('❌ FOURSQUARE: Error fetching venues', error);
+    return [];
   }
 };
 
