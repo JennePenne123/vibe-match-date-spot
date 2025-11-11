@@ -21,38 +21,32 @@ const navigationItems = [
   {
     title: 'Home',
     url: '/home',
-    icon: Home,
-    description: 'Dashboard and overview'
+    icon: Home
   },
   {
     title: 'Plan Date',
     url: '/plan-date',
-    icon: Sparkles,
-    description: 'Smart date planning'
+    icon: Sparkles
   },
   {
     title: 'Profile',
     url: '/profile',
-    icon: User,
-    description: 'Manage your account'
+    icon: User
   },
   {
     title: 'My Friends',
     url: '/my-friends',
-    icon: Users,
-    description: 'Your connections'
+    icon: Users
   },
   {
     title: 'Invitations',
     url: '/invitations',
-    icon: Heart,
-    description: 'View all invitations'
+    icon: Heart
   },
   {
     title: 'My Venues',
     url: '/my-venues',
-    icon: MapPin,
-    description: 'Favorite places'
+    icon: MapPin
   }
 ]
 
@@ -111,10 +105,7 @@ export function AppSidebar() {
                     >
                       <item.icon className="w-4 h-4 flex-shrink-0" />
                       {!isCollapsed && (
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium">{item.title}</span>
-                          <p className="text-xs opacity-60 truncate">{item.description}</p>
-                        </div>
+                        <span className="text-sm font-medium">{item.title}</span>
                       )}
                     </NavLink>
                   </SidebarMenuButton>
