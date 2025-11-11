@@ -169,10 +169,10 @@ const HomeContent: React.FC = () => {
                   </div>
                   
                   {/* Collaborative Planning Card */}
-                  <Card className="border-border hover:border-primary/50 transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-muted/10" onClick={handleCollaborativePlanning}>
+                  <Card className="border-border hover:border-primary/50 transition-all duration-300 ease-out cursor-pointer hover:shadow-glow-md hover:scale-[1.03] hover:-translate-y-1 bg-gradient-to-br from-background to-muted/10 group" onClick={handleCollaborativePlanning}>
                     <CardHeader className="text-center pb-2 pt-4">
-                      <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
-                        <Users className="h-5 w-5 text-primary" />
+                      <div className="mx-auto mb-2 p-2.5 rounded-full bg-primary/10 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
+                        <Users className="h-5 w-5 text-primary transition-transform duration-300 group-hover:scale-110" />
                       </div>
                       <CardTitle className="text-base">Collaborative Planning</CardTitle>
                       <CardDescription className="text-xs leading-tight">
@@ -215,10 +215,10 @@ const HomeContent: React.FC = () => {
               </div>
               
               {/* Collaborative Planning Card */}
-              <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleCollaborativePlanning}>
+              <Card className="border-border hover:border-primary/50 transition-all duration-300 ease-out cursor-pointer hover:shadow-glow-md hover:scale-[1.02] hover:-translate-y-1 bg-gradient-to-br from-background to-muted/10 group" onClick={handleCollaborativePlanning}>
                 <CardHeader className="text-center pb-3">
-                  <div className="mx-auto mb-2 p-2 rounded-full bg-primary/10">
-                    <Users className="h-6 w-6 text-primary" />
+                  <div className="mx-auto mb-2 p-3 rounded-full bg-primary/10 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
+                    <Users className="h-6 w-6 text-primary transition-transform duration-300 group-hover:scale-110" />
                   </div>
                   <CardTitle className="text-lg">Collaborative Planning</CardTitle>
                   <CardDescription className="text-sm">

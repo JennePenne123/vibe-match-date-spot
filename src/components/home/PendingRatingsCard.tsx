@@ -59,7 +59,7 @@ export const PendingRatingsCard: React.FC = () => {
 
   return (
     <>
-      <Card className="border-primary/20 shadow-md">
+      <Card className="border-primary/20 shadow-md transition-all duration-300 ease-out hover:shadow-premium-lg hover:scale-[1.01] hover:-translate-y-1 hover:border-primary/30">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -81,7 +81,7 @@ export const PendingRatingsCard: React.FC = () => {
             return (
               <div
                 key={invitation.id}
-                className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-all duration-200 ease-out hover:shadow-sm hover:scale-[1.01] hover:-translate-y-0.5 cursor-pointer group"
               >
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={partner?.avatar_url} referrerPolicy="no-referrer" />
@@ -104,9 +104,9 @@ export const PendingRatingsCard: React.FC = () => {
                   onClick={() => handleRateClick(invitation)}
                   className="gap-1"
                 >
-                  <Star className="h-3 w-3" />
+                  <Star className="h-3 w-3 transition-transform duration-200 group-hover:rotate-12" />
                   Rate
-                  <ChevronRight className="h-3 w-3" />
+                  <ChevronRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
                 </Button>
               </div>
             );

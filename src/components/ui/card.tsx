@@ -4,17 +4,17 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const cardVariants = cva(
-  "rounded-lg border text-card-foreground transition-all duration-300",
+  "rounded-lg border text-card-foreground transition-all duration-300 ease-out",
   {
     variants: {
       variant: {
-        default: "bg-card shadow-sm",
-        elegant: "bg-card shadow-premium-md hover:shadow-premium-lg border-border/50",
-        glass: "bg-glass-white backdrop-blur-glass border-white/20 shadow-glass",
-        premium: "bg-gradient-to-br from-brand-50 to-brand-100 shadow-premium-lg border-brand-200/30",
-        glow: "bg-card shadow-glow-md hover:shadow-glow-lg border-brand-300/30",
-        romantic: "bg-gradient-romantic border-pink-200/40 shadow-premium-md",
-        tinted: "bg-gradient-surface-light border-accent/20 shadow-premium-sm",
+        default: "bg-card shadow-sm hover:shadow-md hover:scale-[1.02] hover:-translate-y-1",
+        elegant: "bg-card shadow-premium-md hover:shadow-premium-lg hover:scale-[1.02] hover:-translate-y-1 border-border/50",
+        glass: "bg-glass-white backdrop-blur-glass border-white/20 shadow-glass hover:shadow-glass-strong hover:scale-[1.02]",
+        premium: "bg-gradient-to-br from-brand-50 to-brand-100 shadow-premium-lg hover:shadow-premium-xl hover:scale-[1.02] border-brand-200/30",
+        glow: "bg-card shadow-glow-md hover:shadow-glow-lg hover:scale-[1.02] border-brand-300/30",
+        romantic: "bg-gradient-romantic border-pink-200/40 shadow-premium-md hover:shadow-premium-lg hover:scale-[1.02]",
+        tinted: "bg-gradient-surface-light border-accent/20 shadow-premium-sm hover:shadow-premium-md hover:scale-[1.02]",
       },
       size: {
         default: "p-6",

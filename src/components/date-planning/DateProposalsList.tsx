@@ -126,8 +126,8 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
 
   if (visibleProposals.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+      <div className="text-center py-8 text-muted-foreground animate-fade-in">
+        <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50 animate-pulse" />
         <p>No date proposals yet</p>
       </div>
     );
@@ -139,8 +139,8 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
         <div>
           <h3 className="text-base font-semibold text-foreground mb-3">Pending Proposals</h3>
           <div className="space-y-3">
-            {pendingProposals.map((proposal) => (
-              <Card key={proposal.id} className="border-primary/20">
+            {pendingProposals.map((proposal, index) => (
+              <Card key={proposal.id} className="border-primary/20 transition-all duration-300 ease-out hover:shadow-premium-md hover:scale-[1.01] hover:border-primary/40 hover:-translate-y-0.5 cursor-pointer animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{proposal.title}</CardTitle>
@@ -223,8 +223,8 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({
         <div>
           <h3 className="text-base font-semibold text-foreground mb-3">Accepted Proposals</h3>
           <div className="space-y-3">
-            {acceptedProposals.map((proposal) => (
-              <Card key={proposal.id} className="border-success/30 bg-success/5">
+            {acceptedProposals.map((proposal, index) => (
+              <Card key={proposal.id} className="border-success/30 bg-success/5 transition-all duration-300 ease-out hover:shadow-glow-sm hover:scale-[1.01] hover:border-success/50 hover:bg-success/10 hover:-translate-y-0.5 cursor-pointer animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{proposal.title}</CardTitle>

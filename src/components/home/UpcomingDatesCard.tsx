@@ -120,8 +120,8 @@ const UpcomingDatesCard: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="text-center py-6">
-            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+          <div className="text-center py-6 animate-fade-in">
+            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3 animate-pulse" />
             <p className="text-sm text-muted-foreground mb-2">
               No upcoming dates scheduled
             </p>
@@ -135,7 +135,7 @@ const UpcomingDatesCard: React.FC = () => {
   }
 
   return (
-    <Card>
+    <Card className="transition-all duration-300 ease-out hover:shadow-premium-md hover:scale-[1.01]">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <Heart className="h-5 w-5 text-pink-500" />
@@ -143,19 +143,20 @@ const UpcomingDatesCard: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 pt-0">
-        {upcomingDates.map((invitation) => {
+        {upcomingDates.map((invitation, index) => {
           // Determine direction based on which user data is present
           const direction = invitation.sender ? 'received' : 'sent';
           
           return (
-            <DateInviteCard
-              key={invitation.id}
-              invitation={invitation}
-              direction={direction}
-              onAccept={acceptInvitation}
-              onDecline={declineInvitation}
-              onCancel={invitation.status === 'accepted' ? cancelInvitation : undefined}
-            />
+            <div key={invitation.id} className="animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+              <DateInviteCard
+                invitation={invitation}
+                direction={direction}
+                onAccept={acceptInvitation}
+                onDecline={declineInvitation}
+                onCancel={invitation.status === 'accepted' ? cancelInvitation : undefined}
+              />
+            </div>
           );
         })}
       </CardContent>
