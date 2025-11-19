@@ -780,6 +780,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_venue_feedback: {
         Row: {
           context: Json | null
@@ -809,6 +830,47 @@ export type Database = {
           venue_id?: string
         }
         Relationships: []
+      }
+      venue_partnerships: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          id: string
+          partner_id: string
+          status: string
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          partner_id: string
+          status?: string
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          partner_id?: string
+          status?: string
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_partnerships_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       venues: {
         Row: {
@@ -882,6 +944,131 @@ export type Database = {
         }
         Relationships: []
       }
+      voucher_redemptions: {
+        Row: {
+          booking_value: number | null
+          discount_applied: number
+          id: string
+          invitation_id: string | null
+          metadata: Json | null
+          redeemed_at: string
+          status: string
+          user_id: string
+          voucher_id: string
+        }
+        Insert: {
+          booking_value?: number | null
+          discount_applied: number
+          id?: string
+          invitation_id?: string | null
+          metadata?: Json | null
+          redeemed_at?: string
+          status?: string
+          user_id: string
+          voucher_id: string
+        }
+        Update: {
+          booking_value?: number | null
+          discount_applied?: number
+          id?: string
+          invitation_id?: string | null
+          metadata?: Json | null
+          redeemed_at?: string
+          status?: string
+          user_id?: string
+          voucher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voucher_redemptions_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "date_invitations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voucher_redemptions_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "vouchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vouchers: {
+        Row: {
+          applicable_days: string[] | null
+          applicable_times: string[] | null
+          code: string
+          created_at: string
+          current_redemptions: number
+          description: string | null
+          discount_type: string
+          discount_value: number
+          id: string
+          max_redemptions: number | null
+          min_booking_value: number | null
+          partner_id: string
+          status: string
+          terms_conditions: string | null
+          title: string
+          updated_at: string
+          valid_from: string
+          valid_until: string
+          venue_id: string
+        }
+        Insert: {
+          applicable_days?: string[] | null
+          applicable_times?: string[] | null
+          code: string
+          created_at?: string
+          current_redemptions?: number
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          id?: string
+          max_redemptions?: number | null
+          min_booking_value?: number | null
+          partner_id: string
+          status?: string
+          terms_conditions?: string | null
+          title: string
+          updated_at?: string
+          valid_from?: string
+          valid_until: string
+          venue_id: string
+        }
+        Update: {
+          applicable_days?: string[] | null
+          applicable_times?: string[] | null
+          code?: string
+          created_at?: string
+          current_redemptions?: number
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          max_redemptions?: number | null
+          min_booking_value?: number | null
+          partner_id?: string
+          status?: string
+          terms_conditions?: string | null
+          title?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vouchers_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -889,6 +1076,13 @@ export type Database = {
     Functions: {
       count_perfect_pairs: { Args: { target_user_id: string }; Returns: number }
       create_test_venues: { Args: { venues_data: Json }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       reset_user_preferences_to_default: {
         Args: { target_user_id: string }
         Returns: boolean
@@ -907,7 +1101,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "regular" | "venue_partner" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1034,6 +1228,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["regular", "venue_partner", "admin"],
+    },
   },
 } as const

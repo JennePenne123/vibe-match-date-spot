@@ -30,6 +30,9 @@ import PremiumDesignSystemDemo from "./pages/PremiumDesignSystemDemo";
 import Debug from "./pages/Debug";
 import RatingDemo from "./pages/RatingDemo";
 import Landing from "./pages/Landing";
+import PartnerDashboard from "./pages/partner/Dashboard";
+import PartnerVouchers from "./pages/partner/Vouchers";
+import PartnerVenues from "./pages/partner/Venues";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -87,6 +90,11 @@ const App = () => (
                     
                     {/* Debug route */}
                     <Route path="/debug" element={<AppLayout><Debug /></AppLayout>} />
+                    
+                    {/* Partner Routes */}
+                    <Route path="/partner" element={<AppLayout><PartnerDashboard /></AppLayout>} />
+                    <Route path="/partner/vouchers" element={<AppLayout><PartnerVouchers /></AppLayout>} />
+                    <Route path="/partner/venues" element={<AppLayout><PartnerVenues /></AppLayout>} />
                     
                     {/* Demo routes without layout */}
                     <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
