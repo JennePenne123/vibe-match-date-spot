@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Gift, Calendar, TrendingUp } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
+import VoucherCreationModal from '@/components/partner/VoucherCreationModal';
 
 interface Voucher {
   id: string;
@@ -28,6 +29,7 @@ export default function PartnerVouchers() {
   const { toast } = useToast();
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     if (!roleLoading && role !== 'venue_partner' && role !== 'admin') {
@@ -83,7 +85,7 @@ export default function PartnerVouchers() {
             Create and manage special offers for your venues
           </p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => setModalOpen(true)}>
           <Plus className="w-4 h-4" />
           Create Voucher
         </Button>
@@ -97,7 +99,7 @@ export default function PartnerVouchers() {
             <p className="text-muted-foreground mb-6">
               Create your first voucher to start attracting couples to your venue
             </p>
-            <Button className="gap-2">
+            <Button className="gap-2" onClick={() => setModalOpen(true)}>
               <Plus className="w-4 h-4" />
               Create Your First Voucher
             </Button>
@@ -152,6 +154,12 @@ export default function PartnerVouchers() {
           ))}
         </div>
       )}
+
+      <VoucherCreationModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        onSuccess={fetchVouchers}
+      />
     </div>
   );
 }
