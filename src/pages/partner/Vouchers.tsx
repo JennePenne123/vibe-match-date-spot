@@ -21,6 +21,7 @@ import VoucherEditModal from '@/components/partner/VoucherEditModal';
 import VoucherAnalyticsModal from '@/components/partner/VoucherAnalyticsModal';
 import VoucherActionsMenu from '@/components/partner/VoucherActionsMenu';
 import { format } from 'date-fns';
+import { useRealtimeVouchers } from '@/hooks/useRealtimeVouchers';
 
 interface Voucher {
   id: string;
@@ -44,12 +45,14 @@ export default function PartnerVouchers() {
   const { role, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [vouchers, setVouchers] = useState<Voucher[]>([]);
-  const [loading, setLoading] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [analyticsModalOpen, setAnalyticsModalOpen] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+  const [userId, setUserId] = useState<string>();
+
+  // Use real-time hook for live voucher updates
+  const { vouchers, loading, connected } = useRealtimeVouchers(userId);
 
   useEffect(() => {
     if (!roleLoading && role !== 'venue_partner' && role !== 'admin') {
@@ -58,33 +61,14 @@ export default function PartnerVouchers() {
   }, [role, roleLoading, navigate]);
 
   useEffect(() => {
-    fetchVouchers();
-  }, []);
-
-  const fetchVouchers = async () => {
-    try {
+    const getUserId = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('vouchers')
-        .select('*')
-        .eq('partner_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setVouchers(data || []);
-    } catch (error) {
-      console.error('Error fetching vouchers:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load vouchers',
-        variant: 'destructive'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    getUserId();
+  }, []);
 
   const getStatusBadge = (voucher: Voucher) => {
     const isExpired = new Date(voucher.valid_until) < new Date();
@@ -118,9 +102,19 @@ export default function PartnerVouchers() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
-            Manage Vouchers
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
+              Manage Vouchers
+            </h1>
+            {connected ? (
+              <Badge className="bg-green-500 text-white animate-pulse flex items-center gap-2">
+                <div className="w-2 h-2 bg-white rounded-full" />
+                Live
+              </Badge>
+            ) : (
+              <Badge variant="secondary">Offline</Badge>
+            )}
+          </div>
           <p className="text-muted-foreground mt-2">
             Create and manage special offers for your venues
           </p>
@@ -215,7 +209,7 @@ export default function PartnerVouchers() {
                           setSelectedVoucher(voucher);
                           setAnalyticsModalOpen(true);
                         }}
-                        onSuccess={fetchVouchers}
+                        onSuccess={() => {}}
                       />
                     </TableCell>
                   </TableRow>
@@ -229,14 +223,14 @@ export default function PartnerVouchers() {
       <VoucherCreationModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
-        onSuccess={fetchVouchers}
+        onSuccess={() => setCreateModalOpen(false)}
       />
 
       <VoucherEditModal
         open={editModalOpen}
         onOpenChange={setEditModalOpen}
         voucher={selectedVoucher}
-        onSuccess={fetchVouchers}
+        onSuccess={() => setEditModalOpen(false)}
       />
 
       <VoucherAnalyticsModal
