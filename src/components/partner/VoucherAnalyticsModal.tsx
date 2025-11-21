@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, DollarSign, Users, Calendar } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface VoucherAnalyticsModalProps {
   open: boolean;
@@ -128,8 +129,51 @@ export default function VoucherAnalyticsModal({
         </DialogHeader>
 
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <LoadingSpinner />
+          <div className="space-y-6 p-6">
+            {/* Metrics Grid Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} variant="glass">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="w-4 h-4" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-9 w-20" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {/* Chart Skeleton */}
+            <Card variant="glass">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-4 h-4" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-64 w-full" />
+              </CardContent>
+            </Card>
+            {/* Peak Times Skeleton */}
+            <Card variant="glass">
+              <CardHeader>
+                <Skeleton className="h-4 w-32" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         ) : analytics ? (
           <div className="space-y-6">
