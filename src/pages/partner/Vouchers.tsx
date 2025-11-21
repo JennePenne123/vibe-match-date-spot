@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import { useToast } from '@/hooks/use-toast';
 import VoucherCreationModal from '@/components/partner/VoucherCreationModal';
 import VoucherEditModal from '@/components/partner/VoucherEditModal';
@@ -90,7 +91,8 @@ export default function PartnerVouchers() {
     return 'Free Item';
   };
 
-  if (roleLoading || loading) {
+  // Only block for role verification (security requirement)
+  if (roleLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner />
@@ -106,7 +108,12 @@ export default function PartnerVouchers() {
             <h1 className="text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
               Manage Vouchers
             </h1>
-            {connected ? (
+            {loading && !connected ? (
+              <Badge variant="secondary" className="animate-pulse flex items-center gap-2">
+                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse" />
+                Connecting...
+              </Badge>
+            ) : connected ? (
               <Badge className="bg-green-500 text-white animate-pulse flex items-center gap-2">
                 <div className="w-2 h-2 bg-white rounded-full" />
                 Live
@@ -125,7 +132,11 @@ export default function PartnerVouchers() {
         </Button>
       </div>
 
-      {vouchers.length === 0 ? (
+      {loading ? (
+        <Card variant="glass" className="overflow-hidden">
+          <SkeletonLoader variant="voucher-table" count={5} />
+        </Card>
+      ) : vouchers.length === 0 ? (
         <Card variant="elegant" className="text-center py-12">
           <CardContent>
             <Gift className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
@@ -154,8 +165,15 @@ export default function PartnerVouchers() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {vouchers.map((voucher) => (
-                  <TableRow key={voucher.id} className="hover:bg-muted/50 transition-colors">
+                {vouchers.map((voucher, index) => (
+                  <TableRow 
+                    key={voucher.id} 
+                    className="hover:bg-muted/50 transition-colors opacity-0 animate-fade-in"
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                      animationFillMode: 'forwards'
+                    }}
+                  >
                     <TableCell>
                       <div>
                         <div className="font-medium">{voucher.title}</div>
