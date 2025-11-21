@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin } from 'lucide-react';
@@ -6,6 +6,7 @@ import { AIVenueRecommendation } from '@/services/aiVenueService';
 import AIVenueCard from '@/components/AIVenueCard';
 import { useAuth } from '@/contexts/AuthContext';
 import CompatibilitySummaryBanner from './CompatibilitySummaryBanner';
+import { useVenueVouchers } from '@/hooks/useVenueVouchers';
 
 interface CompatibilityScore {
   overall_score?: number;
@@ -37,6 +38,18 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
   compatibilityScore
 }) => {
   const { user } = useAuth();
+
+  // Extract venue IDs and fetch vouchers
+  const venueIds = useMemo(() => {
+    return venueRecommendations
+      .map(rec => {
+        const venueId = getVenueId(rec);
+        return venueId;
+      })
+      .filter((id): id is string => id !== null);
+  }, [venueRecommendations]);
+
+  const { vouchers } = useVenueVouchers(venueIds);
 
   console.log('🤝 PLAN TOGETHER: Rendering collaborative venue selection:', {
     count: venueRecommendations?.length || 0,
@@ -159,6 +172,8 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
 
               console.log(`✅ PLAN TOGETHER - Rendering venue: ${venue.venue_name} with ID: ${venueId}`);
 
+              const venueVouchers = vouchers.get(venueId) || [];
+              
               return (
                 <div key={`${venueId}-${index}`} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                   <AIVenueCard
@@ -171,6 +186,7 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
                       sessionId: sessionId,
                       partnerId: partnerId
                     }}
+                    vouchers={venueVouchers}
                   />
                 </div>
               );

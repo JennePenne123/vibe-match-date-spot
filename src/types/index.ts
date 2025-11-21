@@ -33,6 +33,15 @@ export interface Friend {
   selected?: boolean;
 }
 
+export interface VoucherBadge {
+  id: string;
+  title: string;
+  discount_type: 'percentage' | 'fixed' | 'free_item';
+  discount_value: number;
+  code: string;
+  venue_id: string;
+}
+
 export interface Venue {
   id: string;
   name: string;
@@ -72,6 +81,7 @@ export interface Venue {
   openingHours?: string[];
   placeId?: string;
   priceRange?: string;
+  vouchers?: VoucherBadge[];
   
   // Additional missing properties from React Native code
   cuisine?: string;

@@ -28,6 +28,8 @@ import { AIVenueRecommendation } from '@/services/aiVenueService/recommendations
 import { type FeedbackType } from '@/services/feedbackService';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
+import { VoucherBadge } from '@/components/VoucherBadge';
+import { VoucherBadge as VoucherBadgeType } from '@/hooks/useVenueVouchers';
 
 interface AIVenueCardProps {
   recommendation: AIVenueRecommendation;
@@ -38,6 +40,7 @@ interface AIVenueCardProps {
     sessionId?: string;
     partnerId?: string;
   };
+  vouchers?: VoucherBadgeType[];
 }
 
 const AIVenueCard: React.FC<AIVenueCardProps> = ({
@@ -45,7 +48,8 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   onSelect,
   showAIInsights = true,
   compact = false,
-  sessionContext
+  sessionContext,
+  vouchers = []
 }) => {
   const [showDetails, setShowDetails] = useState(false); // Collapsed by default for cleaner UI
   const [userFeedback, setUserFeedback] = useState<FeedbackType | null>(null);
@@ -145,9 +149,23 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           </div>
         </div>
 
+        {/* Voucher badges */}
+        {vouchers.length > 0 && (
+          <div className="absolute bottom-3 left-3 flex flex-col gap-1 items-start">
+            {vouchers.slice(0, 2).map((voucher) => (
+              <VoucherBadge key={voucher.id} voucher={voucher} compact />
+            ))}
+            {vouchers.length > 2 && (
+              <Badge className="bg-gradient-to-r from-orange-600 to-amber-600 text-white text-xs font-bold shadow-lg">
+                +{vouchers.length - 2} more
+              </Badge>
+            )}
+          </div>
+        )}
+
         {/* Feedback overlay for user's choice */}
         {userFeedback && (
-          <div className="absolute bottom-3 left-3">
+          <div className="absolute bottom-3 right-3">
             <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm">
               {userFeedback === 'like' && '❤️ Liked'}
               {userFeedback === 'super_like' && '✨ Super Liked'}
