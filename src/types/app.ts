@@ -7,6 +7,15 @@ export interface AppUser {
   avatar_url?: string;
 }
 
+export interface VoucherBadge {
+  id: string;
+  title: string;
+  discount_type: 'percentage' | 'fixed' | 'free_item';
+  discount_value: number;
+  code: string;
+  venue_id: string;
+}
+
 export interface AppVenue {
   id: string;
   name: string;
@@ -46,4 +55,5 @@ export interface AppVenue {
   openingHours?: string[];
   placeId?: string;
   priceRange?: string;
+  vouchers?: VoucherBadge[];
 }
