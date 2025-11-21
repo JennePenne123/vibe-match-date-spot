@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -45,6 +45,14 @@ export const useRealtimeVouchers = (partnerId: string | undefined): UseRealtimeV
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   const [lastRedemption, setLastRedemption] = useState<RedemptionEvent | null>(null);
+  
+  // Use ref to access latest vouchers without causing re-subscriptions
+  const vouchersRef = useRef<Voucher[]>([]);
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    vouchersRef.current = vouchers;
+  }, [vouchers]);
 
   // Initial fetch
   useEffect(() => {
@@ -142,8 +150,8 @@ export const useRealtimeVouchers = (partnerId: string | undefined): UseRealtimeV
           console.log('New redemption detected:', payload);
           const redemption = payload.new as RedemptionEvent;
           
-          // Check if this redemption belongs to one of our vouchers
-          const affectedVoucher = vouchers.find((v) => v.id === redemption.voucher_id);
+          // Check if this redemption belongs to one of our vouchers using ref
+          const affectedVoucher = vouchersRef.current.find((v) => v.id === redemption.voucher_id);
           
           if (affectedVoucher) {
             setLastRedemption(redemption);
@@ -175,7 +183,7 @@ export const useRealtimeVouchers = (partnerId: string | undefined): UseRealtimeV
       supabase.removeChannel(channel);
       setConnected(false);
     };
-  }, [partnerId, vouchers]);
+  }, [partnerId]); // Removed vouchers dependency to prevent infinite loop
 
   return {
     vouchers,
