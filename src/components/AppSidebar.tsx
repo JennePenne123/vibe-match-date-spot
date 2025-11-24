@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { Home, User, Users, MapPin, Heart, Sparkles } from 'lucide-react'
+import { Home, User, Users, MapPin, Heart, Sparkles, ChevronDown, MoreHorizontal } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -12,12 +12,13 @@ import {
   SidebarMenuButton,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers'
 
-const navigationItems = [
+const primaryNavItems = [
   {
     title: 'Home',
     url: '/home',
@@ -32,7 +33,10 @@ const navigationItems = [
     title: 'Profile',
     url: '/profile',
     icon: User
-  },
+  }
+]
+
+const secondaryNavItems = [
   {
     title: 'My Friends',
     url: '/my-friends',
@@ -56,6 +60,8 @@ export function AppSidebar() {
   const { user, logout } = useAuth()
   const currentPath = location.pathname
 
+  const [isMoreOpen, setIsMoreOpen] = React.useState(false)
+
   const displayName = getUserName(user)
   const userAvatar = getUserAvatar(user)
   const isCollapsed = state === 'collapsed'
@@ -65,6 +71,14 @@ export function AppSidebar() {
     active 
       ? 'bg-sidebar-accent text-sidebar-primary font-medium border-r-2 border-sidebar-primary' 
       : 'hover:bg-sidebar-accent/50 text-sidebar-foreground'
+
+  const isSecondaryActive = secondaryNavItems.some(item => isActive(item.url))
+
+  React.useEffect(() => {
+    if (isSecondaryActive) {
+      setIsMoreOpen(true)
+    }
+  }, [isSecondaryActive])
 
   return (
     <Sidebar className="border-r border-sidebar-border">
@@ -96,7 +110,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map((item) => (
+              {primaryNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink 
@@ -111,6 +125,52 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+
+              {/* Secondary Navigation - Collapsible "More" Section */}
+              <SidebarMenuItem>
+                {isCollapsed ? (
+                  <Collapsible open={isMoreOpen} onOpenChange={setIsMoreOpen}>
+                    <CollapsibleTrigger asChild>
+                      <button className={`flex items-center justify-center gap-3 px-3 py-2 rounded-md transition-colors w-full ${isSecondaryActive ? 'bg-sidebar-accent/30' : 'hover:bg-sidebar-accent/50'} text-sidebar-foreground`}>
+                        <MoreHorizontal className="w-4 h-4 flex-shrink-0" />
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-1 space-y-1">
+                      {secondaryNavItems.map((item) => (
+                        <NavLink
+                          key={item.title}
+                          to={item.url}
+                          className={`flex items-center justify-center gap-3 px-3 py-2 rounded-md transition-colors ${getNavClasses(isActive(item.url))}`}
+                        >
+                          <item.icon className="w-4 h-4 flex-shrink-0" />
+                        </NavLink>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
+                ) : (
+                  <Collapsible open={isMoreOpen} onOpenChange={setIsMoreOpen}>
+                    <CollapsibleTrigger asChild>
+                      <button className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors w-full text-left mt-2 ${isSecondaryActive ? 'bg-sidebar-accent/30' : 'hover:bg-sidebar-accent/50'} text-sidebar-foreground`}>
+                        <MoreHorizontal className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm font-medium flex-1">More</span>
+                        <ChevronDown className={`w-4 h-4 transition-transform ${isMoreOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-1 space-y-1 pl-3">
+                      {secondaryNavItems.map((item) => (
+                        <NavLink
+                          key={item.title}
+                          to={item.url}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${getNavClasses(isActive(item.url))}`}
+                        >
+                          <item.icon className="w-4 h-4 flex-shrink-0" />
+                          <span className="text-sm font-medium">{item.title}</span>
+                        </NavLink>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
