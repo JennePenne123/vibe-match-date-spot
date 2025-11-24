@@ -15,7 +15,9 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/contexts/AuthContext'
+import { useInvitations } from '@/hooks/useInvitations'
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers'
 
 const primaryNavItems = [
@@ -58,6 +60,7 @@ export function AppSidebar() {
   const { state } = useSidebar()
   const location = useLocation()
   const { user, logout } = useAuth()
+  const { invitations } = useInvitations()
   const currentPath = location.pathname
 
   const [isMoreOpen, setIsMoreOpen] = React.useState(false)
@@ -65,6 +68,13 @@ export function AppSidebar() {
   const displayName = getUserName(user)
   const userAvatar = getUserAvatar(user)
   const isCollapsed = state === 'collapsed'
+
+  // Calculate pending invitations count (only received, not sent)
+  const pendingCount = React.useMemo(() => {
+    return invitations.filter(
+      inv => inv.direction === 'received' && inv.status === 'pending'
+    ).length
+  }, [invitations])
 
   const isActive = (path: string) => currentPath === path
   const getNavClasses = (active: boolean) =>
@@ -131,8 +141,17 @@ export function AppSidebar() {
                 {isCollapsed ? (
                   <Collapsible open={isMoreOpen} onOpenChange={setIsMoreOpen}>
                     <CollapsibleTrigger asChild>
-                      <button className={`flex items-center justify-center gap-3 px-3 py-2 rounded-md transition-colors w-full ${isSecondaryActive ? 'bg-sidebar-accent/30' : 'hover:bg-sidebar-accent/50'} text-sidebar-foreground`}>
+                      <button className={`flex items-center justify-center gap-3 px-3 py-2 rounded-md transition-colors w-full relative ${isSecondaryActive ? 'bg-sidebar-accent/30' : 'hover:bg-sidebar-accent/50'} text-sidebar-foreground`}>
                         <MoreHorizontal className="w-4 h-4 flex-shrink-0" />
+                        {pendingCount > 0 && (
+                          <Badge 
+                            variant="destructive" 
+                            size="sm"
+                            className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px] font-bold"
+                          >
+                            {pendingCount > 9 ? '9+' : pendingCount}
+                          </Badge>
+                        )}
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-1 space-y-1">
@@ -153,6 +172,15 @@ export function AppSidebar() {
                       <button className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors w-full text-left mt-2 ${isSecondaryActive ? 'bg-sidebar-accent/30' : 'hover:bg-sidebar-accent/50'} text-sidebar-foreground`}>
                         <MoreHorizontal className="w-4 h-4 flex-shrink-0" />
                         <span className="text-sm font-medium flex-1">More</span>
+                        {pendingCount > 0 && (
+                          <Badge 
+                            variant="destructive" 
+                            size="sm"
+                            className="h-5 min-w-[20px] px-1.5 flex items-center justify-center text-[10px] font-bold"
+                          >
+                            {pendingCount > 9 ? '9+' : pendingCount}
+                          </Badge>
+                        )}
                         <ChevronDown className={`w-4 h-4 transition-transform ${isMoreOpen ? 'rotate-180' : ''}`} />
                       </button>
                     </CollapsibleTrigger>
