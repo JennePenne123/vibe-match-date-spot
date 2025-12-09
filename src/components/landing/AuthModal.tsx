@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Gift } from 'lucide-react';
+import { validateReferralCode, processReferralSignup } from '@/services/referralService';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -25,11 +27,39 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
+  const [referralValid, setReferralValid] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
+
+  // Check for referral code in URL
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode && !isLogin) {
+      setReferralCode(refCode.toUpperCase());
+      validateReferralCode(refCode).then(result => {
+        setReferralValid(result.valid);
+      });
+    }
+  }, [searchParams, isLogin]);
+
+  // Validate referral code as user types
+  useEffect(() => {
+    if (referralCode.length >= 8) {
+      const timer = setTimeout(async () => {
+        const result = await validateReferralCode(referralCode);
+        setReferralValid(result.valid);
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      setReferralValid(null);
+    }
+  }, [referralCode]);
 
   // Dynamic validation config based on mode
   const validationConfig = useMemo(() => {
@@ -103,6 +133,20 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         }
 
         if (signedUpUser) {
+          // Process referral if valid code was provided
+          if (referralCode && referralValid) {
+            try {
+              const success = await processReferralSignup(referralCode, signedUpUser.id);
+              if (success) {
+                toast({
+                  title: 'Welcome bonus! 🎉',
+                  description: 'You earned 10 bonus points from your referral!',
+                });
+              }
+            } catch (err) {
+              console.error('Failed to process referral:', err);
+            }
+          }
           onClose();
           navigate('/home');
         }
@@ -118,6 +162,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setName('');
     setEmail('');
     setPassword('');
+    setReferralCode('');
+    setReferralValid(null);
     setError('');
     clearErrors();
   };
@@ -197,6 +243,38 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   <p className="text-sm text-destructive">{errors.password}</p>
                 )}
               </div>
+
+              {/* Referral Code Field - Only for Signup */}
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="referralCode" className="text-foreground font-medium flex items-center gap-2">
+                    <Gift className="h-4 w-4 text-primary" />
+                    Referral Code
+                    <span className="text-xs text-muted-foreground">(optional)</span>
+                  </Label>
+                  <Input
+                    id="referralCode"
+                    type="text"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    placeholder="Enter referral code"
+                    className={`h-12 bg-background/50 border-border/50 focus:border-primary transition-colors font-mono uppercase ${
+                      referralValid === true ? 'border-green-500 bg-green-500/5' : 
+                      referralValid === false ? 'border-destructive bg-destructive/5' : ''
+                    }`}
+                    disabled={loading}
+                    maxLength={8}
+                  />
+                  {referralValid === true && (
+                    <p className="text-sm text-green-600 flex items-center gap-1">
+                      ✓ Valid code! You'll get 10 bonus points
+                    </p>
+                  )}
+                  {referralValid === false && referralCode.length >= 8 && (
+                    <p className="text-sm text-destructive">Invalid referral code</p>
+                  )}
+                </div>
+              )}
 
               {error && (
                 <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">

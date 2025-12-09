@@ -203,6 +203,31 @@ export const BADGE_DEFINITIONS: Record<string, {
     description: 'Both partners rated together 5 times',
     icon: '💕',
     requirement: 'Both rate 5 times'
+  },
+  // Referral badges
+  'first_referral': {
+    name: 'Ambassador',
+    description: 'Referred your first friend',
+    icon: '🤝',
+    requirement: 'Refer 1 friend'
+  },
+  'social_recruiter': {
+    name: 'Social Recruiter',
+    description: 'Referred 5 friends',
+    icon: '📣',
+    requirement: 'Refer 5 friends'
+  },
+  'community_builder': {
+    name: 'Community Builder',
+    description: 'Referred 10 friends',
+    icon: '🏗️',
+    requirement: 'Refer 10 friends'
+  },
+  'super_connector': {
+    name: 'Super Connector',
+    description: 'Referred 25 friends',
+    icon: '⭐',
+    requirement: 'Refer 25 friends'
   }
 };
 
