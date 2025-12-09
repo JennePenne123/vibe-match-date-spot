@@ -10,6 +10,7 @@ import ProfileActions from '@/components/ProfileActions';
 import { PointsCard } from '@/components/profile/PointsCard';
 import { BadgesCard } from '@/components/profile/BadgesCard';
 import { LeaderboardCard } from '@/components/profile/LeaderboardCard';
+import ReferralCard from '@/components/profile/ReferralCard';
 import { useUserPoints } from '@/hooks/useUserPoints';
 
 const Profile = () => {
@@ -118,8 +119,14 @@ const Profile = () => {
             <BadgesCard badges={Array.isArray(points.badges) ? points.badges : []} />
           )}
 
+          {/* Referral Program */}
+          <ReferralCard />
+
           {/* Leaderboard */}
           <LeaderboardCard />
+
+          {/* Actions */}
+          <ProfileActions onLogout={logout} />
 
           {/* Actions */}
           <ProfileActions onLogout={logout} />

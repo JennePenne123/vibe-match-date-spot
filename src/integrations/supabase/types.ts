@@ -658,6 +658,42 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          completed_at: string | null
+          completion_points_awarded: boolean | null
+          created_at: string
+          id: string
+          referee_id: string | null
+          referral_code: string
+          referrer_id: string
+          signup_points_awarded: boolean | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completion_points_awarded?: boolean | null
+          created_at?: string
+          id?: string
+          referee_id?: string | null
+          referral_code: string
+          referrer_id: string
+          signup_points_awarded?: boolean | null
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          completion_points_awarded?: boolean | null
+          created_at?: string
+          id?: string
+          referee_id?: string | null
+          referral_code?: string
+          referrer_id?: string
+          signup_points_awarded?: boolean | null
+          status?: string
+        }
+        Relationships: []
+      }
       user_points: {
         Row: {
           badges: Json
@@ -665,6 +701,9 @@ export type Database = {
           id: string
           last_review_date: string | null
           level: number
+          referral_code: string | null
+          referral_count: number
+          referral_points_earned: number
           streak_count: number
           total_points: number
           updated_at: string
@@ -676,6 +715,9 @@ export type Database = {
           id?: string
           last_review_date?: string | null
           level?: number
+          referral_code?: string | null
+          referral_count?: number
+          referral_points_earned?: number
           streak_count?: number
           total_points?: number
           updated_at?: string
@@ -687,6 +729,9 @@ export type Database = {
           id?: string
           last_review_date?: string | null
           level?: number
+          referral_code?: string | null
+          referral_count?: number
+          referral_points_earned?: number
           streak_count?: number
           total_points?: number
           updated_at?: string
