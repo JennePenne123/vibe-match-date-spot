@@ -192,7 +192,16 @@ export function AppSidebar() {
                           className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${getNavClasses(isActive(item.url))}`}
                         >
                           <item.icon className="w-4 h-4 flex-shrink-0" />
-                          <span className="text-sm font-medium">{item.title}</span>
+                          <span className="text-sm font-medium flex-1">{item.title}</span>
+                          {item.title === 'Invitations' && pendingCount > 0 && (
+                            <Badge 
+                              variant="destructive" 
+                              size="sm"
+                              className="h-5 min-w-[20px] px-1.5 flex items-center justify-center text-[10px] font-bold"
+                            >
+                              {pendingCount > 9 ? '9+' : pendingCount}
+                            </Badge>
+                          )}
                         </NavLink>
                       ))}
                     </CollapsibleContent>
