@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 interface NotificationSystemProps {
   children: React.ReactNode;
@@ -10,6 +12,7 @@ interface NotificationSystemProps {
 const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
@@ -44,12 +47,22 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
                 title: "Date Accepted! 🎉",
                 description: `${recipientName} accepted your date invitation! Time to start planning the details.`,
                 duration: 8000,
+                action: (
+                  <ToastAction altText="View invitations" onClick={() => navigate('/invitations')}>
+                    View
+                  </ToastAction>
+                ),
               });
             } else if (newInvitation.status === 'declined') {
               toast({
                 title: "Invitation Response 💙",
                 description: `${recipientName} isn't available for this date. Don't worry - maybe try a different time or venue!`,
                 duration: 6000,
+                action: (
+                  <ToastAction altText="Plan new date" onClick={() => navigate('/smart-date-planning')}>
+                    Plan New
+                  </ToastAction>
+                ),
               });
             }
           }
@@ -84,6 +97,11 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
             title: "New Date Invitation! 💌",
             description: `${senderName} sent you a date invitation. Check it out and respond!`,
             duration: 8000,
+            action: (
+              <ToastAction altText="View invitations" onClick={() => navigate('/invitations')}>
+                View
+              </ToastAction>
+            ),
           });
         }
       )
