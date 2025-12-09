@@ -107,6 +107,74 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_learning_data: {
+        Row: {
+          actual_rating: number | null
+          ai_accuracy_rating: number | null
+          context_data: Json | null
+          created_at: string
+          failure_factors: Json | null
+          id: string
+          invitation_id: string | null
+          partner_id: string | null
+          predicted_factors: Json | null
+          predicted_score: number
+          prediction_error: number | null
+          success_factors: Json | null
+          updated_at: string
+          user_id: string
+          venue_id: string
+          venue_rating: number | null
+          would_recommend: boolean | null
+        }
+        Insert: {
+          actual_rating?: number | null
+          ai_accuracy_rating?: number | null
+          context_data?: Json | null
+          created_at?: string
+          failure_factors?: Json | null
+          id?: string
+          invitation_id?: string | null
+          partner_id?: string | null
+          predicted_factors?: Json | null
+          predicted_score?: number
+          prediction_error?: number | null
+          success_factors?: Json | null
+          updated_at?: string
+          user_id: string
+          venue_id: string
+          venue_rating?: number | null
+          would_recommend?: boolean | null
+        }
+        Update: {
+          actual_rating?: number | null
+          ai_accuracy_rating?: number | null
+          context_data?: Json | null
+          created_at?: string
+          failure_factors?: Json | null
+          id?: string
+          invitation_id?: string | null
+          partner_id?: string | null
+          predicted_factors?: Json | null
+          predicted_score?: number
+          prediction_error?: number | null
+          success_factors?: Json | null
+          updated_at?: string
+          user_id?: string
+          venue_id?: string
+          venue_rating?: number | null
+          would_recommend?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_learning_data_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "date_invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_venue_scores: {
         Row: {
           ai_score: number
@@ -742,37 +810,46 @@ export type Database = {
       user_preference_vectors: {
         Row: {
           activity_vector: number[] | null
+          ai_accuracy: number | null
           cuisine_vector: number[] | null
           feature_weights: Json | null
           id: string
           last_updated: string
           learning_data: Json | null
           price_vector: number[] | null
+          successful_predictions: number | null
           time_vector: number[] | null
+          total_ratings: number | null
           user_id: string
           vibe_vector: number[] | null
         }
         Insert: {
           activity_vector?: number[] | null
+          ai_accuracy?: number | null
           cuisine_vector?: number[] | null
           feature_weights?: Json | null
           id?: string
           last_updated?: string
           learning_data?: Json | null
           price_vector?: number[] | null
+          successful_predictions?: number | null
           time_vector?: number[] | null
+          total_ratings?: number | null
           user_id: string
           vibe_vector?: number[] | null
         }
         Update: {
           activity_vector?: number[] | null
+          ai_accuracy?: number | null
           cuisine_vector?: number[] | null
           feature_weights?: Json | null
           id?: string
           last_updated?: string
           learning_data?: Json | null
           price_vector?: number[] | null
+          successful_predictions?: number | null
           time_vector?: number[] | null
+          total_ratings?: number | null
           user_id?: string
           vibe_vector?: number[] | null
         }
