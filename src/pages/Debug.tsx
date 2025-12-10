@@ -14,8 +14,9 @@ import { VenueSearchTester } from '@/components/debug/VenueSearchTester';
 import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
 import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
 import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
-import { Settings, Code, Database, Users, MapPin, Trophy, Calendar } from 'lucide-react';
+import { Settings, Code, Database, Users, MapPin, Trophy, Calendar, Brain } from 'lucide-react';
 import { GamificationTester } from '@/components/debug/GamificationTester';
+import { AILearningTester } from '@/components/debug/AILearningTester';
 
 const Debug: React.FC = () => {
   // Only show in development
@@ -86,6 +87,19 @@ const Debug: React.FC = () => {
         <CardContent className="space-y-4">
           <AIAnalysisTestButton />
           <SmartPlannerDebug currentStep="preferences" />
+        </CardContent>
+      </Card>
+
+      {/* AI Learning Pipeline Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5" />
+            AI Learning Pipeline Testing
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AILearningTester />
         </CardContent>
       </Card>
 
