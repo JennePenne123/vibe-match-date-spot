@@ -25,6 +25,10 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
     partnerName: string;
     venueName: string;
     dateTime: string;
+    venueId?: string;
+    partnerId?: string;
+    aiPredictedScore?: number | null;
+    aiPredictedFactors?: Record<string, unknown> | null;
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +43,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
     const status = await checkDateFeedbackStatus(invitationId);
     setFeedbackStatus(status);
     
-    // Load invitation data for display
+    // Load invitation data for display including AI data
     const { data: invitation } = await supabase
       .from('date_invitations')
       .select(`
@@ -53,14 +57,20 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
     
     if (invitation) {
       const { data: { user } } = await supabase.auth.getUser();
-      const partnerName = user?.id === invitation.sender_id 
+      const isUserSender = user?.id === invitation.sender_id;
+      const partnerName = isUserSender
         ? invitation.recipient?.name || 'Your partner'
         : invitation.sender?.name || 'Your partner';
+      const partnerId = isUserSender ? invitation.recipient_id : invitation.sender_id;
       
       setInvitationData({
         partnerName,
         venueName: invitation.venue?.name || 'the venue',
         dateTime: invitation.actual_date_time || invitation.proposed_date || '',
+        venueId: invitation.venue_id || undefined,
+        partnerId,
+        aiPredictedScore: invitation.ai_compatibility_score,
+        aiPredictedFactors: invitation.venue_match_factors as Record<string, unknown> | null,
       });
     }
     
@@ -175,6 +185,10 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
         invitationId={invitationId}
         partnerName={invitationData.partnerName}
         venueName={invitationData.venueName}
+        venueId={invitationData.venueId}
+        partnerId={invitationData.partnerId}
+        aiPredictedScore={invitationData.aiPredictedScore}
+        aiPredictedFactors={invitationData.aiPredictedFactors}
         onSuccess={handleSuccess}
       />
     </>
