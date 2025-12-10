@@ -27,6 +27,10 @@ interface DateRatingModalProps {
   invitationId: string;
   partnerName: string;
   venueName: string;
+  venueId?: string;
+  partnerId?: string;
+  aiPredictedScore?: number | null;
+  aiPredictedFactors?: Record<string, unknown> | null;
   onSuccess?: () => void;
 }
 
@@ -55,6 +59,10 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
   invitationId,
   partnerName,
   venueName,
+  venueId,
+  partnerId,
+  aiPredictedScore,
+  aiPredictedFactors,
   onSuccess,
 }) => {
   const {
@@ -67,7 +75,12 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
     canProceed,
     calculatePoints,
     submitRating,
-  } = useDateRating(invitationId);
+  } = useDateRating(invitationId, {
+    venueId,
+    partnerId,
+    aiPredictedScore,
+    aiPredictedFactors,
+  });
 
   const progress = (currentStep / 5) * 100;
   const points = calculatePoints();

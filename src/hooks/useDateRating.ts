@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { learnFromFeedback } from '@/services/aiLearningService';
 
 export interface DateRatingData {
   overallRating: number;
@@ -22,7 +23,14 @@ export interface PointsPreview {
   total: number;
 }
 
-export const useDateRating = (invitationId: string) => {
+export interface DateRatingOptions {
+  venueId?: string;
+  partnerId?: string;
+  aiPredictedScore?: number | null;
+  aiPredictedFactors?: Record<string, unknown> | null;
+}
+
+export const useDateRating = (invitationId: string, options?: DateRatingOptions) => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -209,9 +217,43 @@ export const useDateRating = (invitationId: string) => {
 
       if (pointsError) throw pointsError;
 
+      // Send feedback to AI learning system
+      let learningResult = null;
+      if (options?.venueId) {
+        try {
+          console.log('🧠 Sending feedback to AI learning system...');
+          learningResult = await learnFromFeedback({
+            userId: user.id,
+            partnerId: options.partnerId,
+            venueId: options.venueId,
+            invitationId: invitationId,
+            predictedScore: options.aiPredictedScore ?? 75,
+            predictedFactors: options.aiPredictedFactors ?? {},
+            actualRating: ratingData.overallRating,
+            venueRating: ratingData.venueRating,
+            aiAccuracyRating: ratingData.aiAccuracyRating ?? undefined,
+            wouldRecommend: ratingData.wouldRecommendVenue ?? undefined,
+            contextData: {
+              sentiment: ratingData.sentiment,
+              venueTags: ratingData.venueTags,
+              feedbackText: ratingData.feedbackText,
+            },
+          });
+          if (learningResult) {
+            console.log('✅ AI learned from feedback:', learningResult);
+          }
+        } catch (err) {
+          console.error('⚠️ AI learning failed (non-blocking):', err);
+        }
+      }
+
+      const toastDescription = learningResult?.improvementPercent
+        ? `You earned ${points.total} points! AI accuracy improved by ${learningResult.improvementPercent}%`
+        : `You earned ${points.total} points! Thank you for your feedback.`;
+
       toast({
         title: "🎉 Rating Submitted!",
-        description: `You earned ${points.total} points! Thank you for your feedback.`,
+        description: toastDescription,
       });
 
       return { success: true, points: points.total };
