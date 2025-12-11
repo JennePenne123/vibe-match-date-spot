@@ -1,5 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
+import { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
 
 export const calculateVenueAIScore = async (
   venueId: string,
@@ -9,12 +9,17 @@ export const calculateVenueAIScore = async (
   try {
     console.log('🧮 SCORING: Starting AI score calculation for venue:', venueId, 'user:', userId);
 
-    // Get user preferences
-    const { data: userPrefs, error: prefsError } = await supabase
-      .from('user_preferences')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+    // Fetch user preferences and learned weights in parallel
+    const [prefsResult, learnedWeights] = await Promise.all([
+      supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', userId)
+        .single(),
+      getUserLearnedWeights(userId)
+    ]);
+
+    const { data: userPrefs, error: prefsError } = prefsResult;
 
     if (prefsError) {
       console.error('❌ SCORING: Error fetching user preferences:', prefsError);
@@ -23,7 +28,7 @@ export const calculateVenueAIScore = async (
 
     if (!userPrefs) {
       console.warn('⚠️ SCORING: No user preferences found, using default score');
-      return 50; // Default neutral score
+      return 50;
     }
 
     // Get venue data
@@ -56,135 +61,149 @@ export const calculateVenueAIScore = async (
       priceRange: userPrefs.preferred_price_range
     });
 
-    // Calculate base match score with more lenient scoring
-    let baseScore = 0.6; // Start with higher baseline (60%)
-    
+    if (learnedWeights.hasLearningData) {
+      console.log('🧠 SCORING: Using learned weights:', learnedWeights.weights);
+    }
+
+    // Calculate base match score with learned weights applied
+    let baseScore = 0.6; // Start with baseline (60%)
+    const weights = learnedWeights.weights;
+
     console.log('🔍 SCORING: Starting with base score of 60%');
 
-    // Cuisine matching - make it case insensitive and more flexible
+    // Cuisine matching with learned weight
     if (userPrefs.preferred_cuisines && venue.cuisine_type) {
-      const userCuisines = userPrefs.preferred_cuisines.map(c => c.toLowerCase());
+      const userCuisines = userPrefs.preferred_cuisines.map((c: string) => c.toLowerCase());
       const venueCuisine = venue.cuisine_type.toLowerCase();
       
-      // Exact match
       let cuisineMatch = userCuisines.includes(venueCuisine);
       
-      // Partial match (e.g., "mediterranean" includes "greek")
       if (!cuisineMatch) {
-        cuisineMatch = userCuisines.some(userCuisine => 
+        cuisineMatch = userCuisines.some((userCuisine: string) => 
           venueCuisine.includes(userCuisine) || userCuisine.includes(venueCuisine)
         );
       }
       
+      const cuisineScore = cuisineMatch ? 0.25 : -0.05;
+      const weightedCuisineScore = applyWeight(cuisineScore, weights.cuisine, 'cuisine');
+      
       console.log('🍽️ SCORING: Cuisine matching:', { 
         userCuisines, 
         venueCuisine, 
-        exactMatch: userCuisines.includes(venueCuisine),
-        partialMatch: cuisineMatch,
-        score: cuisineMatch ? '+25%' : '-5%'
+        match: cuisineMatch,
+        baseScore: `${cuisineScore > 0 ? '+' : ''}${Math.round(cuisineScore * 100)}%`,
+        weightedScore: `${weightedCuisineScore > 0 ? '+' : ''}${Math.round(weightedCuisineScore * 100)}%`
       });
       
-      baseScore += cuisineMatch ? 0.25 : -0.05; // Good bonus, small penalty
+      baseScore += weightedCuisineScore;
     }
 
-    // Price range matching with more flexible scoring
+    // Price range matching with learned weight
     if (userPrefs.preferred_price_range && venue.price_range) {
       const priceMatch = userPrefs.preferred_price_range.includes(venue.price_range);
-      console.log('💰 SCORING: Price matching:', { 
-        userPrefs: userPrefs.preferred_price_range, 
-        venue: venue.price_range, 
-        match: priceMatch,
-        score: priceMatch ? '+15%' : 'no penalty'
-      });
       
       if (priceMatch) {
-        baseScore += 0.15;
+        const priceScore = 0.15;
+        const weightedPriceScore = applyWeight(priceScore, weights.price, 'price');
+        
+        console.log('💰 SCORING: Price matching:', { 
+          userPrefs: userPrefs.preferred_price_range, 
+          venue: venue.price_range, 
+          match: true,
+          baseScore: `+${Math.round(priceScore * 100)}%`,
+          weightedScore: `+${Math.round(weightedPriceScore * 100)}%`
+        });
+        
+        baseScore += weightedPriceScore;
       }
-      // No penalty for price mismatch to be more inclusive
     }
 
-    // Vibe matching through tags - improved matching with fallbacks
+    // Vibe matching with learned weight
     if (userPrefs.preferred_vibes && venue.tags && venue.tags.length > 0) {
-      const vibeMatches = userPrefs.preferred_vibes.filter(vibe => 
+      const vibeMatches = userPrefs.preferred_vibes.filter((vibe: string) => 
         venue.tags.some((tag: string) => 
           tag.toLowerCase().includes(vibe.toLowerCase()) ||
           vibe.toLowerCase().includes(tag.toLowerCase())
         )
       );
       
-      // If no tag matches, check cuisine/price for vibe inference
-      let inferredVibeMatch = false;
+      // Infer vibes if no direct matches
       if (vibeMatches.length === 0) {
-        // Romantic inference
         if (userPrefs.preferred_vibes.includes('romantic')) {
           if (venue.price_range === '$$$' || venue.price_range === '$$$$' || 
               venue.cuisine_type?.toLowerCase().includes('fine') ||
               venue.cuisine_type?.toLowerCase().includes('italian') ||
               venue.cuisine_type?.toLowerCase().includes('french')) {
-            inferredVibeMatch = true;
             vibeMatches.push('romantic (inferred)');
           }
         }
         
-        // Casual inference
         if (userPrefs.preferred_vibes.includes('casual')) {
           if (venue.price_range === '$' || venue.price_range === '$$') {
-            inferredVibeMatch = true;
             vibeMatches.push('casual (inferred)');
           }
         }
       }
       
+      const vibeScore = vibeMatches.length * 0.1;
+      const weightedVibeScore = applyWeight(vibeScore, weights.vibe, 'vibe');
+      
       console.log('🎭 SCORING: Vibe matching:', { 
         userVibes: userPrefs.preferred_vibes, 
         venueTags: venue.tags, 
         matches: vibeMatches,
-        inferredMatch: inferredVibeMatch,
-        score: `+${vibeMatches.length * 10}%`
+        baseScore: `+${Math.round(vibeScore * 100)}%`,
+        weightedScore: `+${Math.round(weightedVibeScore * 100)}%`
       });
       
-      baseScore += vibeMatches.length * 0.1; // Good bonus for vibe matches
+      baseScore += weightedVibeScore;
     }
 
-    // Rating bonus - more generous
+    // Rating bonus with learned weight
     if (venue.rating) {
-      const ratingBonus = Math.min((venue.rating - 3.0) * 0.05, 0.1); // Up to 10% bonus
+      const ratingBonus = Math.min((venue.rating - 3.0) * 0.05, 0.1);
+      const weightedRatingBonus = applyWeight(ratingBonus, weights.rating, 'rating');
+      
       console.log('⭐ SCORING: Rating bonus:', {
         rating: venue.rating,
-        bonus: `+${Math.round(ratingBonus * 100)}%`
+        baseBonus: `+${Math.round(ratingBonus * 100)}%`,
+        weightedBonus: `+${Math.round(weightedRatingBonus * 100)}%`
       });
-      baseScore += ratingBonus;
+      
+      baseScore += weightedRatingBonus;
     }
 
-    // Calculate contextual factors
+    // Calculate contextual factors with time weight
     const contextualScore = await calculateContextualFactors(venueId);
+    const weightedContextual = applyWeight(contextualScore, weights.time, 'time/context');
+
+    // Apply confidence boost from learning data
+    const confidenceBoost = getConfidenceBoost(learnedWeights);
     
-    // Final AI score (0-100 scale) with better scaling - ensure higher minimum
-    const finalScore = Math.max(35, Math.min(98, (baseScore + contextualScore) * 100)); // Minimum 35% score, max 98%
+    // Final AI score (0-100 scale)
+    const rawScore = (baseScore + weightedContextual + confidenceBoost) * 100;
+    const finalScore = Math.max(35, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
       venue: venue.name,
       baseScore: `${Math.round(baseScore * 100)}%`,
-      contextualScore: `${Math.round(contextualScore * 100)}%`,
+      contextualScore: `${Math.round(weightedContextual * 100)}%`,
+      confidenceBoost: `+${Math.round(confidenceBoost * 100)}%`,
       finalScore: `${Math.round(finalScore)}%`,
-      breakdown: {
-        cuisineMatch: userPrefs.preferred_cuisines?.some(c => 
-          venue.cuisine_type?.toLowerCase().includes(c.toLowerCase())
-        ),
-        priceMatch: userPrefs.preferred_price_range?.includes(venue.price_range),
-        vibeInferred: true, // Always consider some vibe match
-        rating: venue.rating
-      }
+      learningApplied: learnedWeights.hasLearningData,
+      aiAccuracy: learnedWeights.aiAccuracy
     });
 
-    // Store the AI score
+    // Store the AI score with learning metadata
     const matchFactors = {
       cuisine_match: userPrefs.preferred_cuisines?.includes(venue.cuisine_type) || false,
       price_match: userPrefs.preferred_price_range?.includes(venue.price_range) || false,
-      vibe_matches: userPrefs.preferred_vibes?.filter(vibe => 
+      vibe_matches: userPrefs.preferred_vibes?.filter((vibe: string) => 
         venue.tags?.some((tag: string) => tag.toLowerCase().includes(vibe.toLowerCase()))
       ) || [],
-      rating_bonus: venue.rating ? Math.min((venue.rating - 3.5) * 0.1, 0.15) : 0
+      rating_bonus: venue.rating ? Math.min((venue.rating - 3.5) * 0.1, 0.15) : 0,
+      learned_weights_applied: learnedWeights.hasLearningData,
+      weight_multipliers: learnedWeights.hasLearningData ? learnedWeights.weights : null
     };
 
     const { error: insertError } = await supabase
@@ -194,7 +213,7 @@ export const calculateVenueAIScore = async (
         user_id: userId,
         ai_score: Math.round(finalScore * 100) / 100,
         match_factors: matchFactors,
-        contextual_score: Math.round(contextualScore * 100) / 100,
+        contextual_score: Math.round(weightedContextual * 100) / 100,
         updated_at: new Date().toISOString()
       });
 
@@ -205,7 +224,7 @@ export const calculateVenueAIScore = async (
     return finalScore;
   } catch (error) {
     console.error('Error calculating venue AI score:', error);
-    return 50; // Default neutral score
+    return 50;
   }
 };
 
