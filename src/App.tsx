@@ -34,6 +34,7 @@ import PartnerDashboard from "./pages/partner/Dashboard";
 import PartnerVouchers from "./pages/partner/Vouchers";
 import PartnerVenues from "./pages/partner/Venues";
 import ShareholderReport from "./pages/ShareholderReport";
+import AIInsights from "./pages/AIInsights";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -87,6 +88,7 @@ const App = () => (
                     <Route path="/my-venues" element={<AppLayout><MyVenues /></AppLayout>} />
                     <Route path="/invitations" element={<AppLayout><Invitations /></AppLayout>} />
                     <Route path="/ai-recommendations" element={<AppLayout><AIRecommendations /></AppLayout>} />
+                    <Route path="/ai-insights" element={<AppLayout><AIInsights /></AppLayout>} />
                     <Route path="/plan-date" element={<AppLayout><SmartDatePlanning /></AppLayout>} />
                     
                     {/* Debug route */}

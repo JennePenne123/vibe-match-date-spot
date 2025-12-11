@@ -1,12 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Brain, TrendingUp, Sparkles, Target, RefreshCw } from 'lucide-react';
+import { Brain, TrendingUp, Sparkles, Target, RefreshCw, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAILearning } from '@/hooks/useAILearning';
 
 const AILearningCard: React.FC = () => {
+  const navigate = useNavigate();
   const { insights, loading, refreshInsights } = useAILearning();
 
   if (loading) {
@@ -126,6 +128,16 @@ const AILearningCard: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* View Details Button */}
+            <Button 
+              variant="outline" 
+              className="w-full mt-2"
+              onClick={() => navigate('/ai-insights')}
+            >
+              View Detailed Insights
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
           </>
         ) : (
           <div className="text-center py-4">
