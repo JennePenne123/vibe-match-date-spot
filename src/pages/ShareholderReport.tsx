@@ -1,3 +1,4 @@
+// Shareholder Report - December 2024 Summary
 import { Brain, Store, Gamepad2, Sparkles, MapPin, Bell, Download, Printer, Check, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exportToPDF, printReport } from "@/utils/pdfExport";
