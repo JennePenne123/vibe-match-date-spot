@@ -33,6 +33,7 @@ import Landing from "./pages/Landing";
 import PartnerDashboard from "./pages/partner/Dashboard";
 import PartnerVouchers from "./pages/partner/Vouchers";
 import PartnerVenues from "./pages/partner/Venues";
+import ShareholderReport from "./pages/ShareholderReport";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -100,6 +101,7 @@ const App = () => (
                     <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
                     <Route path="/demo/premium-design-system" element={<PremiumDesignSystemDemo />} />
                     <Route path="/demo/rating" element={<RatingDemo />} />
+                    <Route path="/shareholder-report" element={<ShareholderReport />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </ErrorBoundary>
