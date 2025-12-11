@@ -7,6 +7,39 @@ export interface LearningMetrics {
   predictionError: string | null;
 }
 
+export interface TrendData {
+  ratingTrend: 'improving' | 'stable' | 'declining';
+  accuracyTrend: 'improving' | 'stable' | 'declining';
+  recentAvgRating: number;
+  previousAvgRating: number;
+  improvementPercent: number;
+}
+
+export interface CategoryStat {
+  count: number;
+  avgRating: number;
+  successRate: number;
+}
+
+export interface CategoryPerformance {
+  byCuisine: Record<string, CategoryStat>;
+  byVibe: Record<string, CategoryStat>;
+  byPrice: Record<string, CategoryStat>;
+}
+
+export interface TimelineEntry {
+  date: string;
+  rating: number;
+  predicted: number;
+  accuracy: number;
+}
+
+export interface RadarDataPoint {
+  category: string;
+  value: number;
+  fullMark: number;
+}
+
 export interface AIInsights {
   totalDates: number;
   successfulDates: number;
@@ -18,6 +51,12 @@ export interface AIInsights {
   featureWeights: Record<string, number> | null;
   topSuccessPatterns: Array<{ pattern: string; count: number }>;
   topFailurePatterns: Array<{ pattern: string; count: number }>;
+  // Advanced insights
+  trends?: TrendData;
+  categoryPerformance?: CategoryPerformance;
+  timelineData?: TimelineEntry[];
+  predictions?: string[];
+  radarData?: RadarDataPoint[];
 }
 
 export interface LearnFromFeedbackParams {
