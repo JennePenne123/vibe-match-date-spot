@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +7,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationSystem from "./components/NotificationSystem";
+import PushNotificationPrompt from "./components/PushNotificationPrompt";
 import AppLayout from "./components/AppLayout";
 import Onboarding from "./pages/Onboarding";
 import RegisterLogin from "./pages/RegisterLogin";
@@ -68,6 +68,7 @@ const App = () => (
           <AuthProvider>
             <AppProvider>
               <NotificationSystem>
+                <PushNotificationPrompt />
                 <ErrorBoundary level="page" silent={true}>
                   <Routes>
                     {/* Public routes without layout */}
