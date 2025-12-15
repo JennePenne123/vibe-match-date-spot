@@ -12,7 +12,7 @@ import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { useBreakpoint } from '@/hooks/use-mobile';
 import InvitationMessenger from '@/components/InvitationMessenger';
 import { useInvitationMessages } from '@/hooks/useInvitationMessages';
-import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
+import { ErrorBoundaryWrapper } from '@/components/ErrorBoundary';
 import { useAuth } from '@/contexts/AuthContext';
 import { DateRatingPrompt } from '@/components/DateRatingPrompt';
 interface DateInviteCardProps {

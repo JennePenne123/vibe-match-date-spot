@@ -1,4 +1,3 @@
-
 import React, { Component, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,34 +27,18 @@ class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return {
-      hasError: true,
-      error,
-      errorInfo: null,
-    };
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
-    
-    this.setState({
-      error,
-      errorInfo,
-    });
-
-    // Call custom error handler if provided
-    if (this.props.onError) {
-      this.props.onError(error, errorInfo);
-    }
+    console.error('Error caught by boundary:', error);
+    this.setState({ error, errorInfo });
+    this.props.onError?.(error, errorInfo);
   }
 
   handleRetry = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    });
+    this.setState({ hasError: false, error: null, errorInfo: null });
   };
 
   handleGoHome = () => {
@@ -64,9 +47,9 @@ class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      // If silent mode is enabled, just log and render fallback or null
+      // Silent mode: log and render fallback or null
       if (this.props.silent) {
-        console.warn('ErrorBoundary caught error (silent mode):', this.state.error);
+        console.warn('ErrorBoundary caught error (silent mode):', this.state.error?.message);
         return this.props.fallback || null;
       }
 
@@ -80,43 +63,35 @@ class ErrorBoundary extends Component<Props, State> {
       
       if (level === 'app') {
         return (
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="min-h-screen bg-background flex items-center justify-center p-4">
             <div className="max-w-md w-full space-y-6 text-center">
               <div className="flex justify-center">
-                <AlertTriangle className="w-16 h-16 text-red-500" />
+                <AlertTriangle className="w-16 h-16 text-destructive" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                <h1 className="text-2xl font-bold text-foreground mb-2">
                   Something went wrong
                 </h1>
-                <p className="text-gray-600 mb-6">
+                <p className="text-muted-foreground mb-6">
                   We're sorry, but something unexpected happened. Please try refreshing the page.
                 </p>
               </div>
               <div className="space-y-3">
-                <Button 
-                  onClick={this.handleRetry}
-                  className="w-full"
-                  variant="default"
-                >
+                <Button onClick={this.handleRetry} className="w-full">
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Try Again
                 </Button>
-                <Button 
-                  onClick={this.handleGoHome}
-                  className="w-full"
-                  variant="outline"
-                >
+                <Button onClick={this.handleGoHome} className="w-full" variant="outline">
                   <Home className="w-4 h-4 mr-2" />
                   Go Home
                 </Button>
               </div>
               {process.env.NODE_ENV === 'development' && this.state.error && (
-                <details className="text-left mt-4 p-4 bg-red-50 rounded-md">
-                  <summary className="cursor-pointer text-red-700 font-medium">
+                <details className="text-left mt-4 p-4 bg-destructive/10 rounded-md">
+                  <summary className="cursor-pointer text-destructive font-medium">
                     Error Details (Development)
                   </summary>
-                  <pre className="mt-2 text-xs text-red-600 overflow-auto">
+                  <pre className="mt-2 text-xs text-destructive overflow-auto">
                     {this.state.error.toString()}
                     {this.state.errorInfo?.componentStack}
                   </pre>
@@ -134,21 +109,13 @@ class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Page Error</AlertTitle>
               <AlertDescription className="mt-2">
-                This page encountered an error. Please try refreshing or go back to the previous page.
+                This page encountered an error. Please try refreshing or go back.
                 <div className="mt-4 space-x-2">
-                  <Button 
-                    onClick={this.handleRetry}
-                    size="sm"
-                    variant="outline"
-                  >
+                  <Button onClick={this.handleRetry} size="sm" variant="outline">
                     <RefreshCw className="w-3 h-3 mr-1" />
                     Retry
                   </Button>
-                  <Button 
-                    onClick={() => window.history.back()}
-                    size="sm"
-                    variant="outline"
-                  >
+                  <Button onClick={() => window.history.back()} size="sm" variant="outline">
                     Go Back
                   </Button>
                 </div>
@@ -160,20 +127,15 @@ class ErrorBoundary extends Component<Props, State> {
 
       // Component level error
       return (
-        <div className="p-4 border border-red-200 rounded-md bg-red-50">
-          <div className="flex items-center gap-2 text-red-700">
+        <div className="p-4 border border-destructive/20 rounded-md bg-destructive/5">
+          <div className="flex items-center gap-2 text-destructive">
             <AlertTriangle className="w-4 h-4" />
             <span className="font-medium">Component Error</span>
           </div>
-          <p className="text-red-600 text-sm mt-1">
+          <p className="text-destructive/80 text-sm mt-1">
             This component failed to render properly.
           </p>
-          <Button 
-            onClick={this.handleRetry}
-            size="sm"
-            variant="outline"
-            className="mt-2"
-          >
+          <Button onClick={this.handleRetry} size="sm" variant="outline" className="mt-2">
             <RefreshCw className="w-3 h-3 mr-1" />
             Retry
           </Button>
@@ -186,3 +148,8 @@ class ErrorBoundary extends Component<Props, State> {
 }
 
 export default ErrorBoundary;
+
+// Convenience wrapper for functional component usage (replaces ErrorBoundaryWrapper)
+export const ErrorBoundaryWrapper: React.FC<Props> = (props) => {
+  return <ErrorBoundary {...props} />;
+};
