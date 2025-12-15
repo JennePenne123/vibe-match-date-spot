@@ -2,15 +2,11 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { VenueMatchingDebug } from '@/components/debug/VenueMatchingDebug';
 import TestUserDebugPanel from '@/components/debug/TestUserDebugPanel';
-import { VenueAPITester } from '@/components/debug/VenueAPITester';
 import { EdgeFunctionTester } from '@/components/debug/EdgeFunctionTester';
-import { HamburgVenueTest } from '@/components/debug/HamburgVenueTest';
-import InvitationTestButton from '@/components/debug/InvitationTestButton';
 import { PreferencesReset } from '@/components/debug/PreferencesReset';
 import SessionStatusDebug from '@/components/debug/SessionStatusDebug';
 import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import { TestDataControls } from '@/components/debug/TestDataControls';
-import { VenueSearchTester } from '@/components/debug/VenueSearchTester';
 import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
 import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
 import { Settings, Code, Database, Users, MapPin, Trophy, Brain } from 'lucide-react';
@@ -69,9 +65,6 @@ const Debug: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <VenueMatchingDebug />
-          <VenueAPITester />
-          <VenueSearchTester />
-          <HamburgVenueTest />
         </CardContent>
       </Card>
 
@@ -126,7 +119,6 @@ const Debug: React.FC = () => {
         <CardContent className="space-y-4">
           <EdgeFunctionTester />
           <SessionStatusDebug />
-          <InvitationTestButton />
           <CompatibilityDebug 
             compatibilityScore={null}
             partnerId={undefined}
