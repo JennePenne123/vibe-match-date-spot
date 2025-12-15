@@ -12,9 +12,8 @@ import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import { TestDataControls } from '@/components/debug/TestDataControls';
 import { VenueSearchTester } from '@/components/debug/VenueSearchTester';
 import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
-import { AIAnalysisDebugPanel } from '@/components/date-planning/AIAnalysisDebugPanel';
 import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
-import { Settings, Code, Database, Users, MapPin, Trophy, Calendar, Brain } from 'lucide-react';
+import { Settings, Code, Database, Users, MapPin, Trophy, Brain } from 'lucide-react';
 import { GamificationTester } from '@/components/debug/GamificationTester';
 import { AILearningTester } from '@/components/debug/AILearningTester';
 
@@ -116,35 +115,6 @@ const Debug: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Smart Planning & Sessions Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Smart Planning & Collaborative Sessions
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <SessionStatusDebug />
-          <SmartPlannerDebug currentStep="preferences" />
-          <AIAnalysisDebugPanel 
-            sessionId={undefined}
-            partnerId={undefined}
-            currentStep="preferences"
-            sessionData={undefined}
-            userLocation={undefined}
-            onAnalysisComplete={() => {}}
-          />
-          <AIAnalysisTestButton />
-          <CompatibilityDebug 
-            compatibilityScore={null}
-            partnerId={undefined}
-            userId={undefined}
-          />
-          <InvitationTestButton />
-        </CardContent>
-      </Card>
-
       {/* Backend & Database Section */}
       <Card>
         <CardHeader>
@@ -157,6 +127,11 @@ const Debug: React.FC = () => {
           <EdgeFunctionTester />
           <SessionStatusDebug />
           <InvitationTestButton />
+          <CompatibilityDebug 
+            compatibilityScore={null}
+            partnerId={undefined}
+            userId={undefined}
+          />
         </CardContent>
       </Card>
     </div>
