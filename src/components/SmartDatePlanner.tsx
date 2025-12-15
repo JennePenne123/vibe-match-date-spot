@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useBreakpoint } from '@/hooks/use-mobile';
-import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
+import { ErrorBoundaryWrapper } from '@/components/ErrorBoundary';
 
 import PlanTogether from '@/components/date-planning/PlanTogether';
 import InvitationCreation from '@/components/date-planning/InvitationCreation';
