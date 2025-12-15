@@ -14,8 +14,7 @@ interface DateInvitation {
   proposed_date?: string;
   status: 'pending' | 'accepted' | 'declined' | 'cancelled';
   created_at: string;
-  direction: 'received' | 'sent'; // New field to track direction
-  // Enhanced AI fields
+  direction: 'received' | 'sent';
   ai_compatibility_score?: number;
   ai_reasoning?: string;
   venue_match_factors?: any;
@@ -50,15 +49,85 @@ interface DateInvitation {
 }
 
 // Helper function to extract venue name from message
-const extractVenueFromMessage = (message: string, fallback: string) => {
+const extractVenueFromMessage = (message: string, fallback: string): string => {
   if (fallback === 'Selected Venue' || fallback === 'Venue TBD') {
-    // Try to extract venue name from message like "I'd love to take you to Il Siciliano based on..."
     const venueMatch = message.match(/take you to ([^\.]+?) based on/i);
     if (venueMatch) {
       return venueMatch[1].trim();
     }
   }
   return fallback;
+};
+
+// Helper function to extract venue data from AI fields
+const extractVenueFromAIData = (invitation: any): { name: string; address: string; image_url?: string; photos: any[] } => {
+  const extractedNameFromMessage = extractVenueFromMessage(invitation.message || '', '');
+  const extractedName = extractedNameFromMessage || invitation.title || 'AI Recommended Venue';
+  
+  let venuePhotos: any[] = [];
+  let venueImage: string | undefined;
+  let actualName = extractedName;
+  let actualAddress = 'AI Recommended Location';
+  
+  if (invitation.venue_match_factors) {
+    const venueData = invitation.venue_match_factors;
+    actualName = venueData.venue_name || venueData.name || extractedName;
+    actualAddress = venueData.venue_address || venueData.address || venueData.location || 'AI Recommended Location';
+    venueImage = venueData.venue_image || venueData.image_url || venueData.image;
+    
+    if (venueData.venue_photos && Array.isArray(venueData.venue_photos)) {
+      venuePhotos = venueData.venue_photos;
+    } else if (venueData.photos && Array.isArray(venueData.photos)) {
+      venuePhotos = venueData.photos;
+    }
+  }
+  
+  return {
+    name: actualName,
+    address: actualAddress,
+    image_url: venueImage,
+    photos: venuePhotos
+  };
+};
+
+// Helper function to enrich invitation with venue data
+const enrichInvitationWithVenue = async (invitation: any): Promise<any> => {
+  if (!invitation.venue_id) {
+    return null;
+  }
+
+  // First try to get from database
+  const { data: dbVenue } = await supabase
+    .from('venues')
+    .select('*')
+    .eq('id', invitation.venue_id)
+    .maybeSingle();
+    
+  if (dbVenue) {
+    return {
+      name: dbVenue.name,
+      address: dbVenue.address,
+      image_url: dbVenue.image_url,
+      photos: dbVenue.photos || [],
+      rating: dbVenue.rating,
+      price_range: dbVenue.price_range,
+      cuisine_type: dbVenue.cuisine_type
+    };
+  }
+  
+  // For temporary venue IDs, extract from AI data
+  if (invitation.venue_id?.startsWith('venue_')) {
+    return extractVenueFromAIData(invitation);
+  }
+  
+  // Fallback: extract from message
+  const extractedName = extractVenueFromMessage(invitation.message || '', 'Venue TBD');
+  return {
+    name: extractedName,
+    address: 'Address TBD',
+    image_url: undefined,
+    photos: []
+  };
 };
 
 export const useInvitations = () => {
@@ -68,214 +137,40 @@ export const useInvitations = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchInvitations = useCallback(async () => {
-    if (!user) {
-      console.log('🚨 FETCH INVITATIONS - No user, skipping fetch');
-      return;
-    }
+    if (!user) return;
 
-    console.log('🔄 FETCH INVITATIONS - Starting fetch for user:', user.id);
     setLoading(true);
     try {
-      // Fetch received invitations (where user is recipient)
-      const { data: receivedData, error: receivedError } = await supabase
-        .from('date_invitations')
-        .select(`
-          *,
-          sender:profiles!sender_id(name, email, avatar_url)
-        `)
-        .eq('recipient_id', user.id)
-        .order('created_at', { ascending: false });
+      // Fetch received and sent invitations in parallel
+      const [receivedResult, sentResult] = await Promise.all([
+        supabase
+          .from('date_invitations')
+          .select(`*, sender:profiles!sender_id(name, email, avatar_url)`)
+          .eq('recipient_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('date_invitations')
+          .select(`*, recipient:profiles!recipient_id(name, email, avatar_url)`)
+          .eq('sender_id', user.id)
+          .order('created_at', { ascending: false })
+      ]);
 
-      if (receivedError) throw receivedError;
+      if (receivedResult.error) throw receivedResult.error;
+      if (sentResult.error) throw sentResult.error;
 
-      // Fetch sent invitations (where user is sender)
-      const { data: sentData, error: sentError } = await supabase
-        .from('date_invitations')
-        .select(`
-          *,
-          recipient:profiles!recipient_id(name, email, avatar_url)
-        `)
-        .eq('sender_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (sentError) throw sentError;
-
-      console.log('✅ FETCH INVITATIONS - Success:', {
-        receivedCount: receivedData?.length || 0,
-        sentCount: sentData?.length || 0,
-        totalCount: (receivedData?.length || 0) + (sentData?.length || 0)
-      });
-
-      // Enrich and combine invitations with real venue data
-      const enrichedReceived = await Promise.all((receivedData || []).map(async invitation => {
-        let venue = null;
-        
-        if (invitation.venue_id) {
-          // First try to get from database
-          const { data: dbVenue } = await supabase
-            .from('venues')
-            .select('*')
-            .eq('id', invitation.venue_id)
-            .maybeSingle();
-            
-          if (dbVenue) {
-            venue = {
-              name: dbVenue.name,
-              address: dbVenue.address,
-              image_url: dbVenue.image_url,
-              photos: dbVenue.photos || [],
-              rating: dbVenue.rating,
-              price_range: dbVenue.price_range,
-              cuisine_type: dbVenue.cuisine_type
-            };
-          } else if (invitation.venue_id?.startsWith('venue_')) {
-            // For temporary venue IDs, try to extract venue data from AI reasoning or venue_match_factors
-            console.log('🔍 VENUE LOOKUP - Temporary venue ID found, extracting from AI data for:', invitation.venue_id);
-            
-            // Try to extract venue name from the message first as a fallback
-            const extractedNameFromMessage = extractVenueFromMessage(invitation.message || '', '');
-            console.log('🔍 VENUE LOOKUP - Extracted from message:', extractedNameFromMessage);
-            
-            const extractedName = extractedNameFromMessage || invitation.title || 'AI Recommended Venue';
-            
-            // Try to get venue data from venue_match_factors if available
-            let venuePhotos = [];
-            let venueImage = undefined;
-            let actualName = extractedName;
-            let actualAddress = 'AI Recommended Location';
-            
-            if (invitation.venue_match_factors) {
-              console.log('🎯 VENUE DATA - Extracting from venue_match_factors:', invitation.venue_match_factors);
-              const venueData = invitation.venue_match_factors;
-              
-              // Try different field names for venue name
-              actualName = venueData.venue_name || venueData.name || extractedName;
-              
-              // Try different field names for address  
-              actualAddress = venueData.venue_address || venueData.address || venueData.location || 'AI Recommended Location';
-              
-              // Try different field names for image
-              venueImage = venueData.venue_image || venueData.image_url || venueData.image;
-              
-              // Try different field names for photos
-              if (venueData.venue_photos && Array.isArray(venueData.venue_photos)) {
-                venuePhotos = venueData.venue_photos;
-              } else if (venueData.photos && Array.isArray(venueData.photos)) {
-                venuePhotos = venueData.photos;
-              }
-              
-              console.log('🎯 VENUE DATA - Extracted:', { actualName, actualAddress, venueImage, venuePhotos });
-            }
-            
-            venue = {
-              name: actualName,
-              address: actualAddress,
-              image_url: venueImage,
-              photos: venuePhotos
-            };
-          } else {
-            // If venue not in database, try to extract from message
-            const extractedName = extractVenueFromMessage(invitation.message || '', 'Venue TBD');
-            venue = {
-              name: extractedName,
-              address: 'Address TBD',
-              image_url: undefined,
-              photos: []
-            };
-          }
-        }
-        
-        return {
+      // Enrich invitations with venue data
+      const [enrichedReceived, enrichedSent] = await Promise.all([
+        Promise.all((receivedResult.data || []).map(async invitation => ({
           ...invitation,
           direction: 'received' as const,
-          venue
-        };
-      }));
-
-      const enrichedSent = await Promise.all((sentData || []).map(async invitation => {
-        let venue = null;
-        
-        if (invitation.venue_id) {
-          // First try to get from database
-          const { data: dbVenue } = await supabase
-            .from('venues')
-            .select('*')
-            .eq('id', invitation.venue_id)
-            .maybeSingle();
-            
-          if (dbVenue) {
-            venue = {
-              name: dbVenue.name,
-              address: dbVenue.address,
-              image_url: dbVenue.image_url,
-              photos: dbVenue.photos || [],
-              rating: dbVenue.rating,
-              price_range: dbVenue.price_range,
-              cuisine_type: dbVenue.cuisine_type
-            };
-          } else if (invitation.venue_id?.startsWith('venue_')) {
-            // For temporary venue IDs, try to extract venue data from AI reasoning or venue_match_factors
-            console.log('🔍 VENUE LOOKUP - Temporary venue ID found, extracting from AI data for:', invitation.venue_id);
-            
-            // Try to extract venue name from the message first as a fallback
-            const extractedNameFromMessage = extractVenueFromMessage(invitation.message || '', '');
-            console.log('🔍 VENUE LOOKUP - Extracted from message:', extractedNameFromMessage);
-            
-            const extractedName = extractedNameFromMessage || invitation.title || 'AI Recommended Venue';
-            
-            // Try to get venue data from venue_match_factors if available
-            let venuePhotos = [];
-            let venueImage = undefined;
-            let actualName = extractedName;
-            let actualAddress = 'AI Recommended Location';
-            
-            if (invitation.venue_match_factors) {
-              console.log('🎯 VENUE DATA - Extracting from venue_match_factors:', invitation.venue_match_factors);
-              const venueData = invitation.venue_match_factors;
-              
-              // Try different field names for venue name
-              actualName = venueData.venue_name || venueData.name || extractedName;
-              
-              // Try different field names for address  
-              actualAddress = venueData.venue_address || venueData.address || venueData.location || 'AI Recommended Location';
-              
-              // Try different field names for image
-              venueImage = venueData.venue_image || venueData.image_url || venueData.image;
-              
-              // Try different field names for photos
-              if (venueData.venue_photos && Array.isArray(venueData.venue_photos)) {
-                venuePhotos = venueData.venue_photos;
-              } else if (venueData.photos && Array.isArray(venueData.photos)) {
-                venuePhotos = venueData.photos;
-              }
-              
-              console.log('🎯 VENUE DATA - Extracted:', { actualName, actualAddress, venueImage, venuePhotos });
-            }
-            
-            venue = {
-              name: actualName,
-              address: actualAddress,
-              image_url: venueImage,
-              photos: venuePhotos
-            };
-          } else {
-            // If venue not in database, try to extract from message
-            const extractedName = extractVenueFromMessage(invitation.message || '', 'Venue TBD');
-            venue = {
-              name: extractedName,
-              address: 'Address TBD',
-              image_url: undefined,
-              photos: []
-            };
-          }
-        }
-        
-        return {
+          venue: await enrichInvitationWithVenue(invitation)
+        }))),
+        Promise.all((sentResult.data || []).map(async invitation => ({
           ...invitation,
           direction: 'sent' as const,
-          venue
-        };
-      }));
+          venue: await enrichInvitationWithVenue(invitation)
+        })))
+      ]);
 
       // Combine and sort by created_at
       const allInvitations = [...enrichedReceived, ...enrichedSent]
@@ -283,9 +178,8 @@ export const useInvitations = () => {
 
       setInvitations(allInvitations);
     } catch (error) {
-      console.error('🚨 FETCH INVITATIONS - Catch error:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      handleError(new Error(`Failed to load invitations: ${errorMessage}`), {
+      console.error('Failed to fetch invitations:', error);
+      handleError(new Error('Failed to load invitations'), {
         toastTitle: 'Failed to load invitations',
         toastDescription: 'Please try refreshing the page',
       });
@@ -296,27 +190,21 @@ export const useInvitations = () => {
 
   // Real-time subscription handlers
   const handleInvitationReceived = useCallback(() => {
-    console.log('🔔 REALTIME - New invitation received, refreshing list');
     fetchInvitations();
   }, [fetchInvitations]);
 
   const handleInvitationUpdated = useCallback(() => {
-    console.log('🔔 REALTIME - Invitation updated, refreshing list');
     fetchInvitations();
   }, [fetchInvitations]);
 
-  // Set up real-time subscriptions
   useRealtimeInvitations({
     onInvitationReceived: handleInvitationReceived,
     onInvitationUpdated: handleInvitationUpdated,
   });
 
   const acceptInvitation = async (invitationId: string) => {
-    console.log('✅ ACCEPT INVITATION - Starting for ID:', invitationId);
     try {
-      // Get invitation details for enhanced feedback
       const invitation = invitations.find(inv => inv.id === invitationId);
-      console.log('✅ ACCEPT INVITATION - Found invitation:', !!invitation);
       
       const { error } = await supabase
         .from('date_invitations')
@@ -324,7 +212,6 @@ export const useInvitations = () => {
         .eq('id', invitationId);
 
       if (error) {
-        console.error('🚨 ACCEPT INVITATION - Database error:', error);
         handleError(error, {
           toastTitle: 'Failed to accept invitation',
           toastDescription: 'Please try again',
@@ -332,18 +219,13 @@ export const useInvitations = () => {
         return;
       }
 
-      console.log('✅ ACCEPT INVITATION - Database update successful');
-
       // Update local state optimistically
       setInvitations(prev => 
         prev.map(inv => 
-          inv.id === invitationId 
-            ? { ...inv, status: 'accepted' as const }
-            : inv
+          inv.id === invitationId ? { ...inv, status: 'accepted' as const } : inv
         )
       );
 
-      // Create notification for sender about acceptance
       if (invitation?.sender_id) {
         await createNotificationForSender(invitation.sender_id, {
           type: 'invitation_accepted',
@@ -353,9 +235,7 @@ export const useInvitations = () => {
         });
       }
     } catch (error) {
-      console.error('🚨 ACCEPT INVITATION - Catch error:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      handleError(new Error(`Failed to accept invitation: ${errorMessage}`), {
+      handleError(new Error('Failed to accept invitation'), {
         toastTitle: 'Failed to accept invitation',
         toastDescription: 'Please try again',
       });
@@ -363,11 +243,8 @@ export const useInvitations = () => {
   };
 
   const declineInvitation = async (invitationId: string) => {
-    console.log('❌ DECLINE INVITATION - Starting for ID:', invitationId);
     try {
-      // Get invitation details for enhanced feedback
       const invitation = invitations.find(inv => inv.id === invitationId);
-      console.log('❌ DECLINE INVITATION - Found invitation:', !!invitation);
       
       const { error } = await supabase
         .from('date_invitations')
@@ -375,7 +252,6 @@ export const useInvitations = () => {
         .eq('id', invitationId);
 
       if (error) {
-        console.error('🚨 DECLINE INVITATION - Database error:', error);
         handleError(error, {
           toastTitle: 'Failed to decline invitation',
           toastDescription: 'Please try again',
@@ -383,30 +259,22 @@ export const useInvitations = () => {
         return;
       }
 
-      console.log('❌ DECLINE INVITATION - Database update successful');
-
-      // Update local state optimistically
       setInvitations(prev => 
         prev.map(inv => 
-          inv.id === invitationId 
-            ? { ...inv, status: 'declined' as const }
-            : inv
+          inv.id === invitationId ? { ...inv, status: 'declined' as const } : inv
         )
       );
 
-      // Create notification for sender about decline
       if (invitation?.sender_id) {
         await createNotificationForSender(invitation.sender_id, {
           type: 'invitation_declined',
-          message: `Your date invitation was declined. Don't worry, there are plenty of other opportunities!`,
+          message: `Your date invitation was declined.`,
           invitationId,
           venueName: invitation.venue?.name
         });
       }
     } catch (error) {
-      console.error('🚨 DECLINE INVITATION - Catch error:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      handleError(new Error(`Failed to decline invitation: ${errorMessage}`), {
+      handleError(new Error('Failed to decline invitation'), {
         toastTitle: 'Failed to decline invitation',
         toastDescription: 'Please try again',
       });
@@ -414,10 +282,8 @@ export const useInvitations = () => {
   };
 
   const cancelInvitation = async (invitationId: string) => {
-    console.log('🚫 CANCEL INVITATION - Starting for ID:', invitationId);
     try {
       const invitation = invitations.find(inv => inv.id === invitationId);
-      console.log('🚫 CANCEL INVITATION - Found invitation:', !!invitation);
       
       const { error } = await supabase
         .from('date_invitations')
@@ -425,7 +291,6 @@ export const useInvitations = () => {
         .eq('id', invitationId);
 
       if (error) {
-        console.error('🚨 CANCEL INVITATION - Database error:', error);
         handleError(error, {
           toastTitle: 'Failed to cancel date',
           toastDescription: 'Please try again',
@@ -433,18 +298,12 @@ export const useInvitations = () => {
         return;
       }
 
-      console.log('🚫 CANCEL INVITATION - Database update successful');
-
-      // Update local state optimistically
       setInvitations(prev => 
         prev.map(inv => 
-          inv.id === invitationId 
-            ? { ...inv, status: 'cancelled' as const }
-            : inv
+          inv.id === invitationId ? { ...inv, status: 'cancelled' as const } : inv
         )
       );
 
-      // Notify the other person about cancellation
       const otherPersonId = invitation?.sender_id === user?.id 
         ? invitation?.recipient_id 
         : invitation?.sender_id;
@@ -458,9 +317,7 @@ export const useInvitations = () => {
         });
       }
     } catch (error) {
-      console.error('🚨 CANCEL INVITATION - Catch error:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      handleError(new Error(`Failed to cancel date: ${errorMessage}`), {
+      handleError(new Error('Failed to cancel date'), {
         toastTitle: 'Failed to cancel date',
         toastDescription: 'Please try again',
       });
@@ -477,7 +334,7 @@ export const useInvitations = () => {
       ai_reasoning?: string;
       venue_match_factors?: any;
       planning_session_id?: string;
-      venue_data?: any; // Add venue data from AI recommendations
+      venue_data?: any;
     }
   ) => {
     if (!user) return false;
@@ -487,8 +344,6 @@ export const useInvitations = () => {
       
       // If we have venue data from AI recommendations, save it to database first
       if (aiData?.venue_data && venueId.startsWith('venue_')) {
-        console.log('🔄 SAVE VENUE - Saving AI venue to database:', aiData.venue_data.name);
-        
         const venueToSave = {
           name: aiData.venue_data.name || aiData.venue_data.venue_name || 'Unknown Venue',
           address: aiData.venue_data.address || aiData.venue_data.venue_address || aiData.venue_data.location || aiData.venue_data.vicinity || 'Address not available',
@@ -510,12 +365,8 @@ export const useInvitations = () => {
           .select('id')
           .single();
 
-        if (venueError) {
-          console.error('🚨 SAVE VENUE - Failed to save venue:', venueError);
-          // Continue with original venueId if save fails
-        } else {
+        if (!venueError && savedVenue) {
           finalVenueId = savedVenue.id;
-          console.log('✅ SAVE VENUE - Venue saved with ID:', finalVenueId);
         }
       }
 
@@ -544,14 +395,6 @@ export const useInvitations = () => {
         return false;
       }
 
-      // Get recipient info for notification
-      const { data: recipientData } = await supabase
-        .from('profiles')
-        .select('name')
-        .eq('id', recipientId)
-        .single();
-
-      // Create notification for recipient
       await createNotificationForRecipient(recipientId, {
         type: 'invitation_received',
         message: `You have a new date invitation from ${user.email?.split('@')[0] || 'a friend'}!`,
@@ -569,7 +412,6 @@ export const useInvitations = () => {
     }
   };
 
-  // Submit date feedback after a date
   const submitDateFeedback = async (
     invitationId: string, 
     rating: number,
@@ -613,18 +455,13 @@ export const useInvitations = () => {
     }
   };
 
-  // Helper function to create notifications for sender
+  // Placeholder notification helpers
   const createNotificationForSender = async (senderId: string, notification: any) => {
-    // This could be enhanced with a proper notifications table
-    // For now, we'll use real-time updates to show toasts
-    console.log('📬 Notification for sender:', senderId, notification);
+    console.log('Notification for sender:', senderId, notification.type);
   };
 
-  // Helper function to create notifications for recipient  
   const createNotificationForRecipient = async (recipientId: string, notification: any) => {
-    // This could be enhanced with a proper notifications table
-    // For now, we'll use real-time updates to show toasts
-    console.log('📬 Notification for recipient:', recipientId, notification);
+    console.log('Notification for recipient:', recipientId, notification.type);
   };
 
   useEffect(() => {
