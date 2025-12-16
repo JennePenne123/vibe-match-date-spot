@@ -4,6 +4,7 @@ import HomeHeader from '@/components/HomeHeader';
 import HomeContent from '@/components/HomeContent';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getUserName } from '@/utils/typeHelpers';
+import { safeFirstWord } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBreakpoint } from '@/hooks/use-mobile';
@@ -37,7 +38,7 @@ const Home: React.FC = () => {
     if (!user) return null;
     
     const displayName = getUserName(user);
-    const firstName = displayName.split(' ')[0];
+    const firstName = safeFirstWord(displayName, 'User');
     
     return { displayName, firstName };
   }, [user]);

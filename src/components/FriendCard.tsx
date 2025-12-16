@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageCircle, Calendar, Check, X } from 'lucide-react';
 import { Friend } from '@/types';
 import { Heading, Text } from '@/design-system/components';
+import { getInitials } from '@/lib/utils';
 
 interface FriendCardProps {
   friend: Friend;
@@ -24,8 +25,6 @@ const FriendCard = ({
   onToggleInvite,
   showActions = true 
 }: FriendCardProps) => {
-  const getInitials = (name: string) => 
-    name.split(' ').map(n => n[0]).join('');
 
   if (variant === 'compact') {
     return (

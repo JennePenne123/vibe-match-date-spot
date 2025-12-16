@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useFriends } from '@/hooks/useFriends';
+import { getInitials } from '@/lib/utils';
 
 const Friends = () => {
   const navigate = useNavigate();
@@ -158,7 +159,7 @@ const Friends = () => {
                       <Avatar className="w-12 h-12">
                         <AvatarImage src={friend.avatar_url} alt={friend.name} referrerPolicy="no-referrer" />
                         <AvatarFallback className="bg-primary/10 text-primary">
-                          {friend.name.split(' ').map(n => n[0]).join('')}
+                          {getInitials(friend.name)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">

@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/contexts/AuthContext'
 import { useInvitations } from '@/hooks/useInvitations'
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers'
+import { getInitials } from '@/lib/utils'
 
 const primaryNavItems = [
   {
@@ -99,7 +100,7 @@ export function AppSidebar() {
             <Avatar className="w-8 h-8 border border-sidebar-border">
               <AvatarImage src={userAvatar} alt={displayName} referrerPolicy="no-referrer" />
               <AvatarFallback className="bg-sidebar-accent text-sidebar-accent-foreground text-xs">
-                {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                {getInitials(displayName)}
               </AvatarFallback>
             </Avatar>
             {!isCollapsed && (

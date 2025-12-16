@@ -7,6 +7,7 @@ import { getUserAvatar, getFallbackAvatar } from '@/utils/typeHelpers';
 import { uploadAvatar, deleteAvatar } from '@/utils/avatarUpload';
 import { updateUserProfile } from '@/utils/userProfileHelpers';
 import { useToast } from '@/hooks/use-toast';
+import { getInitials } from '@/lib/utils';
 
 interface ProfileHeaderProps {
   user: any;
@@ -128,7 +129,7 @@ const ProfileHeader = ({
               }}
             />
             <AvatarFallback className="bg-primary/10 text-primary text-2xl">
-              {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
+              {getInitials(displayName)}
             </AvatarFallback>
           </Avatar>
           

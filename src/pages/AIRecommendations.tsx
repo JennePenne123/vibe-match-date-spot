@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sparkles, RefreshCw, Users, MapPin } from 'lucide-react';
 import { getUserName } from '@/utils/typeHelpers';
+import { safeFirstWord } from '@/lib/utils';
 
 const AIRecommendations: React.FC = () => {
   const { user } = useAuthRedirect();
@@ -33,7 +34,7 @@ const AIRecommendations: React.FC = () => {
     if (!user) return null;
     
     const displayName = getUserName(user);
-    const firstName = displayName.split(' ')[0];
+    const firstName = safeFirstWord(displayName, 'User');
     
     return { displayName, firstName };
   }, [user]);
