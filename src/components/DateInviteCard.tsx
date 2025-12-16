@@ -15,6 +15,7 @@ import { useInvitationMessages } from '@/hooks/useInvitationMessages';
 import { ErrorBoundaryWrapper } from '@/components/ErrorBoundary';
 import { useAuth } from '@/contexts/AuthContext';
 import { DateRatingPrompt } from '@/components/DateRatingPrompt';
+import { getInitials } from '@/lib/utils';
 interface DateInviteCardProps {
   invitation: DateInvitation;
   direction: 'received' | 'sent';
@@ -258,7 +259,7 @@ const DateInviteCard = ({
             <Avatar className="w-10 h-10 border-2 border-pink-200">
               <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} referrerPolicy="no-referrer" />
               <AvatarFallback className="bg-pink-100 text-pink-600">
-                {displayData.friendName.split(' ').map(n => n[0]).join('')}
+                {getInitials(displayData.friendName)}
               </AvatarFallback>
             </Avatar>
             <div>

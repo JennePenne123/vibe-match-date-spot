@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { Menu, User, Users, MapPin, LogOut, X, Heart } from 'lucide-react';
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers';
+import { getInitials } from '@/lib/utils';
 
 const BurgerMenu = () => {
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ const BurgerMenu = () => {
               <Avatar className="w-12 h-12 border-2 border-pink-200">
                 <AvatarImage src={getUserAvatar(user)} alt={displayName} referrerPolicy="no-referrer" />
                 <AvatarFallback className="bg-pink-100 text-pink-600">
-                  {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                  {getInitials(displayName)}
                 </AvatarFallback>
               </Avatar>
               <div>

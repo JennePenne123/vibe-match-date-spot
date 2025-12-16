@@ -4,6 +4,7 @@ import BurgerMenu from '@/components/BurgerMenu';
 import { PointsIndicator } from '@/components/profile/PointsIndicator';
 import { AppUser } from '@/types/app';
 import { getUserAvatar, getFallbackAvatar } from '@/utils/typeHelpers';
+import { getInitials } from '@/lib/utils';
 import { Heading } from '@/design-system/components';
 interface HomeHeaderProps {
   user: AppUser;
@@ -51,7 +52,7 @@ const HomeHeader = ({
             }}
           />
           <AvatarFallback className="bg-pink-100 text-pink-600 text-sm">
-            {displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
+            {getInitials(displayName)}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">

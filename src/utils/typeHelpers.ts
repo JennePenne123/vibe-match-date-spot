@@ -36,23 +36,25 @@ export const venueToAppVenue = (venue: Venue): AppVenue => {
 
 // Safe property getters
 export const getUserName = (user: any): string => {
-  return user?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+  const name = user?.name ?? user?.user_metadata?.name ?? user?.email?.split('@')[0];
+  return name ?? 'User';
 };
 
 export const getUserAvatar = (user: any): string | undefined => {
-  return user?.avatar_url || user?.user_metadata?.avatar_url;
+  return user?.avatar_url ?? user?.user_metadata?.avatar_url ?? undefined;
 };
 
-export const getFallbackAvatar = (name: string): string => {
+export const getFallbackAvatar = (name: string | null | undefined): string => {
   // Generate a fallback avatar using UI Avatars service
-  const encodedName = encodeURIComponent(name);
+  const safeName = name ?? 'User';
+  const encodedName = encodeURIComponent(safeName);
   return `https://ui-avatars.com/api/?name=${encodedName}&background=ffc0cb&color=fff&size=128&bold=true`;
 };
 
 export const getVenueDistance = (venue: any): string => {
-  return venue?.distance || '0.5 mi';
+  return venue?.distance ?? '0.5 mi';
 };
 
 export const getVenueMatchScore = (venue: any): number => {
-  return venue?.matchScore || Math.floor(Math.random() * 30) + 70;
+  return venue?.matchScore ?? Math.floor(Math.random() * 30) + 70;
 };

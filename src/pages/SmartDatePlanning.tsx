@@ -9,6 +9,7 @@ import HomeHeader from '@/components/HomeHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { getUserName } from '@/utils/typeHelpers';
+import { safeFirstWord } from '@/lib/utils';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
 
@@ -24,7 +25,7 @@ const SmartDatePlanning: React.FC = () => {
     
     try {
       const displayName = getUserName(user);
-      const firstName = displayName.split(' ')[0];
+      const firstName = safeFirstWord(displayName, 'User');
       return { displayName, firstName };
     } catch (error) {
       console.error('Error getting user name:', error);
