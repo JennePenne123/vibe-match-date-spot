@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { TEST_USERS } from './constants';
+import { TEST_USERS } from './userPreferencesSetup';
 
 export const createTestFriendships = async (currentUserId: string) => {
   try {

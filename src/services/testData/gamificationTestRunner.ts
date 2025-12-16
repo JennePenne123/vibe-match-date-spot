@@ -1,14 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
 import { createComprehensiveTestData } from './gamificationTestData';
 import { triggerCheckCompletedDates, triggerCalculateRewards } from './gamificationTestData';
+import type { TestPhaseResult } from './types';
 
-export interface TestPhaseResult {
-  phase: string;
-  success: boolean;
-  message: string;
-  data?: any;
-  duration?: number;
-}
+// Re-export for backward compatibility
+export type { TestPhaseResult } from './types';
 
 export interface TestRunResults {
   phases: TestPhaseResult[];
@@ -238,7 +234,7 @@ async function phase5_VerifyResults(): Promise<TestPhaseResult> {
 
     const totalRewards = rewards?.length || 0;
     const totalPoints = points?.reduce((sum, p) => sum + p.total_points, 0) || 0;
-    const totalBadges = points?.reduce((sum, p) => sum + (p.badges?.length || 0), 0) || 0;
+    const totalBadges = points?.reduce((sum, p) => sum + ((p.badges as unknown[])?.length || 0), 0) || 0;
 
     return {
       phase: 'Phase 5: Verify Results',
@@ -270,7 +266,7 @@ async function phase6_TestBadges(): Promise<TestPhaseResult> {
     let maxStreak = 0;
 
     points?.forEach(p => {
-      (p.badges || []).forEach((badge: any) => badgeTypes.add(badge.id));
+      ((p.badges as { id: string }[]) || []).forEach((badge) => badgeTypes.add(badge.id));
       maxStreak = Math.max(maxStreak, p.streak_count || 0);
     });
 
@@ -329,7 +325,7 @@ async function phase7_ValidatePoints(): Promise<TestPhaseResult> {
         totalPoints: userPoints.total_points, 
         level: userPoints.level,
         expectedLevel,
-        badges: userPoints.badges?.length || 0
+        badges: (userPoints.badges as unknown[])?.length || 0
       },
       duration: Date.now() - phaseStart
     };
@@ -357,7 +353,7 @@ async function generateSummary() {
     const totalFeedback = feedbackResult.data?.length || 0;
     const totalRewards = rewardsResult.data?.length || 0;
     const usersWithPoints = pointsResult.data?.length || 0;
-    const totalBadgesAwarded = pointsResult.data?.reduce((sum, p) => sum + (p.badges?.length || 0), 0) || 0;
+    const totalBadgesAwarded = pointsResult.data?.reduce((sum, p) => sum + ((p.badges as unknown[])?.length || 0), 0) || 0;
 
     return {
       totalDates,

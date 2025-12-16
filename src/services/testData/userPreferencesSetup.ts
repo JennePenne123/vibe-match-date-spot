@@ -1,4 +1,30 @@
 import { supabase } from '@/integrations/supabase/client';
+import type { TestUser } from './types';
+
+// Re-export for backward compatibility
+export type { TestUser } from './types';
+
+// Predefined test users (consolidated from constants.ts)
+export const TEST_USERS: TestUser[] = [
+  {
+    id: '11111111-1111-1111-1111-111111111111',
+    name: 'Sarah Johnson',
+    email: 'sarah@test.com',
+    avatar_url: 'https://ui-avatars.com/api/?name=Sarah+Johnson&background=ffc0cb&color=fff&size=128&bold=true'
+  },
+  {
+    id: '22222222-2222-2222-2222-222222222222',
+    name: 'Mike Chen',
+    email: 'mike@test.com',
+    avatar_url: 'https://ui-avatars.com/api/?name=Mike+Chen&background=ffc0cb&color=fff&size=128&bold=true'
+  },
+  {
+    id: '33333333-3333-3333-3333-333333333333',
+    name: 'Emma Wilson',
+    email: 'emma@test.com',
+    avatar_url: 'https://ui-avatars.com/api/?name=Emma+Wilson&background=ffc0cb&color=fff&size=128&bold=true'
+  }
+];
 
 // Create diverse test users with different preference profiles for comprehensive testing
 export const createDiverseTestUsers = async () => {
