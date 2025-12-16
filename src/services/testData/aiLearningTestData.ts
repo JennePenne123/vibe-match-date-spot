@@ -1,5 +1,8 @@
-import { supabase } from '@/integrations/supabase/client';
 import { learnFromFeedback, getAIInsights, getUserLearningData, getUserPreferenceVectors } from '@/services/aiLearningService';
+import type { TestPhaseResult } from './types';
+
+// Re-export for backward compatibility
+export type { TestPhaseResult } from './types';
 
 export interface TestFeedbackData {
   venueId: string;
@@ -9,14 +12,6 @@ export interface TestFeedbackData {
   venueRating?: number;
   aiAccuracyRating?: number;
   wouldRecommend?: boolean;
-}
-
-export interface TestPhaseResult {
-  phase: string;
-  success: boolean;
-  message: string;
-  duration: number;
-  data?: unknown;
 }
 
 export interface AILearningTestResults {

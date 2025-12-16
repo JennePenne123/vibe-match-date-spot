@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { updateJennePreferences } from '@/services/testData/preferenceService';
-import { setupMainTestUsers } from '@/services/testData/smartPlannerTestUtils';
+import { updateJennePreferences, setupMainTestUsers } from '@/services/testData/smartPlannerTestUtils';
 
 export const useTestDataSetup = () => {
   const { toast } = useToast();

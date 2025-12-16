@@ -1,12 +1,43 @@
-import { createTestFriendships, createOneMockFriend } from './friendshipService';
-import { createTestUserPreferences } from './preferenceService';
-import { createTestVenues } from './venueService';
+// Consolidated test data services
 
+// Re-export types
+export type { TestPhaseResult, TestUser, TestUserPreferences } from './types';
+
+// Re-export from friendshipService
+export { createTestFriendships, createOneMockFriend } from './friendshipService';
+
+// Re-export from smartPlannerTestUtils (includes merged preferenceService)
+export { 
+  createTestUserPreferences,
+  updateJennePreferences,
+  updateUserPreferences,
+  applyTestScenario,
+  resetToDefaultPreferences,
+  getTestUsers,
+  setupMainTestUsers,
+  TEST_SCENARIOS
+} from './smartPlannerTestUtils';
+
+// Re-export from userPreferencesSetup
+export { 
+  TEST_USERS,
+  createDiverseTestUsers, 
+  getTestUserInfo 
+} from './userPreferencesSetup';
+
+// Re-export from venueService (consolidated - uses enhanced 25+ venues dataset)
+export { createEnhancedTestVenues, createEnhancedTestVenues as createTestVenues } from './venueService';
+
+// Setup function for test environment
 export const setupTestEnvironment = async (currentUserId: string) => {
+  const { createTestFriendships } = await import('./friendshipService');
+  const { createTestUserPreferences } = await import('./smartPlannerTestUtils');
+  const { createEnhancedTestVenues } = await import('./venueService');
+  
   try {
     console.log('Setting up test environment...');
     
-    await createTestVenues();
+    await createEnhancedTestVenues();
     await createTestFriendships(currentUserId);
     await createTestUserPreferences(currentUserId);
     
@@ -17,10 +48,3 @@ export const setupTestEnvironment = async (currentUserId: string) => {
     throw error;
   }
 };
-
-// Re-export all functions for backward compatibility
-export { createTestFriendships, createOneMockFriend } from './friendshipService';
-export { createTestUserPreferences } from './preferenceService';
-export { createTestVenues } from './venueService';
-export { TEST_USERS } from './constants';
-export type { TestUser } from './constants';
