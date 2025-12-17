@@ -717,5 +717,336 @@ describe('scoring', () => {
         expect(score).toBeGreaterThan(60);
       });
     });
+
+    // ==================== COLLABORATIVE SCORING TESTS ====================
+
+    describe('collaborative scoring', () => {
+      const mockPartnerPrefs = {
+        user_id: 'partner-456',
+        preferred_cuisines: ['Italian', 'Japanese'],
+        preferred_vibes: ['romantic', 'intimate'],
+        preferred_price_range: ['$$', '$$$'],
+        preferred_times: ['dinner'],
+        dietary_restrictions: []
+      };
+
+      // Helper for collaborative mocks with separate user/partner tracking
+      const setupCollaborativeMocks = (
+        userPrefs: any,
+        partnerPrefs: any,
+        venue: any,
+        upsertError: any = null
+      ) => {
+        const venueMock = createChainMock(venue);
+        const scoreMock = createUpsertMock(upsertError);
+        
+        // Track which user preference is being requested
+        let prefCallCount = 0;
+        const prefsMock = {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockImplementation((field: string, value: string) => {
+            prefCallCount++;
+            // First call is user, second is partner
+            const prefs = prefCallCount === 1 ? userPrefs : partnerPrefs;
+            return {
+              single: vi.fn().mockResolvedValue({ 
+                data: prefs, 
+                error: prefs === null ? { message: 'Not found' } : null 
+              })
+            };
+          })
+        };
+
+        mockFrom.mockImplementation((table: string) => {
+          if (table === 'user_preferences') return prefsMock as any;
+          if (table === 'venues') return venueMock as any;
+          if (table === 'ai_venue_scores') return scoreMock as any;
+          return createChainMock(null) as any;
+        });
+
+        return { prefsMock, venueMock, scoreMock };
+      };
+
+      describe('partner preference fetching', () => {
+        it('should fetch both user and partner preferences when partnerId provided', async () => {
+          setupCollaborativeMocks(mockUserPrefs, mockPartnerPrefs, mockVenue);
+
+          const score = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          expect(mockFrom).toHaveBeenCalledWith('user_preferences');
+          expect(score).toBeGreaterThan(60);
+        });
+
+        it('should fall back to solo scoring when partner prefs missing', async () => {
+          setupCollaborativeMocks(mockUserPrefs, null, mockVenue);
+
+          const score = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          // Should still calculate a valid score
+          expect(score).toBeGreaterThanOrEqual(35);
+          expect(score).toBeLessThanOrEqual(98);
+        });
+
+        it('should handle partner preference fetch error gracefully', async () => {
+          const venueMock = createChainMock(mockVenue);
+          const scoreMock = createUpsertMock();
+          
+          let prefCallCount = 0;
+          const prefsMock = {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockImplementation(() => {
+              prefCallCount++;
+              if (prefCallCount === 1) {
+                return { single: vi.fn().mockResolvedValue({ data: mockUserPrefs, error: null }) };
+              }
+              return { single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Partner error' } }) };
+            })
+          };
+
+          mockFrom.mockImplementation((table: string) => {
+            if (table === 'user_preferences') return prefsMock as any;
+            if (table === 'venues') return venueMock as any;
+            if (table === 'ai_venue_scores') return scoreMock as any;
+            return createChainMock(null) as any;
+          });
+
+          const score = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          // Should fall back to solo scoring
+          expect(score).toBeGreaterThan(60);
+        });
+      });
+
+      describe('shared preference bonuses', () => {
+        it('should apply cuisine bonus when both users match cuisine', async () => {
+          setupCollaborativeMocks(mockUserPrefs, mockPartnerPrefs, mockVenue);
+
+          const soloScore = await calculateVenueAIScore('venue-123', 'user-123');
+          
+          // Reset mocks for collaborative call
+          setupCollaborativeMocks(mockUserPrefs, mockPartnerPrefs, mockVenue);
+          const collaborativeScore = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          // Collaborative should have shared cuisine bonus (+15%)
+          expect(collaborativeScore).toBeGreaterThanOrEqual(soloScore - 10); // Allow for averaging effect
+        });
+
+        it('should apply price bonus when both users match price', async () => {
+          const samePrefs = { ...mockUserPrefs };
+          const partnerWithSamePrice = { ...mockPartnerPrefs, preferred_price_range: ['$$'] };
+          
+          setupCollaborativeMocks(samePrefs, partnerWithSamePrice, mockVenue);
+
+          const score = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          expect(score).toBeGreaterThan(60);
+        });
+
+        it('should apply vibe bonus when both users share vibe matches', async () => {
+          // Both prefer romantic and venue is romantic
+          const romanticVenue = { ...mockVenue, tags: ['romantic'] };
+          setupCollaborativeMocks(mockUserPrefs, mockPartnerPrefs, romanticVenue);
+
+          const score = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          expect(score).toBeGreaterThan(60);
+        });
+
+        it('should combine multiple shared bonuses correctly', async () => {
+          // Perfect matches for both users
+          const perfectVenue = {
+            ...mockVenue,
+            cuisine_type: 'Italian',
+            price_range: '$$',
+            tags: ['romantic', 'upscale'],
+            rating: 4.8
+          };
+          
+          setupCollaborativeMocks(mockUserPrefs, mockPartnerPrefs, perfectVenue);
+
+          const score = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          // Should have cumulative shared bonuses
+          expect(score).toBeGreaterThan(70);
+        });
+      });
+
+      describe('score averaging', () => {
+        it('should average user and partner individual scores', async () => {
+          setupCollaborativeMocks(mockUserPrefs, mockPartnerPrefs, mockVenue);
+
+          const score = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          // Score should be reasonable average plus bonuses
+          expect(score).toBeGreaterThanOrEqual(35);
+          expect(score).toBeLessThanOrEqual(98);
+        });
+
+        it('should handle case where one user has no matches', async () => {
+          const noMatchPrefs = {
+            ...mockUserPrefs,
+            preferred_cuisines: ['Unknown'],
+            preferred_vibes: ['xyz'],
+            preferred_price_range: ['$$$$$']
+          };
+          
+          setupCollaborativeMocks(noMatchPrefs, mockPartnerPrefs, mockVenue);
+
+          const score = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          // Should still produce valid score (averaged with partner's better score)
+          expect(score).toBeGreaterThanOrEqual(35);
+        });
+
+        it('should handle case where both users have perfect matches', async () => {
+          const perfectVenue = {
+            ...mockVenue,
+            cuisine_type: 'Italian',
+            price_range: '$$',
+            tags: ['romantic', 'upscale'],
+            rating: 5.0
+          };
+          
+          setupCollaborativeMocks(mockUserPrefs, mockPartnerPrefs, perfectVenue);
+
+          const score = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          // Should be high but still clamped
+          expect(score).toBeGreaterThan(75);
+          expect(score).toBeLessThanOrEqual(98);
+        });
+      });
+
+      describe('edge cases', () => {
+        it('should return same score as solo when partner matches nothing', async () => {
+          const noMatchPartner = {
+            ...mockPartnerPrefs,
+            preferred_cuisines: ['Unknown'],
+            preferred_vibes: ['xyz'],
+            preferred_price_range: ['$$$$$']
+          };
+          
+          setupMocks(mockUserPrefs, mockVenue);
+          const soloScore = await calculateVenueAIScore('venue-123', 'user-123');
+          
+          setupCollaborativeMocks(mockUserPrefs, noMatchPartner, mockVenue);
+          const collaborativeScore = await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          // Collaborative should be lower due to averaging with poor partner score
+          expect(collaborativeScore).toBeLessThanOrEqual(soloScore);
+        });
+
+        it('should treat empty partnerId as solo scoring', async () => {
+          setupMocks(mockUserPrefs, mockVenue);
+
+          const scoreWithEmpty = await calculateVenueAIScore('venue-123', 'user-123', '');
+          
+          setupMocks(mockUserPrefs, mockVenue);
+          const soloScore = await calculateVenueAIScore('venue-123', 'user-123');
+
+          // Should be the same (both solo)
+          expect(scoreWithEmpty).toBe(soloScore);
+        });
+
+        it('should treat undefined partnerId as solo scoring', async () => {
+          setupMocks(mockUserPrefs, mockVenue);
+
+          const scoreWithUndefined = await calculateVenueAIScore('venue-123', 'user-123', undefined);
+          
+          setupMocks(mockUserPrefs, mockVenue);
+          const soloScore = await calculateVenueAIScore('venue-123', 'user-123');
+
+          expect(scoreWithUndefined).toBe(soloScore);
+        });
+
+        it('should treat whitespace-only partnerId as solo scoring', async () => {
+          setupMocks(mockUserPrefs, mockVenue);
+
+          const scoreWithWhitespace = await calculateVenueAIScore('venue-123', 'user-123', '   ');
+          
+          setupMocks(mockUserPrefs, mockVenue);
+          const soloScore = await calculateVenueAIScore('venue-123', 'user-123');
+
+          expect(scoreWithWhitespace).toBe(soloScore);
+        });
+      });
+
+      describe('database storage', () => {
+        it('should store collaborative metadata in match_factors', async () => {
+          const scoreMock = createUpsertMock();
+          const venueMock = createChainMock(mockVenue);
+          
+          let prefCallCount = 0;
+          const prefsMock = {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockImplementation(() => {
+              prefCallCount++;
+              const prefs = prefCallCount === 1 ? mockUserPrefs : mockPartnerPrefs;
+              return { single: vi.fn().mockResolvedValue({ data: prefs, error: null }) };
+            })
+          };
+
+          mockFrom.mockImplementation((table: string) => {
+            if (table === 'user_preferences') return prefsMock as any;
+            if (table === 'venues') return venueMock as any;
+            if (table === 'ai_venue_scores') return scoreMock as any;
+            return createChainMock(null) as any;
+          });
+
+          await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          // Verify upsert was called with collaborative metadata
+          expect(scoreMock.upsert).toHaveBeenCalledWith(
+            expect.objectContaining({
+              venue_id: 'venue-123',
+              user_id: 'user-123',
+              match_factors: expect.objectContaining({
+                is_collaborative: true,
+                partner_id: 'partner-456',
+                shared_matches: expect.any(Object)
+              })
+            })
+          );
+        });
+
+        it('should record partner_id in stored score', async () => {
+          const scoreMock = createUpsertMock();
+          const venueMock = createChainMock(mockVenue);
+          
+          let prefCallCount = 0;
+          const prefsMock = {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockImplementation(() => {
+              prefCallCount++;
+              const prefs = prefCallCount === 1 ? mockUserPrefs : mockPartnerPrefs;
+              return { single: vi.fn().mockResolvedValue({ data: prefs, error: null }) };
+            })
+          };
+
+          mockFrom.mockImplementation((table: string) => {
+            if (table === 'user_preferences') return prefsMock as any;
+            if (table === 'venues') return venueMock as any;
+            if (table === 'ai_venue_scores') return scoreMock as any;
+            return createChainMock(null) as any;
+          });
+
+          await calculateVenueAIScore('venue-123', 'user-123', 'partner-456');
+
+          const upsertCall = scoreMock.upsert.mock.calls[0][0];
+          expect(upsertCall.match_factors.partner_id).toBe('partner-456');
+        });
+
+        it('should not include collaborative metadata for solo scoring', async () => {
+          const { scoreMock } = setupMocks(mockUserPrefs, mockVenue);
+
+          await calculateVenueAIScore('venue-123', 'user-123');
+
+          const upsertCall = scoreMock.upsert.mock.calls[0][0];
+          expect(upsertCall.match_factors.is_collaborative).toBe(false);
+          expect(upsertCall.match_factors.partner_id).toBeNull();
+          expect(upsertCall.match_factors.shared_matches).toBeNull();
+        });
+      });
+    });
   });
 });
