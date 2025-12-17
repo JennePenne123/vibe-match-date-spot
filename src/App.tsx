@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationSystem from "./components/NotificationSystem";
 import PushNotificationPrompt from "./components/PushNotificationPrompt";
 import AppLayout from "./components/AppLayout";
+import LoadingSpinner from "./components/LoadingSpinner";
 import Onboarding from "./pages/Onboarding";
 import RegisterLogin from "./pages/RegisterLogin";
 import Home from "./pages/Home";
@@ -25,16 +27,25 @@ import Invitations from "./pages/Invitations";
 import NotFound from "./pages/NotFound";
 import AIRecommendations from "./pages/AIRecommendations";
 import SmartDatePlanning from "./pages/SmartDatePlanning";
-import AIVenueCardDemo from "./pages/AIVenueCardDemo";
-import PremiumDesignSystemDemo from "./pages/PremiumDesignSystemDemo";
-import Debug from "./pages/Debug";
-import RatingDemo from "./pages/RatingDemo";
 import Landing from "./pages/Landing";
 import PartnerDashboard from "./pages/partner/Dashboard";
 import PartnerVouchers from "./pages/partner/Vouchers";
 import PartnerVenues from "./pages/partner/Venues";
-import ShareholderReport from "./pages/ShareholderReport";
 import AIInsights from "./pages/AIInsights";
+
+// Lazy load demo/debug routes (rarely visited, ~1,133 lines)
+const Debug = lazy(() => import("./pages/Debug"));
+const ShareholderReport = lazy(() => import("./pages/ShareholderReport"));
+const AIVenueCardDemo = lazy(() => import("./pages/AIVenueCardDemo"));
+const PremiumDesignSystemDemo = lazy(() => import("./pages/PremiumDesignSystemDemo"));
+const RatingDemo = lazy(() => import("./pages/RatingDemo"));
+
+// Suspense fallback for lazy routes
+const LazyFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <LoadingSpinner size="lg" text="Loading..." />
+  </div>
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -92,19 +103,39 @@ const App = () => (
                     <Route path="/ai-insights" element={<AppLayout><AIInsights /></AppLayout>} />
                     <Route path="/plan-date" element={<AppLayout><SmartDatePlanning /></AppLayout>} />
                     
-                    {/* Debug route */}
-                    <Route path="/debug" element={<AppLayout><Debug /></AppLayout>} />
+                    {/* Debug route - lazy loaded */}
+                    <Route path="/debug" element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <AppLayout><Debug /></AppLayout>
+                      </Suspense>
+                    } />
                     
                     {/* Partner Routes */}
                     <Route path="/partner" element={<AppLayout><PartnerDashboard /></AppLayout>} />
                     <Route path="/partner/vouchers" element={<AppLayout><PartnerVouchers /></AppLayout>} />
                     <Route path="/partner/venues" element={<AppLayout><PartnerVenues /></AppLayout>} />
                     
-                    {/* Demo routes without layout */}
-                    <Route path="/demo/ai-venue-card" element={<AIVenueCardDemo />} />
-                    <Route path="/demo/premium-design-system" element={<PremiumDesignSystemDemo />} />
-                    <Route path="/demo/rating" element={<RatingDemo />} />
-                    <Route path="/shareholder-report" element={<ShareholderReport />} />
+                    {/* Demo routes - lazy loaded */}
+                    <Route path="/demo/ai-venue-card" element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <AIVenueCardDemo />
+                      </Suspense>
+                    } />
+                    <Route path="/demo/premium-design-system" element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <PremiumDesignSystemDemo />
+                      </Suspense>
+                    } />
+                    <Route path="/demo/rating" element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <RatingDemo />
+                      </Suspense>
+                    } />
+                    <Route path="/shareholder-report" element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <ShareholderReport />
+                      </Suspense>
+                    } />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </ErrorBoundary>
