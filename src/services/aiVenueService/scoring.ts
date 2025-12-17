@@ -1,15 +1,129 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
 
+// Calculate individual user score based on preferences
+const calculateUserScore = (
+  userPrefs: any,
+  venue: any,
+  weights: { cuisine: number; price: number; vibe: number; rating: number; time: number }
+): { score: number; matches: { cuisine: boolean; price: boolean; vibes: string[] } } => {
+  let score = 0.6; // Start with baseline (60%)
+  const matches = { cuisine: false, price: false, vibes: [] as string[] };
+
+  // Cuisine matching with learned weight
+  if (userPrefs.preferred_cuisines && venue.cuisine_type) {
+    const userCuisines = userPrefs.preferred_cuisines.map((c: string) => c.toLowerCase());
+    const venueCuisine = venue.cuisine_type.toLowerCase();
+    
+    let cuisineMatch = userCuisines.includes(venueCuisine);
+    
+    if (!cuisineMatch) {
+      cuisineMatch = userCuisines.some((userCuisine: string) => 
+        venueCuisine.includes(userCuisine) || userCuisine.includes(venueCuisine)
+      );
+    }
+    
+    matches.cuisine = cuisineMatch;
+    const cuisineScore = cuisineMatch ? 0.25 : -0.05;
+    score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
+  }
+
+  // Price range matching with learned weight
+  if (userPrefs.preferred_price_range && venue.price_range) {
+    const priceMatch = userPrefs.preferred_price_range.includes(venue.price_range);
+    
+    if (priceMatch) {
+      matches.price = true;
+      const priceScore = 0.15;
+      score += applyWeight(priceScore, weights.price, 'price');
+    }
+  }
+
+  // Vibe matching with learned weight
+  if (userPrefs.preferred_vibes && venue.tags && venue.tags.length > 0) {
+    const vibeMatches = userPrefs.preferred_vibes.filter((vibe: string) => 
+      venue.tags.some((tag: string) => 
+        tag.toLowerCase().includes(vibe.toLowerCase()) ||
+        vibe.toLowerCase().includes(tag.toLowerCase())
+      )
+    );
+    
+    // Infer vibes if no direct matches
+    if (vibeMatches.length === 0) {
+      if (userPrefs.preferred_vibes.includes('romantic')) {
+        if (venue.price_range === '$$$' || venue.price_range === '$$$$' || 
+            venue.cuisine_type?.toLowerCase().includes('fine') ||
+            venue.cuisine_type?.toLowerCase().includes('italian') ||
+            venue.cuisine_type?.toLowerCase().includes('french')) {
+          vibeMatches.push('romantic (inferred)');
+        }
+      }
+      
+      if (userPrefs.preferred_vibes.includes('casual')) {
+        if (venue.price_range === '$' || venue.price_range === '$$') {
+          vibeMatches.push('casual (inferred)');
+        }
+      }
+    }
+    
+    matches.vibes = vibeMatches;
+    const vibeScore = vibeMatches.length * 0.1;
+    score += applyWeight(vibeScore, weights.vibe, 'vibe');
+  }
+
+  // Rating bonus with learned weight
+  if (venue.rating) {
+    const ratingBonus = Math.min((venue.rating - 3.0) * 0.05, 0.1);
+    score += applyWeight(ratingBonus, weights.rating, 'rating');
+  }
+
+  return { score, matches };
+};
+
+// Calculate shared preference bonus for collaborative scoring
+const calculateSharedBonus = (
+  userMatches: { cuisine: boolean; price: boolean; vibes: string[] },
+  partnerMatches: { cuisine: boolean; price: boolean; vibes: string[] }
+): { bonus: number; sharedMatches: { cuisine: boolean; price: boolean; vibes: string[] } } => {
+  let bonus = 0;
+  const sharedMatches = { cuisine: false, price: false, vibes: [] as string[] };
+
+  // Both users match cuisine: +15% bonus
+  if (userMatches.cuisine && partnerMatches.cuisine) {
+    bonus += 0.15;
+    sharedMatches.cuisine = true;
+  }
+
+  // Both users match price: +10% bonus
+  if (userMatches.price && partnerMatches.price) {
+    bonus += 0.10;
+    sharedMatches.price = true;
+  }
+
+  // Both users share vibe matches: +10% per shared vibe
+  const userVibeSet = new Set(userMatches.vibes.map(v => v.toLowerCase().replace(' (inferred)', '')));
+  const partnerVibeSet = new Set(partnerMatches.vibes.map(v => v.toLowerCase().replace(' (inferred)', '')));
+  
+  for (const vibe of userVibeSet) {
+    if (partnerVibeSet.has(vibe)) {
+      bonus += 0.10;
+      sharedMatches.vibes.push(vibe);
+    }
+  }
+
+  return { bonus, sharedMatches };
+};
+
 export const calculateVenueAIScore = async (
   venueId: string,
   userId: string,
   partnerId?: string
 ): Promise<number> => {
   try {
-    console.log('🧮 SCORING: Starting AI score calculation for venue:', venueId, 'user:', userId);
+    const isCollaborative = partnerId && partnerId.trim() !== '';
+    console.log('🧮 SCORING: Starting AI score calculation for venue:', venueId, 'user:', userId, isCollaborative ? `partner: ${partnerId}` : '(solo)');
 
-    // Fetch user preferences and learned weights in parallel
+    // Fetch user preferences and learned weights
     const [prefsResult, learnedWeights] = await Promise.all([
       supabase
         .from('user_preferences')
@@ -18,6 +132,16 @@ export const calculateVenueAIScore = async (
         .single(),
       getUserLearnedWeights(userId)
     ]);
+
+    // Fetch partner preferences separately if collaborative
+    let partnerPrefsResult = null;
+    if (isCollaborative) {
+      partnerPrefsResult = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', partnerId)
+        .single();
+    }
 
     const { data: userPrefs, error: prefsError } = prefsResult;
 
@@ -29,6 +153,16 @@ export const calculateVenueAIScore = async (
     if (!userPrefs) {
       console.warn('⚠️ SCORING: No user preferences found, using default score');
       return 50;
+    }
+
+    // Handle partner preferences (graceful fallback to solo scoring)
+    let partnerPrefs = null;
+    if (isCollaborative && partnerPrefsResult) {
+      if (partnerPrefsResult.error) {
+        console.warn('⚠️ SCORING: Error fetching partner preferences, falling back to solo scoring:', partnerPrefsResult.error);
+      } else {
+        partnerPrefs = partnerPrefsResult.data;
+      }
     }
 
     // Get venue data
@@ -61,116 +195,41 @@ export const calculateVenueAIScore = async (
       priceRange: userPrefs.preferred_price_range
     });
 
+    if (partnerPrefs) {
+      console.log('👥 SCORING: Partner preferences:', {
+        cuisines: partnerPrefs.preferred_cuisines,
+        vibes: partnerPrefs.preferred_vibes,
+        priceRange: partnerPrefs.preferred_price_range
+      });
+    }
+
     if (learnedWeights.hasLearningData) {
       console.log('🧠 SCORING: Using learned weights:', learnedWeights.weights);
     }
 
-    // Calculate base match score with learned weights applied
-    let baseScore = 0.6; // Start with baseline (60%)
     const weights = learnedWeights.weights;
 
-    console.log('🔍 SCORING: Starting with base score of 60%');
+    // Calculate user score
+    const userResult = calculateUserScore(userPrefs, venue, weights);
+    let baseScore = userResult.score;
+    let sharedMatches = null;
 
-    // Cuisine matching with learned weight
-    if (userPrefs.preferred_cuisines && venue.cuisine_type) {
-      const userCuisines = userPrefs.preferred_cuisines.map((c: string) => c.toLowerCase());
-      const venueCuisine = venue.cuisine_type.toLowerCase();
+    // Calculate collaborative score if partner preferences available
+    if (partnerPrefs) {
+      const partnerResult = calculateUserScore(partnerPrefs, venue, weights);
+      const sharedResult = calculateSharedBonus(userResult.matches, partnerResult.matches);
       
-      let cuisineMatch = userCuisines.includes(venueCuisine);
+      // Average scores and add shared bonus
+      baseScore = (userResult.score + partnerResult.score) / 2 + sharedResult.bonus;
+      sharedMatches = sharedResult.sharedMatches;
       
-      if (!cuisineMatch) {
-        cuisineMatch = userCuisines.some((userCuisine: string) => 
-          venueCuisine.includes(userCuisine) || userCuisine.includes(venueCuisine)
-        );
-      }
-      
-      const cuisineScore = cuisineMatch ? 0.25 : -0.05;
-      const weightedCuisineScore = applyWeight(cuisineScore, weights.cuisine, 'cuisine');
-      
-      console.log('🍽️ SCORING: Cuisine matching:', { 
-        userCuisines, 
-        venueCuisine, 
-        match: cuisineMatch,
-        baseScore: `${cuisineScore > 0 ? '+' : ''}${Math.round(cuisineScore * 100)}%`,
-        weightedScore: `${weightedCuisineScore > 0 ? '+' : ''}${Math.round(weightedCuisineScore * 100)}%`
+      console.log('🤝 SCORING: Collaborative scoring:', {
+        userScore: `${Math.round(userResult.score * 100)}%`,
+        partnerScore: `${Math.round(partnerResult.score * 100)}%`,
+        sharedBonus: `+${Math.round(sharedResult.bonus * 100)}%`,
+        combinedScore: `${Math.round(baseScore * 100)}%`,
+        sharedMatches: sharedResult.sharedMatches
       });
-      
-      baseScore += weightedCuisineScore;
-    }
-
-    // Price range matching with learned weight
-    if (userPrefs.preferred_price_range && venue.price_range) {
-      const priceMatch = userPrefs.preferred_price_range.includes(venue.price_range);
-      
-      if (priceMatch) {
-        const priceScore = 0.15;
-        const weightedPriceScore = applyWeight(priceScore, weights.price, 'price');
-        
-        console.log('💰 SCORING: Price matching:', { 
-          userPrefs: userPrefs.preferred_price_range, 
-          venue: venue.price_range, 
-          match: true,
-          baseScore: `+${Math.round(priceScore * 100)}%`,
-          weightedScore: `+${Math.round(weightedPriceScore * 100)}%`
-        });
-        
-        baseScore += weightedPriceScore;
-      }
-    }
-
-    // Vibe matching with learned weight
-    if (userPrefs.preferred_vibes && venue.tags && venue.tags.length > 0) {
-      const vibeMatches = userPrefs.preferred_vibes.filter((vibe: string) => 
-        venue.tags.some((tag: string) => 
-          tag.toLowerCase().includes(vibe.toLowerCase()) ||
-          vibe.toLowerCase().includes(tag.toLowerCase())
-        )
-      );
-      
-      // Infer vibes if no direct matches
-      if (vibeMatches.length === 0) {
-        if (userPrefs.preferred_vibes.includes('romantic')) {
-          if (venue.price_range === '$$$' || venue.price_range === '$$$$' || 
-              venue.cuisine_type?.toLowerCase().includes('fine') ||
-              venue.cuisine_type?.toLowerCase().includes('italian') ||
-              venue.cuisine_type?.toLowerCase().includes('french')) {
-            vibeMatches.push('romantic (inferred)');
-          }
-        }
-        
-        if (userPrefs.preferred_vibes.includes('casual')) {
-          if (venue.price_range === '$' || venue.price_range === '$$') {
-            vibeMatches.push('casual (inferred)');
-          }
-        }
-      }
-      
-      const vibeScore = vibeMatches.length * 0.1;
-      const weightedVibeScore = applyWeight(vibeScore, weights.vibe, 'vibe');
-      
-      console.log('🎭 SCORING: Vibe matching:', { 
-        userVibes: userPrefs.preferred_vibes, 
-        venueTags: venue.tags, 
-        matches: vibeMatches,
-        baseScore: `+${Math.round(vibeScore * 100)}%`,
-        weightedScore: `+${Math.round(weightedVibeScore * 100)}%`
-      });
-      
-      baseScore += weightedVibeScore;
-    }
-
-    // Rating bonus with learned weight
-    if (venue.rating) {
-      const ratingBonus = Math.min((venue.rating - 3.0) * 0.05, 0.1);
-      const weightedRatingBonus = applyWeight(ratingBonus, weights.rating, 'rating');
-      
-      console.log('⭐ SCORING: Rating bonus:', {
-        rating: venue.rating,
-        baseBonus: `+${Math.round(ratingBonus * 100)}%`,
-        weightedBonus: `+${Math.round(weightedRatingBonus * 100)}%`
-      });
-      
-      baseScore += weightedRatingBonus;
     }
 
     // Calculate contextual factors with time weight
@@ -191,19 +250,21 @@ export const calculateVenueAIScore = async (
       confidenceBoost: `+${Math.round(confidenceBoost * 100)}%`,
       finalScore: `${Math.round(finalScore)}%`,
       learningApplied: learnedWeights.hasLearningData,
-      aiAccuracy: learnedWeights.aiAccuracy
+      aiAccuracy: learnedWeights.aiAccuracy,
+      isCollaborative: !!partnerPrefs
     });
 
     // Store the AI score with learning metadata
     const matchFactors = {
-      cuisine_match: userPrefs.preferred_cuisines?.includes(venue.cuisine_type) || false,
-      price_match: userPrefs.preferred_price_range?.includes(venue.price_range) || false,
-      vibe_matches: userPrefs.preferred_vibes?.filter((vibe: string) => 
-        venue.tags?.some((tag: string) => tag.toLowerCase().includes(vibe.toLowerCase()))
-      ) || [],
+      cuisine_match: userResult.matches.cuisine,
+      price_match: userResult.matches.price,
+      vibe_matches: userResult.matches.vibes,
       rating_bonus: venue.rating ? Math.min((venue.rating - 3.5) * 0.1, 0.15) : 0,
       learned_weights_applied: learnedWeights.hasLearningData,
-      weight_multipliers: learnedWeights.hasLearningData ? learnedWeights.weights : null
+      weight_multipliers: learnedWeights.hasLearningData ? learnedWeights.weights : null,
+      is_collaborative: !!partnerPrefs,
+      partner_id: partnerPrefs ? partnerId : null,
+      shared_matches: sharedMatches
     };
 
     const { error: insertError } = await supabase
