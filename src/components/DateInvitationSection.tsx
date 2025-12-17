@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useInvitations } from '@/hooks/useInvitations';
-import DateInviteCard from '@/components/DateInviteCard';
+import { DateInviteCard } from '@/components/date-invite';
 import { useToast } from '@/hooks/use-toast';
 import { DateInvitation } from '@/types/index';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
