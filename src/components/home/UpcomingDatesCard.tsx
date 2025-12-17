@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Heart, ArrowRight, Calendar } from 'lucide-react';
 import { useInvitations } from '@/hooks/useInvitations';
-import DateInviteCard from '@/components/DateInviteCard';
+import { DateInviteCard } from '@/components/date-invite';
 import { DateInvitation } from '@/types/index';
 
 const UpcomingDatesCard: React.FC = () => {

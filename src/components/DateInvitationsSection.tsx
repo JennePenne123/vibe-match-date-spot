@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Plus, Users } from 'lucide-react';
-import DateInviteCard from '@/components/DateInviteCard';
+import { DateInviteCard } from '@/components/date-invite';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import { DateInvitation } from '@/types/index';
 
