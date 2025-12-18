@@ -4,7 +4,6 @@ export const createEnhancedTestVenues = async () => {
   try {
     console.log('Creating enhanced test venue dataset (25+ venues)...');
     
-    // Hamburg coordinates for location-based testing
     const hamburgLat = 53.5511;
     const hamburgLng = 9.9937;
     
@@ -49,7 +48,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng - 0.001,
         is_active: true
       },
-
       // CASUAL AMERICAN PLACES ($ - $$)
       {
         id: 'casual-american-01',
@@ -77,7 +75,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng + 0.003,
         is_active: true
       },
-
       // TRENDY ASIAN RESTAURANTS ($$ - $$$)
       {
         id: 'trendy-asian-01',
@@ -118,7 +115,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng - 0.003,
         is_active: true
       },
-
       // VEGETARIAN/VEGAN OPTIONS
       {
         id: 'vegan-01',
@@ -146,7 +142,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng - 0.004,
         is_active: true
       },
-
       // FRENCH CUISINE ($$$)
       {
         id: 'french-01',
@@ -174,7 +169,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng + 0.004,
         is_active: true
       },
-
       // MEXICAN CUISINE ($ - $$)
       {
         id: 'mexican-01',
@@ -202,7 +196,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng - 0.003,
         is_active: true
       },
-
       // THAI CUISINE ($$ - $$$)
       {
         id: 'thai-01',
@@ -230,7 +223,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng + 0.001,
         is_active: true
       },
-
       // SEAFOOD RESTAURANTS ($$ - $$$$)
       {
         id: 'seafood-01',
@@ -258,7 +250,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng + 0.002,
         is_active: true
       },
-
       // INDIAN CUISINE ($$ - $$$)
       {
         id: 'indian-01',
@@ -286,7 +277,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng + 0.001,
         is_active: true
       },
-
       // STEAKHOUSES ($$$$ - $$$$)
       {
         id: 'steakhouse-01',
@@ -314,7 +304,6 @@ export const createEnhancedTestVenues = async () => {
         longitude: hamburgLng + 0.002,
         is_active: true
       },
-
       // FUSION RESTAURANTS ($$ - $$$)
       {
         id: 'fusion-01',
@@ -346,7 +335,6 @@ export const createEnhancedTestVenues = async () => {
 
     console.log(`Preparing to create ${venues.length} test venues...`);
     
-    // Use security definer function to create venues (bypasses RLS)
     const { error } = await supabase.rpc('create_test_venues', {
       venues_data: venues
     });
@@ -363,3 +351,6 @@ export const createEnhancedTestVenues = async () => {
     throw error;
   }
 };
+
+// Alias for backward compatibility
+export const createTestVenues = createEnhancedTestVenues;

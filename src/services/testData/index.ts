@@ -1,38 +1,54 @@
 // Consolidated test data services
 
-// Re-export types
+// Types
 export type { TestPhaseResult, TestUser, TestUserPreferences } from './types';
 
-// Re-export from friendshipService
-export { createTestFriendships, createOneMockFriend } from './friendshipService';
+// Friendships
+export { createTestFriendships, createOneMockFriend } from './friendships';
 
-// Re-export from smartPlannerTestUtils (includes merged preferenceService)
+// Preferences (consolidated from userPreferencesSetup + smartPlannerTestUtils)
 export { 
+  TEST_USERS,
+  TEST_SCENARIOS,
+  createDiverseTestUsers,
+  getTestUserInfo,
   createTestUserPreferences,
-  updateJennePreferences,
   updateUserPreferences,
   applyTestScenario,
   resetToDefaultPreferences,
   getTestUsers,
   setupMainTestUsers,
-  TEST_SCENARIOS
-} from './smartPlannerTestUtils';
+  updateJennePreferences
+} from './preferences';
 
-// Re-export from userPreferencesSetup
+// Gamification (consolidated from gamificationTestData + gamificationTestRunner)
 export { 
-  TEST_USERS,
-  createDiverseTestUsers, 
-  getTestUserInfo 
-} from './userPreferencesSetup';
+  createGamificationTestData,
+  createComprehensiveTestData,
+  triggerCheckCompletedDates,
+  triggerCalculateRewards,
+  initializeUserPoints,
+  runFullGamificationTest
+} from './gamification';
+export type { TestRunResults } from './gamification';
 
-// Re-export from venueService (consolidated - uses enhanced 25+ venues dataset)
-export { createEnhancedTestVenues, createEnhancedTestVenues as createTestVenues } from './venueService';
+// AI Learning
+export { 
+  runAILearningTest,
+  testSingleFeedback,
+  createMockFeedbackData,
+  createMultipleFeedbackEntries
+} from './aiLearning';
+export type { AILearningTestResults, TestFeedbackData } from './aiLearning';
+
+// Venues
+export { createEnhancedTestVenues, createTestVenues } from './venues';
 
 // Setup function for test environment
 export const setupTestEnvironment = async (currentUserId: string) => {
-  const { createTestFriendships } = await import('./friendshipService');
-  const { createTestUserPreferences } = await import('./smartPlannerTestUtils');
-  const { createEnhancedTestVenues } = await import('./venueService');
+  const { createTestFriendships } = await import('./friendships');
+  const { createTestUserPreferences } = await import('./preferences');
+  const { createEnhancedTestVenues } = await import('./venues');
   
   try {
     console.log('Setting up test environment...');
