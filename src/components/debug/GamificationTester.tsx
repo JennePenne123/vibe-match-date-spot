@@ -8,9 +8,10 @@ import {
   createGamificationTestData,
   createComprehensiveTestData,
   triggerCheckCompletedDates, 
-  triggerCalculateRewards 
-} from '@/services/testData/gamificationTestData';
-import { runFullGamificationTest, type TestRunResults } from '@/services/testData/gamificationTestRunner';
+  triggerCalculateRewards,
+  runFullGamificationTest,
+  type TestRunResults
+} from '@/services/testData/gamification';
 
 export const GamificationTester: React.FC = () => {
   const [loading, setLoading] = useState(false);

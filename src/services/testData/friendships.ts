@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { TEST_USERS } from './userPreferencesSetup';
+import { TEST_USERS } from './preferences';
 
 export const createTestFriendships = async (currentUserId: string) => {
   try {
@@ -32,8 +32,7 @@ export const createOneMockFriend = async (currentUserId: string) => {
   try {
     console.log('Creating one mock friend for user:', currentUserId);
     
-    // First create the test user profile if it doesn't exist
-    const testUser = TEST_USERS[0]; // Use Sarah Johnson
+    const testUser = TEST_USERS[0];
     console.log('Creating profile for:', testUser.name, testUser.id);
     
     const { data: profileData, error: profileError } = await supabase
@@ -53,7 +52,6 @@ export const createOneMockFriend = async (currentUserId: string) => {
     
     console.log('Profile created/updated:', profileData);
 
-    // Check if friendship already exists
     const { data: existingFriendship } = await supabase
       .from('friendships')
       .select('id, status')
@@ -65,7 +63,6 @@ export const createOneMockFriend = async (currentUserId: string) => {
       return true;
     }
 
-    // Create the friendship
     console.log('Creating friendship between:', currentUserId, 'and', testUser.id);
     const { data: friendshipData, error: friendshipError } = await supabase
       .from('friendships')

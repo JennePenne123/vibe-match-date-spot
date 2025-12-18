@@ -11,7 +11,7 @@ import {
   setupMainTestUsers, 
   resetToDefaultPreferences, 
   getTestUsers 
-} from '@/services/testData/smartPlannerTestUtils';
+} from '@/services/testData/preferences';
 
 export const TestDataControls: React.FC = () => {
   const [loading, setLoading] = useState(false);

@@ -1,9 +1,6 @@
 import { learnFromFeedback, getAIInsights, getUserLearningData, getUserPreferenceVectors } from '@/services/aiLearningService';
 import type { TestPhaseResult } from './types';
 
-// Re-export for backward compatibility
-export type { TestPhaseResult } from './types';
-
 export interface TestFeedbackData {
   venueId: string;
   venueName: string;
@@ -40,8 +37,8 @@ export const createMockFeedbackData = (): TestFeedbackData => {
   return {
     venueId: venue.id,
     venueName: venue.name,
-    predictedScore: Math.floor(Math.random() * 45) + 50, // 50-95
-    actualRating: Math.floor(Math.random() * 5) + 1, // 1-5
+    predictedScore: Math.floor(Math.random() * 45) + 50,
+    actualRating: Math.floor(Math.random() * 5) + 1,
     venueRating: Math.floor(Math.random() * 5) + 1,
     aiAccuracyRating: Math.floor(Math.random() * 5) + 1,
     wouldRecommend: Math.random() > 0.3,

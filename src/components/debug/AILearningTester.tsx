@@ -8,9 +8,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { 
   runAILearningTest, 
   testSingleFeedback, 
-  AILearningTestResults, 
-  TestPhaseResult 
-} from '@/services/testData/aiLearningTestData';
+  type AILearningTestResults
+} from '@/services/testData/aiLearning';
+import type { TestPhaseResult } from '@/services/testData/types';
 import { getUserLearningData, getUserPreferenceVectors } from '@/services/aiLearningService';
 
 export const AILearningTester: React.FC = () => {
