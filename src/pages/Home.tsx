@@ -2,7 +2,7 @@
 import React from 'react';
 import HomeHeader from '@/components/HomeHeader';
 import HomeContent from '@/components/HomeContent';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import { getUserName } from '@/utils/typeHelpers';
 import { safeFirstWord } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -42,18 +42,19 @@ const Home: React.FC = () => {
   // Early returns for loading and unauthenticated states
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <LoadingSpinner size="lg" text="Loading your dashboard..." />
+      <div className="min-h-screen bg-background">
+        <div className={isMobile ? "max-w-md mx-auto" : "max-w-none px-6"}>
+          <SkeletonLoader variant="home-dashboard" />
+        </div>
       </div>
     );
   }
 
   if (!user || !userInfo) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4">Redirecting to login...</p>
-          <LoadingSpinner size="md" />
+      <div className="min-h-screen bg-background">
+        <div className={isMobile ? "max-w-md mx-auto" : "max-w-none px-6"}>
+          <SkeletonLoader variant="home-dashboard" />
         </div>
       </div>
     );

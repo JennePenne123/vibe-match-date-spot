@@ -3,7 +3,7 @@ import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface SkeletonLoaderProps {
-  variant: 'friend-card' | 'venue-card' | 'date-invite' | 'profile-header' | 'voucher-table';
+  variant: 'friend-card' | 'venue-card' | 'date-invite' | 'profile-header' | 'voucher-table' | 'home-dashboard';
   count?: number;
 }
 
@@ -111,6 +111,87 @@ const SkeletonLoader = ({ variant, count = 1 }: SkeletonLoaderProps) => {
                 </div>
                 <Skeleton className="h-8 w-8 rounded-md ml-auto" />
               </div>
+            </div>
+          </div>
+        );
+
+      case 'home-dashboard':
+        return (
+          <div className="space-y-5 p-4">
+            {/* Header skeleton */}
+            <div className="flex justify-between items-center pt-8 pb-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-10 h-10 rounded-full" />
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-6 w-32" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-8 w-16 rounded-full" />
+                <Skeleton className="h-8 w-8 rounded-md" />
+              </div>
+            </div>
+            
+            {/* Pending ratings card skeleton */}
+            <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded" />
+                <Skeleton className="h-5 w-40" />
+              </div>
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-10 h-10 rounded-full" />
+                <div className="flex-1 space-y-1">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="h-8 w-16 rounded-md" />
+              </div>
+            </div>
+            
+            {/* Date proposals card skeleton */}
+            <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded" />
+                <Skeleton className="h-5 w-32" />
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
+                  <Skeleton className="w-10 h-10 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-3 w-full" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Upcoming dates card skeleton */}
+            <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded" />
+                <Skeleton className="h-5 w-36" />
+              </div>
+              <div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
+                <Skeleton className="w-10 h-10 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Planning mode card skeleton */}
+            <div className="bg-card border border-border rounded-lg p-6 space-y-4">
+              <div className="text-center space-y-2">
+                <Skeleton className="h-6 w-40 mx-auto" />
+                <Skeleton className="h-4 w-56 mx-auto" />
+              </div>
+              <div className="flex justify-center">
+                <Skeleton className="w-12 h-12 rounded-full" />
+              </div>
+              <Skeleton className="h-10 w-full rounded-md" />
             </div>
           </div>
         );
