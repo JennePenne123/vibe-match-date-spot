@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
@@ -8,45 +8,45 @@
 
 @layer base {
   :root {
-    /* Premium Base Colors */
-    --background: 209 40% 96%;
-    --foreground: 222 47% 11%;
-    --card: 210 40% 98%;
-    --card-foreground: 222 47% 11%;
-    --popover: 214 31% 91%;
-    --popover-foreground: 222 47% 11%;
+    /* Zinc Base Colors (Vega style) */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
 
-    /* Enhanced Brand Colors */
-    --primary: 216 19% 26%;
-    --primary-foreground: 210 19% 98%;
-    --secondary: 215 19% 34%;
-    --secondary-foreground: 210 40% 98%;
-    --accent: 210 40% 98%;
-    --accent-foreground: 215 16% 46%;
+    /* Pink Brand Colors */
+    --primary: 330 81% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
 
-    /* Premium Neutrals */
-    --muted: 215 20% 65%;
-    --muted-foreground: 222 47% 11%;
-    --border: 212 26% 83%;
-    --input: 212 26% 83%;
-    --ring: 216 19% 26%;
+    /* Zinc Neutrals */
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 330 81% 60%;
 
-    /* Enhanced Semantic Colors */
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 0 85% 97%;
+    /* Semantic Colors */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
     --success: 142 76% 48%;
     --success-foreground: 138 85% 98%;
     --warning: 38 88% 52%;
     --warning-foreground: 48 100% 97%;
 
     /* Chart Colors */
-    --chart-1: 217 10% 64%;
-    --chart-2: 215 20% 65%;
-    --chart-3: 215 16% 46%;
-    --chart-4: 219 8% 46%;
-    --chart-5: 215 19% 34%;
+    --chart-1: 330 81% 60%;
+    --chart-2: 351 86% 55%;
+    --chart-3: 240 4.8% 65%;
+    --chart-4: 240 5.9% 50%;
+    --chart-5: 240 3.8% 40%;
 
-    --radius: 0rem;
+    --radius: 0.625rem;
 
     /* Premium Gradient System */
     --gradient-primary: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%);
@@ -70,14 +70,14 @@
     --gradient-cosmic: radial-gradient(circle at 30% 20%, hsl(330, 81%, 60% / 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(351, 86%, 55% / 0.2) 0%, transparent 50%);
     --gradient-shimmer: linear-gradient(45deg, transparent 30%, hsl(330, 81%, 60% / 0.1) 50%, transparent 70%);
 
-     /* Component-Specific Gradients */
-     --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
-     --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-     --gradient-success: linear-gradient(135deg, hsl(142, 76%, 48%) 0%, hsl(142, 78%, 42%) 100%);
-     --gradient-success-hover: linear-gradient(135deg, hsl(142, 78%, 42%) 0%, hsl(142, 80%, 38%) 100%);
-     --gradient-card-elegant: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
-     --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.05) 0%, hsl(351, 86%, 55% / 0.08) 100%);
-     --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    /* Component-Specific Gradients */
+    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
+    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142, 76%, 48%) 0%, hsl(142, 78%, 42%) 100%);
+    --gradient-success-hover: linear-gradient(135deg, hsl(142, 78%, 42%) 0%, hsl(142, 80%, 38%) 100%);
+    --gradient-card-elegant: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
+    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.05) 0%, hsl(351, 86%, 55% / 0.08) 100%);
+    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
 
     /* Premium Shadows */
     --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.3);
@@ -86,19 +86,23 @@
     --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
     --shadow-dreamy: 0 0 40px hsl(330 85% 95% / 0.8), 0 8px 24px hsl(330 81% 60% / 0.25);
 
-    /* Sidebar variables */
-    --sidebar-background: 330 20% 99%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 216 19% 26%;
-    --sidebar-primary-foreground: 210 19% 98%;
-    --sidebar-accent: 215 19% 34%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 212 26% 83%;
-    --sidebar-ring: 216 19% 26%;
-    --sidebar: 210 40% 98%;
-    --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    /* Sidebar variables (subtle menu accent) */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 10% 3.9%;
+    --sidebar-primary: 330 81% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 240 5.9% 90%;
+    --sidebar-ring: 330 81% 60%;
+    --sidebar: 0 0% 100%;
+
+    /* Font System */
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     --font-serif: 'Crimson Pro', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+    /* Shadows */
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
@@ -112,69 +116,69 @@
   }
 
   .dark {
-    /* Premium Dark Base Colors */
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 217 32% 17%;
-    --card-foreground: 210 40% 98%;
-    --popover: 215 24% 26%;
-    --popover-foreground: 210 40% 98%;
+    /* Zinc Dark Base Colors */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
 
-    /* Enhanced Brand Colors for Dark */
-    --primary: 212 26% 83%;
-    --primary-foreground: 228 84% 4%;
-    --secondary: 215 19% 34%;
-    --secondary-foreground: 210 40% 98%;
-    --accent: 228 84% 4%;
-    --accent-foreground: 215 20% 65%;
+    /* Pink Brand Colors for Dark */
+    --primary: 330 81% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
 
-    /* Premium Dark Neutrals */
-    --muted: 215 16% 46%;
-    --muted-foreground: 210 40% 98%;
-    --border: 215 19% 34%;
-    --input: 215 19% 34%;
-    --ring: 212 26% 83%;
+    /* Zinc Dark Neutrals */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 330 81% 60%;
 
-    /* Enhanced Semantic Colors for Dark */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 85% 97%;
+    /* Semantic Colors for Dark */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
     --success: 142 76% 48%;
     --success-foreground: 138 85% 98%;
     --warning: 38 88% 52%;
     --warning-foreground: 48 100% 97%;
 
     /* Chart Colors for Dark */
-    --chart-1: 215 12% 83%;
-    --chart-2: 212 26% 83%;
-    --chart-3: 215 20% 65%;
-    --chart-4: 217 10% 64%;
-    --chart-5: 215 16% 46%;
+    --chart-1: 330 81% 60%;
+    --chart-2: 351 86% 55%;
+    --chart-3: 240 5% 64.9%;
+    --chart-4: 240 3.7% 50%;
+    --chart-5: 240 3.7% 40%;
 
     /* Dark Mode Premium Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%);
     --gradient-secondary: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(45, 75%, 55%) 0%, hsl(35, 78%, 48%) 100%);
-    --gradient-romantic: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(330, 16%, 18%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 75%, 55%) 70%, hsl(330, 16%, 18%) 100%);
-    --gradient-dreamy: linear-gradient(135deg, hsl(330, 22%, 12%) 0%, hsl(330, 16%, 18%) 25%, hsl(351, 86%, 55% / 0.2) 50%, hsl(45, 75%, 55% / 0.15) 75%, hsl(330, 22%, 12%) 100%);
+    --gradient-romantic: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(240, 10%, 10%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 75%, 55%) 70%, hsl(240, 10%, 10%) 100%);
+    --gradient-dreamy: linear-gradient(135deg, hsl(240, 10%, 6%) 0%, hsl(240, 10%, 10%) 25%, hsl(351, 86%, 55% / 0.2) 50%, hsl(45, 75%, 55% / 0.15) 75%, hsl(240, 10%, 6%) 100%);
     --gradient-luxe: linear-gradient(135deg, hsl(330, 94%, 28%) 0%, hsl(330, 81%, 60%) 50%, hsl(351, 86%, 55%) 100%);
 
     /* Dark Mode Surface Gradients */
-    --gradient-surface-subtle: linear-gradient(135deg, hsl(330, 16%, 18%) 0%, hsl(330, 12%, 22%) 100%);
-    --gradient-surface-warm: linear-gradient(135deg, hsl(330, 22%, 12%) 0%, hsl(330, 16%, 18%) 100%);
+    --gradient-surface-subtle: linear-gradient(135deg, hsl(240, 10%, 10%) 0%, hsl(240, 10%, 14%) 100%);
+    --gradient-surface-warm: linear-gradient(135deg, hsl(240, 10%, 6%) 0%, hsl(240, 10%, 10%) 100%);
     --gradient-surface-soft: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
     --gradient-surface-medium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.15) 0%, hsl(351, 86%, 55% / 0.20) 100%);
     --gradient-surface-rich: linear-gradient(135deg, hsl(330, 81%, 60% / 0.25) 0%, hsl(351, 86%, 55% / 0.35) 100%);
     --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
 
-     /* Dark Mode Component Gradients */
-     --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
-     --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-     --gradient-success: linear-gradient(135deg, hsl(142, 76%, 48%) 0%, hsl(142, 78%, 42%) 100%);
-     --gradient-success-hover: linear-gradient(135deg, hsl(142, 78%, 42%) 0%, hsl(142, 80%, 38%) 100%);
-     --gradient-card-elegant: linear-gradient(135deg, hsl(330, 16%, 18%) 0%, hsl(330, 12%, 22%) 100%);
-     --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
-     --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    /* Dark Mode Component Gradients */
+    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
+    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142, 76%, 48%) 0%, hsl(142, 78%, 42%) 100%);
+    --gradient-success-hover: linear-gradient(135deg, hsl(142, 78%, 42%) 0%, hsl(142, 80%, 38%) 100%);
+    --gradient-card-elegant: linear-gradient(135deg, hsl(240, 10%, 10%) 0%, hsl(240, 10%, 14%) 100%);
+    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
+    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
 
     /* Dark Mode Premium Shadows */
     --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.4);
@@ -183,16 +187,18 @@
     --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
     --shadow-dreamy: 0 0 40px hsl(330 81% 60% / 0.3), 0 8px 24px hsl(330 81% 60% / 0.35);
 
-    /* Dark sidebar variables */
-    --sidebar-background: 330 22% 12%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 212 26% 83%;
-    --sidebar-primary-foreground: 228 84% 4%;
-    --sidebar-accent: 215 20% 65%;
-    --sidebar-accent-foreground: 228 84% 4%;
-    --sidebar-border: 215 19% 34%;
-    --sidebar-ring: 212 26% 83%;
-    --sidebar: 217 32% 17%;
+    /* Dark sidebar variables (subtle menu accent) */
+    --sidebar-background: 240 10% 3.9%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 330 81% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 330 81% 60%;
+    --sidebar: 240 10% 3.9%;
+
+    /* Shadows */
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
