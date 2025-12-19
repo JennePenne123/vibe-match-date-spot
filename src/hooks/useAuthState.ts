@@ -17,15 +17,13 @@ export const useAuthState = () => {
         console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         
-        // Always set loading to false synchronously
-        setLoading(false);
-        
         if (session?.user) {
           // Use setTimeout(0) to defer async operations and prevent deadlock
           setTimeout(() => {
             fetchUserProfile(session.user)
               .then(enrichedUser => {
                 setUser(enrichedUser);
+                setLoading(false); // Set loading false AFTER user is resolved
               })
               .catch(error => {
                 console.error('Error fetching user profile in auth state change:', error);
@@ -36,10 +34,12 @@ export const useAuthState = () => {
                   name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
                   avatar_url: session.user.user_metadata?.avatar_url
                 });
+                setLoading(false); // Set loading false AFTER fallback user is set
               });
           }, 0);
         } else {
           setUser(null);
+          setLoading(false); // Only set loading false when no session
         }
       }
     );
@@ -53,7 +53,6 @@ export const useAuthState = () => {
       }
 
       setSession(session);
-      setLoading(false);
       
       if (session?.user) {
         // Use setTimeout(0) for initial profile fetch as well
@@ -61,6 +60,7 @@ export const useAuthState = () => {
           fetchUserProfile(session.user)
             .then(enrichedUser => {
               setUser(enrichedUser);
+              setLoading(false); // Set loading false AFTER user is resolved
             })
             .catch(error => {
               console.error('Error fetching user profile on init:', error);
@@ -71,10 +71,12 @@ export const useAuthState = () => {
                 name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
                 avatar_url: session.user.user_metadata?.avatar_url
               });
+              setLoading(false); // Set loading false AFTER fallback user is set
             });
         }, 0);
       } else {
         setUser(null);
+        setLoading(false); // Only set loading false when no session
       }
     });
 

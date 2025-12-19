@@ -23,14 +23,10 @@ const Home: React.FC = () => {
 
   // Handle authentication redirect
   React.useEffect(() => {
-    const redirectTimer = setTimeout(() => {
-      if (!authLoading && !user) {
-        console.log('No authenticated user found, redirecting to login');
-        navigate('/register-login', { replace: true });
-      }
-    }, 100);
-
-    return () => clearTimeout(redirectTimer);
+    if (!authLoading && !user) {
+      console.log('No authenticated user found, redirecting to login');
+      navigate('/register-login', { replace: true });
+    }
   }, [user, authLoading, navigate]);
 
   // Memoize user display logic
