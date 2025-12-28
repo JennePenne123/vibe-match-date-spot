@@ -12,6 +12,7 @@ import { BadgesCard } from '@/components/profile/BadgesCard';
 import { LeaderboardCard } from '@/components/profile/LeaderboardCard';
 import ReferralCard from '@/components/profile/ReferralCard';
 import AILearningCard from '@/components/profile/AILearningCard';
+import { ThemeSettingsCard } from '@/components/profile/ThemeSettingsCard';
 import { useUserPoints } from '@/hooks/useUserPoints';
 
 const Profile = () => {
@@ -125,6 +126,9 @@ const Profile = () => {
 
           {/* AI Learning */}
           <AILearningCard />
+
+          {/* Theme Settings */}
+          <ThemeSettingsCard />
 
           {/* Leaderboard */}
           <LeaderboardCard />
