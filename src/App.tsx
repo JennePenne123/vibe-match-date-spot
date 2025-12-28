@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -71,8 +72,9 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <ErrorBoundary level="app">
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="vybe-theme">
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
@@ -143,8 +145,9 @@ const App = () => (
             </AppProvider>
           </AuthProvider>
         </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   </ErrorBoundary>
 );
 
