@@ -45,8 +45,10 @@ const ProfileHeader = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
-  console.log('👤 PROFILE HEADER: Avatar URL:', avatarUrl);
-  console.log('👤 PROFILE HEADER: Fallback URL:', fallbackUrl);
+  if (import.meta.env.DEV) {
+    console.log('👤 PROFILE HEADER: Avatar URL:', avatarUrl);
+    console.log('👤 PROFILE HEADER: Fallback URL:', fallbackUrl);
+  }
 
   const handleAvatarClick = () => {
     if (isEditing && fileInputRef.current) {
@@ -119,13 +121,17 @@ const ProfileHeader = ({
               alt={displayName}
               referrerPolicy="no-referrer"
               onError={(e) => {
-                console.error('❌ PROFILE AVATAR: Image failed to load');
-                console.error('❌ PROFILE AVATAR: Failed URL:', avatarUrl);
+                if (import.meta.env.DEV) {
+                  console.error('❌ PROFILE AVATAR: Image failed to load');
+                  console.error('❌ PROFILE AVATAR: Failed URL:', avatarUrl);
+                }
                 setImgError(true);
               }}
               onLoad={() => {
-                console.log('✅ PROFILE AVATAR: Image loaded successfully');
-                console.log('✅ PROFILE AVATAR: Loaded URL:', imgError ? fallbackUrl : avatarUrl);
+                if (import.meta.env.DEV) {
+                  console.log('✅ PROFILE AVATAR: Image loaded successfully');
+                  console.log('✅ PROFILE AVATAR: Loaded URL:', imgError ? fallbackUrl : avatarUrl);
+                }
               }}
             />
             <AvatarFallback className="bg-primary/10 text-primary text-2xl">

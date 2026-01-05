@@ -35,6 +35,26 @@ export default {
     		display: [
     			'Playfair Display',
     			'serif'
+    		],
+    		serif: [
+    			'Crimson Pro',
+    			'ui-serif',
+    			'Georgia',
+    			'Cambria',
+    			'Times New Roman',
+    			'Times',
+    			'serif'
+    		],
+    		mono: [
+    			'SF Mono',
+    			'ui-monospace',
+    			'SFMono-Regular',
+    			'Menlo',
+    			'Monaco',
+    			'Consolas',
+    			'Liberation Mono',
+    			'Courier New',
+    			'monospace'
     		]
     	},
     	extend: {
@@ -252,41 +272,6 @@ export default {
     			'spin-in': 'spin-in 0.4s ease-out forwards',
     			'spin-out': 'spin-out 0.4s ease-out forwards'
     		},
-    		fontFamily: {
-    			sans: [
-    				'Inter',
-    				'ui-sans-serif',
-    				'system-ui',
-    				'-apple-system',
-    				'BlinkMacSystemFont',
-    				'Segoe UI',
-    				'Roboto',
-    				'Helvetica Neue',
-    				'Arial',
-    				'Noto Sans',
-    				'sans-serif'
-    			],
-    			serif: [
-    				'Crimson Pro',
-    				'ui-serif',
-    				'Georgia',
-    				'Cambria',
-    				'Times New Roman',
-    				'Times',
-    				'serif'
-    			],
-    			mono: [
-    				'SF Mono',
-    				'ui-monospace',
-    				'SFMono-Regular',
-    				'Menlo',
-    				'Monaco',
-    				'Consolas',
-    				'Liberation Mono',
-    				'Courier New',
-    				'monospace'
-    			]
-    		}
     	}
     },
 	plugins: [require("tailwindcss-animate")],

@@ -21,11 +21,13 @@ const HomeHeader = ({
   const [imgError, setImgError] = useState(false);
   const fallbackUrl = getFallbackAvatar(displayName);
   
-  console.log('🏠 HEADER: Rendering HomeHeader');
-  console.log('🏠 HEADER: User avatar_url:', user?.avatar_url);
-  console.log('🏠 HEADER: getUserAvatar result:', avatarUrl);
-  console.log('🏠 HEADER: Fallback URL:', fallbackUrl);
-  console.log('🏠 HEADER: Full user object:', user);
+  if (import.meta.env.DEV) {
+    console.log('🏠 HEADER: Rendering HomeHeader');
+    console.log('🏠 HEADER: User avatar_url:', user?.avatar_url);
+    console.log('🏠 HEADER: getUserAvatar result:', avatarUrl);
+    console.log('🏠 HEADER: Fallback URL:', fallbackUrl);
+    console.log('🏠 HEADER: Full user object:', user);
+  }
   
   const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
@@ -41,15 +43,19 @@ const HomeHeader = ({
             src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)}
             alt={displayName}
             referrerPolicy="no-referrer"
-            onError={(e) => {
-              console.error('❌ AVATAR: Image failed to load');
-              console.error('❌ AVATAR: Failed URL:', avatarUrl);
-              console.error('❌ AVATAR: Error event:', e);
+          onError={(e) => {
+              if (import.meta.env.DEV) {
+                console.error('❌ AVATAR: Image failed to load');
+                console.error('❌ AVATAR: Failed URL:', avatarUrl);
+                console.error('❌ AVATAR: Error event:', e);
+              }
               setImgError(true);
             }}
             onLoad={() => {
-              console.log('✅ AVATAR: Image loaded successfully');
-              console.log('✅ AVATAR: Loaded URL:', imgError ? fallbackUrl : avatarUrl);
+              if (import.meta.env.DEV) {
+                console.log('✅ AVATAR: Image loaded successfully');
+                console.log('✅ AVATAR: Loaded URL:', imgError ? fallbackUrl : avatarUrl);
+              }
             }}
           />
           <AvatarFallback className="bg-pink-100 text-pink-600 text-sm">

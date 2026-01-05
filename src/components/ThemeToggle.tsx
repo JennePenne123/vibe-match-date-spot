@@ -18,7 +18,7 @@ const themeConfig = {
 type ThemeKey = keyof typeof themeConfig;
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
