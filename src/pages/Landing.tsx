@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Sparkles, Users, Heart, ArrowRight, Menu, X } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthModal } from '@/components/landing/AuthModal';
+import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function LandingDemo() {
@@ -12,14 +13,18 @@ export default function LandingDemo() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const featuresRef = useRef<HTMLDivElement>(null);
   const howItWorksRef = useRef<HTMLDivElement>(null);
 
   // Auto-open modal if redirected from protected route
   useEffect(() => {
-    if (searchParams.get('auth') === 'required') {
+    const authParam = searchParams.get('auth');
+    if (authParam === 'required') {
       setIsAuthModalOpen(true);
-      // Clean up URL parameter after opening modal
+      setSearchParams({}, { replace: true });
+    } else if (authParam === 'partner') {
+      setIsPartnerModalOpen(true);
       setSearchParams({}, { replace: true });
     }
   }, [searchParams, setSearchParams]);
@@ -94,6 +99,12 @@ export default function LandingDemo() {
               >
                 How It Works
               </button>
+              <button 
+                onClick={() => setIsPartnerModalOpen(true)}
+                className="text-foreground/70 hover:text-foreground transition-colors duration-200 font-medium"
+              >
+                Partner Login
+              </button>
               <ThemeToggle />
               <Button 
                 onClick={() => setIsAuthModalOpen(true)}
@@ -134,6 +145,15 @@ export default function LandingDemo() {
                 className="block w-full text-left py-2 text-foreground/70 hover:text-foreground transition-colors duration-200 font-medium"
               >
                 How It Works
+              </button>
+              <button 
+                onClick={() => {
+                  setIsPartnerModalOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left py-2 text-foreground/70 hover:text-foreground transition-colors duration-200 font-medium"
+              >
+                Partner Login
               </button>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Theme</span>
@@ -448,8 +468,9 @@ export default function LandingDemo() {
         </div>
       </footer>
 
-      {/* Auth Modal */}
+      {/* Auth Modals */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <PartnerAuthModal isOpen={isPartnerModalOpen} onClose={() => setIsPartnerModalOpen(false)} />
     </div>
   );
 }

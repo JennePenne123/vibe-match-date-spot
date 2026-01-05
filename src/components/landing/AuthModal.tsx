@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInputValidation, validationRules } from '@/hooks/useInputValidation';
 import { sanitizeName, sanitizeEmail } from '@/utils/inputSanitization';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
@@ -116,8 +117,21 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         }
 
         if (signedInUser) {
+          // Check user role for proper routing
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', signedInUser.id)
+            .maybeSingle();
+
           onClose();
-          navigate('/home');
+          
+          // Route partners/admins to partner dashboard
+          if (roleData?.role === 'venue_partner' || roleData?.role === 'admin') {
+            navigate('/partner');
+          } else {
+            navigate('/home');
+          }
         }
       } else {
         const { user: signedUpUser, error: signUpError } = await signUp(
