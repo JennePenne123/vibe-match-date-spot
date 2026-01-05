@@ -2,16 +2,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { Menu, User, Users, MapPin, LogOut, X, Heart } from 'lucide-react';
+import { Menu, User, Users, MapPin, LogOut, X, Heart, Monitor, Sun, Moon } from 'lucide-react';
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers';
 import { getInitials } from '@/lib/utils';
+
+const themeOptions = [
+  { value: 'system', label: 'System', icon: Monitor },
+  { value: 'light', label: 'Light', icon: Sun },
+  { value: 'dark', label: 'Dark', icon: Moon },
+] as const;
 
 const BurgerMenu = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   const displayName = getUserName(user);
@@ -59,7 +67,7 @@ const BurgerMenu = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="text-gray-600 hover:bg-gray-100"
+          className="text-muted-foreground hover:bg-accent"
         >
           <Menu className="w-5 h-5" />
         </Button>
@@ -76,18 +84,43 @@ const BurgerMenu = () => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="font-semibold text-gray-900">{displayName}</h2>
-                <p className="text-sm text-gray-600">{user?.email}</p>
+                <h2 className="font-semibold text-foreground">{displayName}</h2>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
               </div>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
-              className="text-gray-600 hover:bg-gray-100"
+              className="text-muted-foreground hover:bg-accent"
             >
               <X className="w-5 h-5" />
             </Button>
+          </div>
+
+          {/* Theme Selector */}
+          <div className="mb-6">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Appearance</p>
+            <div className="flex gap-2">
+              {themeOptions.map((option) => {
+                const Icon = option.icon;
+                const isActive = theme === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => setTheme(option.value)}
+                    className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-lg border transition-colors ${
+                      isActive 
+                        ? 'border-primary bg-primary/5 text-primary' 
+                        : 'border-border text-muted-foreground hover:bg-accent/50'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-xs font-medium">{option.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Menu Items */}
@@ -96,26 +129,26 @@ const BurgerMenu = () => {
               <button
                 key={item.path}
                 onClick={() => handleMenuItemClick(item.path)}
-                className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-accent/50 transition-colors text-left"
               >
                 <div className="flex items-center justify-center w-10 h-10 bg-pink-100 rounded-lg">
                   <item.icon className="w-5 h-5 text-pink-600" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">{item.label}</div>
-                  <div className="text-sm text-gray-600">{item.description}</div>
+                  <div className="font-medium text-foreground">{item.label}</div>
+                  <div className="text-sm text-muted-foreground">{item.description}</div>
                 </div>
               </button>
             ))}
           </div>
 
           {/* Logout Button */}
-          <div className="border-t pt-4">
+          <div className="border-t border-border pt-4">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-red-50 transition-colors text-left text-red-600"
+              className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors text-left text-red-600"
             >
-              <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-lg">
+              <div className="flex items-center justify-center w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg">
                 <LogOut className="w-5 h-5" />
               </div>
               <div className="flex-1">

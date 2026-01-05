@@ -5,6 +5,7 @@ import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -29,11 +30,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
         
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header with sidebar trigger */}
-          <header className="h-12 flex items-center border-b border-border bg-card px-4">
-            <SidebarTrigger className="mr-2">
-              <Menu className="w-4 h-4" />
-            </SidebarTrigger>
-            <h1 className="font-semibold text-foreground">VybePulse</h1>
+          <header className="h-12 flex items-center justify-between border-b border-border bg-card px-4">
+            <div className="flex items-center">
+              <SidebarTrigger className="mr-2">
+                <Menu className="w-4 h-4" />
+              </SidebarTrigger>
+              <h1 className="font-semibold text-foreground">VybePulse</h1>
+            </div>
+            <ThemeToggle />
           </header>
 
           {/* Main content area */}

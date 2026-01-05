@@ -97,14 +97,14 @@ const ProfileHeader = ({
   };
   
   return (
-    <div className="bg-white p-4 pt-12 shadow-sm">
+    <div className="bg-card p-4 pt-12 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Profile</h1>
+        <h1 className="text-xl font-semibold text-foreground">Profile</h1>
         <Button
           onClick={onEditToggle}
           variant="ghost"
           size="icon"
-          className="text-gray-600 hover:bg-gray-100"
+          className="text-muted-foreground hover:bg-accent"
         >
           {isEditing ? <X className="w-6 h-6" /> : <Edit className="w-6 h-6" />}
         </Button>
@@ -163,13 +163,13 @@ const ProfileHeader = ({
             <Input
               value={editedName}
               onChange={(e) => onEditedNameChange(e.target.value)}
-              className="bg-white text-gray-900 text-center font-semibold border-gray-200"
+              className="bg-card text-foreground text-center font-semibold border-border"
               placeholder="Your name"
             />
             <Input
               value={editedEmail}
               onChange={(e) => onEditedEmailChange(e.target.value)}
-              className="bg-white text-gray-900 text-center border-gray-200"
+              className="bg-card text-foreground text-center border-border"
               placeholder="Your email"
               type="email"
             />
@@ -184,7 +184,7 @@ const ProfileHeader = ({
               <Button
                 onClick={onCancel}
                 variant="outline"
-                className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                className="border-border text-foreground hover:bg-accent/50"
               >
                 Cancel
               </Button>
@@ -192,8 +192,8 @@ const ProfileHeader = ({
           </div>
         ) : (
           <>
-            <h2 className="text-2xl font-bold mb-1 text-gray-900">{displayName}</h2>
-            <p className="text-gray-600">{displayEmail}</p>
+            <h2 className="text-2xl font-bold mb-1 text-foreground">{displayName}</h2>
+            <p className="text-muted-foreground">{displayEmail}</p>
           </>
         )}
       </div>
