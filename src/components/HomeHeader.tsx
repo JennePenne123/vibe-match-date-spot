@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import BurgerMenu from '@/components/BurgerMenu';
 import { PointsIndicator } from '@/components/profile/PointsIndicator';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { AppUser } from '@/types/app';
 import { getUserAvatar, getFallbackAvatar } from '@/utils/typeHelpers';
 import { getInitials } from '@/lib/utils';
@@ -33,7 +34,7 @@ const HomeHeader = ({
     return 'Good Evening';
   };
 
-  return <div className="flex justify-between items-center p-4 pt-12 bg-white shadow-sm">
+  return <div className="flex justify-between items-center p-4 pt-12 bg-card shadow-sm">
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <Avatar className="w-10 h-10 border-2 border-pink-200 shrink-0">
           <AvatarImage 
@@ -59,8 +60,9 @@ const HomeHeader = ({
           <Heading size="h2" className="text-foreground text-sm sm:text-base truncate">{getTimeBasedGreeting()} {firstName}! 👋</Heading>
         </div>
       </div>
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-1 shrink-0">
         <PointsIndicator />
+        <ThemeToggle />
         <BurgerMenu />
       </div>
     </div>;

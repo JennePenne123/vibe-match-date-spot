@@ -219,6 +219,26 @@ export default {
     				'100%': {
     					backgroundPosition: '-200% center'
     				}
+    			},
+    			'spin-in': {
+    				'0%': {
+    					transform: 'rotate(-180deg) scale(0)',
+    					opacity: '0'
+    				},
+    				'100%': {
+    					transform: 'rotate(0deg) scale(1)',
+    					opacity: '1'
+    				}
+    			},
+    			'spin-out': {
+    				'0%': {
+    					transform: 'rotate(0deg) scale(1)',
+    					opacity: '1'
+    				},
+    				'100%': {
+    					transform: 'rotate(180deg) scale(0)',
+    					opacity: '0'
+    				}
     			}
     		},
     		animation: {
@@ -228,7 +248,9 @@ export default {
     			'scale-in': 'scale-in 0.2s ease-out',
     			'slide-up': 'slide-up 0.4s ease-out',
     			'slide-down': 'slide-down 0.4s ease-out',
-    			shimmer: 'shimmer 3s ease-in-out infinite'
+    			shimmer: 'shimmer 3s ease-in-out infinite',
+    			'spin-in': 'spin-in 0.4s ease-out forwards',
+    			'spin-out': 'spin-out 0.4s ease-out forwards'
     		},
     		fontFamily: {
     			sans: [

@@ -1,8 +1,9 @@
-import { Monitor, Moon, Sun } from 'lucide-react';
+import { Monitor, Moon, Sun, Check } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 const themeOptions = [
   {
@@ -42,22 +43,39 @@ export function ThemeSettingsCard() {
           onValueChange={setTheme}
           className="space-y-3"
         >
-          {themeOptions.map((option) => (
-            <Label
-              key={option.value}
-              htmlFor={option.value}
-              className="flex items-center gap-3 p-3 rounded-lg border border-border/50 cursor-pointer transition-colors hover:bg-accent/50 has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary/5"
-            >
-              <RadioGroupItem value={option.value} id={option.value} />
-              <option.icon className="h-4 w-4 text-muted-foreground" />
-              <div className="flex-1">
-                <div className="text-sm font-medium">{option.label}</div>
-                <div className="text-xs text-muted-foreground">
-                  {option.description}
+          {themeOptions.map((option) => {
+            const isSelected = theme === option.value;
+            return (
+              <Label
+                key={option.value}
+                htmlFor={option.value}
+                className={cn(
+                  "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200",
+                  "hover:bg-accent/50",
+                  isSelected 
+                    ? "border-primary bg-primary/5 shadow-glow-sm scale-[1.02]" 
+                    : "border-border/50"
+                )}
+              >
+                <RadioGroupItem value={option.value} id={option.value} className="sr-only" />
+                <div className={cn(
+                  "flex items-center justify-center w-8 h-8 rounded-full transition-colors",
+                  isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                )}>
+                  <option.icon className="h-4 w-4" />
                 </div>
-              </div>
-            </Label>
-          ))}
+                <div className="flex-1">
+                  <div className="text-sm font-medium">{option.label}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {option.description}
+                  </div>
+                </div>
+                {isSelected && (
+                  <Check className="h-4 w-4 text-primary animate-scale-in" />
+                )}
+              </Label>
+            );
+          })}
         </RadioGroup>
       </CardContent>
     </Card>

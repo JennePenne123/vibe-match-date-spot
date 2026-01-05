@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Sparkles, Users, Heart, ArrowRight, Menu, X } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthModal } from '@/components/landing/AuthModal';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function LandingDemo() {
   const navigate = useNavigate();
@@ -93,6 +94,7 @@ export default function LandingDemo() {
               >
                 How It Works
               </button>
+              <ThemeToggle />
               <Button 
                 onClick={() => setIsAuthModalOpen(true)}
                 variant="default"
@@ -133,6 +135,10 @@ export default function LandingDemo() {
               >
                 How It Works
               </button>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <ThemeToggle />
+              </div>
               <Button 
                 onClick={() => setIsAuthModalOpen(true)}
                 variant="default"

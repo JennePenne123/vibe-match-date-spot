@@ -193,7 +193,7 @@ const VenueCard = ({
         
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-1">
-            <h3 className="font-semibold text-gray-900 text-sm truncate">
+            <h3 className="font-semibold text-foreground text-sm truncate">
               {venue.name}
             </h3>
             <div className="flex items-center gap-1 text-xs text-yellow-600">
@@ -202,14 +202,14 @@ const VenueCard = ({
             </div>
           </div>
           
-          <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
             <MapPin className="w-3 h-3" />
             <span className="truncate">{venueLocation}</span>
             {venue.cuisine_type && <span> • {venue.cuisine_type}</span>}
           </div>
           
           {/* Distance and Status */}
-          <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
             {venue.distance && (
               <div className="flex items-center gap-1">
                 <Navigation className="w-3 h-3" />
@@ -228,7 +228,7 @@ const VenueCard = ({
           </div>
           
           <div className="flex items-center justify-between text-xs">
-            <div className="flex items-center gap-1 text-gray-500">
+            <div className="flex items-center gap-1 text-muted-foreground">
               <DollarSign className="w-3 h-3" />
               {venuePriceRange}
             </div>
@@ -263,11 +263,11 @@ const VenueCard = ({
         {onToggleLike && (
           <button
             onClick={() => onToggleLike(venue.id)}
-            className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors"
+            className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm rounded-full p-2 hover:bg-background transition-colors"
           >
             <Heart
               className={`w-5 h-5 ${
-                isLiked ? 'text-red-500 fill-current' : 'text-gray-600'
+                isLiked ? 'text-red-500 fill-current' : 'text-muted-foreground'
               }`}
             />
           </button>
@@ -283,22 +283,22 @@ const VenueCard = ({
 
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <h3 className="font-bold text-lg text-gray-900">{venue.name}</h3>
+          <h3 className="font-bold text-lg text-foreground">{venue.name}</h3>
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-yellow-400 fill-current" />
             <span className="text-sm font-medium">{venue.rating}</span>
           </div>
         </div>
 
-        <p className="text-gray-600 text-sm mb-3">{venue.description}</p>
+        <p className="text-muted-foreground text-sm mb-3">{venue.description}</p>
 
         <div className="space-y-2 mb-3">
-          <div className="flex items-center gap-1 text-sm text-gray-500">
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <MapPin className="w-4 h-4 flex-shrink-0" />
             <span className="truncate">{venueLocation}</span>
           </div>
           
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
             {venue.distance && (
               <div className="flex items-center gap-1">
                 <Navigation className="w-4 h-4" />
