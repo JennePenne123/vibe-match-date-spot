@@ -1,25 +1,55 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, TrendingUp, Users, Gift } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sparkles, TrendingUp, Users, Gift, LogIn } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function PartnerDashboard() {
-  const { role, loading } = useUserRole();
+  const { role, loading: roleLoading } = useUserRole();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
+  const isLoading = roleLoading || authLoading;
+
   useEffect(() => {
-    if (!loading && role !== 'venue_partner' && role !== 'admin') {
+    // Only redirect if we're done loading and user is not a partner
+    if (!isLoading && user && role !== 'venue_partner' && role !== 'admin') {
       navigate('/home');
     }
-  }, [role, loading, navigate]);
+  }, [role, isLoading, user, navigate]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Show login prompt if not authenticated
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-6">
+        <Card variant="glass" className="max-w-md w-full text-center p-8">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg mx-auto mb-6">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold mb-2">Partner Portal</h1>
+          <p className="text-muted-foreground mb-6">
+            Sign in to access your venue partner dashboard
+          </p>
+          <Button 
+            onClick={() => navigate('/?auth=partner')}
+            className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white"
+          >
+            <LogIn className="w-4 h-4 mr-2" />
+            Sign In as Partner
+          </Button>
+        </Card>
       </div>
     );
   }
