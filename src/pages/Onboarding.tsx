@@ -54,33 +54,33 @@ const Onboarding = () => {
   const IconComponent = currentScreenData.icon;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto">
         {/* Skip Button */}
         <div className="flex justify-end mb-4">
           <Button
             onClick={handleSkip}
             variant="ghost"
-            className="text-gray-500 hover:text-gray-700"
+            className="text-muted-foreground hover:text-foreground"
           >
             Skip
           </Button>
         </div>
 
         {/* Main Content */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 text-center animate-fade-in">
+        <div className="bg-card rounded-3xl shadow-xl p-8 text-center animate-fade-in">
           {/* Icon/Image */}
           <div className={`mx-auto w-32 h-32 rounded-full bg-gradient-to-r ${currentScreenData.gradient} flex items-center justify-center mb-8 shadow-lg`}>
             <div className="text-6xl">{currentScreenData.image}</div>
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl font-bold text-foreground mb-4">
             {currentScreenData.title}
           </h1>
 
           {/* Description */}
-          <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+          <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
             {currentScreenData.description}
           </p>
 
@@ -92,7 +92,7 @@ const Onboarding = () => {
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   index === currentScreen
                     ? `bg-gradient-to-r ${currentScreenData.gradient}`
-                    : 'bg-gray-200'
+                    : 'bg-muted'
                 }`}
               />
             ))}
@@ -103,7 +103,7 @@ const Onboarding = () => {
             <Button
               onClick={handlePrevious}
               variant="ghost"
-              className={`text-gray-500 hover:text-gray-700 ${
+              className={`text-muted-foreground hover:text-foreground ${
                 currentScreen === 0 ? 'invisible' : ''
               }`}
             >
@@ -125,7 +125,7 @@ const Onboarding = () => {
         <div className="mt-8">
           <svg
             viewBox="0 0 1200 120"
-            className="w-full h-16 text-gray-100"
+            className="w-full h-16 text-muted"
             fill="currentColor"
           >
             <path d="M0,96L48,80C96,64,192,32,288,37.3C384,43,480,85,576,112C672,139,768,149,864,133.3C960,117,1056,75,1152,69.3C1248,64,1344,96,1392,112L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />

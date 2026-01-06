@@ -136,7 +136,7 @@ const DateInviteCardPreview = ({
                   e.stopPropagation();
                   onDecline();
                 }} 
-                className={`border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 ${isMobile ? 'w-full min-h-[44px] text-base' : 'flex-1 h-9 text-sm'}`}
+                className={`border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-300 dark:hover:border-red-700 ${isMobile ? 'w-full min-h-[44px] text-base' : 'flex-1 h-9 text-sm'}`}
               >
                 <X className={`${isMobile ? 'w-4 h-4 mr-2' : 'w-3.5 h-3.5 mr-1.5'}`} />
                 Decline

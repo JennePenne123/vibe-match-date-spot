@@ -10,7 +10,7 @@ const RealtimeStatusIndicator: React.FC<RealtimeStatusIndicatorProps> = ({ isLoa
 
   return (
     <div className="flex items-center justify-center py-2">
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
         <span>Real-time updates active</span>
       </div>

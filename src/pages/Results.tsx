@@ -71,24 +71,24 @@ const Results = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="bg-white p-4 pt-12 shadow-sm">
+        <div className="bg-card p-4 pt-12 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <Button
               onClick={handleBackNavigation}
               variant="ghost"
               size="icon"
-              className="text-gray-600 hover:bg-gray-100"
+              className="text-muted-foreground hover:bg-muted"
             >
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div className="text-center">
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-foreground">
                 {isFromSmartPlanning ? 'Date Venues' : 'AI Recommendations'}
               </h1>
-              <p className="text-sm text-gray-600 flex items-center justify-center gap-1">
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 {isFromSmartPlanning ? (
                   <>
                     <Users className="w-4 h-4 text-blue-500" />
@@ -107,14 +107,14 @@ const Results = () => {
 
         {/* AI-Powered Results */}
         <div className="p-4">
-          <div className="mb-6 text-center bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border border-purple-100">
+          <div className="mb-6 text-center bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 p-4 rounded-lg border border-purple-100 dark:border-purple-800">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-purple-600" />
-              <h2 className="text-lg font-bold text-purple-900">
+              <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <h2 className="text-lg font-bold text-purple-900 dark:text-purple-100">
                 AI-Powered Matches
               </h2>
             </div>
-            <p className="text-sm text-purple-700">
+            <p className="text-sm text-purple-700 dark:text-purple-300">
               Each venue is personally scored based on your preferences and past feedback
             </p>
           </div>
@@ -140,10 +140,10 @@ const Results = () => {
           {recommendations.length === 0 && (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 No recommendations found
               </h3>
-              <p className="text-gray-500">
+              <p className="text-muted-foreground">
                 Try updating your preferences for better matches
               </p>
             </div>
@@ -156,13 +156,13 @@ const Results = () => {
                 <Button
                   onClick={handleBackNavigation}
                   variant="outline"
-                  className="w-full border-blue-200 text-blue-700 hover:bg-blue-50"
+                  className="w-full border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/30"
                 >
                   <Users className="w-4 h-4 mr-2" />
                   Continue Planning Together
                 </Button>
                 {smartPlanningState.compatibilityScore && (
-                  <div className="text-center text-sm text-gray-600">
+                  <div className="text-center text-sm text-muted-foreground">
                     Compatibility Score: {Math.round(smartPlanningState.compatibilityScore * 100)}%
                   </div>
                 )}
@@ -172,7 +172,7 @@ const Results = () => {
                 <Button
                   onClick={() => navigate('/preferences')}
                   variant="outline"
-                  className="w-full border-purple-200 text-purple-700 hover:bg-purple-50"
+                  className="w-full border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/30"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
                   Improve AI Recommendations
@@ -188,12 +188,12 @@ const Results = () => {
           </div>
 
           {/* AI Learning Notice */}
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="mt-6 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h4 className="font-semibold text-blue-900 mb-1">AI Learning Active</h4>
-                <p className="text-sm text-blue-800">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">AI Learning Active</h4>
+                <p className="text-sm text-blue-800 dark:text-blue-200">
                   Your feedback on these venues helps our AI learn your preferences and improve future recommendations.
                 </p>
               </div>

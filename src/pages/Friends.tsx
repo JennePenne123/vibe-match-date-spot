@@ -94,26 +94,26 @@ const Friends = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 pt-12 bg-white shadow-sm">
+        <div className="flex items-center justify-between p-4 pt-12 bg-card shadow-sm">
           <Button
             onClick={() => navigate(isDemoMode ? '/preferences?demo=true' : '/preferences')}
             variant="ghost"
             size="icon"
-            className="text-gray-600 hover:bg-gray-100"
+            className="text-muted-foreground hover:bg-muted"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-gray-900">Invite Friends</h1>
-            <p className="text-sm text-gray-600">Step 2 of 3</p>
+            <h1 className="text-xl font-semibold text-foreground">Invite Friends</h1>
+            <p className="text-sm text-muted-foreground">Step 2 of 3</p>
           </div>
           <Button
             onClick={handleSkip}
             variant="ghost"
-            className="text-gray-600 hover:bg-gray-100 text-sm"
+            className="text-muted-foreground hover:bg-muted text-sm"
           >
             Skip
           </Button>
@@ -121,7 +121,7 @@ const Friends = () => {
 
         {/* Progress Bar */}
         <div className="px-6 mb-8 pt-4">
-          <div className="bg-gray-200 rounded-full h-2">
+          <div className="bg-muted rounded-full h-2">
             <div className="bg-gradient-primary rounded-full h-2 w-2/3 transition-all duration-300" />
           </div>
         </div>
@@ -129,19 +129,19 @@ const Friends = () => {
         <div className="px-6 pb-8">
           {/* Header Text */}
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Who's joining you?</h2>
-            <p className="text-gray-600">Invite friends to join your date adventure</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Who's joining you?</h2>
+            <p className="text-muted-foreground">Invite friends to join your date adventure</p>
           </div>
 
           {/* Search */}
           <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <Input
               type="text"
               placeholder="Search friends..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-12 bg-white border-gray-200"
+              className="pl-10 h-12 bg-card border-border"
             />
           </div>
 
@@ -153,7 +153,7 @@ const Friends = () => {
                 return (
                   <div
                     key={friend.id}
-                    className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
+                    className="bg-card rounded-xl p-4 shadow-sm border border-border"
                   >
                     <div className="flex items-center gap-4">
                       <Avatar className="w-12 h-12">
@@ -163,15 +163,15 @@ const Friends = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{friend.name}</h3>
-                        <p className="text-sm text-gray-500">Available for dates</p>
+                        <h3 className="font-semibold text-foreground">{friend.name}</h3>
+                        <p className="text-sm text-muted-foreground">Available for dates</p>
                       </div>
                       <Button
                         onClick={() => handleInviteFriend(friend.id)}
                         variant={isInvited ? "default" : "outline"}
                         className={isInvited 
                           ? "bg-gradient-primary text-primary-foreground hover:opacity-90" 
-                          : "border-gray-200 text-gray-700 hover:bg-gray-50"
+                          : "border-border text-foreground hover:bg-muted"
                         }
                       >
                         {isInvited ? (
@@ -195,27 +195,27 @@ const Friends = () => {
                 {/* No Friends Found Message */}
                 <div className="text-center py-8">
                   <div className="text-4xl mb-4">👥</div>
-                  <h3 className="text-gray-900 font-semibold mb-2">No friends found</h3>
-                  <p className="text-gray-600">Invite your friends to join VybePulse!</p>
+                  <h3 className="text-foreground font-semibold mb-2">No friends found</h3>
+                  <p className="text-muted-foreground">Invite your friends to join VybePulse!</p>
                 </div>
 
                 {/* Referral Link Section */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
                   <div className="text-center mb-4">
                     <div className="bg-primary/10 rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                       <Share2 className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Invite Friends to VybePulse</h3>
-                    <p className="text-sm text-gray-600">Share your referral link and discover amazing dates together</p>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Invite Friends to VybePulse</h3>
+                    <p className="text-sm text-muted-foreground">Share your referral link and discover amazing dates together</p>
                   </div>
 
                   {/* Referral Link Display */}
-                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                  <div className="bg-muted rounded-lg p-3 mb-4">
                     <div className="flex items-center gap-2">
                       <Input
                         value={generateReferralLink()}
                         readOnly
-                        className="flex-1 bg-transparent border-none text-sm text-gray-700"
+                        className="flex-1 bg-transparent border-none text-sm text-foreground"
                       />
                       <Button
                         onClick={copyReferralLink}
@@ -254,12 +254,12 @@ const Friends = () => {
 
           {/* Invited Count */}
           {(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length) > 0 && (
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
-              <div className="text-center text-gray-700">
+            <div className="bg-card rounded-xl p-4 shadow-sm border border-border mb-6">
+              <div className="text-center text-foreground">
                 <h3 className="font-semibold mb-1">
                   {(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length)} friend{(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length) !== 1 ? 's' : ''} invited
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   They'll get recommendations that work for the group
                 </p>
               </div>

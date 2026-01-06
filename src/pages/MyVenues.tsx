@@ -50,8 +50,8 @@ const MyVenues = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
@@ -59,34 +59,34 @@ const MyVenues = () => {
   const displayName = user?.name || user?.email?.split('@')[0] || 'User';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="bg-white p-4 pt-12 shadow-sm">
+        <div className="bg-card p-4 pt-12 shadow-sm">
           <div className="flex items-center gap-4 mb-6">
             <Button
               onClick={() => navigate(-1)}
               variant="ghost"
               size="icon"
-              className="text-gray-600 hover:bg-gray-100"
+              className="text-muted-foreground hover:bg-muted"
             >
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">My Venues</h1>
-              <p className="text-sm text-gray-600">{displayName}'s favorite places</p>
+              <h1 className="text-xl font-bold text-foreground">My Venues</h1>
+              <p className="text-sm text-muted-foreground">{displayName}'s favorite places</p>
             </div>
           </div>
 
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               type="text"
               placeholder="Search your venues..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-gray-50 border-gray-200"
+              className="pl-10 bg-muted border-border"
             />
           </div>
         </div>
@@ -94,15 +94,15 @@ const MyVenues = () => {
         {/* Content */}
         <div className="p-4">
           {filteredVenues.length === 0 ? (
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-card shadow-sm">
               <CardContent className="p-8 text-center">
-                <div className="text-gray-300 mb-4">
+                <div className="text-muted-foreground mb-4">
                   <Heart className="w-16 h-16 mx-auto" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   {likedVenues.length === 0 ? 'No Favorite Venues Yet' : 'No Matching Venues'}
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-muted-foreground mb-4">
                   {likedVenues.length === 0 
                     ? 'Start exploring and add venues to your favorites!' 
                     : 'Try adjusting your search terms to find more venues.'
@@ -119,7 +119,7 @@ const MyVenues = () => {
                   <Button
                     onClick={() => navigate('/preferences')}
                     variant="outline"
-                    className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
+                    className="w-full border-border text-foreground hover:bg-muted"
                   >
                     <MapPin className="w-4 h-4 mr-2" />
                     Set Preferences
@@ -130,7 +130,7 @@ const MyVenues = () => {
           ) : (
             <>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {filteredVenues.length} favorite venue{filteredVenues.length !== 1 ? 's' : ''}
                 </p>
               </div>
