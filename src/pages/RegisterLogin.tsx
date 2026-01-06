@@ -84,7 +84,7 @@ const RegisterLogin = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <LoadingSpinner size="lg" text="Checking authentication..." />
       </div>
     );
@@ -95,7 +95,7 @@ const RegisterLogin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto space-y-6 animate-fade-in">
         {/* Logo and Header */}
         <div className="text-center space-y-4">
@@ -104,19 +104,19 @@ const RegisterLogin = () => {
               <Heart className="w-12 h-12 text-white" fill="currentColor" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900">VybePulse</h1>
-          <p className="text-lg text-gray-700">
+          <h1 className="text-4xl font-bold text-foreground">VybePulse</h1>
+          <p className="text-lg text-muted-foreground">
             Ready to Create Unforgettable Memories?
           </p>
         </div>
 
         {/* Auth Form */}
-        <Card className="bg-white shadow-xl border-0">
+        <Card className="bg-card shadow-xl border-0">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-gray-900">
+            <CardTitle className="text-2xl text-foreground">
               {isLogin ? 'Welcome Back' : 'Create Account'}
             </CardTitle>
-            <CardDescription className="text-gray-600">
+            <CardDescription className="text-muted-foreground">
               {isLogin 
                 ? 'Sign in to discover amazing date spots' 
                 : 'Start your journey to perfect dates'
@@ -126,7 +126,7 @@ const RegisterLogin = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {(error || Object.keys(errors).length > 0) && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+                <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-md text-red-700 dark:text-red-300 text-sm">
                   <AlertCircle className="w-4 h-4" />
                   {error || Object.values(errors)[0]}
                 </div>
@@ -143,12 +143,12 @@ const RegisterLogin = () => {
                       validateField('name', e.target.value);
                     }}
                     required
-                    className={`h-12 ${errors.name ? 'border-red-300' : ''}`}
+                    className={`h-12 ${errors.name ? 'border-red-300 dark:border-red-700' : ''}`}
                     disabled={loading}
                     maxLength={100}
                   />
                   {errors.name && (
-                    <p className="text-sm text-red-600 mt-1">{errors.name}</p>
+                    <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.name}</p>
                   )}
                 </div>
               )}
@@ -162,12 +162,12 @@ const RegisterLogin = () => {
                     validateField('email', e.target.value);
                   }}
                   required
-                  className={`h-12 ${errors.email ? 'border-red-300' : ''}`}
+                  className={`h-12 ${errors.email ? 'border-red-300 dark:border-red-700' : ''}`}
                   disabled={loading}
                   maxLength={254}
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.email}</p>
                 )}
               </div>
               <div>
@@ -180,13 +180,13 @@ const RegisterLogin = () => {
                     validateField('password', e.target.value);
                   }}
                   required
-                  className={`h-12 ${errors.password ? 'border-red-300' : ''}`}
+                  className={`h-12 ${errors.password ? 'border-red-300 dark:border-red-700' : ''}`}
                   minLength={6}
                   maxLength={128}
                   disabled={loading}
                 />
                 {errors.password && (
-                  <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.password}</p>
                 )}
               </div>
               <Button 
@@ -213,7 +213,7 @@ const RegisterLogin = () => {
                   setEmail('');
                   setPassword('');
                 }}
-                className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 disabled={loading}
               >
                 {isLogin 

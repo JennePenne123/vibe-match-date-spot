@@ -44,7 +44,7 @@ const AIRecommendations: React.FC = () => {
   const { displayName, firstName } = userInfo;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <HomeHeader 
         user={user}
         displayName={displayName}
@@ -56,9 +56,9 @@ const AIRecommendations: React.FC = () => {
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
             <Sparkles className="h-8 w-8 text-purple-500" />
-            <h1 className="text-3xl font-bold text-gray-900">AI Date Recommendations</h1>
+            <h1 className="text-3xl font-bold text-foreground">AI Date Recommendations</h1>
           </div>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Get personalized venue recommendations powered by AI that matches your preferences 
             and compatibility with your date partner.
           </p>
@@ -120,9 +120,9 @@ const AIRecommendations: React.FC = () => {
 
         {/* Error State */}
         {error && (
-          <Card className="max-w-md mx-auto border-red-200 bg-red-50">
+          <Card className="max-w-md mx-auto border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
             <CardContent className="pt-6 text-center">
-              <p className="text-red-600">{error}</p>
+              <p className="text-red-600 dark:text-red-400">{error}</p>
               <Button 
                 onClick={refreshRecommendations}
                 variant="outline"
@@ -138,10 +138,10 @@ const AIRecommendations: React.FC = () => {
         {!loading && recommendations.length > 0 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-2xl font-semibold text-foreground mb-2">
                 Recommended Venues
               </h2>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 {recommendations.length} venues ranked by AI compatibility
               </p>
             </div>
@@ -170,11 +170,11 @@ const AIRecommendations: React.FC = () => {
         {!loading && recommendations.length === 0 && !error && (
           <Card className="max-w-md mx-auto text-center">
             <CardContent className="pt-6">
-              <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 No Recommendations Yet
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-muted-foreground mb-4">
                 Complete your preferences to get personalized AI recommendations.
               </p>
               <Button onClick={refreshRecommendations}>

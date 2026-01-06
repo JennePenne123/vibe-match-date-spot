@@ -39,15 +39,15 @@ const DateInviteCardDetails = ({
     <>
       <DialogHeader>
         <DialogTitle className="flex items-center gap-3">
-          <Avatar className="w-10 h-10 border-2 border-pink-200">
+          <Avatar className="w-10 h-10 border-2 border-pink-200 dark:border-pink-800">
             <AvatarImage src={displayData.friendAvatar} alt={displayData.friendName} referrerPolicy="no-referrer" />
-            <AvatarFallback className="bg-pink-100 text-pink-600">
+            <AvatarFallback className="bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-300">
               {getInitials(displayData.friendName)}
             </AvatarFallback>
           </Avatar>
           <div>
-            <div className="font-semibold text-gray-900">{displayData.friendName}</div>
-            <div className="text-sm text-gray-600 font-normal">invited you to a date</div>
+            <div className="font-semibold text-foreground">{displayData.friendName}</div>
+            <div className="text-sm text-muted-foreground font-normal">invited you to a date</div>
           </div>
         </DialogTitle>
       </DialogHeader>
@@ -66,44 +66,44 @@ const DateInviteCardDetails = ({
         </div>
 
         {/* Message */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <p className="text-gray-700 italic">"{displayData.message}"</p>
+        <div className="bg-muted p-3 rounded-lg">
+          <p className="text-foreground italic">"{displayData.message}"</p>
         </div>
 
         {/* Venue Details */}
         <div className="space-y-3">
-          <h3 className="font-semibold text-gray-900">{displayData.venueName}</h3>
+          <h3 className="font-semibold text-foreground">{displayData.venueName}</h3>
           
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-600">{displayData.time}</span>
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground">{displayData.time}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-600">{displayData.duration}</span>
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground">{displayData.duration}</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-600">{displayData.location}</span>
+              <MapPin className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground">{displayData.location}</span>
             </div>
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-600">{displayData.estimatedCost}</span>
+              <DollarSign className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground">{displayData.estimatedCost}</span>
             </div>
           </div>
 
-          <div className="text-sm text-gray-600">
-            <strong>Address:</strong> {displayData.venueAddress}
+          <div className="text-sm text-muted-foreground">
+            <strong className="text-foreground">Address:</strong> {displayData.venueAddress}
           </div>
 
           {displayData.specialNotes && (
-            <div className="bg-blue-50 p-3 rounded-lg">
+            <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg">
               <div className="flex items-start gap-2">
-                <Info className="w-4 h-4 text-blue-600 mt-0.5" />
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5" />
                 <div>
-                  <div className="text-sm font-medium text-blue-900">Special Notes</div>
-                  <div className="text-sm text-blue-700">{displayData.specialNotes}</div>
+                  <div className="text-sm font-medium text-blue-900 dark:text-blue-100">Special Notes</div>
+                  <div className="text-sm text-blue-700 dark:text-blue-300">{displayData.specialNotes}</div>
                 </div>
               </div>
             </div>
@@ -140,7 +140,7 @@ const DateInviteCardDetails = ({
             <Button 
               onClick={onDecline} 
               variant="outline" 
-              className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+              className="flex-1 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
             >
               <X className="w-4 h-4 mr-2" />
               Decline
@@ -156,8 +156,8 @@ const DateInviteCardDetails = ({
             )}
             
             {dateStatus !== 'completed' && (
-              <div className="text-center py-3 bg-green-50 rounded-lg">
-                <p className="text-sm text-green-700">
+              <div className="text-center py-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                <p className="text-sm text-green-700 dark:text-green-300">
                   ✅ Date Confirmed! See you there!
                 </p>
               </div>
@@ -167,7 +167,7 @@ const DateInviteCardDetails = ({
               <Button 
                 onClick={onOpenCancelDialog}
                 variant="outline" 
-                className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                className="w-full text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-200 dark:border-red-800"
               >
                 <XCircle className="w-4 h-4 mr-2" />
                 Cancel Date
@@ -178,8 +178,8 @@ const DateInviteCardDetails = ({
 
         {/* Cancelled Status */}
         {status === 'cancelled' && (
-          <div className="text-center py-3 bg-red-50 rounded-lg mt-6">
-            <p className="text-sm text-red-600">
+          <div className="text-center py-3 bg-red-50 dark:bg-red-950/30 rounded-lg mt-6">
+            <p className="text-sm text-red-600 dark:text-red-400">
               🚫 This date has been cancelled
             </p>
           </div>

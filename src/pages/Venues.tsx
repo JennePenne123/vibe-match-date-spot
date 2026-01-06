@@ -68,8 +68,8 @@ const Venues = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
@@ -77,40 +77,40 @@ const Venues = () => {
   const displayName = user?.name || user?.email?.split('@')[0] || 'User';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="bg-white p-4 pt-12 shadow-sm">
+        <div className="bg-card p-4 pt-12 shadow-sm">
           <div className="flex items-center gap-4 mb-6">
             <Button
               onClick={() => navigate(-1)}
               variant="ghost"
               size="icon"
-              className="text-gray-600 hover:bg-gray-100"
+              className="text-muted-foreground hover:bg-muted"
             >
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Discover Venues</h1>
-              <p className="text-sm text-gray-600">Find your perfect date spot</p>
+              <h1 className="text-xl font-bold text-foreground">Discover Venues</h1>
+              <p className="text-sm text-muted-foreground">Find your perfect date spot</p>
             </div>
           </div>
 
           {/* Search */}
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               type="text"
               placeholder="Search venues..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-gray-50 border-gray-200"
+              className="pl-10 bg-muted border-border"
             />
           </div>
 
           {/* Filters */}
           <div className="flex items-center gap-2 mb-4">
-            <SlidersHorizontal className="w-4 h-4 text-gray-400" />
+            <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
             <div className="flex flex-wrap gap-2">
               {filters.map((filter) => (
                 <Badge
@@ -119,7 +119,7 @@ const Venues = () => {
                   className={`cursor-pointer transition-colors ${
                     selectedFilters.includes(filter) 
                       ? 'bg-pink-500 text-white hover:bg-pink-600' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   }`}
                   onClick={() => toggleFilter(filter)}
                 >
@@ -133,14 +133,14 @@ const Venues = () => {
         {/* Content */}
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               {filteredVenues.length} venue{filteredVenues.length !== 1 ? 's' : ''} found
             </p>
             <Button
               onClick={() => navigate('/my-venues')}
               variant="outline"
               size="sm"
-              className="border-pink-200 text-pink-600 hover:bg-pink-50"
+              className="border-pink-200 dark:border-pink-800 text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30"
             >
               <MapPin className="w-4 h-4 mr-1" />
               My Venues ({likedVenues.length})

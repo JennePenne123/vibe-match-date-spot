@@ -75,29 +75,29 @@ const Area = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 pt-12 bg-white shadow-sm">
+        <div className="flex items-center justify-between p-4 pt-12 bg-card shadow-sm">
           <Button
             onClick={() => navigate('/friends')}
             variant="ghost"
             size="icon"
-            className="text-gray-600 hover:bg-gray-100"
+            className="text-muted-foreground hover:bg-muted"
             disabled={appState.isLoading}
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-gray-900">Choose Area</h1>
-            <p className="text-sm text-gray-600">Step 3 of 3</p>
+            <h1 className="text-xl font-semibold text-foreground">Choose Area</h1>
+            <p className="text-sm text-muted-foreground">Step 3 of 3</p>
           </div>
           <div className="w-10" />
         </div>
 
         {/* Progress Bar */}
         <div className="px-6 mb-8 pt-4">
-          <div className="bg-gray-200 rounded-full h-2">
+          <div className="bg-muted rounded-full h-2">
             <div className="bg-gradient-primary rounded-full h-2 w-full transition-all duration-300" />
           </div>
         </div>
@@ -106,17 +106,17 @@ const Area = () => {
           {/* Location Status */}
           <div className="mb-6">
             {appState.userLocation ? (
-              <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <Navigation className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-green-700">Location enabled - finding venues near you</span>
+              <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+                <Navigation className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm text-green-700 dark:text-green-300">Location enabled - finding venues near you</span>
               </div>
             ) : appState.locationError ? (
-              <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="p-3 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-lg">
                 <div className="flex items-start gap-2 mb-2">
-                  <AlertCircle className="w-4 h-4 text-orange-600 mt-0.5" />
+                  <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-sm text-orange-700 font-medium">Location Access Needed</p>
-                    <p className="text-xs text-orange-600 mt-1">{appState.locationError}</p>
+                    <p className="text-sm text-orange-700 dark:text-orange-300 font-medium">Location Access Needed</p>
+                    <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">{appState.locationError}</p>
                   </div>
                 </div>
                 <Button
@@ -129,17 +129,17 @@ const Area = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
-                <span className="text-sm text-blue-700">Getting your location...</span>
+              <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <Loader2 className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" />
+                <span className="text-sm text-blue-700 dark:text-blue-300">Getting your location...</span>
               </div>
             )}
           </div>
 
           {/* Header Text */}
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Where would you like to go?</h2>
-            <p className="text-gray-600">Pick your preferred neighborhood for the perfect date</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Where would you like to go?</h2>
+            <p className="text-muted-foreground">Pick your preferred neighborhood for the perfect date</p>
           </div>
 
           {/* Area Selection */}
@@ -152,17 +152,17 @@ const Area = () => {
                 className={`w-full p-4 rounded-xl border-2 transition-all ${
                   selectedArea === area.id
                     ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                    : 'bg-card border-border text-foreground hover:bg-muted'
                 } ${appState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <div className="flex items-center gap-4">
                   <div className="text-2xl">{area.emoji}</div>
                   <div className="flex-1 text-left">
                     <div className="font-semibold">{area.name}</div>
-                    <div className={`text-sm ${selectedArea === area.id ? 'text-primary' : 'text-gray-500'}`}>
+                    <div className={`text-sm ${selectedArea === area.id ? 'text-primary' : 'text-muted-foreground'}`}>
                       {area.description}
                     </div>
-                    <div className={`flex items-center gap-4 text-xs mt-1 ${selectedArea === area.id ? 'text-primary' : 'text-gray-500'}`}>
+                    <div className={`flex items-center gap-4 text-xs mt-1 ${selectedArea === area.id ? 'text-primary' : 'text-muted-foreground'}`}>
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {area.time}

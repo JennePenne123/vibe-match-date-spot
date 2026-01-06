@@ -18,9 +18,9 @@ const CompatibilityScore: React.FC<CompatibilityScoreProps> = ({
   className = ''
 }) => {
   const getScoreColor = (scoreValue: number) => {
-    if (scoreValue >= 0.8) return 'text-green-600';
-    if (scoreValue >= 0.6) return 'text-yellow-600';
-    return 'text-red-500';
+    if (scoreValue >= 0.8) return 'text-green-600 dark:text-green-400';
+    if (scoreValue >= 0.6) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-500 dark:text-red-400';
   };
 
   const getScoreText = (scoreValue: number) => {
@@ -50,7 +50,7 @@ const CompatibilityScore: React.FC<CompatibilityScoreProps> = ({
               {formatPercentage(score.overall_score)}%
             </span>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             {getScoreText(score.overall_score)} compatibility overall
           </p>
           <Progress 
@@ -117,7 +117,7 @@ const CompatibilityScore: React.FC<CompatibilityScoreProps> = ({
         {/* Shared Preferences */}
         {score.compatibility_factors && (
           <div className="space-y-3">
-            <h4 className="font-medium text-sm text-gray-700">Shared Interests</h4>
+            <h4 className="font-medium text-sm text-muted-foreground">Shared Interests</h4>
             <div className="flex flex-wrap gap-2">
               {score.compatibility_factors.shared_cuisines?.map((cuisine: string) => (
                 <Badge key={cuisine} variant="secondary" className="text-xs">

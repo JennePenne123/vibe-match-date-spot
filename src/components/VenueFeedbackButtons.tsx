@@ -144,31 +144,31 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
     const styles = {
       super_like: {
         selected: 'bg-purple-500 hover:bg-purple-600 text-white',
-        unselected: 'hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300'
+        unselected: 'hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300 dark:hover:border-purple-700'
       },
       like: {
         selected: 'bg-red-500 hover:bg-red-600 text-white',
-        unselected: 'hover:bg-red-50 hover:text-red-500 hover:border-red-300'
+        unselected: 'hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-500 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-700'
       },
       interested: {
         selected: 'bg-blue-500 hover:bg-blue-600 text-white',
-        unselected: 'hover:bg-blue-50 hover:text-blue-500 hover:border-blue-300'
+        unselected: 'hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700'
       },
       visited: {
         selected: 'bg-green-500 hover:bg-green-600 text-white',
-        unselected: 'hover:bg-green-50 hover:text-green-500 hover:border-green-300'
+        unselected: 'hover:bg-green-50 dark:hover:bg-green-950/30 hover:text-green-500 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-700'
       },
       skip: {
         selected: 'bg-yellow-500 hover:bg-yellow-600 text-white',
-        unselected: 'hover:bg-yellow-50 hover:text-yellow-600 hover:border-yellow-300'
+        unselected: 'hover:bg-yellow-50 dark:hover:bg-yellow-950/30 hover:text-yellow-600 dark:hover:text-yellow-400 hover:border-yellow-300 dark:hover:border-yellow-700'
       },
       dislike: {
         selected: 'bg-gray-500 hover:bg-gray-600 text-white',
-        unselected: 'hover:bg-gray-50 hover:border-gray-300'
+        unselected: 'hover:bg-muted hover:border-border'
       },
       not_interested: {
         selected: 'bg-gray-600 hover:bg-gray-700 text-white',
-        unselected: 'hover:bg-gray-50 hover:border-gray-400'
+        unselected: 'hover:bg-muted hover:border-border'
       }
     };
 
@@ -336,34 +336,34 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
       {showStats && popularityStats.totalFeedback > 0 && (
         <div className="flex items-center gap-2 flex-wrap">
           {popularityStats.superLikes > 0 && (
-            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
+            <Badge variant="secondary" className="text-xs bg-purple-100 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300">
               <Sparkles className="h-3 w-3 mr-1 fill-current" />
               {popularityStats.superLikes} super like{popularityStats.superLikes !== 1 ? 's' : ''}
             </Badge>
           )}
           
           {popularityStats.likes > 0 && (
-            <Badge variant="secondary" className="text-xs bg-red-100 text-red-700">
+            <Badge variant="secondary" className="text-xs bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300">
               <Heart className="h-3 w-3 mr-1 fill-current" />
               {popularityStats.likes} like{popularityStats.likes !== 1 ? 's' : ''}
             </Badge>
           )}
 
           {popularityStats.visited > 0 && (
-            <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+            <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-300">
               <ThumbsUp className="h-3 w-3 mr-1" />
               {popularityStats.visited} visited
             </Badge>
           )}
           
           {popularityStats.popularityScore > 0.7 && (
-            <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-700">
+            <Badge variant="secondary" className="text-xs bg-yellow-100 dark:bg-yellow-950/30 text-yellow-700 dark:text-yellow-300">
               <Sparkles className="h-3 w-3 mr-1" />
               Popular Choice
             </Badge>
           )}
           
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-muted-foreground">
             {popularityStats.totalFeedback} total feedback{popularityStats.totalFeedback !== 1 ? 's' : ''}
           </span>
         </div>
@@ -371,7 +371,7 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
 
       {/* Current feedback status */}
       {currentFeedback && (
-        <div className="text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded">
+        <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
           <span className="font-medium">Your feedback:</span> {currentFeedback.replace('_', ' ')}
           {currentFeedback === 'super_like' && ' ✨'}
           {currentFeedback === 'like' && ' ❤️'}
@@ -382,7 +382,7 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
 
       {/* AI Learning Note */}
       {currentFeedback && ['like', 'super_like', 'dislike', 'not_interested'].includes(currentFeedback) && (
-        <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1">
+        <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 px-2 py-1 rounded flex items-center gap-1">
           <Sparkles className="h-3 w-3" />
           <span>Your feedback helps improve AI recommendations</span>
         </div>

@@ -19,7 +19,7 @@ const badgeVariants = cva(
         success: "border-transparent bg-success-500 text-white hover:bg-success-600",
         warning: "border-transparent bg-warning-500 text-white hover:bg-warning-600",
         error: "border-transparent bg-error-500 text-white hover:bg-error-600",
-        elegant: "border-neutral-200 bg-white text-neutral-700 shadow-premium-sm hover:shadow-premium-md hover:bg-neutral-50",
+        elegant: "border-border bg-card text-foreground shadow-premium-sm hover:shadow-premium-md hover:bg-muted",
       },
       size: {
         default: "px-2.5 py-0.5 text-xs",
