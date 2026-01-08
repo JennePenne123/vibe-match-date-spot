@@ -26,11 +26,48 @@ Deno.serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     const { action, referralCode, refereeId, invitationId } = await req.json()
     console.log(`Processing referral action: ${action}`, { referralCode, refereeId, invitationId })
+
+    // For validate_code action, no auth required (used during signup)
+    // For other actions, require authentication
+    if (action !== 'validate_code') {
+      // 1. Extract and verify JWT token
+      const authHeader = req.headers.get('authorization')
+      if (!authHeader) {
+        return new Response(
+          JSON.stringify({ error: 'Missing authorization header' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // 2. Create client with anon key for auth verification
+      const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } }
+      })
+      
+      const { data: { user }, error: authError } = await authClient.auth.getUser()
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // 3. Validate refereeId matches authenticated user for signup and first_date actions
+      if ((action === 'process_signup' || action === 'process_first_date') && refereeId !== user.id) {
+        return new Response(
+          JSON.stringify({ error: 'Forbidden: Cannot process referral for other users' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // 4. Now safe to use service role for database operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     if (action === 'validate_code') {
       // Check if referral code exists and is valid

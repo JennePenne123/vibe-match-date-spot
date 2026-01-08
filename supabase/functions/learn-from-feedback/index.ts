@@ -13,8 +13,30 @@ serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // 1. Extract and verify JWT token
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 2. Create client with anon key for auth verification
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+    
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const { 
       userId, 
@@ -29,6 +51,24 @@ serve(async (req) => {
       wouldRecommend,
       contextData
     } = await req.json();
+
+    // 3. Validate userId matches authenticated user
+    if (!userId) {
+      return new Response(
+        JSON.stringify({ error: 'userId is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (userId !== user.id) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden: Cannot submit feedback for other users' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 4. Now safe to use service role for database operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     console.log('📚 Learning from feedback:', { userId, venueId, predictedScore, actualRating });
 
