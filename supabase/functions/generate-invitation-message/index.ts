@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { checkRateLimit, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,6 +9,13 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Rate limiting for AI functions
+  const identifier = getRateLimitIdentifier(req);
+  if (!checkRateLimit(identifier, RATE_LIMITS.AI_FUNCTION)) {
+    console.log('🚫 GEN-INVITATION: Rate limit exceeded for:', identifier.substring(0, 20));
+    return rateLimitResponse(corsHeaders);
   }
 
   try {
