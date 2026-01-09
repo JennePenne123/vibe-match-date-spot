@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import DOMPurify from 'dompurify';
 
 export const exportToPDF = async (elementId: string, filename: string): Promise<void> => {
   const element = document.getElementById(elementId);
@@ -53,16 +54,26 @@ export const printReport = (elementId: string): void => {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
 
+  // Sanitize HTML to prevent XSS
+  const sanitizedHTML = DOMPurify.sanitize(element.innerHTML, {
+    ALLOWED_TAGS: ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
+                   'table', 'thead', 'tbody', 'tr', 'td', 'th', 
+                   'canvas', 'svg', 'path', 'g', 'rect', 'circle', 'line', 'text',
+                   'ul', 'ol', 'li', 'strong', 'em', 'br', 'img'],
+    ALLOWED_ATTR: ['class', 'style', 'viewBox', 'd', 'fill', 'stroke', 
+                   'width', 'height', 'x', 'y', 'cx', 'cy', 'r', 'transform', 'src', 'alt']
+  });
+
   printWindow.document.write(`
     <html>
       <head>
-        <title>VybePulse - December 2024 Report</title>
+        <title>VybePulse - Report</title>
         <style>
           body { margin: 0; padding: 20px; font-family: Inter, sans-serif; }
           @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
         </style>
       </head>
-      <body>${element.innerHTML}</body>
+      <body>${sanitizedHTML}</body>
     </html>
   `);
   printWindow.document.close();
