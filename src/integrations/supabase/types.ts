@@ -447,10 +447,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "date_invitations_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "date_invitations_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "date_invitations_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -646,10 +660,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "friendships_friend_id_fkey"
+            columns: ["friend_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "friendships_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friendships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -695,6 +723,13 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitation_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -933,6 +968,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -1031,6 +1073,7 @@ export type Database = {
         Row: {
           address: string
           created_at: string
+          created_by: string | null
           cuisine_type: string | null
           description: string | null
           foursquare_data: Json | null
@@ -1047,13 +1090,16 @@ export type Database = {
           photos: Json | null
           price_range: string | null
           rating: number | null
+          source: string | null
           tags: string[] | null
           updated_at: string
+          verified: boolean | null
           website: string | null
         }
         Insert: {
           address: string
           created_at?: string
+          created_by?: string | null
           cuisine_type?: string | null
           description?: string | null
           foursquare_data?: Json | null
@@ -1070,13 +1116,16 @@ export type Database = {
           photos?: Json | null
           price_range?: string | null
           rating?: number | null
+          source?: string | null
           tags?: string[] | null
           updated_at?: string
+          verified?: boolean | null
           website?: string | null
         }
         Update: {
           address?: string
           created_at?: string
+          created_by?: string | null
           cuisine_type?: string | null
           description?: string | null
           foursquare_data?: Json | null
@@ -1093,8 +1142,10 @@ export type Database = {
           photos?: Json | null
           price_range?: string | null
           rating?: number | null
+          source?: string | null
           tags?: string[] | null
           updated_at?: string
+          verified?: boolean | null
           website?: string | null
         }
         Relationships: []
@@ -1226,7 +1277,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_view: {
+        Row: {
+          level: number | null
+          streak_count: number | null
+          total_points: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      profiles_safe: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          id: string | null
+          name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: never
+          id?: string | null
+          name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: never
+          id?: string | null
+          name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       count_perfect_pairs: { Args: { target_user_id: string }; Returns: number }
