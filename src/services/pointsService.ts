@@ -103,15 +103,15 @@ export const getLevelProgress = (totalPoints: number, currentLevel: number): num
 };
 
 /**
- * Fetch leaderboard data
+ * Fetch leaderboard data using secure leaderboard_view
  */
 export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEntry[]> => {
-  // First, get the top user_points entries
-  const { data: pointsData, error: pointsError } = await supabase
-    .from('user_points')
+  // Use secure leaderboard_view that only exposes necessary public data
+  // Cast to 'any' since leaderboard_view is not in generated types yet
+  const { data: pointsData, error: pointsError } = await (supabase
+    .from('leaderboard_view' as any)
     .select('user_id, total_points, level, streak_count')
-    .order('total_points', { ascending: false })
-    .limit(limit);
+    .limit(limit)) as { data: Array<{ user_id: string; total_points: number; level: number; streak_count: number }> | null; error: any };
 
   if (pointsError) {
     console.error('Error fetching leaderboard:', pointsError);
@@ -122,12 +122,12 @@ export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEnt
     return [];
   }
 
-  // Then, fetch profiles for these users
+  // Fetch profiles using profiles_safe view (excludes email for non-owners)
   const userIds = pointsData.map(p => p.user_id);
-  const { data: profilesData, error: profilesError } = await supabase
-    .from('profiles')
+  const { data: profilesData, error: profilesError } = await (supabase
+    .from('profiles_safe' as any)
     .select('id, name, avatar_url')
-    .in('id', userIds);
+    .in('id', userIds)) as { data: Array<{ id: string; name: string; avatar_url: string | null }> | null; error: any };
 
   if (profilesError) {
     console.error('Error fetching profiles for leaderboard:', profilesError);
@@ -135,7 +135,7 @@ export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEnt
 
   // Combine the data
   const profilesMap = new Map(
-    (profilesData || []).map(p => [p.id, { name: p.name, avatar_url: p.avatar_url }])
+    (profilesData || []).map(p => [p.id, { name: p.name, avatar_url: p.avatar_url || undefined }])
   );
 
   return pointsData.map(entry => ({

@@ -478,7 +478,8 @@ async function transformAndSaveVenues(venues: any[]): Promise<any[]> {
             tags: venue.tags || [],
             latitude: venue.latitude,
             longitude: venue.longitude,
-            description: venue.description
+            description: venue.description,
+            source: 'google_places'  // Mark as trusted source for RLS policy
           })
           .select('id')
           .single();

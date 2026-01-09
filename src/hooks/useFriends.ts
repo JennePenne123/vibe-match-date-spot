@@ -15,6 +15,7 @@ export const useFriends = () => {
     setLoading(true);
     try {
       // Get accepted friendships where user is either the sender or recipient
+      // Note: We exclude email from friend profiles for privacy
       const { data, error } = await supabase
         .from('friendships')
         .select(`
@@ -22,8 +23,8 @@ export const useFriends = () => {
           status,
           user_id,
           friend_id,
-          user:profiles!user_id(id, name, email, avatar_url),
-          friend:profiles!friend_id(id, name, email, avatar_url)
+          user:profiles!user_id(id, name, avatar_url),
+          friend:profiles!friend_id(id, name, avatar_url)
         `)
         .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
         .eq('status', 'accepted');
@@ -48,7 +49,7 @@ export const useFriends = () => {
           friendsMap.set(profile.id, {
             id: profile.id,
             name: profile.name,
-            email: profile.email,
+            email: '', // Email is no longer fetched for friend profiles (privacy)
             avatar_url: profile.avatar_url,
             friendship_status: friendship.status as 'pending' | 'accepted' | 'declined' | 'blocked',
             friendship_id: friendship.id,
