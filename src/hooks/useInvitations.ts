@@ -356,7 +356,8 @@ export const useInvitations = () => {
           image_url: aiData.venue_data.image_url || aiData.venue_data.venue_image || aiData.venue_data.image,
           photos: aiData.venue_data.photos || aiData.venue_data.venue_photos || [],
           tags: aiData.venue_data.tags || aiData.venue_data.amenities || [],
-          is_active: true
+          is_active: true,
+          source: 'google_places' as const  // Mark as trusted source for RLS policy
         };
 
         const { data: savedVenue, error: venueError } = await supabase

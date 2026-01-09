@@ -327,7 +327,8 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
               latitude: venue.coordinates?.lat || venue.latitude,
               longitude: venue.coordinates?.lng || venue.longitude,
               is_active: true,
-              google_place_id: venue.google_place_id || venue.placeId
+              google_place_id: venue.google_place_id || venue.placeId,
+              source: 'google_places' as const  // Mark as trusted source for RLS policy
             };
             
             console.log('💾 COMPLETE PLANNING SESSION - Creating venue record:', venueRecord);
@@ -354,7 +355,8 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
               cuisine_type: 'Mixed',
               price_range: '$$',
               rating: 4.0,
-              is_active: true
+              is_active: true,
+              source: 'system' as const  // Mark as system source for RLS policy
             };
             
             const { error: basicVenueError } = await supabase
@@ -386,7 +388,8 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
           image_url: selectedVenue.venue_image || selectedVenue.image_url || selectedVenue.image,
           photos: selectedVenue.venue_photos || selectedVenue.photos || [],
           tags: selectedVenue.amenities || selectedVenue.tags || [],
-          is_active: true
+          is_active: true,
+          source: 'google_places' as const  // Mark as trusted source for RLS policy
         };
 
         const { data: savedVenue, error: venueError } = await supabase
