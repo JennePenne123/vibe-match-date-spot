@@ -1,25 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
-
-// Rate limiting store (in-memory for this example)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-const checkRateLimit = (identifier: string, limit = 60, windowMs = 60000): boolean => {
-  const now = Date.now();
-  const record = rateLimitStore.get(identifier);
-  
-  if (!record || now > record.resetTime) {
-    rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs });
-    return true;
-  }
-  
-  if (record.count >= limit) {
-    return false;
-  }
-  
-  record.count++;
-  return true;
-};
+import { checkRateLimit, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
 
 serve(async (req) => {
   console.log('🔍 SEARCH VENUES: ===== FUNCTION START =====');
@@ -30,24 +11,14 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  // Rate limiting for external API functions
+  const identifier = getRateLimitIdentifier(req);
+  if (!checkRateLimit(identifier, RATE_LIMITS.EXTERNAL_API)) {
+    console.log('🚫 SEARCH VENUES: Rate limit exceeded for:', identifier.substring(0, 20));
+    return rateLimitResponse(corsHeaders);
+  }
+
   try {
-    // Rate limiting - use IP or user ID
-    const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-    const authHeader = req.headers.get('authorization');
-    const identifier = authHeader ? `user-${authHeader.substring(0, 20)}` : `ip-${clientIP}`;
-    
-    if (!checkRateLimit(identifier)) {
-      console.log('🚫 SEARCH VENUES: Rate limit exceeded for', identifier.substring(0, 20));
-      return Response.json({
-        success: false,
-        error: 'Rate limit exceeded. Please try again later.',
-        details: 'Too many requests',
-        venues: []
-      }, { 
-        status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      });
-    }
     // 1. Parse and validate Request Body
     const requestBody = await req.json();
     console.log('📥 SEARCH VENUES: Request body received:', JSON.stringify(requestBody, null, 2));
