@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { checkRateLimit, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,6 +34,13 @@ const CUISINE_TO_FSQ_CATEGORIES: Record<string, string> = {
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Rate limiting for external API functions
+  const identifier = getRateLimitIdentifier(req);
+  if (!checkRateLimit(identifier, RATE_LIMITS.EXTERNAL_API)) {
+    console.log('🚫 FOURSQUARE: Rate limit exceeded for:', identifier.substring(0, 20));
+    return rateLimitResponse(corsHeaders);
   }
 
   try {

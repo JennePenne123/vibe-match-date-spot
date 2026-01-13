@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { checkRateLimit, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,6 +20,13 @@ serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Rate limiting for database operations
+  const identifier = getRateLimitIdentifier(req);
+  if (!checkRateLimit(identifier, RATE_LIMITS.DATABASE_OP)) {
+    console.log('🚫 SEND-PUSH: Rate limit exceeded for:', identifier.substring(0, 20));
+    return rateLimitResponse(corsHeaders);
   }
 
   try {

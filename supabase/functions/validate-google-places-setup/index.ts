@@ -1,25 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
-
-// Rate limiting for validation endpoint
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-const checkRateLimit = (identifier: string, limit = 10, windowMs = 60000): boolean => {
-  const now = Date.now();
-  const record = rateLimitStore.get(identifier);
-  
-  if (!record || now > record.resetTime) {
-    rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs });
-    return true;
-  }
-  
-  if (record.count >= limit) {
-    return false;
-  }
-  
-  record.count++;
-  return true;
-};
+import { checkRateLimit, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -27,18 +8,14 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  // Rate limiting for validation endpoints
+  const identifier = getRateLimitIdentifier(req);
+  if (!checkRateLimit(identifier, RATE_LIMITS.VALIDATION)) {
+    console.log('🚫 VALIDATE-GOOGLE: Rate limit exceeded for:', identifier.substring(0, 20));
+    return rateLimitResponse(corsHeaders);
+  }
+
   try {
-    // Rate limiting
-    const clientIP = req.headers.get('x-forwarded-for') || 'unknown';
-    if (!checkRateLimit(`validation-${clientIP}`, 10)) {
-      return Response.json({
-        isValid: false,
-        error: 'Rate limit exceeded for validation requests'
-      }, { 
-        status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      });
-    }
     console.log('🔍 VALIDATE GOOGLE PLACES: Starting validation...');
 
     // Check if API key is available
