@@ -25,6 +25,19 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Authenticate scheduled/manual invocations with CRON_SECRET
+  const cronSecret = Deno.env.get('CRON_SECRET');
+  const providedSecret = req.headers.get('x-cron-secret');
+  
+  // Require valid secret for all invocations
+  if (!cronSecret || providedSecret !== cronSecret) {
+    console.warn('⚠️ Unauthorized access attempt to calculate-feedback-rewards');
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized - Invalid or missing credentials' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   // Check if this is a manual trigger (for testing)
   const url = new URL(req.url);
   const isManualTrigger = url.searchParams.get('manual') === 'true';
