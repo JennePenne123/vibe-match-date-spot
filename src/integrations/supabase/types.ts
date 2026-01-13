@@ -830,6 +830,48 @@ export type Database = {
         }
         Relationships: []
       }
+      request_logs: {
+        Row: {
+          abuse_score: number | null
+          client_ip_hash: string | null
+          function_name: string
+          id: string
+          identifier_hash: string
+          limit_threshold: number | null
+          metadata: Json | null
+          request_count: number | null
+          timestamp: string | null
+          user_agent: string | null
+          was_rate_limited: boolean | null
+        }
+        Insert: {
+          abuse_score?: number | null
+          client_ip_hash?: string | null
+          function_name: string
+          id?: string
+          identifier_hash: string
+          limit_threshold?: number | null
+          metadata?: Json | null
+          request_count?: number | null
+          timestamp?: string | null
+          user_agent?: string | null
+          was_rate_limited?: boolean | null
+        }
+        Update: {
+          abuse_score?: number | null
+          client_ip_hash?: string | null
+          function_name?: string
+          id?: string
+          identifier_hash?: string
+          limit_threshold?: number | null
+          metadata?: Json | null
+          request_count?: number | null
+          timestamp?: string | null
+          user_agent?: string | null
+          was_rate_limited?: boolean | null
+        }
+        Relationships: []
+      }
       user_points: {
         Row: {
           badges: Json
@@ -1286,6 +1328,16 @@ export type Database = {
         }
         Relationships: []
       }
+      potential_abusers: {
+        Row: {
+          identifier_hash: string | null
+          last_seen: string | null
+          max_abuse_score: number | null
+          targeted_functions: string[] | null
+          total_blocked: number | null
+        }
+        Relationships: []
+      }
       profiles_safe: {
         Row: {
           avatar_url: string | null
@@ -1313,8 +1365,20 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_daily_summary: {
+        Row: {
+          avg_abuse_score: number | null
+          blocked_requests: number | null
+          date: string | null
+          function_name: string | null
+          total_requests: number | null
+          unique_identifiers: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      cleanup_old_request_logs: { Args: never; Returns: undefined }
       count_perfect_pairs: { Args: { target_user_id: string }; Returns: number }
       create_test_venues: { Args: { venues_data: Json }; Returns: boolean }
       has_role: {

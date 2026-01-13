@@ -1,3 +1,5 @@
+import { logRequest, RequestLogEntry } from './request-logger.ts';
+
 // In-memory rate limit store
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
@@ -13,6 +15,12 @@ export const RATE_LIMITS = {
   DATABASE_OP: { limit: 60, windowMs: 60000 },     // 60/min for DB operations
   VALIDATION: { limit: 10, windowMs: 60000 },      // 10/min for validation
 } as const;
+
+export interface RateLimitResult {
+  allowed: boolean;
+  count: number;
+  limit: number;
+}
 
 export const checkRateLimit = (
   identifier: string,
@@ -32,6 +40,41 @@ export const checkRateLimit = (
 
   record.count++;
   return true;
+};
+
+// Enhanced rate limit check with logging
+export const checkRateLimitWithLogging = async (
+  identifier: string,
+  functionName: string,
+  config: RateLimitConfig,
+  req: Request
+): Promise<RateLimitResult> => {
+  const allowed = checkRateLimit(identifier, config);
+  const record = rateLimitStore.get(identifier);
+  const count = record?.count || 1;
+  
+  const logEntry: RequestLogEntry = {
+    functionName,
+    identifier,
+    wasRateLimited: !allowed,
+    requestCount: count,
+    limitThreshold: config.limit,
+    clientIp: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined,
+    userAgent: req.headers.get('user-agent') || undefined,
+    metadata: {
+      method: req.method,
+      path: new URL(req.url).pathname
+    }
+  };
+  
+  // Log asynchronously (don't await to not slow down request)
+  logRequest(logEntry).catch(() => {});
+  
+  return {
+    allowed,
+    count,
+    limit: config.limit
+  };
 };
 
 export const getRateLimitIdentifier = (req: Request): string => {
