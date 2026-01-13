@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
-import { checkRateLimit, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
+import { checkRateLimitWithLogging, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -8,10 +8,11 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  // Rate limiting for validation endpoints
+  // Rate limiting with logging for validation endpoints
   const identifier = getRateLimitIdentifier(req);
-  if (!checkRateLimit(identifier, RATE_LIMITS.VALIDATION)) {
-    console.log('🚫 VALIDATE-GOOGLE: Rate limit exceeded for:', identifier.substring(0, 20));
+  const rateLimitResult = await checkRateLimitWithLogging(identifier, 'validate-google-places-setup', RATE_LIMITS.VALIDATION, req);
+  if (!rateLimitResult.allowed) {
+    console.log(`🚫 VALIDATE-GOOGLE: Rate limit ${rateLimitResult.count}/${rateLimitResult.limit}`);
     return rateLimitResponse(corsHeaders);
   }
 

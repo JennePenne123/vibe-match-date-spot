@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { checkRateLimit, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
+import { checkRateLimitWithLogging, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,10 +25,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  // Rate limiting for database operations
+  // Rate limiting with logging for database operations
   const identifier = getRateLimitIdentifier(req);
-  if (!checkRateLimit(identifier, RATE_LIMITS.DATABASE_OP)) {
-    console.log('🚫 PROCESS-REFERRAL: Rate limit exceeded for:', identifier.substring(0, 20));
+  const rateLimitResult = await checkRateLimitWithLogging(identifier, 'process-referral', RATE_LIMITS.DATABASE_OP, req);
+  if (!rateLimitResult.allowed) {
+    console.log(`🚫 PROCESS-REFERRAL: Rate limit ${rateLimitResult.count}/${rateLimitResult.limit}`);
     return rateLimitResponse(corsHeaders);
   }
 
