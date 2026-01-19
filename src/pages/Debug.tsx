@@ -12,6 +12,7 @@ import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
 import { Settings, Code, Database, Users, MapPin, Trophy, Brain } from 'lucide-react';
 import { GamificationTester } from '@/components/debug/GamificationTester';
 import { AILearningTester } from '@/components/debug/AILearningTester';
+import { CacheStatsDisplay } from '@/components/debug/CacheStatsDisplay';
 
 const Debug: React.FC = () => {
   // Only show in development
@@ -64,6 +65,7 @@ const Debug: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <CacheStatsDisplay />
           <VenueMatchingDebug />
         </CardContent>
       </Card>
