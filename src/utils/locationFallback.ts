@@ -34,18 +34,16 @@ export const getLocationFallback = async (userId?: string): Promise<LocationWith
     try {
       const { data: prefs } = await supabase
         .from('user_preferences')
-        .select('max_distance')
+        .select('home_latitude, home_longitude, home_address')
         .eq('user_id', userId)
         .single();
 
-      // Note: home_latitude, home_longitude fields don't exist yet in user_preferences
-      // This is prepared for future migration
-      if (prefs && (prefs as any).home_latitude && (prefs as any).home_longitude) {
+      if (prefs?.home_latitude && prefs?.home_longitude) {
         console.log('📍 Using user saved home location');
         return {
-          latitude: (prefs as any).home_latitude,
-          longitude: (prefs as any).home_longitude,
-          address: (prefs as any).home_address || 'Saved location',
+          latitude: prefs.home_latitude,
+          longitude: prefs.home_longitude,
+          address: prefs.home_address || 'Saved location',
           source: 'user_preferences'
         };
       }
