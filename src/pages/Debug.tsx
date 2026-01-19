@@ -9,10 +9,11 @@ import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import { TestDataControls } from '@/components/debug/TestDataControls';
 import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
 import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
-import { Settings, Code, Database, Users, MapPin, Trophy, Brain } from 'lucide-react';
+import { Settings, Code, Database, Users, MapPin, Trophy, Brain, Activity } from 'lucide-react';
 import { GamificationTester } from '@/components/debug/GamificationTester';
 import { AILearningTester } from '@/components/debug/AILearningTester';
 import { CacheStatsDisplay } from '@/components/debug/CacheStatsDisplay';
+import { ApiUsageDashboard } from '@/components/debug/ApiUsageDashboard';
 
 const Debug: React.FC = () => {
   // Only show in development
@@ -126,6 +127,19 @@ const Debug: React.FC = () => {
             partnerId={undefined}
             userId={undefined}
           />
+        </CardContent>
+      </Card>
+
+      {/* API Usage & Cost Monitoring Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            API Usage & Cost Monitoring
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ApiUsageDashboard />
         </CardContent>
       </Card>
     </div>
