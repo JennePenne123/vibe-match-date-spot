@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAIRecommendations } from '@/hooks/useAIRecommendations';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { useFriends } from '@/hooks/useFriends';
@@ -11,14 +12,20 @@ import SafeComponent from '@/components/SafeComponent';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles, RefreshCw, Users, MapPin } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Sparkles, RefreshCw, Users, MapPin, LayoutGrid, Map } from 'lucide-react';
 import { getUserName } from '@/utils/typeHelpers';
 import { safeFirstWord } from '@/lib/utils';
 
+// Lazy load VenueMapView to avoid SSR issues with Leaflet
+const VenueMapView = lazy(() => import('@/components/VenueMapView'));
+
 const AIRecommendations: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuthRedirect();
   const { friends } = useFriends();
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
   const { 
     recommendations, 
     compatibilityScore, 
@@ -39,6 +46,11 @@ const AIRecommendations: React.FC = () => {
     return { displayName, firstName };
   }, [user]);
 
+  const handleVenueSelect = (venueId: string) => {
+    console.log('Selected venue:', venueId);
+    navigate(`/venue/${venueId}`);
+  };
+
   if (!user || !userInfo) return <LoadingSpinner />;
 
   const { displayName, firstName } = userInfo;
@@ -55,7 +67,7 @@ const AIRecommendations: React.FC = () => {
         {/* Header Section */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
-            <Sparkles className="h-8 w-8 text-purple-500" />
+            <Sparkles className="h-8 w-8 text-primary" />
             <h1 className="text-3xl font-bold text-foreground">AI Date Recommendations</h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -120,9 +132,9 @@ const AIRecommendations: React.FC = () => {
 
         {/* Error State */}
         {error && (
-          <Card className="max-w-md mx-auto border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+          <Card className="max-w-md mx-auto border-destructive/50 bg-destructive/10">
             <CardContent className="pt-6 text-center">
-              <p className="text-red-600 dark:text-red-400">{error}</p>
+              <p className="text-destructive">{error}</p>
               <Button 
                 onClick={refreshRecommendations}
                 variant="outline"
@@ -137,32 +149,63 @@ const AIRecommendations: React.FC = () => {
         {/* AI Venue Recommendations */}
         {!loading && recommendations.length > 0 && (
           <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-foreground mb-2">
-                Recommended Venues
-              </h2>
-              <p className="text-muted-foreground">
-                {recommendations.length} venues ranked by AI compatibility
-              </p>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-center sm:text-left">
+                <h2 className="text-2xl font-semibold text-foreground mb-1">
+                  Recommended Venues
+                </h2>
+                <p className="text-muted-foreground">
+                  {recommendations.length} venues ranked by AI compatibility
+                </p>
+              </div>
+              
+              {/* View Mode Toggle */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="gap-1.5"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  Grid
+                </Button>
+                <Button
+                  variant={viewMode === 'map' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('map')}
+                  className="gap-1.5"
+                >
+                  <Map className="h-4 w-4" />
+                  Map
+                </Button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recommendations.map((recommendation) => (
-                <SafeComponent 
-                  key={recommendation.venue_id}
-                  componentName="AIVenueCard"
-                >
-                  <AIVenueCard
-                    recommendation={recommendation}
-                    onSelect={(venueId) => {
-                      console.log('Selected venue:', venueId);
-                      // Here you could navigate to venue details or start invitation flow
-                    }}
-                    showAIInsights={true}
-                  />
-                </SafeComponent>
-              ))}
-            </div>
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {recommendations.map((recommendation) => (
+                  <SafeComponent 
+                    key={recommendation.venue_id}
+                    componentName="AIVenueCard"
+                  >
+                    <AIVenueCard
+                      recommendation={recommendation}
+                      onSelect={handleVenueSelect}
+                      showAIInsights={true}
+                    />
+                  </SafeComponent>
+                ))}
+              </div>
+            ) : (
+              <Suspense fallback={<Skeleton className="h-[500px] rounded-lg" />}>
+                <VenueMapView
+                  recommendations={recommendations}
+                  onSelectVenue={handleVenueSelect}
+                  height="500px"
+                />
+              </Suspense>
+            )}
           </div>
         )}
 
