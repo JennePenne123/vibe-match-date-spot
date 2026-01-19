@@ -1008,6 +1008,9 @@ export type Database = {
         Row: {
           created_at: string
           dietary_restrictions: string[] | null
+          home_address: string | null
+          home_latitude: number | null
+          home_longitude: number | null
           id: string
           max_distance: number | null
           preferred_cuisines: string[] | null
@@ -1020,6 +1023,9 @@ export type Database = {
         Insert: {
           created_at?: string
           dietary_restrictions?: string[] | null
+          home_address?: string | null
+          home_latitude?: number | null
+          home_longitude?: number | null
           id?: string
           max_distance?: number | null
           preferred_cuisines?: string[] | null
@@ -1032,6 +1038,9 @@ export type Database = {
         Update: {
           created_at?: string
           dietary_restrictions?: string[] | null
+          home_address?: string | null
+          home_latitude?: number | null
+          home_longitude?: number | null
           id?: string
           max_distance?: number | null
           preferred_cuisines?: string[] | null
