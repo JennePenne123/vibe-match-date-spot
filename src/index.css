@@ -269,3 +269,64 @@
     animation: fade-in 0.4s ease-out;
   }
 }
+
+/* Custom venue map marker styles */
+.custom-venue-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.venue-marker {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid white;
+}
+
+.venue-marker-score {
+  transform: rotate(45deg);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Custom marker cluster styles */
+.custom-cluster-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.venue-cluster-icon {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.4);
+  border: 3px solid white;
+}
+
+.venue-cluster-icon-small {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.venue-cluster-icon-medium {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+.venue-cluster-icon-large {
+  width: 50px;
+  height: 50px;
+  font-size: 16px;
+}
