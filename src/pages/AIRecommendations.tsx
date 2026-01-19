@@ -1,5 +1,5 @@
 
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAIRecommendations } from '@/hooks/useAIRecommendations';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Sparkles, RefreshCw, Users, MapPin, LayoutGrid, Map } from 'lucide-react';
 import { getUserName } from '@/utils/typeHelpers';
 import { safeFirstWord } from '@/lib/utils';
+import { getLocationFallback } from '@/utils/locationFallback';
 
 // Lazy load VenueMapView to avoid SSR issues with Leaflet
 const VenueMapView = lazy(() => import('@/components/VenueMapView'));
@@ -26,6 +27,7 @@ const AIRecommendations: React.FC = () => {
   const { friends } = useFriends();
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | undefined>();
   const { 
     recommendations, 
     compatibilityScore, 
@@ -33,6 +35,19 @@ const AIRecommendations: React.FC = () => {
     error, 
     refreshRecommendations 
   } = useAIRecommendations(selectedPartnerId || undefined);
+
+  // Fetch user's saved home location for directions
+  useEffect(() => {
+    const loadUserLocation = async () => {
+      if (user) {
+        const location = await getLocationFallback(user.id);
+        if (location.source === 'user_preferences') {
+          setUserLocation({ latitude: location.latitude, longitude: location.longitude });
+        }
+      }
+    };
+    loadUserLocation();
+  }, [user]);
 
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
 
@@ -202,6 +217,7 @@ const AIRecommendations: React.FC = () => {
                 <VenueMapView
                   recommendations={recommendations}
                   onSelectVenue={handleVenueSelect}
+                  userLocation={userLocation}
                   height="500px"
                 />
               </Suspense>

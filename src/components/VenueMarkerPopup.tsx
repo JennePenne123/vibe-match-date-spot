@@ -1,15 +1,34 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, MapPin } from 'lucide-react';
+import { Star, MapPin, Car, Footprints } from 'lucide-react';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
+import { openDirections } from '@/utils/navigationHelpers';
 
 interface VenueMarkerPopupProps {
   recommendation: AIVenueRecommendation;
   onSelect: (venueId: string) => void;
+  userLocation?: { latitude: number; longitude: number };
 }
 
-const VenueMarkerPopup = ({ recommendation, onSelect }: VenueMarkerPopupProps) => {
+const VenueMarkerPopup = ({ recommendation, onSelect, userLocation }: VenueMarkerPopupProps) => {
+  const hasDirections = userLocation && 
+    recommendation.latitude != null && 
+    recommendation.longitude != null;
+
+  const handleDirections = (mode: 'driving' | 'walking') => {
+    if (!userLocation || !recommendation.latitude || !recommendation.longitude) return;
+    
+    openDirections({
+      originLat: userLocation.latitude,
+      originLng: userLocation.longitude,
+      destLat: recommendation.latitude,
+      destLng: recommendation.longitude,
+      destName: recommendation.venue_name,
+      mode
+    });
+  };
+
   return (
     <div className="min-w-[200px] p-1">
       <div className="flex items-center justify-between mb-2">
@@ -41,6 +60,30 @@ const VenueMarkerPopup = ({ recommendation, onSelect }: VenueMarkerPopupProps) =
           </span>
         )}
       </div>
+
+      {/* Directions buttons */}
+      {hasDirections && (
+        <div className="flex gap-2 mb-2">
+          <Button 
+            size="sm" 
+            variant="outline"
+            className="flex-1 text-xs h-7"
+            onClick={() => handleDirections('driving')}
+          >
+            <Car className="w-3 h-3 mr-1" />
+            Drive
+          </Button>
+          <Button 
+            size="sm" 
+            variant="outline"
+            className="flex-1 text-xs h-7"
+            onClick={() => handleDirections('walking')}
+          >
+            <Footprints className="w-3 h-3 mr-1" />
+            Walk
+          </Button>
+        </div>
+      )}
       
       <Button 
         size="sm" 
