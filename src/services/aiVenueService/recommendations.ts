@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
 import { API_CONFIG } from '@/config/apiConfig';
+import { venueCacheService } from '@/services/venueCacheService';
 
 export interface AIVenueRecommendation {
   venue_id: string;
@@ -166,15 +167,39 @@ const getVenuesFromMultipleSources = async (
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) => {
+  // Check cache first if we have location
+  if (userLocation?.latitude && userLocation?.longitude) {
+    const cachedVenues = venueCacheService.getCachedSearch(
+      userLocation.latitude,
+      userLocation.longitude
+    );
+    if (cachedVenues && cachedVenues.length > 0) {
+      console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
+      return cachedVenues;
+    }
+  }
+
   const strategy = API_CONFIG.venueSearchStrategy;
+  let venues: any[] = [];
   
   if (strategy === 'google-first') {
-    return await getVenuesGoogleFirst(userId, limit, userLocation);
+    venues = await getVenuesGoogleFirst(userId, limit, userLocation);
   } else if (strategy === 'foursquare-first') {
-    return await getVenuesFoursquareFirst(userId, limit, userLocation);
+    venues = await getVenuesFoursquareFirst(userId, limit, userLocation);
+  } else {
+    venues = await getVenuesParallel(userId, limit, userLocation);
   }
   
-  return await getVenuesParallel(userId, limit, userLocation);
+  // Store in cache after fetching
+  if (venues.length > 0 && userLocation?.latitude && userLocation?.longitude) {
+    venueCacheService.setCachedSearch(
+      userLocation.latitude,
+      userLocation.longitude,
+      venues
+    );
+  }
+  
+  return venues;
 };
 
 /**
