@@ -1,9 +1,10 @@
-
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Star, MapPin, Car, Footprints } from 'lucide-react';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { openDirections } from '@/utils/navigationHelpers';
+import { useRouteInfo } from '@/hooks/useRouteInfo';
 
 interface VenueMarkerPopupProps {
   recommendation: AIVenueRecommendation;
@@ -12,9 +13,18 @@ interface VenueMarkerPopupProps {
 }
 
 const VenueMarkerPopup = ({ recommendation, onSelect, userLocation }: VenueMarkerPopupProps) => {
-  const hasDirections = userLocation && 
+  const hasCoordinates = userLocation && 
     recommendation.latitude != null && 
     recommendation.longitude != null;
+
+  // Fetch route info for both driving and walking
+  const { driving, walking, loading } = useRouteInfo({
+    originLat: userLocation?.latitude,
+    originLng: userLocation?.longitude,
+    destLat: recommendation.latitude ?? undefined,
+    destLng: recommendation.longitude ?? undefined,
+    enabled: hasCoordinates
+  });
 
   const handleDirections = (mode: 'driving' | 'walking') => {
     if (!userLocation || !recommendation.latitude || !recommendation.longitude) return;
@@ -61,8 +71,40 @@ const VenueMarkerPopup = ({ recommendation, onSelect, userLocation }: VenueMarke
         )}
       </div>
 
+      {/* Travel time estimates */}
+      {hasCoordinates && (
+        <div className="bg-muted/50 rounded-md p-2 mb-3 space-y-1.5">
+          {loading ? (
+            <>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </>
+          ) : (
+            <>
+              {driving && (
+                <div className="flex items-center gap-2 text-xs text-foreground">
+                  <Car className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="font-medium">{driving.durationText}</span>
+                  <span className="text-muted-foreground">· {driving.distanceText}</span>
+                </div>
+              )}
+              {walking && (
+                <div className="flex items-center gap-2 text-xs text-foreground">
+                  <Footprints className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="font-medium">{walking.durationText}</span>
+                  <span className="text-muted-foreground">· {walking.distanceText}</span>
+                </div>
+              )}
+              {!driving && !walking && (
+                <p className="text-xs text-muted-foreground">Unable to calculate route</p>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
       {/* Directions buttons */}
-      {hasDirections && (
+      {hasCoordinates && (
         <div className="flex gap-2 mb-2">
           <Button 
             size="sm" 
