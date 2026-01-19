@@ -35,6 +35,11 @@ export const API_CONFIG = {
   // Fallback behavior
   requireAtLeastOneSource: true, // If true, fail if both APIs fail
   minVenuesForSuccess: 3, // Minimum venues needed to consider search successful
+  
+  // AI Enhancement (Point 1: AI Edge Function Integration)
+  aiEnhancementEnabled: false, // Set to true to enable AI reasoning for top venues
+  aiEnhancementTopN: 3, // Number of top venues to enhance with AI
+  aiEnhancementCostPerCall: 0.01, // Estimated cost per AI enhancement call
 };
 
 /**
@@ -46,4 +51,8 @@ export const FEATURE_FLAGS = {
   showVerifiedBadge: true,
   showDetailedCategories: true,
   enableDebugLogging: true,
+  
+  // AI Pipeline features
+  enableAIPipelineVisualization: true,
+  enableAIEnhancement: false, // Matches aiEnhancementEnabled
 };

@@ -9,12 +9,12 @@ import { SmartPlannerDebug } from '@/components/debug/SmartPlannerDebug';
 import { TestDataControls } from '@/components/debug/TestDataControls';
 import { AIAnalysisTestButton } from '@/components/debug/AIAnalysisTestButton';
 import CompatibilityDebug from '@/components/debug/CompatibilityDebug';
-import { Settings, Code, Database, Users, MapPin, Trophy, Brain, Activity } from 'lucide-react';
+import { Settings, Code, Database, Users, MapPin, Trophy, Brain, Activity, Workflow } from 'lucide-react';
 import { GamificationTester } from '@/components/debug/GamificationTester';
 import { AILearningTester } from '@/components/debug/AILearningTester';
 import { CacheStatsDisplay } from '@/components/debug/CacheStatsDisplay';
 import { ApiUsageDashboard } from '@/components/debug/ApiUsageDashboard';
-
+import { AIPipelineVisualization } from '@/components/debug/AIPipelineVisualization';
 const Debug: React.FC = () => {
   // Only show in development
   if (process.env.NODE_ENV === 'production') {
@@ -82,6 +82,19 @@ const Debug: React.FC = () => {
         <CardContent className="space-y-4">
           <AIAnalysisTestButton />
           <SmartPlannerDebug currentStep="preferences" />
+        </CardContent>
+      </Card>
+
+      {/* AI Pipeline Visualization Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Workflow className="h-5 w-5" />
+            AI Pipeline Visualization
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AIPipelineVisualization />
         </CardContent>
       </Card>
 
