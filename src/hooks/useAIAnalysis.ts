@@ -4,6 +4,7 @@ import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { getCompatibilityScore, CompatibilityScore } from '@/services/aiMatchingService';
 import { getAIVenueRecommendations } from '@/services/aiVenueService';
 import { supabase } from '@/integrations/supabase/client';
+import { getLocationFallback } from '@/utils/locationFallback';
 
 interface DatePreferences {
   preferred_cuisines?: string[];
@@ -148,14 +149,15 @@ export const useAIAnalysis = () => {
       if (!userLocation?.latitude || !userLocation?.longitude) {
         console.warn('⚠️ AI ANALYSIS: User location not available, trying fallback location...');
         
-        // Try to use a default location based on user preferences or fallback to San Francisco
+        // Use configurable fallback location system
+        const fallbackResult = await getLocationFallback(user.id);
         const fallbackLocation = {
-          latitude: 37.7749,
-          longitude: -122.4194,
-          address: 'San Francisco, CA'
+          latitude: fallbackResult.latitude,
+          longitude: fallbackResult.longitude,
+          address: fallbackResult.address
         };
         
-        console.log('📍 AI ANALYSIS: Using fallback location:', fallbackLocation);
+        console.log('📍 AI ANALYSIS: Using fallback location:', fallbackLocation, '(source:', fallbackResult.source, ')');
         userLocation = fallbackLocation;
       } else {
         console.log('📍 AI ANALYSIS: User location validated:', userLocation);
