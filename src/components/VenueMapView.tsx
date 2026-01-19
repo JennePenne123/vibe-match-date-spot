@@ -193,6 +193,7 @@ const VenueMapView = ({
                   <VenueMarkerPopup 
                     recommendation={recommendation}
                     onSelect={onSelectVenue}
+                    userLocation={userLocation}
                   />
                 </Popup>
               </Marker>
