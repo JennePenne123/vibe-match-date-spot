@@ -35,3 +35,9 @@ verify_jwt = true
 
 [functions.send-push-notification]
 verify_jwt = false
+
+[functions.cleanup-sessions]
+verify_jwt = false
+
+[functions.validate-google-places-setup]
+verify_jwt = true
