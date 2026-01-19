@@ -220,6 +220,45 @@ export type Database = {
         }
         Relationships: []
       }
+      api_usage_logs: {
+        Row: {
+          api_name: string
+          cache_hit: boolean | null
+          created_at: string | null
+          endpoint: string | null
+          estimated_cost: number | null
+          id: string
+          request_metadata: Json | null
+          response_status: number | null
+          response_time_ms: number | null
+          user_id: string | null
+        }
+        Insert: {
+          api_name: string
+          cache_hit?: boolean | null
+          created_at?: string | null
+          endpoint?: string | null
+          estimated_cost?: number | null
+          id?: string
+          request_metadata?: Json | null
+          response_status?: number | null
+          response_time_ms?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          api_name?: string
+          cache_hit?: boolean | null
+          created_at?: string | null
+          endpoint?: string | null
+          estimated_cost?: number | null
+          id?: string
+          request_metadata?: Json | null
+          response_status?: number | null
+          response_time_ms?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       coding_conversations: {
         Row: {
           created_at: string | null
@@ -1319,6 +1358,18 @@ export type Database = {
       }
     }
     Views: {
+      api_usage_daily: {
+        Row: {
+          api_name: string | null
+          avg_response_time_ms: number | null
+          cache_hits: number | null
+          date: string | null
+          error_count: number | null
+          total_calls: number | null
+          total_cost: number | null
+        }
+        Relationships: []
+      }
       leaderboard_view: {
         Row: {
           level: number | null
@@ -1379,6 +1430,14 @@ export type Database = {
     }
     Functions: {
       cleanup_old_request_logs: { Args: never; Returns: undefined }
+      cleanup_stale_sessions: {
+        Args: never
+        Returns: {
+          deleted_messages: number
+          deleted_proposals: number
+          expired_sessions: number
+        }[]
+      }
       count_perfect_pairs: { Args: { target_user_id: string }; Returns: number }
       create_test_venues: { Args: { venues_data: Json }; Returns: boolean }
       has_role: {

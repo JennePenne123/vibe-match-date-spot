@@ -10,6 +10,7 @@ import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationSystem from "./components/NotificationSystem";
 import PushNotificationPrompt from "./components/PushNotificationPrompt";
+import OfflineBanner from "./components/OfflineBanner";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Onboarding from "./pages/Onboarding";
@@ -81,6 +82,7 @@ const App = () => (
           <AuthProvider>
             <AppProvider>
               <NotificationSystem>
+                <OfflineBanner />
                 <PushNotificationPrompt />
                 <ErrorBoundary level="page" silent={true}>
                   <Routes>

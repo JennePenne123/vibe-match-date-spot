@@ -14,5 +14,28 @@
       "type": "image/x-icon"
     }
   ],
-  "categories": ["lifestyle", "social"]
+  "categories": ["lifestyle", "social"],
+  "prefer_related_applications": false,
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "Plan a Date",
+      "short_name": "Plan",
+      "description": "Start planning a new date",
+      "url": "/smart-date-planning",
+      "icons": [{ "src": "/favicon.ico", "sizes": "96x96" }]
+    },
+    {
+      "name": "My Friends",
+      "short_name": "Friends",
+      "description": "View your friends list",
+      "url": "/my-friends",
+      "icons": [{ "src": "/favicon.ico", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "handle_links": "preferred"
 }
