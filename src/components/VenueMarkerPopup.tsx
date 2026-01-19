@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Star, MapPin, Car, Footprints } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Star, MapPin, Car, Footprints, Home, Navigation } from 'lucide-react';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
-import { openDirections } from '@/utils/navigationHelpers';
+import { openDirections, openDirectionsFromCurrentLocation } from '@/utils/navigationHelpers';
 import { useRouteInfo } from '@/hooks/useRouteInfo';
 
 interface VenueMarkerPopupProps {
@@ -13,30 +15,47 @@ interface VenueMarkerPopupProps {
 }
 
 const VenueMarkerPopup = ({ recommendation, onSelect, userLocation }: VenueMarkerPopupProps) => {
-  const hasCoordinates = userLocation && 
+  const hasHomeLocation = userLocation && 
     recommendation.latitude != null && 
     recommendation.longitude != null;
+  
+  const hasVenueCoordinates = recommendation.latitude != null && recommendation.longitude != null;
 
-  // Fetch route info for both driving and walking
+  // Default to home if available, otherwise current
+  const [locationSource, setLocationSource] = useState<'home' | 'current'>(
+    hasHomeLocation ? 'home' : 'current'
+  );
+
+  // Fetch route info for both driving and walking (only when home is selected)
   const { driving, walking, loading } = useRouteInfo({
     originLat: userLocation?.latitude,
     originLng: userLocation?.longitude,
     destLat: recommendation.latitude ?? undefined,
     destLng: recommendation.longitude ?? undefined,
-    enabled: hasCoordinates
+    enabled: hasHomeLocation && locationSource === 'home'
   });
 
   const handleDirections = (mode: 'driving' | 'walking') => {
-    if (!userLocation || !recommendation.latitude || !recommendation.longitude) return;
+    if (!recommendation.latitude || !recommendation.longitude) return;
     
-    openDirections({
-      originLat: userLocation.latitude,
-      originLng: userLocation.longitude,
-      destLat: recommendation.latitude,
-      destLng: recommendation.longitude,
-      destName: recommendation.venue_name,
-      mode
-    });
+    if (locationSource === 'current') {
+      openDirectionsFromCurrentLocation({
+        destLat: recommendation.latitude,
+        destLng: recommendation.longitude,
+        destName: recommendation.venue_name,
+        mode
+      });
+    } else {
+      if (!userLocation) return;
+      openDirections({
+        originLat: userLocation.latitude,
+        originLng: userLocation.longitude,
+        destLat: recommendation.latitude,
+        destLng: recommendation.longitude,
+        destName: recommendation.venue_name,
+        mode
+      });
+    }
   };
 
   return (
@@ -71,8 +90,39 @@ const VenueMarkerPopup = ({ recommendation, onSelect, userLocation }: VenueMarke
         )}
       </div>
 
-      {/* Travel time estimates */}
-      {hasCoordinates && (
+      {/* Location source toggle */}
+      {hasVenueCoordinates && (
+        <div className="mb-2">
+          <p className="text-xs text-muted-foreground mb-1">Directions from:</p>
+          <ToggleGroup 
+            type="single" 
+            value={locationSource} 
+            onValueChange={(v) => v && setLocationSource(v as 'home' | 'current')}
+            className="justify-start"
+          >
+            <ToggleGroupItem 
+              value="home" 
+              size="sm" 
+              disabled={!hasHomeLocation}
+              className="text-xs h-7 px-2"
+            >
+              <Home className="w-3 h-3 mr-1" />
+              Home
+            </ToggleGroupItem>
+            <ToggleGroupItem 
+              value="current" 
+              size="sm"
+              className="text-xs h-7 px-2"
+            >
+              <Navigation className="w-3 h-3 mr-1" />
+              Current
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+      )}
+
+      {/* Travel time estimates - only show for home location */}
+      {locationSource === 'home' && hasHomeLocation && (
         <div className="bg-muted/50 rounded-md p-2 mb-3 space-y-1.5">
           {loading ? (
             <>
@@ -103,8 +153,16 @@ const VenueMarkerPopup = ({ recommendation, onSelect, userLocation }: VenueMarke
         </div>
       )}
 
+      {/* Info note for current location */}
+      {locationSource === 'current' && hasVenueCoordinates && (
+        <p className="text-xs text-muted-foreground mb-2 italic flex items-center gap-1">
+          <Navigation className="w-3 h-3" />
+          Travel time shown in maps app
+        </p>
+      )}
+
       {/* Directions buttons */}
-      {hasCoordinates && (
+      {hasVenueCoordinates && (
         <div className="flex gap-2 mb-2">
           <Button 
             size="sm" 
