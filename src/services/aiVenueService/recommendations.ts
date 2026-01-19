@@ -7,6 +7,7 @@ import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
+import { apiUsageService } from '@/services/apiUsageService';
 
 export interface AIVenueRecommendation {
   venue_id: string;
@@ -175,6 +176,21 @@ const getVenuesFromMultipleSources = async (
     );
     if (cachedVenues && cachedVenues.length > 0) {
       console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
+      
+      // Log cache hit as a "free" API call
+      await apiUsageService.logApiCall({
+        api_name: 'venue_cache',
+        endpoint: '/cached-search',
+        user_id: userId,
+        response_status: 200,
+        cache_hit: true,
+        estimated_cost: 0,
+        request_metadata: { 
+          venueCount: cachedVenues.length,
+          location: `${userLocation.latitude.toFixed(4)},${userLocation.longitude.toFixed(4)}`
+        }
+      });
+      
       return cachedVenues;
     }
   }
@@ -357,6 +373,8 @@ const getVenuesFromFoursquare = async (
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) => {
+  const timer = apiUsageService.createTimer('foursquare', '/search-venues-foursquare');
+  
   try {
     if (!userLocation?.latitude || !userLocation?.longitude) {
       return [];
@@ -368,7 +386,10 @@ const getVenuesFromFoursquare = async (
       .eq('user_id', userId)
       .single();
     
-    if (!userPrefs) return [];
+    if (!userPrefs) {
+      await timer.end({ status: 400, cacheHit: false, userId, metadata: { error: 'No user preferences' } });
+      return [];
+    }
     
     const { data, error } = await supabase.functions.invoke('search-venues-foursquare', {
       body: {
@@ -380,10 +401,35 @@ const getVenuesFromFoursquare = async (
       }
     });
     
-    if (error) return [];
+    if (error) {
+      await timer.end({ 
+        status: 500, 
+        cacheHit: false, 
+        userId,
+        metadata: { error: error.message }
+      });
+      return [];
+    }
     
-    return data?.venues || [];
-  } catch {
+    const venues = data?.venues || [];
+    await timer.end({ 
+      status: 200, 
+      cacheHit: false, 
+      userId,
+      metadata: { 
+        venueCount: venues.length,
+        location: `${userLocation.latitude.toFixed(4)},${userLocation.longitude.toFixed(4)}`
+      }
+    });
+    
+    return venues;
+  } catch (err) {
+    await timer.end({ 
+      status: 500, 
+      cacheHit: false, 
+      userId,
+      metadata: { error: err instanceof Error ? err.message : 'Unknown error' }
+    });
     return [];
   }
 };
@@ -396,6 +442,8 @@ const getVenuesFromGooglePlaces = async (
   limit: number, 
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) => {
+  const timer = apiUsageService.createTimer('google_places', '/search-venues');
+  
   try {
     if (!userId || !userLocation?.latitude || !userLocation?.longitude) {
       throw new Error('User ID and valid location are required');
@@ -408,6 +456,7 @@ const getVenuesFromGooglePlaces = async (
       .single();
 
     if (prefsError || !userPrefs) {
+      await timer.end({ status: 400, cacheHit: false, userId, metadata: { error: 'Preferences not found' } });
       throw new Error('User preferences not found. Please set your preferences first.');
     }
 
@@ -419,6 +468,7 @@ const getVenuesFromGooglePlaces = async (
 
     const locationValidation = validateLocation(userLocation);
     if (!locationValidation.isValid) {
+      await timer.end({ status: 400, cacheHit: false, userId, metadata: { error: 'Invalid location' } });
       throw new Error(locationValidation.error || 'Invalid user location');
     }
 
@@ -444,8 +494,27 @@ const getVenuesFromGooglePlaces = async (
       
       if (result?.error) throw new Error(result.error.message);
       searchResult = result?.data;
-    } catch {
-      // Edge function failed, try database fallback
+      
+      // Log successful API call
+      const venues = searchResult?.venues || [];
+      await timer.end({ 
+        status: 200, 
+        cacheHit: false, 
+        userId,
+        metadata: { 
+          venueCount: venues.length,
+          location: `${latitude.toFixed(4)},${longitude.toFixed(4)}`
+        }
+      });
+    } catch (edgeFnError) {
+      // Edge function failed, log the failure
+      await timer.end({ 
+        status: 500, 
+        cacheHit: false, 
+        userId,
+        metadata: { error: edgeFnError instanceof Error ? edgeFnError.message : 'Edge function failed' }
+      });
+      // Try database fallback
     }
     
     if (!searchResult) {

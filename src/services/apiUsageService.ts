@@ -19,14 +19,16 @@ interface ApiUsageEntry {
 
 // Estimated costs per API call (in USD)
 const API_COSTS: Record<string, number> = {
-  'google_places': 0.017,      // ~$17 per 1000 requests
+  'google_places': 0.017,           // ~$17 per 1000 requests
   'google_places_details': 0.017,
-  'foursquare': 0.00,          // Free tier
+  'foursquare': 0.00,               // Free tier
   'foursquare_details': 0.00,
-  'radar': 0.001,              // ~$1 per 1000 requests
-  'openai_gpt4': 0.03,         // ~$30 per 1000 requests (varies)
-  'openai_gpt35': 0.002,       // ~$2 per 1000 requests
-  'supabase_edge': 0.000002,   // ~$2 per million
+  'radar': 0.001,                   // ~$1 per 1000 requests
+  'openai_gpt4': 0.03,              // ~$30 per 1000 requests (varies)
+  'openai_gpt35': 0.002,            // ~$2 per 1000 requests
+  'supabase_edge': 0.000002,        // ~$2 per million
+  'venue_cache': 0.00,              // Cache hits are free
+  'analyze_compatibility': 0.01,    // AI compatibility analysis
 };
 
 // Local buffer for batch inserts
