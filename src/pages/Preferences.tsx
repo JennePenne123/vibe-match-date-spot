@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,8 +6,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, ArrowRight, Check, Clock, DollarSign, MapPin, Settings, Coffee, Heart, Navigation, Loader2, X } from 'lucide-react';
 
+const MapPreview = lazy(() => import('@/components/MapPreview'));
 interface Preference {
   id: string;
   name: string;
@@ -663,26 +665,44 @@ const Preferences = () => {
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         </div>
         
-        {/* Display Coordinates if Set */}
+        {/* Display Coordinates and Map if Set */}
         {homeLatitude && homeLongitude && (
-          <div className="mt-3 p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <span className="text-sm text-green-800 dark:text-green-300">
-                  Location saved: {homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}
-                </span>
+          <>
+            <div className="mt-3 p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm text-green-800 dark:text-green-300">
+                    Location saved: {homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}
+                  </span>
+                </div>
+                <Button
+                  onClick={clearHomeLocation}
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
-              <Button
-                onClick={clearHomeLocation}
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
-              >
-                <X className="w-4 h-4" />
-              </Button>
             </div>
-          </div>
+            
+            {/* Map Preview */}
+            <div className="mt-4">
+              <Suspense fallback={<Skeleton className="h-[180px] w-full rounded-lg" />}>
+                <MapPreview 
+                  latitude={homeLatitude}
+                  longitude={homeLongitude}
+                  address={homeAddress}
+                  height="180px"
+                  zoom={14}
+                />
+              </Suspense>
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Your saved home location
+              </p>
+            </div>
+          </>
         )}
         
         {/* Error Display */}
