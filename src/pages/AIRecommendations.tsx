@@ -334,6 +334,7 @@ const AIRecommendations: React.FC = () => {
                   onSelectVenue={handleVenueSelect}
                   userLocation={userLocation}
                   height="500px"
+                  routeData={routeData}
                 />
               </Suspense>
             )}

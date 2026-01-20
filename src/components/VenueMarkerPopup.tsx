@@ -7,14 +7,19 @@ import { Star, MapPin, Car, Footprints, Home, Navigation } from 'lucide-react';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { openDirections, openDirectionsFromCurrentLocation } from '@/utils/navigationHelpers';
 import { useRouteInfo } from '@/hooks/useRouteInfo';
+import { RouteInfo } from '@/services/routingService';
 
 interface VenueMarkerPopupProps {
   recommendation: AIVenueRecommendation;
   onSelect: (venueId: string) => void;
   userLocation?: { latitude: number; longitude: number };
+  preloadedRoute?: {
+    driving: RouteInfo | null;
+    walking: RouteInfo | null;
+  };
 }
 
-const VenueMarkerPopup = ({ recommendation, onSelect, userLocation }: VenueMarkerPopupProps) => {
+const VenueMarkerPopup = ({ recommendation, onSelect, userLocation, preloadedRoute }: VenueMarkerPopupProps) => {
   const hasHomeLocation = userLocation && 
     recommendation.latitude != null && 
     recommendation.longitude != null;
@@ -26,14 +31,19 @@ const VenueMarkerPopup = ({ recommendation, onSelect, userLocation }: VenueMarke
     hasHomeLocation ? 'home' : 'current'
   );
 
-  // Fetch route info for both driving and walking (only when home is selected)
-  const { driving, walking, loading } = useRouteInfo({
+  // Only fetch on-demand if no preloaded route data is available
+  const { driving: fetchedDriving, walking: fetchedWalking, loading: fetchLoading } = useRouteInfo({
     originLat: userLocation?.latitude,
     originLng: userLocation?.longitude,
     destLat: recommendation.latitude ?? undefined,
     destLng: recommendation.longitude ?? undefined,
-    enabled: hasHomeLocation && locationSource === 'home'
+    enabled: hasHomeLocation && locationSource === 'home' && !preloadedRoute
   });
+
+  // Prefer preloaded data, fall back to on-demand fetched data
+  const driving = preloadedRoute?.driving ?? fetchedDriving;
+  const walking = preloadedRoute?.walking ?? fetchedWalking;
+  const loading = preloadedRoute ? false : fetchLoading;
 
   const handleDirections = (mode: 'driving' | 'walking') => {
     if (!recommendation.latitude || !recommendation.longitude) return;
