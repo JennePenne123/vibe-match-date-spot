@@ -1,4 +1,4 @@
-// Design system spacing tokens
+// Design system spacing tokens - Generous padding for wellness feel
 export const spacingTokens = {
   // Base spacing scale (8px base unit)
   0: '0',
@@ -21,7 +21,9 @@ export const spacingTokens = {
   12: '3rem',         // 48px
   14: '3.5rem',       // 56px
   16: '4rem',         // 64px
+  18: '4.5rem',       // 72px - new
   20: '5rem',         // 80px
+  22: '5.5rem',       // 88px - new
   24: '6rem',         // 96px
   28: '7rem',         // 112px
   32: '8rem',         // 128px
@@ -38,27 +40,42 @@ export const spacingTokens = {
   96: '24rem',        // 384px
 };
 
-// Semantic spacing aliases
+// Semantic spacing aliases - Increased for wellness feel
 export const semanticSpacing = {
-  // Component spacing
+  // Component spacing - Generous internal padding
   component: {
-    xs: spacingTokens[1],     // 4px
-    sm: spacingTokens[2],     // 8px
-    md: spacingTokens[4],     // 16px
-    lg: spacingTokens[6],     // 24px
-    xl: spacingTokens[8],     // 32px
-    '2xl': spacingTokens[12], // 48px
-    '3xl': spacingTokens[16], // 64px
+    xs: spacingTokens[1.5],   // 6px (was 4px)
+    sm: spacingTokens[3],     // 12px (was 8px)
+    md: spacingTokens[5],     // 20px (was 16px)
+    lg: spacingTokens[8],     // 32px (was 24px)
+    xl: spacingTokens[10],    // 40px (was 32px)
+    '2xl': spacingTokens[14], // 56px (was 48px)
+    '3xl': spacingTokens[20], // 80px (was 64px)
   },
   
-  // Layout spacing
+  // Layout spacing - Breathing room
   layout: {
-    xs: spacingTokens[4],     // 16px
-    sm: spacingTokens[6],     // 24px
-    md: spacingTokens[8],     // 32px
-    lg: spacingTokens[12],    // 48px
-    xl: spacingTokens[16],    // 64px
-    '2xl': spacingTokens[24], // 96px
-    '3xl': spacingTokens[32], // 128px
+    xs: spacingTokens[5],     // 20px (was 16px)
+    sm: spacingTokens[8],     // 32px (was 24px)
+    md: spacingTokens[10],    // 40px (was 32px)
+    lg: spacingTokens[14],    // 56px (was 48px)
+    xl: spacingTokens[20],    // 80px (was 64px)
+    '2xl': spacingTokens[28], // 112px (was 96px)
+    '3xl': spacingTokens[36], // 144px (was 128px)
+  },
+
+  // Card padding - Extra generous
+  card: {
+    sm: spacingTokens[5],     // 20px
+    default: spacingTokens[8], // 32px
+    lg: spacingTokens[10],    // 40px
+    xl: spacingTokens[12],    // 48px
+  },
+
+  // Section padding
+  section: {
+    sm: spacingTokens[16],    // 64px
+    default: spacingTokens[24], // 96px
+    lg: spacingTokens[36],    // 144px
   }
 };

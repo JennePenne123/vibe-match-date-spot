@@ -1,45 +1,45 @@
-// Design system effects tokens (shadows, borders, etc.)
+// Design system effects tokens - Wellness-Inspired (gentle, diffused)
 export const effectTokens = {
-  // Premium shadow system with layered depths
+  // Gentle shadow system - diffused, neutral, calming
   boxShadow: {
-    xs: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-    sm: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-    '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-    inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+    xs: '0 1px 2px 0 rgb(0 0 0 / 0.03)',
+    sm: '0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.04)',
+    md: '0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+    lg: '0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
+    xl: '0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.05)',
+    '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.12)',
+    inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.04)',
     none: '0 0 #0000',
   },
 
-  // Premium brand shadows with sophisticated layering
+  // Wellness brand shadows - soft, warm undertones
   brandShadow: {
-    subtle: '0 2px 8px -2px hsl(330 81% 60% / 0.12)',
-    soft: '0 4px 16px -4px hsl(330 81% 60% / 0.18)',
-    medium: '0 8px 24px -6px hsl(330 81% 60% / 0.24)',
-    elegant: '0 10px 30px -10px hsl(330 81% 60% / 0.3), 0 2px 8px -2px hsl(330 81% 60% / 0.1)',
-    strong: '0 16px 40px -8px hsl(330 81% 60% / 0.32)',
-    glow: '0 0 24px hsl(330 81% 60% / 0.35), 0 0 48px hsl(330 81% 60% / 0.2)',
-    romantic: '0 12px 32px -8px hsl(330 81% 60% / 0.4), 0 4px 16px -4px hsl(330 81% 60% / 0.2), 0 0 0 1px hsl(330 81% 60% / 0.08)',
-    glass: '0 8px 32px rgba(31, 38, 135, 0.37)',
-    dreamy: '0 0 40px hsl(330 85% 95% / 0.8), 0 8px 24px hsl(330 81% 60% / 0.25)',
+    subtle: '0 2px 8px -2px hsl(150 25% 45% / 0.08)',
+    soft: '0 4px 16px -4px hsl(150 25% 45% / 0.12)',
+    medium: '0 8px 24px -6px hsl(150 25% 45% / 0.15)',
+    gentle: '0 10px 30px -10px hsl(35 20% 40% / 0.12), 0 2px 8px -2px hsl(35 15% 50% / 0.06)',
+    elevated: '0 16px 40px -8px hsl(35 20% 40% / 0.15)',
+    focus: '0 0 0 3px hsl(150 25% 45% / 0.15)',
+    calm: '0 12px 32px -8px hsl(35 20% 40% / 0.12), 0 4px 16px -4px hsl(150 25% 45% / 0.08)',
+    glass: '0 8px 32px rgba(31, 38, 50, 0.08)',
+    dreamy: '0 0 40px hsl(35 30% 90% / 0.5), 0 8px 24px hsl(150 25% 45% / 0.12)',
   },
 
-  // Enhanced border radius with premium curves
+  // Rounder border radius for wellness feel
   borderRadius: {
     none: '0px',
-    xs: '0.0625rem',   // 1px
-    sm: '0.125rem',    // 2px
-    md: '0.375rem',    // 6px
-    lg: '0.5rem',      // 8px
-    xl: '0.75rem',     // 12px
-    '2xl': '1rem',     // 16px
+    xs: '0.125rem',    // 2px
+    sm: '0.25rem',     // 4px
+    md: '0.5rem',      // 8px
+    lg: '0.75rem',     // 12px
+    xl: '1rem',        // 16px (default)
+    '2xl': '1.25rem',  // 20px
     '3xl': '1.5rem',   // 24px
     '4xl': '2rem',     // 32px
     full: '9999px',
   },
 
-  // Premium border system
+  // Border system
   borderWidth: {
     0: '0px',
     0.5: '0.5px',
@@ -52,7 +52,7 @@ export const effectTokens = {
     8: '8px',
   },
 
-  // Advanced backdrop blur for premium glass effects
+  // Gentle backdrop blur for soft glass effects
   backdropBlur: {
     none: 'blur(0)',
     xs: 'blur(2px)',
@@ -62,43 +62,43 @@ export const effectTokens = {
     xl: 'blur(24px)',
     '2xl': 'blur(40px)',
     '3xl': 'blur(64px)',
-    subtle: 'blur(8px) saturate(150%)',
-    premium: 'blur(16px) saturate(180%) brightness(110%)',
+    subtle: 'blur(8px) saturate(120%)',
+    wellness: 'blur(16px) saturate(130%) brightness(105%)',
   },
 
-  // Premium gradient system with sophisticated color transitions
+  // Wellness gradient system - soft, low saturation, calming
   gradients: {
-    // Enhanced brand gradients
+    // Wellness brand gradients
     brand: {
-      primary: 'linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%)',
-      secondary: 'linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%)',
-      accent: 'linear-gradient(135deg, hsl(45, 90%, 96%) 0%, hsl(35, 75%, 55%) 100%)',
-      romantic: 'linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(330, 85%, 95%) 100%)',
-      sunset: 'linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 90%, 96%) 70%, hsl(330, 82%, 95%) 100%)',
-      dreamy: 'linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 25%, hsl(351, 95%, 94%) 50%, hsl(45, 85%, 90%) 75%, hsl(330, 85%, 98%) 100%)',
-      luxe: 'linear-gradient(135deg, hsl(330, 94%, 28%) 0%, hsl(330, 81%, 60%) 50%, hsl(351, 86%, 55%) 100%)',
+      primary: 'linear-gradient(135deg, hsl(150, 25%, 45%) 0%, hsl(150, 22%, 52%) 100%)',
+      secondary: 'linear-gradient(135deg, hsl(35, 30%, 85%) 0%, hsl(25, 28%, 78%) 100%)',
+      accent: 'linear-gradient(135deg, hsl(40, 40%, 96%) 0%, hsl(30, 35%, 90%) 100%)',
+      calm: 'linear-gradient(135deg, hsl(40, 30%, 98%) 0%, hsl(35, 25%, 95%) 50%, hsl(40, 20%, 97%) 100%)',
+      earth: 'linear-gradient(135deg, hsl(35, 30%, 85%) 0%, hsl(25, 28%, 78%) 50%, hsl(40, 25%, 92%) 100%)',
+      meadow: 'linear-gradient(135deg, hsl(150, 25%, 45% / 0.1) 0%, hsl(120, 20%, 50% / 0.08) 100%)',
+      sunrise: 'linear-gradient(135deg, hsl(40, 40%, 96%) 0%, hsl(30, 35%, 90%) 50%, hsl(45, 30%, 94%) 100%)',
     },
     
-    // Surface gradients with premium feel
+    // Surface gradients - subtle warmth
     surface: {
-      subtle: 'linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%)',
-      warm: 'linear-gradient(135deg, hsl(330, 20%, 99%) 0%, hsl(330, 15%, 97%) 100%)',
-      soft: 'linear-gradient(135deg, hsl(330, 81%, 60% / 0.03) 0%, hsl(351, 86%, 55% / 0.08) 100%)',
-      medium: 'linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.15) 100%)',
-      rich: 'linear-gradient(135deg, hsl(330, 81%, 60% / 0.15) 0%, hsl(351, 86%, 55% / 0.25) 100%)',
-      glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+      subtle: 'linear-gradient(135deg, hsl(40, 25%, 98%) 0%, hsl(35, 20%, 96%) 100%)',
+      warm: 'linear-gradient(135deg, hsl(35, 30%, 97%) 0%, hsl(30, 25%, 95%) 100%)',
+      soft: 'linear-gradient(135deg, hsl(150, 25%, 45% / 0.03) 0%, hsl(25, 35%, 55% / 0.05) 100%)',
+      medium: 'linear-gradient(135deg, hsl(150, 25%, 45% / 0.06) 0%, hsl(25, 35%, 55% / 0.10) 100%)',
+      rich: 'linear-gradient(135deg, hsl(150, 25%, 45% / 0.10) 0%, hsl(25, 35%, 55% / 0.15) 100%)',
+      glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%)',
     },
 
-    // Special effect gradients
+    // Nature-inspired effect gradients
     special: {
-      aurora: 'linear-gradient(135deg, hsl(330, 81%, 60% / 0.8) 0%, hsl(351, 86%, 55% / 0.6) 25%, hsl(45, 90%, 96% / 0.4) 50%, hsl(195, 87%, 45% / 0.6) 75%, hsl(330, 81%, 60% / 0.8) 100%)',
-      cosmic: 'radial-gradient(circle at 30% 20%, hsl(330, 81%, 60% / 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(351, 86%, 55% / 0.2) 0%, transparent 50%)',
-      shimmer: 'linear-gradient(45deg, transparent 30%, hsl(330, 81%, 60% / 0.1) 50%, transparent 70%)',
+      forest: 'linear-gradient(135deg, hsl(150, 25%, 45% / 0.3) 0%, hsl(145, 30%, 50% / 0.2) 50%, hsl(160, 20%, 55% / 0.1) 100%)',
+      desert: 'radial-gradient(circle at 30% 20%, hsl(35, 30%, 75% / 0.2) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(25, 35%, 70% / 0.15) 0%, transparent 50%)',
+      shimmer: 'linear-gradient(45deg, transparent 30%, hsl(150, 25%, 45% / 0.08) 50%, transparent 70%)',
     },
   },
 };
 
-// Animation and transition tokens
+// Animation and transition tokens - slower, gentler for wellness feel
 export const animationTokens = {
   duration: {
     75: '75ms',
@@ -106,7 +106,9 @@ export const animationTokens = {
     150: '150ms',
     200: '200ms',
     300: '300ms',
+    400: '400ms',  // New default
     500: '500ms',
+    600: '600ms',
     700: '700ms',
     1000: '1000ms',
   },
@@ -116,15 +118,16 @@ export const animationTokens = {
     in: 'cubic-bezier(0.4, 0, 1, 1)',
     out: 'cubic-bezier(0, 0, 0.2, 1)',
     'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
-    elastic: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+    gentle: 'cubic-bezier(0.25, 0.1, 0.25, 1)',  // Gentler easing
+    calm: 'cubic-bezier(0.2, 0, 0.1, 1)',        // Very smooth
   },
 
   transition: {
     none: 'none',
-    all: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-    colors: 'color 150ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-    opacity: 'opacity 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-    shadow: 'box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-    transform: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+    all: 'all 400ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+    colors: 'color 400ms cubic-bezier(0.25, 0.1, 0.25, 1), background-color 400ms cubic-bezier(0.25, 0.1, 0.25, 1), border-color 400ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+    opacity: 'opacity 400ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+    shadow: 'box-shadow 400ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+    transform: 'transform 400ms cubic-bezier(0.25, 0.1, 0.25, 1)',
   }
 };
