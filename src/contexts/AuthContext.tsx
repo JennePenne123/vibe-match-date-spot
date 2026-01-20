@@ -41,10 +41,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         // Clear only user's own preferences from active sessions (preserve partner data)
         await clearUserPreferenceFields(user.id);
-        console.log('✅ AUTH: User preferences cleared on logout (partner data preserved)');
-        
-        // Don't expire sessions - let them remain active for collaborative partners
-        console.log('✅ AUTH: Collaborative sessions preserved for partners');
+        if (import.meta.env.DEV) {
+          console.log('✅ AUTH: User preferences cleared on logout (partner data preserved)');
+          // Don't expire sessions - let them remain active for collaborative partners
+          console.log('✅ AUTH: Collaborative sessions preserved for partners');
+        }
       } catch (error) {
         console.error('❌ AUTH: Failed to clean up user data on logout:', error);
         // Continue with logout even if cleanup fails
@@ -84,8 +85,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: { session: currentSession } } = await supabase.auth.getSession();
       if (currentSession?.user) {
         const enrichedUser = await fetchUserProfile(currentSession.user);
-        console.log('✅ REFRESH: Profile refreshed. Avatar URL:', enrichedUser.avatar_url);
-        console.log('✅ REFRESH: Full user object:', enrichedUser);
+        if (import.meta.env.DEV) {
+          console.log('✅ REFRESH: Profile refreshed. Avatar URL:', enrichedUser.avatar_url);
+        }
         setUser(enrichedUser);
       }
     } catch (error) {

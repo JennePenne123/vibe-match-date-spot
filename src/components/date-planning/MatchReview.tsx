@@ -37,11 +37,13 @@ const MatchReview: React.FC<MatchReviewProps> = ({
 }) => {
   const { user } = useAuth();
 
-  console.log('🔍 MATCH REVIEW: Rendering compatibility analysis:', {
-    compatibilityScore,
-    venueCount,
-    partnerName
-  });
+  if (import.meta.env.DEV) {
+    console.log('🔍 MATCH REVIEW: Rendering compatibility analysis:', {
+      compatibilityScore,
+      venueCount,
+      partnerName
+    });
+  }
 
   if (error) {
     return (
@@ -65,23 +67,27 @@ const MatchReview: React.FC<MatchReviewProps> = ({
   }
 
   // Debug collaborative session state
-  console.log('🔍 MATCH REVIEW - Collaborative state check:', {
-    isCollaborative,
-    hasPartnerSetPreferences,
-    isWaitingForPartner,
-    sessionId,
-    shouldShowWaiting: isCollaborative && (!hasPartnerSetPreferences || isWaitingForPartner)
-  });
+  if (import.meta.env.DEV) {
+    console.log('🔍 MATCH REVIEW - Collaborative state check:', {
+      isCollaborative,
+      hasPartnerSetPreferences,
+      isWaitingForPartner,
+      sessionId,
+      shouldShowWaiting: isCollaborative && (!hasPartnerSetPreferences || isWaitingForPartner)
+    });
+  }
 
   // FIXED: Only show waiting state if BOTH preferences are NOT complete in database
   // If we have venue count > 0, preferences are definitely complete - show results
   if (isCollaborative && venueCount === 0 && (!hasPartnerSetPreferences || isWaitingForPartner)) {
-    console.log('🔍 MATCH REVIEW - Showing collaborative waiting state because:', {
-      hasPartnerSetPreferences,
-      isWaitingForPartner,
-      venueCount,
-      reason: venueCount === 0 ? 'No venues found yet' : 'Unknown reason'
-    });
+    if (import.meta.env.DEV) {
+      console.log('🔍 MATCH REVIEW - Showing collaborative waiting state because:', {
+        hasPartnerSetPreferences,
+        isWaitingForPartner,
+        venueCount,
+        reason: venueCount === 0 ? 'No venues found yet' : 'Unknown reason'
+      });
+    }
     
     return (
       <div className="space-y-6">
@@ -100,12 +106,14 @@ const MatchReview: React.FC<MatchReviewProps> = ({
   // Additional check: If this is collaborative but we're getting 100% compatibility, it might be preference duplication
   // However, only block if we have clear signs this is test data pollution, not legitimate similar preferences
   if (isCollaborative && typeof compatibilityScore === 'number' && compatibilityScore >= 1.0) {
-    console.warn('⚠️ MATCH REVIEW - Perfect 100% compatibility detected in collaborative mode');
-    console.log('🔍 MATCH REVIEW - Checking if this should be blocked or allowed to proceed');
-    
-    // Allow the flow to continue - perfect compatibility can be legitimate
-    // The session validation will catch true duplications during the preference setting phase
-    console.log('✅ MATCH REVIEW - Allowing perfect compatibility to proceed');
+    if (import.meta.env.DEV) {
+      console.warn('⚠️ MATCH REVIEW - Perfect 100% compatibility detected in collaborative mode');
+      console.log('🔍 MATCH REVIEW - Checking if this should be blocked or allowed to proceed');
+      
+      // Allow the flow to continue - perfect compatibility can be legitimate
+      // The session validation will catch true duplications during the preference setting phase
+      console.log('✅ MATCH REVIEW - Allowing perfect compatibility to proceed');
+    }
   }
 
   return (
@@ -138,14 +146,18 @@ const MatchReview: React.FC<MatchReviewProps> = ({
                 </div>
                 <Button 
                   onClick={() => {
-                    console.log('🎯 MATCH REVIEW - "Continue to Plan Together" button clicked');
-                    console.log('🎯 MATCH REVIEW - Current state before transition:', {
-                      venueCount,
-                      compatibilityScore: typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore,
-                      partnerName
-                    });
+                    if (import.meta.env.DEV) {
+                      console.log('🎯 MATCH REVIEW - "Continue to Plan Together" button clicked');
+                      console.log('🎯 MATCH REVIEW - Current state before transition:', {
+                        venueCount,
+                        compatibilityScore: typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore,
+                        partnerName
+                      });
+                    }
                     onContinueToPlanning();
-                    console.log('🎯 MATCH REVIEW - onContinueToPlanning() called successfully');
+                    if (import.meta.env.DEV) {
+                      console.log('🎯 MATCH REVIEW - onContinueToPlanning() called successfully');
+                    }
                   }}
                   className="w-full md:w-auto bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white px-8 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
                 >

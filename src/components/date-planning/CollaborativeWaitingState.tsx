@@ -24,14 +24,16 @@ const CollaborativeWaitingState: React.FC<CollaborativeWaitingStateProps> = ({
   hasCurrentUserSetPreferences = true,
   currentUserName = 'You'
 }) => {
-  console.log('🔍 WAITING STATE: Rendering with props:', {
-    partnerName,
-    hasPartnerSetPreferences,
-    isWaitingForPartner,
-    bothPreferencesComplete,
-    hasCurrentUserSetPreferences,
-    currentUserName
-  });
+  if (import.meta.env.DEV) {
+    console.log('🔍 WAITING STATE: Rendering with props:', {
+      partnerName,
+      hasPartnerSetPreferences,
+      isWaitingForPartner,
+      bothPreferencesComplete,
+      hasCurrentUserSetPreferences,
+      currentUserName
+    });
+  }
 
   // Priority 1: If current user hasn't set preferences, show that first
   if (!hasCurrentUserSetPreferences) {
