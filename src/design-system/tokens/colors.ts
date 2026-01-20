@@ -1,111 +1,114 @@
-// Design system color tokens
+// Design system color tokens - Wellness-Inspired Earth Tones
 export const colorTokens = {
-  // Premium Brand palette - Enhanced VybePulse theme
+  // Wellness Brand palette - Calm, grounded, reassuring
   brand: {
+    // Muted Sage Green - Primary
     primary: {
-      50: 'hsl(330, 85%, 98%)',   // Rose Quartz
-      100: 'hsl(330, 82%, 95%)',  // Soft Blush
-      200: 'hsl(330, 78%, 88%)',  // Warm Blush
-      300: 'hsl(330, 75%, 78%)',  // Light Romance
-      400: 'hsl(330, 72%, 68%)',  // Medium Romance
-      500: 'hsl(330, 81%, 60%)',  // Romantic Pink (VybePulse primary)
-      600: 'hsl(330, 84%, 52%)',  // Deep Romance
-      700: 'hsl(330, 87%, 45%)',  // Rich Romance
-      800: 'hsl(330, 90%, 38%)',  // Dark Romance
-      900: 'hsl(330, 94%, 28%)',  // Midnight Romance
+      50: 'hsl(150, 30%, 97%)',
+      100: 'hsl(150, 28%, 92%)',
+      200: 'hsl(150, 26%, 85%)',
+      300: 'hsl(150, 25%, 72%)',
+      400: 'hsl(150, 24%, 58%)',
+      500: 'hsl(150, 25%, 45%)',  // Main sage green
+      600: 'hsl(150, 28%, 38%)',
+      700: 'hsl(150, 30%, 32%)',
+      800: 'hsl(150, 32%, 26%)',
+      900: 'hsl(150, 35%, 20%)',
     },
+    // Warm Sand - Secondary
     secondary: {
-      50: 'hsl(351, 100%, 98%)',  // Soft Coral
-      100: 'hsl(351, 95%, 94%)',  // Light Coral
-      200: 'hsl(351, 90%, 87%)',  // Warm Coral
-      300: 'hsl(351, 88%, 78%)',  // Medium Coral
-      400: 'hsl(351, 85%, 68%)',  // Rich Coral
-      500: 'hsl(351, 86%, 55%)',  // Vibrant Coral
-      600: 'hsl(351, 88%, 48%)',  // Deep Coral
-      700: 'hsl(351, 90%, 40%)',  // Dark Coral
-      800: 'hsl(351, 92%, 32%)',  // Very Dark Coral
-      900: 'hsl(351, 95%, 24%)',  // Midnight Coral
+      50: 'hsl(35, 40%, 97%)',
+      100: 'hsl(35, 35%, 92%)',
+      200: 'hsl(35, 30%, 85%)',
+      300: 'hsl(35, 28%, 75%)',
+      400: 'hsl(35, 25%, 62%)',
+      500: 'hsl(35, 22%, 50%)',
+      600: 'hsl(35, 25%, 42%)',
+      700: 'hsl(35, 28%, 35%)',
+      800: 'hsl(35, 30%, 28%)',
+      900: 'hsl(35, 32%, 22%)',
     },
+    // Soft Terracotta - Accent
     accent: {
-      50: 'hsl(45, 90%, 96%)',    // Champagne
-      100: 'hsl(45, 85%, 90%)',   // Light Gold
-      200: 'hsl(42, 82%, 82%)',   // Soft Gold
-      300: 'hsl(40, 80%, 72%)',   // Warm Gold
-      400: 'hsl(38, 78%, 62%)',   // Golden Hour
-      500: 'hsl(35, 75%, 55%)',   // Rich Gold
-      600: 'hsl(32, 78%, 48%)',   // Deep Gold
-      700: 'hsl(30, 82%, 40%)',   // Dark Gold
-      800: 'hsl(28, 85%, 32%)',   // Very Dark Gold
-      900: 'hsl(25, 88%, 24%)',   // Midnight Gold
+      50: 'hsl(25, 45%, 97%)',
+      100: 'hsl(25, 40%, 92%)',
+      200: 'hsl(25, 38%, 82%)',
+      300: 'hsl(25, 36%, 70%)',
+      400: 'hsl(25, 35%, 60%)',
+      500: 'hsl(25, 35%, 55%)',  // Soft terracotta
+      600: 'hsl(25, 38%, 48%)',
+      700: 'hsl(25, 40%, 40%)',
+      800: 'hsl(25, 42%, 32%)',
+      900: 'hsl(25, 45%, 25%)',
     }
   },
 
-  // Enhanced semantic colors with premium feel
+  // Softer semantic colors for wellness feel
   semantic: {
     success: {
-      50: 'hsl(138, 85%, 98%)',
-      100: 'hsl(141, 88%, 94%)',
-      200: 'hsl(141, 85%, 87%)',
-      300: 'hsl(142, 82%, 76%)',
-      400: 'hsl(142, 78%, 62%)',
-      500: 'hsl(142, 76%, 48%)',
-      600: 'hsl(142, 80%, 38%)',
-      700: 'hsl(142, 82%, 30%)',
-      800: 'hsl(143, 85%, 22%)',
-      900: 'hsl(144, 88%, 18%)',
+      50: 'hsl(145, 45%, 97%)',
+      100: 'hsl(145, 42%, 92%)',
+      200: 'hsl(145, 40%, 85%)',
+      300: 'hsl(145, 38%, 72%)',
+      400: 'hsl(145, 35%, 55%)',
+      500: 'hsl(145, 40%, 42%)',  // Forest green
+      600: 'hsl(145, 42%, 38%)',
+      700: 'hsl(145, 45%, 32%)',
+      800: 'hsl(145, 48%, 25%)',
+      900: 'hsl(145, 50%, 20%)',
     },
     warning: {
-      50: 'hsl(48, 100%, 97%)',
-      100: 'hsl(48, 98%, 91%)',
-      200: 'hsl(48, 95%, 80%)',
-      300: 'hsl(46, 92%, 68%)',
-      400: 'hsl(43, 90%, 58%)',
-      500: 'hsl(38, 88%, 52%)',
-      600: 'hsl(32, 90%, 46%)',
-      700: 'hsl(26, 92%, 39%)',
-      800: 'hsl(23, 88%, 33%)',
-      900: 'hsl(22, 85%, 28%)',
+      50: 'hsl(40, 80%, 97%)',
+      100: 'hsl(40, 75%, 92%)',
+      200: 'hsl(40, 72%, 82%)',
+      300: 'hsl(40, 70%, 68%)',
+      400: 'hsl(40, 68%, 58%)',
+      500: 'hsl(40, 70%, 50%)',  // Warm amber
+      600: 'hsl(40, 72%, 45%)',
+      700: 'hsl(40, 75%, 38%)',
+      800: 'hsl(40, 78%, 32%)',
+      900: 'hsl(40, 80%, 25%)',
     },
     error: {
-      50: 'hsl(0, 90%, 98%)',
-      100: 'hsl(0, 95%, 95%)',
-      200: 'hsl(0, 92%, 90%)',
-      300: 'hsl(0, 90%, 84%)',
-      400: 'hsl(0, 88%, 73%)',
-      500: 'hsl(0, 85%, 62%)',
-      600: 'hsl(0, 82%, 53%)',
-      700: 'hsl(0, 85%, 44%)',
-      800: 'hsl(0, 88%, 37%)',
-      900: 'hsl(0, 92%, 33%)',
+      50: 'hsl(0, 60%, 97%)',
+      100: 'hsl(0, 55%, 92%)',
+      200: 'hsl(0, 52%, 85%)',
+      300: 'hsl(0, 50%, 75%)',
+      400: 'hsl(0, 48%, 65%)',
+      500: 'hsl(0, 50%, 55%)',  // Dusty rose
+      600: 'hsl(0, 52%, 50%)',
+      700: 'hsl(0, 55%, 42%)',
+      800: 'hsl(0, 58%, 35%)',
+      900: 'hsl(0, 60%, 28%)',
     }
   },
 
-  // Premium neutral palette with warm undertones
+  // Warm neutral palette with earth undertones
   neutral: {
-    50: 'hsl(330, 20%, 99%)',    // Warm White
-    100: 'hsl(330, 15%, 97%)',   // Soft White
-    200: 'hsl(330, 12%, 93%)',   // Light Warm
-    300: 'hsl(330, 10%, 86%)',   // Soft Warm
-    400: 'hsl(330, 8%, 68%)',    // Medium Warm
-    500: 'hsl(330, 6%, 48%)',    // Balanced Warm
-    600: 'hsl(330, 8%, 36%)',    // Deep Warm
-    700: 'hsl(330, 12%, 28%)',   // Rich Warm
-    800: 'hsl(330, 16%, 18%)',   // Dark Warm
-    900: 'hsl(330, 22%, 12%)',   // Midnight Warm
+    50: 'hsl(40, 30%, 98%)',   // Warm cream
+    100: 'hsl(40, 25%, 96%)',
+    200: 'hsl(35, 20%, 92%)',
+    300: 'hsl(35, 18%, 85%)',
+    400: 'hsl(35, 15%, 65%)',
+    500: 'hsl(35, 12%, 48%)',
+    600: 'hsl(35, 15%, 36%)',
+    700: 'hsl(35, 18%, 28%)',
+    800: 'hsl(35, 20%, 18%)',
+    900: 'hsl(35, 22%, 12%)',  // Deep warm charcoal
   },
 
-  // Traditional gray for contrast
+  // Traditional gray for contrast elements
   gray: {
-    50: 'hsl(210, 20%, 98%)',
-    100: 'hsl(220, 14%, 96%)',
-    200: 'hsl(220, 13%, 91%)',
-    300: 'hsl(216, 12%, 84%)',
-    400: 'hsl(218, 11%, 65%)',
-    500: 'hsl(220, 9%, 46%)',
-    600: 'hsl(215, 14%, 34%)',
-    700: 'hsl(217, 19%, 27%)',
-    800: 'hsl(215, 28%, 17%)',
-    900: 'hsl(221, 39%, 11%)',
+    50: 'hsl(35, 15%, 98%)',
+    100: 'hsl(35, 12%, 96%)',
+    200: 'hsl(35, 10%, 91%)',
+    300: 'hsl(35, 8%, 84%)',
+    400: 'hsl(35, 6%, 65%)',
+    500: 'hsl(35, 5%, 46%)',
+    600: 'hsl(35, 8%, 34%)',
+    700: 'hsl(35, 12%, 27%)',
+    800: 'hsl(35, 15%, 17%)',
+    900: 'hsl(35, 18%, 11%)',
   }
 };
 
@@ -118,6 +121,14 @@ export const figmaTokens = {
         "100": { "value": colorTokens.brand.primary[100], "type": "color" },
         "500": { "value": colorTokens.brand.primary[500], "type": "color" },
         "900": { "value": colorTokens.brand.primary[900], "type": "color" }
+      },
+      "secondary": {
+        "50": { "value": colorTokens.brand.secondary[50], "type": "color" },
+        "500": { "value": colorTokens.brand.secondary[500], "type": "color" },
+      },
+      "accent": {
+        "50": { "value": colorTokens.brand.accent[50], "type": "color" },
+        "500": { "value": colorTokens.brand.accent[500], "type": "color" },
       }
     }
   }

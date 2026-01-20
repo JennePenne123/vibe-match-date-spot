@@ -1,263 +1,299 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import 'leaflet/dist/leaflet.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+/* Wellness-Inspired Design System - Calm, gentle, earth tones */
 
 @layer base {
   :root {
-    /* Zinc Base Colors (Vega style) */
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    /* Warm Cream Background */
+    --background: 40 30% 98%;
+    --foreground: 35 20% 15%;
+    --card: 40 25% 97%;
+    --card-foreground: 35 20% 15%;
+    --popover: 40 25% 97%;
+    --popover-foreground: 35 20% 15%;
 
-    /* Pink Brand Colors */
-    --primary: 330 81% 60%;
+    /* Muted Sage Green Primary */
+    --primary: 150 25% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    
+    /* Warm Sand Secondary */
+    --secondary: 35 30% 92%;
+    --secondary-foreground: 35 25% 20%;
+    
+    /* Soft Taupe Accent */
+    --accent: 30 20% 90%;
+    --accent-foreground: 35 25% 20%;
 
-    /* Zinc Neutrals */
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 330 81% 60%;
+    /* Warm Neutral Muted */
+    --muted: 35 15% 92%;
+    --muted-foreground: 35 15% 45%;
+    --border: 35 20% 88%;
+    --input: 35 20% 88%;
+    --ring: 150 25% 45%;
 
-    /* Semantic Colors */
-    --destructive: 0 84.2% 60.2%;
+    /* Semantic Colors - Softer versions */
+    --destructive: 0 50% 55%;
     --destructive-foreground: 0 0% 98%;
-    --success: 142 76% 48%;
-    --success-foreground: 138 85% 98%;
-    --warning: 38 88% 52%;
-    --warning-foreground: 48 100% 97%;
+    --success: 145 40% 42%;
+    --success-foreground: 145 85% 98%;
+    --warning: 40 70% 50%;
+    --warning-foreground: 40 100% 97%;
 
-    /* Chart Colors */
-    --chart-1: 330 81% 60%;
-    --chart-2: 351 86% 55%;
-    --chart-3: 240 4.8% 65%;
-    --chart-4: 240 5.9% 50%;
-    --chart-5: 240 3.8% 40%;
+    /* Chart Colors - Earth tones */
+    --chart-1: 150 25% 45%;
+    --chart-2: 25 35% 55%;
+    --chart-3: 35 30% 65%;
+    --chart-4: 180 20% 50%;
+    --chart-5: 35 15% 50%;
 
-    --radius: 0.625rem;
+    /* Increased border radius for rounder corners */
+    --radius: 1rem;
 
-    /* Premium Gradient System */
-    --gradient-primary: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(45, 90%, 96%) 0%, hsl(35, 75%, 55%) 100%);
-    --gradient-romantic: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(330, 85%, 95%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 90%, 96%) 70%, hsl(330, 82%, 95%) 100%);
-    --gradient-dreamy: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 25%, hsl(351, 95%, 94%) 50%, hsl(45, 85%, 90%) 75%, hsl(330, 85%, 98%) 100%);
-    --gradient-luxe: linear-gradient(135deg, hsl(330, 94%, 28%) 0%, hsl(330, 81%, 60%) 50%, hsl(351, 86%, 55%) 100%);
+    /* Wellness Gradient System - Soft, low saturation */
+    --gradient-primary: linear-gradient(135deg, hsl(150, 25%, 45%) 0%, hsl(150, 22%, 52%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(35, 30%, 85%) 0%, hsl(25, 28%, 78%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(40, 40%, 96%) 0%, hsl(30, 35%, 90%) 100%);
+    --gradient-calm: linear-gradient(135deg, hsl(40, 30%, 98%) 0%, hsl(35, 25%, 95%) 50%, hsl(40, 20%, 97%) 100%);
+    --gradient-earth: linear-gradient(135deg, hsl(35, 30%, 85%) 0%, hsl(25, 28%, 78%) 50%, hsl(40, 25%, 92%) 100%);
+    --gradient-meadow: linear-gradient(135deg, hsl(150, 25%, 45% / 0.1) 0%, hsl(120, 20%, 50% / 0.08) 100%);
+    --gradient-sunrise: linear-gradient(135deg, hsl(40, 40%, 96%) 0%, hsl(30, 35%, 90%) 50%, hsl(45, 30%, 94%) 100%);
 
-    /* Premium Surface Gradients */
-    --gradient-surface-subtle: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
-    --gradient-surface-warm: linear-gradient(135deg, hsl(330, 20%, 99%) 0%, hsl(330, 15%, 97%) 100%);
-    --gradient-surface-soft: linear-gradient(135deg, hsl(330, 81%, 60% / 0.03) 0%, hsl(351, 86%, 55% / 0.08) 100%);
-    --gradient-surface-medium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.15) 100%);
-    --gradient-surface-rich: linear-gradient(135deg, hsl(330, 81%, 60% / 0.15) 0%, hsl(351, 86%, 55% / 0.25) 100%);
-    --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    /* Surface Gradients - Subtle warmth */
+    --gradient-surface-subtle: linear-gradient(135deg, hsl(40, 25%, 98%) 0%, hsl(35, 20%, 96%) 100%);
+    --gradient-surface-warm: linear-gradient(135deg, hsl(35, 30%, 97%) 0%, hsl(30, 25%, 95%) 100%);
+    --gradient-surface-soft: linear-gradient(135deg, hsl(150, 25%, 45% / 0.03) 0%, hsl(25, 35%, 55% / 0.05) 100%);
+    --gradient-surface-medium: linear-gradient(135deg, hsl(150, 25%, 45% / 0.06) 0%, hsl(25, 35%, 55% / 0.10) 100%);
+    --gradient-surface-rich: linear-gradient(135deg, hsl(150, 25%, 45% / 0.10) 0%, hsl(25, 35%, 55% / 0.15) 100%);
+    --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
 
-    /* Special Effect Gradients */
-    --gradient-aurora: linear-gradient(135deg, hsl(330, 81%, 60% / 0.8) 0%, hsl(351, 86%, 55% / 0.6) 25%, hsl(45, 90%, 96% / 0.4) 50%, hsl(195, 87%, 45% / 0.6) 75%, hsl(330, 81%, 60% / 0.8) 100%);
-    --gradient-cosmic: radial-gradient(circle at 30% 20%, hsl(330, 81%, 60% / 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(351, 86%, 55% / 0.2) 0%, transparent 50%);
-    --gradient-shimmer: linear-gradient(45deg, transparent 30%, hsl(330, 81%, 60% / 0.1) 50%, transparent 70%);
+    /* Legacy gradient mappings for compatibility */
+    --gradient-romantic: var(--gradient-calm);
+    --gradient-dreamy: var(--gradient-sunrise);
+    --gradient-sunset: var(--gradient-earth);
+    --gradient-luxe: linear-gradient(135deg, hsl(150, 30%, 30%) 0%, hsl(150, 25%, 45%) 50%, hsl(25, 35%, 55%) 100%);
 
-    /* Component-Specific Gradients */
-    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
-    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142, 76%, 48%) 0%, hsl(142, 78%, 42%) 100%);
-    --gradient-success-hover: linear-gradient(135deg, hsl(142, 78%, 42%) 0%, hsl(142, 80%, 38%) 100%);
-    --gradient-card-elegant: linear-gradient(135deg, hsl(330, 85%, 98%) 0%, hsl(330, 82%, 95%) 100%);
-    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.05) 0%, hsl(351, 86%, 55% / 0.08) 100%);
-    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    /* Component Gradients */
+    --gradient-button-premium: linear-gradient(135deg, hsl(150, 25%, 45%) 0%, hsl(150, 28%, 40%) 100%);
+    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(145, 40%, 42%) 0%, hsl(145, 42%, 38%) 100%);
+    --gradient-success-hover: linear-gradient(135deg, hsl(145, 42%, 38%) 0%, hsl(145, 45%, 35%) 100%);
+    --gradient-card-elegant: linear-gradient(135deg, hsl(40, 25%, 98%) 0%, hsl(35, 20%, 96%) 100%);
+    --gradient-card-premium: linear-gradient(135deg, hsl(150, 25%, 45% / 0.04) 0%, hsl(25, 35%, 55% / 0.06) 100%);
+    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+    --gradient-surface-light: var(--gradient-surface-subtle);
 
-    /* Premium Shadows */
-    --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.3);
-    --shadow-romantic: 0 12px 32px -8px hsl(330 81% 60% / 0.4), 0 4px 16px -4px hsl(330 81% 60% / 0.2);
-    --shadow-glow: 0 0 24px hsl(330 81% 60% / 0.35), 0 0 48px hsl(330 81% 60% / 0.2);
-    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
-    --shadow-dreamy: 0 0 40px hsl(330 85% 95% / 0.8), 0 8px 24px hsl(330 81% 60% / 0.25);
+    /* Gentle Shadows - Diffused, neutral */
+    --shadow-gentle-sm: 0 2px 8px hsl(35 10% 50% / 0.06);
+    --shadow-gentle-md: 0 4px 16px hsl(35 10% 50% / 0.08);
+    --shadow-gentle-lg: 0 8px 32px hsl(35 10% 50% / 0.10);
+    --shadow-gentle-xl: 0 16px 48px hsl(35 10% 50% / 0.12);
+    --shadow-focus: 0 0 0 3px hsl(150 25% 45% / 0.15);
+    --shadow-elevated: 0 4px 20px hsl(35 15% 40% / 0.08), 0 2px 8px hsl(35 10% 50% / 0.06);
 
-    /* Sidebar variables (subtle menu accent) */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 3.9%;
-    --sidebar-primary: 330 81% 60%;
+    /* Legacy shadow mappings */
+    --shadow-elegant: var(--shadow-gentle-lg);
+    --shadow-romantic: var(--shadow-gentle-xl);
+    --shadow-glow: 0 0 20px hsl(150 25% 45% / 0.15);
+    --shadow-glass: 0 8px 32px rgba(31, 38, 50, 0.12);
+    --shadow-dreamy: var(--shadow-gentle-xl);
+
+    /* Sidebar variables */
+    --sidebar-background: 40 30% 98%;
+    --sidebar-foreground: 35 20% 15%;
+    --sidebar-primary: 150 25% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 240 5.9% 90%;
-    --sidebar-ring: 330 81% 60%;
-    --sidebar: 0 0% 100%;
+    --sidebar-accent: 35 15% 92%;
+    --sidebar-accent-foreground: 35 25% 20%;
+    --sidebar-border: 35 20% 88%;
+    --sidebar-ring: 150 25% 45%;
+    --sidebar: 40 30% 98%;
 
-    /* Font System */
+    /* Font System - Inter only for calm consistency */
     --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    --font-serif: 'Crimson Pro', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+    --font-serif: 'Inter', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
-    /* Shadows */
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    /* Base Shadows */
+    --shadow-2xs: 0 1px 3px 0px hsl(35 15% 30% / 0.04);
+    --shadow-xs: 0 1px 3px 0px hsl(35 15% 30% / 0.05);
+    --shadow-sm: 0 1px 3px 0px hsl(35 15% 30% / 0.06), 0 1px 2px -1px hsl(35 15% 30% / 0.06);
+    --shadow: 0 1px 3px 0px hsl(35 15% 30% / 0.06), 0 1px 2px -1px hsl(35 15% 30% / 0.06);
+    --shadow-md: 0 1px 3px 0px hsl(35 15% 30% / 0.08), 0 2px 4px -1px hsl(35 15% 30% / 0.06);
+    --shadow-lg: 0 1px 3px 0px hsl(35 15% 30% / 0.08), 0 4px 6px -1px hsl(35 15% 30% / 0.06);
+    --shadow-xl: 0 1px 3px 0px hsl(35 15% 30% / 0.08), 0 8px 10px -1px hsl(35 15% 30% / 0.06);
+    --shadow-2xl: 0 1px 3px 0px hsl(35 15% 30% / 0.15);
     --tracking-normal: 0em;
     --spacing: 0.25rem;
   }
 
   .dark {
-    /* Zinc Dark Base Colors */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    /* Deep Warm Charcoal Background */
+    --background: 35 15% 8%;
+    --foreground: 40 15% 92%;
+    --card: 35 12% 12%;
+    --card-foreground: 40 15% 92%;
+    --popover: 35 12% 12%;
+    --popover-foreground: 40 15% 92%;
 
-    /* Pink Brand Colors for Dark */
-    --primary: 330 81% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    /* Lighter Sage for Dark Mode */
+    --primary: 150 30% 55%;
+    --primary-foreground: 35 15% 8%;
+    
+    /* Muted Sand for Dark */
+    --secondary: 35 20% 20%;
+    --secondary-foreground: 40 15% 90%;
+    
+    /* Warm Dark Accent */
+    --accent: 30 15% 18%;
+    --accent-foreground: 40 15% 90%;
 
-    /* Zinc Dark Neutrals */
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 330 81% 60%;
+    /* Dark Neutrals */
+    --muted: 35 12% 16%;
+    --muted-foreground: 35 15% 55%;
+    --border: 35 12% 18%;
+    --input: 35 12% 18%;
+    --ring: 150 30% 55%;
 
     /* Semantic Colors for Dark */
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 45% 45%;
     --destructive-foreground: 0 0% 98%;
-    --success: 142 76% 48%;
-    --success-foreground: 138 85% 98%;
-    --warning: 38 88% 52%;
-    --warning-foreground: 48 100% 97%;
+    --success: 145 45% 50%;
+    --success-foreground: 145 85% 98%;
+    --warning: 40 65% 55%;
+    --warning-foreground: 40 100% 97%;
 
     /* Chart Colors for Dark */
-    --chart-1: 330 81% 60%;
-    --chart-2: 351 86% 55%;
-    --chart-3: 240 5% 64.9%;
-    --chart-4: 240 3.7% 50%;
-    --chart-5: 240 3.7% 40%;
+    --chart-1: 150 30% 55%;
+    --chart-2: 25 40% 60%;
+    --chart-3: 35 25% 50%;
+    --chart-4: 180 25% 55%;
+    --chart-5: 35 15% 45%;
 
-    /* Dark Mode Premium Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(330, 84%, 52%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(351, 88%, 48%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(45, 75%, 55%) 0%, hsl(35, 78%, 48%) 100%);
-    --gradient-romantic: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 50%, hsl(240, 10%, 10%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(351, 86%, 55%) 0%, hsl(38, 88%, 52%) 30%, hsl(45, 75%, 55%) 70%, hsl(240, 10%, 10%) 100%);
-    --gradient-dreamy: linear-gradient(135deg, hsl(240, 10%, 6%) 0%, hsl(240, 10%, 10%) 25%, hsl(351, 86%, 55% / 0.2) 50%, hsl(45, 75%, 55% / 0.15) 75%, hsl(240, 10%, 6%) 100%);
-    --gradient-luxe: linear-gradient(135deg, hsl(330, 94%, 28%) 0%, hsl(330, 81%, 60%) 50%, hsl(351, 86%, 55%) 100%);
+    /* Dark Mode Wellness Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(150, 30%, 55%) 0%, hsl(150, 25%, 48%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(35, 25%, 25%) 0%, hsl(25, 22%, 22%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(40, 30%, 18%) 0%, hsl(30, 25%, 15%) 100%);
+    --gradient-calm: linear-gradient(135deg, hsl(35, 15%, 10%) 0%, hsl(35, 12%, 14%) 50%, hsl(35, 10%, 12%) 100%);
+    --gradient-earth: linear-gradient(135deg, hsl(35, 20%, 18%) 0%, hsl(25, 18%, 15%) 50%, hsl(35, 15%, 12%) 100%);
+    --gradient-meadow: linear-gradient(135deg, hsl(150, 30%, 55% / 0.12) 0%, hsl(120, 25%, 50% / 0.08) 100%);
+    --gradient-sunrise: linear-gradient(135deg, hsl(35, 20%, 12%) 0%, hsl(30, 18%, 15%) 50%, hsl(40, 15%, 14%) 100%);
 
-    /* Dark Mode Surface Gradients */
-    --gradient-surface-subtle: linear-gradient(135deg, hsl(240, 10%, 10%) 0%, hsl(240, 10%, 14%) 100%);
-    --gradient-surface-warm: linear-gradient(135deg, hsl(240, 10%, 6%) 0%, hsl(240, 10%, 10%) 100%);
-    --gradient-surface-soft: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
-    --gradient-surface-medium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.15) 0%, hsl(351, 86%, 55% / 0.20) 100%);
-    --gradient-surface-rich: linear-gradient(135deg, hsl(330, 81%, 60% / 0.25) 0%, hsl(351, 86%, 55% / 0.35) 100%);
-    --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    /* Dark Surface Gradients */
+    --gradient-surface-subtle: linear-gradient(135deg, hsl(35, 12%, 12%) 0%, hsl(35, 10%, 14%) 100%);
+    --gradient-surface-warm: linear-gradient(135deg, hsl(35, 15%, 10%) 0%, hsl(35, 12%, 12%) 100%);
+    --gradient-surface-soft: linear-gradient(135deg, hsl(150, 30%, 55% / 0.06) 0%, hsl(25, 40%, 60% / 0.08) 100%);
+    --gradient-surface-medium: linear-gradient(135deg, hsl(150, 30%, 55% / 0.10) 0%, hsl(25, 40%, 60% / 0.12) 100%);
+    --gradient-surface-rich: linear-gradient(135deg, hsl(150, 30%, 55% / 0.15) 0%, hsl(25, 40%, 60% / 0.18) 100%);
+    --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
 
-    /* Dark Mode Component Gradients */
-    --gradient-button-premium: linear-gradient(135deg, hsl(330, 81%, 60%) 0%, hsl(351, 86%, 55%) 100%);
-    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142, 76%, 48%) 0%, hsl(142, 78%, 42%) 100%);
-    --gradient-success-hover: linear-gradient(135deg, hsl(142, 78%, 42%) 0%, hsl(142, 80%, 38%) 100%);
-    --gradient-card-elegant: linear-gradient(135deg, hsl(240, 10%, 10%) 0%, hsl(240, 10%, 14%) 100%);
-    --gradient-card-premium: linear-gradient(135deg, hsl(330, 81%, 60% / 0.08) 0%, hsl(351, 86%, 55% / 0.12) 100%);
-    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    /* Legacy gradient mappings */
+    --gradient-romantic: var(--gradient-calm);
+    --gradient-dreamy: var(--gradient-sunrise);
+    --gradient-sunset: var(--gradient-earth);
+    --gradient-luxe: linear-gradient(135deg, hsl(150, 35%, 25%) 0%, hsl(150, 30%, 55%) 50%, hsl(25, 40%, 60%) 100%);
+    --gradient-surface-light: var(--gradient-surface-subtle);
 
-    /* Dark Mode Premium Shadows */
-    --shadow-elegant: 0 10px 30px -10px hsl(330 81% 60% / 0.4);
-    --shadow-romantic: 0 12px 32px -8px hsl(330 81% 60% / 0.5), 0 4px 16px -4px hsl(330 81% 60% / 0.3);
-    --shadow-glow: 0 0 24px hsl(330 81% 60% / 0.45), 0 0 48px hsl(330 81% 60% / 0.3);
-    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --shadow-dreamy: 0 0 40px hsl(330 81% 60% / 0.3), 0 8px 24px hsl(330 81% 60% / 0.35);
+    /* Dark Component Gradients */
+    --gradient-button-premium: linear-gradient(135deg, hsl(150, 30%, 55%) 0%, hsl(150, 28%, 48%) 100%);
+    --gradient-button-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(145, 45%, 50%) 0%, hsl(145, 42%, 45%) 100%);
+    --gradient-success-hover: linear-gradient(135deg, hsl(145, 42%, 45%) 0%, hsl(145, 45%, 42%) 100%);
+    --gradient-card-elegant: linear-gradient(135deg, hsl(35, 12%, 12%) 0%, hsl(35, 10%, 14%) 100%);
+    --gradient-card-premium: linear-gradient(135deg, hsl(150, 30%, 55% / 0.06) 0%, hsl(25, 40%, 60% / 0.08) 100%);
+    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
 
-    /* Dark sidebar variables (subtle menu accent) */
-    --sidebar-background: 240 10% 3.9%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 330 81% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 330 81% 60%;
-    --sidebar: 240 10% 3.9%;
+    /* Dark Gentle Shadows */
+    --shadow-gentle-sm: 0 2px 8px hsl(35 20% 5% / 0.25);
+    --shadow-gentle-md: 0 4px 16px hsl(35 20% 5% / 0.30);
+    --shadow-gentle-lg: 0 8px 32px hsl(35 20% 5% / 0.35);
+    --shadow-gentle-xl: 0 16px 48px hsl(35 20% 5% / 0.40);
+    --shadow-focus: 0 0 0 3px hsl(150 30% 55% / 0.20);
+    --shadow-elevated: 0 4px 20px hsl(35 20% 5% / 0.30), 0 2px 8px hsl(35 20% 5% / 0.25);
 
-    /* Shadows */
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    /* Legacy shadow mappings */
+    --shadow-elegant: var(--shadow-gentle-lg);
+    --shadow-romantic: var(--shadow-gentle-xl);
+    --shadow-glow: 0 0 20px hsl(150 30% 55% / 0.20);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.35);
+    --shadow-dreamy: var(--shadow-gentle-xl);
+
+    /* Dark sidebar variables */
+    --sidebar-background: 35 15% 8%;
+    --sidebar-foreground: 40 15% 92%;
+    --sidebar-primary: 150 30% 55%;
+    --sidebar-primary-foreground: 35 15% 8%;
+    --sidebar-accent: 35 12% 16%;
+    --sidebar-accent-foreground: 40 15% 90%;
+    --sidebar-border: 35 12% 18%;
+    --sidebar-ring: 150 30% 55%;
+    --sidebar: 35 15% 8%;
+
+    /* Dark Shadows */
+    --shadow-2xs: 0 1px 3px 0px hsl(35 20% 5% / 0.15);
+    --shadow-xs: 0 1px 3px 0px hsl(35 20% 5% / 0.18);
+    --shadow-sm: 0 1px 3px 0px hsl(35 20% 5% / 0.20), 0 1px 2px -1px hsl(35 20% 5% / 0.15);
+    --shadow: 0 1px 3px 0px hsl(35 20% 5% / 0.20), 0 1px 2px -1px hsl(35 20% 5% / 0.15);
+    --shadow-md: 0 1px 3px 0px hsl(35 20% 5% / 0.25), 0 2px 4px -1px hsl(35 20% 5% / 0.18);
+    --shadow-lg: 0 1px 3px 0px hsl(35 20% 5% / 0.25), 0 4px 6px -1px hsl(35 20% 5% / 0.18);
+    --shadow-xl: 0 1px 3px 0px hsl(35 20% 5% / 0.25), 0 8px 10px -1px hsl(35 20% 5% / 0.18);
+    --shadow-2xl: 0 1px 3px 0px hsl(35 20% 5% / 0.40);
   }
 }
 
 @layer base {
   html {
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.4s ease, color 0.4s ease;
   }
 
   * {
     @apply border-border;
-    transition: background-color 0.3s ease,
-                border-color 0.3s ease,
-                color 0.3s ease,
-                fill 0.3s ease,
-                stroke 0.3s ease;
+    transition: background-color 0.4s ease,
+                border-color 0.4s ease,
+                color 0.4s ease,
+                fill 0.4s ease,
+                stroke 0.4s ease;
   }
 
   body {
     @apply bg-background text-foreground;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    font-family: var(--font-sans);
+    letter-spacing: 0.01em;
+    line-height: 1.7;
   }
 }
 
 @layer utilities {
   .theme-transition {
-    transition: background-color 0.3s ease,
-                border-color 0.3s ease,
-                color 0.3s ease,
-                box-shadow 0.3s ease,
-                fill 0.3s ease,
-                stroke 0.3s ease;
+    transition: background-color 0.4s ease,
+                border-color 0.4s ease,
+                color 0.4s ease,
+                box-shadow 0.4s ease,
+                fill 0.4s ease,
+                stroke 0.4s ease;
   }
 }
 
 @layer components {
   .venue-card {
-    background: var(--gradient-venue);
-    @apply border border-border/20 rounded-xl shadow-sm hover:shadow-md transition-all duration-300;
+    background: var(--gradient-surface-subtle);
+    @apply border border-border/30 rounded-2xl shadow-[var(--shadow-gentle-sm)] hover:shadow-[var(--shadow-gentle-md)] transition-all duration-400;
   }
 
   .venue-ai-card {
-    background: var(--gradient-venue-ai);
-    @apply border border-border/20 overflow-hidden hover:shadow-lg transition-all duration-300;
+    background: var(--gradient-surface-warm);
+    @apply border border-border/25 overflow-hidden rounded-2xl hover:shadow-[var(--shadow-gentle-lg)] transition-all duration-400;
   }
 
-  /* Fade-in animation for staggered loading */
+  /* Fade-in animation for staggered loading - gentler */
   @keyframes fade-in {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(8px);
     }
     to {
       opacity: 1;
@@ -266,11 +302,11 @@
   }
 
   .animate-fade-in {
-    animation: fade-in 0.4s ease-out;
+    animation: fade-in 0.5s ease-out;
   }
 }
 
-/* Custom venue map marker styles */
+/* Custom venue map marker styles - Sage green theme */
 .custom-venue-marker {
   background: transparent !important;
   border: none !important;
@@ -284,7 +320,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   border: 2px solid white;
 }
 
@@ -292,24 +328,24 @@
   transform: rotate(45deg);
   color: white;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
-/* Custom marker cluster styles */
+/* Custom marker cluster styles - Sage green */
 .custom-cluster-icon {
   background: transparent !important;
   border: none !important;
 }
 
 .venue-cluster-icon {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.85) 100%);
   border-radius: 50%;
   color: white;
-  font-weight: bold;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px hsl(var(--primary) / 0.4);
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.25);
   border: 3px solid white;
 }
 

@@ -4,22 +4,27 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const cardVariants = cva(
-  "rounded-lg border text-card-foreground transition-all duration-300 ease-out",
+  "rounded-2xl border text-card-foreground transition-all duration-400 ease-out",
   {
     variants: {
       variant: {
-        default: "bg-card shadow-sm hover:shadow-md hover:scale-[1.02] hover:-translate-y-1",
-        elegant: "bg-card shadow-premium-md hover:shadow-premium-lg hover:scale-[1.02] hover:-translate-y-1 border-border/50",
-        glass: "bg-glass-white backdrop-blur-glass border-white/20 shadow-glass hover:shadow-glass-strong hover:scale-[1.02]",
-        premium: "bg-gradient-to-br from-brand-50 to-brand-100 shadow-premium-lg hover:shadow-premium-xl hover:scale-[1.02] border-brand-200/30",
-        glow: "bg-card shadow-glow-md hover:shadow-glow-lg hover:scale-[1.02] border-brand-300/30",
-        romantic: "bg-gradient-romantic border-pink-200/40 shadow-premium-md hover:shadow-premium-lg hover:scale-[1.02]",
-        tinted: "bg-gradient-surface-light border-accent/20 shadow-premium-sm hover:shadow-premium-md hover:scale-[1.02]",
+        default: "bg-card shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.01] hover:-translate-y-0.5",
+        elegant: "bg-card shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01] hover:-translate-y-0.5 border-border/40",
+        glass: "bg-card/80 backdrop-blur-lg border-border/20 shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01]",
+        wellness: "bg-gradient-to-br from-card to-secondary/30 shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01] border-border/30",
+        earth: "bg-gradient-earth border-border/20 shadow-gentle-lg hover:shadow-gentle-xl hover:scale-[1.01]",
+        calm: "bg-gradient-calm border-border/25 shadow-gentle-md hover:shadow-gentle-lg",
+        // Legacy variants mapped to wellness equivalents
+        premium: "bg-gradient-to-br from-card to-secondary/30 shadow-gentle-lg hover:shadow-gentle-xl hover:scale-[1.01] border-border/30",
+        glow: "bg-card shadow-focus hover:shadow-gentle-lg hover:scale-[1.01] border-primary/20",
+        romantic: "bg-gradient-calm border-border/30 shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01]",
+        tinted: "bg-gradient-surface-light border-border/20 shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.01]",
       },
       size: {
-        default: "p-6",
-        sm: "p-4",
-        lg: "p-8",
+        default: "p-8",      // Increased from p-6 for generous padding
+        sm: "p-5",           // Increased from p-4
+        lg: "p-10",          // Increased from p-8
+        xl: "p-12",          // New extra-large size
       }
     },
     defaultVariants: {
@@ -50,7 +55,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5", className)}
+    className={cn("flex flex-col space-y-2", className)}
     {...props}
   />
 ))
@@ -77,7 +82,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-muted-foreground leading-relaxed", className)}
     {...props}
   />
 ))

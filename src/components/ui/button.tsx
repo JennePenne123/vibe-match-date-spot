@@ -5,30 +5,35 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-all duration-200 ease-out active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-all duration-400 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md hover:scale-105",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm hover:shadow-md hover:scale-105",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm hover:shadow-md hover:scale-105",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm hover:shadow-md hover:scale-105",
-        ghost: "hover:bg-accent hover:text-accent-foreground hover:scale-105",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.02]",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.02]",
+        outline: "border-2 border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.02]",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.02]",
+        ghost: "hover:bg-accent hover:text-accent-foreground hover:scale-[1.02]",
         link: "text-primary underline-offset-4 hover:underline",
-        premium: "bg-gradient-to-r from-primary to-secondary text-white shadow-[var(--shadow-elegant)] hover:shadow-[var(--shadow-romantic)] hover:scale-105 transition-all duration-300",
-        soft: "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 hover:border-primary/30 backdrop-blur-sm hover:scale-105",
-        glass: "bg-white/10 backdrop-blur-md border border-white/20 text-foreground hover:bg-white/20 shadow-[var(--shadow-glass)] hover:scale-105",
-        glow: "bg-gradient-to-r from-primary to-secondary text-white shadow-[var(--shadow-glow)] hover:shadow-[0_0_30px_hsl(330_81%_60%/0.4)] hover:scale-105",
+        // Wellness-specific variants
+        wellness: "bg-gradient-primary text-white shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.02] transition-all duration-400",
+        calm: "bg-primary/10 text-primary hover:bg-primary/15 border border-primary/20 hover:border-primary/30 backdrop-blur-sm hover:scale-[1.02]",
+        earth: "bg-gradient-earth text-foreground shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.02]",
+        // Legacy variants mapped to wellness equivalents
+        premium: "bg-gradient-primary text-white shadow-gentle-lg hover:shadow-gentle-xl hover:scale-[1.02] transition-all duration-400",
+        soft: "bg-primary/10 text-primary hover:bg-primary/15 border border-primary/20 hover:border-primary/30 backdrop-blur-sm hover:scale-[1.02]",
+        glass: "bg-card/60 backdrop-blur-lg border border-border/30 text-foreground hover:bg-card/80 shadow-gentle-md hover:scale-[1.02]",
+        glow: "bg-gradient-primary text-white shadow-focus hover:shadow-gentle-lg hover:scale-[1.02]",
       },
       size: {
-        xs: "h-8 px-3 text-xs rounded-md",
-        sm: "h-9 px-4 text-sm rounded-md",
-        default: "h-10 px-6 text-sm rounded-lg",
-        lg: "h-11 px-8 text-base rounded-lg",
-        xl: "h-12 px-10 text-lg rounded-xl",
-        icon: "h-10 w-10 rounded-lg",
-        "icon-sm": "h-8 w-8 rounded-md",
-        "icon-lg": "h-12 w-12 rounded-xl",
+        xs: "h-8 px-3 text-xs rounded-lg",
+        sm: "h-9 px-4 text-sm rounded-lg",
+        default: "h-11 px-7 text-sm rounded-xl",  // Slightly larger with more padding
+        lg: "h-12 px-9 text-base rounded-xl",
+        xl: "h-14 px-12 text-lg rounded-2xl",
+        icon: "h-11 w-11 rounded-xl",
+        "icon-sm": "h-9 w-9 rounded-lg",
+        "icon-lg": "h-14 w-14 rounded-2xl",
       },
       fullWidth: {
         true: "w-full",
