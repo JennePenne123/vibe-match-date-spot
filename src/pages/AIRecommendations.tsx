@@ -118,7 +118,6 @@ const AIRecommendations: React.FC = () => {
   }, [recommendations, sortBy, routeData]);
 
   const handleVenueSelect = (venueId: string) => {
-    console.log('Selected venue:', venueId);
     navigate(`/venue/${venueId}`);
   };
 

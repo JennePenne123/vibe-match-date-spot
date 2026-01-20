@@ -36,8 +36,9 @@ export const AIAnalysisTestButton: React.FC<AIAnalysisTestButtonProps> = ({
     setTestResults(null);
 
     try {
-      console.log('🧪 AI TEST: Starting manual AI analysis test...');
-      
+      if (import.meta.env.DEV) {
+        console.log('🧪 AI TEST: Starting manual AI analysis test...');
+      }
       // First get session data to find partner
       const { data: session, error: sessionError } = await supabase
         .from('date_planning_sessions')
@@ -49,12 +50,14 @@ export const AIAnalysisTestButton: React.FC<AIAnalysisTestButtonProps> = ({
         throw new Error(`Session not found: ${sessionError?.message || 'No session data'}`);
       }
 
-      console.log('🧪 AI TEST: Session found:', {
-        sessionId: session.id,
-        initiator: session.initiator_id,
-        partner: session.partner_id,
-        bothComplete: session.both_preferences_complete
-      });
+      if (import.meta.env.DEV) {
+        console.log('🧪 AI TEST: Session found:', {
+          sessionId: session.id,
+          initiator: session.initiator_id,
+          partner: session.partner_id,
+          bothComplete: session.both_preferences_complete
+        });
+      }
 
       // Determine partner ID
       const partnerId = session.initiator_id === user.id 
@@ -72,7 +75,9 @@ export const AIAnalysisTestButton: React.FC<AIAnalysisTestButtonProps> = ({
         throw new Error(`User preferences not found: ${prefsError?.message || 'No preferences'}`);
       }
 
-      console.log('🧪 AI TEST: User preferences found:', userPrefs);
+      if (import.meta.env.DEV) {
+        console.log('🧪 AI TEST: User preferences found:', userPrefs);
+      }
 
       // Use provided location or fallback
       const locationForTest = userLocation || {
@@ -81,7 +86,9 @@ export const AIAnalysisTestButton: React.FC<AIAnalysisTestButtonProps> = ({
         address: 'San Francisco, CA (test fallback)'
       };
 
-      console.log('🧪 AI TEST: Using location:', locationForTest);
+      if (import.meta.env.DEV) {
+        console.log('🧪 AI TEST: Using location:', locationForTest);
+      }
 
       // Run AI analysis
       await analyzeCompatibilityAndVenues(
