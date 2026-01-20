@@ -21,7 +21,9 @@ import {
   Eye,
   Check,
   PlayCircle,
-  X
+  X,
+  Car,
+  PersonStanding
 } from 'lucide-react';
 import VenueFeedbackButtons from '@/components/VenueFeedbackButtons';
 import { AIVenueRecommendation } from '@/services/aiVenueService/recommendations';
@@ -30,6 +32,12 @@ import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
 import { VoucherBadge } from '@/components/VoucherBadge';
 import { VoucherBadge as VoucherBadgeType } from '@/hooks/useVenueVouchers';
+import { RouteInfo } from '@/services/routingService';
+
+interface TravelInfo {
+  driving?: RouteInfo | null;
+  walking?: RouteInfo | null;
+}
 
 interface AIVenueCardProps {
   recommendation: AIVenueRecommendation;
@@ -41,6 +49,7 @@ interface AIVenueCardProps {
     partnerId?: string;
   };
   vouchers?: VoucherBadgeType[];
+  travelInfo?: TravelInfo;
 }
 
 const AIVenueCard: React.FC<AIVenueCardProps> = ({
@@ -49,8 +58,10 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   showAIInsights = true,
   compact = false,
   sessionContext,
-  vouchers = []
+  vouchers = [],
+  travelInfo
 }) => {
+
   const [showDetails, setShowDetails] = useState(false); // Collapsed by default for cleaner UI
   const [userFeedback, setUserFeedback] = useState<FeedbackType | null>(null);
 
@@ -191,6 +202,24 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
               {venueNeighborhood || formattedAddress}
             </Text>
           </div>
+
+          {/* Travel time info */}
+          {travelInfo && (travelInfo.driving || travelInfo.walking) && (
+            <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+              {travelInfo.driving && (
+                <span className="flex items-center gap-1">
+                  <Car className="w-3 h-3" />
+                  {travelInfo.driving.durationText}
+                </span>
+              )}
+              {travelInfo.walking && (
+                <span className="flex items-center gap-1">
+                  <PersonStanding className="w-3 h-3" />
+                  {travelInfo.walking.durationText}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </CardHeader>
 

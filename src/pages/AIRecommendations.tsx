@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAIRecommendations } from '@/hooks/useAIRecommendations';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { useFriends } from '@/hooks/useFriends';
+import { useBatchRouteInfo } from '@/hooks/useBatchRouteInfo';
 import HomeHeader from '@/components/HomeHeader';
 import AIVenueCard from '@/components/AIVenueCard';
 import CompatibilityScore from '@/components/CompatibilityScore';
@@ -13,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Sparkles, RefreshCw, Users, MapPin, LayoutGrid, Map } from 'lucide-react';
+import { Sparkles, RefreshCw, Users, MapPin, LayoutGrid, Map, Car, PersonStanding, ArrowUpDown } from 'lucide-react';
 import { getUserName } from '@/utils/typeHelpers';
 import { safeFirstWord } from '@/lib/utils';
 import { getLocationFallback } from '@/utils/locationFallback';
@@ -21,12 +22,15 @@ import { getLocationFallback } from '@/utils/locationFallback';
 // Lazy load VenueMapView to avoid SSR issues with Leaflet
 const VenueMapView = lazy(() => import('@/components/VenueMapView'));
 
+type SortOption = 'ai_score' | 'driving_time' | 'walking_time' | 'distance';
+
 const AIRecommendations: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthRedirect();
   const { friends } = useFriends();
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
+  const [sortBy, setSortBy] = useState<SortOption>('ai_score');
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | undefined>();
   const { 
     recommendations, 
@@ -49,6 +53,22 @@ const AIRecommendations: React.FC = () => {
     loadUserLocation();
   }, [user]);
 
+  // Batch fetch route info for all venues
+  const venueLocations = useMemo(() => 
+    recommendations.map(r => ({
+      venue_id: r.venue_id,
+      latitude: r.latitude,
+      longitude: r.longitude
+    })), 
+    [recommendations]
+  );
+
+  const { routeData, loading: routeLoading, progress: routeProgress } = useBatchRouteInfo({
+    venues: venueLocations,
+    userLocation,
+    enabled: !!userLocation && recommendations.length > 0
+  });
+
   const selectedPartner = friends.find(f => f.id === selectedPartnerId);
 
   // Memoize user display logic
@@ -61,10 +81,48 @@ const AIRecommendations: React.FC = () => {
     return { displayName, firstName };
   }, [user]);
 
+  // Sort recommendations based on selected option
+  const sortedRecommendations = useMemo(() => {
+    if (!recommendations.length) return [];
+    
+    const sorted = [...recommendations];
+    
+    switch (sortBy) {
+      case 'ai_score':
+        return sorted.sort((a, b) => b.ai_score - a.ai_score);
+        
+      case 'driving_time':
+        return sorted.sort((a, b) => {
+          const aTime = routeData.get(a.venue_id)?.driving?.duration ?? Infinity;
+          const bTime = routeData.get(b.venue_id)?.driving?.duration ?? Infinity;
+          return aTime - bTime;
+        });
+        
+      case 'walking_time':
+        return sorted.sort((a, b) => {
+          const aTime = routeData.get(a.venue_id)?.walking?.duration ?? Infinity;
+          const bTime = routeData.get(b.venue_id)?.walking?.duration ?? Infinity;
+          return aTime - bTime;
+        });
+        
+      case 'distance':
+        return sorted.sort((a, b) => {
+          const aDist = routeData.get(a.venue_id)?.driving?.distance ?? Infinity;
+          const bDist = routeData.get(b.venue_id)?.driving?.distance ?? Infinity;
+          return aDist - bDist;
+        });
+        
+      default:
+        return sorted;
+    }
+  }, [recommendations, sortBy, routeData]);
+
   const handleVenueSelect = (venueId: string) => {
     console.log('Selected venue:', venueId);
     navigate(`/venue/${venueId}`);
   };
+
+  const hasHomeLocation = !!userLocation;
 
   if (!user || !userInfo) return <LoadingSpinner />;
 
@@ -174,48 +232,105 @@ const AIRecommendations: React.FC = () => {
                 </p>
               </div>
               
-              {/* View Mode Toggle */}
-              <div className="flex items-center gap-2">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="gap-1.5"
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                  Grid
-                </Button>
-                <Button
-                  variant={viewMode === 'map' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('map')}
-                  className="gap-1.5"
-                >
-                  <Map className="h-4 w-4" />
-                  Map
-                </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Sort Dropdown */}
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                  <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ai_score">
+                        <span className="flex items-center gap-2">
+                          <Sparkles className="h-3 w-3" />
+                          AI Score
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="driving_time" disabled={!hasHomeLocation}>
+                        <span className="flex items-center gap-2">
+                          <Car className="h-3 w-3" />
+                          Drive Time
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="walking_time" disabled={!hasHomeLocation}>
+                        <span className="flex items-center gap-2">
+                          <PersonStanding className="h-3 w-3" />
+                          Walk Time
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="distance" disabled={!hasHomeLocation}>
+                        <span className="flex items-center gap-2">
+                          <MapPin className="h-3 w-3" />
+                          Distance
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Route loading indicator */}
+                {routeLoading && sortBy !== 'ai_score' && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <RefreshCw className="h-3 w-3 animate-spin" />
+                    {routeProgress}%
+                  </span>
+                )}
+
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className="gap-1.5"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    Grid
+                  </Button>
+                  <Button
+                    variant={viewMode === 'map' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('map')}
+                    className="gap-1.5"
+                  >
+                    <Map className="h-4 w-4" />
+                    Map
+                  </Button>
+                </div>
               </div>
             </div>
 
+            {/* No home location warning */}
+            {!hasHomeLocation && sortBy !== 'ai_score' && (
+              <div className="text-sm text-muted-foreground bg-muted/50 rounded-md p-3 text-center">
+                Set your home location in Preferences to sort by travel time
+              </div>
+            )}
+
             {viewMode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recommendations.map((recommendation) => (
-                  <SafeComponent 
-                    key={recommendation.venue_id}
-                    componentName="AIVenueCard"
-                  >
-                    <AIVenueCard
-                      recommendation={recommendation}
-                      onSelect={handleVenueSelect}
-                      showAIInsights={true}
-                    />
-                  </SafeComponent>
-                ))}
+                {sortedRecommendations.map((recommendation) => {
+                  const venueRoute = routeData.get(recommendation.venue_id);
+                  return (
+                    <SafeComponent 
+                      key={recommendation.venue_id}
+                      componentName="AIVenueCard"
+                    >
+                      <AIVenueCard
+                        recommendation={recommendation}
+                        onSelect={handleVenueSelect}
+                        showAIInsights={true}
+                        travelInfo={venueRoute}
+                      />
+                    </SafeComponent>
+                  );
+                })}
               </div>
             ) : (
               <Suspense fallback={<Skeleton className="h-[500px] rounded-lg" />}>
                 <VenueMapView
-                  recommendations={recommendations}
+                  recommendations={sortedRecommendations}
                   onSelectVenue={handleVenueSelect}
                   userLocation={userLocation}
                   height="500px"
@@ -248,3 +363,4 @@ const AIRecommendations: React.FC = () => {
 };
 
 export default AIRecommendations;
+
