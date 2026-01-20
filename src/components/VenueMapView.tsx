@@ -6,12 +6,15 @@ import { Icon, LatLngBounds, DivIcon } from 'leaflet';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import VenueMarkerPopup from './VenueMarkerPopup';
 import { AlertCircle, Home } from 'lucide-react';
+import { RouteInfo } from '@/services/routingService';
+import { VenueRouteData } from '@/hooks/useBatchRouteInfo';
 
 interface VenueMapViewProps {
   recommendations: AIVenueRecommendation[];
   onSelectVenue: (venueId: string) => void;
   userLocation?: { latitude: number; longitude: number };
   height?: string;
+  routeData?: Map<string, VenueRouteData>;
 }
 
 // Helper component to update map bounds
@@ -61,7 +64,8 @@ const VenueMapView = ({
   recommendations, 
   onSelectVenue, 
   userLocation,
-  height = '500px' 
+  height = '500px',
+  routeData
 }: VenueMapViewProps) => {
   // Filter venues with valid coordinates
   const venuesWithCoords = useMemo(() => 
@@ -183,21 +187,25 @@ const VenueMapView = ({
             spiderfyOnMaxZoom={true}
             showCoverageOnHover={false}
           >
-            {venuesWithCoords.map((recommendation) => (
-              <Marker
-                key={recommendation.venue_id}
-                position={[recommendation.latitude!, recommendation.longitude!]}
-                icon={createVenueIcon(recommendation.ai_score)}
-              >
-                <Popup>
-                  <VenueMarkerPopup 
-                    recommendation={recommendation}
-                    onSelect={onSelectVenue}
-                    userLocation={userLocation}
-                  />
-                </Popup>
-              </Marker>
-            ))}
+            {venuesWithCoords.map((recommendation) => {
+              const venueRoute = routeData?.get(recommendation.venue_id);
+              return (
+                <Marker
+                  key={recommendation.venue_id}
+                  position={[recommendation.latitude!, recommendation.longitude!]}
+                  icon={createVenueIcon(recommendation.ai_score)}
+                >
+                  <Popup>
+                    <VenueMarkerPopup 
+                      recommendation={recommendation}
+                      onSelect={onSelectVenue}
+                      userLocation={userLocation}
+                      preloadedRoute={venueRoute}
+                    />
+                  </Popup>
+                </Marker>
+              );
+            })}
           </MarkerClusterGroup>
         </MapContainer>
       </div>
