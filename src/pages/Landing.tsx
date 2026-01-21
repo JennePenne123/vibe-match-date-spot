@@ -72,7 +72,11 @@ export default function LandingDemo() {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 group">
-              
+              <img 
+                src="/icon-192.png" 
+                alt="VybePulse" 
+                className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl shadow-gentle-md animate-logo-pulse group-hover:scale-105 transition-all duration-300"
+              />
               <span className="text-xl lg:text-2xl font-semibold text-foreground">
                 VybePulse
               </span>
@@ -362,7 +366,12 @@ export default function LandingDemo() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <Link to="/" className="flex items-center space-x-2 group">
-              <img src="/icon-192.png" alt="VybePulse" className="w-8 h-8 rounded-xl shadow-gentle-md group-hover:scale-105 transition-all duration-300" />
+              <img 
+                src="/icon-192.png" 
+                alt="VybePulse" 
+                className="w-8 h-8 rounded-xl shadow-gentle-md animate-logo-pulse group-hover:scale-105 transition-all duration-300"
+                style={{ animationDelay: '0.3s' }}
+              />
               <span className="text-xl font-semibold text-foreground">
                 VybePulse
               </span>
