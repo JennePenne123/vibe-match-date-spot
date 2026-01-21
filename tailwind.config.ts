@@ -317,15 +317,29 @@ export default {
     				'50%': { transform: 'scale(0.95)' },
     				'75%': { transform: 'scale(1.1)' }
     			},
-    			'spin-in': {
-    				'0%': { transform: 'rotate(-90deg) scale(0)', opacity: '0' },
-    				'100%': { transform: 'rotate(0) scale(1)', opacity: '1' }
-    			},
-    			'spin-out': {
-    				'0%': { transform: 'rotate(0) scale(1)', opacity: '1' },
-    				'100%': { transform: 'rotate(90deg) scale(0)', opacity: '0' }
-    			}
-    		},
+			'spin-in': {
+				'0%': { transform: 'rotate(-90deg) scale(0)', opacity: '0' },
+				'100%': { transform: 'rotate(0) scale(1)', opacity: '1' }
+			},
+			'spin-out': {
+				'0%': { transform: 'rotate(0) scale(1)', opacity: '1' },
+				'100%': { transform: 'rotate(90deg) scale(0)', opacity: '0' }
+			},
+			'logo-pulse': {
+				'0%': { 
+					transform: 'scale(1)', 
+					boxShadow: '0 0 0 0 hsl(var(--primary) / 0.4)' 
+				},
+				'50%': { 
+					transform: 'scale(1.08)', 
+					boxShadow: '0 0 20px 8px hsl(var(--primary) / 0.3)' 
+				},
+				'100%': { 
+					transform: 'scale(1)', 
+					boxShadow: '0 0 0 0 hsl(var(--primary) / 0)' 
+				}
+			}
+		},
     		animation: {
     			'accordion-down': 'accordion-down 0.25s ease-out',
     			'accordion-up': 'accordion-up 0.25s ease-out',
@@ -336,10 +350,11 @@ export default {
     			'shimmer': 'shimmer 2s ease-in-out infinite',
     			'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
     			'card-tap': 'card-tap 0.15s ease-out',
-    			'heart-bounce': 'heart-bounce 0.4s ease-out',
-    			'spin-in': 'spin-in 0.3s ease-out',
-    			'spin-out': 'spin-out 0.2s ease-in'
-    		},
+			'heart-bounce': 'heart-bounce 0.4s ease-out',
+			'spin-in': 'spin-in 0.3s ease-out',
+			'spin-out': 'spin-out 0.2s ease-in',
+			'logo-pulse': 'logo-pulse 1.2s ease-out forwards'
+		},
     	}
     },
 	plugins: [require("tailwindcss-animate")],
