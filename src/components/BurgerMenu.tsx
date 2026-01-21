@@ -77,9 +77,9 @@ const BurgerMenu = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12 border-2 border-pink-200">
+              <Avatar className="w-12 h-12 border-2 border-sage-200 dark:border-sage-800">
                 <AvatarImage src={getUserAvatar(user)} alt={displayName} referrerPolicy="no-referrer" />
-                <AvatarFallback className="bg-pink-100 text-pink-600">
+                <AvatarFallback className="bg-sage-100 text-sage-600 dark:bg-sage-900/30 dark:text-sage-400">
                   {getInitials(displayName)}
                 </AvatarFallback>
               </Avatar>
@@ -131,8 +131,8 @@ const BurgerMenu = () => {
                 onClick={() => handleMenuItemClick(item.path)}
                 className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-accent/50 transition-colors text-left"
               >
-                <div className="flex items-center justify-center w-10 h-10 bg-pink-100 rounded-lg">
-                  <item.icon className="w-5 h-5 text-pink-600" />
+                <div className="flex items-center justify-center w-10 h-10 bg-sage-100 dark:bg-sage-900/30 rounded-lg">
+                  <item.icon className="w-5 h-5 text-sage-600 dark:text-sage-400" />
                 </div>
                 <div className="flex-1">
                   <div className="font-medium text-foreground">{item.label}</div>
@@ -146,14 +146,14 @@ const BurgerMenu = () => {
           <div className="border-t border-border pt-4">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors text-left text-red-600"
+              className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-error-50 dark:hover:bg-error-950/20 transition-colors text-left text-error-600 dark:text-error-400"
             >
-              <div className="flex items-center justify-center w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg">
+              <div className="flex items-center justify-center w-10 h-10 bg-error-100 dark:bg-error-900/30 rounded-lg">
                 <LogOut className="w-5 h-5" />
               </div>
               <div className="flex-1">
                 <div className="font-medium">Sign Out</div>
-                <div className="text-sm text-red-500">Log out of your account</div>
+                <div className="text-sm text-error-500 dark:text-error-400">Log out of your account</div>
               </div>
             </button>
           </div>

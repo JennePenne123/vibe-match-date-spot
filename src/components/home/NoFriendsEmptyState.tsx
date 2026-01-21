@@ -11,37 +11,37 @@ const NoFriendsEmptyState: React.FC = () => {
 
   return (
     <SafeComponent componentName="NoFriendsEmptyState">
-      <Card className="bg-gradient-to-r from-pink-50 to-rose-50 border-pink-200">
+      <Card className="bg-gradient-to-r from-sage-50 to-sand-50 dark:from-sage-950/30 dark:to-sand-950/30 border-sage-200 dark:border-sage-800">
         <CardHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
-            <div className="bg-gradient-to-r from-pink-400 to-rose-500 rounded-full p-4 shadow-md">
+            <div className="bg-gradient-primary rounded-full p-4 shadow-md">
               <Heart className="w-12 h-12 text-white" fill="currentColor" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-800">
+          <CardTitle className="text-2xl font-bold text-foreground">
             Start Your Dating Journey
           </CardTitle>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Add friends to start planning amazing dates with AI-powered recommendations
           </p>
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-white rounded-lg border border-pink-100">
-              <Users className="h-8 w-8 text-pink-500 mx-auto mb-2" />
-              <h3 className="font-medium text-gray-800 mb-1">Connect with Friends</h3>
-              <p className="text-sm text-gray-600">Add friends to start planning dates together</p>
+            <div className="p-4 bg-card rounded-lg border border-sage-100 dark:border-sage-800">
+              <Users className="h-8 w-8 text-sage-500 mx-auto mb-2" />
+              <h3 className="font-medium text-foreground mb-1">Connect with Friends</h3>
+              <p className="text-sm text-muted-foreground">Add friends to start planning dates together</p>
             </div>
-            <div className="p-4 bg-white rounded-lg border border-pink-100">
-              <Sparkles className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-              <h3 className="font-medium text-gray-800 mb-1">AI-Powered Matching</h3>
-              <p className="text-sm text-gray-600">Get personalized venue recommendations</p>
+            <div className="p-4 bg-card rounded-lg border border-sage-100 dark:border-sage-800">
+              <Sparkles className="h-8 w-8 text-terracotta-500 mx-auto mb-2" />
+              <h3 className="font-medium text-foreground mb-1">AI-Powered Matching</h3>
+              <p className="text-sm text-muted-foreground">Get personalized venue recommendations</p>
             </div>
           </div>
           
           <Button 
             onClick={() => navigate('/my-friends')}
-            className="bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
+            variant="wellness"
             size="lg"
           >
             <UserPlus className="h-4 w-4 mr-2" />

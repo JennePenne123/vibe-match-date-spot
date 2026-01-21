@@ -111,7 +111,8 @@ const MyVenues = () => {
                 <div className="space-y-2">
                   <Button
                     onClick={() => navigate('/venues')}
-                    className="w-full bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
+                    variant="wellness"
+                    className="w-full"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Discover Venues

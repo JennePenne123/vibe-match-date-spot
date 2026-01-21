@@ -29,9 +29,9 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
   const timingScore = detailedScore ? Math.round(detailedScore.timing_score * 100) : 0;
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800';
-    if (score >= 60) return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-800';
-    return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800';
+    if (score >= 80) return 'text-success-600 dark:text-success-400 bg-success-50 dark:bg-success-950/30 border-success-200 dark:border-success-800';
+    if (score >= 60) return 'text-warning-600 dark:text-warning-400 bg-warning-50 dark:bg-warning-950/30 border-warning-200 dark:border-warning-800';
+    return 'text-error-600 dark:text-error-400 bg-error-50 dark:bg-error-950/30 border-error-200 dark:border-error-800';
   };
 
   const getScoreText = (score: number) => {
@@ -54,7 +54,7 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
       {/* Compatibility Score */}
       <div className="text-center space-y-3">
         <div className="flex items-center justify-center gap-3">
-          <Heart className="h-6 w-6 text-pink-500" />
+          <Heart className="h-6 w-6 text-primary" />
           <div>
             <div className="text-4xl font-bold text-foreground">
               {overallScore}%
@@ -71,14 +71,14 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
         
         <Progress 
           value={overallScore} 
-          className="w-full max-w-xs mx-auto h-2.5 bg-pink-100 dark:bg-pink-950/30"
+          className="w-full max-w-xs mx-auto h-2.5 bg-sage-100 dark:bg-sage-950/30"
         />
       </div>
 
       {/* AI Insights */}
-      <div className="bg-card p-3 rounded-lg border border-purple-100 dark:border-purple-800">
+      <div className="bg-card p-3 rounded-lg border border-sage-100 dark:border-sage-800">
         <div className="flex items-start gap-2.5">
-          <TrendingUp className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+          <TrendingUp className="h-4 w-4 text-sage-500 mt-0.5 flex-shrink-0" />
           <div>
             <h4 className="font-semibold text-foreground mb-1.5 text-sm">AI Insights</h4>
             <p className="text-muted-foreground text-xs leading-relaxed">
@@ -89,9 +89,9 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
       </div>
 
       {/* Venue Recommendations Summary */}
-      <div className="flex items-center justify-center flex-col gap-2 bg-card p-3 rounded-lg border border-purple-100 dark:border-purple-800">
+      <div className="flex items-center justify-center flex-col gap-2 bg-card p-3 rounded-lg border border-sage-100 dark:border-sage-800">
         <div className="flex items-center gap-2.5">
-          <MapPin className="h-4 w-4 text-purple-500" />
+          <MapPin className="h-4 w-4 text-sage-500" />
           <div className="text-center">
             <div className="font-semibold text-foreground text-base">{venueCount} Perfect Venues Found</div>
             <div className="text-xs text-muted-foreground">
@@ -99,7 +99,7 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
             </div>
           </div>
         </div>
-        <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 text-xs px-2.5 py-0.5">
+        <Badge variant="secondary" className="bg-sage-100 dark:bg-sage-950/30 text-sage-700 dark:text-sage-300 text-xs px-2.5 py-0.5">
           AI Curated
         </Badge>
       </div>
@@ -107,20 +107,20 @@ const AIMatchSummary: React.FC<AIMatchSummaryProps> = ({
       {/* Compatibility Breakdown */}
       {detailedScore && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="text-center p-2.5 bg-card rounded-lg border border-purple-100 dark:border-purple-800">
-            <div className="text-base font-bold text-purple-600 dark:text-purple-400">{cuisineScore}%</div>
+          <div className="text-center p-2.5 bg-card rounded-lg border border-sage-100 dark:border-sage-800">
+            <div className="text-base font-bold text-sage-600 dark:text-sage-400">{cuisineScore}%</div>
             <div className="text-[10px] text-muted-foreground mt-0.5">Cuisine Match</div>
           </div>
-          <div className="text-center p-2.5 bg-card rounded-lg border border-purple-100 dark:border-purple-800">
-            <div className="text-base font-bold text-purple-600 dark:text-purple-400">{vibeScore}%</div>
+          <div className="text-center p-2.5 bg-card rounded-lg border border-sage-100 dark:border-sage-800">
+            <div className="text-base font-bold text-sage-600 dark:text-sage-400">{vibeScore}%</div>
             <div className="text-[10px] text-muted-foreground mt-0.5">Vibe Match</div>
           </div>
-          <div className="text-center p-2.5 bg-card rounded-lg border border-purple-100 dark:border-purple-800">
-            <div className="text-base font-bold text-purple-600 dark:text-purple-400">{priceScore}%</div>
+          <div className="text-center p-2.5 bg-card rounded-lg border border-sage-100 dark:border-sage-800">
+            <div className="text-base font-bold text-sage-600 dark:text-sage-400">{priceScore}%</div>
             <div className="text-[10px] text-muted-foreground mt-0.5">Price Match</div>
           </div>
-          <div className="text-center p-2.5 bg-card rounded-lg border border-purple-100 dark:border-purple-800">
-            <div className="text-base font-bold text-purple-600 dark:text-purple-400">{timingScore}%</div>
+          <div className="text-center p-2.5 bg-card rounded-lg border border-sage-100 dark:border-sage-800">
+            <div className="text-base font-bold text-sage-600 dark:text-sage-400">{timingScore}%</div>
             <div className="text-[10px] text-muted-foreground mt-0.5">Time Match</div>
           </div>
         </div>

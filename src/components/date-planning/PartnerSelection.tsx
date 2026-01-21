@@ -50,12 +50,12 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
   const selectedCount = selectedPartnerIds.length;
 
   return (
-    <Card variant="elegant" className="border-pink-200/40 dark:border-pink-900/30">
+    <Card variant="elegant" className="border-sage-200/40 dark:border-sage-800/30">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-pink-100 dark:bg-pink-900/20">
-              <Users className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+            <div className="p-2 rounded-full bg-sage-100 dark:bg-sage-900/20">
+              <Users className="h-5 w-5 text-sage-600 dark:text-sage-400" />
             </div>
             <CardTitle className="text-xl font-semibold">
               {dateMode === 'single' ? 'Choose Your Date Partner' : 'Choose Your Group'}
@@ -64,7 +64,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
           <Toggle 
             pressed={dateMode === 'group'} 
             onPressedChange={(pressed) => onDateModeChange(pressed ? 'group' : 'single')}
-            className="rounded-full px-3 py-1.5 text-xs font-medium data-[state=on]:bg-pink-100 data-[state=on]:text-pink-700 dark:data-[state=on]:bg-pink-900/30 dark:data-[state=on]:text-pink-300 data-[state=off]:bg-muted data-[state=off]:text-muted-foreground hover:bg-pink-50 dark:hover:bg-pink-900/20"
+            className="rounded-full px-3 py-1.5 text-xs font-medium data-[state=on]:bg-sage-100 data-[state=on]:text-sage-700 dark:data-[state=on]:bg-sage-900/30 dark:data-[state=on]:text-sage-300 data-[state=off]:bg-muted data-[state=off]:text-muted-foreground hover:bg-sage-50 dark:hover:bg-sage-900/20"
           >
             {dateMode === 'single' ? (
               <>
@@ -103,12 +103,12 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
           <div className="space-y-3">
             <div className="grid gap-3 max-h-48 overflow-y-auto pr-2">
               {friends.map((friend) => (
-                <div key={friend.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-pink-50/50 dark:hover:bg-pink-900/10 transition-colors border border-transparent hover:border-pink-200/50 dark:hover:border-pink-800/30">
+                <div key={friend.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-sage-50/50 dark:hover:bg-sage-900/10 transition-colors border border-transparent hover:border-sage-200/50 dark:hover:border-sage-800/30">
                   <Checkbox
                     id={friend.id}
                     checked={selectedPartnerIds.includes(friend.id)}
                     onCheckedChange={(checked) => handlePartnerToggle(friend.id, checked as boolean)}
-                    className="data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500"
+                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
                   <label 
                     htmlFor={friend.id} 
@@ -125,7 +125,8 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
         <Button 
           onClick={onContinue}
           disabled={!isValidSelection || loading}
-          className="w-full h-12 bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="wellness"
+          className="w-full h-12"
         >
           {loading ? (
             <>
