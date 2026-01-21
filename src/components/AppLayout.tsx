@@ -3,8 +3,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
-import { Menu } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Menu, Sparkles } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 interface AppLayoutProps {
@@ -30,12 +29,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
         
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header with sidebar trigger */}
-          <header className="h-12 flex items-center justify-between border-b border-border bg-card px-4">
-            <div className="flex items-center">
-              <SidebarTrigger className="mr-2">
-                <Menu className="w-4 h-4" />
+          <header className="h-14 flex items-center justify-between border-b border-border/40 bg-card/80 backdrop-blur-lg px-6">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger className="text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-lg p-2 transition-colors">
+                <Menu className="w-5 h-5" />
               </SidebarTrigger>
-              <h1 className="font-semibold text-foreground">VybePulse</h1>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow-primary/30">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <h1 className="font-semibold text-foreground text-lg">VybePulse</h1>
+              </div>
             </div>
             <ThemeToggle />
           </header>

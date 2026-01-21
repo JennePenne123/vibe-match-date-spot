@@ -7,11 +7,13 @@ import { AppUser } from '@/types/app';
 import { getUserAvatar, getFallbackAvatar } from '@/utils/typeHelpers';
 import { getInitials } from '@/lib/utils';
 import { Heading } from '@/design-system/components';
+
 interface HomeHeaderProps {
   user: AppUser;
   displayName: string;
   firstName: string;
 }
+
 const HomeHeader = ({
   user,
   displayName,
@@ -36,14 +38,15 @@ const HomeHeader = ({
     return 'Good Evening';
   };
 
-  return <div className="flex justify-between items-center p-4 pt-12 bg-card shadow-sm">
-      <div className="flex items-center gap-2 flex-1 min-w-0">
-        <Avatar className="w-10 h-10 border-2 border-pink-200 shrink-0">
+  return (
+    <div className="flex justify-between items-center p-4 pt-12 bg-card/80 backdrop-blur-lg border-b border-border/40 shadow-gentle-sm">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <Avatar className="w-10 h-10 border-2 border-primary/30 ring-2 ring-primary/10 shrink-0">
           <AvatarImage 
             src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)}
             alt={displayName}
             referrerPolicy="no-referrer"
-          onError={(e) => {
+            onError={(e) => {
               if (import.meta.env.DEV) {
                 console.error('❌ AVATAR: Image failed to load');
                 console.error('❌ AVATAR: Failed URL:', avatarUrl);
@@ -58,12 +61,14 @@ const HomeHeader = ({
               }
             }}
           />
-          <AvatarFallback className="bg-pink-100 text-pink-600 text-sm">
+          <AvatarFallback className="bg-primary/20 text-primary text-sm font-medium">
             {getInitials(displayName)}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <Heading size="h2" className="text-foreground text-sm sm:text-base truncate">{getTimeBasedGreeting()} {firstName}! 👋</Heading>
+          <Heading size="h2" className="text-foreground text-sm sm:text-base truncate">
+            {getTimeBasedGreeting()} {firstName}! 👋
+          </Heading>
         </div>
       </div>
       <div className="flex items-center gap-1 shrink-0">
@@ -71,6 +76,8 @@ const HomeHeader = ({
         <ThemeToggle />
         <BurgerMenu />
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default HomeHeader;

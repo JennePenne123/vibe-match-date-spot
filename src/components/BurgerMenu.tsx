@@ -67,19 +67,19 @@ const BurgerMenu = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="text-muted-foreground hover:bg-accent"
+          className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
         >
           <Menu className="w-5 h-5" />
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="max-w-md mx-auto">
+      <DrawerContent className="max-w-md mx-auto bg-card/95 backdrop-blur-xl border-border/40">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12 border-2 border-sage-200 dark:border-sage-800">
+              <Avatar className="w-12 h-12 border-2 border-primary/30 ring-2 ring-primary/10">
                 <AvatarImage src={getUserAvatar(user)} alt={displayName} referrerPolicy="no-referrer" />
-                <AvatarFallback className="bg-sage-100 text-sage-600 dark:bg-sage-900/30 dark:text-sage-400">
+                <AvatarFallback className="bg-primary/20 text-primary font-medium">
                   {getInitials(displayName)}
                 </AvatarFallback>
               </Avatar>
@@ -92,7 +92,7 @@ const BurgerMenu = () => {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
-              className="text-muted-foreground hover:bg-accent"
+              className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
             >
               <X className="w-5 h-5" />
             </Button>
@@ -100,7 +100,7 @@ const BurgerMenu = () => {
 
           {/* Theme Selector */}
           <div className="mb-6">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Appearance</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Appearance</p>
             <div className="flex gap-2">
               {themeOptions.map((option) => {
                 const Icon = option.icon;
@@ -109,10 +109,10 @@ const BurgerMenu = () => {
                   <button
                     key={option.value}
                     onClick={() => setTheme(option.value)}
-                    className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-lg border transition-colors ${
+                    className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-300 ${
                       isActive 
-                        ? 'border-primary bg-primary/5 text-primary' 
-                        : 'border-border text-muted-foreground hover:bg-accent/50'
+                        ? 'border-primary/50 bg-primary/20 text-primary shadow-glow-primary/20' 
+                        : 'border-border/40 text-muted-foreground hover:bg-white/10 hover:border-border/60'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -129,10 +129,10 @@ const BurgerMenu = () => {
               <button
                 key={item.path}
                 onClick={() => handleMenuItemClick(item.path)}
-                className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-accent/50 transition-colors text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/10 transition-all duration-300 text-left group"
               >
-                <div className="flex items-center justify-center w-10 h-10 bg-sage-100 dark:bg-sage-900/30 rounded-lg">
-                  <item.icon className="w-5 h-5 text-sage-600 dark:text-sage-400" />
+                <div className="flex items-center justify-center w-10 h-10 bg-primary/20 rounded-xl group-hover:bg-primary/30 transition-colors">
+                  <item.icon className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
                   <div className="font-medium text-foreground">{item.label}</div>
@@ -143,17 +143,17 @@ const BurgerMenu = () => {
           </div>
 
           {/* Logout Button */}
-          <div className="border-t border-border pt-4">
+          <div className="border-t border-border/40 pt-4">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-4 p-4 rounded-lg hover:bg-error-50 dark:hover:bg-error-950/20 transition-colors text-left text-error-600 dark:text-error-400"
+              className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-error-500/10 transition-all duration-300 text-left text-error-500 group"
             >
-              <div className="flex items-center justify-center w-10 h-10 bg-error-100 dark:bg-error-900/30 rounded-lg">
+              <div className="flex items-center justify-center w-10 h-10 bg-error-500/20 rounded-xl group-hover:bg-error-500/30 transition-colors">
                 <LogOut className="w-5 h-5" />
               </div>
               <div className="flex-1">
                 <div className="font-medium">Sign Out</div>
-                <div className="text-sm text-error-500 dark:text-error-400">Log out of your account</div>
+                <div className="text-sm opacity-80">Log out of your account</div>
               </div>
             </button>
           </div>

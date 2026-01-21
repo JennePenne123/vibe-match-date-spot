@@ -11,15 +11,21 @@ const badgeVariants = cva(
         default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
         secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-        premium: "border-transparent bg-gradient-primary text-white shadow-premium-sm hover:shadow-premium-md hover:scale-105",
-        glow: "border-transparent bg-brand-500 text-white shadow-glow-sm hover:shadow-glow-md hover:scale-105",
-        romantic: "border-transparent bg-gradient-romantic text-white shadow-premium-sm hover:shadow-glow-sm hover:scale-105",
-        glass: "border-white/20 bg-glass-white backdrop-blur-glass text-foreground shadow-glass hover:bg-white/30",
+        outline: "border-border/50 text-foreground bg-transparent",
+        // Modern glass variants
+        glass: "border-white/20 bg-white/10 backdrop-blur-md text-foreground shadow-gentle-sm hover:bg-white/20",
+        "glass-primary": "border-primary/30 bg-primary/20 backdrop-blur-md text-primary-foreground shadow-gentle-sm hover:bg-primary/30",
+        // Gradient variants
+        premium: "border-transparent bg-gradient-primary text-white shadow-gentle-sm hover:shadow-glow-primary hover:scale-105",
+        accent: "border-transparent bg-gradient-accent text-white shadow-gentle-sm hover:shadow-glow-accent hover:scale-105",
+        glow: "border-transparent bg-primary text-white shadow-glow-primary hover:shadow-glow-secondary hover:scale-105",
+        // Status variants
         success: "border-transparent bg-success-500 text-white hover:bg-success-600",
         warning: "border-transparent bg-warning-500 text-white hover:bg-warning-600",
         error: "border-transparent bg-error-500 text-white hover:bg-error-600",
-        elegant: "border-border bg-card text-foreground shadow-premium-sm hover:shadow-premium-md hover:bg-muted",
+        // Legacy mappings
+        romantic: "border-transparent bg-gradient-accent text-white shadow-gentle-sm hover:shadow-glow-accent hover:scale-105",
+        elegant: "border-border/40 bg-card/80 backdrop-blur-sm text-foreground shadow-gentle-sm hover:shadow-gentle-md hover:bg-card",
       },
       size: {
         default: "px-2.5 py-0.5 text-xs",
