@@ -4,20 +4,23 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const inputVariants = cva(
-  "flex h-10 w-full rounded-md text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+  "flex h-10 w-full rounded-xl text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
   {
     variants: {
       variant: {
-        default: "border border-input bg-background px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        glass: "border border-white/20 bg-glass-white backdrop-blur-glass px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0 focus-visible:shadow-glow-sm",
-        premium: "border border-brand-200 bg-gradient-to-br from-brand-50 to-white px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-0 focus-visible:shadow-premium-md",
-        romantic: "border border-pink-200/60 bg-gradient-to-br from-pink-50 to-rose-50 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-0 focus-visible:shadow-glow-sm",
-        elegant: "border border-neutral-200 bg-white px-3 py-2 shadow-premium-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-0 focus-visible:shadow-premium-md",
-        floating: "border-0 border-b-2 border-input bg-transparent px-0 py-2 rounded-none focus-visible:outline-none focus-visible:border-brand-500 focus-visible:ring-0",
+        default: "border border-border/50 bg-card/50 backdrop-blur-sm px-4 py-2 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50",
+        glass: "border border-white/20 bg-white/10 backdrop-blur-md px-4 py-2 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:border-white/40 focus-visible:shadow-glow-primary",
+        "glass-strong": "border border-white/30 bg-white/15 backdrop-blur-lg px-4 py-2 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/50",
+        premium: "border border-primary/30 bg-primary/10 backdrop-blur-sm px-4 py-2 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/60 focus-visible:shadow-glow-primary",
+        minimal: "border-0 border-b-2 border-border/50 bg-transparent px-0 py-2 rounded-none focus-visible:outline-none focus-visible:border-primary focus-visible:ring-0",
+        // Legacy mappings
+        romantic: "border border-accent/30 bg-accent/10 backdrop-blur-sm px-4 py-2 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:border-accent/60 focus-visible:shadow-glow-accent",
+        elegant: "border border-border/40 bg-card/80 backdrop-blur-sm px-4 py-2 shadow-gentle-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:shadow-gentle-md",
+        floating: "border-0 border-b-2 border-border/50 bg-transparent px-0 py-2 rounded-none focus-visible:outline-none focus-visible:border-primary focus-visible:ring-0",
       },
       inputSize: {
-        default: "h-10",
-        sm: "h-8 text-sm",
+        default: "h-11",
+        sm: "h-9 text-sm",
         lg: "h-12 text-lg",
       }
     },

@@ -4,27 +4,29 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const cardVariants = cva(
-  "rounded-2xl border text-card-foreground transition-all duration-400 ease-out",
+  "rounded-2xl border text-card-foreground transition-all duration-300 ease-out",
   {
     variants: {
       variant: {
-        default: "bg-card shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.01] hover:-translate-y-0.5",
-        elegant: "bg-card shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01] hover:-translate-y-0.5 border-border/40",
-        glass: "bg-card/80 backdrop-blur-lg border-border/20 shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01]",
-        wellness: "bg-gradient-to-br from-card to-secondary/30 shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01] border-border/30",
-        earth: "bg-gradient-earth border-border/20 shadow-gentle-lg hover:shadow-gentle-xl hover:scale-[1.01]",
-        calm: "bg-gradient-calm border-border/25 shadow-gentle-md hover:shadow-gentle-lg",
-        // Legacy variants mapped to wellness equivalents
-        premium: "bg-gradient-to-br from-card to-secondary/30 shadow-gentle-lg hover:shadow-gentle-xl hover:scale-[1.01] border-border/30",
-        glow: "bg-card shadow-focus hover:shadow-gentle-lg hover:scale-[1.01] border-primary/20",
-        romantic: "bg-gradient-calm border-border/30 shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01]",
-        tinted: "bg-gradient-surface-light border-border/20 shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.01]",
+        default: "bg-card/80 backdrop-blur-sm border-border/40 shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.01] hover:-translate-y-0.5",
+        elegant: "bg-card/90 backdrop-blur-md border-border/50 shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01] hover:-translate-y-0.5",
+        glass: "bg-white/10 backdrop-blur-md border-white/20 shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01]",
+        "glass-strong": "bg-white/15 backdrop-blur-lg border-white/25 shadow-gentle-lg hover:shadow-glow-primary hover:scale-[1.01]",
+        modern: "bg-card/80 backdrop-blur-md border-border/40 shadow-gentle-md hover:shadow-glow-primary hover:border-primary/40 hover:scale-[1.02]",
+        wellness: "bg-card/80 backdrop-blur-sm border-border/40 shadow-gentle-md hover:shadow-gentle-lg hover:scale-[1.01] hover:border-primary/30",
+        earth: "bg-gradient-earth border-border/30 shadow-gentle-lg hover:shadow-gentle-xl hover:scale-[1.01]",
+        calm: "bg-gradient-calm border-border/30 shadow-gentle-md hover:shadow-gentle-lg",
+        // Legacy variants
+        premium: "bg-card/90 backdrop-blur-lg border-border/40 shadow-gentle-lg hover:shadow-glow-primary hover:scale-[1.01] hover:border-primary/40",
+        glow: "bg-card/80 backdrop-blur-sm shadow-glow-primary hover:shadow-glow-secondary hover:scale-[1.01] border-primary/30",
+        romantic: "bg-gradient-secondary/10 backdrop-blur-sm border-accent/30 shadow-gentle-md hover:shadow-glow-accent hover:scale-[1.01]",
+        tinted: "bg-gradient-meadow border-border/30 shadow-gentle-sm hover:shadow-gentle-md hover:scale-[1.01]",
       },
       size: {
-        default: "p-8",      // Increased from p-6 for generous padding
-        sm: "p-5",           // Increased from p-4
-        lg: "p-10",          // Increased from p-8
-        xl: "p-12",          // New extra-large size
+        default: "p-6",
+        sm: "p-4",
+        lg: "p-8",
+        xl: "p-10",
       }
     },
     defaultVariants: {
