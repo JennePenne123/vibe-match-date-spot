@@ -29,9 +29,9 @@ const FriendCard = ({
   if (variant === 'compact') {
     return (
       <div className="flex items-center gap-3 p-2">
-        <Avatar className="w-10 h-10 border-2 border-pink-200">
+        <Avatar className="w-10 h-10 border-2 border-sage-200 dark:border-sage-800">
           <AvatarImage src={friend.avatar_url} alt={friend.name} referrerPolicy="no-referrer" />
-          <AvatarFallback className="bg-pink-100 text-pink-600">
+          <AvatarFallback className="bg-sage-100 text-sage-600 dark:bg-sage-900/30 dark:text-sage-400">
             {getInitials(friend.name)}
           </AvatarFallback>
         </Avatar>
@@ -45,11 +45,7 @@ const FriendCard = ({
           <Button
             onClick={() => onToggleInvite(friend.id)}
             size="sm"
-            variant={friend.isInvited ? "default" : "outline"}
-            className={friend.isInvited ? 
-              "bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600" : 
-              "border-border text-foreground hover:bg-accent/50"
-            }
+            variant={friend.isInvited ? "wellness" : "outline"}
           >
             {friend.isInvited ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
           </Button>
@@ -63,15 +59,15 @@ const FriendCard = ({
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <Avatar className="w-14 h-14 border-2 border-pink-200">
+            <Avatar className="w-14 h-14 border-2 border-sage-200 dark:border-sage-800">
               <AvatarImage src={friend.avatar_url} alt={friend.name} referrerPolicy="no-referrer" />
-              <AvatarFallback className="bg-pink-100 text-pink-600">
+              <AvatarFallback className="bg-sage-100 text-sage-600 dark:bg-sage-900/30 dark:text-sage-400">
                 {getInitials(friend.name)}
               </AvatarFallback>
             </Avatar>
             {friend.status && (
               <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-card ${
-                friend.status === 'online' ? 'bg-green-500' : 'bg-muted-foreground'
+                friend.status === 'online' ? 'bg-success-500' : 'bg-muted-foreground'
               }`} />
             )}
           </div>
@@ -106,7 +102,8 @@ const FriendCard = ({
                   <Button
                     onClick={() => onInvite(friend.id, friend.name)}
                     size="sm"
-                    className="flex-1 bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600"
+                    variant="wellness"
+                    className="flex-1"
                   >
                     <Calendar className="w-4 h-4 mr-1" />
                     Invite

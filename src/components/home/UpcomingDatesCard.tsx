@@ -97,7 +97,7 @@ const UpcomingDatesCard: React.FC = () => {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
-            <Heart className="h-5 w-5 text-pink-500" />
+            <Heart className="h-5 w-5 text-primary" />
             Upcoming Dates
           </CardTitle>
         </CardHeader>
@@ -115,7 +115,7 @@ const UpcomingDatesCard: React.FC = () => {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
-            <Heart className="h-5 w-5 text-pink-500" />
+            <Heart className="h-5 w-5 text-primary" />
             Upcoming Dates
           </CardTitle>
         </CardHeader>
@@ -138,7 +138,7 @@ const UpcomingDatesCard: React.FC = () => {
     <Card className="transition-all duration-300 ease-out hover:shadow-premium-md hover:scale-[1.01]">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <Heart className="h-5 w-5 text-pink-500" />
+          <Heart className="h-5 w-5 text-primary" />
           Upcoming Dates
         </CardTitle>
       </CardHeader>
