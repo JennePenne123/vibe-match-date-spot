@@ -6,7 +6,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthModal } from '@/components/landing/AuthModal';
 import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
 import { ThemeToggle } from '@/components/ThemeToggle';
-
 export default function LandingDemo() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,10 +21,14 @@ export default function LandingDemo() {
     const authParam = searchParams.get('auth');
     if (authParam === 'required') {
       setIsAuthModalOpen(true);
-      setSearchParams({}, { replace: true });
+      setSearchParams({}, {
+        replace: true
+      });
     } else if (authParam === 'partner') {
       setIsPartnerModalOpen(true);
-      setSearchParams({}, { replace: true });
+      setSearchParams({}, {
+        replace: true
+      });
     }
   }, [searchParams, setSearchParams]);
 
@@ -44,8 +47,7 @@ export default function LandingDemo() {
       threshold: 0.1,
       rootMargin: '0px 0px -100px 0px'
     };
-
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-fade-in');
@@ -53,35 +55,24 @@ export default function LandingDemo() {
         }
       });
     }, observerOptions);
-
     const animatedElements = document.querySelectorAll('.scroll-animate');
     animatedElements.forEach(el => observer.observe(el));
-
     return () => observer.disconnect();
   }, []);
-
   const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
-    ref.current?.scrollIntoView({ behavior: 'smooth' });
+    ref.current?.scrollIntoView({
+      behavior: 'smooth'
+    });
     setIsMobileMenuOpen(false);
   };
-
-  return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+  return <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Navigation Header */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${
-        isScrolled 
-          ? 'bg-background/90 backdrop-blur-lg border-b border-border/40 shadow-gentle-sm' 
-          : 'bg-transparent'
-      }`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${isScrolled ? 'bg-background/90 backdrop-blur-lg border-b border-border/40 shadow-gentle-sm' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 group">
-              <img 
-                src="/icon-192.png" 
-                alt="VybePulse" 
-                className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl shadow-gentle-md group-hover:shadow-gentle-lg group-hover:scale-105 transition-all duration-300"
-              />
+              
               <span className="text-xl lg:text-2xl font-semibold text-foreground">
                 VybePulse
               </span>
@@ -89,89 +80,52 @@ export default function LandingDemo() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <button 
-                onClick={() => scrollToSection(featuresRef)}
-                className="text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium"
-              >
+              <button onClick={() => scrollToSection(featuresRef)} className="text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium">
                 Features
               </button>
-              <button 
-                onClick={() => scrollToSection(howItWorksRef)}
-                className="text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium"
-              >
+              <button onClick={() => scrollToSection(howItWorksRef)} className="text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium">
                 How It Works
               </button>
-              <button 
-                onClick={() => setIsPartnerModalOpen(true)}
-                className="text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium"
-              >
+              <button onClick={() => setIsPartnerModalOpen(true)} className="text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium">
                 Partner Login
               </button>
               <ThemeToggle />
-              <Button 
-                onClick={() => setIsAuthModalOpen(true)}
-                variant="default"
-                size="default"
-                className="shadow-gentle-md hover:shadow-gentle-lg transition-all duration-400"
-              >
+              <Button onClick={() => setIsAuthModalOpen(true)} variant="default" size="default" className="shadow-gentle-md hover:shadow-gentle-lg transition-all duration-400">
                 Get Started
               </Button>
             </div>
 
             {/* Mobile Menu Button */}
-            <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl hover:bg-accent/30 transition-colors duration-300"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6 text-foreground" />
-              ) : (
-                <Menu className="w-6 h-6 text-foreground" />
-              )}
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden p-2 rounded-xl hover:bg-accent/30 transition-colors duration-300">
+              {isMobileMenuOpen ? <X className="w-6 h-6 text-foreground" /> : <Menu className="w-6 h-6 text-foreground" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-background/95 backdrop-blur-lg border-t border-border/40 shadow-gentle-lg animate-fade-in">
+        {isMobileMenuOpen && <div className="md:hidden bg-background/95 backdrop-blur-lg border-t border-border/40 shadow-gentle-lg animate-fade-in">
             <div className="px-6 py-5 space-y-4">
-              <button 
-                onClick={() => scrollToSection(featuresRef)}
-                className="block w-full text-left py-2 text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium"
-              >
+              <button onClick={() => scrollToSection(featuresRef)} className="block w-full text-left py-2 text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium">
                 Features
               </button>
-              <button 
-                onClick={() => scrollToSection(howItWorksRef)}
-                className="block w-full text-left py-2 text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium"
-              >
+              <button onClick={() => scrollToSection(howItWorksRef)} className="block w-full text-left py-2 text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium">
                 How It Works
               </button>
-              <button 
-                onClick={() => {
-                  setIsPartnerModalOpen(true);
-                  setIsMobileMenuOpen(false);
-                }}
-                className="block w-full text-left py-2 text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium"
-              >
+              <button onClick={() => {
+            setIsPartnerModalOpen(true);
+            setIsMobileMenuOpen(false);
+          }} className="block w-full text-left py-2 text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium">
                 Partner Login
               </button>
               <div className="flex items-center justify-between py-2">
                 <span className="text-sm text-muted-foreground">Theme</span>
                 <ThemeToggle />
               </div>
-              <Button 
-                onClick={() => setIsAuthModalOpen(true)}
-                variant="default"
-                size="default"
-                className="w-full shadow-gentle-md"
-              >
+              <Button onClick={() => setIsAuthModalOpen(true)} variant="default" size="default" className="w-full shadow-gentle-md">
                 Get Started
               </Button>
             </div>
-          </div>
-        )}
+          </div>}
       </nav>
 
       {/* Hero Section */}
@@ -198,20 +152,11 @@ export default function LandingDemo() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-10">
-              <Button 
-                onClick={() => setIsAuthModalOpen(true)}
-                size="xl"
-                className="text-lg px-10 py-7 shadow-gentle-lg hover:shadow-gentle-xl transition-all duration-400 w-full sm:w-auto"
-              >
+              <Button onClick={() => setIsAuthModalOpen(true)} size="xl" className="text-lg px-10 py-7 shadow-gentle-lg hover:shadow-gentle-xl transition-all duration-400 w-full sm:w-auto">
                 Begin Your Journey
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button 
-                onClick={() => scrollToSection(featuresRef)}
-                variant="outline"
-                size="xl"
-                className="text-lg px-10 py-7 w-full sm:w-auto"
-              >
+              <Button onClick={() => scrollToSection(featuresRef)} variant="outline" size="xl" className="text-lg px-10 py-7 w-full sm:w-auto">
                 Learn More
               </Button>
             </div>
@@ -243,11 +188,9 @@ export default function LandingDemo() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {/* Feature 1 */}
-            <Card 
-              variant="wellness" 
-              className="scroll-animate opacity-0 group cursor-pointer"
-              style={{ animationDelay: '100ms' }}
-            >
+            <Card variant="wellness" className="scroll-animate opacity-0 group cursor-pointer" style={{
+            animationDelay: '100ms'
+          }}>
               <div className="p-10 space-y-5">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400">
                   <Sparkles className="w-8 h-8 text-white" />
@@ -263,11 +206,9 @@ export default function LandingDemo() {
             </Card>
 
             {/* Feature 2 */}
-            <Card 
-              variant="wellness" 
-              className="scroll-animate opacity-0 group cursor-pointer"
-              style={{ animationDelay: '200ms' }}
-            >
+            <Card variant="wellness" className="scroll-animate opacity-0 group cursor-pointer" style={{
+            animationDelay: '200ms'
+          }}>
               <div className="p-10 space-y-5">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-earth flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400">
                   <Users className="w-8 h-8 text-foreground" />
@@ -283,11 +224,9 @@ export default function LandingDemo() {
             </Card>
 
             {/* Feature 3 */}
-            <Card 
-              variant="wellness" 
-              className="scroll-animate opacity-0 group cursor-pointer md:col-span-2 lg:col-span-1"
-              style={{ animationDelay: '300ms' }}
-            >
+            <Card variant="wellness" className="scroll-animate opacity-0 group cursor-pointer md:col-span-2 lg:col-span-1" style={{
+            animationDelay: '300ms'
+          }}>
               <div className="p-10 space-y-5">
                 <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400">
                   <Heart className="w-8 h-8 text-white" />
@@ -409,12 +348,7 @@ export default function LandingDemo() {
               Start planning dates that matter.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-6">
-              <Button 
-                onClick={() => setIsAuthModalOpen(true)}
-                size="xl"
-                variant="secondary"
-                className="text-lg px-10 py-7 bg-white text-primary hover:bg-white/90 shadow-gentle-lg hover:shadow-gentle-xl transition-all duration-400 w-full sm:w-auto"
-              >
+              <Button onClick={() => setIsAuthModalOpen(true)} size="xl" variant="secondary" className="text-lg px-10 py-7 bg-white text-primary hover:bg-white/90 shadow-gentle-lg hover:shadow-gentle-xl transition-all duration-400 w-full sm:w-auto">
                 Start Your Journey
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
@@ -428,11 +362,7 @@ export default function LandingDemo() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <Link to="/" className="flex items-center space-x-2 group">
-              <img 
-                src="/icon-192.png" 
-                alt="VybePulse" 
-                className="w-8 h-8 rounded-xl shadow-gentle-md group-hover:scale-105 transition-all duration-300"
-              />
+              <img src="/icon-192.png" alt="VybePulse" className="w-8 h-8 rounded-xl shadow-gentle-md group-hover:scale-105 transition-all duration-300" />
               <span className="text-xl font-semibold text-foreground">
                 VybePulse
               </span>
@@ -445,14 +375,7 @@ export default function LandingDemo() {
       </footer>
 
       {/* Auth Modals */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-      />
-      <PartnerAuthModal 
-        isOpen={isPartnerModalOpen} 
-        onClose={() => setIsPartnerModalOpen(false)} 
-      />
-    </div>
-  );
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <PartnerAuthModal isOpen={isPartnerModalOpen} onClose={() => setIsPartnerModalOpen(false)} />
+    </div>;
 }
