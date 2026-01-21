@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Sparkles, Users, Heart, ArrowRight, Menu, X, Leaf } from 'lucide-react';
+import { Sparkles, Users, Heart, ArrowRight, Menu, X } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthModal } from '@/components/landing/AuthModal';
 import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
@@ -77,9 +77,11 @@ export default function LandingDemo() {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 group">
-              <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400">
-                <Leaf className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
-              </div>
+              <img 
+                src="/icon-192.png" 
+                alt="VybePulse" 
+                className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl shadow-gentle-md group-hover:shadow-gentle-lg group-hover:scale-105 transition-all duration-300"
+              />
               <span className="text-xl lg:text-2xl font-semibold text-foreground">
                 VybePulse
               </span>
@@ -336,7 +338,7 @@ export default function LandingDemo() {
               <div className="order-1 lg:order-2">
                 <Card variant="elegant" size="xl">
                   <div className="aspect-video bg-gradient-calm rounded-xl flex items-center justify-center">
-                    <Leaf className="w-20 h-20 text-primary/60" />
+                    <img src="/icon-512.png" alt="VybePulse" className="w-24 h-24 rounded-2xl shadow-lg" />
                   </div>
                 </Card>
               </div>
@@ -425,10 +427,12 @@ export default function LandingDemo() {
       <footer className="bg-card border-t border-border/30 py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-xl bg-gradient-primary flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-white" />
-              </div>
+            <Link to="/" className="flex items-center space-x-2 group">
+              <img 
+                src="/icon-192.png" 
+                alt="VybePulse" 
+                className="w-8 h-8 rounded-xl shadow-gentle-md group-hover:scale-105 transition-all duration-300"
+              />
               <span className="text-xl font-semibold text-foreground">
                 VybePulse
               </span>
