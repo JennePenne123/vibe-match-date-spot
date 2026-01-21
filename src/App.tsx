@@ -42,6 +42,7 @@ const AIVenueCardDemo = lazy(() => import("./pages/AIVenueCardDemo"));
 const PremiumDesignSystemDemo = lazy(() => import("./pages/PremiumDesignSystemDemo"));
 const RatingDemo = lazy(() => import("./pages/RatingDemo"));
 const VenueDesignSystemDemo = lazy(() => import("./pages/VenueDesignSystemDemo"));
+const ModernDesignSystemDemo = lazy(() => import("./pages/ModernDesignSystemDemo"));
 
 // Suspense fallback for lazy routes
 const LazyFallback = () => (
@@ -139,6 +140,11 @@ const App = () => (
                     <Route path="/demo/venue-design-system" element={
                       <Suspense fallback={<LazyFallback />}>
                         <VenueDesignSystemDemo />
+                      </Suspense>
+                    } />
+                    <Route path="/demo/modern-venue-design" element={
+                      <Suspense fallback={<LazyFallback />}>
+                        <ModernDesignSystemDemo />
                       </Suspense>
                     } />
                     <Route path="/shareholder-report" element={
