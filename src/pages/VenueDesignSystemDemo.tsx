@@ -35,9 +35,16 @@ const VenueDesignSystemDemo: React.FC = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Venue Design System</h1>
-              <p className="text-sm text-muted-foreground">Discovery-focused component library</p>
+            <div className="flex items-center gap-3">
+              <img 
+                src="/icon-192.png" 
+                alt="VybePulse" 
+                className="w-10 h-10 rounded-xl shadow-md animate-logo-pulse"
+              />
+              <div>
+                <h1 className="text-xl font-bold text-foreground">Venue Design System</h1>
+                <p className="text-sm text-muted-foreground">Discovery-focused component library</p>
+              </div>
             </div>
           </div>
           <Button variant="outline" size="icon" onClick={toggleTheme}>
