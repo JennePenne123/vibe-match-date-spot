@@ -64,11 +64,18 @@ const ModernDesignSystemDemo: React.FC = () => {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-                Modern Design System
-              </h1>
-              <p className="text-sm text-slate-400">Dark theme • Venue Discovery</p>
+            <div className="flex items-center gap-3">
+              <img 
+                src="/icon-192.png" 
+                alt="VybePulse" 
+                className="w-10 h-10 rounded-xl shadow-lg animate-logo-pulse"
+              />
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+                  Modern Design System
+                </h1>
+                <p className="text-sm text-slate-400">Dark theme • Venue Discovery</p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700">

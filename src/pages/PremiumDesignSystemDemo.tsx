@@ -42,9 +42,11 @@ const PremiumDesignSystemDemo = () => {
       <div className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
+            <img 
+              src="/icon-192.png" 
+              alt="VybePulse" 
+              className="w-10 h-10 rounded-xl shadow-lg animate-logo-pulse"
+            />
             <div>
               <Display size="lg" className="text-foreground">VybePulse Premium Design System</Display>
               <Text size="sm" className="text-muted-foreground">A comprehensive showcase of enhanced design tokens and components</Text>
