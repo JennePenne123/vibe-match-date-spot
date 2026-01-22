@@ -335,7 +335,7 @@ const VenueCard = ({
         {showActions && (
           <Button
             onClick={() => navigate(`/venue/${venue.id}`)}
-            className="w-full bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:opacity-90"
+            className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:opacity-90 shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300"
           >
             View Details
           </Button>
