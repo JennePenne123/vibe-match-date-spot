@@ -24,7 +24,7 @@ const PreferenceSection: React.FC<PreferenceSectionProps> = ({
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         {icon}
-        <h3 className="font-medium text-gray-900">{title}</h3>
+        <h3 className="font-medium text-foreground">{title}</h3>
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -36,12 +36,12 @@ const PreferenceSection: React.FC<PreferenceSectionProps> = ({
           return (
             <div key={option} className="relative">
               <div
-                className={`p-2 rounded-lg border cursor-pointer transition-all ${
+                className={`p-2 rounded-lg border cursor-pointer transition-all duration-300 ${
                   isSelected
                     ? isMatching
-                      ? 'bg-green-50 border-green-300 text-green-800'
-                      : 'bg-blue-50 border-blue-300 text-blue-800'
-                    : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
+                      : 'bg-primary/20 border-primary/50 text-primary'
+                    : 'bg-card/50 border-border/50 hover:bg-white/10 hover:border-primary/30'
                 }`}
                 onClick={() => onToggle(option)}
               >
@@ -52,12 +52,12 @@ const PreferenceSection: React.FC<PreferenceSectionProps> = ({
               </div>
               
               {isMatching && (
-                <Badge className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-1 py-0">
+                <Badge className="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs px-1 py-0">
                   Match!
                 </Badge>
               )}
               {isPartnerSelected && !isSelected && (
-                <Badge className="absolute -top-1 -right-1 bg-purple-100 text-purple-600 text-xs px-1 py-0">
+                <Badge className="absolute -top-1 -right-1 bg-violet-500/80 text-white text-xs px-1 py-0">
                   Partner ♥
                 </Badge>
               )}
