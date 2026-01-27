@@ -214,8 +214,8 @@ export default function LandingDemo() {
             animationDelay: '200ms'
           }}>
               <div className="p-10 space-y-5">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-earth flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400">
-                  <Users className="w-8 h-8 text-foreground" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-secondary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400">
+                  <Users className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-semibold text-foreground">
                   Plan Together
