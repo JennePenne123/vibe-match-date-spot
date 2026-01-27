@@ -290,7 +290,7 @@ export default function LandingDemo() {
             {/* Step 2 */}
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center scroll-animate opacity-0">
               <div className="order-2 space-y-6">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-earth text-foreground font-semibold text-xl shadow-gentle-md">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-secondary text-white font-semibold text-xl shadow-gentle-md">
                   2
                 </div>
                 <h3 className="text-3xl lg:text-4xl font-semibold text-foreground">
@@ -303,8 +303,8 @@ export default function LandingDemo() {
               </div>
               <div className="order-1">
                 <Card variant="elegant" size="xl">
-                  <div className="aspect-video bg-gradient-earth rounded-xl flex items-center justify-center">
-                    <Sparkles className="w-20 h-20 text-foreground/40" />
+                  <div className="aspect-video bg-gradient-secondary rounded-xl flex items-center justify-center">
+                    <Sparkles className="w-20 h-20 text-white/70" />
                   </div>
                 </Card>
               </div>
