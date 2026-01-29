@@ -44,8 +44,8 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
@@ -72,15 +72,15 @@ const Profile = () => {
   const displayEmail = user.email || '';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Back Button */}
-        <div className="bg-white p-4 pt-12 shadow-sm">
+        <div className="bg-card p-4 pt-12 shadow-sm">
           <Button
             onClick={() => navigate(-1)}
             variant="ghost"
             size="icon"
-            className="text-gray-600 hover:bg-gray-100 mb-6"
+            className="text-muted-foreground hover:bg-muted mb-6"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>

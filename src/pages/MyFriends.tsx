@@ -58,7 +58,7 @@ const MyFriends = () => {
           <Button
             variant="outline"
             size="icon"
-            className="text-sage-600 dark:text-sage-400 border-sage-200 dark:border-sage-800 hover:bg-sage-50 dark:hover:bg-sage-900/20"
+            className="text-primary border-border hover:bg-primary/10"
           >
             <UserPlus className="w-5 h-5" />
           </Button>
@@ -79,15 +79,15 @@ const MyFriends = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-gradient-to-br from-sage-50 to-sand-50 dark:from-sage-950/30 dark:to-sand-950/30 border-sage-200 dark:border-sage-800">
+            <Card className="bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border-indigo-500/20">
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-sage-600 dark:text-sage-400">{friends.length}</div>
+                <div className="text-2xl font-bold text-indigo-400">{friends.length}</div>
                 <div className="text-sm text-muted-foreground">Total Friends</div>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-sand-50 to-terracotta-50 dark:from-sand-950/30 dark:to-terracotta-950/30 border-sand-200 dark:border-sand-800">
+            <Card className="bg-gradient-to-br from-violet-500/10 to-pink-500/10 border-pink-500/20">
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-terracotta-600 dark:text-terracotta-400">
+                <div className="text-2xl font-bold text-pink-400">
                   {friends.filter(f => f.status === 'online').length}
                 </div>
                 <div className="text-sm text-muted-foreground">Online Now</div>

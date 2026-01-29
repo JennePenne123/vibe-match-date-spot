@@ -43,7 +43,7 @@ const VenueDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Header Image */}
         <div className="relative">
@@ -103,31 +103,31 @@ const VenueDetail = () => {
         {/* Content */}
         <div className="p-4">
           {/* Basic Info */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4">
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-border/50 mb-4">
             <div className="flex items-start justify-between mb-3">
-              <h1 className="text-2xl font-bold text-gray-900">{appVenue.name}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{appVenue.name}</h1>
               <div className="flex items-center gap-1">
                 <Star className="w-5 h-5 text-yellow-400 fill-current" />
                 <span className="font-semibold">{appVenue.rating || 4.5}</span>
               </div>
             </div>
 
-            <p className="text-gray-600 mb-4">{appVenue.description}</p>
+            <p className="text-muted-foreground mb-4">{appVenue.description}</p>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4" />
                 {appVenue.distance}
               </div>
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <DollarSign className="w-4 h-4" />
                 {appVenue.price_range || '$$'}
               </div>
             </div>
 
             {appVenue.discount && (
-              <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                <div className="flex items-center gap-2 text-orange-700">
+              <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                <div className="flex items-center gap-2 text-amber-500">
                   <Sparkles className="w-4 h-4" />
                   <span className="font-semibold">{appVenue.discount}</span>
                 </div>
@@ -136,8 +136,8 @@ const VenueDetail = () => {
           </div>
 
           {/* Tags */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4">
-            <h3 className="font-semibold text-gray-900 mb-3">Perfect For</h3>
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-border/50 mb-4">
+            <h3 className="font-semibold text-foreground mb-3">Perfect For</h3>
             <div className="flex flex-wrap gap-2">
               {appVenue.tags?.map((tag) => (
                 <Badge key={tag} variant="secondary">
@@ -148,22 +148,22 @@ const VenueDetail = () => {
           </div>
 
           {/* Contact Info & Hours */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4">
-            <h3 className="font-semibold text-gray-900 mb-4">Contact & Hours</h3>
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-border/50 mb-4">
+            <h3 className="font-semibold text-foreground mb-4">Contact & Hours</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-600">{appVenue.address}</span>
+                <MapPin className="w-5 h-5 text-muted-foreground" />
+                <span className="text-muted-foreground">{appVenue.address}</span>
               </div>
               {appVenue.phone && (
                 <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-gray-400" />
-                  <span className="text-gray-600">{appVenue.phone}</span>
+                  <Phone className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-muted-foreground">{appVenue.phone}</span>
                 </div>
               )}
               {appVenue.website && (
                 <div className="flex items-center gap-3">
-                  <Globe className="w-5 h-5 text-gray-400" />
+                  <Globe className="w-5 h-5 text-muted-foreground" />
                   <a 
                     href={appVenue.website} 
                     target="_blank" 
@@ -177,14 +177,14 @@ const VenueDetail = () => {
               )}
               {appVenue.openingHours && appVenue.openingHours.length > 0 && (
                 <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
-                  <div className="text-gray-600">
+                  <Clock className="w-5 h-5 text-muted-foreground mt-0.5" />
+                  <div className="text-muted-foreground">
                     <div className="font-medium mb-1">Hours:</div>
                     {appVenue.openingHours.slice(0, 3).map((hours, index) => (
                       <div key={index} className="text-sm">{hours}</div>
                     ))}
                     {appVenue.openingHours.length > 3 && (
-                      <div className="text-sm text-gray-500">+ {appVenue.openingHours.length - 3} more</div>
+                      <div className="text-sm text-muted-foreground">+ {appVenue.openingHours.length - 3} more</div>
                     )}
                   </div>
                 </div>
