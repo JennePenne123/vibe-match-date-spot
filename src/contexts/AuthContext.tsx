@@ -3,10 +3,10 @@ import React, { createContext, useContext } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { AppUser } from '@/types/app';
 import { useAuthState } from '@/hooks/useAuthState';
-import { signUpUser, signInUser, signOutUser } from '@/services/authService';
+import { signUpUser, signInUser, signOutUser, signInWithGoogle, signInWithApple } from '@/services/authService';
 import { updateUserProfile, fetchUserProfile } from '@/utils/userProfileHelpers';
 import { inviteFriendById } from '@/services/friendshipService';
-import { expireUserSessions, clearUserPreferenceFields } from '@/services/sessionCleanupService';
+import { clearUserPreferenceFields } from '@/services/sessionCleanupService';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
@@ -15,6 +15,8 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, userData?: any) => Promise<{ user: AppUser | null; error: any }>;
   signIn: (email: string, password: string) => Promise<{ user: AppUser | null; error: any }>;
+  signInWithGoogle: () => Promise<{ data: any; error: any }>;
+  signInWithApple: () => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
   updateUser: (userData: any) => Promise<void>;
   inviteFriend: (friendId: string) => void;
@@ -102,6 +104,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loading,
       signUp,
       signIn,
+      signInWithGoogle,
+      signInWithApple,
       signOut,
       updateUser,
       inviteFriend,
