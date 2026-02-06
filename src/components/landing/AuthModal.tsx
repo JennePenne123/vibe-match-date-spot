@@ -362,6 +362,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Enter your name"
+                      autoComplete="name"
                       className="h-12 bg-background/50 border-border/50 focus:border-primary transition-colors"
                       disabled={loading || isOAuthLoading}
                     />
@@ -381,6 +382,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
+                    autoComplete="email"
                     className="h-12 bg-background/50 border-border/50 focus:border-primary transition-colors"
                     disabled={loading || isOAuthLoading}
                   />
@@ -399,6 +401,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
+                    autoComplete={isLogin ? "current-password" : "new-password"}
                     className="h-12 bg-background/50 border-border/50 focus:border-primary transition-colors"
                     disabled={loading || isOAuthLoading}
                   />

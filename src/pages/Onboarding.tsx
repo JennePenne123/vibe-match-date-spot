@@ -36,7 +36,7 @@ const Onboarding = () => {
     if (currentScreen < screens.length - 1) {
       setCurrentScreen(currentScreen + 1);
     } else {
-      navigate('/register-login');
+      navigate('/?auth=required');
     }
   };
 
@@ -47,7 +47,7 @@ const Onboarding = () => {
   };
 
   const handleSkip = () => {
-    navigate('/register-login');
+    navigate('/?auth=required');
   };
 
   const currentScreenData = screens[currentScreen];

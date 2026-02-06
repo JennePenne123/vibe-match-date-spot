@@ -283,7 +283,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   if (!user) {
     return (
       <SmartDatePlannerAuth
-        onSignIn={() => navigate('/register-login')}
+        onSignIn={() => navigate('/?auth=required')}
       />
     );
   }
