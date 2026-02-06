@@ -25,7 +25,7 @@ const Home: React.FC = () => {
   React.useEffect(() => {
     if (!authLoading && !user) {
       console.log('No authenticated user found, redirecting to login');
-      navigate('/register-login', { replace: true });
+      navigate('/?auth=required', { replace: true });
     }
   }, [user, authLoading, navigate]);
 

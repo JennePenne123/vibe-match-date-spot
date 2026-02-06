@@ -167,7 +167,7 @@ const SmartDatePlanning: React.FC = () => {
           <h1 className="text-2xl font-bold text-foreground mb-4">Authentication Required</h1>
           <p className="text-muted-foreground mb-6">Please sign in to use the Smart Date Planner.</p>
           <button 
-            onClick={() => window.location.href = '/register-login'}
+            onClick={() => window.location.href = '/?auth=required'}
             className="bg-primary text-primary-foreground px-6 py-2 rounded hover:bg-primary/90"
           >
             Sign In
