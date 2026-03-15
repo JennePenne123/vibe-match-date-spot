@@ -499,7 +499,7 @@ export default function PartnerReports() {
                           <TableCell className="text-right">€{v.totalRevenue.toFixed(2)}</TableCell>
                           <TableCell className="text-right">
                             {v.growthPercent !== null ? (
-                              <span className={`inline-flex items-center gap-1 ${v.growthPercent >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                              <span className={`inline-flex items-center gap-1 ${v.growthPercent >= 0 ? 'text-primary' : 'text-destructive'}`}>
                                 {v.growthPercent >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                                 {Math.abs(v.growthPercent).toFixed(1)}%
                               </span>
