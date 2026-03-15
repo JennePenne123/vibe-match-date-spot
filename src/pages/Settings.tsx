@@ -44,6 +44,10 @@ const Settings = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (!loading && !user) {
       navigate('/?auth=required', { replace: true });
     }
