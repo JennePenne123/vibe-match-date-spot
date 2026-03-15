@@ -35,6 +35,7 @@ import PartnerVouchers from "./pages/partner/Vouchers";
 import PartnerVenues from "./pages/partner/Venues";
 import PartnerReports from "./pages/partner/Reports";
 import PartnerQRCode from "./pages/partner/QRCode";
+import PartnerNetworkMap from "./pages/partner/NetworkMap";
 import AIInsights from "./pages/AIInsights";
 
 // Lazy load demo/debug routes (rarely visited, ~1,133 lines)
