@@ -97,9 +97,9 @@ const Preferences = () => {
   const quickTemplates: QuickTemplate[] = [
     {
       id: 'romantic',
-      title: 'Romantic Dinner',
+      title: t('preferences.romanticDinner'),
       emoji: '💕',
-      description: 'Candlelight, fine dining, intimate atmosphere',
+      description: t('preferences.romanticDinnerDesc'),
       cuisines: ['italian', 'french'],
       vibes: ['romantic'],
       priceRange: [2, 3],
@@ -108,9 +108,9 @@ const Preferences = () => {
     },
     {
       id: 'casual',
-      title: 'Casual Brunch',
+      title: t('preferences.casualBrunch'),
       emoji: '☕',
-      description: 'Relaxed, tasty, social',
+      description: t('preferences.casualBrunchDesc'),
       cuisines: ['american'],
       vibes: ['casual'],
       priceRange: [1, 2],
@@ -119,9 +119,9 @@ const Preferences = () => {
     },
     {
       id: 'trendy',
-      title: 'Trendy Cocktail Bar',
+      title: t('preferences.trendyCocktail'),
       emoji: '🍸',
-      description: 'Hip, stylish, perfect for drinks',
+      description: t('preferences.trendyCocktailDesc'),
       cuisines: ['modern'],
       vibes: ['nightlife'],
       priceRange: [2, 3],
