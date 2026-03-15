@@ -12,6 +12,7 @@ import { DateInvitation } from '@/types/index';
 
 const UpcomingDatesCard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { invitations, loading, acceptInvitation, declineInvitation, cancelInvitation } = useInvitations();
 
   // Filter and get upcoming dates (accepted/scheduled) regardless of direction
