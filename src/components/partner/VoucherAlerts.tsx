@@ -99,6 +99,14 @@ export default function VoucherAlerts() {
           description: t('partner.alerts.nearLimitDesc', { title: alert.title, percent: alert.redemptionPercent }),
           className: 'border-blue-500/50 bg-blue-500/10 text-blue-700 dark:text-blue-400',
         };
+      case 'active':
+        return {
+          icon: <CheckCircle className="h-4 w-4" />,
+          variant: 'default' as const,
+          title: t('partner.alerts.activeOk'),
+          description: t('partner.alerts.activeOkDesc', { title: alert.title }),
+          className: 'border-green-500/50 bg-green-500/10 text-green-700 dark:text-green-400',
+        };
     }
   };
 
