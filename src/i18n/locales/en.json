@@ -419,6 +419,15 @@
     "manageVenue": "Manage Venue",
     "cuisine": "Cuisine",
     "rating": "Rating",
-    "visitWebsite": "Visit Website"
+    "visitWebsite": "Visit Website",
+    "alerts": {
+      "expiredActive": "Expired Voucher Still Active",
+      "expiredActiveDesc": "\"{{title}}\" ({{code}}) has expired but is still marked as active. Deactivate it to avoid confusion.",
+      "expiringSoon": "Voucher Expiring Soon",
+      "expiringSoonDesc": "\"{{title}}\" expires in {{days}} day(s). Consider extending or creating a replacement.",
+      "nearLimit": "Redemption Limit Almost Reached",
+      "nearLimitDesc": "\"{{title}}\" is at {{percent}}% of its redemption limit. Consider increasing the limit.",
+      "manage": "Manage"
+    }
   }
 }

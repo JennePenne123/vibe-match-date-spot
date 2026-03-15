@@ -419,6 +419,15 @@
     "manageVenue": "Venue verwalten",
     "cuisine": "Küche",
     "rating": "Bewertung",
-    "visitWebsite": "Website besuchen"
+    "visitWebsite": "Website besuchen",
+    "alerts": {
+      "expiredActive": "Abgelaufener Gutschein noch aktiv",
+      "expiredActiveDesc": "\"{{title}}\" ({{code}}) ist abgelaufen, aber noch als aktiv markiert. Deaktiviere ihn, um Verwirrung zu vermeiden.",
+      "expiringSoon": "Gutschein läuft bald ab",
+      "expiringSoonDesc": "\"{{title}}\" läuft in {{days}} Tag(en) ab. Verlängere ihn oder erstelle einen Ersatz.",
+      "nearLimit": "Einlösungslimit fast erreicht",
+      "nearLimitDesc": "\"{{title}}\" hat {{percent}}% des Einlösungslimits erreicht. Erwäge eine Erhöhung.",
+      "manage": "Verwalten"
+    }
   }
 }

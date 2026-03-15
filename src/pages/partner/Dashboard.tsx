@@ -10,6 +10,7 @@ import { Sparkles, TrendingUp, Users, Gift, LogIn } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import LanguageSelector from '@/components/LanguageSelector';
 import RedemptionChart from '@/components/partner/RedemptionChart';
+import VoucherAlerts from '@/components/partner/VoucherAlerts';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
@@ -114,6 +115,9 @@ export default function PartnerDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Voucher Alerts */}
+      <VoucherAlerts />
 
       {/* Analytics Chart */}
       <RedemptionChart />
