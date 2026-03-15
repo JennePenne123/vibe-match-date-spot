@@ -659,7 +659,7 @@ const Preferences = () => {
         <div className="relative">
           <Input
             type="text"
-            placeholder="Or enter your city/address..."
+            placeholder={t('preferences.enterAddress')}
             value={homeAddress}
             onChange={(e) => setHomeAddress(e.target.value)}
             className="w-full h-12 pl-10"
