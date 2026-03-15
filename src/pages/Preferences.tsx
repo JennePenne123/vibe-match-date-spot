@@ -861,7 +861,7 @@ const Preferences = () => {
                 className="text-muted-foreground hover:text-foreground"
                 disabled={isSaving}
               >
-                Skip this step
+                {t('preferences.skipStep')}
               </Button>
             </div>
           )}
