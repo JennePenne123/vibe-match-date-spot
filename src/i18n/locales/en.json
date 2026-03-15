@@ -108,10 +108,62 @@
     "screen3Desc": "Invite friends, share experiences, and plan group dates together. Make every moment memorable with the people you love."
   },
   "profile": {
-    "title": "Profile"
+    "title": "Profile",
+    "save": "Save",
+    "cancel": "Cancel",
+    "yourName": "Your name",
+    "yourEmail": "Your email",
+    "avatarUpdated": "Avatar updated!",
+    "avatarUpdatedDesc": "Your profile picture has been updated successfully.",
+    "uploadFailed": "Upload failed",
+    "uploadFailedDesc": "Failed to upload avatar. Please try again.",
+    "totalPoints": "Total Points",
+    "level": "Level",
+    "friends": "Friends",
+    "badges": "Badges",
+    "friendsList": "Friends (0)",
+    "noFriendsYet": "No friends added yet",
+    "addFriends": "Add Friends",
+    "accountSettings": "Account Settings",
+    "updatePreferences": "Update Preferences",
+    "findNewSpots": "Find New Date Spots"
   },
   "invitations": {
     "title": "Date Invitations"
+  },
+  "proposals": {
+    "loadingProposals": "Loading proposals...",
+    "noProposals": "No date proposals yet",
+    "pendingProposals": "Pending Proposals",
+    "acceptedProposals": "Accepted Proposals",
+    "previousProposals": "Previous Proposals",
+    "proposalAccepted": "Proposal Accepted!",
+    "startingSession": "Starting collaborative planning session...",
+    "proposalDeclined": "Proposal Declined",
+    "declinedDesc": "The proposal has been declined",
+    "proposalCancelled": "Proposal Cancelled",
+    "cancelledDesc": "Your proposal has been cancelled",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "declined": "Declined",
+    "expired": "Expired",
+    "acceptStartPlanning": "Accept & Start Planning",
+    "accept": "Accept",
+    "decline": "Decline",
+    "cancelProposal": "Cancel Proposal",
+    "startAIPlanning": "Start AI Planning",
+    "freshSession": "Fresh Session Created",
+    "freshSessionDesc": "Starting with clean preferences...",
+    "to": "To:",
+    "from": "From:"
+  },
+  "ratings": {
+    "pendingRatings": "Pending Ratings",
+    "rateYourDates": "Rate Your Dates",
+    "pending": "{{count}} pending",
+    "dateWith": "Date with {{name}}",
+    "rate": "Rate",
+    "moreDates": "+{{count}} more dates to rate"
   },
   "myFriends": {
     "title": "My Friends",
@@ -124,7 +176,10 @@
     "inviteMoreDesc": "Connect with more people to discover amazing dates together",
     "contacts": "Contacts",
     "messageSent": "Message sent!",
-    "startConversation": "Starting conversation with {{name}}"
+    "startConversation": "Starting conversation with {{name}}",
+    "message": "Message",
+    "mutualFriends": "{{count}} mutual friends",
+    "availableForDates": "Available for dates"
   },
   "friends": {
     "inviteFriends": "Invite Friends",
