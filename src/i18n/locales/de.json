@@ -430,6 +430,34 @@
       "manage": "Verwalten",
       "activeOk": "Aktiv",
       "activeOkDesc": "\"{{title}}\" ist aktiv und läuft einwandfrei."
+    },
+    "reports": {
+      "title": "Berichte & Rechnungen",
+      "subtitle": "Monatliche Abrechnungen und Venue-Performance für die Steuererklärung",
+      "taxReady": "Steuerfertig",
+      "totalRedemptions": "Einlösungen gesamt",
+      "uniqueGuests": "Einzelne Gäste",
+      "totalDiscount": "Gewährter Rabatt",
+      "totalRevenue": "Buchungswert gesamt",
+      "voucherBreakdown": "Gutschein-Aufschlüsselung",
+      "voucherBreakdownDesc": "Detaillierte Einlösungen pro Gutschein für diesen Monat",
+      "voucherName": "Gutschein",
+      "code": "Code",
+      "redemptionsCol": "Einlösungen",
+      "discountGiven": "Gewährter Rabatt",
+      "bookingValue": "Buchungswert",
+      "venuePerformance": "Venue-Performance",
+      "venuePerformanceDesc": "Performance-Kennzahlen im Vergleich zum Vormonat",
+      "venue": "Venue",
+      "revenue": "Umsatz",
+      "growth": "Wachstum",
+      "summary": "Zusammenfassung",
+      "noRedemptions": "Keine Einlösungen in diesem Monat",
+      "partnerReport": "Partner-Bericht",
+      "generatedOn": "Erstellt am",
+      "exportSuccess": "Bericht erfolgreich exportiert",
+      "taxHintTitle": "Hinweis zur Steuerabsetzung",
+      "taxHintDesc": "Lade deine monatlichen Berichte als PDF oder CSV herunter und reiche sie bei deinem Steuerberater ein. Alle Rabattbeträge und Buchungswerte sind dokumentiert."
     }
   }
 }

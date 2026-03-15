@@ -430,6 +430,34 @@
       "manage": "Manage",
       "activeOk": "Active",
       "activeOkDesc": "\"{{title}}\" is active and running smoothly."
+    },
+    "reports": {
+      "title": "Reports & Invoices",
+      "subtitle": "Monthly billing reports and venue performance for tax purposes",
+      "taxReady": "Tax-Ready",
+      "totalRedemptions": "Total Redemptions",
+      "uniqueGuests": "Unique Guests",
+      "totalDiscount": "Total Discount Given",
+      "totalRevenue": "Total Booking Value",
+      "voucherBreakdown": "Voucher Breakdown",
+      "voucherBreakdownDesc": "Detailed redemptions per voucher for this month",
+      "voucherName": "Voucher",
+      "code": "Code",
+      "redemptionsCol": "Redemptions",
+      "discountGiven": "Discount Given",
+      "bookingValue": "Booking Value",
+      "venuePerformance": "Venue Performance",
+      "venuePerformanceDesc": "Performance metrics compared to previous month",
+      "venue": "Venue",
+      "revenue": "Revenue",
+      "growth": "Growth",
+      "summary": "Summary",
+      "noRedemptions": "No redemptions in this month",
+      "partnerReport": "Partner Report",
+      "generatedOn": "Generated on",
+      "exportSuccess": "Report exported successfully",
+      "taxHintTitle": "Tax Deduction Hint",
+      "taxHintDesc": "Download your monthly reports as PDF or CSV to submit to your tax advisor. All discount amounts and booking values are documented for your records."
     }
   }
 }
