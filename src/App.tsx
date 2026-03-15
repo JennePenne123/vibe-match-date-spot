@@ -21,6 +21,7 @@ import Area from "./pages/Area";
 import Results from "./pages/Results";
 import VenueDetail from "./pages/VenueDetail";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import Venues from "./pages/Venues";
 import MyFriends from "./pages/MyFriends";
 import MyVenues from "./pages/MyVenues";
