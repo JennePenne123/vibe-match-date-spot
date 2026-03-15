@@ -108,10 +108,62 @@
     "screen3Desc": "Lade Freunde ein, teile Erlebnisse und plant gemeinsam Gruppen-Dates. Mache jeden Moment unvergesslich mit den Menschen, die du liebst."
   },
   "profile": {
-    "title": "Profil"
+    "title": "Profil",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "yourName": "Dein Name",
+    "yourEmail": "Deine E-Mail",
+    "avatarUpdated": "Avatar aktualisiert!",
+    "avatarUpdatedDesc": "Dein Profilbild wurde erfolgreich aktualisiert.",
+    "uploadFailed": "Upload fehlgeschlagen",
+    "uploadFailedDesc": "Avatar konnte nicht hochgeladen werden. Bitte versuche es erneut.",
+    "totalPoints": "Gesamtpunkte",
+    "level": "Level",
+    "friends": "Freunde",
+    "badges": "Abzeichen",
+    "friendsList": "Freunde (0)",
+    "noFriendsYet": "Noch keine Freunde hinzugefügt",
+    "addFriends": "Freunde hinzufügen",
+    "accountSettings": "Kontoeinstellungen",
+    "updatePreferences": "Vorlieben aktualisieren",
+    "findNewSpots": "Neue Date-Spots finden"
   },
   "invitations": {
     "title": "Date-Einladungen"
+  },
+  "proposals": {
+    "loadingProposals": "Vorschläge werden geladen...",
+    "noProposals": "Noch keine Date-Vorschläge",
+    "pendingProposals": "Offene Vorschläge",
+    "acceptedProposals": "Angenommene Vorschläge",
+    "previousProposals": "Frühere Vorschläge",
+    "proposalAccepted": "Vorschlag angenommen!",
+    "startingSession": "Gemeinsame Planungssitzung wird gestartet...",
+    "proposalDeclined": "Vorschlag abgelehnt",
+    "declinedDesc": "Der Vorschlag wurde abgelehnt",
+    "proposalCancelled": "Vorschlag zurückgezogen",
+    "cancelledDesc": "Dein Vorschlag wurde zurückgezogen",
+    "pending": "Ausstehend",
+    "accepted": "Angenommen",
+    "declined": "Abgelehnt",
+    "expired": "Abgelaufen",
+    "acceptStartPlanning": "Annehmen & Planen",
+    "accept": "Annehmen",
+    "decline": "Ablehnen",
+    "cancelProposal": "Vorschlag zurückziehen",
+    "startAIPlanning": "KI-Planung starten",
+    "freshSession": "Neue Sitzung erstellt",
+    "freshSessionDesc": "Starte mit sauberen Vorlieben...",
+    "to": "An:",
+    "from": "Von:"
+  },
+  "ratings": {
+    "pendingRatings": "Ausstehende Bewertungen",
+    "rateYourDates": "Bewerte deine Dates",
+    "pending": "{{count}} ausstehend",
+    "dateWith": "Date mit {{name}}",
+    "rate": "Bewerten",
+    "moreDates": "+{{count}} weitere Dates zu bewerten"
   },
   "myFriends": {
     "title": "Meine Freunde",
@@ -124,7 +176,10 @@
     "inviteMoreDesc": "Verbinde dich mit mehr Leuten, um tolle Dates zu entdecken",
     "contacts": "Kontakte",
     "messageSent": "Nachricht gesendet!",
-    "startConversation": "Gespräch mit {{name}} starten"
+    "startConversation": "Gespräch mit {{name}} starten",
+    "message": "Nachricht",
+    "mutualFriends": "{{count}} gemeinsame Freunde",
+    "availableForDates": "Verfügbar für Dates"
   },
   "friends": {
     "inviteFriends": "Freunde einladen",
