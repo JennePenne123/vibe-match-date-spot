@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +12,7 @@ import { DateInvitation } from '@/types/index';
 
 const UpcomingDatesCard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { invitations, loading, acceptInvitation, declineInvitation, cancelInvitation } = useInvitations();
 
   // Filter and get upcoming dates (accepted/scheduled) regardless of direction
@@ -98,7 +100,7 @@ const UpcomingDatesCard: React.FC = () => {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
             <Heart className="h-5 w-5 text-primary" />
-            Upcoming Dates
+            {t('home.upcomingDates')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -116,17 +118,17 @@ const UpcomingDatesCard: React.FC = () => {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
             <Heart className="h-5 w-5 text-primary" />
-            Upcoming Dates
+            {t('home.upcomingDates')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-center py-6 animate-fade-in">
             <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3 animate-pulse" />
             <p className="text-sm text-muted-foreground mb-2">
-              No upcoming dates scheduled
+              {t('home.noUpcomingDates')}
             </p>
             <p className="text-xs text-muted-foreground">
-              Accepted dates will appear here
+              {t('home.acceptedDatesHint')}
             </p>
           </div>
         </CardContent>
@@ -139,7 +141,7 @@ const UpcomingDatesCard: React.FC = () => {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <Heart className="h-5 w-5 text-primary" />
-          Upcoming Dates
+          {t('home.upcomingDates')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 pt-0">
