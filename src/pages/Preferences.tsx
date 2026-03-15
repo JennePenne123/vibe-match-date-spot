@@ -645,12 +645,12 @@ const Preferences = () => {
           {isLocating ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Getting location...
+              {t('preferences.gettingLocation')}
             </>
           ) : (
             <>
               <Navigation className="w-4 h-4 mr-2" />
-              Use Current Location
+              {t('preferences.useCurrentLocation')}
             </>
           )}
         </Button>
