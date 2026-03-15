@@ -57,7 +57,10 @@
     "sendDateProposal": "Date-Vorschlag senden",
     "backToStart": "Zurück zum Start",
     "proposalSentTitle": "Vorschlag gesendet!",
-    "proposalSentDesc": "Dein Date-Vorschlag wurde erfolgreich gesendet."
+    "proposalSentDesc": "Dein Date-Vorschlag wurde erfolgreich gesendet.",
+    "upcomingDates": "Anstehende Dates",
+    "noUpcomingDates": "Keine anstehenden Dates geplant",
+    "acceptedDatesHint": "Angenommene Dates erscheinen hier"
   },
   "landing": {
     "features": "Funktionen",
