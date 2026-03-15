@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import BurgerMenu from '@/components/BurgerMenu';
 import { PointsIndicator } from '@/components/profile/PointsIndicator';
@@ -14,28 +15,17 @@ interface HomeHeaderProps {
   firstName: string;
 }
 
-const HomeHeader = ({
-  user,
-  displayName,
-  firstName
-}: HomeHeaderProps) => {
+const HomeHeader = ({ user, displayName, firstName }: HomeHeaderProps) => {
+  const { t } = useTranslation();
   const avatarUrl = getUserAvatar(user);
   const [imgError, setImgError] = useState(false);
   const fallbackUrl = getFallbackAvatar(displayName);
   
-  if (import.meta.env.DEV) {
-    console.log('🏠 HEADER: Rendering HomeHeader');
-    console.log('🏠 HEADER: User avatar_url:', user?.avatar_url);
-    console.log('🏠 HEADER: getUserAvatar result:', avatarUrl);
-    console.log('🏠 HEADER: Fallback URL:', fallbackUrl);
-    console.log('🏠 HEADER: Full user object:', user);
-  }
-  
   const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return t('greeting.morning');
+    if (hour < 17) return t('greeting.afternoon');
+    return t('greeting.evening');
   };
 
   return (
@@ -46,20 +36,7 @@ const HomeHeader = ({
             src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)}
             alt={displayName}
             referrerPolicy="no-referrer"
-            onError={(e) => {
-              if (import.meta.env.DEV) {
-                console.error('❌ AVATAR: Image failed to load');
-                console.error('❌ AVATAR: Failed URL:', avatarUrl);
-                console.error('❌ AVATAR: Error event:', e);
-              }
-              setImgError(true);
-            }}
-            onLoad={() => {
-              if (import.meta.env.DEV) {
-                console.log('✅ AVATAR: Image loaded successfully');
-                console.log('✅ AVATAR: Loaded URL:', imgError ? fallbackUrl : avatarUrl);
-              }
-            }}
+            onError={() => setImgError(true)}
           />
           <AvatarFallback className="bg-primary/20 text-primary text-sm font-medium">
             {getInitials(displayName)}

@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -10,111 +10,64 @@ import { Menu, User, Users, MapPin, LogOut, X, Heart, Monitor, Sun, Moon } from 
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers';
 import { getInitials } from '@/lib/utils';
 
-const themeOptions = [
-  { value: 'system', label: 'System', icon: Monitor },
-  { value: 'light', label: 'Light', icon: Sun },
-  { value: 'dark', label: 'Dark', icon: Moon },
-] as const;
-
 const BurgerMenu = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   const displayName = getUserName(user);
 
+  const themeOptions = [
+    { value: 'system', label: t('menu.system'), icon: Monitor },
+    { value: 'light', label: t('menu.light'), icon: Sun },
+    { value: 'dark', label: t('menu.dark'), icon: Moon },
+  ] as const;
+
   const menuItems = [
-    {
-      icon: User,
-      label: 'Profile',
-      path: '/profile',
-      description: 'Manage your account'
-    },
-    {
-      icon: Users,
-      label: 'My Friends',
-      path: '/my-friends',
-      description: 'Your connections'
-    },
-    {
-      icon: Heart,
-      label: 'My Invitations',
-      path: '/invitations',
-      description: 'View all invitations'
-    },
-    {
-      icon: MapPin,
-      label: 'My Venues',
-      path: '/my-venues',
-      description: 'Favorite places'
-    }
+    { icon: User, label: t('menu.profile'), path: '/profile', description: t('menu.profileDesc') },
+    { icon: Users, label: t('menu.myFriends'), path: '/my-friends', description: t('menu.myFriendsDesc') },
+    { icon: Heart, label: t('menu.myInvitations'), path: '/invitations', description: t('menu.myInvitationsDesc') },
+    { icon: MapPin, label: t('menu.myVenues'), path: '/my-venues', description: t('menu.myVenuesDesc') },
   ];
 
-  const handleMenuItemClick = (path: string) => {
-    navigate(path);
-    setIsOpen(false);
-  };
-
-  const handleLogout = () => {
-    logout();
-    setIsOpen(false);
-  };
+  const handleMenuItemClick = (path: string) => { navigate(path); setIsOpen(false); };
+  const handleLogout = () => { logout(); setIsOpen(false); };
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
-        >
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-white/10 hover:text-foreground">
           <Menu className="w-5 h-5" />
         </Button>
       </DrawerTrigger>
       <DrawerContent className="max-w-md mx-auto bg-card/95 backdrop-blur-xl border-border/40">
         <div className="p-6">
-          {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Avatar className="w-12 h-12 border-2 border-primary/30 ring-2 ring-primary/10">
                 <AvatarImage src={getUserAvatar(user)} alt={displayName} referrerPolicy="no-referrer" />
-                <AvatarFallback className="bg-primary/20 text-primary font-medium">
-                  {getInitials(displayName)}
-                </AvatarFallback>
+                <AvatarFallback className="bg-primary/20 text-primary font-medium">{getInitials(displayName)}</AvatarFallback>
               </Avatar>
               <div>
                 <h2 className="font-semibold text-foreground">{displayName}</h2>
                 <p className="text-sm text-muted-foreground">{user?.email}</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(false)}
-              className="text-muted-foreground hover:bg-white/10 hover:text-foreground"
-            >
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="text-muted-foreground hover:bg-white/10 hover:text-foreground">
               <X className="w-5 h-5" />
             </Button>
           </div>
 
-          {/* Theme Selector */}
           <div className="mb-6">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Appearance</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">{t('menu.appearance')}</p>
             <div className="flex gap-2">
               {themeOptions.map((option) => {
                 const Icon = option.icon;
                 const isActive = theme === option.value;
                 return (
-                  <button
-                    key={option.value}
-                    onClick={() => setTheme(option.value)}
-                    className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-300 ${
-                      isActive 
-                        ? 'border-primary/50 bg-primary/20 text-primary shadow-glow-primary/20' 
-                        : 'border-border/40 text-muted-foreground hover:bg-white/10 hover:border-border/60'
-                    }`}
-                  >
+                  <button key={option.value} onClick={() => setTheme(option.value)} className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-300 ${isActive ? 'border-primary/50 bg-primary/20 text-primary shadow-glow-primary/20' : 'border-border/40 text-muted-foreground hover:bg-white/10 hover:border-border/60'}`}>
                     <Icon className="w-4 h-4" />
                     <span className="text-xs font-medium">{option.label}</span>
                   </button>
@@ -123,14 +76,9 @@ const BurgerMenu = () => {
             </div>
           </div>
 
-          {/* Menu Items */}
           <div className="space-y-2 mb-6">
             {menuItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => handleMenuItemClick(item.path)}
-                className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/10 transition-all duration-300 text-left group"
-              >
+              <button key={item.path} onClick={() => handleMenuItemClick(item.path)} className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/10 transition-all duration-300 text-left group">
                 <div className="flex items-center justify-center w-10 h-10 bg-primary/20 rounded-xl group-hover:bg-primary/30 transition-colors">
                   <item.icon className="w-5 h-5 text-primary" />
                 </div>
@@ -142,18 +90,14 @@ const BurgerMenu = () => {
             ))}
           </div>
 
-          {/* Logout Button */}
           <div className="border-t border-border/40 pt-4">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-error-500/10 transition-all duration-300 text-left text-error-500 group"
-            >
+            <button onClick={handleLogout} className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-error-500/10 transition-all duration-300 text-left text-error-500 group">
               <div className="flex items-center justify-center w-10 h-10 bg-error-500/20 rounded-xl group-hover:bg-error-500/30 transition-colors">
                 <LogOut className="w-5 h-5" />
               </div>
               <div className="flex-1">
-                <div className="font-medium">Sign Out</div>
-                <div className="text-sm opacity-80">Log out of your account</div>
+                <div className="font-medium">{t('menu.signOut')}</div>
+                <div className="text-sm opacity-80">{t('menu.signOutDesc')}</div>
               </div>
             </button>
           </div>
