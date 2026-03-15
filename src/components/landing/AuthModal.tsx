@@ -38,6 +38,7 @@ const AppleIcon = () => (
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenPartner?: () => void;
 }
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
