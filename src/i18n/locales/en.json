@@ -427,7 +427,9 @@
       "expiringSoonDesc": "\"{{title}}\" expires in {{days}} day(s). Consider extending or creating a replacement.",
       "nearLimit": "Redemption Limit Almost Reached",
       "nearLimitDesc": "\"{{title}}\" is at {{percent}}% of its redemption limit. Consider increasing the limit.",
-      "manage": "Manage"
+      "manage": "Manage",
+      "activeOk": "Active",
+      "activeOkDesc": "\"{{title}}\" is active and running smoothly."
     }
   }
 }

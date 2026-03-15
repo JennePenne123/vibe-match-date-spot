@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Clock, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 
 interface VoucherAlert {
   id: string;
   title: string;
   code: string;
-  type: 'expiring' | 'expired_active' | 'near_limit';
+  type: 'expiring' | 'expired_active' | 'near_limit' | 'active';
   daysLeft?: number;
   redemptionPercent?: number;
 }
@@ -51,6 +51,10 @@ export default function VoucherAlerts() {
         // Expiring within 3 days
         else if (v.status === 'active' && expiryDate <= threeDaysFromNow && expiryDate >= now) {
           newAlerts.push({ id: v.id, title: v.title, code: v.code, type: 'expiring', daysLeft });
+        }
+        // Active and healthy
+        else if (v.status === 'active' && expiryDate > threeDaysFromNow) {
+          newAlerts.push({ id: v.id, title: v.title, code: v.code, type: 'active' });
         }
 
         // Near redemption limit (≥90%)
@@ -94,6 +98,14 @@ export default function VoucherAlerts() {
           title: t('partner.alerts.nearLimit'),
           description: t('partner.alerts.nearLimitDesc', { title: alert.title, percent: alert.redemptionPercent }),
           className: 'border-blue-500/50 bg-blue-500/10 text-blue-700 dark:text-blue-400',
+        };
+      case 'active':
+        return {
+          icon: <CheckCircle className="h-4 w-4" />,
+          variant: 'default' as const,
+          title: t('partner.alerts.activeOk'),
+          description: t('partner.alerts.activeOkDesc', { title: alert.title }),
+          className: 'border-green-500/50 bg-green-500/10 text-green-700 dark:text-green-400',
         };
     }
   };

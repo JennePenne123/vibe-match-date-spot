@@ -427,7 +427,9 @@
       "expiringSoonDesc": "\"{{title}}\" läuft in {{days}} Tag(en) ab. Verlängere ihn oder erstelle einen Ersatz.",
       "nearLimit": "Einlösungslimit fast erreicht",
       "nearLimitDesc": "\"{{title}}\" hat {{percent}}% des Einlösungslimits erreicht. Erwäge eine Erhöhung.",
-      "manage": "Verwalten"
+      "manage": "Verwalten",
+      "activeOk": "Aktiv",
+      "activeOkDesc": "\"{{title}}\" ist aktiv und läuft einwandfrei."
     }
   }
 }
