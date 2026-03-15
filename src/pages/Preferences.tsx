@@ -827,7 +827,7 @@ const Preferences = () => {
                 className="flex-1 h-12 border-primary text-primary hover:bg-primary/10"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t('common.back')}
               </Button>
             )}
             
