@@ -799,7 +799,7 @@ const Preferences = () => {
               {getStepIcon()}
               <h1 className="text-xl font-semibold text-foreground">{getStepTitle()}</h1>
             </div>
-            <p className="text-sm text-muted-foreground">Step {currentStep} of {totalSteps}</p>
+            <p className="text-sm text-muted-foreground">{t('preferences.step', { current: currentStep, total: totalSteps })}</p>
           </div>
           <div className="w-10" />
         </div>
