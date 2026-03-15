@@ -1,26 +1,27 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Users, MapPin, Trophy, Star, TrendingUp } from 'lucide-react';
+import { Users, Trophy, Star, TrendingUp } from 'lucide-react';
 import { Heading, Text } from '@/design-system/components';
 import { useUserPoints } from '@/hooks/useUserPoints';
 import { useFriends } from '@/hooks/useFriends';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const ProfileStats = () => {
+  const { t } = useTranslation();
   const { points, loading: pointsLoading } = useUserPoints();
   const { friends } = useFriends();
 
-  // Calculate stats
   const totalPoints = points?.total_points || 0;
   const level = points?.level || 1;
   const friendsCount = friends.filter(f => f.friendship_status === 'accepted').length;
   const badgesCount = Array.isArray(points?.badges) ? points.badges.length : 0;
 
   const stats = [
-    { label: 'Total Points', value: totalPoints.toLocaleString(), icon: Trophy, color: 'text-yellow-500' },
-    { label: 'Level', value: level.toString(), icon: Star, color: 'text-primary' },
-    { label: 'Friends', value: friendsCount.toString(), icon: Users, color: 'text-blue-500' },
-    { label: 'Badges', value: badgesCount.toString(), icon: TrendingUp, color: 'text-green-500' }
+    { label: t('profile.totalPoints'), value: totalPoints.toLocaleString(), icon: Trophy, color: 'text-yellow-500' },
+    { label: t('profile.level'), value: level.toString(), icon: Star, color: 'text-primary' },
+    { label: t('profile.friends'), value: friendsCount.toString(), icon: Users, color: 'text-blue-500' },
+    { label: t('profile.badges'), value: badgesCount.toString(), icon: TrendingUp, color: 'text-green-500' },
   ];
 
   if (pointsLoading) {

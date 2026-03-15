@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Venue } from '@/types';
 
 const Venues = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
@@ -20,142 +21,62 @@ const Venues = () => {
 
   const filters = ['Italian', 'Japanese', 'Mexican', 'American', 'Romantic', 'Casual', 'Nightlife'];
 
-  React.useEffect(() => {
-    if (!loading && !user) {
-      navigate('/');
-    }
-  }, [loading, user, navigate]);
+  React.useEffect(() => { if (!loading && !user) navigate('/'); }, [loading, user, navigate]);
 
   useEffect(() => {
-    // Load liked venues from localStorage
     const saved = localStorage.getItem('likedVenues');
-    if (saved) {
-      setLikedVenues(JSON.parse(saved));
-    }
+    if (saved) setLikedVenues(JSON.parse(saved));
   }, []);
 
-  const toggleFilter = (filter: string) => {
-    setSelectedFilters(prev => 
-      prev.includes(filter)
-        ? prev.filter(f => f !== filter)
-        : [...prev, filter]
-    );
-  };
+  const toggleFilter = (filter: string) => setSelectedFilters(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
 
   const toggleLike = (venueId: string) => {
-    const newLikedVenues = likedVenues.includes(venueId)
-      ? likedVenues.filter(id => id !== venueId)
-      : [...likedVenues, venueId];
-    
+    const newLikedVenues = likedVenues.includes(venueId) ? likedVenues.filter(id => id !== venueId) : [...likedVenues, venueId];
     setLikedVenues(newLikedVenues);
     localStorage.setItem('likedVenues', JSON.stringify(newLikedVenues));
   };
 
   const filteredVenues = venues.filter(venue => {
-    const matchesSearch = searchQuery === '' || 
-      venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      venue.cuisine_type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      venue.address.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesFilters = selectedFilters.length === 0 || 
-      selectedFilters.some(filter => 
-        venue.cuisine_type?.toLowerCase().includes(filter.toLowerCase()) ||
-        venue.tags?.some(tag => tag.toLowerCase().includes(filter.toLowerCase()))
-      );
-
+    const matchesSearch = searchQuery === '' || venue.name.toLowerCase().includes(searchQuery.toLowerCase()) || venue.cuisine_type?.toLowerCase().includes(searchQuery.toLowerCase()) || venue.address.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilters = selectedFilters.length === 0 || selectedFilters.some(filter => venue.cuisine_type?.toLowerCase().includes(filter.toLowerCase()) || venue.tags?.some(tag => tag.toLowerCase().includes(filter.toLowerCase())));
     return matchesSearch && matchesFilters;
   });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
-      </div>
-    );
-  }
-
-  const displayName = user?.name || user?.email?.split('@')[0] || 'User';
+  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="text-muted-foreground">{t('common.loading')}</div></div>;
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
-        {/* Header */}
         <div className="bg-card p-4 pt-12 shadow-sm">
           <div className="flex items-center gap-4 mb-6">
-            <Button
-              onClick={() => navigate(-1)}
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:bg-muted"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </Button>
+            <Button onClick={() => navigate(-1)} variant="ghost" size="icon" className="text-muted-foreground hover:bg-muted"><ArrowLeft className="w-6 h-6" /></Button>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Discover Venues</h1>
-              <p className="text-sm text-muted-foreground">Find your perfect date spot</p>
+              <h1 className="text-xl font-bold text-foreground">{t('venues.discover')}</h1>
+              <p className="text-sm text-muted-foreground">{t('venues.findPerfect')}</p>
             </div>
           </div>
-
-          {/* Search */}
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              type="text"
-              placeholder="Search venues..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-muted border-border"
-            />
+            <Input type="text" placeholder={t('venues.searchVenues')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 bg-muted border-border" />
           </div>
-
-          {/* Filters */}
           <div className="flex items-center gap-2 mb-4">
             <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
             <div className="flex flex-wrap gap-2">
               {filters.map((filter) => (
-                <Badge
-                  key={filter}
-                  variant={selectedFilters.includes(filter) ? "default" : "secondary"}
-                  className={`cursor-pointer transition-colors ${
-                    selectedFilters.includes(filter) 
-                      ? 'bg-pink-500 text-white hover:bg-pink-600' 
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
-                  onClick={() => toggleFilter(filter)}
-                >
-                  {filter}
-                </Badge>
+                <Badge key={filter} variant={selectedFilters.includes(filter) ? 'default' : 'secondary'} className={`cursor-pointer transition-colors ${selectedFilters.includes(filter) ? 'bg-pink-500 text-white hover:bg-pink-600' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`} onClick={() => toggleFilter(filter)}>{filter}</Badge>
               ))}
             </div>
           </div>
         </div>
-
-        {/* Content */}
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-muted-foreground">
-              {filteredVenues.length} venue{filteredVenues.length !== 1 ? 's' : ''} found
-            </p>
-            <Button
-              onClick={() => navigate('/my-venues')}
-              variant="outline"
-              size="sm"
-              className="border-pink-200 dark:border-pink-800 text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30"
-            >
-              <MapPin className="w-4 h-4 mr-1" />
-              My Venues ({likedVenues.length})
+            <p className="text-sm text-muted-foreground">{t('venues.venuesFound', { count: filteredVenues.length })}</p>
+            <Button onClick={() => navigate('/my-venues')} variant="outline" size="sm" className="border-pink-200 dark:border-pink-800 text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30">
+              <MapPin className="w-4 h-4 mr-1" />{t('venues.myVenues')} ({likedVenues.length})
             </Button>
           </div>
-
           <div className="space-y-4">
-            {filteredVenues.map((venue) => (
-              <VenueCard
-                key={venue.id}
-                venue={venue}
-                isLiked={likedVenues.includes(venue.id)}
-                onToggleLike={toggleLike}
-              />
-            ))}
+            {filteredVenues.map((venue) => <VenueCard key={venue.id} venue={venue} isLiked={likedVenues.includes(venue.id)} onToggleLike={toggleLike} />)}
           </div>
         </div>
       </div>
