@@ -773,6 +773,65 @@ export type Database = {
           },
         ]
       }
+      partner_exclusive_vouchers: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          discount_type: string
+          discount_value: number
+          id: string
+          offering_partner_id: string
+          offering_venue_id: string | null
+          receiving_partner_id: string
+          redeemed_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          valid_until: string
+        }
+        Insert: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          offering_partner_id: string
+          offering_venue_id?: string | null
+          receiving_partner_id: string
+          redeemed_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          valid_until?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          offering_partner_id?: string
+          offering_venue_id?: string | null
+          receiving_partner_id?: string
+          redeemed_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_exclusive_vouchers_offering_venue_id_fkey"
+            columns: ["offering_venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
