@@ -132,83 +132,83 @@ const Preferences = () => {
 
   // Data definitions
   const cuisines: Preference[] = [
-    { id: 'italian', name: 'Italian', emoji: '🍝' },
-    { id: 'japanese', name: 'Japanese', emoji: '🍣' },
-    { id: 'mexican', name: 'Mexican', emoji: '🌮' },
-    { id: 'french', name: 'French', emoji: '🥐' },
-    { id: 'indian', name: 'Indian', emoji: '🍛' },
-    { id: 'mediterranean', name: 'Mediterranean', emoji: '🫒' },
-    { id: 'american', name: 'American', emoji: '🍔' },
-    { id: 'thai', name: 'Thai', emoji: '🍜' },
-    { id: 'chinese', name: 'Chinese', emoji: '🥢' },
-    { id: 'korean', name: 'Korean', emoji: '🍲' }
+    { id: 'italian', name: t('preferences.cuisine_italian'), emoji: '🍝' },
+    { id: 'japanese', name: t('preferences.cuisine_japanese'), emoji: '🍣' },
+    { id: 'mexican', name: t('preferences.cuisine_mexican'), emoji: '🌮' },
+    { id: 'french', name: t('preferences.cuisine_french'), emoji: '🥐' },
+    { id: 'indian', name: t('preferences.cuisine_indian'), emoji: '🍛' },
+    { id: 'mediterranean', name: t('preferences.cuisine_mediterranean'), emoji: '🫒' },
+    { id: 'american', name: t('preferences.cuisine_american'), emoji: '🍔' },
+    { id: 'thai', name: t('preferences.cuisine_thai'), emoji: '🍜' },
+    { id: 'chinese', name: t('preferences.cuisine_chinese'), emoji: '🥢' },
+    { id: 'korean', name: t('preferences.cuisine_korean'), emoji: '🍲' }
   ];
 
   const vibes: Preference[] = [
-    { id: 'romantic', name: 'Romantic', emoji: '💕', desc: 'Intimate and cozy' },
-    { id: 'casual', name: 'Casual', emoji: '😊', desc: 'Relaxed and comfortable' },
-    { id: 'outdoor', name: 'Outdoor', emoji: '🌳', desc: 'Fresh air and nature' },
-    { id: 'nightlife', name: 'Nightlife', emoji: '🌃', desc: 'Vibrant and energetic' },
-    { id: 'cultural', name: 'Cultural', emoji: '🎭', desc: 'Arts and history' },
-    { id: 'adventurous', name: 'Adventurous', emoji: '🗺️', desc: 'Something new and exciting' }
+    { id: 'romantic', name: t('preferences.vibe_romantic'), emoji: '💕', desc: t('preferences.vibe_romanticDesc') },
+    { id: 'casual', name: t('preferences.vibe_casual'), emoji: '😊', desc: t('preferences.vibe_casualDesc') },
+    { id: 'outdoor', name: t('preferences.vibe_outdoor'), emoji: '🌳', desc: t('preferences.vibe_outdoorDesc') },
+    { id: 'nightlife', name: t('preferences.vibe_nightlife'), emoji: '🌃', desc: t('preferences.vibe_nightlifeDesc') },
+    { id: 'cultural', name: t('preferences.vibe_cultural'), emoji: '🎭', desc: t('preferences.vibe_culturalDesc') },
+    { id: 'adventurous', name: t('preferences.vibe_adventurous'), emoji: '🗺️', desc: t('preferences.vibe_adventurousDesc') }
   ];
 
   const priceRanges: Preference[] = [
-    { id: 'budget', name: 'Budget', emoji: '💰', desc: 'Up to $15 per person' },
-    { id: 'moderate', name: 'Moderate', emoji: '💳', desc: '$15-30 per person' },
-    { id: 'upscale', name: 'Upscale', emoji: '💎', desc: '$30-50 per person' },
-    { id: 'luxury', name: 'Luxury', emoji: '👑', desc: 'Over $50 per person' }
+    { id: 'budget', name: t('preferences.price_budget'), emoji: '💰', desc: t('preferences.price_budgetDesc') },
+    { id: 'moderate', name: t('preferences.price_moderate'), emoji: '💳', desc: t('preferences.price_moderateDesc') },
+    { id: 'upscale', name: t('preferences.price_upscale'), emoji: '💎', desc: t('preferences.price_upscaleDesc') },
+    { id: 'luxury', name: t('preferences.price_luxury'), emoji: '👑', desc: t('preferences.price_luxuryDesc') }
   ];
 
   const timePreferences: Preference[] = [
-    { id: 'brunch', name: 'Brunch', emoji: '🌅', desc: '9:00-12:00' },
-    { id: 'lunch', name: 'Lunch', emoji: '☀️', desc: '12:00-15:00' },
-    { id: 'afternoon', name: 'Afternoon', emoji: '🌤️', desc: '15:00-18:00' },
-    { id: 'dinner', name: 'Dinner', emoji: '🌆', desc: '18:00-21:00' },
-    { id: 'evening', name: 'Evening', emoji: '🌙', desc: 'After 21:00' },
-    { id: 'flexible', name: 'Flexible', emoji: '🕐', desc: 'Anytime' }
+    { id: 'brunch', name: t('preferences.time_brunch'), emoji: '🌅', desc: t('preferences.time_brunchDesc') },
+    { id: 'lunch', name: t('preferences.time_lunch'), emoji: '☀️', desc: t('preferences.time_lunchDesc') },
+    { id: 'afternoon', name: t('preferences.time_afternoon'), emoji: '🌤️', desc: t('preferences.time_afternoonDesc') },
+    { id: 'dinner', name: t('preferences.time_dinner'), emoji: '🌆', desc: t('preferences.time_dinnerDesc') },
+    { id: 'evening', name: t('preferences.time_evening'), emoji: '🌙', desc: t('preferences.time_eveningDesc') },
+    { id: 'flexible', name: t('preferences.time_flexible'), emoji: '🕐', desc: t('preferences.time_flexibleDesc') }
   ];
 
   const durations: Preference[] = [
-    { id: 'quick', name: 'Quick & Sweet', emoji: '⚡', desc: '1-2 hours' },
-    { id: 'relaxed', name: 'Relaxed', emoji: '⏰', desc: '2-3 hours' },
-    { id: 'extended', name: 'Full Experience', emoji: '🕐', desc: '3+ hours' },
-    { id: 'spontaneous', name: 'Go with the flow', emoji: '🤷', desc: 'Let\'s see how it goes' }
+    { id: 'quick', name: t('preferences.duration_quick'), emoji: '⚡', desc: t('preferences.duration_quickDesc') },
+    { id: 'relaxed', name: t('preferences.duration_relaxed'), emoji: '⏰', desc: t('preferences.duration_relaxedDesc') },
+    { id: 'extended', name: t('preferences.duration_extended'), emoji: '🕐', desc: t('preferences.duration_extendedDesc') },
+    { id: 'spontaneous', name: t('preferences.duration_spontaneous'), emoji: '🤷', desc: t('preferences.duration_spontaneousDesc') }
   ];
 
   const activities: Preference[] = [
-    { id: 'dining', name: 'Just Dining', emoji: '🍽️', desc: 'Restaurant/café focus' },
-    { id: 'dining_plus', name: 'Dining + Activity', emoji: '🎪', desc: 'Dinner & show/event' },
-    { id: 'cocktails', name: 'Cocktails/Bar', emoji: '🍸', desc: 'Drinks & conversation' },
-    { id: 'cultural', name: 'Cultural', emoji: '🎨', desc: 'Museum, theater, concert' },
-    { id: 'active', name: 'Active', emoji: '🎳', desc: 'Bowling, mini-golf, escape room' },
-    { id: 'nightlife', name: 'Nightlife', emoji: '🎉', desc: 'Club, disco, live music' }
+    { id: 'dining', name: t('preferences.activity_dining'), emoji: '🍽️', desc: t('preferences.activity_diningDesc') },
+    { id: 'dining_plus', name: t('preferences.activity_dining_plus'), emoji: '🎪', desc: t('preferences.activity_dining_plusDesc') },
+    { id: 'cocktails', name: t('preferences.activity_cocktails'), emoji: '🍸', desc: t('preferences.activity_cocktailsDesc') },
+    { id: 'cultural', name: t('preferences.activity_cultural'), emoji: '🎨', desc: t('preferences.activity_culturalDesc') },
+    { id: 'active', name: t('preferences.activity_active'), emoji: '🎳', desc: t('preferences.activity_activeDesc') },
+    { id: 'nightlife', name: t('preferences.activity_nightlife'), emoji: '🎉', desc: t('preferences.activity_nightlifeDesc') }
   ];
 
   const entertainment: Preference[] = [
-    { id: 'live_music', name: 'Live Music', emoji: '🎵' },
-    { id: 'dj_playlist', name: 'DJ/Playlist', emoji: '🎧' },
-    { id: 'quiet_conversation', name: 'Quiet Chat', emoji: '💬' },
-    { id: 'games', name: 'Games', emoji: '🎮' },
-    { id: 'dancing', name: 'Dancing', emoji: '💃' },
-    { id: 'sports_viewing', name: 'Watch Sports', emoji: '📺' }
+    { id: 'live_music', name: t('preferences.ent_live_music'), emoji: '🎵' },
+    { id: 'dj_playlist', name: t('preferences.ent_dj_playlist'), emoji: '🎧' },
+    { id: 'quiet_conversation', name: t('preferences.ent_quiet_conversation'), emoji: '💬' },
+    { id: 'games', name: t('preferences.ent_games'), emoji: '🎮' },
+    { id: 'dancing', name: t('preferences.ent_dancing'), emoji: '💃' },
+    { id: 'sports_viewing', name: t('preferences.ent_sports_viewing'), emoji: '📺' }
   ];
 
   const dietaryRequirements: Preference[] = [
-    { id: 'vegetarian', name: 'Vegetarian', emoji: '🥬' },
-    { id: 'vegan', name: 'Vegan', emoji: '🌱' },
-    { id: 'gluten_free', name: 'Gluten-Free', emoji: '🚫' },
-    { id: 'dairy_free', name: 'Dairy-Free', emoji: '🥛' },
-    { id: 'halal', name: 'Halal', emoji: '☪️' },
-    { id: 'kosher', name: 'Kosher', emoji: '✡️' }
+    { id: 'vegetarian', name: t('preferences.dietary_vegetarian'), emoji: '🥬' },
+    { id: 'vegan', name: t('preferences.dietary_vegan'), emoji: '🌱' },
+    { id: 'gluten_free', name: t('preferences.dietary_gluten_free'), emoji: '🚫' },
+    { id: 'dairy_free', name: t('preferences.dietary_dairy_free'), emoji: '🥛' },
+    { id: 'halal', name: t('preferences.dietary_halal'), emoji: '☪️' },
+    { id: 'kosher', name: t('preferences.dietary_kosher'), emoji: '✡️' }
   ];
 
   const accessibilityNeeds: Preference[] = [
-    { id: 'wheelchair', name: 'Wheelchair Accessible', emoji: '♿' },
-    { id: 'parking', name: 'Parking Available', emoji: '🅿️' },
-    { id: 'public_transport', name: 'Near Public Transport', emoji: '🚇' },
-    { id: 'pet_friendly', name: 'Pet Friendly', emoji: '🐕' },
-    { id: 'non_smoking', name: 'Non-Smoking', emoji: '🚭' }
+    { id: 'wheelchair', name: t('preferences.access_wheelchair'), emoji: '♿' },
+    { id: 'parking', name: t('preferences.access_parking'), emoji: '🅿️' },
+    { id: 'public_transport', name: t('preferences.access_public_transport'), emoji: '🚇' },
+    { id: 'pet_friendly', name: t('preferences.access_pet_friendly'), emoji: '🐕' },
+    { id: 'non_smoking', name: t('preferences.access_non_smoking'), emoji: '🚭' }
   ];
 
   // Toggle functions
