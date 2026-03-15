@@ -431,6 +431,28 @@
       "activeOk": "Aktiv",
       "activeOkDesc": "\"{{title}}\" ist aktiv und läuft einwandfrei."
     },
+    "qr": {
+      "title": "QR-Codes & Scanner",
+      "subtitle": "Zeige deinen Voucher-QR-Code oder scanne Codes anderer Partner",
+      "myQR": "Mein QR-Code",
+      "scanner": "Scanner",
+      "noVouchers": "Keine aktiven Gutscheine",
+      "noVouchersDesc": "Erstelle zuerst einen Gutschein, um einen QR-Code zu erhalten.",
+      "createVoucher": "Gutschein erstellen",
+      "download": "QR-Code herunterladen",
+      "scanTitle": "Gutschein scannen",
+      "scanDesc": "Scanne den QR-Code eines anderen Partners, um den Gutschein einzulösen.",
+      "startScan": "Scan starten",
+      "scanAgain": "Erneut scannen",
+      "redeemSuccess": "Gutschein erfolgreich eingelöst!",
+      "redeemed": "Eingelöst",
+      "invalidQR": "Ungültiger QR-Code",
+      "voucherNotFound": "Gutschein nicht gefunden",
+      "voucherInactive": "Gutschein ist nicht aktiv",
+      "voucherExpired": "Gutschein ist abgelaufen",
+      "maxRedemptions": "Einlösungslimit erreicht",
+      "alreadyRedeemed": "Bereits eingelöst"
+    },
     "reports": {
       "title": "Berichte & Rechnungen",
       "subtitle": "Monatliche Abrechnungen und Venue-Performance für die Steuererklärung",
