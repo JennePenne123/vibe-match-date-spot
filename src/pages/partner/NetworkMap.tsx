@@ -255,7 +255,7 @@ export default function PartnerNetworkMap() {
             <span className="text-muted-foreground">{t('partner.network.yourVenues')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-violet-600 border-2 border-white shadow-sm" />
+            <div className="w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ background: 'hsl(262, 83%, 58%)' }} />
             <span className="text-muted-foreground">{t('partner.network.otherPartners')}</span>
           </div>
         </CardContent>
