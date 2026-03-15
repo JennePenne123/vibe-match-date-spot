@@ -384,8 +384,8 @@ const Preferences = () => {
     <>
       {/* Quick Templates */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-foreground mb-2">Quick Start</h2>
-        <p className="text-muted-foreground mb-4">Or choose a ready-made template</p>
+        <h2 className="text-xl font-bold text-foreground mb-2">{t('preferences.quickStart')}</h2>
+        <p className="text-muted-foreground mb-4">{t('preferences.orChooseTemplate')}</p>
         <div className="grid grid-cols-1 gap-3">
           {quickTemplates.map((template) => (
             <button
