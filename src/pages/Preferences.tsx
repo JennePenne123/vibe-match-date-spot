@@ -675,7 +675,7 @@ const Preferences = () => {
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
                   <span className="text-sm text-green-800 dark:text-green-300">
-                    Location saved: {homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}
+                    {t('preferences.locationSaved')} {homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}
                   </span>
                 </div>
                 <Button
