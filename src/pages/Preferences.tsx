@@ -743,8 +743,8 @@ const Preferences = () => {
 
       {/* Accessibility */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Any special needs?</h2>
-        <p className="text-muted-foreground mb-6">What accessibility features do you need?</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.specialNeedsTitle')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.accessibilityFeatures')}</p>
         
         <div className="space-y-3">
           {accessibilityNeeds.map((access) => (
