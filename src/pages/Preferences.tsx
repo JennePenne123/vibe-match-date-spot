@@ -503,8 +503,8 @@ const Preferences = () => {
 
       {/* Time Preferences */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">When works best?</h2>
-        <p className="text-muted-foreground mb-6">Choose your preferred timing</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whenBest')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.chooseTiming')}</p>
         
         <div className="grid grid-cols-2 gap-3">
           {timePreferences.map((time) => (
