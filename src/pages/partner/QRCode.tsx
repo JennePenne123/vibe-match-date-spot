@@ -10,27 +10,39 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
-import { QrCode, ScanLine, Download, CheckCircle, XCircle, Gift } from 'lucide-react';
+import { QrCode, ScanLine, Download, CheckCircle, XCircle, Handshake, Gift, Users } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
-interface ActiveVoucher {
-  id: string;
-  code: string;
-  title: string;
-  discount_type: string;
-  discount_value: number;
+interface PartnerVenue {
   venue_id: string;
   venues: { name: string } | null;
 }
 
+interface ExclusiveVoucher {
+  id: string;
+  title: string;
+  description: string | null;
+  discount_type: string;
+  discount_value: number;
+  code: string;
+  status: string;
+  valid_until: string;
+  redeemed_at: string | null;
+  created_at: string;
+  offering_partner_id: string;
+  receiving_partner_id: string;
+  offering_venue_id: string | null;
+}
+
 interface ScanResult {
-  status: 'success' | 'error' | 'already_redeemed';
+  status: 'success' | 'error' | 'already_connected';
   message: string;
   voucher?: {
     title: string;
-    discount_type: string;
     discount_value: number;
+    code: string;
     venue_name: string;
   };
 }
@@ -41,8 +53,9 @@ export default function PartnerQRCode() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [vouchers, setVouchers] = useState<ActiveVoucher[]>([]);
-  const [selectedVoucher, setSelectedVoucher] = useState<ActiveVoucher | null>(null);
+  const [partnerVenues, setPartnerVenues] = useState<PartnerVenue[]>([]);
+  const [receivedVouchers, setReceivedVouchers] = useState<ExclusiveVoucher[]>([]);
+  const [offeredVouchers, setOfferedVouchers] = useState<ExclusiveVoucher[]>([]);
   const [loading, setLoading] = useState(true);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [scanning, setScanning] = useState(false);
@@ -55,64 +68,81 @@ export default function PartnerQRCode() {
   }, [role, roleLoading, navigate]);
 
   useEffect(() => {
-    fetchVouchers();
-  }, []);
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
-  const fetchVouchers = async () => {
+  const fetchData = async () => {
+    if (!user) return;
     try {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      if (!currentUser) return;
+      // Fetch partner's venues
+      const { data: venues } = await supabase
+        .from('venue_partnerships')
+        .select('venue_id, venues(name)')
+        .eq('partner_id', user.id)
+        .eq('status', 'active');
 
-      const { data, error } = await supabase
-        .from('vouchers')
-        .select('id, code, title, discount_type, discount_value, venue_id, venues(name)')
-        .eq('partner_id', currentUser.id)
-        .eq('status', 'active')
-        .gt('valid_until', new Date().toISOString())
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      const mapped = (data || []).map(v => ({
-        ...v,
+      const mappedVenues = (venues || []).map(v => ({
+        venue_id: v.venue_id,
         venues: v.venues as unknown as { name: string } | null
       }));
-      setVouchers(mapped);
-      if (mapped.length > 0) setSelectedVoucher(mapped[0]);
+      setPartnerVenues(mappedVenues);
+
+      // Fetch received exclusive vouchers
+      const { data: received } = await supabase
+        .from('partner_exclusive_vouchers')
+        .select('*')
+        .eq('receiving_partner_id', user.id)
+        .order('created_at', { ascending: false });
+
+      setReceivedVouchers((received as ExclusiveVoucher[]) || []);
+
+      // Fetch offered exclusive vouchers
+      const { data: offered } = await supabase
+        .from('partner_exclusive_vouchers')
+        .select('*')
+        .eq('offering_partner_id', user.id)
+        .order('created_at', { ascending: false });
+
+      setOfferedVouchers((offered as ExclusiveVoucher[]) || []);
     } catch (error) {
-      console.error('Error fetching vouchers:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const generateQRData = (voucher: ActiveVoucher) => {
+  // Generate a unique partner QR code payload
+  const generatePartnerQR = () => {
+    if (!user) return '';
     return JSON.stringify({
-      type: 'vybe_voucher',
-      voucher_id: voucher.id,
-      code: voucher.code,
-      partner_id: user?.id,
+      type: 'vybe_partner',
+      partner_id: user.id,
+      venues: partnerVenues.map(v => ({
+        id: v.venue_id,
+        name: v.venues?.name || 'Venue'
+      })),
+      ts: Date.now(),
     });
   };
 
   const handleDownloadQR = () => {
-    if (!selectedVoucher) return;
-    const svg = document.getElementById('partner-qr-code');
+    const svg = document.getElementById('partner-identity-qr');
     if (!svg) return;
-
     const svgData = new XMLSerializer().serializeToString(svg);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
-
     img.onload = () => {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx?.drawImage(img, 0, 0);
       const pngFile = canvas.toDataURL('image/png');
-      const downloadLink = document.createElement('a');
-      downloadLink.download = `qr-${selectedVoucher.code}.png`;
-      downloadLink.href = pngFile;
-      downloadLink.click();
+      const link = document.createElement('a');
+      link.download = `partner-qr-${user?.id?.slice(0, 8)}.png`;
+      link.href = pngFile;
+      link.click();
     };
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   };
@@ -120,13 +150,10 @@ export default function PartnerQRCode() {
   const startScanner = () => {
     setScanResult(null);
     setScanning(true);
-
-    // Small delay to let the DOM render the container
     setTimeout(() => {
       if (scannerRef.current) {
         scannerRef.current.clear();
       }
-
       const scanner = new Html5QrcodeScanner(
         'qr-reader',
         {
@@ -136,18 +163,14 @@ export default function PartnerQRCode() {
         },
         false
       );
-
       scanner.render(
         async (decodedText) => {
           scanner.clear();
           setScanning(false);
           await handleScanResult(decodedText);
         },
-        (error) => {
-          // Scan error - ignore, keep scanning
-        }
+        () => {}
       );
-
       scannerRef.current = scanner;
     }, 100);
   };
@@ -164,87 +187,95 @@ export default function PartnerQRCode() {
     try {
       const data = JSON.parse(decodedText);
 
-      if (data.type !== 'vybe_voucher') {
-        setScanResult({ status: 'error', message: t('partner.qr.invalidQR') });
+      // Only accept partner QR codes
+      if (data.type !== 'vybe_partner') {
+        setScanResult({ status: 'error', message: t('partner.qr.notPartnerCode') });
         return;
       }
 
-      // Look up voucher
-      const { data: voucher, error } = await supabase
-        .from('vouchers')
-        .select('id, title, discount_type, discount_value, status, valid_until, max_redemptions, current_redemptions, venue_id, venues(name)')
-        .eq('id', data.voucher_id)
-        .eq('code', data.code)
+      // Can't scan own code
+      if (data.partner_id === user?.id) {
+        setScanResult({ status: 'error', message: t('partner.qr.ownCode') });
+        return;
+      }
+
+      // Verify the scanned user is actually a venue_partner
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.partner_id)
+        .eq('role', 'venue_partner')
         .maybeSingle();
 
-      if (error || !voucher) {
-        setScanResult({ status: 'error', message: t('partner.qr.voucherNotFound') });
+      if (!roleData) {
+        setScanResult({ status: 'error', message: t('partner.qr.notPartnerCode') });
         return;
       }
 
-      if (voucher.status !== 'active') {
-        setScanResult({ status: 'error', message: t('partner.qr.voucherInactive') });
-        return;
+      // Get offering partner's venue info
+      const offeringVenueName = data.venues?.[0]?.name || 'Partner Venue';
+      const offeringVenueId = data.venues?.[0]?.id || null;
+
+      // Check if already connected
+      if (offeringVenueId) {
+        const { data: existing } = await supabase
+          .from('partner_exclusive_vouchers')
+          .select('id')
+          .eq('offering_partner_id', data.partner_id)
+          .eq('receiving_partner_id', user?.id || '')
+          .eq('offering_venue_id', offeringVenueId)
+          .maybeSingle();
+
+        if (existing) {
+          setScanResult({ status: 'already_connected', message: t('partner.qr.alreadyConnected') });
+          return;
+        }
       }
 
-      if (new Date(voucher.valid_until) < new Date()) {
-        setScanResult({ status: 'error', message: t('partner.qr.voucherExpired') });
-        return;
-      }
+      // Create exclusive partner voucher
+      const voucherTitle = `Partner-Exklusiv: ${offeringVenueName}`;
+      const voucherCode = `PX-${Date.now().toString(36).toUpperCase().slice(-6)}`;
 
-      if (voucher.max_redemptions && voucher.current_redemptions >= voucher.max_redemptions) {
-        setScanResult({ status: 'error', message: t('partner.qr.maxRedemptions') });
-        return;
-      }
-
-      // Check if this user already redeemed
-      const { data: existing } = await supabase
-        .from('voucher_redemptions')
-        .select('id')
-        .eq('voucher_id', voucher.id)
-        .eq('user_id', user?.id || '')
-        .maybeSingle();
-
-      if (existing) {
-        setScanResult({ status: 'already_redeemed', message: t('partner.qr.alreadyRedeemed') });
-        return;
-      }
-
-      // Redeem the voucher
-      const { error: redeemError } = await supabase
-        .from('voucher_redemptions')
+      const { data: newVoucher, error } = await supabase
+        .from('partner_exclusive_vouchers')
         .insert({
-          voucher_id: voucher.id,
-          user_id: user?.id || '',
-          discount_applied: voucher.discount_value,
-          status: 'redeemed',
-        });
+          offering_partner_id: data.partner_id,
+          receiving_partner_id: user?.id || '',
+          offering_venue_id: offeringVenueId,
+          title: voucherTitle,
+          description: t('partner.qr.exclusiveDesc', { venue: offeringVenueName }),
+          discount_type: 'percentage',
+          discount_value: 15,
+          code: voucherCode,
+        })
+        .select()
+        .single();
 
-      if (redeemError) throw redeemError;
-
-      const venueName = (voucher.venues as unknown as { name: string })?.name || 'Unknown';
+      if (error) throw error;
 
       setScanResult({
         status: 'success',
-        message: t('partner.qr.redeemSuccess'),
+        message: t('partner.qr.connectionSuccess'),
         voucher: {
-          title: voucher.title,
-          discount_type: voucher.discount_type,
-          discount_value: voucher.discount_value,
-          venue_name: venueName,
+          title: voucherTitle,
+          discount_value: 15,
+          code: voucherCode,
+          venue_name: offeringVenueName,
         },
       });
 
       toast({
-        title: t('partner.qr.redeemed'),
-        description: `${voucher.title} - ${venueName}`,
+        title: t('partner.qr.newPartnerVoucher'),
+        description: `15% ${t('partner.qr.atVenue')} ${offeringVenueName}`,
       });
+
+      // Refresh data
+      fetchData();
     } catch {
       setScanResult({ status: 'error', message: t('partner.qr.invalidQR') });
     }
   };
 
-  // Cleanup scanner on unmount
   useEffect(() => {
     return () => {
       if (scannerRef.current) {
@@ -262,97 +293,108 @@ export default function PartnerQRCode() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
+        <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
           {t('partner.qr.title')}
         </h1>
-        <p className="text-muted-foreground mt-2">{t('partner.qr.subtitle')}</p>
+        <p className="text-muted-foreground mt-2 text-sm">{t('partner.qr.subtitle')}</p>
       </div>
 
-      <Tabs defaultValue="my-qr" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="my-qr" className="gap-2">
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card variant="glass">
+          <CardContent className="p-4 text-center">
+            <Handshake className="w-6 h-6 mx-auto mb-1 text-primary" />
+            <div className="text-2xl font-bold">{receivedVouchers.length}</div>
+            <p className="text-xs text-muted-foreground">{t('partner.qr.received')}</p>
+          </CardContent>
+        </Card>
+        <Card variant="glass">
+          <CardContent className="p-4 text-center">
+            <Gift className="w-6 h-6 mx-auto mb-1 text-primary" />
+            <div className="text-2xl font-bold">{offeredVouchers.length}</div>
+            <p className="text-xs text-muted-foreground">{t('partner.qr.offered')}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="my-qr" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="my-qr" className="gap-1 text-xs sm:text-sm">
             <QrCode className="w-4 h-4" />
             {t('partner.qr.myQR')}
           </TabsTrigger>
-          <TabsTrigger value="scanner" className="gap-2">
+          <TabsTrigger value="scanner" className="gap-1 text-xs sm:text-sm">
             <ScanLine className="w-4 h-4" />
             {t('partner.qr.scanner')}
           </TabsTrigger>
+          <TabsTrigger value="vouchers" className="gap-1 text-xs sm:text-sm">
+            <Gift className="w-4 h-4" />
+            {t('partner.qr.myVouchers')}
+          </TabsTrigger>
         </TabsList>
 
-        {/* MY QR CODE TAB */}
+        {/* MY PARTNER QR CODE */}
         <TabsContent value="my-qr" className="space-y-4">
-          {vouchers.length === 0 ? (
-            <Card variant="elegant" className="text-center py-12">
-              <CardContent>
-                <Gift className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">{t('partner.qr.noVouchers')}</h3>
-                <p className="text-muted-foreground mb-4">{t('partner.qr.noVouchersDesc')}</p>
-                <Button onClick={() => navigate('/partner/vouchers')}>
-                  {t('partner.qr.createVoucher')}
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              {/* Voucher selector */}
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {vouchers.map((v) => (
-                  <Button
-                    key={v.id}
-                    variant={selectedVoucher?.id === v.id ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedVoucher(v)}
-                    className="whitespace-nowrap"
-                  >
-                    {v.title}
-                  </Button>
-                ))}
+          <Card variant="glass" className="flex flex-col items-center py-6">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-lg">{t('partner.qr.partnerCode')}</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {partnerVenues.length > 0
+                  ? partnerVenues.map(v => v.venues?.name).join(', ')
+                  : t('partner.qr.noVenuesLinked')}
+              </p>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center gap-4">
+              <div className="bg-white p-4 rounded-2xl shadow-lg relative">
+                <QRCodeSVG
+                  id="partner-identity-qr"
+                  value={generatePartnerQR()}
+                  size={200}
+                  level="H"
+                  includeMargin
+                  imageSettings={{
+                    src: '',
+                    x: undefined,
+                    y: undefined,
+                    height: 0,
+                    width: 0,
+                    excavate: false,
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Handshake className="w-5 h-5 text-primary" />
+                  </div>
+                </div>
               </div>
-
-              {selectedVoucher && (
-                <Card variant="glass" className="flex flex-col items-center py-8">
-                  <CardHeader className="text-center pb-2">
-                    <CardTitle className="text-lg">{selectedVoucher.title}</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedVoucher.venues?.name || 'Venue'}
-                    </p>
-                    <Badge variant="outline" className="mt-2">
-                      {selectedVoucher.code}
-                    </Badge>
-                  </CardHeader>
-                  <CardContent className="flex flex-col items-center gap-4">
-                    <div className="bg-white p-4 rounded-2xl shadow-lg">
-                      <QRCodeSVG
-                        id="partner-qr-code"
-                        value={generateQRData(selectedVoucher)}
-                        size={220}
-                        level="H"
-                        includeMargin
-                      />
-                    </div>
-                    <Button variant="outline" onClick={handleDownloadQR} className="gap-2">
-                      <Download className="w-4 h-4" />
-                      {t('partner.qr.download')}
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </>
-          )}
+              <Badge variant="outline" className="gap-1">
+                <Users className="w-3 h-3" />
+                {t('partner.qr.exclusiveBadge')}
+              </Badge>
+              <p className="text-xs text-muted-foreground text-center max-w-[280px]">
+                {t('partner.qr.shareHint')}
+              </p>
+              <Button variant="outline" onClick={handleDownloadQR} className="gap-2" size="sm">
+                <Download className="w-4 h-4" />
+                {t('partner.qr.download')}
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        {/* SCANNER TAB */}
+        {/* SCANNER */}
         <TabsContent value="scanner" className="space-y-4">
           <Card variant="glass">
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-4 sm:p-6 space-y-4">
               {!scanning && !scanResult && (
-                <div className="text-center py-8">
-                  <ScanLine className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <div className="text-center py-6">
+                  <ScanLine className="w-14 h-14 mx-auto mb-3 text-muted-foreground" />
                   <h3 className="text-lg font-semibold mb-2">{t('partner.qr.scanTitle')}</h3>
-                  <p className="text-sm text-muted-foreground mb-6">{t('partner.qr.scanDesc')}</p>
+                  <p className="text-sm text-muted-foreground mb-4 max-w-[280px] mx-auto">
+                    {t('partner.qr.scanDesc')}
+                  </p>
                   <Button onClick={startScanner} className="gap-2">
                     <ScanLine className="w-4 h-4" />
                     {t('partner.qr.startScan')}
@@ -370,37 +412,38 @@ export default function PartnerQRCode() {
               )}
 
               {scanResult && (
-                <div className="text-center py-6 space-y-4">
+                <div className="text-center py-4 space-y-4">
                   {scanResult.status === 'success' ? (
                     <>
-                      <CheckCircle className="w-16 h-16 mx-auto text-green-500" />
-                      <h3 className="text-xl font-bold text-green-600">{scanResult.message}</h3>
+                      <CheckCircle className="w-14 h-14 mx-auto text-emerald-500" />
+                      <h3 className="text-lg font-bold">{scanResult.message}</h3>
                       {scanResult.voucher && (
-                        <div className="bg-muted/50 rounded-xl p-4 space-y-1">
-                          <p className="font-semibold">{scanResult.voucher.title}</p>
-                          <p className="text-sm text-muted-foreground">{scanResult.voucher.venue_name}</p>
-                          <Badge>
-                            {scanResult.voucher.discount_type === 'percentage'
-                              ? `${scanResult.voucher.discount_value}%`
-                              : scanResult.voucher.discount_type === 'fixed'
-                              ? `$${scanResult.voucher.discount_value}`
-                              : 'Free Item'}
-                          </Badge>
-                        </div>
+                        <Card variant="elegant" className="text-left">
+                          <CardContent className="p-4 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-sm">{scanResult.voucher.venue_name}</span>
+                              <Badge>{scanResult.voucher.discount_value}%</Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{scanResult.voucher.title}</p>
+                            <code className="text-xs bg-muted px-2 py-1 rounded block text-center">
+                              {scanResult.voucher.code}
+                            </code>
+                          </CardContent>
+                        </Card>
                       )}
                     </>
-                  ) : scanResult.status === 'already_redeemed' ? (
+                  ) : scanResult.status === 'already_connected' ? (
                     <>
-                      <XCircle className="w-16 h-16 mx-auto text-amber-500" />
-                      <h3 className="text-xl font-bold text-amber-600">{scanResult.message}</h3>
+                      <Handshake className="w-14 h-14 mx-auto text-amber-500" />
+                      <h3 className="text-lg font-bold">{scanResult.message}</h3>
                     </>
                   ) : (
                     <>
-                      <XCircle className="w-16 h-16 mx-auto text-destructive" />
-                      <h3 className="text-xl font-bold text-destructive">{scanResult.message}</h3>
+                      <XCircle className="w-14 h-14 mx-auto text-destructive" />
+                      <h3 className="text-lg font-bold">{scanResult.message}</h3>
                     </>
                   )}
-                  <Button onClick={() => { setScanResult(null); startScanner(); }} className="gap-2">
+                  <Button onClick={() => { setScanResult(null); startScanner(); }} className="gap-2" size="sm">
                     <ScanLine className="w-4 h-4" />
                     {t('partner.qr.scanAgain')}
                   </Button>
@@ -408,6 +451,84 @@ export default function PartnerQRCode() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* MY EXCLUSIVE VOUCHERS */}
+        <TabsContent value="vouchers" className="space-y-4">
+          {receivedVouchers.length === 0 && offeredVouchers.length === 0 ? (
+            <Card variant="elegant" className="text-center py-10">
+              <CardContent>
+                <Handshake className="w-14 h-14 mx-auto mb-3 text-muted-foreground" />
+                <h3 className="text-lg font-semibold mb-1">{t('partner.qr.noExclusiveYet')}</h3>
+                <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
+                  {t('partner.qr.noExclusiveDesc')}
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {receivedVouchers.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                    <Gift className="w-4 h-4 text-primary" />
+                    {t('partner.qr.receivedVouchers')} ({receivedVouchers.length})
+                  </h3>
+                  {receivedVouchers.map((v) => (
+                    <Card key={v.id} variant="glass" className="hover:scale-[1.01] transition-transform">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{v.title}</p>
+                            {v.description && (
+                              <p className="text-xs text-muted-foreground truncate">{v.description}</p>
+                            )}
+                            <div className="flex items-center gap-2 mt-1">
+                              <code className="text-xs bg-muted px-1.5 py-0.5 rounded">{v.code}</code>
+                              <span className="text-xs text-muted-foreground">
+                                {t('partner.qr.validUntil')} {format(new Date(v.valid_until), 'dd.MM.yyyy')}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <Badge variant={v.status === 'active' ? 'default' : 'secondary'}>
+                              {v.discount_value}%
+                            </Badge>
+                            {v.redeemed_at && (
+                              <p className="text-xs text-muted-foreground mt-1">{t('partner.qr.redeemed')}</p>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {offeredVouchers.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                    <Users className="w-4 h-4 text-primary" />
+                    {t('partner.qr.offeredVouchers')} ({offeredVouchers.length})
+                  </h3>
+                  {offeredVouchers.map((v) => (
+                    <Card key={v.id} variant="glass" className="opacity-80">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-sm">{v.title}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(v.created_at), 'dd.MM.yyyy')}
+                            </p>
+                          </div>
+                          <Badge variant="outline">{v.discount_value}%</Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </TabsContent>
       </Tabs>
     </div>
