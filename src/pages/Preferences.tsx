@@ -433,8 +433,8 @@ const Preferences = () => {
 
       {/* Vibe Selection */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">What vibe are you going for?</h2>
-        <p className="text-muted-foreground mb-6">Choose the perfect atmosphere for your date</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatVibe')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.chooseAtmosphere')}</p>
         
         <div className="space-y-3">
           {vibes.map((vibe) => (
