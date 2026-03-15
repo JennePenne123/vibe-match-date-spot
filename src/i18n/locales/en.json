@@ -270,7 +270,16 @@
     "prefsSaved": "Preferences saved!",
     "prefsSavedDesc": "Your preferences have been saved successfully.",
     "prefsError": "Error saving preferences",
-    "prefsErrorDesc": "Please try again later."
+    "prefsErrorDesc": "Please try again later.",
+    "cuisine_italian": "Italian", "cuisine_japanese": "Japanese", "cuisine_mexican": "Mexican", "cuisine_french": "French", "cuisine_indian": "Indian", "cuisine_mediterranean": "Mediterranean", "cuisine_american": "American", "cuisine_thai": "Thai", "cuisine_chinese": "Chinese", "cuisine_korean": "Korean",
+    "vibe_romantic": "Romantic", "vibe_romanticDesc": "Intimate and cozy", "vibe_casual": "Casual", "vibe_casualDesc": "Relaxed and comfortable", "vibe_outdoor": "Outdoor", "vibe_outdoorDesc": "Fresh air and nature", "vibe_nightlife": "Nightlife", "vibe_nightlifeDesc": "Vibrant and energetic", "vibe_cultural": "Cultural", "vibe_culturalDesc": "Arts and history", "vibe_adventurous": "Adventurous", "vibe_adventurousDesc": "Something new and exciting",
+    "price_budget": "Budget", "price_budgetDesc": "Up to $15 per person", "price_moderate": "Moderate", "price_moderateDesc": "$15-30 per person", "price_upscale": "Upscale", "price_upscaleDesc": "$30-50 per person", "price_luxury": "Luxury", "price_luxuryDesc": "Over $50 per person",
+    "time_brunch": "Brunch", "time_brunchDesc": "9:00-12:00", "time_lunch": "Lunch", "time_lunchDesc": "12:00-15:00", "time_afternoon": "Afternoon", "time_afternoonDesc": "15:00-18:00", "time_dinner": "Dinner", "time_dinnerDesc": "18:00-21:00", "time_evening": "Evening", "time_eveningDesc": "After 21:00", "time_flexible": "Flexible", "time_flexibleDesc": "Anytime",
+    "duration_quick": "Quick & Sweet", "duration_quickDesc": "1-2 hours", "duration_relaxed": "Relaxed", "duration_relaxedDesc": "2-3 hours", "duration_extended": "Full Experience", "duration_extendedDesc": "3+ hours", "duration_spontaneous": "Go with the flow", "duration_spontaneousDesc": "Let's see how it goes",
+    "activity_dining": "Just Dining", "activity_diningDesc": "Restaurant/café focus", "activity_dining_plus": "Dining + Activity", "activity_dining_plusDesc": "Dinner & show/event", "activity_cocktails": "Cocktails/Bar", "activity_cocktailsDesc": "Drinks & conversation", "activity_cultural": "Cultural", "activity_culturalDesc": "Museum, theater, concert", "activity_active": "Active", "activity_activeDesc": "Bowling, mini-golf, escape room", "activity_nightlife": "Nightlife", "activity_nightlifeDesc": "Club, disco, live music",
+    "ent_live_music": "Live Music", "ent_dj_playlist": "DJ/Playlist", "ent_quiet_conversation": "Quiet Chat", "ent_games": "Games", "ent_dancing": "Dancing", "ent_sports_viewing": "Watch Sports",
+    "dietary_vegetarian": "Vegetarian", "dietary_vegan": "Vegan", "dietary_gluten_free": "Gluten-Free", "dietary_dairy_free": "Dairy-Free", "dietary_halal": "Halal", "dietary_kosher": "Kosher",
+    "access_wheelchair": "Wheelchair Accessible", "access_parking": "Parking Available", "access_public_transport": "Near Public Transport", "access_pet_friendly": "Pet Friendly", "access_non_smoking": "Non-Smoking"
   },
   "notFound": {
     "title": "404",

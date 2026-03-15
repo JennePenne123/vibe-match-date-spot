@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,6 +32,7 @@ interface QuickTemplate {
 
 const Preferences = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { updateCuisines, updateVibes } = useApp();
   const { user } = useAuth();
   
@@ -95,9 +97,9 @@ const Preferences = () => {
   const quickTemplates: QuickTemplate[] = [
     {
       id: 'romantic',
-      title: 'Romantic Dinner',
+      title: t('preferences.romanticDinner'),
       emoji: '💕',
-      description: 'Candlelight, fine dining, intimate atmosphere',
+      description: t('preferences.romanticDinnerDesc'),
       cuisines: ['italian', 'french'],
       vibes: ['romantic'],
       priceRange: [2, 3],
@@ -106,9 +108,9 @@ const Preferences = () => {
     },
     {
       id: 'casual',
-      title: 'Casual Brunch',
+      title: t('preferences.casualBrunch'),
       emoji: '☕',
-      description: 'Relaxed, tasty, social',
+      description: t('preferences.casualBrunchDesc'),
       cuisines: ['american'],
       vibes: ['casual'],
       priceRange: [1, 2],
@@ -117,9 +119,9 @@ const Preferences = () => {
     },
     {
       id: 'trendy',
-      title: 'Trendy Cocktail Bar',
+      title: t('preferences.trendyCocktail'),
       emoji: '🍸',
-      description: 'Hip, stylish, perfect for drinks',
+      description: t('preferences.trendyCocktailDesc'),
       cuisines: ['modern'],
       vibes: ['nightlife'],
       priceRange: [2, 3],
@@ -130,83 +132,83 @@ const Preferences = () => {
 
   // Data definitions
   const cuisines: Preference[] = [
-    { id: 'italian', name: 'Italian', emoji: '🍝' },
-    { id: 'japanese', name: 'Japanese', emoji: '🍣' },
-    { id: 'mexican', name: 'Mexican', emoji: '🌮' },
-    { id: 'french', name: 'French', emoji: '🥐' },
-    { id: 'indian', name: 'Indian', emoji: '🍛' },
-    { id: 'mediterranean', name: 'Mediterranean', emoji: '🫒' },
-    { id: 'american', name: 'American', emoji: '🍔' },
-    { id: 'thai', name: 'Thai', emoji: '🍜' },
-    { id: 'chinese', name: 'Chinese', emoji: '🥢' },
-    { id: 'korean', name: 'Korean', emoji: '🍲' }
+    { id: 'italian', name: t('preferences.cuisine_italian'), emoji: '🍝' },
+    { id: 'japanese', name: t('preferences.cuisine_japanese'), emoji: '🍣' },
+    { id: 'mexican', name: t('preferences.cuisine_mexican'), emoji: '🌮' },
+    { id: 'french', name: t('preferences.cuisine_french'), emoji: '🥐' },
+    { id: 'indian', name: t('preferences.cuisine_indian'), emoji: '🍛' },
+    { id: 'mediterranean', name: t('preferences.cuisine_mediterranean'), emoji: '🫒' },
+    { id: 'american', name: t('preferences.cuisine_american'), emoji: '🍔' },
+    { id: 'thai', name: t('preferences.cuisine_thai'), emoji: '🍜' },
+    { id: 'chinese', name: t('preferences.cuisine_chinese'), emoji: '🥢' },
+    { id: 'korean', name: t('preferences.cuisine_korean'), emoji: '🍲' }
   ];
 
   const vibes: Preference[] = [
-    { id: 'romantic', name: 'Romantic', emoji: '💕', desc: 'Intimate and cozy' },
-    { id: 'casual', name: 'Casual', emoji: '😊', desc: 'Relaxed and comfortable' },
-    { id: 'outdoor', name: 'Outdoor', emoji: '🌳', desc: 'Fresh air and nature' },
-    { id: 'nightlife', name: 'Nightlife', emoji: '🌃', desc: 'Vibrant and energetic' },
-    { id: 'cultural', name: 'Cultural', emoji: '🎭', desc: 'Arts and history' },
-    { id: 'adventurous', name: 'Adventurous', emoji: '🗺️', desc: 'Something new and exciting' }
+    { id: 'romantic', name: t('preferences.vibe_romantic'), emoji: '💕', desc: t('preferences.vibe_romanticDesc') },
+    { id: 'casual', name: t('preferences.vibe_casual'), emoji: '😊', desc: t('preferences.vibe_casualDesc') },
+    { id: 'outdoor', name: t('preferences.vibe_outdoor'), emoji: '🌳', desc: t('preferences.vibe_outdoorDesc') },
+    { id: 'nightlife', name: t('preferences.vibe_nightlife'), emoji: '🌃', desc: t('preferences.vibe_nightlifeDesc') },
+    { id: 'cultural', name: t('preferences.vibe_cultural'), emoji: '🎭', desc: t('preferences.vibe_culturalDesc') },
+    { id: 'adventurous', name: t('preferences.vibe_adventurous'), emoji: '🗺️', desc: t('preferences.vibe_adventurousDesc') }
   ];
 
   const priceRanges: Preference[] = [
-    { id: 'budget', name: 'Budget', emoji: '💰', desc: 'Up to $15 per person' },
-    { id: 'moderate', name: 'Moderate', emoji: '💳', desc: '$15-30 per person' },
-    { id: 'upscale', name: 'Upscale', emoji: '💎', desc: '$30-50 per person' },
-    { id: 'luxury', name: 'Luxury', emoji: '👑', desc: 'Over $50 per person' }
+    { id: 'budget', name: t('preferences.price_budget'), emoji: '💰', desc: t('preferences.price_budgetDesc') },
+    { id: 'moderate', name: t('preferences.price_moderate'), emoji: '💳', desc: t('preferences.price_moderateDesc') },
+    { id: 'upscale', name: t('preferences.price_upscale'), emoji: '💎', desc: t('preferences.price_upscaleDesc') },
+    { id: 'luxury', name: t('preferences.price_luxury'), emoji: '👑', desc: t('preferences.price_luxuryDesc') }
   ];
 
   const timePreferences: Preference[] = [
-    { id: 'brunch', name: 'Brunch', emoji: '🌅', desc: '9:00-12:00' },
-    { id: 'lunch', name: 'Lunch', emoji: '☀️', desc: '12:00-15:00' },
-    { id: 'afternoon', name: 'Afternoon', emoji: '🌤️', desc: '15:00-18:00' },
-    { id: 'dinner', name: 'Dinner', emoji: '🌆', desc: '18:00-21:00' },
-    { id: 'evening', name: 'Evening', emoji: '🌙', desc: 'After 21:00' },
-    { id: 'flexible', name: 'Flexible', emoji: '🕐', desc: 'Anytime' }
+    { id: 'brunch', name: t('preferences.time_brunch'), emoji: '🌅', desc: t('preferences.time_brunchDesc') },
+    { id: 'lunch', name: t('preferences.time_lunch'), emoji: '☀️', desc: t('preferences.time_lunchDesc') },
+    { id: 'afternoon', name: t('preferences.time_afternoon'), emoji: '🌤️', desc: t('preferences.time_afternoonDesc') },
+    { id: 'dinner', name: t('preferences.time_dinner'), emoji: '🌆', desc: t('preferences.time_dinnerDesc') },
+    { id: 'evening', name: t('preferences.time_evening'), emoji: '🌙', desc: t('preferences.time_eveningDesc') },
+    { id: 'flexible', name: t('preferences.time_flexible'), emoji: '🕐', desc: t('preferences.time_flexibleDesc') }
   ];
 
   const durations: Preference[] = [
-    { id: 'quick', name: 'Quick & Sweet', emoji: '⚡', desc: '1-2 hours' },
-    { id: 'relaxed', name: 'Relaxed', emoji: '⏰', desc: '2-3 hours' },
-    { id: 'extended', name: 'Full Experience', emoji: '🕐', desc: '3+ hours' },
-    { id: 'spontaneous', name: 'Go with the flow', emoji: '🤷', desc: 'Let\'s see how it goes' }
+    { id: 'quick', name: t('preferences.duration_quick'), emoji: '⚡', desc: t('preferences.duration_quickDesc') },
+    { id: 'relaxed', name: t('preferences.duration_relaxed'), emoji: '⏰', desc: t('preferences.duration_relaxedDesc') },
+    { id: 'extended', name: t('preferences.duration_extended'), emoji: '🕐', desc: t('preferences.duration_extendedDesc') },
+    { id: 'spontaneous', name: t('preferences.duration_spontaneous'), emoji: '🤷', desc: t('preferences.duration_spontaneousDesc') }
   ];
 
   const activities: Preference[] = [
-    { id: 'dining', name: 'Just Dining', emoji: '🍽️', desc: 'Restaurant/café focus' },
-    { id: 'dining_plus', name: 'Dining + Activity', emoji: '🎪', desc: 'Dinner & show/event' },
-    { id: 'cocktails', name: 'Cocktails/Bar', emoji: '🍸', desc: 'Drinks & conversation' },
-    { id: 'cultural', name: 'Cultural', emoji: '🎨', desc: 'Museum, theater, concert' },
-    { id: 'active', name: 'Active', emoji: '🎳', desc: 'Bowling, mini-golf, escape room' },
-    { id: 'nightlife', name: 'Nightlife', emoji: '🎉', desc: 'Club, disco, live music' }
+    { id: 'dining', name: t('preferences.activity_dining'), emoji: '🍽️', desc: t('preferences.activity_diningDesc') },
+    { id: 'dining_plus', name: t('preferences.activity_dining_plus'), emoji: '🎪', desc: t('preferences.activity_dining_plusDesc') },
+    { id: 'cocktails', name: t('preferences.activity_cocktails'), emoji: '🍸', desc: t('preferences.activity_cocktailsDesc') },
+    { id: 'cultural', name: t('preferences.activity_cultural'), emoji: '🎨', desc: t('preferences.activity_culturalDesc') },
+    { id: 'active', name: t('preferences.activity_active'), emoji: '🎳', desc: t('preferences.activity_activeDesc') },
+    { id: 'nightlife', name: t('preferences.activity_nightlife'), emoji: '🎉', desc: t('preferences.activity_nightlifeDesc') }
   ];
 
   const entertainment: Preference[] = [
-    { id: 'live_music', name: 'Live Music', emoji: '🎵' },
-    { id: 'dj_playlist', name: 'DJ/Playlist', emoji: '🎧' },
-    { id: 'quiet_conversation', name: 'Quiet Chat', emoji: '💬' },
-    { id: 'games', name: 'Games', emoji: '🎮' },
-    { id: 'dancing', name: 'Dancing', emoji: '💃' },
-    { id: 'sports_viewing', name: 'Watch Sports', emoji: '📺' }
+    { id: 'live_music', name: t('preferences.ent_live_music'), emoji: '🎵' },
+    { id: 'dj_playlist', name: t('preferences.ent_dj_playlist'), emoji: '🎧' },
+    { id: 'quiet_conversation', name: t('preferences.ent_quiet_conversation'), emoji: '💬' },
+    { id: 'games', name: t('preferences.ent_games'), emoji: '🎮' },
+    { id: 'dancing', name: t('preferences.ent_dancing'), emoji: '💃' },
+    { id: 'sports_viewing', name: t('preferences.ent_sports_viewing'), emoji: '📺' }
   ];
 
   const dietaryRequirements: Preference[] = [
-    { id: 'vegetarian', name: 'Vegetarian', emoji: '🥬' },
-    { id: 'vegan', name: 'Vegan', emoji: '🌱' },
-    { id: 'gluten_free', name: 'Gluten-Free', emoji: '🚫' },
-    { id: 'dairy_free', name: 'Dairy-Free', emoji: '🥛' },
-    { id: 'halal', name: 'Halal', emoji: '☪️' },
-    { id: 'kosher', name: 'Kosher', emoji: '✡️' }
+    { id: 'vegetarian', name: t('preferences.dietary_vegetarian'), emoji: '🥬' },
+    { id: 'vegan', name: t('preferences.dietary_vegan'), emoji: '🌱' },
+    { id: 'gluten_free', name: t('preferences.dietary_gluten_free'), emoji: '🚫' },
+    { id: 'dairy_free', name: t('preferences.dietary_dairy_free'), emoji: '🥛' },
+    { id: 'halal', name: t('preferences.dietary_halal'), emoji: '☪️' },
+    { id: 'kosher', name: t('preferences.dietary_kosher'), emoji: '✡️' }
   ];
 
   const accessibilityNeeds: Preference[] = [
-    { id: 'wheelchair', name: 'Wheelchair Accessible', emoji: '♿' },
-    { id: 'parking', name: 'Parking Available', emoji: '🅿️' },
-    { id: 'public_transport', name: 'Near Public Transport', emoji: '🚇' },
-    { id: 'pet_friendly', name: 'Pet Friendly', emoji: '🐕' },
-    { id: 'non_smoking', name: 'Non-Smoking', emoji: '🚭' }
+    { id: 'wheelchair', name: t('preferences.access_wheelchair'), emoji: '♿' },
+    { id: 'parking', name: t('preferences.access_parking'), emoji: '🅿️' },
+    { id: 'public_transport', name: t('preferences.access_public_transport'), emoji: '🚇' },
+    { id: 'pet_friendly', name: t('preferences.access_pet_friendly'), emoji: '🐕' },
+    { id: 'non_smoking', name: t('preferences.access_non_smoking'), emoji: '🚭' }
   ];
 
   // Toggle functions
@@ -240,7 +242,7 @@ const Preferences = () => {
     setLocationError('');
     
     if (!navigator.geolocation) {
-      setLocationError('Geolocation is not supported by your browser');
+      setLocationError(t('preferences.locationNotSupported'));
       setIsLocating(false);
       return;
     }
@@ -273,7 +275,7 @@ const Preferences = () => {
         setHomeAddress('Current Location');
       }
     } catch (error) {
-      setLocationError('Unable to get your location. Please try again or enter an address manually.');
+      setLocationError(t('preferences.locationError'));
     } finally {
       setIsLocating(false);
     }
@@ -326,15 +328,15 @@ const Preferences = () => {
           if (error) throw error;
           
           toast({
-            title: 'Preferences saved!',
-            description: 'Your preferences have been saved successfully.',
+            title: t('preferences.prefsSaved'),
+            description: t('preferences.prefsSavedDesc'),
           });
         } catch (error) {
           console.error('Error saving preferences:', error);
           toast({
             variant: 'destructive',
-            title: 'Error saving preferences',
-            description: 'Please try again later.',
+            title: t('preferences.prefsError'),
+            description: t('preferences.prefsErrorDesc'),
           });
         } finally {
           setIsSaving(false);
@@ -349,11 +351,11 @@ const Preferences = () => {
 
   const getStepTitle = () => {
     switch (currentStep) {
-      case 1: return 'Food & Vibe';
-      case 2: return 'Budget & Timing';
-      case 3: return 'Activities';
-      case 4: return 'Special Needs & Location';
-      default: return 'Preferences';
+      case 1: return t('preferences.foodAndVibe');
+      case 2: return t('preferences.budgetAndTiming');
+      case 3: return t('preferences.activities');
+      case 4: return t('preferences.specialNeeds');
+      default: return t('preferences.foodAndVibe');
     }
   };
 
@@ -382,8 +384,8 @@ const Preferences = () => {
     <>
       {/* Quick Templates */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-foreground mb-2">Quick Start</h2>
-        <p className="text-muted-foreground mb-4">Or choose a ready-made template</p>
+        <h2 className="text-xl font-bold text-foreground mb-2">{t('preferences.quickStart')}</h2>
+        <p className="text-muted-foreground mb-4">{t('preferences.orChooseTemplate')}</p>
         <div className="grid grid-cols-1 gap-3">
           {quickTemplates.map((template) => (
             <button
@@ -405,8 +407,8 @@ const Preferences = () => {
 
       {/* Cuisine Selection */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">What are you craving?</h2>
-        <p className="text-muted-foreground mb-6">Choose your favorite cuisines</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatCraving')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.chooseCuisines')}</p>
         
         <div className="grid grid-cols-2 gap-3">
           {cuisines.map((cuisine) => (
@@ -431,8 +433,8 @@ const Preferences = () => {
 
       {/* Vibe Selection */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">What vibe are you going for?</h2>
-        <p className="text-muted-foreground mb-6">Choose the perfect atmosphere for your date</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatVibe')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.chooseAtmosphere')}</p>
         
         <div className="space-y-3">
           {vibes.map((vibe) => (
@@ -468,8 +470,8 @@ const Preferences = () => {
     <>
       {/* Price Range */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">What's your budget?</h2>
-        <p className="text-muted-foreground mb-6">Select your preferred price range</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatBudget')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.selectPriceRange')}</p>
         
         <div className="space-y-3">
           {priceRanges.map((price) => (
@@ -501,8 +503,8 @@ const Preferences = () => {
 
       {/* Time Preferences */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">When works best?</h2>
-        <p className="text-muted-foreground mb-6">Choose your preferred timing</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whenBest')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.chooseTiming')}</p>
         
         <div className="grid grid-cols-2 gap-3">
           {timePreferences.map((time) => (
@@ -530,8 +532,8 @@ const Preferences = () => {
 
       {/* Duration */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">How long should it last?</h2>
-        <p className="text-muted-foreground mb-6">Choose your ideal date duration</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.howLong')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.chooseDuration')}</p>
         
         <div className="space-y-3">
           {durations.map((duration) => (
@@ -567,8 +569,8 @@ const Preferences = () => {
     <>
       {/* Activities */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">What type of activity?</h2>
-        <p className="text-muted-foreground mb-6">What do you want to do together?</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatActivity')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.whatToDo')}</p>
         
         <div className="space-y-3">
           {activities.map((activity) => (
@@ -600,8 +602,8 @@ const Preferences = () => {
 
       {/* Entertainment */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">What entertainment?</h2>
-        <p className="text-muted-foreground mb-6">How do you like to be entertained?</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatEntertainment')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.howEntertained')}</p>
         
         <div className="grid grid-cols-2 gap-3">
           {entertainment.map((ent) => (
@@ -630,8 +632,8 @@ const Preferences = () => {
     <>
       {/* Home Location */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Your Home Location</h2>
-        <p className="text-muted-foreground mb-4">Set your default location for venue searches</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.homeLocation')}</h2>
+        <p className="text-muted-foreground mb-4">{t('preferences.setDefaultLocation')}</p>
         
         {/* Use Current Location Button */}
         <Button
@@ -643,12 +645,12 @@ const Preferences = () => {
           {isLocating ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Getting location...
+              {t('preferences.gettingLocation')}
             </>
           ) : (
             <>
               <Navigation className="w-4 h-4 mr-2" />
-              Use Current Location
+              {t('preferences.useCurrentLocation')}
             </>
           )}
         </Button>
@@ -657,7 +659,7 @@ const Preferences = () => {
         <div className="relative">
           <Input
             type="text"
-            placeholder="Or enter your city/address..."
+            placeholder={t('preferences.enterAddress')}
             value={homeAddress}
             onChange={(e) => setHomeAddress(e.target.value)}
             className="w-full h-12 pl-10"
@@ -673,7 +675,7 @@ const Preferences = () => {
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
                   <span className="text-sm text-green-800 dark:text-green-300">
-                    Location saved: {homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}
+                    {t('preferences.locationSaved')} {homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}
                   </span>
                 </div>
                 <Button
@@ -699,7 +701,7 @@ const Preferences = () => {
                 />
               </Suspense>
               <p className="text-xs text-muted-foreground text-center mt-2">
-                Your saved home location
+                {t('preferences.yourSavedLocation')}
               </p>
             </div>
           </>
@@ -715,8 +717,8 @@ const Preferences = () => {
 
       {/* Dietary Requirements */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Any dietary requirements?</h2>
-        <p className="text-muted-foreground mb-6">Let us know your dietary needs</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.dietaryRequirements')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.letUsKnow')}</p>
         
         <div className="grid grid-cols-2 gap-3">
           {dietaryRequirements.map((dietary) => (
@@ -741,8 +743,8 @@ const Preferences = () => {
 
       {/* Accessibility */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Any special needs?</h2>
-        <p className="text-muted-foreground mb-6">What accessibility features do you need?</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.specialNeedsTitle')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.accessibilityFeatures')}</p>
         
         <div className="space-y-3">
           {accessibilityNeeds.map((access) => (
@@ -797,7 +799,7 @@ const Preferences = () => {
               {getStepIcon()}
               <h1 className="text-xl font-semibold text-foreground">{getStepTitle()}</h1>
             </div>
-            <p className="text-sm text-muted-foreground">Step {currentStep} of {totalSteps}</p>
+            <p className="text-sm text-muted-foreground">{t('preferences.step', { current: currentStep, total: totalSteps })}</p>
           </div>
           <div className="w-10" />
         </div>
@@ -825,7 +827,7 @@ const Preferences = () => {
                 className="flex-1 h-12 border-primary text-primary hover:bg-primary/10"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t('common.back')}
               </Button>
             )}
             
@@ -839,12 +841,12 @@ const Preferences = () => {
               {isSaving ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
+                  {t('preferences.saving')}
                 </>
               ) : currentStep === totalSteps ? (
-                'Find Dates!'
+                t('preferences.findDates')
               ) : (
-                'Next'
+                t('common.next')
               )}
               {!isSaving && <ArrowRight className="w-4 h-4 ml-2" />}
             </Button>
@@ -859,7 +861,7 @@ const Preferences = () => {
                 className="text-muted-foreground hover:text-foreground"
                 disabled={isSaving}
               >
-                Skip this step
+                {t('preferences.skipStep')}
               </Button>
             </div>
           )}
