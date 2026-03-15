@@ -52,6 +52,10 @@ export default function VoucherAlerts() {
         else if (v.status === 'active' && expiryDate <= threeDaysFromNow && expiryDate >= now) {
           newAlerts.push({ id: v.id, title: v.title, code: v.code, type: 'expiring', daysLeft });
         }
+        // Active and healthy
+        else if (v.status === 'active' && expiryDate > threeDaysFromNow) {
+          newAlerts.push({ id: v.id, title: v.title, code: v.code, type: 'active' });
+        }
 
         // Near redemption limit (≥90%)
         if (v.max_redemptions && v.max_redemptions > 0 && v.status === 'active') {
