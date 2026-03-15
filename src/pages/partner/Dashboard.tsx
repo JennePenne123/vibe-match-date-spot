@@ -122,6 +122,20 @@ export default function PartnerDashboard() {
       {/* Analytics Chart */}
       <RedemptionChart />
 
+      {/* Reports Link */}
+      <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/reports')}>
+        <CardContent className="p-6 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+            <FileText className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold">{t('partner.reports.title')}</h3>
+            <p className="text-sm text-muted-foreground">{t('partner.reports.subtitle')}</p>
+          </div>
+          <Badge variant="outline">{t('partner.reports.taxReady')}</Badge>
+        </CardContent>
+      </Card>
+
       {/* Language Selector */}
       <LanguageSelector />
 
