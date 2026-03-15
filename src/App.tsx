@@ -21,6 +21,7 @@ import Area from "./pages/Area";
 import Results from "./pages/Results";
 import VenueDetail from "./pages/VenueDetail";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import Venues from "./pages/Venues";
 import MyFriends from "./pages/MyFriends";
 import MyVenues from "./pages/MyVenues";
@@ -100,6 +101,7 @@ const App = () => (
                     <Route path="/results" element={<AppLayout><Results /></AppLayout>} />
                     <Route path="/venue/:id" element={<AppLayout><VenueDetail /></AppLayout>} />
                     <Route path="/profile" element={<AppLayout><Profile /></AppLayout>} />
+                    <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
                     <Route path="/venues" element={<AppLayout><Venues /></AppLayout>} />
                     <Route path="/my-friends" element={<AppLayout><MyFriends /></AppLayout>} />
                     <Route path="/my-venues" element={<AppLayout><MyVenues /></AppLayout>} />
