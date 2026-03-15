@@ -41,7 +41,7 @@ interface AuthModalProps {
   onOpenPartner?: () => void;
 }
 
-export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
