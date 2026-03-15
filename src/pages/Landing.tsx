@@ -214,7 +214,7 @@ export default function LandingDemo() {
         </div>
       </footer>
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onOpenPartner={() => setIsPartnerModalOpen(true)} />
       <PartnerAuthModal isOpen={isPartnerModalOpen} onClose={() => setIsPartnerModalOpen(false)} />
     </div>;
 }

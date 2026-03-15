@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, Gift } from 'lucide-react';
+import { Loader2, Gift, Store } from 'lucide-react';
 import { validateReferralCode, processReferralSignup } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
 
@@ -38,9 +38,10 @@ const AppleIcon = () => (
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenPartner?: () => void;
 }
 
-export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -484,6 +485,25 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   )}
                 </button>
               </div>
+
+              {/* Become a Partner CTA */}
+              {onOpenPartner && (
+                <div className="pt-2 border-t border-border/30">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenPartner();
+                    }}
+                    disabled={loading || isOAuthLoading}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                  >
+                    <Store className="w-4 h-4" />
+                    <span>Venue-Besitzer?</span>
+                    <span className="text-primary font-semibold">Werde jetzt Partner</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
