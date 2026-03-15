@@ -602,8 +602,8 @@ const Preferences = () => {
 
       {/* Entertainment */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">What entertainment?</h2>
-        <p className="text-muted-foreground mb-6">How do you like to be entertained?</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatEntertainment')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.howEntertained')}</p>
         
         <div className="grid grid-cols-2 gap-3">
           {entertainment.map((ent) => (
