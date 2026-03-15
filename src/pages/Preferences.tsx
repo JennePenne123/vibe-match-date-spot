@@ -328,15 +328,15 @@ const Preferences = () => {
           if (error) throw error;
           
           toast({
-            title: 'Preferences saved!',
-            description: 'Your preferences have been saved successfully.',
+            title: t('preferences.prefsSaved'),
+            description: t('preferences.prefsSavedDesc'),
           });
         } catch (error) {
           console.error('Error saving preferences:', error);
           toast({
             variant: 'destructive',
-            title: 'Error saving preferences',
-            description: 'Please try again later.',
+            title: t('preferences.prefsError'),
+            description: t('preferences.prefsErrorDesc'),
           });
         } finally {
           setIsSaving(false);
