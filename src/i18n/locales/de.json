@@ -490,6 +490,19 @@
       "exportSuccess": "Bericht erfolgreich exportiert",
       "taxHintTitle": "Hinweis zur Steuerabsetzung",
       "taxHintDesc": "Lade deine monatlichen Berichte als PDF oder CSV herunter und reiche sie bei deinem Steuerberater ein. Alle Rabattbeträge und Buchungswerte sind dokumentiert."
+    },
+    "network": {
+      "findPartners": "Finde andere Partner",
+      "findPartnersDesc": "Entdecke Venue-Partner in deiner Nähe auf der Karte",
+      "mapBadge": "Karte",
+      "mapTitle": "Partner-Netzwerk Karte",
+      "mapDesc": "{{count}} andere Partner in deiner Nähe",
+      "yourVenues": "Deine Venues",
+      "otherPartners": "Andere Partner",
+      "you": "Du",
+      "connect": "Verbinden",
+      "noPartners": "Noch keine Partner-Venues auf der Karte",
+      "addVenue": "Venue hinzufügen"
     }
   }
 }

@@ -490,6 +490,19 @@
       "exportSuccess": "Report exported successfully",
       "taxHintTitle": "Tax Deduction Hint",
       "taxHintDesc": "Download your monthly reports as PDF or CSV to submit to your tax advisor. All discount amounts and booking values are documented for your records."
+    },
+    "network": {
+      "findPartners": "Find Other Partners",
+      "findPartnersDesc": "Discover venue partners nearby on the map",
+      "mapBadge": "Map",
+      "mapTitle": "Partner Network Map",
+      "mapDesc": "{{count}} other partners nearby",
+      "yourVenues": "Your Venues",
+      "otherPartners": "Other Partners",
+      "you": "You",
+      "connect": "Connect",
+      "noPartners": "No partner venues on the map yet",
+      "addVenue": "Add Venue"
     }
   }
 }
