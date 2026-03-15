@@ -485,6 +485,25 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   )}
                 </button>
               </div>
+
+              {/* Become a Partner CTA */}
+              {onOpenPartner && (
+                <div className="pt-2 border-t border-border/30">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenPartner();
+                    }}
+                    disabled={loading || isOAuthLoading}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                  >
+                    <Store className="w-4 h-4" />
+                    <span>Venue-Besitzer?</span>
+                    <span className="text-primary font-semibold">Werde jetzt Partner</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
