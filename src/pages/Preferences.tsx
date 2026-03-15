@@ -470,8 +470,8 @@ const Preferences = () => {
     <>
       {/* Price Range */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">What's your budget?</h2>
-        <p className="text-muted-foreground mb-6">Select your preferred price range</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatBudget')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.selectPriceRange')}</p>
         
         <div className="space-y-3">
           {priceRanges.map((price) => (
