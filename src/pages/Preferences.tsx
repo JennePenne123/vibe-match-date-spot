@@ -351,11 +351,11 @@ const Preferences = () => {
 
   const getStepTitle = () => {
     switch (currentStep) {
-      case 1: return 'Food & Vibe';
-      case 2: return 'Budget & Timing';
-      case 3: return 'Activities';
-      case 4: return 'Special Needs & Location';
-      default: return 'Preferences';
+      case 1: return t('preferences.foodAndVibe');
+      case 2: return t('preferences.budgetAndTiming');
+      case 3: return t('preferences.activities');
+      case 4: return t('preferences.specialNeeds');
+      default: return t('preferences.foodAndVibe');
     }
   };
 
