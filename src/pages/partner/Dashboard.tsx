@@ -116,6 +116,9 @@ export default function PartnerDashboard() {
         </Card>
       </div>
 
+      {/* Voucher Alerts */}
+      <VoucherAlerts />
+
       {/* Analytics Chart */}
       <RedemptionChart />
 
