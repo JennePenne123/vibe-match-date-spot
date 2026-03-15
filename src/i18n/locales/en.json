@@ -57,7 +57,10 @@
     "sendDateProposal": "Send Date Proposal",
     "backToStart": "Back to the Start",
     "proposalSentTitle": "Proposal Sent!",
-    "proposalSentDesc": "Your date proposal has been sent successfully."
+    "proposalSentDesc": "Your date proposal has been sent successfully.",
+    "upcomingDates": "Upcoming Dates",
+    "noUpcomingDates": "No upcoming dates scheduled",
+    "acceptedDatesHint": "Accepted dates will appear here"
   },
   "landing": {
     "features": "Features",
