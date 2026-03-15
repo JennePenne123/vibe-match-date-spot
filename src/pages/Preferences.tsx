@@ -275,7 +275,7 @@ const Preferences = () => {
         setHomeAddress('Current Location');
       }
     } catch (error) {
-      setLocationError('Unable to get your location. Please try again or enter an address manually.');
+      setLocationError(t('preferences.locationError'));
     } finally {
       setIsLocating(false);
     }
