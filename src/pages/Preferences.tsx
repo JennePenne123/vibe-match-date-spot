@@ -841,12 +841,12 @@ const Preferences = () => {
               {isSaving ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
+                  {t('preferences.saving')}
                 </>
               ) : currentStep === totalSteps ? (
-                'Find Dates!'
+                t('preferences.findDates')
               ) : (
-                'Next'
+                t('common.next')
               )}
               {!isSaving && <ArrowRight className="w-4 h-4 ml-2" />}
             </Button>
