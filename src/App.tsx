@@ -34,6 +34,7 @@ import PartnerDashboard from "./pages/partner/Dashboard";
 import PartnerVouchers from "./pages/partner/Vouchers";
 import PartnerVenues from "./pages/partner/Venues";
 import PartnerReports from "./pages/partner/Reports";
+import PartnerQRCode from "./pages/partner/QRCode";
 import AIInsights from "./pages/AIInsights";
 
 // Lazy load demo/debug routes (rarely visited, ~1,133 lines)
@@ -123,6 +124,7 @@ const App = () => (
                     <Route path="/partner/vouchers" element={<AppLayout><PartnerVouchers /></AppLayout>} />
                     <Route path="/partner/venues" element={<AppLayout><PartnerVenues /></AppLayout>} />
                     <Route path="/partner/reports" element={<AppLayout><PartnerReports /></AppLayout>} />
+                    <Route path="/partner/qr-code" element={<AppLayout><PartnerQRCode /></AppLayout>} />
                     
                     {/* Demo routes - lazy loaded */}
                     <Route path="/demo/ai-venue-card" element={

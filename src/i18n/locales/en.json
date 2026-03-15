@@ -431,6 +431,28 @@
       "activeOk": "Active",
       "activeOkDesc": "\"{{title}}\" is active and running smoothly."
     },
+    "qr": {
+      "title": "QR Codes & Scanner",
+      "subtitle": "Show your voucher QR code or scan codes from other partners",
+      "myQR": "My QR Code",
+      "scanner": "Scanner",
+      "noVouchers": "No active vouchers",
+      "noVouchersDesc": "Create a voucher first to get a QR code.",
+      "createVoucher": "Create Voucher",
+      "download": "Download QR Code",
+      "scanTitle": "Scan Voucher",
+      "scanDesc": "Scan another partner's QR code to redeem their voucher.",
+      "startScan": "Start Scan",
+      "scanAgain": "Scan Again",
+      "redeemSuccess": "Voucher redeemed successfully!",
+      "redeemed": "Redeemed",
+      "invalidQR": "Invalid QR code",
+      "voucherNotFound": "Voucher not found",
+      "voucherInactive": "Voucher is not active",
+      "voucherExpired": "Voucher has expired",
+      "maxRedemptions": "Redemption limit reached",
+      "alreadyRedeemed": "Already redeemed"
+    },
     "reports": {
       "title": "Reports & Invoices",
       "subtitle": "Monthly billing reports and venue performance for tax purposes",
