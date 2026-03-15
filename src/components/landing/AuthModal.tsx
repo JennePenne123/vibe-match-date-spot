@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, Gift } from 'lucide-react';
+import { Loader2, Gift, Store } from 'lucide-react';
 import { validateReferralCode, processReferralSignup } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
 
