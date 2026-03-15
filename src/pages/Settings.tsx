@@ -154,9 +154,7 @@ const Settings = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Mitglied seit</span>
-                <span className="text-sm font-medium text-foreground">
-                  {user.created_at ? new Date(user.created_at).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' }) : '–'}
-                </span>
+                <span className="text-sm font-medium text-foreground">–</span>
               </div>
             </CardContent>
           </Card>
