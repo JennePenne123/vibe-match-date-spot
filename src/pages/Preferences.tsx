@@ -32,6 +32,7 @@ interface QuickTemplate {
 
 const Preferences = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { updateCuisines, updateVibes } = useApp();
   const { user } = useAuth();
   
