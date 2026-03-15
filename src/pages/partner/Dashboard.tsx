@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode } from 'lucide-react';
+import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode, Map } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import LanguageSelector from '@/components/LanguageSelector';
 import RedemptionChart from '@/components/partner/RedemptionChart';
@@ -146,6 +146,19 @@ export default function PartnerDashboard() {
               <h3 className="font-semibold">{t('partner.qr.title')}</h3>
               <p className="text-sm text-muted-foreground">{t('partner.qr.subtitle')}</p>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/network-map')}>
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Map className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold">{t('partner.network.findPartners')}</h3>
+              <p className="text-sm text-muted-foreground">{t('partner.network.findPartnersDesc')}</p>
+            </div>
+            <Badge variant="outline">{t('partner.network.mapBadge')}</Badge>
           </CardContent>
         </Card>
       </div>
