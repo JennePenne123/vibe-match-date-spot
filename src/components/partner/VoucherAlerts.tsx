@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Clock, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 
 interface VoucherAlert {
   id: string;
   title: string;
   code: string;
-  type: 'expiring' | 'expired_active' | 'near_limit';
+  type: 'expiring' | 'expired_active' | 'near_limit' | 'active';
   daysLeft?: number;
   redemptionPercent?: number;
 }
