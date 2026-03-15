@@ -40,9 +40,17 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
       {/* Actions */}
       <div className="space-y-3">
         <Button
+          onClick={() => navigate('/settings')}
+          variant="outline"
+          className="w-full border-border text-foreground hover:bg-accent/50"
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          Account Settings
+        </Button>
+        <Button
           onClick={() => navigate('/preferences')}
           variant="outline"
-          className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
+          className="w-full border-border text-foreground hover:bg-accent/50"
         >
           Update Preferences
         </Button>
@@ -55,7 +63,7 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
         <Button
           onClick={onLogout}
           variant="outline"
-          className="w-full text-red-600 border-red-200 hover:bg-red-50"
+          className="w-full text-destructive border-destructive/30 hover:bg-destructive/10"
         >
           Sign Out
         </Button>

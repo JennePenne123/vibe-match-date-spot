@@ -101,6 +101,7 @@ const App = () => (
                     <Route path="/results" element={<AppLayout><Results /></AppLayout>} />
                     <Route path="/venue/:id" element={<AppLayout><VenueDetail /></AppLayout>} />
                     <Route path="/profile" element={<AppLayout><Profile /></AppLayout>} />
+                    <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
                     <Route path="/venues" element={<AppLayout><Venues /></AppLayout>} />
                     <Route path="/my-friends" element={<AppLayout><MyFriends /></AppLayout>} />
                     <Route path="/my-venues" element={<AppLayout><MyVenues /></AppLayout>} />
