@@ -632,8 +632,8 @@ const Preferences = () => {
     <>
       {/* Home Location */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Your Home Location</h2>
-        <p className="text-muted-foreground mb-4">Set your default location for venue searches</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.homeLocation')}</h2>
+        <p className="text-muted-foreground mb-4">{t('preferences.setDefaultLocation')}</p>
         
         {/* Use Current Location Button */}
         <Button
