@@ -242,7 +242,7 @@ const Preferences = () => {
     setLocationError('');
     
     if (!navigator.geolocation) {
-      setLocationError('Geolocation is not supported by your browser');
+      setLocationError(t('preferences.locationNotSupported'));
       setIsLocating(false);
       return;
     }
