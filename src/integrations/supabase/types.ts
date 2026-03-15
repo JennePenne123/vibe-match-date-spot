@@ -779,7 +779,9 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          is_paused: boolean
           name: string
+          paused_at: string | null
           updated_at: string
         }
         Insert: {
@@ -787,7 +789,9 @@ export type Database = {
           created_at?: string
           email: string
           id: string
+          is_paused?: boolean
           name: string
+          paused_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -795,7 +799,9 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          is_paused?: boolean
           name?: string
+          paused_at?: string | null
           updated_at?: string
         }
         Relationships: []
