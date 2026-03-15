@@ -125,10 +125,10 @@ const UpcomingDatesCard: React.FC = () => {
           <div className="text-center py-6 animate-fade-in">
             <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3 animate-pulse" />
             <p className="text-sm text-muted-foreground mb-2">
-              No upcoming dates scheduled
+              {t('home.noUpcomingDates')}
             </p>
             <p className="text-xs text-muted-foreground">
-              Accepted dates will appear here
+              {t('home.acceptedDatesHint')}
             </p>
           </div>
         </CardContent>
