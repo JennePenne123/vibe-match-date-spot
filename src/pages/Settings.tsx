@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { 
   AlertDialog, 
   AlertDialogAction, 
@@ -18,7 +19,7 @@ import {
   AlertDialogTitle, 
   AlertDialogTrigger 
 } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Lock, Trash2, Shield, Loader2, Check } from 'lucide-react';
+import { ArrowLeft, Lock, Trash2, Shield, Loader2, Check, PauseCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Settings = () => {
@@ -33,15 +34,42 @@ const Settings = () => {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
 
+  // Pause state
+  const [isPaused, setIsPaused] = useState(false);
+  const [pauseLoading, setPauseLoading] = useState(false);
+  const [pauseInitialLoad, setPauseInitialLoad] = useState(true);
+
   // Account deletion state
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!loading && !user) {
       navigate('/?auth=required', { replace: true });
     }
   }, [user, loading, navigate]);
+
+  // Fetch pause status
+  useEffect(() => {
+    const fetchPauseStatus = async () => {
+      if (!user) return;
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('is_paused')
+          .eq('id', user.id)
+          .single();
+        if (data) {
+          setIsPaused(data.is_paused ?? false);
+        }
+      } catch (error) {
+        console.error('Failed to fetch pause status:', error);
+      } finally {
+        setPauseInitialLoad(false);
+      }
+    };
+    fetchPauseStatus();
+  }, [user]);
 
   if (loading || !user) {
     return (
@@ -67,7 +95,6 @@ const Settings = () => {
 
     setPasswordLoading(true);
     try {
-      // Verify current password by re-signing in
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: user.email || '',
         password: currentPassword,
@@ -97,12 +124,38 @@ const Settings = () => {
     }
   };
 
+  const handleTogglePause = async (paused: boolean) => {
+    setPauseLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          is_paused: paused, 
+          paused_at: paused ? new Date().toISOString() : null 
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      setIsPaused(paused);
+      toast({
+        title: paused ? 'Account pausiert' : 'Account reaktiviert',
+        description: paused 
+          ? 'Dein Profil ist jetzt unsichtbar für andere. Du kannst es jederzeit reaktivieren.' 
+          : 'Willkommen zurück! Dein Profil ist wieder aktiv.',
+      });
+    } catch (error: any) {
+      toast({ title: 'Fehler', description: error.message || 'Etwas ist schiefgelaufen.', variant: 'destructive' });
+    } finally {
+      setPauseLoading(false);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'LÖSCHEN') return;
 
     setDeleteLoading(true);
     try {
-      // Sign out and notify user - actual deletion requires admin/server-side action
       toast({ 
         title: 'Account-Löschung angefordert', 
         description: 'Dein Account wird in Kürze gelöscht. Du wirst jetzt abgemeldet.' 
@@ -153,8 +206,10 @@ const Settings = () => {
                 <span className="text-sm font-medium text-foreground">{user.name || '–'}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Mitglied seit</span>
-                <span className="text-sm font-medium text-foreground">–</span>
+                <span className="text-sm text-muted-foreground">Status</span>
+                <span className={`text-sm font-medium ${isPaused ? 'text-amber-500' : 'text-emerald-500'}`}>
+                  {pauseInitialLoad ? '...' : isPaused ? 'Pausiert' : 'Aktiv'}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -226,6 +281,39 @@ const Settings = () => {
                   {passwordSuccess ? 'Passwort geändert' : 'Passwort ändern'}
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+
+          {/* Pause Account */}
+          <Card className={`bg-card ${isPaused ? 'border-amber-500/40' : 'border-border'}`}>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base text-foreground">
+                <PauseCircle className={`w-4 h-4 ${isPaused ? 'text-amber-500' : 'text-primary'}`} />
+                Account pausieren
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {isPaused 
+                  ? 'Dein Account ist pausiert. Dein Profil ist für andere unsichtbar und du erhältst keine Einladungen.'
+                  : 'Pausiere deinen Account vorübergehend. Deine Daten bleiben erhalten, aber dein Profil wird unsichtbar.'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium text-foreground">
+                    {isPaused ? 'Account ist pausiert' : 'Account ist aktiv'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {isPaused ? 'Schalte den Toggle um, um zu reaktivieren' : 'Du kannst jederzeit pausieren'}
+                  </p>
+                </div>
+                <Switch
+                  checked={isPaused}
+                  onCheckedChange={handleTogglePause}
+                  disabled={pauseLoading || pauseInitialLoad}
+                  className="data-[state=checked]:bg-amber-500"
+                />
+              </div>
             </CardContent>
           </Card>
 
