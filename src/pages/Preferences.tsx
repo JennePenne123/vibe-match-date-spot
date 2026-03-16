@@ -606,7 +606,7 @@ const Preferences = () => {
                 <PrefIcon id={price.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{price.name}</div>
-                  <div className={`text-sm ${selectedPriceRange.includes(price.id) ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <div className="text-sm text-muted-foreground">
                     {price.desc}
                   </div>
                 </div>
