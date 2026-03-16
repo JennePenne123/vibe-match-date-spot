@@ -264,7 +264,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
             }
           }
           onClose();
-          navigate('/home');
+          navigate(hasMoodToday() ? '/home' : '/mood');
         }
       }
     } catch (err) {
