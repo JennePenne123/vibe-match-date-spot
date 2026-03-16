@@ -834,6 +834,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(dietary.id, selectedDietary, setSelectedDietary)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
               className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
               <PrefIcon id={dietary.id} />
               <div className="font-medium text-sm">{dietary.name}</div>
               {selectedDietary.includes(dietary.id) && (
