@@ -257,6 +257,15 @@ function EmptyState({ tab }: { tab: WalletTab }) {
 
 export function PremiumWalletCard() {
   const [activeTab, setActiveTab] = useState<WalletTab>('active');
+  const [direction, setDirection] = useState(0);
+  const tabOrder: WalletTab[] = ['active', 'expiring', 'redeemed', 'expired'];
+
+  const handleTabChange = (newTab: string) => {
+    const oldIndex = tabOrder.indexOf(activeTab);
+    const newIndex = tabOrder.indexOf(newTab as WalletTab);
+    setDirection(newIndex > oldIndex ? 1 : -1);
+    setActiveTab(newTab as WalletTab);
+  };
 
   // TODO: Replace with real data from Supabase when subscription system is built
   const { active, expiring, expired, redeemed } = categorizeVouchers(mockVouchers);
