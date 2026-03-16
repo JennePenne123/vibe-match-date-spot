@@ -1,5 +1,5 @@
-import React from 'react'
-import { useLocation } from 'react-router-dom'
+import React, { useRef, useCallback, useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
 import { PartnerSidebar } from './PartnerSidebar'
@@ -9,6 +9,14 @@ import { cn } from '@/lib/utils'
 import { Menu, Sparkles } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
+// Tab order for directional slide
+const NAV_ORDER = ['/home', '/chats', '/plan-date', '/profile']
+
+function getNavIndex(path: string) {
+  const idx = NAV_ORDER.indexOf(path)
+  return idx >= 0 ? idx : -1
+}
+
 interface AppLayoutProps {
   children: React.ReactNode
 }
@@ -16,12 +24,125 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const { isMobile, isDesktop } = useBreakpoint()
   const location = useLocation()
+  const navigate = useNavigate()
   const isPartnerRoute = location.pathname.startsWith('/partner')
+
+  // Track previous path for slide direction
+  const prevPath = useRef(location.pathname)
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  // Swipe state
+  const touchStartX = useRef(0)
+  const touchCurrentX = useRef(0)
+  const [dragOffset, setDragOffset] = useState(0)
+  const isDragging = useRef(false)
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  // Determine slide direction on route change
+  useEffect(() => {
+    if (prevPath.current === location.pathname) return
+
+    const prevIdx = getNavIndex(prevPath.current)
+    const currIdx = getNavIndex(location.pathname)
+
+    if (prevIdx >= 0 && currIdx >= 0) {
+      setSlideDirection(currIdx > prevIdx ? 'left' : 'right')
+      setIsAnimating(true)
+      const timer = setTimeout(() => {
+        setIsAnimating(false)
+        setSlideDirection(null)
+      }, 350)
+      prevPath.current = location.pathname
+      return () => clearTimeout(timer)
+    }
+
+    prevPath.current = location.pathname
+  }, [location.pathname])
+
+  // Swipe handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchCurrentX.current = e.touches[0].clientX
+    isDragging.current = true
+  }, [])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDragging.current) return
+    touchCurrentX.current = e.touches[0].clientX
+    const diff = touchCurrentX.current - touchStartX.current
+    const currentIdx = getNavIndex(location.pathname)
+
+    // Dampen at edges
+    if (currentIdx <= 0 && diff > 0) {
+      setDragOffset(diff * 0.2)
+    } else if (currentIdx >= NAV_ORDER.length - 1 && diff < 0) {
+      setDragOffset(diff * 0.2)
+    } else {
+      setDragOffset(diff * 0.5)
+    }
+  }, [location.pathname])
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isDragging.current) return
+    isDragging.current = false
+
+    const diff = touchCurrentX.current - touchStartX.current
+    const currentIdx = getNavIndex(location.pathname)
+    const THRESHOLD = 60
+
+    if (Math.abs(diff) > THRESHOLD && currentIdx >= 0) {
+      if (diff < -THRESHOLD && currentIdx < NAV_ORDER.length - 1) {
+        // Swipe left → next tab
+        navigate(NAV_ORDER[currentIdx + 1])
+      } else if (diff > THRESHOLD && currentIdx > 0) {
+        // Swipe right → prev tab
+        navigate(NAV_ORDER[currentIdx - 1])
+      }
+    }
+
+    setDragOffset(0)
+  }, [location.pathname, navigate])
+
+  // Slide animation style
+  const getContentStyle = (): React.CSSProperties => {
+    if (dragOffset !== 0) {
+      return {
+        transform: `translateX(${dragOffset}px)`,
+        transition: 'none',
+      }
+    }
+    if (isAnimating && slideDirection) {
+      return {
+        animation: `nav-slide-${slideDirection} 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
+      }
+    }
+    return {}
+  }
 
   if (isMobile) {
     return (
       <div className="min-h-screen w-full bg-background pb-16">
-        {children}
+        <style>{`
+          @keyframes nav-slide-left {
+            0% { transform: translateX(30%); opacity: 0.4; }
+            100% { transform: translateX(0); opacity: 1; }
+          }
+          @keyframes nav-slide-right {
+            0% { transform: translateX(-30%); opacity: 0.4; }
+            100% { transform: translateX(0); opacity: 1; }
+          }
+        `}</style>
+        <div
+          ref={contentRef}
+          style={getContentStyle()}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="will-change-transform"
+        >
+          {children}
+        </div>
         {!isPartnerRoute && <MobileBottomNav />}
       </div>
     )
