@@ -116,6 +116,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [partnerPreferences, setPartnerPreferences] = useState<UserPreferences | null>(null);
   const [autoNavigating, setAutoNavigating] = useState(false);
   const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [learnedTemplate, setLearnedTemplate] = useState<typeof quickStartTemplates[0] | null>(null);
   
   // Track user modifications to prevent overwriting their choices
   const [userModifiedDate, setUserModifiedDate] = useState(false);
