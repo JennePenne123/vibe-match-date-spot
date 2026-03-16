@@ -22,11 +22,13 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  // Handle authentication redirect
+  // Handle authentication redirect + mood check
   React.useEffect(() => {
     if (!authLoading && !user) {
       console.log('No authenticated user found, redirecting to login');
       navigate('/?auth=required', { replace: true });
+    } else if (!authLoading && user && !hasMoodToday()) {
+      navigate('/mood', { replace: true });
     }
   }, [user, authLoading, navigate]);
 
