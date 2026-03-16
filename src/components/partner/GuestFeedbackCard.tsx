@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Star, MessageSquare, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Star, MessageSquare, TrendingUp, TrendingDown, Minus, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface FeedbackSummary {
   avgVenueRating: number;
