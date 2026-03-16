@@ -459,7 +459,7 @@ const Preferences = () => {
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="text-2xl">{vibe.emoji}</div>
+                <PrefIcon id={vibe.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{vibe.name}</div>
                   <div className={`text-sm ${selectedVibes.includes(vibe.id) ? 'text-primary' : 'text-muted-foreground'}`}>
