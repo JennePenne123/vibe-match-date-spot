@@ -13,6 +13,7 @@ import { LeaderboardCard } from '@/components/profile/LeaderboardCard';
 import ReferralCard from '@/components/profile/ReferralCard';
 import AILearningCard from '@/components/profile/AILearningCard';
 import { ThemeSettingsCard } from '@/components/profile/ThemeSettingsCard';
+import ActivityFeed from '@/components/profile/ActivityFeed';
 import { useUserPoints } from '@/hooks/useUserPoints';
 
 const Profile = () => {
@@ -42,12 +43,43 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
-        <div className="bg-card p-4 pt-12 shadow-sm">
-          <Button onClick={() => navigate(-1)} variant="ghost" size="icon" className="text-muted-foreground hover:bg-muted mb-6"><ArrowLeft className="w-6 h-6" /></Button>
+        {/* Back button - floating over header */}
+        <div className="absolute top-3 left-3 z-20">
+          <Button 
+            onClick={() => navigate(-1)} 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/80 text-foreground shadow-sm"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
         </div>
-        <ProfileHeader user={user} displayName={displayName} displayEmail={displayEmail} isEditing={isEditing} editedName={editedName} editedEmail={editedEmail} onEditedNameChange={setEditedName} onEditedEmailChange={setEditedEmail} onEditToggle={() => setIsEditing(!isEditing)} onSave={handleSave} onCancel={handleCancel} onAvatarUpdate={refreshProfile} />
-        <div className="p-4 -mt-8 space-y-4">
+
+        {/* Premium Header */}
+        <ProfileHeader 
+          user={user} 
+          displayName={displayName} 
+          displayEmail={displayEmail} 
+          isEditing={isEditing} 
+          editedName={editedName} 
+          editedEmail={editedEmail} 
+          onEditedNameChange={setEditedName} 
+          onEditedEmailChange={setEditedEmail} 
+          onEditToggle={() => setIsEditing(!isEditing)} 
+          onSave={handleSave} 
+          onCancel={handleCancel} 
+          onAvatarUpdate={refreshProfile}
+          level={points?.level}
+          totalPoints={points?.total_points}
+        />
+
+        {/* Content cards */}
+        <div className="px-4 pb-6 -mt-4 space-y-4 relative z-10">
           <ProfileStats />
+          
+          {/* Activity Feed */}
+          <ActivityFeed />
+
           {!pointsLoading && points && <PointsCard totalPoints={points.total_points} level={points.level} streakCount={points.streak_count} />}
           {!pointsLoading && points && <BadgesCard badges={Array.isArray(points.badges) ? points.badges : []} />}
           <ReferralCard />

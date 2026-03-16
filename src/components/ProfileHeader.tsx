@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Edit, Save, X, Camera, Loader2 } from 'lucide-react';
+import { Edit, Save, X, Camera, Loader2, MapPin, Calendar } from 'lucide-react';
 import { getUserAvatar, getFallbackAvatar } from '@/utils/typeHelpers';
 import { uploadAvatar, deleteAvatar } from '@/utils/avatarUpload';
 import { updateUserProfile } from '@/utils/userProfileHelpers';
 import { useToast } from '@/hooks/use-toast';
 import { getInitials } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface ProfileHeaderProps {
   user: any;
@@ -23,11 +24,14 @@ interface ProfileHeaderProps {
   onSave: () => void;
   onCancel: () => void;
   onAvatarUpdate?: () => void;
+  level?: number;
+  totalPoints?: number;
 }
 
 const ProfileHeader = ({
   user, displayName, displayEmail, isEditing, editedName, editedEmail,
-  onEditedNameChange, onEditedEmailChange, onEditToggle, onSave, onCancel, onAvatarUpdate
+  onEditedNameChange, onEditedEmailChange, onEditToggle, onSave, onCancel, onAvatarUpdate,
+  level = 1, totalPoints = 0
 }: ProfileHeaderProps) => {
   const { t } = useTranslation();
   const avatarUrl = getUserAvatar(user);
@@ -36,11 +40,6 @@ const ProfileHeader = ({
   const fallbackUrl = getFallbackAvatar(displayName);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  
-  if (import.meta.env.DEV) {
-    console.log('👤 PROFILE HEADER: Avatar URL:', avatarUrl);
-    console.log('👤 PROFILE HEADER: Fallback URL:', fallbackUrl);
-  }
 
   const handleAvatarClick = () => { if (isEditing && fileInputRef.current) fileInputRef.current.click(); };
 
@@ -62,48 +61,96 @@ const ProfileHeader = ({
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
-  
+
+  const memberSince = user?.created_at
+    ? new Date(user.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
+    : null;
+
   return (
-    <div className="bg-card p-4 pt-12 shadow-sm">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-foreground">{t('profile.title')}</h1>
-        <Button onClick={onEditToggle} variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent">
-          {isEditing ? <X className="w-6 h-6" /> : <Edit className="w-6 h-6" />}
-        </Button>
-      </div>
-      <div className="text-center">
-        <div className="relative inline-block mb-4">
-          <Avatar className="w-24 h-24 border-4 border-primary/20">
-            <AvatarImage src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)} alt={displayName} referrerPolicy="no-referrer"
-              onError={() => { if (import.meta.env.DEV) console.error('❌ PROFILE AVATAR: Image failed to load'); setImgError(true); }}
-              onLoad={() => { if (import.meta.env.DEV) console.log('✅ PROFILE AVATAR: Image loaded successfully'); }}
-            />
-            <AvatarFallback className="bg-primary/10 text-primary text-2xl">{getInitials(displayName)}</AvatarFallback>
-          </Avatar>
-          {isEditing && (
-            <>
-              <Button onClick={handleAvatarClick} disabled={isUploading} size="icon" className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary hover:bg-primary/90 shadow-lg">
-                {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-              </Button>
-              <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleFileChange} className="hidden" />
-            </>
+    <div className="relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/30 animate-gradient-shift" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+      
+      {/* Floating orbs */}
+      <div className="absolute top-4 right-8 w-24 h-24 rounded-full bg-primary/10 blur-2xl animate-pulse" />
+      <div className="absolute bottom-8 left-4 w-32 h-32 rounded-full bg-accent/10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+
+      <div className="relative z-10 px-4 pt-6 pb-8">
+        {/* Top bar */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-xl font-bold text-foreground">{t('profile.title')}</h1>
+          <Button 
+            onClick={onEditToggle} 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/80 transition-all duration-300"
+          >
+            {isEditing ? <X className="w-5 h-5" /> : <Edit className="w-5 h-5" />}
+          </Button>
+        </div>
+
+        {/* Avatar + Info */}
+        <div className="flex flex-col items-center">
+          <div className="relative mb-4 group">
+            {/* Glow ring */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-secondary rounded-full opacity-60 blur-sm group-hover:opacity-80 transition-opacity duration-500" />
+            <Avatar className="w-28 h-28 border-4 border-card relative z-10 shadow-xl">
+              <AvatarImage 
+                src={imgError ? fallbackUrl : (avatarUrl || fallbackUrl)} 
+                alt={displayName} 
+                referrerPolicy="no-referrer"
+                onError={() => setImgError(true)}
+              />
+              <AvatarFallback className="bg-primary/20 text-primary text-3xl font-bold">{getInitials(displayName)}</AvatarFallback>
+            </Avatar>
+            {isEditing && (
+              <>
+                <Button 
+                  onClick={handleAvatarClick} 
+                  disabled={isUploading} 
+                  size="icon" 
+                  className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary hover:bg-primary/90 shadow-lg z-20 transition-transform duration-200 hover:scale-110"
+                >
+                  {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                </Button>
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleFileChange} className="hidden" />
+              </>
+            )}
+          </div>
+
+          {isEditing ? (
+            <div className="space-y-3 w-full max-w-xs">
+              <Input value={editedName} onChange={(e) => onEditedNameChange(e.target.value)} className="bg-card/60 backdrop-blur-sm text-foreground text-center font-semibold border-border/50" placeholder={t('profile.yourName')} />
+              <Input value={editedEmail} onChange={(e) => onEditedEmailChange(e.target.value)} className="bg-card/60 backdrop-blur-sm text-foreground text-center border-border/50" placeholder={t('profile.yourEmail')} type="email" />
+              <div className="flex gap-2 justify-center">
+                <Button onClick={onSave} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25">
+                  <Save className="w-4 h-4 mr-2" />{t('profile.save')}
+                </Button>
+                <Button onClick={onCancel} variant="outline" className="border-border/50 backdrop-blur-sm">{t('profile.cancel')}</Button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-foreground mb-1">{displayName}</h2>
+              <p className="text-muted-foreground text-sm mb-3">{displayEmail}</p>
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                <Badge variant="secondary" className="bg-primary/15 text-primary border-primary/20 px-3 py-1 text-xs font-semibold">
+                  Level {level}
+                </Badge>
+                <Badge variant="secondary" className="bg-accent/15 text-accent border-accent/20 px-3 py-1 text-xs">
+                  {totalPoints.toLocaleString()} pts
+                </Badge>
+                {memberSince && (
+                  <Badge variant="outline" className="border-border/50 text-muted-foreground px-3 py-1 text-xs">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    {memberSince}
+                  </Badge>
+                )}
+              </div>
+            </div>
           )}
         </div>
-        {isEditing ? (
-          <div className="space-y-3 max-w-xs mx-auto">
-            <Input value={editedName} onChange={(e) => onEditedNameChange(e.target.value)} className="bg-card text-foreground text-center font-semibold border-border" placeholder={t('profile.yourName')} />
-            <Input value={editedEmail} onChange={(e) => onEditedEmailChange(e.target.value)} className="bg-card text-foreground text-center border-border" placeholder={t('profile.yourEmail')} type="email" />
-            <div className="flex gap-2 justify-center">
-              <Button onClick={onSave} className="bg-gradient-primary text-primary-foreground hover:opacity-90"><Save className="w-4 h-4 mr-2" />{t('profile.save')}</Button>
-              <Button onClick={onCancel} variant="outline" className="border-border text-foreground hover:bg-accent/50">{t('profile.cancel')}</Button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <h2 className="text-2xl font-bold mb-1 text-foreground">{displayName}</h2>
-            <p className="text-muted-foreground">{displayEmail}</p>
-          </>
-        )}
       </div>
     </div>
   );
