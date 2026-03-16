@@ -98,6 +98,7 @@ const App = () => (
                     {/* Public routes without layout */}
                     <Route path="/" element={<Landing />} />
                     <Route path="/welcome" element={<Onboarding />} />
+                    <Route path="/mood" element={<MoodCheckIn />} />
                     <Route path="/register-login" element={<Navigate to="/?auth=required" replace />} />
                     
                     {/* Protected routes with responsive layout */}
