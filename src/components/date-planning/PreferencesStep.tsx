@@ -652,7 +652,7 @@ useEffect(() => {
               <div className="text-xl md:text-2xl mb-1">{item.emoji}</div>
               <div className="font-medium text-sm md:text-base">{item.name}</div>
               {item.desc && (
-                <div className={`text-xs mt-1 leading-tight ${isSelected ? 'text-primary/70' : 'text-muted-foreground'}`}>
+                <div className="text-xs mt-1 leading-tight text-muted-foreground">
                   {item.desc}
                 </div>
               )}

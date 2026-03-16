@@ -509,7 +509,7 @@ const Preferences = () => {
             <button
               key={template.id}
               onClick={() => applyQuickTemplate(template)}
-              className="p-4 rounded-xl border-2 border-border bg-card hover:bg-accent/50 transition-all text-left"
+              className="p-4 rounded-xl border-2 border-border bg-card transition-none text-left"
             >
               <div className="flex items-center gap-3">
                 <PrefIcon id={'template_' + template.id} size="lg" />
