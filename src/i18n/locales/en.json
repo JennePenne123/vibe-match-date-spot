@@ -467,8 +467,7 @@
       "discountSettingsDesc": "Set the discount percentage other partners receive when they scan your QR code.",
       "discountLabel": "Discount",
       "discountSaved": "Network discount updated successfully.",
-      "dailyLimitReached": "Daily scan limit reached ({{limit}}/day). Try again tomorrow.",
-      "scansRemaining": "{{count}} scan(s) remaining today"
+      "alreadyScannedToday": "You already scanned this partner today. Try again tomorrow."
     },
     "reports": {
       "title": "Reports & Invoices",

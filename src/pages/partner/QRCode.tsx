@@ -63,9 +63,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
   const [scanning, setScanning] = useState(false);
   const [networkDiscount, setNetworkDiscount] = useState(15);
   const [savingDiscount, setSavingDiscount] = useState(false);
-  const [dailyScansUsed, setDailyScansUsed] = useState(0);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  const DAILY_SCAN_LIMIT = 3;
 
   useEffect(() => {
     if (!roleLoading && role !== 'venue_partner' && role !== 'admin') {
@@ -123,17 +121,6 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         .order('created_at', { ascending: false });
 
       setOfferedVouchers((offered as ExclusiveVoucher[]) || []);
-
-      // Fetch today's scan count
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      const { count } = await supabase
-        .from('partner_exclusive_vouchers')
-        .select('*', { count: 'exact', head: true })
-        .eq('receiving_partner_id', user.id)
-        .gte('created_at', todayStart.toISOString());
-
-      setDailyScansUsed(count || 0);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -234,15 +221,6 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
 
   const handleScanResult = async (decodedText: string) => {
     try {
-      // Check daily scan limit
-      if (dailyScansUsed >= DAILY_SCAN_LIMIT) {
-        setScanResult({
-          status: 'error',
-          message: t('partner.qr.dailyLimitReached', { limit: DAILY_SCAN_LIMIT }),
-        });
-        return;
-      }
-
       const data = JSON.parse(decodedText);
 
       // Only accept partner QR codes
@@ -274,20 +252,24 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
       const offeringVenueName = data.venues?.[0]?.name || 'Partner Venue';
       const offeringVenueId = data.venues?.[0]?.id || null;
 
-      // Check if already connected
-      if (offeringVenueId) {
-        const { data: existing } = await supabase
-          .from('partner_exclusive_vouchers')
-          .select('id')
-          .eq('offering_partner_id', data.partner_id)
-          .eq('receiving_partner_id', user?.id || '')
-          .eq('offering_venue_id', offeringVenueId)
-          .maybeSingle();
+      // Check if already scanned this partner TODAY
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
 
-        if (existing) {
-          setScanResult({ status: 'already_connected', message: t('partner.qr.alreadyConnected') });
-          return;
-        }
+      const { data: existingToday } = await supabase
+        .from('partner_exclusive_vouchers')
+        .select('id')
+        .eq('offering_partner_id', data.partner_id)
+        .eq('receiving_partner_id', user?.id || '')
+        .gte('created_at', todayStart.toISOString())
+        .maybeSingle();
+
+      if (existingToday) {
+        setScanResult({
+          status: 'already_connected',
+          message: t('partner.qr.alreadyScannedToday'),
+        });
+        return;
       }
 
       // Get offering partner's configured discount
@@ -505,13 +487,10 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
                 <div className="text-center py-6">
                   <ScanLine className="w-14 h-14 mx-auto mb-3 text-muted-foreground" />
                   <h3 className="text-lg font-semibold mb-2">{t('partner.qr.scanTitle')}</h3>
-                  <p className="text-sm text-muted-foreground mb-2 max-w-[280px] mx-auto">
+                  <p className="text-sm text-muted-foreground mb-4 max-w-[280px] mx-auto">
                     {t('partner.qr.scanDesc')}
                   </p>
-                  <Badge variant="outline" className="mb-4">
-                    {t('partner.qr.scansRemaining', { count: Math.max(0, DAILY_SCAN_LIMIT - dailyScansUsed) })}
-                  </Badge>
-                  <Button onClick={startScanner} className="gap-2" disabled={dailyScansUsed >= DAILY_SCAN_LIMIT}>
+                  <Button onClick={startScanner} className="gap-2">
                     <ScanLine className="w-4 h-4" />
                     {t('partner.qr.startScan')}
                   </Button>
