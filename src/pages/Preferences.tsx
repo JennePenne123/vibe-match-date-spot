@@ -512,6 +512,7 @@ const Preferences = () => {
               onClick={() => applyQuickTemplate(template)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
               className="p-4 rounded-xl border-2 border-border bg-card transition-none text-left select-none"
+            >
               <div className="flex items-center gap-3">
                 <PrefIcon id={'template_' + template.id} size="lg" />
                 <div>
