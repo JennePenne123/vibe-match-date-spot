@@ -13,6 +13,7 @@ import { LeaderboardCard } from '@/components/profile/LeaderboardCard';
 import ReferralCard from '@/components/profile/ReferralCard';
 import AILearningCard from '@/components/profile/AILearningCard';
 import { ThemeSettingsCard } from '@/components/profile/ThemeSettingsCard';
+import { PremiumWalletCard } from '@/components/profile/PremiumWalletCard';
 import ActivityFeed from '@/components/profile/ActivityFeed';
 import { useUserPoints } from '@/hooks/useUserPoints';
 
@@ -84,6 +85,8 @@ const Profile = () => {
           {!pointsLoading && points && <BadgesCard badges={Array.isArray(points.badges) ? points.badges : []} />}
           <ReferralCard />
           <AILearningCard />
+          {/* TODO: Show Wallet for premium users, ThemeSettings for free users */}
+          <PremiumWalletCard />
           <ThemeSettingsCard />
           <LeaderboardCard />
           <ProfileActions onLogout={logout} />
