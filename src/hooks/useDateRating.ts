@@ -143,6 +143,15 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
         }
       }
 
+      // Notify venue partner about new review (non-blocking)
+      supabase.functions.invoke('notify-venue-partner', {
+        body: {
+          invitationId,
+          venueRating: ratingData.venueRating,
+          overallRating: ratingData.overallRating,
+        },
+      }).catch(err => console.error('⚠️ Partner notification failed (non-blocking):', err));
+
       const speedText = hasSpeedBonus ? ' (inkl. ⚡ Speed-Bonus!)' : '';
       toast({
         title: "🎉 Bewertung abgegeben!",

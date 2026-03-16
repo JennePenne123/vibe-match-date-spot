@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.validate-google-places-setup]
 verify_jwt = true
+
+[functions.notify-venue-partner]
+verify_jwt = false
