@@ -668,7 +668,7 @@ const Preferences = () => {
                 <PrefIcon id={duration.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{duration.name}</div>
-                  <div className={`text-sm ${selectedDuration === duration.id ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <div className="text-sm text-muted-foreground">
                     {duration.desc}
                   </div>
                 </div>
