@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import BurgerMenu from '@/components/BurgerMenu';
+
 import { PointsIndicator } from '@/components/profile/PointsIndicator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { AppUser } from '@/types/app';
