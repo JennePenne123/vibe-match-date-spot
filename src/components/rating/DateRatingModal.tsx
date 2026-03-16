@@ -2,7 +2,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Star } from 'lucide-react';
+import { Star, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDateRating } from '@/hooks/useDateRating';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,35 @@ interface DateRatingModalProps {
   onSuccess?: () => void;
 }
 
-const starLabels = ['', 'Schlecht', 'Naja', 'Okay', 'Gut', 'Fantastisch'];
+const overallLabels = ['', 'Schlecht', 'Naja', 'Okay', 'Gut', 'Fantastisch'];
+
+const StarRow = ({
+  value,
+  onChange,
+  size = 'h-10 w-10',
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  size?: string;
+}) => (
+  <div className="flex gap-2 justify-center">
+    {[1, 2, 3, 4, 5].map((star) => (
+      <button
+        key={star}
+        type="button"
+        onClick={() => onChange(star)}
+        className="transition-transform hover:scale-125 active:scale-95"
+      >
+        <Star
+          className={cn(
+            size,
+            star <= value ? 'fill-accent text-accent' : 'text-muted-foreground/30'
+          )}
+        />
+      </button>
+    ))}
+  </div>
+);
 
 export const DateRatingModal: React.FC<DateRatingModalProps> = ({
   open,
@@ -58,15 +86,15 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[420px]">
+      <DialogContent className="sm:max-w-[440px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center">
             {t('rating.title', 'Wie war euer Date?')}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* Context */}
+        <div className="space-y-6 py-2">
+          {/* Subtitle */}
           <p className="text-sm text-center text-muted-foreground">
             {t('rating.subtitle', 'Bewerte dein Date mit {{partner}} bei {{venue}}', {
               partner: partnerName,
@@ -74,35 +102,78 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
             })}
           </p>
 
-          {/* Star Rating */}
-          <div className="flex flex-col items-center gap-3">
-            <div className="flex gap-3 justify-center">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => updateRatingData({ overallRating: star })}
-                  className="transition-transform hover:scale-125 active:scale-95"
-                >
-                  <Star
-                    className={cn(
-                      'h-10 w-10',
-                      star <= ratingData.overallRating
-                        ? 'fill-accent text-accent'
-                        : 'text-muted-foreground/30'
-                    )}
-                  />
-                </button>
-              ))}
-            </div>
+          {/* Overall Rating — required */}
+          <div className="flex flex-col items-center gap-2">
+            <label className="text-sm font-medium">
+              {t('rating.overallLabel', 'Gesamtbewertung')} *
+            </label>
+            <StarRow
+              value={ratingData.overallRating}
+              onChange={(v) => updateRatingData({ overallRating: v })}
+            />
             {ratingData.overallRating > 0 && (
               <span className="text-sm font-medium text-accent animate-fade-in">
-                {starLabels[ratingData.overallRating]}
+                {overallLabels[ratingData.overallRating]}
               </span>
             )}
           </div>
 
-          {/* Optional Comment */}
+          {/* Divider */}
+          <div className="border-t border-border" />
+
+          {/* Optional section header */}
+          <p className="text-xs text-muted-foreground text-center uppercase tracking-wide">
+            {t('rating.optionalSection', 'Optional – hilft uns, besser zu werden')}
+          </p>
+
+          {/* Venue Rating — optional */}
+          <div className="flex flex-col items-center gap-2">
+            <label className="text-sm font-medium">
+              {t('rating.venueLabel', 'Wie war das Venue?')}
+            </label>
+            <StarRow
+              value={ratingData.venueRating}
+              onChange={(v) => updateRatingData({ venueRating: v })}
+              size="h-8 w-8"
+            />
+          </div>
+
+          {/* Would Recommend — optional */}
+          <div className="flex flex-col items-center gap-2">
+            <label className="text-sm font-medium">
+              {t('rating.recommendLabel', 'Würdest du das Venue empfehlen?')}
+            </label>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => updateRatingData({ wouldRecommendVenue: true })}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all',
+                  ratingData.wouldRecommendVenue === true
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border hover:border-primary/50'
+                )}
+              >
+                <ThumbsUp className="h-4 w-4" />
+                <span className="text-sm font-medium">{t('common.yes', 'Ja')}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => updateRatingData({ wouldRecommendVenue: false })}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all',
+                  ratingData.wouldRecommendVenue === false
+                    ? 'border-destructive bg-destructive/10 text-destructive'
+                    : 'border-border hover:border-destructive/50'
+                )}
+              >
+                <ThumbsDown className="h-4 w-4" />
+                <span className="text-sm font-medium">{t('common.no', 'Nein')}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Comment — optional */}
           <div className="space-y-2">
             <label className="text-sm text-muted-foreground">
               {t('rating.commentLabel', 'Kommentar (optional)')}
@@ -111,7 +182,7 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
               placeholder={t('rating.commentPlaceholder', 'Was hat dir besonders gefallen oder was könnte besser sein?')}
               value={ratingData.feedbackText}
               onChange={(e) => updateRatingData({ feedbackText: e.target.value })}
-              className="min-h-[80px] resize-none"
+              className="min-h-[70px] resize-none"
               maxLength={500}
             />
           </div>
