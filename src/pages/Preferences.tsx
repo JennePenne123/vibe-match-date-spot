@@ -555,14 +555,11 @@ const Preferences = () => {
         <div className="space-y-3">
           {vibes.map((vibe) => (
             <button
+              type="button"
               key={vibe.id}
               onClick={() => toggleSelection(vibe.id, selectedVibes, setSelectedVibes)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedVibes.includes(vibe.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
-            >
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
               <div className="flex items-center gap-4">
                 <PrefIcon id={vibe.id} />
                 <div className="flex-1 text-left">
