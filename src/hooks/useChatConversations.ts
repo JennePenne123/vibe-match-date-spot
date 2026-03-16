@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -122,11 +122,20 @@ export const useChatConversations = () => {
   }, [fetchConversations]);
 
   // Listen for new messages to refresh
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
   useEffect(() => {
     if (!user) return;
 
+    // Remove previous channel if exists
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
+    const channelName = `chat-updates-${user.id}-${Date.now()}`;
     const channel = supabase
-      .channel('chat-conversations-updates')
+      .channel(channelName)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'invitation_messages' },
@@ -139,8 +148,11 @@ export const useChatConversations = () => {
       )
       .subscribe();
 
+    channelRef.current = channel;
+
     return () => {
       supabase.removeChannel(channel);
+      channelRef.current = null;
     };
   }, [user, fetchConversations]);
 
