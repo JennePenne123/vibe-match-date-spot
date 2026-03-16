@@ -85,6 +85,8 @@ const Profile = () => {
           {!pointsLoading && points && <BadgesCard badges={Array.isArray(points.badges) ? points.badges : []} />}
           <ReferralCard />
           <AILearningCard />
+          {/* TODO: Show Wallet for premium users, ThemeSettings for free users */}
+          <PremiumWalletCard />
           <ThemeSettingsCard />
           <LeaderboardCard />
           <ProfileActions onLogout={logout} />
