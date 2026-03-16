@@ -26,6 +26,7 @@ import Venues from "./pages/Venues";
 import MyFriends from "./pages/MyFriends";
 import MyVenues from "./pages/MyVenues";
 import Invitations from "./pages/Invitations";
+import Chats from "./pages/Chats";
 import NotFound from "./pages/NotFound";
 import AIRecommendations from "./pages/AIRecommendations";
 import SmartDatePlanning from "./pages/SmartDatePlanning";
