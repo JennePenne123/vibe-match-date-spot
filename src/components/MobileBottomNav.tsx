@@ -1,7 +1,7 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Home, Sparkles, User, MoreHorizontal, Heart } from 'lucide-react'
+import { Home, Sparkles, User, MoreHorizontal, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { useInvitations } from '@/hooks/useInvitations'
@@ -33,8 +33,8 @@ export function MobileBottomNav() {
       {/* Home */}
       <NavItem icon={Home} label={t('nav.home')} path="/home" active={isActive('/home')} />
 
-      {/* My Invitations */}
-      <NavItem icon={Heart} label={t('menu.myInvitations')} path="/invitations" active={isActive('/invitations')} badge={pendingCount} />
+      {/* Chats */}
+      <NavItem icon={Send} label={t('nav.chats', 'Chats')} path="/chats" active={isActive('/chats')} />
 
       {/* Plan Date (center highlight) */}
       <NavItem icon={Sparkles} label={t('nav.planDate')} path="/plan-date" active={isActive('/plan-date')} highlight />
