@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
   // Cuisine icons
-  UtensilsCrossed, Fish, Beef, Croissant, Flame, Leaf, Sandwich, Soup, ChefHat, CookingPot,
+  Pizza, Fish, Pepper, Croissant, CookingPot, Leaf, Beef, Soup, Utensils, Flame,
   // Vibe icons
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
   // Price icons
@@ -19,7 +19,7 @@ import {
   // Time icons
   Sunrise, Sun, CloudSun, Sunset, MoonStar, Clock3,
   // Duration icons
-  Zap, Hourglass, Timer, HelpCircle,
+  Zap, Hourglass, Timer, Shuffle,
   // Activity icons
   Wine, Tent, Martini, Palette, Dumbbell, PartyPopper,
   // Entertainment icons
