@@ -516,6 +516,18 @@
       "connect": "Verbinden",
       "noPartners": "Noch keine Partner-Venues auf der Karte",
       "addVenue": "Venue hinzufügen"
+    },
+    "cityRankings": {
+      "title": "City Rankings",
+      "dashboardDesc": "Sieh, wie dein Venue in deiner Stadt abschneidet",
+      "rankingBadge": "Ranking",
+      "noCity": "Keine Stadt hinterlegt",
+      "noCityDesc": "Bitte hinterlege deine Stadt im Partnerprofil, um das Ranking zu sehen.",
+      "noData": "Noch keine Daten",
+      "noDataDesc": "Sobald Dates in {{city}} stattfinden, erscheint hier das Ranking.",
+      "yourVenue": "Dein Venue",
+      "visits": "Besuche",
+      "noRatings": "Keine Bewertungen"
     }
   },
   "rating": {
