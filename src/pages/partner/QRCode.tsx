@@ -511,7 +511,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
                   <Badge variant="outline" className="mb-4">
                     {t('partner.qr.scansRemaining', { count: Math.max(0, DAILY_SCAN_LIMIT - dailyScansUsed) })}
                   </Badge>
-                  <Button onClick={startScanner} className="gap-2">
+                  <Button onClick={startScanner} className="gap-2" disabled={dailyScansUsed >= DAILY_SCAN_LIMIT}>
                     <ScanLine className="w-4 h-4" />
                     {t('partner.qr.startScan')}
                   </Button>
