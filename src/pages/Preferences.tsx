@@ -596,10 +596,10 @@ const Preferences = () => {
             <button
               key={price.id}
               onClick={() => toggleSelection(price.id, selectedPriceRange, setSelectedPriceRange)}
-              className={`w-full p-4 rounded-xl border-2 transition-all ${
+              className={`w-full p-4 rounded-xl border-2 transition-none ${
                 selectedPriceRange.includes(price.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <div className="flex items-center gap-4">
