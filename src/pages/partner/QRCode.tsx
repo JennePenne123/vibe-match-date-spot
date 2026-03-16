@@ -493,6 +493,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
                   <Button onClick={startScanner} className="gap-2">
                     <ScanLine className="w-4 h-4" />
                     {t('partner.qr.startScan')}
+                  </Button>
                 </div>
               )}
 
