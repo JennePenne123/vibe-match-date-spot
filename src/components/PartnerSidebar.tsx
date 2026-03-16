@@ -38,7 +38,8 @@ export function PartnerSidebar() {
 
   const settingsNavItems = [
     { title: t('partnerNav.profile', 'Firmenprofil'), url: '/partner/profile', icon: User },
-    { title: t('partnerNav.qrCode', 'QR-Code'), url: '/partner/qr-code', icon: QrCode },
+    { title: t('partnerNav.qrCode', 'Mein QR-Code'), url: '/partner/qr-code', icon: QrCode },
+    { title: t('partnerNav.scanner', 'QR-Scanner'), url: '/partner/qr-scanner', icon: ScanLine },
   ]
 
   const isActive = (path: string) => {
