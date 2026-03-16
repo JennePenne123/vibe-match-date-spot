@@ -559,10 +559,10 @@ const Preferences = () => {
             <button
               key={vibe.id}
               onClick={() => toggleSelection(vibe.id, selectedVibes, setSelectedVibes)}
-              className={`w-full p-4 rounded-xl border-2 transition-all ${
+              className={`w-full p-4 rounded-xl border-2 transition-none ${
                 selectedVibes.includes(vibe.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <div className="flex items-center gap-4">
@@ -596,10 +596,10 @@ const Preferences = () => {
             <button
               key={price.id}
               onClick={() => toggleSelection(price.id, selectedPriceRange, setSelectedPriceRange)}
-              className={`w-full p-4 rounded-xl border-2 transition-all ${
+              className={`w-full p-4 rounded-xl border-2 transition-none ${
                 selectedPriceRange.includes(price.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <div className="flex items-center gap-4">
@@ -629,10 +629,10 @@ const Preferences = () => {
             <button
               key={time.id}
               onClick={() => toggleSelection(time.id, selectedTimePreferences, setSelectedTimePreferences)}
-              className={`p-4 rounded-xl border-2 transition-all ${
+              className={`p-4 rounded-xl border-2 transition-none ${
                 selectedTimePreferences.includes(time.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <PrefIcon id={time.id} />
@@ -658,10 +658,10 @@ const Preferences = () => {
             <button
               key={duration.id}
               onClick={() => toggleSingleSelection(duration.id, setSelectedDuration)}
-              className={`w-full p-4 rounded-xl border-2 transition-all ${
+              className={`w-full p-4 rounded-xl border-2 transition-none ${
                 selectedDuration === duration.id
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <div className="flex items-center gap-4">
@@ -695,10 +695,10 @@ const Preferences = () => {
             <button
               key={activity.id}
               onClick={() => toggleSelection(activity.id, selectedActivities, setSelectedActivities)}
-              className={`w-full p-4 rounded-xl border-2 transition-all ${
+              className={`w-full p-4 rounded-xl border-2 transition-none ${
                 selectedActivities.includes(activity.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <div className="flex items-center gap-4">
@@ -728,10 +728,10 @@ const Preferences = () => {
             <button
               key={ent.id}
               onClick={() => toggleSelection(ent.id, selectedEntertainment, setSelectedEntertainment)}
-              className={`p-4 rounded-xl border-2 transition-all ${
+              className={`p-4 rounded-xl border-2 transition-none ${
                 selectedEntertainment.includes(ent.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <PrefIcon id={ent.id} />
@@ -843,10 +843,10 @@ const Preferences = () => {
             <button
               key={dietary.id}
               onClick={() => toggleSelection(dietary.id, selectedDietary, setSelectedDietary)}
-              className={`p-4 rounded-xl border-2 transition-all ${
+              className={`p-4 rounded-xl border-2 transition-none ${
                 selectedDietary.includes(dietary.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <PrefIcon id={dietary.id} />
@@ -869,10 +869,10 @@ const Preferences = () => {
             <button
               key={access.id}
               onClick={() => toggleSelection(access.id, selectedAccessibility, setSelectedAccessibility)}
-              className={`w-full p-4 rounded-xl border-2 transition-all ${
+              className={`w-full p-4 rounded-xl border-2 transition-none ${
                 selectedAccessibility.includes(access.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <div className="flex items-center gap-4">
