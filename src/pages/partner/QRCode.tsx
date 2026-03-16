@@ -93,6 +93,17 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
       }));
       setPartnerVenues(mappedVenues);
 
+      // Fetch own network discount setting
+      const { data: partnerProfile } = await supabase
+        .from('partner_profiles')
+        .select('network_discount_value')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (partnerProfile?.network_discount_value != null) {
+        setNetworkDiscount(Number(partnerProfile.network_discount_value));
+      }
+
       // Fetch received exclusive vouchers
       const { data: received } = await supabase
         .from('partner_exclusive_vouchers')
