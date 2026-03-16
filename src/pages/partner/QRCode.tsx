@@ -61,6 +61,8 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
   const [loading, setLoading] = useState(true);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [networkDiscount, setNetworkDiscount] = useState(15);
+  const [savingDiscount, setSavingDiscount] = useState(false);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
   useEffect(() => {
