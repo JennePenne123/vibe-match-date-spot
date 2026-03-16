@@ -33,8 +33,8 @@ export function MobileBottomNav() {
       {/* Home */}
       <NavItem icon={Home} label={t('nav.home')} path="/home" active={isActive('/home')} />
 
-      {/* My Invitations */}
-      <NavItem icon={Heart} label={t('menu.myInvitations')} path="/invitations" active={isActive('/invitations')} badge={pendingCount} />
+      {/* Chats */}
+      <NavItem icon={Send} label={t('nav.chats', 'Chats')} path="/chats" active={isActive('/chats')} />
 
       {/* Plan Date (center highlight) */}
       <NavItem icon={Sparkles} label={t('nav.planDate')} path="/plan-date" active={isActive('/plan-date')} highlight />
