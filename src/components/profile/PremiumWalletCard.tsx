@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { VoucherQRDetail } from './VoucherQRDetail';
 
 interface WalletVoucher {
   id: string;
@@ -144,16 +146,21 @@ function DiscountDisplay({ voucher }: { voucher: WalletVoucher }) {
   }
 }
 
-function VoucherCard({ voucher, variant }: { voucher: WalletVoucher; variant: WalletTab }) {
+function VoucherCard({ voucher, variant, onTap }: { voucher: WalletVoucher; variant: WalletTab; onTap?: () => void }) {
   const daysLeft = getDaysRemaining(voucher.valid_until);
   const isExpiring = variant === 'expiring';
   const isExpired = variant === 'expired';
   const isRedeemed = variant === 'redeemed';
+  const isTappable = !isExpired && !isRedeemed;
 
   return (
     <div
+      onClick={isTappable ? onTap : undefined}
+      role={isTappable ? 'button' : undefined}
+      tabIndex={isTappable ? 0 : undefined}
       className={cn(
         'relative flex items-stretch gap-0 rounded-xl border overflow-hidden transition-all duration-200',
+        isTappable && 'cursor-pointer active:scale-[0.98]',
         isExpired && 'opacity-60',
         isRedeemed && 'opacity-75',
         isExpiring
@@ -258,6 +265,8 @@ function EmptyState({ tab }: { tab: WalletTab }) {
 export function PremiumWalletCard() {
   const [activeTab, setActiveTab] = useState<WalletTab>('active');
   const [direction, setDirection] = useState(0);
+  const [selectedVoucher, setSelectedVoucher] = useState<WalletVoucher | null>(null);
+  const { user } = useAuth();
   const tabOrder: WalletTab[] = ['active', 'expiring', 'redeemed', 'expired'];
 
   const handleTabChange = (newTab: string) => {
@@ -337,7 +346,7 @@ export function PremiumWalletCard() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.06, duration: 0.2 }}
                     >
-                      <VoucherCard voucher={voucher} variant={activeTab} />
+                      <VoucherCard voucher={voucher} variant={activeTab} onTap={() => setSelectedVoucher(voucher)} />
                     </motion.div>
                   ))
                 )}
@@ -352,6 +361,15 @@ export function PremiumWalletCard() {
           Vouchers sind 30 Tage ab Erstellung gültig
         </p>
       </CardContent>
+
+      {/* QR Detail Modal */}
+      {selectedVoucher && user && (
+        <VoucherQRDetail
+          voucher={selectedVoucher}
+          userId={user.id}
+          onClose={() => setSelectedVoucher(null)}
+        />
+      )}
     </Card>
   );
 }

@@ -44,3 +44,6 @@ verify_jwt = true
 
 [functions.notify-venue-partner]
 verify_jwt = false
+
+[functions.redeem-voucher]
+verify_jwt = true

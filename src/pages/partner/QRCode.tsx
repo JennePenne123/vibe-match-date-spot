@@ -223,12 +223,62 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
     try {
       const data = JSON.parse(decodedText);
 
-      // Only accept partner QR codes
-      if (data.type !== 'vybe_partner') {
-        setScanResult({ status: 'error', message: t('partner.qr.notPartnerCode') });
+      // Handle user voucher QR codes
+      if (data.type === 'vybe_user_voucher') {
+        await handleUserVoucherScan(data);
         return;
       }
 
+      // Handle partner QR codes (existing flow)
+      if (data.type === 'vybe_partner') {
+        await handlePartnerScan(data);
+        return;
+      }
+
+      setScanResult({ status: 'error', message: t('partner.qr.invalidQR') });
+    } catch {
+      setScanResult({ status: 'error', message: t('partner.qr.invalidQR') });
+    }
+  };
+
+  const handleUserVoucherScan = async (data: { voucher_id: string; user_id: string; code: string; type: string }) => {
+    try {
+      const { data: result, error } = await supabase.functions.invoke('redeem-voucher', {
+        body: {
+          voucher_id: data.voucher_id,
+          user_id: data.user_id,
+          code: data.code,
+          type: data.type,
+        },
+      });
+
+      if (error) {
+        setScanResult({ status: 'error', message: 'Fehler beim Einlösen des Vouchers' });
+        return;
+      }
+
+      if (result.status === 'success') {
+        setScanResult({
+          status: 'success',
+          message: result.message,
+          voucher: result.voucher,
+        });
+        toast({
+          title: '✅ Voucher eingelöst!',
+          description: `${result.voucher.title} – ${result.voucher.discount_type === 'percentage' ? result.voucher.discount_value + '%' : '€' + result.voucher.discount_value} Rabatt`,
+        });
+      } else {
+        setScanResult({
+          status: 'error',
+          message: result.error || 'Voucher konnte nicht eingelöst werden',
+        });
+      }
+    } catch {
+      setScanResult({ status: 'error', message: 'Verbindungsfehler beim Einlösen' });
+    }
+  };
+
+  const handlePartnerScan = async (data: any) => {
       // Can't scan own code
       if (data.partner_id === user?.id) {
         setScanResult({ status: 'error', message: t('partner.qr.ownCode') });
@@ -325,9 +375,6 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
 
       // Refresh data
       fetchData();
-    } catch {
-      setScanResult({ status: 'error', message: t('partner.qr.invalidQR') });
-    }
   };
 
   useEffect(() => {
