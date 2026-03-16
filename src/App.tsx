@@ -14,6 +14,7 @@ import OfflineBanner from "./components/OfflineBanner";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Onboarding from "./pages/Onboarding";
+import MoodCheckIn from "./pages/MoodCheckIn";
 import Home from "./pages/Home";
 import Preferences from "./pages/Preferences";
 import Friends from "./pages/Friends";
