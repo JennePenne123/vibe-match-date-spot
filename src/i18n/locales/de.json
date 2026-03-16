@@ -17,7 +17,8 @@
     "email": "E-Mail",
     "signIn": "Anmelden",
     "getStarted": "Jetzt starten",
-    "returnHome": "Zurück zur Startseite"
+    "returnHome": "Zurück zur Startseite",
+    "saved": "Gespeichert"
   },
   "nav": {
     "home": "Home",
@@ -461,7 +462,11 @@
       "noExclusiveYet": "Noch keine Partner-Vorteile",
       "noExclusiveDesc": "Scanne Partner-Codes oder lass deinen Code scannen, um exklusive Vorteile zu teilen.",
       "validUntil": "Gültig bis",
-      "redeemed": "Eingelöst"
+      "redeemed": "Eingelöst",
+      "discountSettings": "Netzwerk-Rabatt",
+      "discountSettingsDesc": "Lege fest, wie viel Prozent Rabatt andere Partner erhalten, wenn sie deinen QR-Code scannen.",
+      "discountLabel": "Rabatt",
+      "discountSaved": "Netzwerk-Rabatt erfolgreich aktualisiert."
     },
     "reports": {
       "title": "Berichte & Rechnungen",

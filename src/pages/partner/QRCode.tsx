@@ -10,7 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
-import { QrCode, ScanLine, Download, CheckCircle, XCircle, Handshake, Gift, Users } from 'lucide-react';
+import { QrCode, ScanLine, Download, CheckCircle, XCircle, Handshake, Gift, Users, Settings2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -59,6 +61,8 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
   const [loading, setLoading] = useState(true);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [networkDiscount, setNetworkDiscount] = useState(15);
+  const [savingDiscount, setSavingDiscount] = useState(false);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
   useEffect(() => {
@@ -88,6 +92,17 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         venues: v.venues as unknown as { name: string } | null
       }));
       setPartnerVenues(mappedVenues);
+
+      // Fetch own network discount setting
+      const { data: partnerProfile } = await supabase
+        .from('partner_profiles')
+        .select('network_discount_value')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (partnerProfile?.network_discount_value != null) {
+        setNetworkDiscount(Number(partnerProfile.network_discount_value));
+      }
 
       // Fetch received exclusive vouchers
       const { data: received } = await supabase
@@ -123,8 +138,29 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         id: v.venue_id,
         name: v.venues?.name || 'Venue'
       })),
+      discount: networkDiscount,
       ts: Date.now(),
     });
+  };
+
+  const saveNetworkDiscount = async () => {
+    if (!user) return;
+    setSavingDiscount(true);
+    try {
+      const { error } = await supabase
+        .from('partner_profiles')
+        .update({ network_discount_value: networkDiscount } as any)
+        .eq('user_id', user.id);
+      if (error) throw error;
+      toast({
+        title: t('common.saved'),
+        description: t('partner.qr.discountSaved'),
+      });
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    } finally {
+      setSavingDiscount(false);
+    }
   };
 
   const handleDownloadQR = () => {
@@ -232,6 +268,20 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         }
       }
 
+      // Get offering partner's configured discount
+      let discountValue = data.discount || 15;
+      
+      // Fetch the latest from DB as authoritative source
+      const { data: offeringProfile } = await supabase
+        .from('partner_profiles')
+        .select('network_discount_value')
+        .eq('user_id', data.partner_id)
+        .maybeSingle();
+
+      if (offeringProfile?.network_discount_value != null) {
+        discountValue = Number(offeringProfile.network_discount_value);
+      }
+
       // Create exclusive partner voucher
       const voucherTitle = `Partner-Exklusiv: ${offeringVenueName}`;
       const voucherCode = `PX-${Date.now().toString(36).toUpperCase().slice(-6)}`;
@@ -245,7 +295,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
           title: voucherTitle,
           description: t('partner.qr.exclusiveDesc', { venue: offeringVenueName }),
           discount_type: 'percentage',
-          discount_value: 15,
+          discount_value: discountValue,
           code: voucherCode,
         })
         .select()
@@ -258,7 +308,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         message: t('partner.qr.connectionSuccess'),
         voucher: {
           title: voucherTitle,
-          discount_value: 15,
+          discount_value: discountValue,
           code: voucherCode,
           venue_name: offeringVenueName,
         },
@@ -266,7 +316,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
 
       toast({
         title: t('partner.qr.newPartnerVoucher'),
-        description: `15% ${t('partner.qr.atVenue')} ${offeringVenueName}`,
+        description: `${discountValue}% ${t('partner.qr.atVenue')} ${offeringVenueName}`,
       });
 
       // Refresh data
@@ -380,6 +430,47 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
                 <Download className="w-4 h-4" />
                 {t('partner.qr.download')}
               </Button>
+            </CardContent>
+          </Card>
+
+          {/* Network Discount Settings */}
+          <Card variant="glass">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Settings2 className="w-4 h-4 text-primary" />
+                <h3 className="font-semibold text-sm">{t('partner.qr.discountSettings')}</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t('partner.qr.discountSettingsDesc')}
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <Label htmlFor="network-discount" className="text-xs">
+                    {t('partner.qr.discountLabel')}
+                  </Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      id="network-discount"
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={networkDiscount}
+                      onChange={e => setNetworkDiscount(Math.min(100, Math.max(1, Number(e.target.value))))}
+                      className="w-24"
+                      inputSize="sm"
+                    />
+                    <span className="text-sm text-muted-foreground font-medium">%</span>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={saveNetworkDiscount}
+                  disabled={savingDiscount}
+                  className="mt-5"
+                >
+                  {savingDiscount ? '...' : t('common.save')}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

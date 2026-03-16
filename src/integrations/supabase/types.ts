@@ -844,6 +844,7 @@ export type Database = {
           description: string | null
           id: string
           logo_url: string | null
+          network_discount_value: number
           phone: string | null
           postal_code: string | null
           tax_id: string | null
@@ -862,6 +863,7 @@ export type Database = {
           description?: string | null
           id?: string
           logo_url?: string | null
+          network_discount_value?: number
           phone?: string | null
           postal_code?: string | null
           tax_id?: string | null
@@ -880,6 +882,7 @@ export type Database = {
           description?: string | null
           id?: string
           logo_url?: string | null
+          network_discount_value?: number
           phone?: string | null
           postal_code?: string | null
           tax_id?: string | null
