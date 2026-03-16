@@ -589,14 +589,11 @@ const Preferences = () => {
         <div className="space-y-3">
           {priceRanges.map((price) => (
             <button
+              type="button"
               key={price.id}
               onClick={() => toggleSelection(price.id, selectedPriceRange, setSelectedPriceRange)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedPriceRange.includes(price.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
-            >
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
               <div className="flex items-center gap-4">
                 <PrefIcon id={price.id} />
                 <div className="flex-1 text-left">
