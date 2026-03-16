@@ -742,7 +742,7 @@ const Preferences = () => {
                   : 'bg-card border-border text-foreground hover:bg-accent/50'
               }`}
             >
-              <div className="text-2xl mb-1">{dietary.emoji}</div>
+              <PrefIcon id={dietary.id} />
               <div className="font-medium text-sm">{dietary.name}</div>
               {selectedDietary.includes(dietary.id) && (
                 <Check className="w-4 h-4 mx-auto mt-1" />
