@@ -121,7 +121,7 @@ const App = () => (
                     } />
                     
                     {/* Partner Routes */}
-                    <Route path="/partner" element={<PartnerDashboard />} />
+                    <Route path="/partner" element={<AppLayout><PartnerDashboard /></AppLayout>} />
                     <Route path="/partner/vouchers" element={<AppLayout><PartnerVouchers /></AppLayout>} />
                     <Route path="/partner/venues" element={<AppLayout><PartnerVenues /></AppLayout>} />
                     <Route path="/partner/reports" element={<AppLayout><PartnerReports /></AppLayout>} />
