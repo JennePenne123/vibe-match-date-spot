@@ -491,6 +491,17 @@
       "taxHintTitle": "Tax Deduction Hint",
       "taxHintDesc": "Download your monthly reports as PDF or CSV to submit to your tax advisor. All discount amounts and booking values are documented for your records."
     },
+    "feedback": {
+      "title": "Guest Feedback",
+      "subtitle": "Ratings and reviews from your date guests",
+      "venueRating": "Venue Rating",
+      "dateRating": "Date Rating",
+      "totalReviews": "Reviews",
+      "recommend": "Recommend Rate",
+      "recentReviews": "Recent Reviews",
+      "noFeedback": "No guest feedback yet",
+      "noFeedbackDesc": "Reviews will appear once guests have rated their date at your venue"
+    },
     "network": {
       "findPartners": "Find Other Partners",
       "findPartnersDesc": "Discover venue partners nearby on the map",
