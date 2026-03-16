@@ -65,6 +65,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
       setInvitationData({
         partnerName,
         venueName: invitation.venue?.name || 'Venue',
+        dateTime: invitation.actual_date_time || invitation.proposed_date || undefined,
         venueId: invitation.venue_id || undefined,
         partnerId,
         aiPredictedScore: invitation.ai_compatibility_score,
