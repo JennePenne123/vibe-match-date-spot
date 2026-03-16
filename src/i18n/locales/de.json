@@ -521,9 +521,16 @@
   "rating": {
     "title": "Wie war euer Date?",
     "subtitle": "Bewerte dein Date mit {{partner}} bei {{venue}}",
+    "overallLabel": "Gesamtbewertung",
+    "venueLabel": "Wie war das Venue?",
+    "recommendLabel": "Würdest du das Venue empfehlen?",
+    "optionalSection": "Optional – hilft uns, besser zu werden",
     "commentLabel": "Kommentar (optional)",
     "commentPlaceholder": "Was hat dir besonders gefallen oder was könnte besser sein?",
     "submitting": "Wird gespeichert...",
-    "submit": "Bewertung abgeben"
+    "submit": "Bewertung abgeben",
+    "alreadyRated": "Du hast dieses Date bewertet",
+    "bothRated": "{{partner}} hat auch bewertet!",
+    "waitingPartner": "Warte auf {{partner}}s Bewertung"
   }
 }
