@@ -374,6 +374,43 @@ useEffect(() => {
     loadPartnerPreferences();
   }, [user?.id, partnerId]);
 
+  // Load user's past preferences to create a personalized template
+  useEffect(() => {
+    const loadLearnedPreferences = async () => {
+      if (!user?.id) return;
+      try {
+        const { data, error } = await supabase
+          .from('user_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error || !data) return;
+
+        const hasCuisines = data.preferred_cuisines && data.preferred_cuisines.length > 0;
+        const hasVibes = data.preferred_vibes && data.preferred_vibes.length > 0;
+        const hasPrices = data.preferred_price_range && data.preferred_price_range.length > 0;
+        const hasTimes = data.preferred_times && data.preferred_times.length > 0;
+
+        if (hasCuisines || hasVibes || hasPrices || hasTimes) {
+          setLearnedTemplate({
+            id: 'ai-learned',
+            title: 'Für dich',
+            emoji: '🤖',
+            description: 'Basierend auf deinen bisherigen Vorlieben',
+            cuisines: data.preferred_cuisines || [],
+            vibes: data.preferred_vibes || [],
+            priceRange: data.preferred_price_range || [],
+            timePreferences: data.preferred_times || []
+          });
+        }
+      } catch (err) {
+        console.error('Error loading learned preferences:', err);
+      }
+    };
+    loadLearnedPreferences();
+  }, [user?.id]);
+
   const loadPartnerPreferences = async () => {
     try {
       const { data, error } = await supabase
