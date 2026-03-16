@@ -83,11 +83,10 @@ export function VoucherQRDetail({ voucher, userId, onClose }: VoucherQRDetailPro
           </div>
 
           {/* Content */}
-          <div className="px-6 pb-6 text-center space-y-4">
-            {/* Venue & title */}
+          <div className="px-5 pb-5 text-center space-y-3">
             <div>
-              <h3 className="text-lg font-bold">{voucher.title}</h3>
-              <p className="text-sm text-muted-foreground">{voucher.venue_name}</p>
+              <h3 className="text-base font-bold">{voucher.title}</h3>
+              <p className="text-xs text-muted-foreground">{voucher.venue_name}</p>
             </div>
 
             {/* Discount badge */}
