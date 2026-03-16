@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { Home, User, Users, MapPin, Heart, Sparkles, ChevronDown, MoreHorizontal, LogOut } from 'lucide-react'
+import { Home, User, Users, MapPin, Heart, Sparkles, ChevronDown, MoreHorizontal, LogOut, Trophy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/contexts/AuthContext'
 import { useInvitations } from '@/hooks/useInvitations'
+import { useUserRole } from '@/hooks/useUserRole'
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers'
 import { getInitials } from '@/lib/utils'
 
@@ -21,6 +22,7 @@ export function AppSidebar() {
   const location = useLocation()
   const { user, logout } = useAuth()
   const { invitations } = useInvitations()
+  const { isPartner, isAdmin } = useUserRole()
   const currentPath = location.pathname
   const [isMoreOpen, setIsMoreOpen] = React.useState(false)
 
@@ -38,6 +40,7 @@ export function AppSidebar() {
     { title: t('nav.myFriends'), url: '/my-friends', icon: Users },
     { title: t('nav.invitations'), url: '/invitations', icon: Heart },
     { title: t('nav.myVenues'), url: '/my-venues', icon: MapPin },
+    ...((isPartner || isAdmin) ? [{ title: t('partner.cityRankings.title', 'City Rankings'), url: '/partner/city-rankings', icon: Trophy }] : []),
   ]
 
   const pendingCount = React.useMemo(() => {
