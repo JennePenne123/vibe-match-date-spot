@@ -10,7 +10,7 @@ import { Menu, Sparkles } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 // Tab order for directional slide
-const NAV_ORDER = ['/home', '/chats', '/plan-date', '/profile']
+const NAV_ORDER = ['/home', '/chats', '/preferences', '/profile']
 
 function getNavIndex(path: string) {
   const idx = NAV_ORDER.indexOf(path)
