@@ -133,7 +133,7 @@ export default function GuestFeedbackCard() {
             className={cn(
               'w-3.5 h-3.5',
               i < Math.round(rating)
-                ? 'fill-yellow-400 text-yellow-400'
+                ? 'fill-accent text-accent'
                 : 'text-muted-foreground/30'
             )}
           />
