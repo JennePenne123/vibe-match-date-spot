@@ -769,7 +769,7 @@ const Preferences = () => {
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="text-2xl">{access.emoji}</div>
+                <PrefIcon id={access.id} />
                 <div className="font-semibold">{access.name}</div>
                 {selectedAccessibility.includes(access.id) && (
                   <Check className="w-5 h-5 ml-auto" />
