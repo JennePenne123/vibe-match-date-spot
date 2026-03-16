@@ -705,7 +705,7 @@ const Preferences = () => {
                 <PrefIcon id={activity.id === 'cultural' ? 'cultural_act' : activity.id === 'nightlife' ? 'nightlife_act' : activity.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{activity.name}</div>
-                  <div className={`text-sm ${selectedActivities.includes(activity.id) ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <div className="text-sm text-muted-foreground">
                     {activity.desc}
                   </div>
                 </div>

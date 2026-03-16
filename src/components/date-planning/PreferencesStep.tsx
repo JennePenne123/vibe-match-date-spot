@@ -682,7 +682,7 @@ useEffect(() => {
             <button
               key={template.id}
               onClick={() => applyQuickStartTemplate(template)}
-              className="p-3 md:p-4 rounded-lg border border-border text-left transition-all hover:bg-muted hover:border-primary/20"
+              className="p-3 md:p-4 rounded-lg border border-border text-left transition-none"
             >
               <div className="flex items-center gap-3">
                 <div className="text-xl md:text-2xl flex-shrink-0">{template.emoji}</div>
