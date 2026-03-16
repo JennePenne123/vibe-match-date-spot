@@ -10,8 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
+  Icon,
   // Cuisine icons
-  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup, Utensils, Cherry,
+  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup, Cherry,
   // Vibe icons
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
   // Price icons
