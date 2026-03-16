@@ -26,6 +26,7 @@ import Venues from "./pages/Venues";
 import MyFriends from "./pages/MyFriends";
 import MyVenues from "./pages/MyVenues";
 import Invitations from "./pages/Invitations";
+import Chats from "./pages/Chats";
 import NotFound from "./pages/NotFound";
 import AIRecommendations from "./pages/AIRecommendations";
 import SmartDatePlanning from "./pages/SmartDatePlanning";
@@ -111,6 +112,7 @@ const App = () => (
                     <Route path="/my-friends" element={<AppLayout><MyFriends /></AppLayout>} />
                     <Route path="/my-venues" element={<AppLayout><MyVenues /></AppLayout>} />
                     <Route path="/invitations" element={<AppLayout><Invitations /></AppLayout>} />
+                    <Route path="/chats" element={<AppLayout><Chats /></AppLayout>} />
                     <Route path="/ai-recommendations" element={<AppLayout><AIRecommendations /></AppLayout>} />
                     <Route path="/ai-insights" element={<AppLayout><AIInsights /></AppLayout>} />
                     <Route path="/plan-date" element={<AppLayout><SmartDatePlanning /></AppLayout>} />

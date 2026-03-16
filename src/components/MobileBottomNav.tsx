@@ -1,16 +1,18 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Home, Sparkles, User, MoreHorizontal } from 'lucide-react'
+import { Home, Sparkles, User, MoreHorizontal, MessageCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { useInvitations } from '@/hooks/useInvitations'
+import { useChatConversations } from '@/hooks/useChatConversations'
 import BurgerMenu from '@/components/BurgerMenu'
 
 export function MobileBottomNav() {
   const { t } = useTranslation()
   const location = useLocation()
   const { invitations } = useInvitations()
+  const { totalUnread } = useChatConversations()
 
   const pendingCount = React.useMemo(() => {
     return invitations.filter(inv => inv.direction === 'received' && inv.status === 'pending').length
@@ -19,8 +21,9 @@ export function MobileBottomNav() {
   const isActive = (path: string) => location.pathname === path
 
   const navItems = [
-    { label: t('nav.home'), icon: Home, path: '/home' },
     { label: t('nav.planDate'), icon: Sparkles, path: '/plan-date' },
+    { label: t('nav.home'), icon: Home, path: '/home' },
+    { label: t('nav.chats', 'Chats'), icon: MessageCircle, path: '/chats', badge: totalUnread },
     { label: t('nav.profile'), icon: User, path: '/profile' },
   ]
 
@@ -43,7 +46,7 @@ export function MobileBottomNav() {
             to={item.path}
             className={cn(
               'relative flex flex-col items-center justify-center gap-0.5',
-              'min-w-[64px] py-2 px-3',
+              'min-w-[56px] py-2 px-2',
               'transition-all duration-300',
               active ? 'text-primary' : 'text-muted-foreground'
             )}
@@ -54,6 +57,14 @@ export function MobileBottomNav() {
                 <div className="absolute inset-0 blur-md opacity-40">
                   <item.icon className="w-5 h-5 text-primary" />
                 </div>
+              )}
+              {item.badge && item.badge > 0 && (
+                <Badge
+                  variant="default"
+                  className="absolute -top-2 -right-3 h-4 min-w-[16px] px-1 flex items-center justify-center text-[9px] font-bold"
+                >
+                  {item.badge > 9 ? '9+' : item.badge}
+                </Badge>
               )}
             </div>
             <span className={cn(
@@ -70,7 +81,7 @@ export function MobileBottomNav() {
       })}
 
       {/* More button triggers the existing BurgerMenu drawer */}
-      <div className="relative flex flex-col items-center justify-center gap-0.5 min-w-[64px] py-2 px-3">
+      <div className="relative flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-2 px-2">
         <BurgerMenuTrigger pendingCount={pendingCount} />
       </div>
     </nav>
