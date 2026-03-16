@@ -466,7 +466,9 @@
       "discountSettings": "Netzwerk-Rabatt",
       "discountSettingsDesc": "Lege fest, wie viel Prozent Rabatt andere Partner erhalten, wenn sie deinen QR-Code scannen.",
       "discountLabel": "Rabatt",
-      "discountSaved": "Netzwerk-Rabatt erfolgreich aktualisiert."
+      "discountSaved": "Netzwerk-Rabatt erfolgreich aktualisiert.",
+      "dailyLimitReached": "Tägliches Scan-Limit erreicht ({{limit}}/Tag). Versuche es morgen wieder.",
+      "scansRemaining": "{{count}} Scan(s) heute noch verfügbar"
     },
     "reports": {
       "title": "Berichte & Rechnungen",
