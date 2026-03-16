@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
 import { PartnerSidebar } from './PartnerSidebar'
+import { MobileBottomNav } from './MobileBottomNav'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { Menu, Sparkles } from 'lucide-react'
@@ -18,10 +19,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const isPartnerRoute = location.pathname.startsWith('/partner')
 
   if (isMobile) {
-    // Mobile layout - no sidebar, just content
     return (
-      <div className="min-h-screen w-full bg-background">
+      <div className="min-h-screen w-full bg-background pb-16">
         {children}
+        {!isPartnerRoute && <MobileBottomNav />}
       </div>
     )
   }
