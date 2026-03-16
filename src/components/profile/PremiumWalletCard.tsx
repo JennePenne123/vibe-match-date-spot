@@ -265,6 +265,8 @@ function EmptyState({ tab }: { tab: WalletTab }) {
 export function PremiumWalletCard() {
   const [activeTab, setActiveTab] = useState<WalletTab>('active');
   const [direction, setDirection] = useState(0);
+  const [selectedVoucher, setSelectedVoucher] = useState<WalletVoucher | null>(null);
+  const { user } = useAuth();
   const tabOrder: WalletTab[] = ['active', 'expiring', 'redeemed', 'expired'];
 
   const handleTabChange = (newTab: string) => {
