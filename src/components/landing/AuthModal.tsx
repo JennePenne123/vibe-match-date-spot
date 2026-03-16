@@ -127,7 +127,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   useEffect(() => {
     if (user) {
       onClose();
-      navigate('/home');
+      navigate(hasMoodToday() ? '/home' : '/mood');
     }
   }, [user, navigate, onClose]);
 
