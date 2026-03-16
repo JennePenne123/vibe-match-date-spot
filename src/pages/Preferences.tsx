@@ -48,7 +48,7 @@ const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> 
   mediterranean:  { icon: Leaf,            bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
   american:       { icon: Beef,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
   thai:           { icon: Soup,            bg: 'bg-lime-500/15', fg: 'text-lime-500' },
-  chinese:        { icon: Utensils,        bg: 'bg-rose-500/15', fg: 'text-rose-500' },
+  chinese:        { icon: null, labIcon: bowlChopsticks, bg: 'bg-rose-500/15', fg: 'text-rose-500' },
   korean:         { icon: CookingPot,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   // Vibes
   romantic:       { icon: HeartHandshake,  bg: 'bg-pink-500/15', fg: 'text-pink-500' },
