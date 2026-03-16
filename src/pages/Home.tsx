@@ -8,6 +8,7 @@ import { safeFirstWord } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { hasMoodToday } from '@/pages/MoodCheckIn';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
