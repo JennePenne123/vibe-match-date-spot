@@ -138,8 +138,29 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         id: v.venue_id,
         name: v.venues?.name || 'Venue'
       })),
+      discount: networkDiscount,
       ts: Date.now(),
     });
+  };
+
+  const saveNetworkDiscount = async () => {
+    if (!user) return;
+    setSavingDiscount(true);
+    try {
+      const { error } = await supabase
+        .from('partner_profiles')
+        .update({ network_discount_value: networkDiscount } as any)
+        .eq('user_id', user.id);
+      if (error) throw error;
+      toast({
+        title: t('common.saved'),
+        description: t('partner.qr.discountSaved'),
+      });
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    } finally {
+      setSavingDiscount(false);
+    }
   };
 
   const handleDownloadQR = () => {
