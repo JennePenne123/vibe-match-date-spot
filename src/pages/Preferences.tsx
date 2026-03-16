@@ -13,7 +13,7 @@ import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
   Icon,
   // Cuisine icons
-  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup, Cherry,
+  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup,
   // Vibe icons
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
   // Price icons
@@ -44,10 +44,10 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
   japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
   mexican:        { icon: Flame,           bg: 'bg-yellow-600/15', fg: 'text-yellow-600' },
   french:         { icon: Croissant,       bg: 'bg-amber-500/15', fg: 'text-amber-500' },
-  indian:         { icon: Cherry,          bg: 'bg-orange-600/15', fg: 'text-orange-600' },
+  indian:         { icon: Soup,            bg: 'bg-orange-600/15', fg: 'text-orange-600' },
   mediterranean:  { icon: Leaf,            bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
   american:       { icon: Beef,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
-  thai:           { icon: Soup,            bg: 'bg-lime-500/15', fg: 'text-lime-500' },
+  thai:           { icon: CookingPot,      bg: 'bg-lime-500/15', fg: 'text-lime-500' },
   chinese:        { icon: null, labIcon: bowlChopsticks, bg: 'bg-rose-500/15', fg: 'text-rose-500' },
   korean:         { icon: CookingPot,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   // Vibes
