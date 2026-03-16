@@ -1,8 +1,9 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Star, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Star, ThumbsUp, ThumbsDown, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDateRating } from '@/hooks/useDateRating';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +14,7 @@ interface DateRatingModalProps {
   invitationId: string;
   partnerName: string;
   venueName: string;
+  dateTime?: string;
   venueId?: string;
   partnerId?: string;
   aiPredictedScore?: number | null;
@@ -56,6 +58,7 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
   invitationId,
   partnerName,
   venueName,
+  dateTime,
   venueId,
   partnerId,
   aiPredictedScore,
@@ -76,6 +79,11 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
     aiPredictedFactors,
   });
 
+  const hoursSinceDate = dateTime
+    ? (Date.now() - new Date(dateTime).getTime()) / (1000 * 60 * 60)
+    : 999;
+  const hasSpeedBonus = hoursSinceDate <= 24;
+
   const handleSubmit = async () => {
     const result = await submitRating();
     if (result.success) {
@@ -94,6 +102,16 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
         </DialogHeader>
 
         <div className="space-y-6 py-2">
+          {/* Speed bonus banner */}
+          {hasSpeedBonus && (
+            <div className="flex items-center justify-center">
+              <Badge variant="secondary" className="gap-1.5 px-3 py-1 text-xs bg-accent/10 text-accent border-accent/20">
+                <Zap className="h-3.5 w-3.5" />
+                {t('rating.speedBonus', '⚡ Speed-Bonus: +10 Extra-Punkte für schnelle Bewertung!')}
+              </Badge>
+            </div>
+          )}
+
           {/* Subtitle */}
           <p className="text-sm text-center text-muted-foreground">
             {t('rating.subtitle', 'Bewerte dein Date mit {{partner}} bei {{venue}}', {

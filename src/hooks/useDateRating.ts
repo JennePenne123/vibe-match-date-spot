@@ -42,6 +42,19 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Fetch invitation to check date time for speed bonus
+      const { data: invitation } = await supabase
+        .from('date_invitations')
+        .select('actual_date_time, proposed_date')
+        .eq('id', invitationId)
+        .single();
+
+      const dateTime = invitation?.actual_date_time || invitation?.proposed_date;
+      const hoursSinceDate = dateTime
+        ? (Date.now() - new Date(dateTime).getTime()) / (1000 * 60 * 60)
+        : 999;
+      const hasSpeedBonus = hoursSinceDate <= 24;
+
       const { data: feedback, error: feedbackError } = await supabase
         .from('date_feedback')
         .insert({
@@ -62,6 +75,7 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
       if (ratingData.venueRating > 0) pointsEarned += 5;
       if (ratingData.feedbackText.trim().length > 10) pointsEarned += 10;
       if (ratingData.wouldRecommendVenue !== null) pointsEarned += 5;
+      if (hasSpeedBonus) pointsEarned += 10; // speed bonus
 
       const completionLevel = pointsEarned >= 25 ? 'complete' : pointsEarned >= 15 ? 'detailed' : 'basic';
 
@@ -73,7 +87,7 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
           points_earned: pointsEarned,
           badges_earned: [],
           completion_level: completionLevel,
-          speed_bonus: false,
+          speed_bonus: hasSpeedBonus,
           both_rated_bonus: false,
         });
 
@@ -129,9 +143,10 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
         }
       }
 
+      const speedText = hasSpeedBonus ? ' (inkl. ⚡ Speed-Bonus!)' : '';
       toast({
         title: "🎉 Bewertung abgegeben!",
-        description: `Du hast ${pointsEarned} Punkte verdient. Danke für dein Feedback!`,
+        description: `Du hast ${pointsEarned} Punkte verdient${speedText}. Danke für dein Feedback!`,
       });
 
       return { success: true, points: pointsEarned };

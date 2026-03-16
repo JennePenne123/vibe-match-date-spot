@@ -531,6 +531,7 @@
     "submit": "Submit rating",
     "alreadyRated": "You rated this date",
     "bothRated": "{{partner}} also rated!",
-    "waitingPartner": "Waiting for {{partner}}'s rating"
+    "waitingPartner": "Waiting for {{partner}}'s rating",
+    "speedBonus": "⚡ Speed bonus: +10 extra points for quick rating!"
   }
 }

@@ -26,6 +26,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
   const [invitationData, setInvitationData] = useState<{
     partnerName: string;
     venueName: string;
+    dateTime?: string;
     venueId?: string;
     partnerId?: string;
     aiPredictedScore?: number | null;
@@ -64,6 +65,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
       setInvitationData({
         partnerName,
         venueName: invitation.venue?.name || 'Venue',
+        dateTime: invitation.actual_date_time || invitation.proposed_date || undefined,
         venueId: invitation.venue_id || undefined,
         partnerId,
         aiPredictedScore: invitation.ai_compatibility_score,
@@ -144,6 +146,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
         invitationId={invitationId}
         partnerName={invitationData.partnerName}
         venueName={invitationData.venueName}
+        dateTime={invitationData.dateTime}
         venueId={invitationData.venueId}
         partnerId={invitationData.partnerId}
         aiPredictedScore={invitationData.aiPredictedScore}
