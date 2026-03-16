@@ -500,7 +500,9 @@
       "recommend": "Recommend Rate",
       "recentReviews": "Recent Reviews",
       "noFeedback": "No guest feedback yet",
-      "noFeedbackDesc": "Reviews will appear once guests have rated their date at your venue"
+      "noFeedbackDesc": "Reviews will appear once guests have rated their date at your venue",
+      "newReviewTitle": "New Review! ⭐",
+      "newReviewDesc": "A guest has submitted a new review for your venue."
     },
     "network": {
       "findPartners": "Find Other Partners",

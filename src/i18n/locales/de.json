@@ -500,7 +500,9 @@
       "recommend": "Empfehlungsrate",
       "recentReviews": "Letzte Bewertungen",
       "noFeedback": "Noch kein Gästefeedback",
-      "noFeedbackDesc": "Bewertungen erscheinen, sobald Gäste ihr Date bei dir bewertet haben"
+      "noFeedbackDesc": "Bewertungen erscheinen, sobald Gäste ihr Date bei dir bewertet haben",
+      "newReviewTitle": "Neue Bewertung! ⭐",
+      "newReviewDesc": "Ein Gast hat eine neue Bewertung für Ihr Venue abgegeben."
     },
     "network": {
       "findPartners": "Finde andere Partner",
