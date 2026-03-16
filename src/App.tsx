@@ -13,36 +13,42 @@ import PushNotificationPrompt from "./components/PushNotificationPrompt";
 import OfflineBanner from "./components/OfflineBanner";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
-import Onboarding from "./pages/Onboarding";
-import MoodCheckIn from "./pages/MoodCheckIn";
-import Home from "./pages/Home";
-import Preferences from "./pages/Preferences";
-import Friends from "./pages/Friends";
-import Area from "./pages/Area";
-import Results from "./pages/Results";
-import VenueDetail from "./pages/VenueDetail";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import Venues from "./pages/Venues";
-import MyFriends from "./pages/MyFriends";
-import MyVenues from "./pages/MyVenues";
-import Invitations from "./pages/Invitations";
-import Chats from "./pages/Chats";
-import NotFound from "./pages/NotFound";
-import AIRecommendations from "./pages/AIRecommendations";
-import SmartDatePlanning from "./pages/SmartDatePlanning";
-import Landing from "./pages/Landing";
-import PartnerDashboard from "./pages/partner/Dashboard";
-import PartnerVouchers from "./pages/partner/Vouchers";
-import PartnerVenues from "./pages/partner/Venues";
-import PartnerReports from "./pages/partner/Reports";
-import PartnerQRCode from "./pages/partner/QRCode";
-import PartnerNetworkMap from "./pages/partner/NetworkMap";
-import PartnerProfile from "./pages/partner/Profile";
-import PartnerCityRankings from "./pages/partner/CityRankings";
-import AIInsights from "./pages/AIInsights";
 
-// Lazy load demo/debug routes (rarely visited, ~1,133 lines)
+// Only Landing is eagerly loaded (first screen users see)
+import Landing from "./pages/Landing";
+
+// All protected routes – lazy loaded
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const MoodCheckIn = lazy(() => import("./pages/MoodCheckIn"));
+const Home = lazy(() => import("./pages/Home"));
+const Preferences = lazy(() => import("./pages/Preferences"));
+const Friends = lazy(() => import("./pages/Friends"));
+const Area = lazy(() => import("./pages/Area"));
+const Results = lazy(() => import("./pages/Results"));
+const VenueDetail = lazy(() => import("./pages/VenueDetail"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Venues = lazy(() => import("./pages/Venues"));
+const MyFriends = lazy(() => import("./pages/MyFriends"));
+const MyVenues = lazy(() => import("./pages/MyVenues"));
+const Invitations = lazy(() => import("./pages/Invitations"));
+const Chats = lazy(() => import("./pages/Chats"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AIRecommendations = lazy(() => import("./pages/AIRecommendations"));
+const SmartDatePlanning = lazy(() => import("./pages/SmartDatePlanning"));
+const AIInsights = lazy(() => import("./pages/AIInsights"));
+
+// Partner routes – lazy loaded
+const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
+const PartnerVouchers = lazy(() => import("./pages/partner/Vouchers"));
+const PartnerVenues = lazy(() => import("./pages/partner/Venues"));
+const PartnerReports = lazy(() => import("./pages/partner/Reports"));
+const PartnerQRCode = lazy(() => import("./pages/partner/QRCode"));
+const PartnerNetworkMap = lazy(() => import("./pages/partner/NetworkMap"));
+const PartnerProfile = lazy(() => import("./pages/partner/Profile"));
+const PartnerCityRankings = lazy(() => import("./pages/partner/CityRankings"));
+
+// Demo/debug routes – lazy loaded
 const Debug = lazy(() => import("./pages/Debug"));
 const ShareholderReport = lazy(() => import("./pages/ShareholderReport"));
 const AIVenueCardDemo = lazy(() => import("./pages/AIVenueCardDemo"));
@@ -51,28 +57,37 @@ const RatingDemo = lazy(() => import("./pages/RatingDemo"));
 const VenueDesignSystemDemo = lazy(() => import("./pages/VenueDesignSystemDemo"));
 const ModernDesignSystemDemo = lazy(() => import("./pages/ModernDesignSystemDemo"));
 
-// Suspense fallback for lazy routes
+// Suspense fallback – minimal spinner
 const LazyFallback = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <LoadingSpinner size="lg" text="Loading..." />
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <LoadingSpinner size="lg" />
   </div>
 );
+
+// Wrap lazy page in Suspense + AppLayout
+function LazyPage({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<LazyFallback />}>
+      <AppLayout>{children}</AppLayout>
+    </Suspense>
+  );
+}
+
+function LazyPageNoLayout({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<LazyFallback />}>{children}</Suspense>;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error) => {
-        // Don't retry on 4xx errors
         if (error && typeof error === 'object' && 'status' in error) {
           const status = error.status as number;
-          if (status >= 400 && status < 500) {
-            return false;
-          }
+          if (status >= 400 && status < 500) return false;
         }
-        // Retry up to 3 times for other errors
         return failureCount < 3;
       },
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     },
     mutations: {
       retry: 1,
@@ -97,79 +112,51 @@ const App = () => (
                   <Routes>
                     {/* Public routes without layout */}
                     <Route path="/" element={<Landing />} />
-                    <Route path="/welcome" element={<Onboarding />} />
-                    <Route path="/mood" element={<MoodCheckIn />} />
+                    <Route path="/welcome" element={<LazyPageNoLayout><Onboarding /></LazyPageNoLayout>} />
+                    <Route path="/mood" element={<LazyPageNoLayout><MoodCheckIn /></LazyPageNoLayout>} />
                     <Route path="/register-login" element={<Navigate to="/?auth=required" replace />} />
                     
                     {/* Protected routes with responsive layout */}
-                    <Route path="/home" element={<AppLayout><Home /></AppLayout>} />
-                    <Route path="/preferences" element={<AppLayout><Preferences /></AppLayout>} />
-                    <Route path="/friends" element={<AppLayout><Friends /></AppLayout>} />
-                    <Route path="/area" element={<AppLayout><Area /></AppLayout>} />
-                    <Route path="/results" element={<AppLayout><Results /></AppLayout>} />
-                    <Route path="/venue/:id" element={<AppLayout><VenueDetail /></AppLayout>} />
-                    <Route path="/profile" element={<AppLayout><Profile /></AppLayout>} />
-                    <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
-                    <Route path="/venues" element={<AppLayout><Venues /></AppLayout>} />
-                    <Route path="/my-friends" element={<AppLayout><MyFriends /></AppLayout>} />
-                    <Route path="/my-venues" element={<AppLayout><MyVenues /></AppLayout>} />
-                    <Route path="/invitations" element={<AppLayout><Invitations /></AppLayout>} />
-                    <Route path="/chats" element={<AppLayout><Chats /></AppLayout>} />
-                    <Route path="/ai-recommendations" element={<AppLayout><AIRecommendations /></AppLayout>} />
-                    <Route path="/ai-insights" element={<AppLayout><AIInsights /></AppLayout>} />
-                    <Route path="/plan-date" element={<AppLayout><SmartDatePlanning /></AppLayout>} />
+                    <Route path="/home" element={<LazyPage><Home /></LazyPage>} />
+                    <Route path="/preferences" element={<LazyPage><Preferences /></LazyPage>} />
+                    <Route path="/friends" element={<LazyPage><Friends /></LazyPage>} />
+                    <Route path="/area" element={<LazyPage><Area /></LazyPage>} />
+                    <Route path="/results" element={<LazyPage><Results /></LazyPage>} />
+                    <Route path="/venue/:id" element={<LazyPage><VenueDetail /></LazyPage>} />
+                    <Route path="/profile" element={<LazyPage><Profile /></LazyPage>} />
+                    <Route path="/settings" element={<LazyPage><Settings /></LazyPage>} />
+                    <Route path="/venues" element={<LazyPage><Venues /></LazyPage>} />
+                    <Route path="/my-friends" element={<LazyPage><MyFriends /></LazyPage>} />
+                    <Route path="/my-venues" element={<LazyPage><MyVenues /></LazyPage>} />
+                    <Route path="/invitations" element={<LazyPage><Invitations /></LazyPage>} />
+                    <Route path="/chats" element={<LazyPage><Chats /></LazyPage>} />
+                    <Route path="/ai-recommendations" element={<LazyPage><AIRecommendations /></LazyPage>} />
+                    <Route path="/ai-insights" element={<LazyPage><AIInsights /></LazyPage>} />
+                    <Route path="/plan-date" element={<LazyPage><SmartDatePlanning /></LazyPage>} />
                     
-                    {/* Debug route - lazy loaded */}
-                    <Route path="/debug" element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <AppLayout><Debug /></AppLayout>
-                      </Suspense>
-                    } />
+                    {/* Debug route */}
+                    <Route path="/debug" element={<LazyPage><Debug /></LazyPage>} />
                     
                     {/* Partner Routes */}
-                    <Route path="/partner" element={<AppLayout><PartnerDashboard /></AppLayout>} />
-                    <Route path="/partner/vouchers" element={<AppLayout><PartnerVouchers /></AppLayout>} />
-                    <Route path="/partner/venues" element={<AppLayout><PartnerVenues /></AppLayout>} />
-                    <Route path="/partner/reports" element={<AppLayout><PartnerReports /></AppLayout>} />
-                    <Route path="/partner/qr-code" element={<AppLayout><PartnerQRCode /></AppLayout>} />
-                    <Route path="/partner/qr-scanner" element={<AppLayout><PartnerQRCode defaultTab="scanner" /></AppLayout>} />
-                    <Route path="/partner/network-map" element={<AppLayout><PartnerNetworkMap /></AppLayout>} />
-                    <Route path="/partner/network" element={<AppLayout><PartnerNetworkMap /></AppLayout>} />
-                    <Route path="/partner/profile" element={<AppLayout><PartnerProfile /></AppLayout>} />
-                    <Route path="/partner/city-rankings" element={<AppLayout><PartnerCityRankings /></AppLayout>} />
+                    <Route path="/partner" element={<LazyPage><PartnerDashboard /></LazyPage>} />
+                    <Route path="/partner/vouchers" element={<LazyPage><PartnerVouchers /></LazyPage>} />
+                    <Route path="/partner/venues" element={<LazyPage><PartnerVenues /></LazyPage>} />
+                    <Route path="/partner/reports" element={<LazyPage><PartnerReports /></LazyPage>} />
+                    <Route path="/partner/qr-code" element={<LazyPage><PartnerQRCode /></LazyPage>} />
+                    <Route path="/partner/qr-scanner" element={<LazyPage><PartnerQRCode defaultTab="scanner" /></LazyPage>} />
+                    <Route path="/partner/network-map" element={<LazyPage><PartnerNetworkMap /></LazyPage>} />
+                    <Route path="/partner/network" element={<LazyPage><PartnerNetworkMap /></LazyPage>} />
+                    <Route path="/partner/profile" element={<LazyPage><PartnerProfile /></LazyPage>} />
+                    <Route path="/partner/city-rankings" element={<LazyPage><PartnerCityRankings /></LazyPage>} />
                     
-                    {/* Demo routes - lazy loaded */}
-                    <Route path="/demo/ai-venue-card" element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <AIVenueCardDemo />
-                      </Suspense>
-                    } />
-                    <Route path="/demo/premium-design-system" element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <PremiumDesignSystemDemo />
-                      </Suspense>
-                    } />
-                    <Route path="/demo/rating" element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <RatingDemo />
-                      </Suspense>
-                    } />
-                    <Route path="/demo/venue-design-system" element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <VenueDesignSystemDemo />
-                      </Suspense>
-                    } />
-                    <Route path="/demo/modern-venue-design" element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <ModernDesignSystemDemo />
-                      </Suspense>
-                    } />
-                    <Route path="/shareholder-report" element={
-                      <Suspense fallback={<LazyFallback />}>
-                        <ShareholderReport />
-                      </Suspense>
-                    } />
-                    <Route path="*" element={<NotFound />} />
+                    {/* Demo routes */}
+                    <Route path="/demo/ai-venue-card" element={<LazyPageNoLayout><AIVenueCardDemo /></LazyPageNoLayout>} />
+                    <Route path="/demo/premium-design-system" element={<LazyPageNoLayout><PremiumDesignSystemDemo /></LazyPageNoLayout>} />
+                    <Route path="/demo/rating" element={<LazyPageNoLayout><RatingDemo /></LazyPageNoLayout>} />
+                    <Route path="/demo/venue-design-system" element={<LazyPageNoLayout><VenueDesignSystemDemo /></LazyPageNoLayout>} />
+                    <Route path="/demo/modern-venue-design" element={<LazyPageNoLayout><ModernDesignSystemDemo /></LazyPageNoLayout>} />
+                    <Route path="/shareholder-report" element={<LazyPageNoLayout><ShareholderReport /></LazyPageNoLayout>} />
+                    <Route path="*" element={<LazyPageNoLayout><NotFound /></LazyPageNoLayout>} />
                   </Routes>
                 </ErrorBoundary>
               </NotificationSystem>
