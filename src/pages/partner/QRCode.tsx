@@ -63,9 +63,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
   const [scanning, setScanning] = useState(false);
   const [networkDiscount, setNetworkDiscount] = useState(15);
   const [savingDiscount, setSavingDiscount] = useState(false);
-  const [dailyScansUsed, setDailyScansUsed] = useState(0);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  const DAILY_SCAN_LIMIT = 3;
 
   useEffect(() => {
     if (!roleLoading && role !== 'venue_partner' && role !== 'admin') {
