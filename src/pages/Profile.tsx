@@ -87,7 +87,6 @@ const Profile = () => {
           <AILearningCard />
           {/* TODO: Show Wallet for premium users, ThemeSettings for free users */}
           <PremiumWalletCard />
-          <ThemeSettingsCard />
           <LeaderboardCard />
           <ProfileActions onLogout={logout} />
         </div>
