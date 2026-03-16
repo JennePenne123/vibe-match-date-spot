@@ -51,7 +51,6 @@ const HomeHeader = ({ user, displayName, firstName }: HomeHeaderProps) => {
       <div className="flex items-center gap-1 shrink-0">
         <PointsIndicator />
         <ThemeToggle />
-        <BurgerMenu />
       </div>
     </div>
   );
