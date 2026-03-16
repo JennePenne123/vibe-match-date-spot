@@ -697,7 +697,7 @@ const Preferences = () => {
               }`}
             >
               <div className="flex items-center gap-4">
-                <PrefIcon id={activity.id === 'cultural' ? 'cultural_activity' : activity.id === 'nightlife' ? 'nightlife_activity' : activity.id} />
+                <PrefIcon id={activity.id === 'cultural' ? 'cultural_act' : activity.id === 'nightlife' ? 'nightlife_act' : activity.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{activity.name}</div>
                   <div className={`text-sm ${selectedActivities.includes(activity.id) ? 'text-primary' : 'text-muted-foreground'}`}>
