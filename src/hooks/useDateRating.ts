@@ -5,22 +5,7 @@ import { learnFromFeedback } from '@/services/aiLearningService';
 
 export interface DateRatingData {
   overallRating: number;
-  sentiment: 'loved' | 'good' | 'okay' | 'meh' | 'bad' | null;
-  venueRating: number;
-  venueTags: string[];
-  aiAccuracyRating: number | null;
   feedbackText: string;
-  wouldRecommendVenue: boolean | null;
-  wouldUseAiAgain: boolean | null;
-}
-
-export interface PointsPreview {
-  basic: number;
-  aiAccuracy: number;
-  detailedFeedback: number;
-  completeAll: number;
-  speedBonus: number;
-  total: number;
 }
 
 export interface DateRatingOptions {
@@ -32,112 +17,18 @@ export interface DateRatingOptions {
 
 export const useDateRating = (invitationId: string, options?: DateRatingOptions) => {
   const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ratingData, setRatingData] = useState<DateRatingData>({
     overallRating: 0,
-    sentiment: null,
-    venueRating: 0,
-    venueTags: [],
-    aiAccuracyRating: null,
     feedbackText: '',
-    wouldRecommendVenue: null,
-    wouldUseAiAgain: null,
   });
-
-  const calculatePoints = (): PointsPreview => {
-    let points = {
-      basic: 0,
-      aiAccuracy: 0,
-      detailedFeedback: 0,
-      completeAll: 0,
-      speedBonus: 0,
-      total: 0,
-    };
-
-    // Basic rating (Steps 1-2)
-    if (ratingData.overallRating > 0 && ratingData.venueRating > 0) {
-      points.basic = 10;
-    }
-
-    // AI accuracy rating (Step 3)
-    if (ratingData.aiAccuracyRating !== null) {
-      points.aiAccuracy = 5;
-    }
-
-    // Detailed feedback (Step 4)
-    if (ratingData.feedbackText.trim().length > 20) {
-      points.detailedFeedback = 10;
-    }
-
-    // Complete all questions (Step 5)
-    if (
-      ratingData.wouldRecommendVenue !== null &&
-      ratingData.wouldUseAiAgain !== null
-    ) {
-      points.completeAll = 15;
-    }
-
-    // Speed bonus (if submitted within 24h - calculated server-side)
-    // This will be determined when we submit
-    points.speedBonus = 5; // Preview value
-
-    points.total = 
-      points.basic + 
-      points.aiAccuracy + 
-      points.detailedFeedback + 
-      points.completeAll + 
-      points.speedBonus;
-
-    return points;
-  };
 
   const updateRatingData = (updates: Partial<DateRatingData>) => {
     setRatingData(prev => ({ ...prev, ...updates }));
   };
 
-  const nextStep = () => {
-    if (currentStep < 5) {
-      setCurrentStep(prev => prev + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
-    }
-  };
-
-  const canProceed = (): boolean => {
-    switch (currentStep) {
-      case 1:
-        return ratingData.overallRating > 0 && ratingData.sentiment !== null;
-      case 2:
-        return ratingData.venueRating > 0;
-      case 3:
-      case 4:
-      case 5:
-        return true; // These steps are optional
-      default:
-        return false;
-    }
-  };
-
-  const getCompletionLevel = (): 'basic' | 'detailed' | 'complete' => {
-    const hasBasic = ratingData.overallRating > 0 && ratingData.venueRating > 0;
-    const hasAiRating = ratingData.aiAccuracyRating !== null;
-    const hasFeedback = ratingData.feedbackText.trim().length > 20;
-    const hasRecommendations = 
-      ratingData.wouldRecommendVenue !== null && 
-      ratingData.wouldUseAiAgain !== null;
-
-    if (hasBasic && hasAiRating && hasFeedback && hasRecommendations) {
-      return 'complete';
-    } else if (hasBasic && (hasAiRating || hasFeedback)) {
-      return 'detailed';
-    } else {
-      return 'basic';
-    }
+  const canSubmit = (): boolean => {
+    return ratingData.overallRating > 0;
   };
 
   const submitRating = async () => {
@@ -147,17 +38,14 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Create date feedback entry
+      // Create date feedback entry — single overall rating stored in both rating and venue_rating
       const { data: feedback, error: feedbackError } = await supabase
         .from('date_feedback')
         .insert({
           invitation_id: invitationId,
           user_id: user.id,
           rating: ratingData.overallRating,
-          venue_rating: ratingData.venueRating,
-          ai_accuracy_rating: ratingData.aiAccuracyRating,
-          would_recommend_venue: ratingData.wouldRecommendVenue,
-          would_use_ai_again: ratingData.wouldUseAiAgain,
+          venue_rating: ratingData.overallRating,
           feedback_text: ratingData.feedbackText || null,
         })
         .select()
@@ -165,21 +53,19 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
 
       if (feedbackError) throw feedbackError;
 
-      // Calculate points and badges
-      const completionLevel = getCompletionLevel();
-      const points = calculatePoints();
+      // Award points for rating
+      const pointsEarned = ratingData.feedbackText.trim().length > 10 ? 15 : 10;
 
-      // Create feedback reward entry
       const { error: rewardError } = await supabase
         .from('feedback_rewards')
         .insert({
           feedback_id: feedback.id,
           user_id: user.id,
-          points_earned: points.total,
+          points_earned: pointsEarned,
           badges_earned: [],
-          completion_level: completionLevel,
-          speed_bonus: true, // Will be validated server-side
-          both_rated_bonus: false, // Will be calculated server-side
+          completion_level: ratingData.feedbackText.trim().length > 10 ? 'detailed' : 'basic',
+          speed_bonus: false,
+          both_rated_bonus: false,
         });
 
       if (rewardError) throw rewardError;
@@ -191,22 +77,19 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
         .eq('user_id', user.id)
         .single();
 
-      const newTotal = (existingPoints?.total_points || 0) + points.total;
-      
-      // Calculate streak
-      const lastReview = existingPoints?.last_review_date 
+      const newTotal = (existingPoints?.total_points || 0) + pointsEarned;
+      const lastReview = existingPoints?.last_review_date
         ? new Date(existingPoints.last_review_date)
         : null;
       const today = new Date();
-      const daysSinceLastReview = lastReview 
+      const daysSinceLastReview = lastReview
         ? Math.floor((today.getTime() - lastReview.getTime()) / (1000 * 60 * 60 * 24))
         : 999;
-      
-      const newStreak = daysSinceLastReview <= 1 
-        ? (existingPoints?.streak_count || 0) + 1 
+      const newStreak = daysSinceLastReview <= 1
+        ? (existingPoints?.streak_count || 0) + 1
         : 1;
 
-      const { error: pointsError } = await supabase
+      await supabase
         .from('user_points')
         .upsert({
           user_id: user.id,
@@ -215,53 +98,38 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
           last_review_date: today.toISOString(),
         });
 
-      if (pointsError) throw pointsError;
-
       // Send feedback to AI learning system
-      let learningResult = null;
       if (options?.venueId) {
         try {
-          console.log('🧠 Sending feedback to AI learning system...');
-          learningResult = await learnFromFeedback({
+          await learnFromFeedback({
             userId: user.id,
             partnerId: options.partnerId,
             venueId: options.venueId,
-            invitationId: invitationId,
+            invitationId,
             predictedScore: options.aiPredictedScore ?? 75,
             predictedFactors: options.aiPredictedFactors ?? {},
             actualRating: ratingData.overallRating,
-            venueRating: ratingData.venueRating,
-            aiAccuracyRating: ratingData.aiAccuracyRating ?? undefined,
-            wouldRecommend: ratingData.wouldRecommendVenue ?? undefined,
+            venueRating: ratingData.overallRating,
             contextData: {
-              sentiment: ratingData.sentiment,
-              venueTags: ratingData.venueTags,
               feedbackText: ratingData.feedbackText,
             },
           });
-          if (learningResult) {
-            console.log('✅ AI learned from feedback:', learningResult);
-          }
         } catch (err) {
           console.error('⚠️ AI learning failed (non-blocking):', err);
         }
       }
 
-      const toastDescription = learningResult?.improvementPercent
-        ? `You earned ${points.total} points! AI accuracy improved by ${learningResult.improvementPercent}%`
-        : `You earned ${points.total} points! Thank you for your feedback.`;
-
       toast({
-        title: "🎉 Rating Submitted!",
-        description: toastDescription,
+        title: "🎉 Bewertung abgegeben!",
+        description: `Du hast ${pointsEarned} Punkte verdient. Danke für dein Feedback!`,
       });
 
-      return { success: true, points: points.total };
+      return { success: true, points: pointsEarned };
     } catch (error) {
       console.error('Error submitting rating:', error);
       toast({
-        title: "Submission Failed",
-        description: "Failed to submit your rating. Please try again.",
+        title: "Fehler",
+        description: "Bewertung konnte nicht gespeichert werden. Bitte versuche es erneut.",
         variant: "destructive",
       });
       return { success: false, points: 0 };
@@ -271,15 +139,10 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
   };
 
   return {
-    currentStep,
     ratingData,
     isSubmitting,
     updateRatingData,
-    nextStep,
-    prevStep,
-    canProceed,
-    calculatePoints,
+    canSubmit,
     submitRating,
-    setCurrentStep,
   };
 };
