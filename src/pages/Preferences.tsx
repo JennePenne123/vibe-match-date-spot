@@ -679,14 +679,11 @@ const Preferences = () => {
         <div className="space-y-3">
           {activities.map((activity) => (
             <button
+              type="button"
               key={activity.id}
               onClick={() => toggleSelection(activity.id, selectedActivities, setSelectedActivities)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedActivities.includes(activity.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
-            >
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
               <div className="flex items-center gap-4">
                 <PrefIcon id={activity.id === 'cultural' ? 'cultural_act' : activity.id === 'nightlife' ? 'nightlife_act' : activity.id} />
                 <div className="flex-1 text-left">
