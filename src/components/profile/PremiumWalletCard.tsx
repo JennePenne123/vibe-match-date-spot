@@ -297,7 +297,7 @@ export function PremiumWalletCard() {
       </CardHeader>
 
       <CardContent className="pt-0">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as WalletTab)}>
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="w-full grid grid-cols-4 h-9 bg-muted/50 p-0.5">
             <TabsTrigger value="active" className="text-[10px] data-[state=active]:bg-card data-[state=active]:shadow-sm px-1">
               Aktiv {counts.active > 0 && <span className="ml-0.5 text-primary">({counts.active})</span>}
@@ -316,17 +316,34 @@ export function PremiumWalletCard() {
             </TabsTrigger>
           </TabsList>
 
-          {(['active', 'expiring', 'redeemed', 'expired'] as WalletTab[]).map((tab) => (
-            <TabsContent key={tab} value={tab} className="mt-3 space-y-2.5">
-              {tabVouchers[tab].length === 0 ? (
-                <EmptyState tab={tab} />
-              ) : (
-                tabVouchers[tab].map((voucher) => (
-                  <VoucherCard key={voucher.id} voucher={voucher} variant={tab} />
-                ))
-              )}
-            </TabsContent>
-          ))}
+          <div className="relative overflow-hidden">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={activeTab}
+                custom={direction}
+                initial={{ x: direction * 80, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: direction * -80, opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className="mt-3 space-y-2.5"
+              >
+                {tabVouchers[activeTab].length === 0 ? (
+                  <EmptyState tab={activeTab} />
+                ) : (
+                  tabVouchers[activeTab].map((voucher, i) => (
+                    <motion.div
+                      key={voucher.id}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.06, duration: 0.2 }}
+                    >
+                      <VoucherCard voucher={voucher} variant={activeTab} />
+                    </motion.div>
+                  ))
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </Tabs>
 
         {/* 30-day validity info */}
