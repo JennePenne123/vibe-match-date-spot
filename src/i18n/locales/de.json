@@ -24,10 +24,16 @@
     "home": "Home",
     "planDate": "Date planen",
     "profile": "Profil",
+    "chats": "Chats",
     "myFriends": "Meine Freunde",
     "invitations": "Einladungen",
     "myVenues": "Meine Venues",
     "navigation": "Navigation"
+  },
+  "chats": {
+    "empty": "Noch keine Unterhaltungen. Plane ein Date und starte den Chat!",
+    "noResults": "Keine Chats gefunden",
+    "you": "Du"
   },
   "greeting": {
     "morning": "Guten Morgen",
