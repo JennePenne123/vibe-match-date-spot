@@ -22,6 +22,7 @@ export function AppSidebar() {
   const location = useLocation()
   const { user, logout } = useAuth()
   const { invitations } = useInvitations()
+  const { isPartner, isAdmin } = useUserRole()
   const currentPath = location.pathname
   const [isMoreOpen, setIsMoreOpen] = React.useState(false)
 
