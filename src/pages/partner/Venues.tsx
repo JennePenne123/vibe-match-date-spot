@@ -5,9 +5,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Phone, Globe, Plus } from 'lucide-react';
+import { MapPin, Phone, Globe, Plus, Settings } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
+import { VenueManagementSheet } from '@/components/partner/VenueManagementSheet';
 
 interface Partnership {
   id: string;
@@ -30,6 +31,7 @@ export default function PartnerVenues() {
   const { toast } = useToast();
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [loading, setLoading] = useState(true);
+  const [managingVenue, setManagingVenue] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     if (!roleLoading && role !== 'venue_partner' && role !== 'admin') {
@@ -159,14 +161,29 @@ export default function PartnerVenues() {
                 )}
 
                 {partnership.status === 'active' && (
-                  <Button className="w-full mt-4" variant="outline">
-                    Manage Venue
+                  <Button
+                    className="w-full mt-4 gap-2"
+                    variant="outline"
+                    onClick={() => setManagingVenue({ id: partnership.venue_id, name: partnership.venues.name })}
+                  >
+                    <Settings className="w-4 h-4" />
+                    Venue verwalten
                   </Button>
                 )}
               </CardContent>
             </Card>
           ))}
         </div>
+      )}
+
+      {managingVenue && (
+        <VenueManagementSheet
+          open={!!managingVenue}
+          onOpenChange={(open) => !open && setManagingVenue(null)}
+          venueId={managingVenue.id}
+          venueName={managingVenue.name}
+          onUpdated={fetchPartnerships}
+        />
       )}
     </div>
   );
