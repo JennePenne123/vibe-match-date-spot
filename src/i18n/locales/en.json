@@ -461,7 +461,11 @@
       "noExclusiveYet": "No partner perks yet",
       "noExclusiveDesc": "Scan partner codes or let your code be scanned to share exclusive perks.",
       "validUntil": "Valid until",
-      "redeemed": "Redeemed"
+      "redeemed": "Redeemed",
+      "discountSettings": "Network Discount",
+      "discountSettingsDesc": "Set the discount percentage other partners receive when they scan your QR code.",
+      "discountLabel": "Discount",
+      "discountSaved": "Network discount updated successfully."
     },
     "reports": {
       "title": "Reports & Invoices",
