@@ -724,13 +724,47 @@ useEffect(() => {
         <h2 className="text-base md:text-lg font-bold mb-2">Quick Start</h2>
         <p className="text-muted-foreground text-sm mb-3 md:mb-4">Or choose a ready-made template</p>
         <div className="grid grid-cols-1 gap-2 md:gap-3">
+          {/* AI-learned personalized template */}
+          {learnedTemplate && (
+            <button
+              type="button"
+              key={learnedTemplate.id}
+              onClick={() => applyQuickStartTemplate(learnedTemplate)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className={cn(
+                "p-3 md:p-4 rounded-lg border-2 text-left transition-none select-none relative",
+                selectedTemplateId === learnedTemplate.id
+                  ? "border-primary bg-card"
+                  : "border-border bg-card"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="text-xl md:text-2xl flex-shrink-0">{learnedTemplate.emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm md:text-base flex items-center gap-2">
+                    {learnedTemplate.title}
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">KI</Badge>
+                  </h3>
+                  <p className="text-xs md:text-sm text-muted-foreground leading-tight">{learnedTemplate.description}</p>
+                </div>
+                {selectedTemplateId === learnedTemplate.id && (
+                  <Check className="w-4 h-4 flex-shrink-0" />
+                )}
+              </div>
+            </button>
+          )}
           {quickStartTemplates.map((template) => (
             <button
               type="button"
               key={template.id}
               onClick={() => applyQuickStartTemplate(template)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-3 md:p-4 rounded-lg border border-border text-left transition-none select-none"
+              className={cn(
+                "p-3 md:p-4 rounded-lg border-2 text-left transition-none select-none relative",
+                selectedTemplateId === template.id
+                  ? "border-primary bg-card"
+                  : "border-border bg-card"
+              )}
             >
               <div className="flex items-center gap-3">
                 <div className="text-xl md:text-2xl flex-shrink-0">{template.emoji}</div>
@@ -738,6 +772,9 @@ useEffect(() => {
                   <h3 className="font-semibold text-sm md:text-base">{template.title}</h3>
                   <p className="text-xs md:text-sm text-muted-foreground leading-tight">{template.description}</p>
                 </div>
+                {selectedTemplateId === template.id && (
+                  <Check className="w-4 h-4 flex-shrink-0" />
+                )}
               </div>
             </button>
           ))}
