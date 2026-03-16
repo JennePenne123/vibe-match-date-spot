@@ -629,10 +629,10 @@ const Preferences = () => {
             <button
               key={time.id}
               onClick={() => toggleSelection(time.id, selectedTimePreferences, setSelectedTimePreferences)}
-              className={`p-4 rounded-xl border-2 transition-all ${
+              className={`p-4 rounded-xl border-2 transition-none ${
                 selectedTimePreferences.includes(time.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <PrefIcon id={time.id} />
