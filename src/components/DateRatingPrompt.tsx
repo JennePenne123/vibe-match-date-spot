@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, Trophy, Clock, CheckCheck } from 'lucide-react';
+import { Star, CheckCheck } from 'lucide-react';
 import { DateRatingModal } from './rating/DateRatingModal';
 import { checkDateFeedbackStatus } from '@/services/feedbackService';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
 
 interface DateRatingPromptProps {
   invitationId: string;
@@ -16,6 +17,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
   invitationId,
   onRatingComplete,
 }) => {
+  const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [feedbackStatus, setFeedbackStatus] = useState<{
     hasRated: boolean;
@@ -24,7 +26,6 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
   const [invitationData, setInvitationData] = useState<{
     partnerName: string;
     venueName: string;
-    dateTime: string;
     venueId?: string;
     partnerId?: string;
     aiPredictedScore?: number | null;
@@ -38,12 +39,9 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
 
   const loadData = async () => {
     setLoading(true);
-    
-    // Load feedback status
     const status = await checkDateFeedbackStatus(invitationId);
     setFeedbackStatus(status);
-    
-    // Load invitation data for display including AI data
+
     const { data: invitation } = await supabase
       .from('date_invitations')
       .select(`
@@ -54,26 +52,25 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
       `)
       .eq('id', invitationId)
       .single();
-    
+
     if (invitation) {
       const { data: { user } } = await supabase.auth.getUser();
       const isUserSender = user?.id === invitation.sender_id;
       const partnerName = isUserSender
-        ? invitation.recipient?.name || 'Your partner'
-        : invitation.sender?.name || 'Your partner';
+        ? invitation.recipient?.name || 'Partner'
+        : invitation.sender?.name || 'Partner';
       const partnerId = isUserSender ? invitation.recipient_id : invitation.sender_id;
-      
+
       setInvitationData({
         partnerName,
-        venueName: invitation.venue?.name || 'the venue',
-        dateTime: invitation.actual_date_time || invitation.proposed_date || '',
+        venueName: invitation.venue?.name || 'Venue',
         venueId: invitation.venue_id || undefined,
         partnerId,
         aiPredictedScore: invitation.ai_compatibility_score,
         aiPredictedFactors: invitation.venue_match_factors as Record<string, unknown> | null,
       });
     }
-    
+
     setLoading(false);
   };
 
@@ -92,42 +89,27 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
     );
   }
 
-  // Don't show if user already rated
   if (feedbackStatus?.hasRated) {
     return (
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
         <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <CheckCheck className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm">You rated this date</p>
-                <p className="text-xs text-muted-foreground">
-                  {feedbackStatus.partnerHasRated 
-                    ? `${invitationData.partnerName} also rated - Both reviews complete!` 
-                    : `Waiting for ${invitationData.partnerName} to rate`}
-                </p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <CheckCheck className="h-5 w-5 text-primary" />
             </div>
-            {feedbackStatus.partnerHasRated && (
-              <Badge variant="secondary" className="gap-1">
-                <Trophy className="h-3 w-3" />
-                +20 bonus
-              </Badge>
-            )}
+            <div>
+              <p className="font-semibold text-sm">{t('rating.alreadyRated', 'Du hast dieses Date bewertet')}</p>
+              <p className="text-xs text-muted-foreground">
+                {feedbackStatus.partnerHasRated
+                  ? t('rating.bothRated', '{{partner}} hat auch bewertet!', { partner: invitationData.partnerName })
+                  : t('rating.waitingPartner', 'Warte auf {{partner}}s Bewertung', { partner: invitationData.partnerName })}
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
     );
   }
-
-  // Calculate time since date
-  const dateObj = new Date(invitationData.dateTime);
-  const now = new Date();
-  const hoursSince = Math.floor((now.getTime() - dateObj.getTime()) / (1000 * 60 * 60));
-  const isWithin24h = hoursSince < 24;
 
   return (
     <>
@@ -136,44 +118,21 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-                <h3 className="font-semibold">Rate Your Date</h3>
+                <Star className="h-5 w-5 fill-accent text-accent" />
+                <h3 className="font-semibold">{t('rating.title')}</h3>
               </div>
-              
+
               <p className="text-sm text-muted-foreground mb-3">
-                How was your date with <span className="font-medium text-foreground">{invitationData.partnerName}</span> at{' '}
-                <span className="font-medium text-foreground">{invitationData.venueName}</span>?
+                {t('rating.subtitle', { partner: invitationData.partnerName, venue: invitationData.venueName })}
               </p>
 
-              <div className="flex flex-wrap gap-2 mb-3">
-                {isWithin24h && (
-                  <Badge variant="secondary" className="gap-1">
-                    <Clock className="h-3 w-3" />
-                    24h bonus available
-                  </Badge>
-                )}
-                {feedbackStatus?.partnerHasRated && (
-                  <Badge variant="secondary" className="gap-1">
-                    <Trophy className="h-3 w-3" />
-                    {invitationData.partnerName} already rated!
-                  </Badge>
-                )}
-                <Badge variant="outline" className="gap-1">
-                  Up to 45 points
-                </Badge>
-              </div>
-
-              <Button 
+              <Button
                 onClick={() => setModalOpen(true)}
                 className="w-full sm:w-auto gap-2"
               >
                 <Star className="h-4 w-4" />
-                Rate Now & Earn Points
+                {t('rating.submit')}
               </Button>
-            </div>
-
-            <div className="hidden sm:flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
-              <Trophy className="h-8 w-8 text-primary" />
             </div>
           </div>
         </CardContent>
