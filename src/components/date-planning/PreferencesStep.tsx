@@ -452,6 +452,9 @@ useEffect(() => {
         : [...prev, item]
     );
     
+    // Clear template selection when user manually changes preferences
+    setSelectedTemplateId(null);
+    
     // Track if user manually changed time preferences
     if (category === 'preferred_times') {
       setUserModifiedTimePrefs(true);
