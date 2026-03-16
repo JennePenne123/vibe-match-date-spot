@@ -8,6 +8,7 @@ import { safeFirstWord } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { hasMoodToday } from '@/pages/MoodCheckIn';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -21,11 +22,13 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  // Handle authentication redirect
+  // Handle authentication redirect + mood check
   React.useEffect(() => {
     if (!authLoading && !user) {
       console.log('No authenticated user found, redirecting to login');
       navigate('/?auth=required', { replace: true });
+    } else if (!authLoading && user && !hasMoodToday()) {
+      navigate('/mood', { replace: true });
     }
   }, [user, authLoading, navigate]);
 
