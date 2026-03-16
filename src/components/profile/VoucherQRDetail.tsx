@@ -90,7 +90,7 @@ export function VoucherQRDetail({ voucher, userId, onClose }: VoucherQRDetailPro
             </div>
 
             {/* Discount badge */}
-            <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-base px-4 py-1.5">
+            <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm px-3 py-1">
               {discountText}
             </Badge>
 
