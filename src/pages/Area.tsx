@@ -130,7 +130,16 @@ const Area = () => {
                 } ${appState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="text-2xl">{area.emoji}</div>
+                  {(() => {
+                    const iconConfig = areaIconMap[area.id];
+                    if (!iconConfig) return null;
+                    const AreaIcon = iconConfig.icon;
+                    return (
+                      <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', iconConfig.bg)}>
+                        <AreaIcon className={cn('w-5 h-5', iconConfig.fg)} />
+                      </div>
+                    );
+                  })()}
                   <div className="flex-1 text-left">
                     <div className="font-semibold">{area.name}</div>
                     <div className={`text-sm ${selectedArea === area.id ? 'text-primary' : 'text-muted-foreground'}`}>
