@@ -432,7 +432,7 @@ const Preferences = () => {
                   : 'bg-card border-border text-foreground hover:bg-accent/50'
               }`}
             >
-              <div className="text-2xl mb-1">{cuisine.emoji}</div>
+              <PrefIcon id={cuisine.id} />
               <div className="font-medium text-sm">{cuisine.name}</div>
               {selectedCuisines.includes(cuisine.id) && (
                 <Check className="w-4 h-4 mx-auto mt-1" />
