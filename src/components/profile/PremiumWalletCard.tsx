@@ -361,6 +361,15 @@ export function PremiumWalletCard() {
           Vouchers sind 30 Tage ab Erstellung gültig
         </p>
       </CardContent>
+
+      {/* QR Detail Modal */}
+      {selectedVoucher && user && (
+        <VoucherQRDetail
+          voucher={selectedVoucher}
+          userId={user.id}
+          onClose={() => setSelectedVoucher(null)}
+        />
+      )}
     </Card>
   );
 }
