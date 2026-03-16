@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
   // Cuisine icons
-  Pizza, Fish, Pepper, Croissant, CookingPot, Leaf, Beef, Soup, Utensils, Flame,
+  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup, Utensils, Cherry,
   // Vibe icons
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
   // Price icons
