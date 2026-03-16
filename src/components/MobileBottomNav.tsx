@@ -21,9 +21,9 @@ export function MobileBottomNav() {
   const isActive = (path: string) => location.pathname === path
 
   const navItems = [
-    { label: t('nav.planDate'), icon: Sparkles, path: '/plan-date' },
     { label: t('nav.home'), icon: Home, path: '/home' },
-    { label: t('nav.chats', 'Chats'), icon: MessageCircle, path: '/chats', badge: totalUnread },
+    { label: t('menu.myInvitations'), icon: MessageCircle, path: '/invitations', badge: totalUnread },
+    { label: t('nav.planDate'), icon: Sparkles, path: '/plan-date', highlight: true },
     { label: t('nav.profile'), icon: User, path: '/profile' },
   ]
 
