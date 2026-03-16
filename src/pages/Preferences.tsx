@@ -627,7 +627,7 @@ const Preferences = () => {
                   : 'bg-card border-border text-foreground hover:bg-accent/50'
               }`}
             >
-              <div className="text-2xl mb-1">{ent.emoji}</div>
+              <PrefIcon id={ent.id} />
               <div className="font-medium text-sm">{ent.name}</div>
               {selectedEntertainment.includes(ent.id) && (
                 <Check className="w-4 h-4 mx-auto mt-1" />
