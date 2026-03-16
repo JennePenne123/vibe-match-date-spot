@@ -24,12 +24,74 @@ interface FeedbackSummary {
 
 export default function GuestFeedbackCard() {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [summary, setSummary] = useState<FeedbackSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [newCount, setNewCount] = useState(0);
+
+  const handleNewFeedback = useCallback(() => {
+    setNewCount(prev => prev + 1);
+    fetchFeedback();
+    toast({
+      title: t('partner.feedback.newReviewTitle', 'Neue Bewertung! ⭐'),
+      description: t('partner.feedback.newReviewDesc', 'Ein Gast hat eine neue Bewertung für Ihr Venue abgegeben.'),
+      duration: 6000,
+    });
+  }, [t, toast]);
 
   useEffect(() => {
     fetchFeedback();
   }, []);
+
+  // Realtime subscription for new feedback on partner's venues
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    const setupRealtime = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: partnerships } = await supabase
+        .from('venue_partnerships')
+        .select('venue_id')
+        .eq('partner_id', user.id)
+        .eq('status', 'approved');
+
+      const venueIds = partnerships?.map(p => p.venue_id) || [];
+      if (venueIds.length === 0) return;
+
+      // Listen for new feedback on date_invitations that reference partner venues
+      channel = supabase
+        .channel('partner-feedback-notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'date_feedback',
+          },
+          async (payload) => {
+            // Check if this feedback is for one of our venues
+            const { data: invitation } = await supabase
+              .from('date_invitations')
+              .select('venue_id')
+              .eq('id', payload.new.invitation_id)
+              .single();
+
+            if (invitation && venueIds.includes(invitation.venue_id || '')) {
+              handleNewFeedback();
+            }
+          }
+        )
+        .subscribe();
+    };
+
+    setupRealtime();
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [handleNewFeedback]);
 
   const fetchFeedback = async () => {
     try {
