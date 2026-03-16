@@ -30,7 +30,6 @@ const BurgerMenu = ({ renderTrigger }: BurgerMenuProps = {}) => {
   ] as const;
 
   const menuItems = [
-    { icon: User, label: t('menu.profile'), path: '/profile', description: t('menu.profileDesc') },
     { icon: Users, label: t('menu.myFriends'), path: '/my-friends', description: t('menu.myFriendsDesc') },
     { icon: Heart, label: t('menu.myInvitations'), path: '/invitations', description: t('menu.myInvitationsDesc') },
     { icon: MapPin, label: t('menu.myVenues'), path: '/my-venues', description: t('menu.myVenuesDesc') },
