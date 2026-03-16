@@ -5,7 +5,9 @@ import { learnFromFeedback } from '@/services/aiLearningService';
 
 export interface DateRatingData {
   overallRating: number;
+  venueRating: number;
   feedbackText: string;
+  wouldRecommendVenue: boolean | null;
 }
 
 export interface DateRatingOptions {
@@ -20,7 +22,9 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ratingData, setRatingData] = useState<DateRatingData>({
     overallRating: 0,
+    venueRating: 0,
     feedbackText: '',
+    wouldRecommendVenue: null,
   });
 
   const updateRatingData = (updates: Partial<DateRatingData>) => {
@@ -38,14 +42,14 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Create date feedback entry — single overall rating stored in both rating and venue_rating
       const { data: feedback, error: feedbackError } = await supabase
         .from('date_feedback')
         .insert({
           invitation_id: invitationId,
           user_id: user.id,
           rating: ratingData.overallRating,
-          venue_rating: ratingData.overallRating,
+          venue_rating: ratingData.venueRating > 0 ? ratingData.venueRating : null,
+          would_recommend_venue: ratingData.wouldRecommendVenue,
           feedback_text: ratingData.feedbackText || null,
         })
         .select()
@@ -53,8 +57,13 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
 
       if (feedbackError) throw feedbackError;
 
-      // Award points for rating
-      const pointsEarned = ratingData.feedbackText.trim().length > 10 ? 15 : 10;
+      // Calculate points based on completeness
+      let pointsEarned = 10; // base for overall rating
+      if (ratingData.venueRating > 0) pointsEarned += 5;
+      if (ratingData.feedbackText.trim().length > 10) pointsEarned += 10;
+      if (ratingData.wouldRecommendVenue !== null) pointsEarned += 5;
+
+      const completionLevel = pointsEarned >= 25 ? 'complete' : pointsEarned >= 15 ? 'detailed' : 'basic';
 
       const { error: rewardError } = await supabase
         .from('feedback_rewards')
@@ -63,7 +72,7 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
           user_id: user.id,
           points_earned: pointsEarned,
           badges_earned: [],
-          completion_level: ratingData.feedbackText.trim().length > 10 ? 'detailed' : 'basic',
+          completion_level: completionLevel,
           speed_bonus: false,
           both_rated_bonus: false,
         });
@@ -98,7 +107,7 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
           last_review_date: today.toISOString(),
         });
 
-      // Send feedback to AI learning system
+      // AI learning from predicted vs actual
       if (options?.venueId) {
         try {
           await learnFromFeedback({
@@ -109,7 +118,8 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
             predictedScore: options.aiPredictedScore ?? 75,
             predictedFactors: options.aiPredictedFactors ?? {},
             actualRating: ratingData.overallRating,
-            venueRating: ratingData.overallRating,
+            venueRating: ratingData.venueRating > 0 ? ratingData.venueRating : ratingData.overallRating,
+            wouldRecommend: ratingData.wouldRecommendVenue ?? undefined,
             contextData: {
               feedbackText: ratingData.feedbackText,
             },
