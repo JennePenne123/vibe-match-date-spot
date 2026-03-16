@@ -1574,6 +1574,19 @@ export type Database = {
       }
       count_perfect_pairs: { Args: { target_user_id: string }; Returns: number }
       create_test_venues: { Args: { venues_data: Json }; Returns: boolean }
+      get_city_venue_rankings: {
+        Args: { _city: string }
+        Returns: {
+          avg_rating: number
+          cuisine_type: string
+          price_range: string
+          review_count: number
+          venue_address: string
+          venue_id: string
+          venue_name: string
+          visit_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
