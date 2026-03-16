@@ -110,7 +110,6 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
 function PrefIcon({ id, size = 'md' }: { id: string; size?: 'sm' | 'md' | 'lg' }) {
   const config = prefIconMap[id];
   if (!config) return null;
-  const Icon = config.icon;
   const sizeClasses = {
     sm: 'w-8 h-8 [&_svg]:w-4 [&_svg]:h-4',
     md: 'w-10 h-10 [&_svg]:w-5 [&_svg]:h-5',
@@ -121,7 +120,11 @@ function PrefIcon({ id, size = 'md' }: { id: string; size?: 'sm' | 'md' | 'lg' }
       'rounded-xl flex items-center justify-center flex-shrink-0',
       config.bg, sizeClasses[size]
     )}>
-      <Icon className={cn(config.fg)} />
+      {config.labIcon ? (
+        <Icon iconNode={config.labIcon} className={cn(config.fg)} />
+      ) : config.icon ? (
+        <config.icon className={cn(config.fg)} />
+      ) : null}
     </div>
   );
 }
