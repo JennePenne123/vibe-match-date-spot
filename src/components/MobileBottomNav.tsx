@@ -1,24 +1,16 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Home, Sparkles, User, MoreHorizontal, Send } from 'lucide-react'
+import { Home, Sparkles, User, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
-import { useInvitations } from '@/hooks/useInvitations'
-import BurgerMenu from '@/components/BurgerMenu'
 
 export function MobileBottomNav() {
   const { t } = useTranslation()
   const location = useLocation()
-  const { invitations } = useInvitations()
-
-  const pendingCount = React.useMemo(() => {
-    return invitations.filter(inv => inv.direction === 'received' && inv.status === 'pending').length
-  }, [invitations])
 
   const isActive = (path: string) => location.pathname === path
 
-  // Order: Home • My Invitations • Plan Date • More • Profile
   return (
     <nav
       className={cn(
@@ -30,31 +22,9 @@ export function MobileBottomNav() {
       role="navigation"
       aria-label="Main navigation"
     >
-      {/* Home */}
       <NavItem icon={Home} label={t('nav.home')} path="/home" active={isActive('/home')} />
-
-      {/* Chats */}
       <NavItem icon={Send} label={t('nav.chats', 'Chats')} path="/chats" active={isActive('/chats')} />
-
-      {/* Plan Date (center highlight) */}
       <NavItem icon={Sparkles} label={t('nav.planDate')} path="/preferences" active={isActive('/preferences')} highlight />
-
-      {/* More */}
-      <div className="relative flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-2 px-2">
-        <BurgerMenu
-          renderTrigger={(open) => (
-            <button
-              onClick={open}
-              className="flex flex-col items-center justify-center gap-0.5 text-muted-foreground transition-all duration-300"
-            >
-              <MoreHorizontal className="w-5 h-5" />
-              <span className="text-[10px] font-medium opacity-70">{t('common.more')}</span>
-            </button>
-          )}
-        />
-      </div>
-
-      {/* Profile */}
       <NavItem icon={User} label={t('nav.profile')} path="/profile" active={isActive('/profile')} />
     </nav>
   )
