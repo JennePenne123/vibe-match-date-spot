@@ -146,14 +146,18 @@ function DiscountDisplay({ voucher }: { voucher: WalletVoucher }) {
   }
 }
 
-function VoucherCard({ voucher, variant }: { voucher: WalletVoucher; variant: WalletTab }) {
+function VoucherCard({ voucher, variant, onTap }: { voucher: WalletVoucher; variant: WalletTab; onTap?: () => void }) {
   const daysLeft = getDaysRemaining(voucher.valid_until);
   const isExpiring = variant === 'expiring';
   const isExpired = variant === 'expired';
   const isRedeemed = variant === 'redeemed';
+  const isTappable = !isExpired && !isRedeemed;
 
   return (
     <div
+      onClick={isTappable ? onTap : undefined}
+      role={isTappable ? 'button' : undefined}
+      tabIndex={isTappable ? 0 : undefined}
       className={cn(
         'relative flex items-stretch gap-0 rounded-xl border overflow-hidden transition-all duration-200',
         isExpired && 'opacity-60',
