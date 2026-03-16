@@ -23,8 +23,8 @@ export function MobileBottomNav() {
       aria-label="Main navigation"
     >
       <NavItem icon={Home} label={t('nav.home')} path="/home" active={isActive('/home')} />
-      <NavItem icon={Send} label={t('nav.chats', 'Chats')} path="/chats" active={isActive('/chats')} />
       <NavItem icon={Sparkles} label={t('nav.planDate')} path="/preferences" active={isActive('/preferences')} highlight />
+      <NavItem icon={Send} label={t('nav.chats', 'Chats')} path="/chats" active={isActive('/chats')} />
       <NavItem icon={User} label={t('nav.profile')} path="/profile" active={isActive('/profile')} />
     </nav>
   )
