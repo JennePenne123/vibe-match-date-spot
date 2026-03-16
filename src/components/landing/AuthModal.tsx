@@ -232,7 +232,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
           if (roleData?.role === 'venue_partner' || roleData?.role === 'admin') {
             navigate('/partner');
           } else {
-            navigate('/home');
+            navigate(hasMoodToday() ? '/home' : '/mood');
           }
         }
       } else {
