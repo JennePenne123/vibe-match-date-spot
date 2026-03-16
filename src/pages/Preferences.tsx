@@ -655,6 +655,7 @@ const Preferences = () => {
               onClick={() => toggleSingleSelection(duration.id, setSelectedDuration)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
               className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
               <div className="flex items-center gap-4">
                 <PrefIcon id={duration.id} />
                 <div className="flex-1 text-left">
