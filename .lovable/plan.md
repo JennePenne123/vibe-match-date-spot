@@ -170,3 +170,22 @@ Update other files to use the `useAuthRedirect` hook or direct `/?auth=required`
 - [ ] Auth modal opens automatically on redirect
 - [ ] Password managers detect form fields correctly
 - [ ] No deprecated meta tag warnings in console
+
+---
+
+## Premium / Subscription Plan (TODO – Details TBD)
+
+### Confirmed
+- **Zahlungsanbieter**: Stripe (volle Kontrolle)
+- **Free-Tier**: Venue-Empfehlungen mit AI-Matching (keine Vouchers)
+- **Premium-Tier**: Exklusive Vouchers – aber **nur für die Top-3 Venues** mit dem höchsten AI-Match-Score
+- **Weitere Premium-Benefits**: Noch offen
+- **Preise**: Noch offen
+
+### Implementation Plan (wenn Details feststehen)
+1. `user_subscriptions`-Tabelle erstellen (`plan: free | premium`, `stripe_customer_id`, `stripe_subscription_id`, etc.)
+2. Stripe aktivieren via Lovable Stripe-Integration
+3. Paywall-Gating: Voucher-Badges nur für Premium-User auf Top-3 AI-Match Venues anzeigen
+4. Premium-Upsell UI für Free-User ("🔒 Unlock exclusive deals with Premium")
+5. Pricing-Page & Checkout-Flow
+6. Webhook für Subscription-Status-Updates
