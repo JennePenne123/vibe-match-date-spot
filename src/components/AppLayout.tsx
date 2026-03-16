@@ -14,6 +14,8 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const { isMobile, isDesktop } = useBreakpoint()
+  const location = useLocation()
+  const isPartnerRoute = location.pathname.startsWith('/partner')
 
   if (isMobile) {
     // Mobile layout - no sidebar, just content
