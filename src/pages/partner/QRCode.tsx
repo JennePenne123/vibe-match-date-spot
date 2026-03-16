@@ -268,6 +268,20 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         }
       }
 
+      // Get offering partner's configured discount
+      let discountValue = data.discount || 15;
+      
+      // Fetch the latest from DB as authoritative source
+      const { data: offeringProfile } = await supabase
+        .from('partner_profiles')
+        .select('network_discount_value')
+        .eq('user_id', data.partner_id)
+        .maybeSingle();
+
+      if (offeringProfile?.network_discount_value != null) {
+        discountValue = Number(offeringProfile.network_discount_value);
+      }
+
       // Create exclusive partner voucher
       const voucherTitle = `Partner-Exklusiv: ${offeringVenueName}`;
       const voucherCode = `PX-${Date.now().toString(36).toUpperCase().slice(-6)}`;
@@ -281,7 +295,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
           title: voucherTitle,
           description: t('partner.qr.exclusiveDesc', { venue: offeringVenueName }),
           discount_type: 'percentage',
-          discount_value: 15,
+          discount_value: discountValue,
           code: voucherCode,
         })
         .select()
@@ -294,7 +308,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         message: t('partner.qr.connectionSuccess'),
         voucher: {
           title: voucherTitle,
-          discount_value: 15,
+          discount_value: discountValue,
           code: voucherCode,
           venue_name: offeringVenueName,
         },
@@ -302,7 +316,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
 
       toast({
         title: t('partner.qr.newPartnerVoucher'),
-        description: `15% ${t('partner.qr.atVenue')} ${offeringVenueName}`,
+        description: `${discountValue}% ${t('partner.qr.atVenue')} ${offeringVenueName}`,
       });
 
       // Refresh data
