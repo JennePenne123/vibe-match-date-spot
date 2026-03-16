@@ -569,5 +569,16 @@
     "bothRated": "{{partner}} also rated!",
     "waitingPartner": "Waiting for {{partner}}'s rating",
     "speedBonus": "⚡ Speed bonus: +10 extra points for quick rating!"
+  },
+  "mood": {
+    "greeting": "Hey {{name}} 👋",
+    "question": "How are you feeling today?",
+    "great": "Feeling great!",
+    "greatDesc": "Ready for something exciting",
+    "okay": "Doing alright",
+    "okayDesc": "Open to casual plans",
+    "meTime": "Need some me-time",
+    "meTimeDesc": "Something calm and relaxing",
+    "skip": "Skip for now"
   }
 }

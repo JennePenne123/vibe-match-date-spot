@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { hasMoodToday } from '@/pages/MoodCheckIn';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -126,7 +127,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   useEffect(() => {
     if (user) {
       onClose();
-      navigate('/home');
+      navigate(hasMoodToday() ? '/home' : '/mood');
     }
   }, [user, navigate, onClose]);
 
@@ -231,7 +232,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
           if (roleData?.role === 'venue_partner' || roleData?.role === 'admin') {
             navigate('/partner');
           } else {
-            navigate('/home');
+            navigate(hasMoodToday() ? '/home' : '/mood');
           }
         }
       } else {
@@ -263,7 +264,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
             }
           }
           onClose();
-          navigate('/home');
+          navigate(hasMoodToday() ? '/home' : '/mood');
         }
       }
     } catch (err) {

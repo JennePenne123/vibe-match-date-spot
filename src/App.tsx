@@ -14,6 +14,7 @@ import OfflineBanner from "./components/OfflineBanner";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Onboarding from "./pages/Onboarding";
+import MoodCheckIn from "./pages/MoodCheckIn";
 import Home from "./pages/Home";
 import Preferences from "./pages/Preferences";
 import Friends from "./pages/Friends";
@@ -97,6 +98,7 @@ const App = () => (
                     {/* Public routes without layout */}
                     <Route path="/" element={<Landing />} />
                     <Route path="/welcome" element={<Onboarding />} />
+                    <Route path="/mood" element={<MoodCheckIn />} />
                     <Route path="/register-login" element={<Navigate to="/?auth=required" replace />} />
                     
                     {/* Protected routes with responsive layout */}

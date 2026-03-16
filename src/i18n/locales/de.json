@@ -569,5 +569,16 @@
     "bothRated": "{{partner}} hat auch bewertet!",
     "waitingPartner": "Warte auf {{partner}}s Bewertung",
     "speedBonus": "⚡ Speed-Bonus: +10 Extra-Punkte für schnelle Bewertung!"
+  },
+  "mood": {
+    "greeting": "Hey {{name}} 👋",
+    "question": "Wie geht's dir heute?",
+    "great": "Großartig!",
+    "greatDesc": "Bereit für was Aufregendes",
+    "okay": "Passt schon",
+    "okayDesc": "Offen für lockere Pläne",
+    "meTime": "Brauch Zeit für mich",
+    "meTimeDesc": "Etwas Ruhiges und Entspanntes",
+    "skip": "Überspringen"
   }
 }
