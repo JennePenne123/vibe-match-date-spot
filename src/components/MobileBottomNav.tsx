@@ -37,7 +37,7 @@ export function MobileBottomNav() {
       <NavItem icon={Send} label={t('nav.chats', 'Chats')} path="/chats" active={isActive('/chats')} />
 
       {/* Plan Date (center highlight) */}
-      <NavItem icon={Sparkles} label={t('nav.planDate')} path="/plan-date" active={isActive('/plan-date')} highlight />
+      <NavItem icon={Sparkles} label={t('nav.planDate')} path="/preferences" active={isActive('/preferences')} highlight />
 
       {/* More */}
       <div className="relative flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-2 px-2">
