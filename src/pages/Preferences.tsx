@@ -8,18 +8,120 @@ import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, ArrowRight, Check, Clock, DollarSign, MapPin, Settings, Coffee, Heart, Navigation, Loader2, X } from 'lucide-react';
-import { prefIllustrations } from '@/assets/prefs';
+import {
+  ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
+  // Cuisine icons
+  UtensilsCrossed, Fish, Beef, Croissant, Flame, Leaf, Sandwich, Soup, ChefHat, CookingPot,
+  // Vibe icons
+  HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
+  // Price icons
+  PiggyBank, CreditCard, Gem, Crown,
+  // Time icons
+  Sunrise, Sun, CloudSun, Sunset, MoonStar, Clock3,
+  // Duration icons
+  Zap, Hourglass, Timer, HelpCircle,
+  // Activity icons
+  Wine, Tent, Martini, Palette, Dumbbell, PartyPopper,
+  // Entertainment icons
+  Guitar, Headphones, MessageCircle, Gamepad2, Music4, Tv,
+  // Dietary icons
+  Salad, Sprout, WheatOff, MilkOff, CircleDot, Star,
+  // Accessibility icons
+  Accessibility, ParkingCircle, TrainFront, Dog, CigaretteOff,
+  // Template icons
+  Sparkles, type LucideIcon
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const MapPreview = lazy(() => import('@/components/MapPreview'));
 
-// Helper to resolve illustration for a preference id
-function PrefIcon({ id, className = 'w-10 h-10 object-contain' }: { id: string; className?: string }) {
-  const src = prefIllustrations[id];
-  if (src) {
-    return <img src={src} alt="" className={className} loading="lazy" />;
-  }
-  return null;
+// Icon + color mapping for each preference ID
+const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> = {
+  // Cuisines
+  italian:        { icon: UtensilsCrossed, bg: 'bg-red-500/15', fg: 'text-red-500' },
+  japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
+  mexican:        { icon: Beef,            bg: 'bg-yellow-600/15', fg: 'text-yellow-600' },
+  french:         { icon: Croissant,       bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  indian:         { icon: Flame,           bg: 'bg-orange-600/15', fg: 'text-orange-600' },
+  mediterranean:  { icon: Leaf,            bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
+  american:       { icon: Sandwich,        bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  thai:           { icon: Soup,            bg: 'bg-lime-500/15', fg: 'text-lime-500' },
+  chinese:        { icon: ChefHat,         bg: 'bg-rose-500/15', fg: 'text-rose-500' },
+  korean:         { icon: CookingPot,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+  // Vibes
+  romantic:       { icon: HeartHandshake,  bg: 'bg-pink-500/15', fg: 'text-pink-500' },
+  casual:         { icon: Smile,           bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  outdoor:        { icon: TreePine,        bg: 'bg-green-500/15', fg: 'text-green-500' },
+  nightlife:      { icon: Moon,            bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
+  cultural:       { icon: Theater,         bg: 'bg-purple-500/15', fg: 'text-purple-500' },
+  adventurous:    { icon: Compass,         bg: 'bg-teal-500/15', fg: 'text-teal-500' },
+  // Prices
+  budget:         { icon: PiggyBank,       bg: 'bg-green-500/15', fg: 'text-green-500' },
+  moderate:       { icon: CreditCard,      bg: 'bg-blue-500/15', fg: 'text-blue-500' },
+  upscale:        { icon: Gem,             bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
+  luxury:         { icon: Crown,           bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  // Times
+  brunch:         { icon: Sunrise,         bg: 'bg-orange-400/15', fg: 'text-orange-400' },
+  lunch:          { icon: Sun,             bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
+  afternoon:      { icon: CloudSun,        bg: 'bg-amber-400/15', fg: 'text-amber-400' },
+  dinner:         { icon: Sunset,          bg: 'bg-orange-600/15', fg: 'text-orange-600' },
+  evening:        { icon: MoonStar,        bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
+  flexible:       { icon: Clock3,          bg: 'bg-slate-400/15', fg: 'text-slate-400' },
+  // Durations
+  quick:          { icon: Zap,             bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
+  relaxed:        { icon: Hourglass,       bg: 'bg-teal-500/15', fg: 'text-teal-500' },
+  extended:       { icon: Timer,           bg: 'bg-blue-500/15', fg: 'text-blue-500' },
+  spontaneous:    { icon: HelpCircle,      bg: 'bg-purple-400/15', fg: 'text-purple-400' },
+  // Activities
+  dining:         { icon: Wine,            bg: 'bg-red-500/15', fg: 'text-red-500' },
+  dining_plus:    { icon: Tent,            bg: 'bg-pink-500/15', fg: 'text-pink-500' },
+  cocktails:      { icon: Martini,         bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+  cultural_act:   { icon: Palette,         bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
+  active:         { icon: Dumbbell,        bg: 'bg-rose-500/15', fg: 'text-rose-500' },
+  nightlife_act:  { icon: PartyPopper,     bg: 'bg-fuchsia-500/15', fg: 'text-fuchsia-500' },
+  // Entertainment
+  live_music:          { icon: Guitar,         bg: 'bg-red-500/15', fg: 'text-red-500' },
+  dj_playlist:         { icon: Headphones,     bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
+  quiet_conversation:  { icon: MessageCircle,  bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  games:               { icon: Gamepad2,       bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
+  dancing:             { icon: Music4,         bg: 'bg-pink-500/15', fg: 'text-pink-500' },
+  sports_viewing:      { icon: Tv,             bg: 'bg-blue-500/15', fg: 'text-blue-500' },
+  // Dietary
+  vegetarian:     { icon: Salad,           bg: 'bg-green-500/15', fg: 'text-green-500' },
+  vegan:          { icon: Sprout,          bg: 'bg-lime-500/15', fg: 'text-lime-500' },
+  gluten_free:    { icon: WheatOff,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  dairy_free:     { icon: MilkOff,         bg: 'bg-sky-400/15', fg: 'text-sky-400' },
+  halal:          { icon: CircleDot,       bg: 'bg-emerald-600/15', fg: 'text-emerald-600' },
+  kosher:         { icon: Star,            bg: 'bg-blue-600/15', fg: 'text-blue-600' },
+  // Accessibility
+  wheelchair:       { icon: Accessibility,   bg: 'bg-blue-500/15', fg: 'text-blue-500' },
+  parking:          { icon: ParkingCircle,   bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  public_transport: { icon: TrainFront,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+  pet_friendly:     { icon: Dog,             bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  non_smoking:      { icon: CigaretteOff,   bg: 'bg-red-500/15', fg: 'text-red-500' },
+  // Templates
+  template_romantic: { icon: Heart,          bg: 'bg-pink-500/15', fg: 'text-pink-500' },
+  template_casual:   { icon: Coffee,         bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  template_trendy:   { icon: Sparkles,       bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+};
+
+function PrefIcon({ id, size = 'md' }: { id: string; size?: 'sm' | 'md' | 'lg' }) {
+  const config = prefIconMap[id];
+  if (!config) return null;
+  const Icon = config.icon;
+  const sizeClasses = {
+    sm: 'w-8 h-8 [&_svg]:w-4 [&_svg]:h-4',
+    md: 'w-10 h-10 [&_svg]:w-5 [&_svg]:h-5',
+    lg: 'w-12 h-12 [&_svg]:w-6 [&_svg]:h-6',
+  };
+  return (
+    <div className={cn(
+      'rounded-xl flex items-center justify-center flex-shrink-0',
+      config.bg, sizeClasses[size]
+    )}>
+      <Icon className={cn(config.fg)} />
+    </div>
+  );
 }
 
 interface Preference {
@@ -405,7 +507,7 @@ const Preferences = () => {
               className="p-4 rounded-xl border-2 border-border bg-card hover:bg-accent/50 transition-all text-left"
             >
               <div className="flex items-center gap-3">
-                <PrefIcon id={'template_' + template.id} className="w-12 h-12 object-contain" />
+                <PrefIcon id={'template_' + template.id} size="lg" />
                 <div>
                   <div className="font-semibold text-foreground">{template.title}</div>
                   <div className="text-sm text-muted-foreground">{template.description}</div>
@@ -595,7 +697,7 @@ const Preferences = () => {
               }`}
             >
               <div className="flex items-center gap-4">
-                <PrefIcon id={activity.id === 'cultural' ? 'cultural_activity' : activity.id === 'nightlife' ? 'nightlife_activity' : activity.id} />
+                <PrefIcon id={activity.id === 'cultural' ? 'cultural_act' : activity.id === 'nightlife' ? 'nightlife_act' : activity.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{activity.name}</div>
                   <div className={`text-sm ${selectedActivities.includes(activity.id) ? 'text-primary' : 'text-muted-foreground'}`}>
