@@ -521,9 +521,16 @@
   "rating": {
     "title": "How was your date?",
     "subtitle": "Rate your date with {{partner}} at {{venue}}",
+    "overallLabel": "Overall rating",
+    "venueLabel": "How was the venue?",
+    "recommendLabel": "Would you recommend this venue?",
+    "optionalSection": "Optional – helps us improve",
     "commentLabel": "Comment (optional)",
     "commentPlaceholder": "What did you enjoy or what could be improved?",
     "submitting": "Submitting...",
-    "submit": "Submit rating"
+    "submit": "Submit rating",
+    "alreadyRated": "You rated this date",
+    "bothRated": "{{partner}} also rated!",
+    "waitingPartner": "Waiting for {{partner}}'s rating"
   }
 }
