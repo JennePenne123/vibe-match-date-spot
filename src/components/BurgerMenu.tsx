@@ -10,7 +10,11 @@ import { Menu, User, Users, MapPin, LogOut, X, Heart, Monitor, Sun, Moon } from 
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers';
 import { getInitials } from '@/lib/utils';
 
-const BurgerMenu = () => {
+interface BurgerMenuProps {
+  renderTrigger?: (open: () => void) => React.ReactNode;
+}
+
+const BurgerMenu = ({ renderTrigger }: BurgerMenuProps = {}) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user, logout } = useAuth();
@@ -37,11 +41,15 @@ const BurgerMenu = () => {
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-white/10 hover:text-foreground">
-          <Menu className="w-5 h-5" />
-        </Button>
-      </DrawerTrigger>
+      {renderTrigger ? (
+        renderTrigger(() => setIsOpen(true))
+      ) : (
+        <DrawerTrigger asChild>
+          <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-white/10 hover:text-foreground">
+            <Menu className="w-5 h-5" />
+          </Button>
+        </DrawerTrigger>
+      )}
       <DrawerContent className="max-w-md mx-auto bg-card/95 backdrop-blur-xl border-border/40">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
