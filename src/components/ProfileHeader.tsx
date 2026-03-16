@@ -132,8 +132,7 @@ const ProfileHeader = ({
             </div>
           ) : (
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-1">{displayName}</h2>
-              <p className="text-muted-foreground text-sm mb-3">{displayEmail}</p>
+              <h2 className="text-2xl font-bold text-foreground mb-3">{displayName}</h2>
               <div className="flex items-center justify-center gap-2 flex-wrap">
                 <Badge variant="secondary" className="bg-primary/15 text-primary border-primary/20 px-3 py-1 text-xs font-semibold">
                   Level {level}
