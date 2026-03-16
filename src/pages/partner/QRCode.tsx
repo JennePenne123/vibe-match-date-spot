@@ -123,6 +123,17 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         .order('created_at', { ascending: false });
 
       setOfferedVouchers((offered as ExclusiveVoucher[]) || []);
+
+      // Fetch today's scan count
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const { count } = await supabase
+        .from('partner_exclusive_vouchers')
+        .select('*', { count: 'exact', head: true })
+        .eq('receiving_partner_id', user.id)
+        .gte('created_at', todayStart.toISOString());
+
+      setDailyScansUsed(count || 0);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
