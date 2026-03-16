@@ -832,6 +832,63 @@ export type Database = {
           },
         ]
       }
+      partner_profiles: {
+        Row: {
+          address: string | null
+          business_email: string
+          business_name: string
+          city: string | null
+          contact_person: string
+          country: string | null
+          created_at: string
+          description: string | null
+          id: string
+          logo_url: string | null
+          phone: string | null
+          postal_code: string | null
+          tax_id: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_email?: string
+          business_name?: string
+          city?: string | null
+          contact_person?: string
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          tax_id?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_email?: string
+          business_name?: string
+          city?: string | null
+          contact_person?: string
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          tax_id?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
