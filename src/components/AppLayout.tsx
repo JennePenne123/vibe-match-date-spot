@@ -1,6 +1,8 @@
 import React from 'react'
+import { useLocation } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
+import { PartnerSidebar } from './PartnerSidebar'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { Menu, Sparkles } from 'lucide-react'
