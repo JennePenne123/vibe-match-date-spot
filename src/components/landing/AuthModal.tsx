@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { hasMoodToday } from '@/pages/MoodCheckIn';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
