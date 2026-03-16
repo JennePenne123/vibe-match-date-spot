@@ -559,10 +559,10 @@ const Preferences = () => {
             <button
               key={vibe.id}
               onClick={() => toggleSelection(vibe.id, selectedVibes, setSelectedVibes)}
-              className={`w-full p-4 rounded-xl border-2 transition-all ${
+              className={`w-full p-4 rounded-xl border-2 transition-none ${
                 selectedVibes.includes(vibe.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <div className="flex items-center gap-4">
