@@ -189,3 +189,19 @@ Update other files to use the `useAuthRedirect` hook or direct `/?auth=required`
 4. Premium-Upsell UI für Free-User ("🔒 Unlock exclusive deals with Premium")
 5. Pricing-Page & Checkout-Flow
 6. Webhook für Subscription-Status-Updates
+
+### Voucher-Redemption via QR-Code
+
+**Regeln:**
+- Jeder Voucher hat einen **einzigartigen QR-Code** in der Premium Wallet
+- Voucher ist **einmalig gültig** – nach Scan durch Venue-Partner endgültig eingelöst
+- Scan erfolgt über den **QR-Scanner des Venue-Partners** (Partner-Dashboard)
+- Nach Einlösung: Status → `redeemed`, `redeemed_at` wird gesetzt
+- Eingelöster Voucher erscheint in Wallet unter Tab "Eingelöst"
+
+**Implementation Plan:**
+1. QR-Code-Generierung in der Wallet (enthält Voucher-ID + User-ID als signiertes Token)
+2. QR-Scanner UI im Partner-Dashboard (`/partner/scan`)
+3. Edge Function `redeem-voucher` – validiert Token, prüft Einmaligkeit, markiert als eingelöst
+4. Echtzeit-Update: Partner sieht Bestätigung, User-Wallet aktualisiert sich
+5. `voucher_redemptions`-Tabelle wird für die Dokumentation genutzt
