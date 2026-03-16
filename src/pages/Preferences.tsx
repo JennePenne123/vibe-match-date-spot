@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
   // Cuisine icons
-  UtensilsCrossed, Fish, Beef, Croissant, Flame, Leaf, Sandwich, Soup, ChefHat, CookingPot,
+  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup, Utensils, Cherry,
   // Vibe icons
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
   // Price icons
@@ -19,7 +19,7 @@ import {
   // Time icons
   Sunrise, Sun, CloudSun, Sunset, MoonStar, Clock3,
   // Duration icons
-  Zap, Hourglass, Timer, HelpCircle,
+  Zap, Hourglass, Timer, Shuffle,
   // Activity icons
   Wine, Tent, Martini, Palette, Dumbbell, PartyPopper,
   // Entertainment icons
@@ -37,16 +37,16 @@ const MapPreview = lazy(() => import('@/components/MapPreview'));
 
 // Icon + color mapping for each preference ID
 const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> = {
-  // Cuisines
-  italian:        { icon: UtensilsCrossed, bg: 'bg-red-500/15', fg: 'text-red-500' },
+  // Cuisines — each icon chosen to represent the cuisine's most iconic element
+  italian:        { icon: Pizza,           bg: 'bg-red-500/15', fg: 'text-red-500' },
   japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
-  mexican:        { icon: Beef,            bg: 'bg-yellow-600/15', fg: 'text-yellow-600' },
+  mexican:        { icon: Flame,           bg: 'bg-yellow-600/15', fg: 'text-yellow-600' },
   french:         { icon: Croissant,       bg: 'bg-amber-500/15', fg: 'text-amber-500' },
-  indian:         { icon: Flame,           bg: 'bg-orange-600/15', fg: 'text-orange-600' },
+  indian:         { icon: Cherry,          bg: 'bg-orange-600/15', fg: 'text-orange-600' },
   mediterranean:  { icon: Leaf,            bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
-  american:       { icon: Sandwich,        bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  american:       { icon: Beef,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
   thai:           { icon: Soup,            bg: 'bg-lime-500/15', fg: 'text-lime-500' },
-  chinese:        { icon: ChefHat,         bg: 'bg-rose-500/15', fg: 'text-rose-500' },
+  chinese:        { icon: Utensils,        bg: 'bg-rose-500/15', fg: 'text-rose-500' },
   korean:         { icon: CookingPot,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   // Vibes
   romantic:       { icon: HeartHandshake,  bg: 'bg-pink-500/15', fg: 'text-pink-500' },
@@ -71,7 +71,7 @@ const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> 
   quick:          { icon: Zap,             bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
   relaxed:        { icon: Hourglass,       bg: 'bg-teal-500/15', fg: 'text-teal-500' },
   extended:       { icon: Timer,           bg: 'bg-blue-500/15', fg: 'text-blue-500' },
-  spontaneous:    { icon: HelpCircle,      bg: 'bg-purple-400/15', fg: 'text-purple-400' },
+  spontaneous:    { icon: Shuffle,         bg: 'bg-purple-400/15', fg: 'text-purple-400' },
   // Activities
   dining:         { icon: Wine,            bg: 'bg-red-500/15', fg: 'text-red-500' },
   dining_plus:    { icon: Tent,            bg: 'bg-pink-500/15', fg: 'text-pink-500' },
