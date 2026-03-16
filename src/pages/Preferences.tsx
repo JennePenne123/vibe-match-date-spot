@@ -619,14 +619,11 @@ const Preferences = () => {
         <div className="grid grid-cols-2 gap-3">
           {timePreferences.map((time) => (
             <button
+              type="button"
               key={time.id}
               onClick={() => toggleSelection(time.id, selectedTimePreferences, setSelectedTimePreferences)}
-              className={`p-4 rounded-xl border-2 transition-none ${
-                selectedTimePreferences.includes(time.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
-            >
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
               <PrefIcon id={time.id} />
               <div className="font-medium text-sm">{time.name}</div>
               <div className="text-xs text-muted-foreground">
