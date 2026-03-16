@@ -677,6 +677,7 @@ useEffect(() => {
               onClick={() => applyQuickStartTemplate(template)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
               className="p-3 md:p-4 rounded-lg border border-border text-left transition-none select-none"
+            >
               <div className="flex items-center gap-3">
                 <div className="text-xl md:text-2xl flex-shrink-0">{template.emoji}</div>
                 <div className="flex-1 min-w-0">

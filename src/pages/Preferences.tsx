@@ -858,6 +858,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(access.id, selectedAccessibility, setSelectedAccessibility)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
               className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
               <div className="flex items-center gap-4">
                 <PrefIcon id={access.id} />
                 <div className="font-semibold">{access.name}</div>
