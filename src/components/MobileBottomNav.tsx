@@ -1,7 +1,7 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Home, Sparkles, User, MoreHorizontal, Heart } from 'lucide-react'
+import { Home, Sparkles, User, MoreHorizontal, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { useInvitations } from '@/hooks/useInvitations'
