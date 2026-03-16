@@ -7,11 +7,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { bowlChopsticks } from '@lucide/lab';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
+  Icon,
   // Cuisine icons
-  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup, Utensils, Cherry,
+  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup, Cherry,
   // Vibe icons
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
   // Price icons
@@ -36,7 +38,7 @@ import { cn } from '@/lib/utils';
 const MapPreview = lazy(() => import('@/components/MapPreview'));
 
 // Icon + color mapping for each preference ID
-const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> = {
+const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
   // Cuisines — each icon chosen to represent the cuisine's most iconic element
   italian:        { icon: Pizza,           bg: 'bg-red-500/15', fg: 'text-red-500' },
   japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
@@ -46,7 +48,7 @@ const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> 
   mediterranean:  { icon: Leaf,            bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
   american:       { icon: Beef,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
   thai:           { icon: Soup,            bg: 'bg-lime-500/15', fg: 'text-lime-500' },
-  chinese:        { icon: Utensils,        bg: 'bg-rose-500/15', fg: 'text-rose-500' },
+  chinese:        { icon: null, labIcon: bowlChopsticks, bg: 'bg-rose-500/15', fg: 'text-rose-500' },
   korean:         { icon: CookingPot,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   // Vibes
   romantic:       { icon: HeartHandshake,  bg: 'bg-pink-500/15', fg: 'text-pink-500' },
@@ -108,7 +110,6 @@ const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> 
 function PrefIcon({ id, size = 'md' }: { id: string; size?: 'sm' | 'md' | 'lg' }) {
   const config = prefIconMap[id];
   if (!config) return null;
-  const Icon = config.icon;
   const sizeClasses = {
     sm: 'w-8 h-8 [&_svg]:w-4 [&_svg]:h-4',
     md: 'w-10 h-10 [&_svg]:w-5 [&_svg]:h-5',
@@ -119,7 +120,11 @@ function PrefIcon({ id, size = 'md' }: { id: string; size?: 'sm' | 'md' | 'lg' }
       'rounded-xl flex items-center justify-center flex-shrink-0',
       config.bg, sizeClasses[size]
     )}>
-      <Icon className={cn(config.fg)} />
+      {config.labIcon ? (
+        <Icon iconNode={config.labIcon} className={cn(config.fg)} />
+      ) : config.icon ? (
+        <config.icon className={cn(config.fg)} />
+      ) : null}
     </div>
   );
 }
