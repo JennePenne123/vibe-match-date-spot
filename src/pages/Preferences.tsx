@@ -37,16 +37,16 @@ const MapPreview = lazy(() => import('@/components/MapPreview'));
 
 // Icon + color mapping for each preference ID
 const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> = {
-  // Cuisines
-  italian:        { icon: UtensilsCrossed, bg: 'bg-red-500/15', fg: 'text-red-500' },
+  // Cuisines — each icon chosen to represent the cuisine's most iconic element
+  italian:        { icon: Pizza,           bg: 'bg-red-500/15', fg: 'text-red-500' },
   japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
-  mexican:        { icon: Beef,            bg: 'bg-yellow-600/15', fg: 'text-yellow-600' },
+  mexican:        { icon: Flame,           bg: 'bg-yellow-600/15', fg: 'text-yellow-600' },
   french:         { icon: Croissant,       bg: 'bg-amber-500/15', fg: 'text-amber-500' },
-  indian:         { icon: Flame,           bg: 'bg-orange-600/15', fg: 'text-orange-600' },
+  indian:         { icon: Cherry,          bg: 'bg-orange-600/15', fg: 'text-orange-600' },
   mediterranean:  { icon: Leaf,            bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
-  american:       { icon: Sandwich,        bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  american:       { icon: Beef,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
   thai:           { icon: Soup,            bg: 'bg-lime-500/15', fg: 'text-lime-500' },
-  chinese:        { icon: ChefHat,         bg: 'bg-rose-500/15', fg: 'text-rose-500' },
+  chinese:        { icon: Utensils,        bg: 'bg-rose-500/15', fg: 'text-rose-500' },
   korean:         { icon: CookingPot,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   // Vibes
   romantic:       { icon: HeartHandshake,  bg: 'bg-pink-500/15', fg: 'text-pink-500' },
