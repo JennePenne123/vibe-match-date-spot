@@ -17,7 +17,8 @@
     "email": "Email",
     "signIn": "Sign In",
     "getStarted": "Get Started",
-    "returnHome": "Return to Home"
+    "returnHome": "Return to Home",
+    "saved": "Saved"
   },
   "nav": {
     "home": "Home",

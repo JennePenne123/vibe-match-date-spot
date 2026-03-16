@@ -17,7 +17,8 @@
     "email": "E-Mail",
     "signIn": "Anmelden",
     "getStarted": "Jetzt starten",
-    "returnHome": "Zurück zur Startseite"
+    "returnHome": "Zurück zur Startseite",
+    "saved": "Gespeichert"
   },
   "nav": {
     "home": "Home",
