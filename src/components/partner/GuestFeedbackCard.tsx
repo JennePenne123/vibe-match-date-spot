@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Star, MessageSquare, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Star, MessageSquare, TrendingUp, TrendingDown, Minus, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface FeedbackSummary {
   avgVenueRating: number;
@@ -23,12 +24,74 @@ interface FeedbackSummary {
 
 export default function GuestFeedbackCard() {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [summary, setSummary] = useState<FeedbackSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [newCount, setNewCount] = useState(0);
+
+  const handleNewFeedback = useCallback(() => {
+    setNewCount(prev => prev + 1);
+    fetchFeedback();
+    toast({
+      title: t('partner.feedback.newReviewTitle', 'Neue Bewertung! ⭐'),
+      description: t('partner.feedback.newReviewDesc', 'Ein Gast hat eine neue Bewertung für Ihr Venue abgegeben.'),
+      duration: 6000,
+    });
+  }, [t, toast]);
 
   useEffect(() => {
     fetchFeedback();
   }, []);
+
+  // Realtime subscription for new feedback on partner's venues
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    const setupRealtime = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: partnerships } = await supabase
+        .from('venue_partnerships')
+        .select('venue_id')
+        .eq('partner_id', user.id)
+        .eq('status', 'approved');
+
+      const venueIds = partnerships?.map(p => p.venue_id) || [];
+      if (venueIds.length === 0) return;
+
+      // Listen for new feedback on date_invitations that reference partner venues
+      channel = supabase
+        .channel('partner-feedback-notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'date_feedback',
+          },
+          async (payload) => {
+            // Check if this feedback is for one of our venues
+            const { data: invitation } = await supabase
+              .from('date_invitations')
+              .select('venue_id')
+              .eq('id', payload.new.invitation_id)
+              .single();
+
+            if (invitation && venueIds.includes(invitation.venue_id || '')) {
+              handleNewFeedback();
+            }
+          }
+        )
+        .subscribe();
+    };
+
+    setupRealtime();
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [handleNewFeedback]);
 
   const fetchFeedback = async () => {
     try {
@@ -163,6 +226,12 @@ export default function GuestFeedbackCard() {
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-primary" />
           {t('partner.feedback.title')}
+          {newCount > 0 && (
+            <span className="flex items-center gap-1 text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+              <Bell className="w-3 h-3" />
+              +{newCount}
+            </span>
+          )}
         </CardTitle>
         <CardDescription>{t('partner.feedback.subtitle')}</CardDescription>
       </CardHeader>
