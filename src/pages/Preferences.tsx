@@ -9,8 +9,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, ArrowRight, Check, Clock, DollarSign, MapPin, Settings, Coffee, Heart, Navigation, Loader2, X } from 'lucide-react';
+import { prefIllustrations } from '@/assets/prefs';
 
 const MapPreview = lazy(() => import('@/components/MapPreview'));
+
+// Helper to resolve illustration for a preference id
+function PrefIcon({ id, className = 'w-10 h-10 object-contain' }: { id: string; className?: string }) {
+  const src = prefIllustrations[id];
+  if (src) {
+    return <img src={src} alt="" className={className} loading="lazy" />;
+  }
+  return null;
+}
+
 interface Preference {
   id: string;
   name: string;
@@ -394,7 +405,7 @@ const Preferences = () => {
               className="p-4 rounded-xl border-2 border-border bg-card hover:bg-accent/50 transition-all text-left"
             >
               <div className="flex items-center gap-3">
-                <div className="text-2xl">{template.emoji}</div>
+                <PrefIcon id={'template_' + template.id} className="w-12 h-12 object-contain" />
                 <div>
                   <div className="font-semibold text-foreground">{template.title}</div>
                   <div className="text-sm text-muted-foreground">{template.description}</div>
@@ -421,7 +432,7 @@ const Preferences = () => {
                   : 'bg-card border-border text-foreground hover:bg-accent/50'
               }`}
             >
-              <div className="text-2xl mb-1">{cuisine.emoji}</div>
+              <PrefIcon id={cuisine.id} />
               <div className="font-medium text-sm">{cuisine.name}</div>
               {selectedCuisines.includes(cuisine.id) && (
                 <Check className="w-4 h-4 mx-auto mt-1" />
@@ -448,7 +459,7 @@ const Preferences = () => {
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="text-2xl">{vibe.emoji}</div>
+                <PrefIcon id={vibe.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{vibe.name}</div>
                   <div className={`text-sm ${selectedVibes.includes(vibe.id) ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -485,7 +496,7 @@ const Preferences = () => {
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="text-2xl">{price.emoji}</div>
+                <PrefIcon id={price.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{price.name}</div>
                   <div className={`text-sm ${selectedPriceRange.includes(price.id) ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -517,7 +528,7 @@ const Preferences = () => {
                   : 'bg-card border-border text-foreground hover:bg-accent/50'
               }`}
             >
-              <div className="text-2xl mb-1">{time.emoji}</div>
+              <PrefIcon id={time.id} />
               <div className="font-medium text-sm">{time.name}</div>
               <div className={`text-xs ${selectedTimePreferences.includes(time.id) ? 'text-primary' : 'text-muted-foreground'}`}>
                 {time.desc}
@@ -547,7 +558,7 @@ const Preferences = () => {
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="text-2xl">{duration.emoji}</div>
+                <PrefIcon id={duration.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{duration.name}</div>
                   <div className={`text-sm ${selectedDuration === duration.id ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -584,7 +595,7 @@ const Preferences = () => {
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="text-2xl">{activity.emoji}</div>
+                <PrefIcon id={activity.id === 'cultural' ? 'cultural_activity' : activity.id === 'nightlife' ? 'nightlife_activity' : activity.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{activity.name}</div>
                   <div className={`text-sm ${selectedActivities.includes(activity.id) ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -616,7 +627,7 @@ const Preferences = () => {
                   : 'bg-card border-border text-foreground hover:bg-accent/50'
               }`}
             >
-              <div className="text-2xl mb-1">{ent.emoji}</div>
+              <PrefIcon id={ent.id} />
               <div className="font-medium text-sm">{ent.name}</div>
               {selectedEntertainment.includes(ent.id) && (
                 <Check className="w-4 h-4 mx-auto mt-1" />
@@ -731,7 +742,7 @@ const Preferences = () => {
                   : 'bg-card border-border text-foreground hover:bg-accent/50'
               }`}
             >
-              <div className="text-2xl mb-1">{dietary.emoji}</div>
+              <PrefIcon id={dietary.id} />
               <div className="font-medium text-sm">{dietary.name}</div>
               {selectedDietary.includes(dietary.id) && (
                 <Check className="w-4 h-4 mx-auto mt-1" />
@@ -758,7 +769,7 @@ const Preferences = () => {
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="text-2xl">{access.emoji}</div>
+                <PrefIcon id={access.id} />
                 <div className="font-semibold">{access.name}</div>
                 {selectedAccessibility.includes(access.id) && (
                   <Check className="w-5 h-5 ml-auto" />
