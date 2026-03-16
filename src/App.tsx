@@ -130,6 +130,7 @@ const App = () => (
                     <Route path="/partner/qr-code" element={<AppLayout><PartnerQRCode /></AppLayout>} />
                     <Route path="/partner/network-map" element={<AppLayout><PartnerNetworkMap /></AppLayout>} />
                     <Route path="/partner/profile" element={<AppLayout><PartnerProfile /></AppLayout>} />
+                    <Route path="/partner/city-rankings" element={<AppLayout><PartnerCityRankings /></AppLayout>} />
                     
                     {/* Demo routes - lazy loaded */}
                     <Route path="/demo/ai-venue-card" element={
