@@ -1,6 +1,8 @@
 import React from 'react'
+import { useLocation } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
+import { PartnerSidebar } from './PartnerSidebar'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { Menu, Sparkles } from 'lucide-react'
@@ -12,6 +14,8 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const { isMobile, isDesktop } = useBreakpoint()
+  const location = useLocation()
+  const isPartnerRoute = location.pathname.startsWith('/partner')
 
   if (isMobile) {
     // Mobile layout - no sidebar, just content
@@ -25,7 +29,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider defaultOpen={isDesktop}>
       <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar />
+        {isPartnerRoute ? <PartnerSidebar /> : <AppSidebar />}
         
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header with sidebar trigger */}
