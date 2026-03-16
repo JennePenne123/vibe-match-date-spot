@@ -531,6 +531,7 @@
     "submit": "Bewertung abgeben",
     "alreadyRated": "Du hast dieses Date bewertet",
     "bothRated": "{{partner}} hat auch bewertet!",
-    "waitingPartner": "Warte auf {{partner}}s Bewertung"
+    "waitingPartner": "Warte auf {{partner}}s Bewertung",
+    "speedBonus": "⚡ Speed-Bonus: +10 Extra-Punkte für schnelle Bewertung!"
   }
 }
