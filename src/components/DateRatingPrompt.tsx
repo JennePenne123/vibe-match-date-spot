@@ -26,6 +26,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
   const [invitationData, setInvitationData] = useState<{
     partnerName: string;
     venueName: string;
+    dateTime?: string;
     venueId?: string;
     partnerId?: string;
     aiPredictedScore?: number | null;
