@@ -640,15 +640,11 @@ useEffect(() => {
 
           return (
             <button
+              type="button"
               key={item.id}
               onClick={() => toggleSelection(item.id, selectedItems, setSelectedItems, category)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
-              className={`p-3 md:p-4 rounded-xl border-2 transition-none relative min-h-[80px] select-none ${
-                isSelected
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
-            >
+              className="p-3 md:p-4 rounded-xl border-2 transition-none relative min-h-[80px] select-none bg-card border-border text-foreground"
               <div className="text-xl md:text-2xl mb-1">{item.emoji}</div>
               <div className="font-medium text-sm md:text-base">{item.name}</div>
               {item.desc && (

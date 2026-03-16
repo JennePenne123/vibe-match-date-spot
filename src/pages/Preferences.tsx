@@ -507,10 +507,11 @@ const Preferences = () => {
         <div className="grid grid-cols-1 gap-3">
           {quickTemplates.map((template) => (
             <button
+              type="button"
               key={template.id}
               onClick={() => applyQuickTemplate(template)}
-              className="p-4 rounded-xl border-2 border-border bg-card transition-none text-left"
-            >
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 border-border bg-card transition-none text-left select-none"
               <div className="flex items-center gap-3">
                 <PrefIcon id={'template_' + template.id} size="lg" />
                 <div>
