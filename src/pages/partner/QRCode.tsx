@@ -319,7 +319,7 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         </Card>
       </div>
 
-      <Tabs defaultValue="my-qr" className="space-y-4">
+      <Tabs defaultValue={defaultTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="my-qr" className="gap-1 text-xs sm:text-sm">
             <QrCode className="w-4 h-4" />
