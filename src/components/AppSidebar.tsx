@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { Home, User, Users, MapPin, Heart, Sparkles, ChevronDown, MoreHorizontal, LogOut } from 'lucide-react'
+import { Home, User, Users, MapPin, Heart, Sparkles, ChevronDown, MoreHorizontal, LogOut, Trophy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
