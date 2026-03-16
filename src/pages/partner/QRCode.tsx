@@ -252,20 +252,24 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
       const offeringVenueName = data.venues?.[0]?.name || 'Partner Venue';
       const offeringVenueId = data.venues?.[0]?.id || null;
 
-      // Check if already connected
-      if (offeringVenueId) {
-        const { data: existing } = await supabase
-          .from('partner_exclusive_vouchers')
-          .select('id')
-          .eq('offering_partner_id', data.partner_id)
-          .eq('receiving_partner_id', user?.id || '')
-          .eq('offering_venue_id', offeringVenueId)
-          .maybeSingle();
+      // Check if already scanned this partner TODAY
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
 
-        if (existing) {
-          setScanResult({ status: 'already_connected', message: t('partner.qr.alreadyConnected') });
-          return;
-        }
+      const { data: existingToday } = await supabase
+        .from('partner_exclusive_vouchers')
+        .select('id')
+        .eq('offering_partner_id', data.partner_id)
+        .eq('receiving_partner_id', user?.id || '')
+        .gte('created_at', todayStart.toISOString())
+        .maybeSingle();
+
+      if (existingToday) {
+        setScanResult({
+          status: 'already_connected',
+          message: t('partner.qr.alreadyScannedToday'),
+        });
+        return;
       }
 
       // Get offering partner's configured discount
