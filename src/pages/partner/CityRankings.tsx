@@ -181,9 +181,9 @@ export default function CityRankings() {
                     {/* Rank */}
                     <div className={cn(
                       'w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm',
-                      rank === 1 && 'bg-yellow-500/20 text-yellow-600',
-                      rank === 2 && 'bg-gray-300/30 text-gray-500',
-                      rank === 3 && 'bg-amber-600/20 text-amber-700',
+                      rank === 1 && 'bg-accent/20 text-accent',
+                      rank === 2 && 'bg-muted text-muted-foreground',
+                      rank === 3 && 'bg-primary/20 text-primary',
                       rank > 3 && 'bg-muted text-muted-foreground'
                     )}>
                       {rank <= 3 ? <Trophy className="w-4 h-4" /> : `#${rank}`}
