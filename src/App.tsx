@@ -128,7 +128,9 @@ const App = () => (
                     <Route path="/partner/venues" element={<AppLayout><PartnerVenues /></AppLayout>} />
                     <Route path="/partner/reports" element={<AppLayout><PartnerReports /></AppLayout>} />
                     <Route path="/partner/qr-code" element={<AppLayout><PartnerQRCode /></AppLayout>} />
+                    <Route path="/partner/qr-scanner" element={<AppLayout><PartnerQRCode defaultTab="scanner" /></AppLayout>} />
                     <Route path="/partner/network-map" element={<AppLayout><PartnerNetworkMap /></AppLayout>} />
+                    <Route path="/partner/network" element={<AppLayout><PartnerNetworkMap /></AppLayout>} />
                     <Route path="/partner/profile" element={<AppLayout><PartnerProfile /></AppLayout>} />
                     <Route path="/partner/city-rankings" element={<AppLayout><PartnerCityRankings /></AppLayout>} />
                     
