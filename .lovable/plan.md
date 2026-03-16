@@ -1,207 +1,126 @@
 
-# End-to-End User Flow Testing Results and Fix Plan
-
-## Testing Summary
-
-I conducted comprehensive end-to-end testing of the user flow including:
-- Landing page display and navigation
-- Authentication modal (login/signup)
-- Social login buttons (Google/Apple)
-- Form validation and error handling
-- Protected route redirects
-- Session management
+# VybePulse – Projekt-Übersicht & Roadmap
 
 ---
 
-## Issues Found
+## ✅ Heutige Session – Zusammenfassung (16. März 2026)
 
-### Issue 1: Inconsistent Auth Redirect Path (Low Priority)
+### 1. QR-Code Voucher-Redemption System (komplett)
+- **Wallet QR-Detail**: Neuer Dialog zeigt QR-Code mit signiertem Payload (`vybe_user_voucher`) beim Tippen auf aktive Voucher
+- **Edge Function `redeem-voucher`**: Validiert Partner-JWT, prüft Einmaligkeit via `voucher_redemptions`, markiert Voucher als eingelöst
+- **Partner QR-Scanner erweitert**: Erkennt automatisch den QR-Typ:
+  - `vybe_user_voucher` → Einlösung via Edge Function
+  - `vybe_partner` → Partner-Netzwerk-Verbindung
+- **UX-Iteration**: QR-Dialog von custom framer-motion Overlay zu sauberem Radix Dialog umgebaut – klar schließbar mit X-Button, korrekte Größe auf Mobile
+- **„Fenster schließen"-Button entfernt** – X oben rechts reicht
 
-**Location**: `src/pages/Home.tsx` line 28
+### 2. Profil-Header bereinigt
+- E-Mail-Adresse unter dem Nutzernamen entfernt (Privacy-Verbesserung)
 
-**Problem**: When a user is not authenticated and tries to access `/home`, the page redirects to `/register-login` instead of directly to `/?auth=required`. While there's a catch-all redirect from `/register-login` to `/?auth=required` in App.tsx, this causes an unnecessary navigation hop.
-
-**Current Code**:
-```typescript
-navigate('/register-login', { replace: true });
-```
-
-**Should Be**:
-```typescript
-navigate('/?auth=required', { replace: true });
-```
-
-**Impact**: Minor - causes extra redirect but still works.
+### 3. Swipe-Navigation Fix
+- Bug behoben: `NAV_ORDER` in `AppLayout.tsx` nutzte `/plan-date` statt `/preferences` (= tatsächliche Route der Bottom-Nav)
+- Swipe zwischen Home ↔ Chats ↔ Plan Date ↔ Profile sollte jetzt funktionieren
 
 ---
 
-### Issue 2: Unused useAuthRedirect Hook (Code Quality)
+## 📊 Performance-Analyse & Empfehlungen
 
-**Location**: Multiple files
+### Aktueller Stand
 
-**Problem**: A `useAuthRedirect` hook exists at `src/hooks/useAuthRedirect.ts` that correctly handles auth redirects to `/?auth=required`, but several pages implement their own redirect logic instead of using this hook:
-- `src/pages/Home.tsx` - custom redirect logic
-- `src/pages/SmartDatePlanning.tsx` - redirects to `/register-login`
-- `src/components/SmartDatePlanner.tsx` - redirects to `/register-login`
+| Bereich | Status | Details |
+|---------|--------|---------|
+| **Bundle Size** | ⚠️ Mittel | ~40+ direkte Imports in App.tsx; nur Demo-Routes lazy-loaded |
+| **Code Splitting** | 🟡 Teilweise | 7 Demo/Debug-Routes lazy, aber alle 20+ Haupt-Routes eagerly geladen |
+| **Venue Cache** | ✅ Gut | 30-min LRU-Cache für Venue-Suchen |
+| **Skeleton Loaders** | ✅ Gut | 6+ Varianten für perceived performance |
+| **PWA/Offline** | ✅ Gut | Service Worker mit network-first Caching |
+| **DB-Indexing** | ✅ Gut | Indexes auf friendships, feedback, etc. |
+| **Session Cleanup** | ✅ Gut | Automatische Bereinigung stale Sessions |
 
-**Recommendation**: Consolidate to use `useAuthRedirect` hook consistently.
+### 🔴 Kritische Optimierungen (sollten bald umgesetzt werden)
 
----
+#### 1. Aggressive Route-basiertes Code Splitting
+**Problem**: 20+ Seiten werden im initialen Bundle geladen – der User sieht aber nur die Landing Page.
+**Lösung**: Alle geschützten Routes lazy-loaden (Home, Profile, Chats, Preferences, etc.)
+**Erwartete Verbesserung**: ~40-60% kleineres initiales Bundle, deutlich schnellere First Paint
 
-### Issue 3: Input Autocomplete Attributes Missing (Accessibility)
+#### 2. Dependency-Audit
+**Problem**: Große Abhängigkeiten wie `recharts`, `qrcode.react`, `framer-motion`, `i18next` werden global geladen.
+**Lösung**:
+- `recharts` nur in Chart-Komponenten lazy importieren
+- `qrcode.react` nur in QR-Komponenten lazy importieren
+- Tree-shaking prüfen für lucide-react Icons
+**Erwartete Verbesserung**: ~100-200KB weniger im Haupt-Bundle
 
-**Location**: `src/components/landing/AuthModal.tsx`
+#### 3. React Query Optimierung
+**Problem**: Aktuell `staleTime: 5min` global – aber manche Daten (Profil, Preferences) ändern sich selten.
+**Lösung**: Differenzierte staleTime pro Query-Typ:
+- Profil/Preferences: 30min
+- Invitations/Chats: 30sec (real-time relevant)
+- Venues: via Cache-Service (bereits vorhanden)
 
-**Problem**: Browser console shows warning:
-```
-Input elements should have autocomplete attributes (suggested: "current-password")
-```
+### 🟡 Mittlere Priorität
 
-The email and password inputs are missing `autoComplete` attributes which:
-- Reduces accessibility
-- Prevents password managers from working optimally
+#### 4. Image-Optimierung
+- Venue-Bilder sollten mit `loading="lazy"` und `srcSet` für responsive Größen geladen werden
+- Avatar-Uploads auf max 500KB komprimieren vor Upload
+- WebP-Format bevorzugen
 
-**Fix**: Add `autoComplete` attributes:
-- Email input: `autoComplete="email"`
-- Password input: `autoComplete="current-password"` (login) or `autoComplete="new-password"` (signup)
-- Name input: `autoComplete="name"`
+#### 5. Supabase Realtime-Kanäle konsolidieren
+- Aktuell potenziell mehrere Subscriptions aktiv (Invitations, Sessions, Vouchers)
+- Gemeinsamen Channel mit Filter nutzen statt separate Subscriptions
 
----
+#### 6. Animation Performance
+- `framer-motion` Animationen auf `will-change: transform` beschränken
+- Komplexe Animationen auf `GPU-composited properties` (transform, opacity) limitieren
+- `AnimatePresence` nur wo nötig einsetzen
 
-### Issue 4: Deprecated PWA Meta Tag (Minor)
+### 🟢 Nice-to-Have
 
-**Location**: `index.html`
+#### 7. Preloading kritischer Routes
+- Nach Login: `/home` und `/profile` prefetchen
+- Link-Prefetching bei Hover auf Nav-Items
 
-**Problem**: Console warning:
-```
-<meta name="apple-mobile-web-app-capable" content="yes"> is deprecated.
-```
-
-**Fix**: Replace with `<meta name="mobile-web-app-capable" content="yes">`
-
----
-
-## Working Features Confirmed
-
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Landing page | Working | Beautiful wellness-inspired design |
-| Auth modal opens | Working | Opens on "Get Started" click |
-| Social login buttons | Working | Google/Apple buttons display correctly |
-| Email/password form | Working | Validates and submits correctly |
-| Form validation | Working | Shows error for invalid credentials |
-| Login/Signup toggle | Working | Switches between modes correctly |
-| Referral code field | Working | Shows in signup mode with validation |
-| Protected route redirect | Working | Redirects unauthenticated users |
-| OAuth redirect flow | Partially Working | Redirects to Supabase but needs provider config |
-
----
-
-## OAuth Configuration Status
-
-**Google OAuth**: Returns `400 validation_failed` with message "Unsupported provider: provider is not enabled"
-
-**Required Configuration** (User must complete in Supabase Dashboard):
-1. Enable Google provider in Authentication > Providers
-2. Add Client ID and Secret from Google Cloud Console
-3. Add authorized redirect URL: `https://dfjwubatslzblagthbdw.supabase.co/auth/v1/callback`
-4. Add Site URL and Redirect URLs in Authentication > URL Configuration
+#### 8. Bundle-Analyse automatisieren
+- `vite-plugin-visualizer` einbauen für regelmäßige Bundle-Checks
+- Budget-Limits setzen (z.B. max 500KB initial JS)
 
 ---
 
-## Implementation Plan
+## 📋 Offene Punkte aus früheren Sessions
 
-### Step 1: Fix Auth Redirect Consistency
-
-**File**: `src/pages/Home.tsx`
-
-Update line 28 to redirect directly to landing with auth modal:
-
-```typescript
-navigate('/?auth=required', { replace: true });
-```
-
-### Step 2: Add Input Autocomplete Attributes
-
-**File**: `src/components/landing/AuthModal.tsx`
-
-Add autocomplete attributes to form inputs:
-- Name input: `autoComplete="name"`
-- Email input: `autoComplete="email"`
-- Password input: `autoComplete={isLogin ? "current-password" : "new-password"}`
-
-### Step 3: Update PWA Meta Tag
-
-**File**: `index.html`
-
-Replace deprecated meta tag with modern equivalent.
-
-### Step 4: Consolidate Auth Redirects (Optional)
-
-Update other files to use the `useAuthRedirect` hook or direct `/?auth=required` redirect:
-- `src/pages/SmartDatePlanning.tsx`
-- `src/components/SmartDatePlanner.tsx`
-- `src/pages/Onboarding.tsx`
-
----
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/pages/Home.tsx` | Fix redirect path (line 28) |
-| `src/components/landing/AuthModal.tsx` | Add autoComplete attributes to inputs |
-| `index.html` | Update deprecated meta tag |
-| `src/pages/SmartDatePlanning.tsx` | Optional - update redirect path |
-| `src/components/SmartDatePlanner.tsx` | Optional - update redirect path |
-| `src/pages/Onboarding.tsx` | Optional - update redirect paths |
-
----
-
-## Testing Checklist Post-Implementation
-
-- [ ] Landing page loads without console errors
-- [ ] "Get Started" opens auth modal
-- [ ] Login form submits correctly
-- [ ] Invalid credentials show error message
-- [ ] Signup form shows name and referral fields
-- [ ] Toggle between login/signup preserves modal state
-- [ ] Accessing `/home` while logged out redirects to `/?auth=required`
-- [ ] Auth modal opens automatically on redirect
-- [ ] Password managers detect form fields correctly
-- [ ] No deprecated meta tag warnings in console
-
----
-
-## Premium / Subscription Plan (TODO – Details TBD)
-
-### Confirmed
-- **Zahlungsanbieter**: Stripe (volle Kontrolle)
+### Premium / Subscription Plan (TODO)
+- **Zahlungsanbieter**: Stripe
 - **Free-Tier**: Venue-Empfehlungen mit AI-Matching (keine Vouchers)
-- **Premium-Tier**: Exklusive Vouchers – aber **nur für die Top-3 Venues** mit dem höchsten AI-Match-Score
-- **Weitere Premium-Benefits**: Noch offen
-- **Preise**: Noch offen
+- **Premium-Tier**: Exklusive Vouchers für Top-3 AI-Match Venues
+- **Preise & weitere Benefits**: Noch offen
 
 ### Implementation Plan (wenn Details feststehen)
-1. `user_subscriptions`-Tabelle erstellen (`plan: free | premium`, `stripe_customer_id`, `stripe_subscription_id`, etc.)
+1. `user_subscriptions`-Tabelle erstellen
 2. Stripe aktivieren via Lovable Stripe-Integration
-3. Paywall-Gating: Voucher-Badges nur für Premium-User auf Top-3 AI-Match Venues anzeigen
-4. Premium-Upsell UI für Free-User ("🔒 Unlock exclusive deals with Premium")
+3. Paywall-Gating: Voucher-Badges nur für Premium-User
+4. Premium-Upsell UI für Free-User
 5. Pricing-Page & Checkout-Flow
 6. Webhook für Subscription-Status-Updates
 
-### Voucher-Redemption via QR-Code
+### Voucher-Redemption via QR-Code ✅
+- QR-Code in Wallet → ✅ implementiert
+- QR-Scanner im Partner-Dashboard → ✅ implementiert (erkennt User-Voucher + Partner-Codes)
+- Edge Function `redeem-voucher` → ✅ implementiert
+- **Offen**: Push-Notifications bei erfolgreicher Einlösung (User + Partner)
+- **Offen**: Wallet mit echten Supabase-Daten statt Mock-Daten verbinden
 
-**Regeln:**
-- Jeder Voucher hat einen **einzigartigen QR-Code** in der Premium Wallet
-- Voucher ist **einmalig gültig** – nach Scan durch Venue-Partner endgültig eingelöst
-- Scan erfolgt über den **QR-Scanner des Venue-Partners** (Partner-Dashboard)
-- Nach Einlösung: Status → `redeemed`, `redeemed_at` wird gesetzt
-- Eingelöster Voucher erscheint in Wallet unter Tab "Eingelöst"
+### Bekannte Issues (niedrige Priorität)
+- Auth-Redirect Inkonsistenz (manche Seiten → `/register-login` statt `/?auth=required`)
+- Input `autoComplete`-Attribute fehlen im Auth-Modal
+- Deprecated PWA Meta-Tag in `index.html`
 
-**Implementation Plan:**
-1. QR-Code-Generierung in der Wallet (enthält Voucher-ID + User-ID als signiertes Token)
-2. QR-Scanner UI im Partner-Dashboard (`/partner/scan`)
-3. Edge Function `redeem-voucher` – validiert Token, prüft Einmaligkeit, markiert als eingelöst
-4. Echtzeit-Update: Partner sieht Bestätigung, User-Wallet aktualisiert sich
-5. `voucher_redemptions`-Tabelle wird für die Dokumentation genutzt
+---
+
+## 🏗️ Nächste sinnvolle Schritte
+
+1. **Wallet mit echten Daten** – Mock-Vouchers durch Supabase-Queries ersetzen
+2. **Redemption-Notifications** – Push bei Voucher-Einlösung
+3. **Route Code Splitting** – Alle Haupt-Routes lazy-loaden (Performance-Gewinn)
+4. **Stripe Integration** – Premium-Subscription aufsetzen
+5. **Partner Redemption-Übersicht** – Eingelöste Vouchers im Partner-Dashboard
