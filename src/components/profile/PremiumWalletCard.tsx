@@ -160,6 +160,7 @@ function VoucherCard({ voucher, variant, onTap }: { voucher: WalletVoucher; vari
       tabIndex={isTappable ? 0 : undefined}
       className={cn(
         'relative flex items-stretch gap-0 rounded-xl border overflow-hidden transition-all duration-200',
+        isTappable && 'cursor-pointer active:scale-[0.98]',
         isExpired && 'opacity-60',
         isRedeemed && 'opacity-75',
         isExpiring
