@@ -728,10 +728,10 @@ const Preferences = () => {
             <button
               key={ent.id}
               onClick={() => toggleSelection(ent.id, selectedEntertainment, setSelectedEntertainment)}
-              className={`p-4 rounded-xl border-2 transition-all ${
+              className={`p-4 rounded-xl border-2 transition-none ${
                 selectedEntertainment.includes(ent.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <PrefIcon id={ent.id} />
