@@ -126,6 +126,9 @@ export default function PartnerDashboard() {
       {/* Voucher Alerts */}
       <VoucherAlerts />
 
+      {/* Guest Feedback */}
+      <GuestFeedbackCard />
+
       {/* Analytics Chart */}
       <RedemptionChart />
 
