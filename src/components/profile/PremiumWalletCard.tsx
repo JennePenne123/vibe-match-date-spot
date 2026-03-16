@@ -346,7 +346,7 @@ export function PremiumWalletCard() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.06, duration: 0.2 }}
                     >
-                      <VoucherCard voucher={voucher} variant={activeTab} />
+                      <VoucherCard voucher={voucher} variant={activeTab} onTap={() => setSelectedVoucher(voucher)} />
                     </motion.div>
                   ))
                 )}
