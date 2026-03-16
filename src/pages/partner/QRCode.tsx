@@ -487,13 +487,13 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
                 <div className="text-center py-6">
                   <ScanLine className="w-14 h-14 mx-auto mb-3 text-muted-foreground" />
                   <h3 className="text-lg font-semibold mb-2">{t('partner.qr.scanTitle')}</h3>
-                  <p className="text-sm text-muted-foreground mb-2 max-w-[280px] mx-auto">
+                  <p className="text-sm text-muted-foreground mb-4 max-w-[280px] mx-auto">
                     {t('partner.qr.scanDesc')}
                   </p>
-                  <Badge variant="outline" className="mb-4">
-                    {t('partner.qr.scansRemaining', { count: Math.max(0, DAILY_SCAN_LIMIT - dailyScansUsed) })}
-                  </Badge>
-                  <Button onClick={startScanner} className="gap-2" disabled={dailyScansUsed >= DAILY_SCAN_LIMIT}>
+                  <Button onClick={startScanner} className="gap-2">
+                    <ScanLine className="w-4 h-4" />
+                    {t('partner.qr.startScan')}
+                  </Button>
                     <ScanLine className="w-4 h-4" />
                     {t('partner.qr.startScan')}
                   </Button>
