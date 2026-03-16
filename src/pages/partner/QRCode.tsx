@@ -47,7 +47,7 @@ interface ScanResult {
   };
 }
 
-export default function PartnerQRCode() {
+export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: string }) {
   const { t } = useTranslation();
   const { role, loading: roleLoading } = useUserRole();
   const { user } = useAuth();
