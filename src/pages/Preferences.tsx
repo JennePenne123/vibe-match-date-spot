@@ -869,10 +869,10 @@ const Preferences = () => {
             <button
               key={access.id}
               onClick={() => toggleSelection(access.id, selectedAccessibility, setSelectedAccessibility)}
-              className={`w-full p-4 rounded-xl border-2 transition-all ${
+              className={`w-full p-4 rounded-xl border-2 transition-none ${
                 selectedAccessibility.includes(access.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <div className="flex items-center gap-4">
