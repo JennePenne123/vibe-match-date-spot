@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Star, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Star, ThumbsUp, ThumbsDown, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDateRating } from '@/hooks/useDateRating';
 import { useTranslation } from 'react-i18next';
