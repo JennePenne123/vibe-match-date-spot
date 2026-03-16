@@ -479,15 +479,30 @@ useEffect(() => {
   };
 
   const applyQuickStartTemplate = (template: typeof quickStartTemplates[0]) => {
-    setSelectedCuisines(template.cuisines);
-    setSelectedVibes(template.vibes);
-    setSelectedPriceRange(template.priceRange);
-    setSelectedTimePreferences(template.timePreferences);
+    const isDeselecting = selectedTemplateId === template.id;
     
-    toast({
-      title: `${template.title} template applied!`,
-      description: "You can still customize your preferences.",
-    });
+    if (isDeselecting) {
+      // Deselect: clear all preferences
+      setSelectedTemplateId(null);
+      setSelectedCuisines([]);
+      setSelectedVibes([]);
+      setSelectedPriceRange([]);
+      setSelectedTimePreferences([]);
+      toast({
+        title: `Template deselected`,
+        description: "All preferences cleared.",
+      });
+    } else {
+      setSelectedTemplateId(template.id);
+      setSelectedCuisines(template.cuisines);
+      setSelectedVibes(template.vibes);
+      setSelectedPriceRange(template.priceRange);
+      setSelectedTimePreferences(template.timePreferences);
+      toast({
+        title: `${template.title} applied!`,
+        description: "You can still customize your preferences.",
+      });
+    }
   };
 
   const submitPreferences = async () => {
