@@ -821,14 +821,11 @@ const Preferences = () => {
         <div className="grid grid-cols-2 gap-3">
           {dietaryRequirements.map((dietary) => (
             <button
+              type="button"
               key={dietary.id}
               onClick={() => toggleSelection(dietary.id, selectedDietary, setSelectedDietary)}
-              className={`p-4 rounded-xl border-2 transition-none ${
-                selectedDietary.includes(dietary.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
-            >
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
               <PrefIcon id={dietary.id} />
               <div className="font-medium text-sm">{dietary.name}</div>
               {selectedDietary.includes(dietary.id) && (
