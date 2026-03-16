@@ -234,15 +234,6 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
 
   const handleScanResult = async (decodedText: string) => {
     try {
-      // Check daily scan limit
-      if (dailyScansUsed >= DAILY_SCAN_LIMIT) {
-        setScanResult({
-          status: 'error',
-          message: t('partner.qr.dailyLimitReached', { limit: DAILY_SCAN_LIMIT }),
-        });
-        return;
-      }
-
       const data = JSON.parse(decodedText);
 
       // Only accept partner QR codes
