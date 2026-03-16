@@ -133,7 +133,19 @@
     "addFriends": "Add Friends",
     "accountSettings": "Account Settings",
     "updatePreferences": "Update Preferences",
-    "findNewSpots": "Find New Date Spots"
+    "findNewSpots": "Find New Date Spots",
+    "activity": {
+      "title": "Recent Activity",
+      "dateSent": "Date Invitation Sent",
+      "dateReceived": "Date Invitation Received",
+      "youInvited": "You invited someone",
+      "youWereInvited": "You were invited",
+      "ratedDate": "Rated a Date",
+      "newFriend": "New Connection",
+      "connectionMade": "You made a new friend",
+      "noActivity": "No activity yet",
+      "startExploring": "Start planning dates to see your activity here!"
+    }
   },
   "invitations": {
     "title": "Date Invitations"

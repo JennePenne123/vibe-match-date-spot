@@ -133,7 +133,19 @@
     "addFriends": "Freunde hinzufügen",
     "accountSettings": "Kontoeinstellungen",
     "updatePreferences": "Vorlieben aktualisieren",
-    "findNewSpots": "Neue Date-Spots finden"
+    "findNewSpots": "Neue Date-Spots finden",
+    "activity": {
+      "title": "Letzte Aktivitäten",
+      "dateSent": "Date-Einladung gesendet",
+      "dateReceived": "Date-Einladung erhalten",
+      "youInvited": "Du hast jemanden eingeladen",
+      "youWereInvited": "Du wurdest eingeladen",
+      "ratedDate": "Date bewertet",
+      "newFriend": "Neue Verbindung",
+      "connectionMade": "Du hast einen neuen Freund gefunden",
+      "noActivity": "Noch keine Aktivitäten",
+      "startExploring": "Plane Dates, um hier deine Aktivitäten zu sehen!"
+    }
   },
   "invitations": {
     "title": "Date-Einladungen"
