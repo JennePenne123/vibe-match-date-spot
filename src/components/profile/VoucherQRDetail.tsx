@@ -61,15 +61,15 @@ export function VoucherQRDetail({ voucher, userId, onClose }: VoucherQRDetailPro
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4"
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          initial={{ scale: 0.95, opacity: 0, y: 40 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          exit={{ scale: 0.95, opacity: 0, y: 40 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="bg-card rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-border/50"
+          className="bg-card rounded-2xl shadow-2xl max-w-sm w-full max-h-[85vh] overflow-y-auto border border-border/50"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header accent */}
