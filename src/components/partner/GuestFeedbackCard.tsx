@@ -143,7 +143,7 @@ export default function GuestFeedbackCard() {
   };
 
   const TrendIcon = summary?.trend === 'up' ? TrendingUp : summary?.trend === 'down' ? TrendingDown : Minus;
-  const trendColor = summary?.trend === 'up' ? 'text-emerald-500' : summary?.trend === 'down' ? 'text-destructive' : 'text-muted-foreground';
+  const trendColor = summary?.trend === 'up' ? 'text-primary' : summary?.trend === 'down' ? 'text-destructive' : 'text-muted-foreground';
 
   if (loading) {
     return (
