@@ -71,7 +71,7 @@ const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> 
   quick:          { icon: Zap,             bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
   relaxed:        { icon: Hourglass,       bg: 'bg-teal-500/15', fg: 'text-teal-500' },
   extended:       { icon: Timer,           bg: 'bg-blue-500/15', fg: 'text-blue-500' },
-  spontaneous:    { icon: HelpCircle,      bg: 'bg-purple-400/15', fg: 'text-purple-400' },
+  spontaneous:    { icon: Shuffle,         bg: 'bg-purple-400/15', fg: 'text-purple-400' },
   // Activities
   dining:         { icon: Wine,            bg: 'bg-red-500/15', fg: 'text-red-500' },
   dining_plus:    { icon: Tent,            bg: 'bg-pink-500/15', fg: 'text-pink-500' },
