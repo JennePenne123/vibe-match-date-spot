@@ -507,7 +507,7 @@ const Preferences = () => {
               className="p-4 rounded-xl border-2 border-border bg-card hover:bg-accent/50 transition-all text-left"
             >
               <div className="flex items-center gap-3">
-                <PrefIcon id={'template_' + template.id} className="w-12 h-12 object-contain" />
+                <PrefIcon id={'template_' + template.id} size="lg" />
                 <div>
                   <div className="font-semibold text-foreground">{template.title}</div>
                   <div className="text-sm text-muted-foreground">{template.description}</div>
