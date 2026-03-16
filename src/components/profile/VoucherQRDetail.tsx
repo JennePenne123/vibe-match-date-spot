@@ -124,9 +124,6 @@ export function VoucherQRDetail({ voucher, userId, onClose }: VoucherQRDetailPro
               Einmalig gültig · Wird nach dem Scan endgültig eingelöst
             </p>
 
-            <Button type="button" variant="secondary" className="w-full" onClick={onClose}>
-              Fenster schließen
-            </Button>
           </div>
         </div>
       </DialogContent>
