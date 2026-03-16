@@ -13,7 +13,7 @@ import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
   Icon,
   // Cuisine icons
-  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup, Cherry,
+  Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup,
   // Vibe icons
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
   // Price icons
