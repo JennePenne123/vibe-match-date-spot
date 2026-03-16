@@ -143,9 +143,10 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
         }
       }
 
+      const speedText = hasSpeedBonus ? ' (inkl. ⚡ Speed-Bonus!)' : '';
       toast({
         title: "🎉 Bewertung abgegeben!",
-        description: `Du hast ${pointsEarned} Punkte verdient. Danke für dein Feedback!`,
+        description: `Du hast ${pointsEarned} Punkte verdient${speedText}. Danke für dein Feedback!`,
       });
 
       return { success: true, points: pointsEarned };
