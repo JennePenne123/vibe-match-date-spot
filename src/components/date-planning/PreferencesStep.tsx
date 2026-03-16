@@ -640,29 +640,21 @@ useEffect(() => {
 
           return (
             <button
+              type="button"
               key={item.id}
               onClick={() => toggleSelection(item.id, selectedItems, setSelectedItems, category)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
-              className={`p-3 md:p-4 rounded-xl border-2 transition-none relative min-h-[80px] select-none ${
-                isSelected
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              className="p-3 md:p-4 rounded-xl border-2 transition-none relative min-h-[80px] select-none bg-card border-border text-foreground"
             >
               <div className="text-xl md:text-2xl mb-1">{item.emoji}</div>
               <div className="font-medium text-sm md:text-base">{item.name}</div>
               {item.desc && (
-                <div className={`text-xs mt-1 leading-tight ${isSelected ? 'text-primary/70' : 'text-muted-foreground'}`}>
+                <div className="text-xs mt-1 leading-tight text-muted-foreground">
                   {item.desc}
                 </div>
               )}
               {isSelected && (
                 <Check className="w-3 h-3 md:w-4 md:h-4 absolute top-2 right-2" />
-              )}
-              {isShared && (
-                <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full text-xs px-1.5 py-0.5">
-                  Match!
-                </div>
               )}
             </button>
           );
@@ -680,9 +672,11 @@ useEffect(() => {
         <div className="grid grid-cols-1 gap-2 md:gap-3">
           {quickStartTemplates.map((template) => (
             <button
+              type="button"
               key={template.id}
               onClick={() => applyQuickStartTemplate(template)}
-              className="p-3 md:p-4 rounded-lg border border-border text-left transition-all hover:bg-muted hover:border-primary/20"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-3 md:p-4 rounded-lg border border-border text-left transition-none select-none"
             >
               <div className="flex items-center gap-3">
                 <div className="text-xl md:text-2xl flex-shrink-0">{template.emoji}</div>

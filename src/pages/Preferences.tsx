@@ -507,9 +507,11 @@ const Preferences = () => {
         <div className="grid grid-cols-1 gap-3">
           {quickTemplates.map((template) => (
             <button
+              type="button"
               key={template.id}
               onClick={() => applyQuickTemplate(template)}
-              className="p-4 rounded-xl border-2 border-border bg-card hover:bg-accent/50 transition-all text-left"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 border-border bg-card transition-none text-left select-none"
             >
               <div className="flex items-center gap-3">
                 <PrefIcon id={'template_' + template.id} size="lg" />
@@ -531,13 +533,11 @@ const Preferences = () => {
         <div className="grid grid-cols-2 gap-3">
           {cuisines.map((cuisine) => (
             <button
+              type="button"
               key={cuisine.id}
               onClick={() => toggleSelection(cuisine.id, selectedCuisines, setSelectedCuisines)}
-              className={`p-4 rounded-xl border-2 transition-none ${
-                selectedCuisines.includes(cuisine.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
             >
               <PrefIcon id={cuisine.id} />
               <div className="font-medium text-sm">{cuisine.name}</div>
@@ -557,19 +557,17 @@ const Preferences = () => {
         <div className="space-y-3">
           {vibes.map((vibe) => (
             <button
+              type="button"
               key={vibe.id}
               onClick={() => toggleSelection(vibe.id, selectedVibes, setSelectedVibes)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedVibes.includes(vibe.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
             >
               <div className="flex items-center gap-4">
                 <PrefIcon id={vibe.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{vibe.name}</div>
-                  <div className={`text-sm ${selectedVibes.includes(vibe.id) ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <div className="text-sm text-muted-foreground">
                     {vibe.desc}
                   </div>
                 </div>
@@ -594,19 +592,17 @@ const Preferences = () => {
         <div className="space-y-3">
           {priceRanges.map((price) => (
             <button
+              type="button"
               key={price.id}
               onClick={() => toggleSelection(price.id, selectedPriceRange, setSelectedPriceRange)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedPriceRange.includes(price.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
             >
               <div className="flex items-center gap-4">
                 <PrefIcon id={price.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{price.name}</div>
-                  <div className={`text-sm ${selectedPriceRange.includes(price.id) ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <div className="text-sm text-muted-foreground">
                     {price.desc}
                   </div>
                 </div>
@@ -627,17 +623,15 @@ const Preferences = () => {
         <div className="grid grid-cols-2 gap-3">
           {timePreferences.map((time) => (
             <button
+              type="button"
               key={time.id}
               onClick={() => toggleSelection(time.id, selectedTimePreferences, setSelectedTimePreferences)}
-              className={`p-4 rounded-xl border-2 transition-none ${
-                selectedTimePreferences.includes(time.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
             >
               <PrefIcon id={time.id} />
               <div className="font-medium text-sm">{time.name}</div>
-              <div className={`text-xs ${selectedTimePreferences.includes(time.id) ? 'text-primary' : 'text-muted-foreground'}`}>
+              <div className="text-xs text-muted-foreground">
                 {time.desc}
               </div>
               {selectedTimePreferences.includes(time.id) && (
@@ -656,19 +650,17 @@ const Preferences = () => {
         <div className="space-y-3">
           {durations.map((duration) => (
             <button
+              type="button"
               key={duration.id}
               onClick={() => toggleSingleSelection(duration.id, setSelectedDuration)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedDuration === duration.id
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
             >
               <div className="flex items-center gap-4">
                 <PrefIcon id={duration.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{duration.name}</div>
-                  <div className={`text-sm ${selectedDuration === duration.id ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <div className="text-sm text-muted-foreground">
                     {duration.desc}
                   </div>
                 </div>
@@ -693,19 +685,17 @@ const Preferences = () => {
         <div className="space-y-3">
           {activities.map((activity) => (
             <button
+              type="button"
               key={activity.id}
               onClick={() => toggleSelection(activity.id, selectedActivities, setSelectedActivities)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedActivities.includes(activity.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
             >
               <div className="flex items-center gap-4">
                 <PrefIcon id={activity.id === 'cultural' ? 'cultural_act' : activity.id === 'nightlife' ? 'nightlife_act' : activity.id} />
                 <div className="flex-1 text-left">
                   <div className="font-semibold">{activity.name}</div>
-                  <div className={`text-sm ${selectedActivities.includes(activity.id) ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <div className="text-sm text-muted-foreground">
                     {activity.desc}
                   </div>
                 </div>
@@ -726,13 +716,11 @@ const Preferences = () => {
         <div className="grid grid-cols-2 gap-3">
           {entertainment.map((ent) => (
             <button
+              type="button"
               key={ent.id}
               onClick={() => toggleSelection(ent.id, selectedEntertainment, setSelectedEntertainment)}
-              className={`p-4 rounded-xl border-2 transition-none ${
-                selectedEntertainment.includes(ent.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
             >
               <PrefIcon id={ent.id} />
               <div className="font-medium text-sm">{ent.name}</div>
@@ -841,13 +829,11 @@ const Preferences = () => {
         <div className="grid grid-cols-2 gap-3">
           {dietaryRequirements.map((dietary) => (
             <button
+              type="button"
               key={dietary.id}
               onClick={() => toggleSelection(dietary.id, selectedDietary, setSelectedDietary)}
-              className={`p-4 rounded-xl border-2 transition-none ${
-                selectedDietary.includes(dietary.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
             >
               <PrefIcon id={dietary.id} />
               <div className="font-medium text-sm">{dietary.name}</div>
@@ -867,13 +853,11 @@ const Preferences = () => {
         <div className="space-y-3">
           {accessibilityNeeds.map((access) => (
             <button
+              type="button"
               key={access.id}
               onClick={() => toggleSelection(access.id, selectedAccessibility, setSelectedAccessibility)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedAccessibility.includes(access.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
             >
               <div className="flex items-center gap-4">
                 <PrefIcon id={access.id} />
