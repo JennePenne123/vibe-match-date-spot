@@ -642,7 +642,11 @@ useEffect(() => {
             <button
               key={item.id}
               onClick={() => toggleSelection(item.id, selectedItems, setSelectedItems, category)}
-              className={`p-3 md:p-4 rounded-xl border-2 transition-all relative min-h-[80px] bg-card border-border text-foreground hover:bg-muted`}
+              className={`p-3 md:p-4 rounded-xl border-2 transition-all relative min-h-[80px] ${
+                isSelected
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground hover:bg-muted'
+              }`}
             >
               <div className="text-xl md:text-2xl mb-1">{item.emoji}</div>
               <div className="font-medium text-sm md:text-base">{item.name}</div>
