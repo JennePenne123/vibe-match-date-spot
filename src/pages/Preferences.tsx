@@ -843,10 +843,10 @@ const Preferences = () => {
             <button
               key={dietary.id}
               onClick={() => toggleSelection(dietary.id, selectedDietary, setSelectedDietary)}
-              className={`p-4 rounded-xl border-2 transition-all ${
+              className={`p-4 rounded-xl border-2 transition-none ${
                 selectedDietary.includes(dietary.id)
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'bg-card border-border text-foreground hover:bg-accent/50'
+                  ? 'bg-card border-primary text-foreground'
+                  : 'bg-card border-border text-foreground'
               }`}
             >
               <PrefIcon id={dietary.id} />
