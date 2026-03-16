@@ -87,7 +87,7 @@ const queryClient = new QueryClient({
         }
         return failureCount < 3;
       },
-      staleTime: 5 * 60 * 1000,
+      staleTime: 10 * 60 * 1000, // 10 minutes – most data is fetched via direct Supabase calls
     },
     mutations: {
       retry: 1,
