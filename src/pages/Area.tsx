@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MapPin, Clock, Sparkles, Loader2, AlertCircle, Navigation, Check } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Sparkles, Loader2, AlertCircle, Navigation, Check, Building2, Waves, Palette, Landmark, Gem } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const Area = () => {
   const navigate = useNavigate();
