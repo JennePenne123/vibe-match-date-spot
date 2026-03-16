@@ -532,14 +532,11 @@ const Preferences = () => {
         <div className="grid grid-cols-2 gap-3">
           {cuisines.map((cuisine) => (
             <button
+              type="button"
               key={cuisine.id}
               onClick={() => toggleSelection(cuisine.id, selectedCuisines, setSelectedCuisines)}
-              className={`p-4 rounded-xl border-2 transition-none ${
-                selectedCuisines.includes(cuisine.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
-            >
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
               <PrefIcon id={cuisine.id} />
               <div className="font-medium text-sm">{cuisine.name}</div>
               {selectedCuisines.includes(cuisine.id) && (
