@@ -844,14 +844,11 @@ const Preferences = () => {
         <div className="space-y-3">
           {accessibilityNeeds.map((access) => (
             <button
+              type="button"
               key={access.id}
               onClick={() => toggleSelection(access.id, selectedAccessibility, setSelectedAccessibility)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedAccessibility.includes(access.id)
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
-            >
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
               <div className="flex items-center gap-4">
                 <PrefIcon id={access.id} />
                 <div className="font-semibold">{access.name}</div>
