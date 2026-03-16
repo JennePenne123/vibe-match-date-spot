@@ -146,6 +146,7 @@ export const DateRatingPrompt: React.FC<DateRatingPromptProps> = ({
         invitationId={invitationId}
         partnerName={invitationData.partnerName}
         venueName={invitationData.venueName}
+        dateTime={invitationData.dateTime}
         venueId={invitationData.venueId}
         partnerId={invitationData.partnerId}
         aiPredictedScore={invitationData.aiPredictedScore}
