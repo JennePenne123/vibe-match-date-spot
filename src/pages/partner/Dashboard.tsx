@@ -20,12 +20,40 @@ export default function PartnerDashboard() {
 
   const isLoading = roleLoading || authLoading;
 
-  // TODO: Re-enable auth guard for production
-  // useEffect(() => {
-  //   if (!isLoading && user && role !== 'venue_partner' && role !== 'admin') {
-  //     navigate('/home');
-  //   }
-  // }, [role, isLoading, user, navigate]);
+  useEffect(() => {
+    if (!isLoading && user && role !== 'venue_partner' && role !== 'admin') {
+      navigate('/home');
+    }
+  }, [role, isLoading, user, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-6">
+        <Card variant="glass" className="max-w-md w-full text-center p-8">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg mx-auto mb-6">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold mb-2">{t('partner.portalTitle')}</h1>
+          <p className="text-muted-foreground mb-6">{t('partner.portalSignIn')}</p>
+          <Button onClick={() => navigate('/?auth=partner')} className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white">
+            <LogIn className="w-4 h-4 mr-2" />
+            {t('partner.signInAsPartner')}
+          </Button>
+          <div className="mt-6">
+            <LanguageSelector />
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
