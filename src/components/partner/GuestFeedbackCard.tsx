@@ -184,7 +184,7 @@ export default function GuestFeedbackCard() {
               <span className="text-2xl font-bold">
                 {summary && summary.avgOverallRating > 0 ? summary.avgOverallRating.toFixed(1) : '–'}
               </span>
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              <Star className="w-4 h-4 fill-accent text-accent" />
             </div>
             <p className="text-xs text-muted-foreground">{t('partner.feedback.dateRating')}</p>
           </div>
