@@ -226,6 +226,12 @@ export default function GuestFeedbackCard() {
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-primary" />
           {t('partner.feedback.title')}
+          {newCount > 0 && (
+            <span className="flex items-center gap-1 text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+              <Bell className="w-3 h-3" />
+              +{newCount}
+            </span>
+          )}
         </CardTitle>
         <CardDescription>{t('partner.feedback.subtitle')}</CardDescription>
       </CardHeader>
