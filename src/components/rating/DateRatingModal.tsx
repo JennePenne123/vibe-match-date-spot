@@ -14,6 +14,7 @@ interface DateRatingModalProps {
   invitationId: string;
   partnerName: string;
   venueName: string;
+  dateTime?: string;
   venueId?: string;
   partnerId?: string;
   aiPredictedScore?: number | null;
