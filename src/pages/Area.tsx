@@ -11,47 +11,20 @@ const Area = () => {
   const { updateArea, generateRecommendations, appState, requestLocation } = useApp();
   const [selectedArea, setSelectedArea] = useState('');
 
+  const areaIconMap: Record<string, { icon: React.ElementType; bg: string; fg: string }> = {
+    downtown:       { icon: Building2, bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+    waterfront:     { icon: Waves,     bg: 'bg-cyan-500/15',   fg: 'text-cyan-500' },
+    'arts-district': { icon: Palette,  bg: 'bg-pink-500/15',   fg: 'text-pink-500' },
+    oldtown:        { icon: Landmark,  bg: 'bg-amber-500/15',  fg: 'text-amber-500' },
+    uptown:         { icon: Gem,       bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
+  };
+
   const areas = [
-    {
-      id: 'downtown',
-      name: 'Downtown',
-      description: 'Urban vibes with trendy restaurants and rooftop bars',
-      emoji: '🏙️',
-      time: '10-15 min drive',
-      venues: 24
-    },
-    {
-      id: 'waterfront',
-      name: 'Waterfront',
-      description: 'Scenic views with seafood and sunset spots',
-      emoji: '🌊',
-      time: '15-20 min drive',
-      venues: 18
-    },
-    {
-      id: 'arts-district',
-      name: 'Arts District',
-      description: 'Creative atmosphere with galleries and jazz clubs',
-      emoji: '🎨',
-      time: '8-12 min drive',
-      venues: 16
-    },
-    {
-      id: 'oldtown',
-      name: 'Old Town',
-      description: 'Historic charm with cozy cafes and wine bars',
-      emoji: '🏛️',
-      time: '12-18 min drive',
-      venues: 22
-    },
-    {
-      id: 'uptown',
-      name: 'Uptown',
-      description: 'Upscale dining and sophisticated cocktail lounges',
-      emoji: '✨',
-      time: '5-10 min drive',
-      venues: 19
-    }
+    { id: 'downtown', name: 'Downtown', description: 'Urban vibes with trendy restaurants and rooftop bars', time: '10-15 min drive', venues: 24 },
+    { id: 'waterfront', name: 'Waterfront', description: 'Scenic views with seafood and sunset spots', time: '15-20 min drive', venues: 18 },
+    { id: 'arts-district', name: 'Arts District', description: 'Creative atmosphere with galleries and jazz clubs', time: '8-12 min drive', venues: 16 },
+    { id: 'oldtown', name: 'Old Town', description: 'Historic charm with cozy cafes and wine bars', time: '12-18 min drive', venues: 22 },
+    { id: 'uptown', name: 'Uptown', description: 'Upscale dining and sophisticated cocktail lounges', time: '5-10 min drive', venues: 19 },
   ];
 
   // Request location when component mounts
