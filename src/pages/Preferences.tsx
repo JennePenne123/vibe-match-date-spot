@@ -528,7 +528,7 @@ const Preferences = () => {
                   : 'bg-card border-border text-foreground hover:bg-accent/50'
               }`}
             >
-              <div className="text-2xl mb-1">{time.emoji}</div>
+              <PrefIcon id={time.id} />
               <div className="font-medium text-sm">{time.name}</div>
               <div className={`text-xs ${selectedTimePreferences.includes(time.id) ? 'text-primary' : 'text-muted-foreground'}`}>
                 {time.desc}
