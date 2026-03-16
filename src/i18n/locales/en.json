@@ -517,5 +517,13 @@
       "noPartners": "No partner venues on the map yet",
       "addVenue": "Add Venue"
     }
+  },
+  "rating": {
+    "title": "How was your date?",
+    "subtitle": "Rate your date with {{partner}} at {{venue}}",
+    "commentLabel": "Comment (optional)",
+    "commentPlaceholder": "What did you enjoy or what could be improved?",
+    "submitting": "Submitting...",
+    "submit": "Submit rating"
   }
 }
