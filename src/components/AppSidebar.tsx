@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/contexts/AuthContext'
 import { useInvitations } from '@/hooks/useInvitations'
-import { useUserRole } from '@/hooks/useUserRole'
+
 import { getUserName, getUserAvatar } from '@/utils/typeHelpers'
 import { getInitials } from '@/lib/utils'
 
