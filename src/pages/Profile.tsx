@@ -76,6 +76,9 @@ const Profile = () => {
 
         {/* Content cards */}
         <div className="px-4 pb-6 -mt-4 space-y-4 relative z-10">
+          {/* Premium Wallet – first for immediate overview */}
+          <PremiumWalletCard />
+          
           <ProfileStats />
           
           {/* Activity Feed */}
@@ -85,8 +88,6 @@ const Profile = () => {
           {!pointsLoading && points && <BadgesCard badges={Array.isArray(points.badges) ? points.badges : []} />}
           <ReferralCard />
           <AILearningCard />
-          {/* TODO: Show Wallet for premium users, ThemeSettings for free users */}
-          <PremiumWalletCard />
           <LeaderboardCard />
           <ProfileActions onLogout={logout} />
         </div>
