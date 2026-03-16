@@ -38,7 +38,7 @@ import { cn } from '@/lib/utils';
 const MapPreview = lazy(() => import('@/components/MapPreview'));
 
 // Icon + color mapping for each preference ID
-const prefIconMap: Record<string, { icon: LucideIcon; bg: string; fg: string }> = {
+const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: IconNode; bg: string; fg: string }> = {
   // Cuisines — each icon chosen to represent the cuisine's most iconic element
   italian:        { icon: Pizza,           bg: 'bg-red-500/15', fg: 'text-red-500' },
   japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
