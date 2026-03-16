@@ -65,7 +65,7 @@ export function VoucherQRDetail({ voucher, userId, onClose }: VoucherQRDetailPro
         <div className="h-1.5 bg-gradient-to-r from-primary via-primary/60 to-accent" />
 
         <div className="max-h-[80vh] overflow-y-auto px-4 pb-4 pt-5">
-          <DialogHeader className="space-y-2 pr-8 text-center">
+          <DialogHeader className="space-y-2 text-center">
             <div className="flex justify-center">
               <Badge className="bg-gradient-to-r from-primary to-primary/80 px-3 py-1 text-xs text-primary-foreground">
                 {discountText}
