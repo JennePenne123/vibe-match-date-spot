@@ -61,15 +61,15 @@ export function VoucherQRDetail({ voucher, userId, onClose }: VoucherQRDetailPro
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4"
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          initial={{ scale: 0.95, opacity: 0, y: 40 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          exit={{ scale: 0.95, opacity: 0, y: 40 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="bg-card rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-border/50"
+          className="bg-card rounded-2xl shadow-2xl max-w-sm w-full max-h-[85vh] overflow-y-auto border border-border/50"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header accent */}
@@ -83,24 +83,23 @@ export function VoucherQRDetail({ voucher, userId, onClose }: VoucherQRDetailPro
           </div>
 
           {/* Content */}
-          <div className="px-6 pb-6 text-center space-y-4">
-            {/* Venue & title */}
+          <div className="px-5 pb-5 text-center space-y-3">
             <div>
-              <h3 className="text-lg font-bold">{voucher.title}</h3>
-              <p className="text-sm text-muted-foreground">{voucher.venue_name}</p>
+              <h3 className="text-base font-bold">{voucher.title}</h3>
+              <p className="text-xs text-muted-foreground">{voucher.venue_name}</p>
             </div>
 
             {/* Discount badge */}
-            <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-base px-4 py-1.5">
+            <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm px-3 py-1">
               {discountText}
             </Badge>
 
             {/* QR Code */}
             <div className="flex justify-center">
-              <div className="bg-white p-4 rounded-2xl shadow-lg relative">
+              <div className="bg-white p-3 rounded-xl shadow-lg relative">
                 <QRCodeSVG
                   value={qrPayload}
-                  size={200}
+                  size={160}
                   level="H"
                   includeMargin
                 />
