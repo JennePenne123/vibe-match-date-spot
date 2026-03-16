@@ -432,6 +432,47 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
               </Button>
             </CardContent>
           </Card>
+
+          {/* Network Discount Settings */}
+          <Card variant="glass">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Settings2 className="w-4 h-4 text-primary" />
+                <h3 className="font-semibold text-sm">{t('partner.qr.discountSettings')}</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t('partner.qr.discountSettingsDesc')}
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <Label htmlFor="network-discount" className="text-xs">
+                    {t('partner.qr.discountLabel')}
+                  </Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      id="network-discount"
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={networkDiscount}
+                      onChange={e => setNetworkDiscount(Math.min(100, Math.max(1, Number(e.target.value))))}
+                      className="w-24"
+                      inputSize="sm"
+                    />
+                    <span className="text-sm text-muted-foreground font-medium">%</span>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={saveNetworkDiscount}
+                  disabled={savingDiscount}
+                  className="mt-5"
+                >
+                  {savingDiscount ? '...' : t('common.save')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* SCANNER */}
