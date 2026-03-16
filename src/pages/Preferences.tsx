@@ -9,8 +9,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, ArrowRight, Check, Clock, DollarSign, MapPin, Settings, Coffee, Heart, Navigation, Loader2, X } from 'lucide-react';
+import { prefIllustrations } from '@/assets/prefs';
 
 const MapPreview = lazy(() => import('@/components/MapPreview'));
+
+// Helper to resolve illustration for a preference id
+function PrefIcon({ id, className = 'w-10 h-10 object-contain' }: { id: string; className?: string }) {
+  const src = prefIllustrations[id];
+  if (src) {
+    return <img src={src} alt="" className={className} loading="lazy" />;
+  }
+  return null;
+}
+
 interface Preference {
   id: string;
   name: string;
