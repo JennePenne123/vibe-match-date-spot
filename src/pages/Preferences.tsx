@@ -645,14 +645,11 @@ const Preferences = () => {
         <div className="space-y-3">
           {durations.map((duration) => (
             <button
+              type="button"
               key={duration.id}
               onClick={() => toggleSingleSelection(duration.id, setSelectedDuration)}
-              className={`w-full p-4 rounded-xl border-2 transition-none ${
-                selectedDuration === duration.id
-                  ? 'bg-card border-primary text-foreground'
-                  : 'bg-card border-border text-foreground'
-              }`}
-            >
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
               <div className="flex items-center gap-4">
                 <PrefIcon id={duration.id} />
                 <div className="flex-1 text-left">
