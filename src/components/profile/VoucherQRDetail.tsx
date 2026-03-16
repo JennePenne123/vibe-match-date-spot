@@ -96,10 +96,10 @@ export function VoucherQRDetail({ voucher, userId, onClose }: VoucherQRDetailPro
 
             {/* QR Code */}
             <div className="flex justify-center">
-              <div className="bg-white p-4 rounded-2xl shadow-lg relative">
+              <div className="bg-white p-3 rounded-xl shadow-lg relative">
                 <QRCodeSVG
                   value={qrPayload}
-                  size={200}
+                  size={160}
                   level="H"
                   includeMargin
                 />
