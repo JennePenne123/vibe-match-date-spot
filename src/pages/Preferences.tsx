@@ -690,6 +690,7 @@ const Preferences = () => {
               onClick={() => toggleSelection(activity.id, selectedActivities, setSelectedActivities)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
               className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
               <div className="flex items-center gap-4">
                 <PrefIcon id={activity.id === 'cultural' ? 'cultural_act' : activity.id === 'nightlife' ? 'nightlife_act' : activity.id} />
                 <div className="flex-1 text-left">
