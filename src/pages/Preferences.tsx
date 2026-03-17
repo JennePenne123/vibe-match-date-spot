@@ -31,7 +31,11 @@ import {
   // Accessibility icons
   Accessibility, ParkingCircle, TrainFront, Dog, CigaretteOff,
   // Template icons
-  Sparkles, type LucideIcon
+  Sparkles,
+  // Venue type icons (Step 5)
+  Landmark, Film, Ticket, Trophy, Waves, Mountain, Drama,
+  Footprints, Target, Lock, Bike, Building2,
+  type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -101,6 +105,27 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
   public_transport: { icon: TrainFront,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   pet_friendly:     { icon: Dog,             bg: 'bg-amber-500/15', fg: 'text-amber-500' },
   non_smoking:      { icon: CigaretteOff,   bg: 'bg-red-500/15', fg: 'text-red-500' },
+  // Venue types – Kultur & Bildung
+  museum:           { icon: Landmark,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  gallery:          { icon: Palette,         bg: 'bg-fuchsia-500/15', fg: 'text-fuchsia-500' },
+  theater_venue:    { icon: Drama,           bg: 'bg-purple-500/15', fg: 'text-purple-500' },
+  cinema:           { icon: Film,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  concert_hall:     { icon: Music4,          bg: 'bg-rose-500/15', fg: 'text-rose-500' },
+  exhibition:       { icon: Ticket,          bg: 'bg-teal-500/15', fg: 'text-teal-500' },
+  // Venue types – Freizeit & Sport
+  mini_golf:        { icon: Target,          bg: 'bg-green-500/15', fg: 'text-green-500' },
+  bowling:          { icon: Trophy,          bg: 'bg-orange-500/15', fg: 'text-orange-500' },
+  escape_room:      { icon: Lock,            bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
+  climbing:         { icon: Mountain,        bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
+  swimming:         { icon: Waves,           bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
+  hiking:           { icon: Footprints,      bg: 'bg-lime-500/15', fg: 'text-lime-500' },
+  cycling:          { icon: Bike,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  // Venue types – Unterhaltung
+  karaoke:          { icon: Headphones,      bg: 'bg-pink-500/15', fg: 'text-pink-500' },
+  comedy_club:      { icon: Smile,           bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
+  arcade:           { icon: Gamepad2,        bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+  live_event:       { icon: Sparkles,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  spa_wellness:     { icon: Building2,       bg: 'bg-teal-500/15', fg: 'text-teal-500' },
   // Templates
   template_romantic: { icon: Heart,          bg: 'bg-pink-500/15', fg: 'text-pink-500' },
   template_casual:   { icon: Coffee,         bg: 'bg-amber-500/15', fg: 'text-amber-500' },
@@ -158,7 +183,7 @@ const Preferences = () => {
   
   // Multi-step state management
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const totalSteps = 5;
   
   // Step 1: Cuisine & Vibes (existing)
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
@@ -176,6 +201,10 @@ const Preferences = () => {
   // Step 4: Special Requirements & Home Location
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
+
+  // Step 5: Venue Types (Experiences beyond dining)
+  const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
+
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
@@ -331,6 +360,34 @@ const Preferences = () => {
     { id: 'non_smoking', name: t('preferences.access_non_smoking'), emoji: '🚭' }
   ];
 
+  // Step 5: Venue Types
+  const cultureVenues: Preference[] = [
+    { id: 'museum', name: t('preferences.venue_museum'), emoji: '🏛️', desc: t('preferences.venue_museumDesc') },
+    { id: 'gallery', name: t('preferences.venue_gallery'), emoji: '🎨', desc: t('preferences.venue_galleryDesc') },
+    { id: 'theater_venue', name: t('preferences.venue_theater'), emoji: '🎭', desc: t('preferences.venue_theaterDesc') },
+    { id: 'cinema', name: t('preferences.venue_cinema'), emoji: '🎬', desc: t('preferences.venue_cinemaDesc') },
+    { id: 'concert_hall', name: t('preferences.venue_concert'), emoji: '🎵', desc: t('preferences.venue_concertDesc') },
+    { id: 'exhibition', name: t('preferences.venue_exhibition'), emoji: '🎟️', desc: t('preferences.venue_exhibitionDesc') },
+  ];
+
+  const leisureVenues: Preference[] = [
+    { id: 'mini_golf', name: t('preferences.venue_mini_golf'), emoji: '⛳', desc: t('preferences.venue_mini_golfDesc') },
+    { id: 'bowling', name: t('preferences.venue_bowling'), emoji: '🎳', desc: t('preferences.venue_bowlingDesc') },
+    { id: 'escape_room', name: t('preferences.venue_escape_room'), emoji: '🔐', desc: t('preferences.venue_escape_roomDesc') },
+    { id: 'climbing', name: t('preferences.venue_climbing'), emoji: '🧗', desc: t('preferences.venue_climbingDesc') },
+    { id: 'swimming', name: t('preferences.venue_swimming'), emoji: '🏊', desc: t('preferences.venue_swimmingDesc') },
+    { id: 'hiking', name: t('preferences.venue_hiking'), emoji: '🥾', desc: t('preferences.venue_hikingDesc') },
+    { id: 'cycling', name: t('preferences.venue_cycling'), emoji: '🚴', desc: t('preferences.venue_cyclingDesc') },
+  ];
+
+  const entertainmentVenues: Preference[] = [
+    { id: 'karaoke', name: t('preferences.venue_karaoke'), emoji: '🎤', desc: t('preferences.venue_karaokeDesc') },
+    { id: 'comedy_club', name: t('preferences.venue_comedy'), emoji: '😂', desc: t('preferences.venue_comedyDesc') },
+    { id: 'arcade', name: t('preferences.venue_arcade'), emoji: '🕹️', desc: t('preferences.venue_arcadeDesc') },
+    { id: 'live_event', name: t('preferences.venue_live_event'), emoji: '✨', desc: t('preferences.venue_live_eventDesc') },
+    { id: 'spa_wellness', name: t('preferences.venue_spa'), emoji: '🧖', desc: t('preferences.venue_spaDesc') },
+  ];
+
   // Toggle functions
   const toggleSelection = (item: string, selectedItems: string[], setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>) => {
     setSelectedItems(prev =>
@@ -483,6 +540,7 @@ const Preferences = () => {
       case 2: return t('preferences.budgetAndTiming');
       case 3: return t('preferences.activities');
       case 4: return t('preferences.specialNeeds');
+      case 5: return t('preferences.experiences');
       default: return t('preferences.foodAndVibe');
     }
   };
@@ -493,6 +551,7 @@ const Preferences = () => {
       case 2: return <Clock className="w-5 h-5" />;
       case 3: return <Coffee className="w-5 h-5" />;
       case 4: return <MapPin className="w-5 h-5" />;
+      case 5: return <Ticket className="w-5 h-5" />;
       default: return <Heart className="w-5 h-5" />;
     }
   };
@@ -503,6 +562,7 @@ const Preferences = () => {
       case 2: return true; // Optional step
       case 3: return true; // Optional step
       case 4: return true; // Optional step
+      case 5: return true; // Optional step
       default: return false;
     }
   };
@@ -883,12 +943,92 @@ const Preferences = () => {
     </>
   );
 
+  const renderStep5 = () => (
+    <>
+      {/* Culture & Education */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.cultureAndEducation')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.cultureAndEducationDesc')}</p>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {cultureVenues.map((venue) => (
+            <button
+              type="button"
+              key={venue.id}
+              onClick={() => toggleSelection(venue.id, selectedVenueTypes, setSelectedVenueTypes)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
+              <PrefIcon id={venue.id} />
+              <div className="font-medium text-sm mt-1">{venue.name}</div>
+              {venue.desc && <div className="text-xs text-muted-foreground mt-0.5">{venue.desc}</div>}
+              {selectedVenueTypes.includes(venue.id) && (
+                <Check className="w-4 h-4 mx-auto mt-1" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Leisure & Sports */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.leisureAndSports')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.leisureAndSportsDesc')}</p>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {leisureVenues.map((venue) => (
+            <button
+              type="button"
+              key={venue.id}
+              onClick={() => toggleSelection(venue.id, selectedVenueTypes, setSelectedVenueTypes)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
+              <PrefIcon id={venue.id} />
+              <div className="font-medium text-sm mt-1">{venue.name}</div>
+              {venue.desc && <div className="text-xs text-muted-foreground mt-0.5">{venue.desc}</div>}
+              {selectedVenueTypes.includes(venue.id) && (
+                <Check className="w-4 h-4 mx-auto mt-1" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Entertainment */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.entertainmentVenues')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.entertainmentVenuesDesc')}</p>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {entertainmentVenues.map((venue) => (
+            <button
+              type="button"
+              key={venue.id}
+              onClick={() => toggleSelection(venue.id, selectedVenueTypes, setSelectedVenueTypes)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
+              <PrefIcon id={venue.id} />
+              <div className="font-medium text-sm mt-1">{venue.name}</div>
+              {venue.desc && <div className="text-xs text-muted-foreground mt-0.5">{venue.desc}</div>}
+              {selectedVenueTypes.includes(venue.id) && (
+                <Check className="w-4 h-4 mx-auto mt-1" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1: return renderStep1();
       case 2: return renderStep2();
       case 3: return renderStep3();
       case 4: return renderStep4();
+      case 5: return renderStep5();
       default: return renderStep1();
     }
   };
