@@ -59,7 +59,7 @@ export const useRewardShop = () => {
         venue_id: v.venue_id,
         venue_name: (v.venues as any)?.name || 'Venue',
         code: v.code,
-        points_cost: Math.round(v.discount_value * 50),
+        points_cost: Math.round(v.discount_value * 100),
       }));
 
       // Fetch monthly redemption count

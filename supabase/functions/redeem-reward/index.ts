@@ -147,7 +147,7 @@ serve(async (req) => {
 
       // Calculate cost: voucher discount_value as points cost
       // e.g. 10% = 500 points, 15% = 750, 20% = 1000, 25% = 1250
-      const pointsCost = Math.round(voucher.discount_value * 50);
+      const pointsCost = Math.round(voucher.discount_value * 100);
 
       if (userPoints.total_points < pointsCost) {
         return new Response(
