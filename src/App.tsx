@@ -139,6 +139,11 @@ const App = () => (
                     <Route path="/plan-date" element={<LazyPage><SmartDatePlanning /></LazyPage>} />
                     <Route path="/rewards" element={<LazyPage><Rewards /></LazyPage>} />
                     
+                    {/* Legal pages – accessible without auth */}
+                    <Route path="/impressum" element={<LazyPageNoLayout><Impressum /></LazyPageNoLayout>} />
+                    <Route path="/datenschutz" element={<LazyPageNoLayout><Datenschutz /></LazyPageNoLayout>} />
+                    <Route path="/agb" element={<LazyPageNoLayout><AGB /></LazyPageNoLayout>} />
+                    
                     {/* Debug route */}
                     <Route path="/debug" element={<LazyPage><Debug /></LazyPage>} />
                     
