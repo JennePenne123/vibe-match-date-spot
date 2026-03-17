@@ -32,6 +32,7 @@ export const PointsCard: React.FC<PointsCardProps> = ({
   level,
   streakCount
 }) => {
+  const navigate = useNavigate();
   const progress = getLevelProgress(totalPoints, level);
   const nextLevelPoints = getPointsForNextLevel(level);
   const pointsNeeded = nextLevelPoints - totalPoints;
