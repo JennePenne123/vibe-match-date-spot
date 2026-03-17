@@ -102,6 +102,16 @@ export const PointsCard: React.FC<PointsCardProps> = ({
             Bewerte Dates, plane Abende und löse Vouchers ein, um aufzusteigen!
           </p>
         )}
+
+        {/* Redeem Points CTA */}
+        <Button
+          onClick={() => navigate('/rewards')}
+          variant="outline"
+          className="w-full border-primary/30 text-primary hover:bg-primary/10 gap-2"
+        >
+          <Gift className="w-4 h-4" />
+          Punkte einlösen
+        </Button>
       </CardContent>
     </Card>
   );
