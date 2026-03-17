@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, TrendingUp, Zap, icons } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, Gift, icons } from 'lucide-react';
 import { getLevelProgress, getPointsForNextLevel, getLevelInfo, LEVEL_THRESHOLDS } from '@/services/pointsService';
 
 interface PointsCardProps {
