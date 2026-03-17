@@ -14,9 +14,12 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, 
   AlertDialogTitle, AlertDialogTrigger 
 } from '@/components/ui/alert-dialog';
+import {
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger
+} from '@/components/ui/accordion';
 import { 
   ArrowLeft, Lock, Trash2, Shield, Loader2, Check, PauseCircle, 
-  Bell, Mail, Download, ExternalLink, FileText, Scale
+  Bell, Mail, Download, ExternalLink, FileText, Scale, HelpCircle, MessageCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
