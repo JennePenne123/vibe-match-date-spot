@@ -540,6 +540,7 @@ const Preferences = () => {
       case 2: return t('preferences.budgetAndTiming');
       case 3: return t('preferences.activities');
       case 4: return t('preferences.specialNeeds');
+      case 5: return t('preferences.experiences');
       default: return t('preferences.foodAndVibe');
     }
   };
