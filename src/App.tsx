@@ -67,6 +67,7 @@ const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
 const AdminUsers = lazy(() => import("./pages/admin/Users"));
 const AdminModeration = lazy(() => import("./pages/admin/Moderation"));
 const AdminSystemHealth = lazy(() => import("./pages/admin/SystemHealth"));
+const AdminErrors = lazy(() => import("./pages/admin/Errors"));
 
 // Demo/debug routes – lazy loaded
 const Debug = lazy(() => import("./pages/Debug"));
