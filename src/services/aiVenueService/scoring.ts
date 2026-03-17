@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
+import { getMoodScoreModifier, getMoodInfluenceLabel } from './moodScoring';
 
 // Calculate individual user score based on preferences
 const calculateUserScore = (
@@ -236,17 +237,22 @@ export const calculateVenueAIScore = async (
     const contextualScore = await calculateContextualFactors(venueId);
     const weightedContextual = applyWeight(contextualScore, weights.time, 'time/context');
 
+    // Apply mood-based modifier
+    const moodModifier = getMoodScoreModifier(venue);
+    const moodLabel = getMoodInfluenceLabel();
+
     // Apply confidence boost from learning data
     const confidenceBoost = getConfidenceBoost(learnedWeights);
     
     // Final AI score (0-100 scale)
-    const rawScore = (baseScore + weightedContextual + confidenceBoost) * 100;
+    const rawScore = (baseScore + weightedContextual + moodModifier + confidenceBoost) * 100;
     const finalScore = Math.max(35, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
       venue: venue.name,
       baseScore: `${Math.round(baseScore * 100)}%`,
       contextualScore: `${Math.round(weightedContextual * 100)}%`,
+      moodModifier: moodModifier !== 0 ? `${moodModifier > 0 ? '+' : ''}${Math.round(moodModifier * 100)}% (${moodLabel})` : 'none',
       confidenceBoost: `+${Math.round(confidenceBoost * 100)}%`,
       finalScore: `${Math.round(finalScore)}%`,
       learningApplied: learnedWeights.hasLearningData,
@@ -264,7 +270,9 @@ export const calculateVenueAIScore = async (
       weight_multipliers: learnedWeights.hasLearningData ? learnedWeights.weights : null,
       is_collaborative: !!partnerPrefs,
       partner_id: partnerPrefs ? partnerId : null,
-      shared_matches: sharedMatches
+      shared_matches: sharedMatches,
+      mood_modifier: moodModifier !== 0 ? moodModifier : null,
+      mood_label: moodLabel
     };
 
     const { error: insertError } = await supabase
