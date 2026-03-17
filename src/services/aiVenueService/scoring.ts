@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
 import { getMoodScoreModifier, getMoodInfluenceLabel } from './moodScoring';
+import { getImplicitSignalBoost } from '@/services/implicitSignalsService';
 
 // Calculate individual user score based on preferences
 const calculateUserScore = (
@@ -243,9 +244,12 @@ export const calculateVenueAIScore = async (
 
     // Apply confidence boost from learning data
     const confidenceBoost = getConfidenceBoost(learnedWeights);
+
+    // Apply implicit signal boost
+    const implicitBoost = await getImplicitSignalBoost(userId, venueId);
     
     // Final AI score (0-100 scale)
-    const rawScore = (baseScore + weightedContextual + moodModifier + confidenceBoost) * 100;
+    const rawScore = (baseScore + weightedContextual + moodModifier + confidenceBoost + implicitBoost) * 100;
     const finalScore = Math.max(35, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
@@ -254,6 +258,7 @@ export const calculateVenueAIScore = async (
       contextualScore: `${Math.round(weightedContextual * 100)}%`,
       moodModifier: moodModifier !== 0 ? `${moodModifier > 0 ? '+' : ''}${Math.round(moodModifier * 100)}% (${moodLabel})` : 'none',
       confidenceBoost: `+${Math.round(confidenceBoost * 100)}%`,
+      implicitBoost: implicitBoost !== 0 ? `${implicitBoost > 0 ? '+' : ''}${Math.round(implicitBoost * 100)}%` : 'none',
       finalScore: `${Math.round(finalScore)}%`,
       learningApplied: learnedWeights.hasLearningData,
       aiAccuracy: learnedWeights.aiAccuracy,

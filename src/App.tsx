@@ -22,6 +22,12 @@ import PushNotificationPrompt from "./components/PushNotificationPrompt";
 import OfflineBanner from "./components/OfflineBanner";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
+import { useAppUsageTracking } from "./hooks/useImplicitSignals";
+
+function AppUsageTracker() {
+  useAppUsageTracking();
+  return null;
+}
 
 // Only Landing is eagerly loaded (first screen users see)
 import Landing from "./pages/Landing";
@@ -130,6 +136,7 @@ const App = () => (
               <NotificationSystem>
                 <OfflineBanner />
                 <PushNotificationPrompt />
+                <AppUsageTracker />
                 <ErrorBoundary level="page" silent={true}>
                   <Routes>
                     {/* Public routes without layout */}

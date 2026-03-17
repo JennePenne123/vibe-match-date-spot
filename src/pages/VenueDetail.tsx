@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Star, MapPin, DollarSign, Clock, Phone, Share, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
 import { venueToAppVenue } from '@/utils/typeHelpers';
+import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
 
 const VenueDetail = () => {
   const { id } = useParams();
+  useVenueImplicitTracking(id);
   const navigate = useNavigate();
   const { appState } = useApp();
 
