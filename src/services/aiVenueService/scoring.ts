@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
 import { getMoodScoreModifier, getMoodInfluenceLabel } from './moodScoring';
+import { getImplicitSignalBoost } from '@/services/implicitSignalsService';
 
 // Calculate individual user score based on preferences
 const calculateUserScore = (
