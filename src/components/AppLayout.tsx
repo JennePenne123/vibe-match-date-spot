@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
 import { PartnerSidebar } from './PartnerSidebar'
+import { AdminSidebar } from './AdminSidebar'
 import { MobileBottomNav } from './MobileBottomNav'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
@@ -26,6 +27,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const isPartnerRoute = location.pathname.startsWith('/partner')
+  const isAdminRoute = location.pathname.startsWith('/admin')
 
   // Track previous path for slide direction
   const prevPath = useRef(location.pathname)
@@ -143,7 +145,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         >
           {children}
         </div>
-        {!isPartnerRoute && <MobileBottomNav />}
+        {!isPartnerRoute && !isAdminRoute && <MobileBottomNav />}
       </div>
     )
   }
@@ -151,7 +153,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider defaultOpen={isDesktop}>
       <div className="min-h-screen flex w-full bg-background">
-        {isPartnerRoute ? <PartnerSidebar /> : <AppSidebar />}
+        {isAdminRoute ? <AdminSidebar /> : isPartnerRoute ? <PartnerSidebar /> : <AppSidebar />}
         
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header with sidebar trigger */}

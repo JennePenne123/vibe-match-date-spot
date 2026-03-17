@@ -60,6 +60,13 @@ const PartnerNetworkMap = lazy(() => import("./pages/partner/NetworkMap"));
 const PartnerProfile = lazy(() => import("./pages/partner/Profile"));
 const PartnerCityRankings = lazy(() => import("./pages/partner/CityRankings"));
 
+// Admin routes – lazy loaded
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const AdminModeration = lazy(() => import("./pages/admin/Moderation"));
+const AdminSystemHealth = lazy(() => import("./pages/admin/SystemHealth"));
+
 // Demo/debug routes – lazy loaded
 const Debug = lazy(() => import("./pages/Debug"));
 const ShareholderReport = lazy(() => import("./pages/ShareholderReport"));
@@ -167,6 +174,14 @@ const App = () => (
                     <Route path="/partner/network" element={<LazyPage><PartnerNetworkMap /></LazyPage>} />
                     <Route path="/partner/profile" element={<LazyPage><PartnerProfile /></LazyPage>} />
                     <Route path="/partner/city-rankings" element={<LazyPage><PartnerCityRankings /></LazyPage>} />
+                    
+                    {/* Admin Routes */}
+                    <Route path="/admin" element={<LazyPage><AdminDashboard /></LazyPage>} />
+                    <Route path="/admin/analytics" element={<LazyPage><AdminAnalytics /></LazyPage>} />
+                    <Route path="/admin/users" element={<LazyPage><AdminUsers /></LazyPage>} />
+                    <Route path="/admin/moderation" element={<LazyPage><AdminModeration /></LazyPage>} />
+                    <Route path="/admin/health" element={<LazyPage><AdminSystemHealth /></LazyPage>} />
+                    <Route path="/admin/reports" element={<LazyPage><AdminModeration /></LazyPage>} />
                     
                     {/* Demo routes */}
                     <Route path="/demo/ai-venue-card" element={<LazyPageNoLayout><AIVenueCardDemo /></LazyPageNoLayout>} />
