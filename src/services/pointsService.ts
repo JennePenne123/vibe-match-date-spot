@@ -218,80 +218,138 @@ export const BADGE_DEFINITIONS: Record<string, {
   description: string;
   icon: string;
   requirement: string;
+  category: 'rating' | 'social' | 'engagement' | 'exploration' | 'referral';
 }> = {
+  // Rating badges
   'first_reviewer': {
     name: 'First Steps',
-    description: 'Completed your first date rating',
+    description: 'Deine erste Date-Bewertung abgegeben',
     icon: '⭐',
-    requirement: 'Rate 1 date'
+    requirement: '1 Date bewerten',
+    category: 'rating',
   },
   'speed_demon': {
     name: 'Speed Demon',
-    description: 'Rated within 24 hours of the date',
+    description: 'Innerhalb von 24 Stunden bewertet',
     icon: '⚡',
-    requirement: 'Rate within 24h'
+    requirement: 'Bewertung < 24h',
+    category: 'rating',
   },
   'consistent_reviewer': {
     name: 'Getting Consistent',
-    description: 'Maintained a 3-day rating streak',
+    description: '3-Tage Bewertungs-Streak erreicht',
     icon: '🔥',
-    requirement: '3-day streak'
+    requirement: '3-Tage Streak',
+    category: 'rating',
   },
   'review_master': {
     name: 'Review Master',
-    description: 'Maintained a 7-day rating streak',
+    description: '7-Tage Bewertungs-Streak erreicht',
     icon: '🏆',
-    requirement: '7-day streak'
+    requirement: '7-Tage Streak',
+    category: 'rating',
   },
   'date_night_hero': {
     name: 'Date Night Hero',
-    description: 'Completed 10 date ratings',
+    description: '10 Date-Bewertungen abgegeben',
     icon: '💝',
-    requirement: '10 ratings'
+    requirement: '10 Bewertungen',
+    category: 'rating',
   },
   'social_butterfly': {
     name: 'Social Butterfly',
-    description: 'Completed 25 date ratings',
+    description: '25 Date-Bewertungen abgegeben',
     icon: '🦋',
-    requirement: '25 ratings'
+    requirement: '25 Bewertungen',
+    category: 'rating',
   },
   'legend': {
-    name: 'Legend',
-    description: 'Completed 50 date ratings',
+    name: 'Legende',
+    description: '50 Date-Bewertungen abgegeben',
     icon: '👑',
-    requirement: '50 ratings'
+    requirement: '50 Bewertungen',
+    category: 'rating',
   },
   'perfect_pair': {
     name: 'Perfect Pair',
-    description: 'Both partners rated together 5 times',
+    description: 'Beide Partner haben 5× zusammen bewertet',
     icon: '💕',
-    requirement: 'Both rate 5 times'
+    requirement: '5× gemeinsam bewertet',
+    category: 'rating',
+  },
+  // Exploration badges
+  'explorer': {
+    name: 'Explorer',
+    description: '5 verschiedene Venues besucht',
+    icon: '🗺️',
+    requirement: '5 Venues besucht',
+    category: 'exploration',
+  },
+  'foodie': {
+    name: 'Foodie',
+    description: '3 verschiedene Küchen ausprobiert',
+    icon: '🍽️',
+    requirement: '3 Küchen-Typen',
+    category: 'exploration',
+  },
+  // Engagement badges
+  'planner': {
+    name: 'Planner',
+    description: '10 Dates geplant',
+    icon: '🎯',
+    requirement: '10 Dates geplant',
+    category: 'engagement',
+  },
+  'deal_hunter': {
+    name: 'Deal Hunter',
+    description: '5 Vouchers eingelöst',
+    icon: '🎟️',
+    requirement: '5 Vouchers eingelöst',
+    category: 'engagement',
+  },
+  'committed': {
+    name: 'Committed',
+    description: '30-Tage Login-Streak erreicht',
+    icon: '📅',
+    requirement: '30-Tage Streak',
+    category: 'engagement',
+  },
+  'chatterbox': {
+    name: 'Chatterbox',
+    description: '50 Chat-Nachrichten gesendet',
+    icon: '💬',
+    requirement: '50 Nachrichten',
+    category: 'social',
   },
   // Referral badges
   'first_referral': {
     name: 'Ambassador',
-    description: 'Referred your first friend',
+    description: 'Ersten Freund eingeladen',
     icon: '🤝',
-    requirement: 'Refer 1 friend'
+    requirement: '1 Freund einladen',
+    category: 'referral',
   },
   'social_recruiter': {
     name: 'Social Recruiter',
-    description: 'Referred 5 friends',
+    description: '5 Freunde eingeladen',
     icon: '📣',
-    requirement: 'Refer 5 friends'
+    requirement: '5 Freunde einladen',
+    category: 'referral',
   },
   'community_builder': {
     name: 'Community Builder',
-    description: 'Referred 10 friends',
+    description: '10 Freunde eingeladen',
     icon: '🏗️',
-    requirement: 'Refer 10 friends'
+    requirement: '10 Freunde einladen',
+    category: 'referral',
   },
   'super_connector': {
     name: 'Super Connector',
-    description: 'Referred 25 friends',
-    icon: '⭐',
-    requirement: 'Refer 25 friends'
-  }
+    description: '25 Freunde eingeladen',
+    icon: '🌟',
+    requirement: '25 Freunde einladen',
+    category: 'referral',
+  },
 };
 
 /**
