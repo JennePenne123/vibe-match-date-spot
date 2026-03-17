@@ -14,8 +14,18 @@ interface RewardVoucher {
   points_cost: number;
 }
 
+export interface RedemptionHistoryItem {
+  id: string;
+  reward_type: 'voucher' | 'premium';
+  points_spent: number;
+  created_at: string;
+  voucher_title?: string;
+  venue_name?: string;
+}
+
 interface RewardRedemptionState {
   vouchers: RewardVoucher[];
+  history: RedemptionHistoryItem[];
   monthlyUsed: number;
   monthlyLimit: number;
   isPremium: boolean;
@@ -27,6 +37,7 @@ export const useRewardShop = () => {
   const { user } = useAuth();
   const [state, setState] = useState<RewardRedemptionState>({
     vouchers: [],
+    history: [],
     monthlyUsed: 0,
     monthlyLimit: 2,
     isPremium: false,
@@ -73,6 +84,27 @@ export const useRewardShop = () => {
         .eq('user_id', user!.id)
         .gte('created_at', startOfMonth.toISOString())) as any;
 
+      // Fetch redemption history (last 20)
+      const { data: historyData } = await (supabase
+        .from('reward_redemptions' as any)
+        .select('id, reward_type, points_spent, created_at, voucher_id')
+        .eq('user_id', user!.id)
+        .order('created_at', { ascending: false })
+        .limit(20)) as any;
+
+      // Enrich voucher redemptions with titles
+      const history: RedemptionHistoryItem[] = (historyData || []).map((h: any) => {
+        const matchedVoucher = vouchers.find(v => v.id === h.voucher_id);
+        return {
+          id: h.id,
+          reward_type: h.reward_type,
+          points_spent: h.points_spent,
+          created_at: h.created_at,
+          voucher_title: matchedVoucher?.title,
+          venue_name: matchedVoucher?.venue_name,
+        };
+      });
+
       // Fetch premium status
       const { data: pointsData } = await supabase
         .from('user_points')
@@ -85,6 +117,7 @@ export const useRewardShop = () => {
 
       setState({
         vouchers,
+        history,
         monthlyUsed: count ?? 0,
         monthlyLimit: 2,
         isPremium,
@@ -107,7 +140,6 @@ export const useRewardShop = () => {
       if (error) throw error;
 
       if (data?.status === 'success') {
-        // Refresh shop data
         await loadShopData();
         return { success: true, data };
       }
@@ -115,7 +147,6 @@ export const useRewardShop = () => {
       return { success: false, error: data?.error || 'Unbekannter Fehler' };
     } catch (err: any) {
       console.error('Redeem error:', err);
-      // Try to parse edge function error body
       const errorMsg = err?.message || 'Fehler beim Einlösen';
       return { success: false, error: errorMsg };
     } finally {

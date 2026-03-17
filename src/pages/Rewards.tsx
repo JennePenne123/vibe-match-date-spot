@@ -2,11 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserPoints } from '@/hooks/useUserPoints';
-import { useRewardShop } from '@/hooks/useRewardShop';
+import { useRewardShop, type RedemptionHistoryItem } from '@/hooks/useRewardShop';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Gift, Ticket, Crown, Star, Lock, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Gift, Ticket, Crown, Star, Lock, Loader2, Sparkles, History, Clock } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { toast } from '@/hooks/use-toast';
 
