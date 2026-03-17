@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, TrendingUp, Zap, icons } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, Gift, icons } from 'lucide-react';
 import { getLevelProgress, getPointsForNextLevel, getLevelInfo, LEVEL_THRESHOLDS } from '@/services/pointsService';
 
 interface PointsCardProps {
@@ -30,6 +32,7 @@ export const PointsCard: React.FC<PointsCardProps> = ({
   level,
   streakCount
 }) => {
+  const navigate = useNavigate();
   const progress = getLevelProgress(totalPoints, level);
   const nextLevelPoints = getPointsForNextLevel(level);
   const pointsNeeded = nextLevelPoints - totalPoints;
@@ -99,6 +102,16 @@ export const PointsCard: React.FC<PointsCardProps> = ({
             Bewerte Dates, plane Abende und löse Vouchers ein, um aufzusteigen!
           </p>
         )}
+
+        {/* Redeem Points CTA */}
+        <Button
+          onClick={() => navigate('/rewards')}
+          variant="outline"
+          className="w-full border-primary/30 text-primary hover:bg-primary/10 gap-2"
+        >
+          <Gift className="w-4 h-4" />
+          Punkte einlösen
+        </Button>
       </CardContent>
     </Card>
   );

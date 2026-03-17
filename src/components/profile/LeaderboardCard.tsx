@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Crown, TrendingUp, Gift } from 'lucide-react';
+import { Crown, TrendingUp } from 'lucide-react';
 import { getLeaderboard, type LeaderboardEntry } from '@/services/pointsService';
 import { useAuth } from '@/contexts/AuthContext';
 import SafeComponent from '@/components/SafeComponent';
 
 export const LeaderboardCard: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -150,15 +147,6 @@ export const LeaderboardCard: React.FC = () => {
             </div>
           )}
 
-          {/* Redeem Points CTA */}
-          <Button
-            onClick={() => navigate('/rewards')}
-            variant="outline"
-            className="w-full mt-4 border-primary/30 text-primary hover:bg-primary/10 gap-2"
-          >
-            <Gift className="w-4 h-4" />
-            Punkte einlösen
-          </Button>
         </CardContent>
       </Card>
     </SafeComponent>
