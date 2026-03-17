@@ -12,6 +12,7 @@ import SafeComponent from '@/components/SafeComponent';
 
 export const LeaderboardCard: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
