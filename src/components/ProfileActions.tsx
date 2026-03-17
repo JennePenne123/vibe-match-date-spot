@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Settings, Heart, MapPin, ChevronRight } from 'lucide-react';
+import { Users, Settings, Heart, MapPin, ChevronRight, Gift } from 'lucide-react';
 
 interface ProfileActionsProps {
   onLogout: () => void;
