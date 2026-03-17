@@ -136,6 +136,17 @@
 
 ---
 
+## 📡 Implizite Signale (implementiert – 17. März 2026)
+
+- **Signal-Service** (`implicitSignalsService.ts`): Buffered tracking mit 10s Flush-Intervall
+- **Signaltypen**: Venue Dwell Time, Scroll Depth, Repeat Views, Voucher Clicks/Ignores, Planning Abandonment, App Usage Time
+- **Hooks**: `useVenueImplicitTracking` (VenueDetail), `useAppUsageTracking` (App-Level)
+- **AI-Integration**: `getImplicitSignalBoost()` fließt in Venue-Scoring ein (+/- bis zu 10%)
+- **Speicherung**: Über bestehende `user_venue_feedback`-Tabelle mit `implicit: true` Context
+- **Pre-Launch TODO**: ⚠️ **DSGVO/Privacy**: Datenschutzerklärung aktualisieren! Implizites Tracking muss transparent kommuniziert werden. Prüfen ob Opt-In/Opt-Out nötig (Art. 6 DSGVO – berechtigtes Interesse vs. Einwilligung). Ggf. Cookie-Banner/Consent-Manager erweitern.
+
+---
+
 ## 🏗️ Nächste sinnvolle Schritte
 
 1. **Wallet mit echten Daten** – Mock-Vouchers durch Supabase-Queries ersetzen
@@ -145,3 +156,4 @@
 5. **Partner Redemption-Übersicht** – Eingelöste Vouchers im Partner-Dashboard
 6. **Admin-Zugänge vor Launch konfigurieren** – Admin-Rollen in `user_roles` für finale Nutzer setzen
 7. **Sentry vor Launch einrichten** – Konto erstellen, DSN hinterlegen, SDK integrieren
+8. **DSGVO-Check für implizites Tracking** – Datenschutzerklärung + Consent prüfen

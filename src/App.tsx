@@ -136,6 +136,7 @@ const App = () => (
               <NotificationSystem>
                 <OfflineBanner />
                 <PushNotificationPrompt />
+                <AppUsageTracker />
                 <ErrorBoundary level="page" silent={true}>
                   <Routes>
                     {/* Public routes without layout */}
