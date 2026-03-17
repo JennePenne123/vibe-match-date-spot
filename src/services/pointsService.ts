@@ -360,6 +360,7 @@ export const getBadgeInfo = (badgeId: string) => {
     name: badgeId,
     description: 'Achievement unlocked',
     icon: '🏅',
-    requirement: 'Special achievement'
+    requirement: 'Special achievement',
+    category: 'engagement' as const,
   };
 };
