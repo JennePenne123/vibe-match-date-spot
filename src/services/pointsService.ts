@@ -397,7 +397,9 @@ export const getBadgeInfo = (badgeId: string) => {
   return BADGE_DEFINITIONS[badgeId] || {
     name: badgeId,
     description: 'Achievement unlocked',
-    icon: '🏅',
+    lucideIcon: 'award',
+    color: 'text-primary',
+    bg: 'bg-primary/15',
     requirement: 'Special achievement',
     category: 'engagement' as const,
   };
