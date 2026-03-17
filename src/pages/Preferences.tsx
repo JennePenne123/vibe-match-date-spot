@@ -31,7 +31,11 @@ import {
   // Accessibility icons
   Accessibility, ParkingCircle, TrainFront, Dog, CigaretteOff,
   // Template icons
-  Sparkles, type LucideIcon
+  Sparkles,
+  // Venue type icons (Step 5)
+  Landmark, Film, Ticket, Trophy, Waves, Mountain, Drama,
+  Footprints, Target, Lock, Bike, Building2,
+  type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
