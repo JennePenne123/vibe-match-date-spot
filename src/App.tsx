@@ -60,6 +60,13 @@ const PartnerNetworkMap = lazy(() => import("./pages/partner/NetworkMap"));
 const PartnerProfile = lazy(() => import("./pages/partner/Profile"));
 const PartnerCityRankings = lazy(() => import("./pages/partner/CityRankings"));
 
+// Admin routes – lazy loaded
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const AdminModeration = lazy(() => import("./pages/admin/Moderation"));
+const AdminSystemHealth = lazy(() => import("./pages/admin/SystemHealth"));
+
 // Demo/debug routes – lazy loaded
 const Debug = lazy(() => import("./pages/Debug"));
 const ShareholderReport = lazy(() => import("./pages/ShareholderReport"));
