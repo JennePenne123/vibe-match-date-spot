@@ -115,6 +115,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <AuthProvider>
             <AppProvider>
               <NotificationSystem>
