@@ -403,6 +403,14 @@ export const useInvitations = () => {
         senderName: user.email?.split('@')[0] || 'Friend'
       });
 
+      // Award points for planning a date
+      try {
+        const { awardPoints } = await import('@/services/awardPointsService');
+        await awardPoints('date_planned');
+      } catch (e) {
+        console.error('Failed to award date_planned points:', e);
+      }
+
       return true;
     } catch (error) {
       handleError(error, {
