@@ -59,7 +59,10 @@ export const awardPoints = async (
 
     console.log(`Awarded ${pointDef.points} points for "${source}". Total: ${newTotal}, Level: ${newLevel}${levelUp ? ' (LEVEL UP!)' : ''}`);
 
-    return { success: true, newTotal, levelUp };
+    // Check and award badges asynchronously (non-blocking)
+    const newBadges = await checkAndAwardBadges(user.id);
+
+    return { success: true, newTotal, levelUp, newBadges };
   } catch (err) {
     console.error('awardPoints error:', err);
     return { success: false };
