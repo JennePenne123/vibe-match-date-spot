@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -150,6 +150,8 @@ interface QuickTemplate {
 
 const Preferences = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isOnboarding = searchParams.get('onboarding') === 'true';
   const { t } = useTranslation();
   const { updateCuisines, updateVibes } = useApp();
   const { user } = useAuth();
@@ -469,7 +471,7 @@ const Preferences = () => {
         }
       }
       
-      navigate('/friends');
+      navigate(isOnboarding ? '/home' : '/friends');
     } else {
       nextStep();
     }

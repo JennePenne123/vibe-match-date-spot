@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBreakpoint } from '@/hooks/use-mobile';
 import { hasMoodToday } from '@/pages/MoodCheckIn';
+import { supabase } from '@/integrations/supabase/client';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -22,14 +23,41 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  // Handle authentication redirect + mood check
+  // Handle authentication redirect + onboarding + mood check
   React.useEffect(() => {
-    if (!authLoading && !user) {
-      console.log('No authenticated user found, redirecting to login');
-      navigate('/?auth=required', { replace: true });
-    } else if (!authLoading && user && !hasMoodToday()) {
-      navigate('/mood', { replace: true });
+    if (authLoading || !user) {
+      if (!authLoading && !user) {
+        console.log('No authenticated user found, redirecting to login');
+        navigate('/?auth=required', { replace: true });
+      }
+      return;
     }
+
+    // Check if user has preferences set (onboarding check)
+    const checkOnboarding = async () => {
+      try {
+        const { data } = await supabase
+          .from('user_preferences')
+          .select('id, preferred_cuisines')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        // No preferences at all, or empty cuisines → send to onboarding
+        if (!data || !data.preferred_cuisines || data.preferred_cuisines.length === 0) {
+          navigate('/preferences?onboarding=true', { replace: true });
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking preferences:', error);
+      }
+
+      // Preferences exist → check mood
+      if (!hasMoodToday()) {
+        navigate('/mood', { replace: true });
+      }
+    };
+
+    checkOnboarding();
   }, [user, authLoading, navigate]);
 
   // Memoize user display logic
