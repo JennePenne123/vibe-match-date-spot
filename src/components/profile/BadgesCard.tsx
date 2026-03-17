@@ -8,10 +8,30 @@ interface BadgesCardProps {
   badges: string[];
 }
 
+const CATEGORY_LABELS: Record<string, string> = {
+  rating: 'Bewertungen',
+  exploration: 'Entdecken',
+  engagement: 'Engagement',
+  social: 'Social',
+  referral: 'Einladungen',
+};
+
+const CATEGORY_ORDER = ['rating', 'exploration', 'engagement', 'social', 'referral'];
+
 export const BadgesCard: React.FC<BadgesCardProps> = ({ badges }) => {
-  const earnedBadges = badges.map(getBadgeInfo);
-  const allBadges = Object.keys(BADGE_DEFINITIONS);
-  const lockedBadges = allBadges.filter(id => !badges.includes(id)).map(getBadgeInfo);
+  const allBadgeIds = Object.keys(BADGE_DEFINITIONS);
+  const earnedSet = new Set(badges);
+
+  // Group all badges by category
+  const grouped = CATEGORY_ORDER.map(cat => ({
+    category: cat,
+    label: CATEGORY_LABELS[cat] || cat,
+    badges: allBadgeIds
+      .filter(id => BADGE_DEFINITIONS[id].category === cat)
+      .map(id => ({ id, ...BADGE_DEFINITIONS[id], earned: earnedSet.has(id) })),
+  })).filter(g => g.badges.length > 0);
+
+  const earnedCount = badges.filter(b => BADGE_DEFINITIONS[b]).length;
 
   return (
     <Card>
@@ -20,56 +40,38 @@ export const BadgesCard: React.FC<BadgesCardProps> = ({ badges }) => {
           <Award className="h-5 w-5 text-primary" />
           Achievements
           <Badge variant="secondary" className="ml-auto">
-            {earnedBadges.length} / {allBadges.length}
+            {earnedCount} / {allBadgeIds.length}
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Earned Badges */}
-        {earnedBadges.length > 0 && (
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Unlocked</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {earnedBadges.map((badge, index) => (
-                <div
-                  key={index}
-                  className="p-3 rounded-lg border border-primary/20 bg-gradient-to-br from-primary/5 to-background hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-2">
-                    <span className="text-2xl">{badge.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate">{badge.name}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-2">
-                        {badge.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Locked Badges */}
-        {lockedBadges.length > 0 && (
-          <div>
-            <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
-              Locked
+      <CardContent className="space-y-5">
+        {grouped.map(group => (
+          <div key={group.category}>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+              {group.label}
             </h3>
             <div className="grid grid-cols-2 gap-2">
-              {lockedBadges.slice(0, 4).map((badge, index) => (
+              {group.badges.map(badge => (
                 <div
-                  key={index}
-                  className="p-3 rounded-lg border border-border bg-muted/30 opacity-60"
+                  key={badge.id}
+                  className={
+                    badge.earned
+                      ? 'p-3 rounded-lg border border-primary/20 bg-gradient-to-br from-primary/5 to-background hover:shadow-md transition-shadow'
+                      : 'p-3 rounded-lg border border-border bg-muted/30 opacity-50'
+                  }
                 >
                   <div className="flex items-start gap-2">
-                    <Lock className="h-5 w-5 text-muted-foreground mt-0.5" />
+                    {badge.earned ? (
+                      <span className="text-2xl">{badge.icon}</span>
+                    ) : (
+                      <Lock className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
+                    )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-muted-foreground truncate">
+                      <p className={`font-semibold text-sm truncate ${!badge.earned ? 'text-muted-foreground' : ''}`}>
                         {badge.name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {badge.requirement}
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {badge.earned ? badge.description : badge.requirement}
                       </p>
                     </div>
                   </div>
@@ -77,17 +79,14 @@ export const BadgesCard: React.FC<BadgesCardProps> = ({ badges }) => {
               ))}
             </div>
           </div>
-        )}
+        ))}
 
         {/* Empty State */}
-        {earnedBadges.length === 0 && (
-          <div className="text-center py-6">
-            <Award className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground mb-1">
-              No badges yet
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Start rating dates to earn your first badge!
+        {earnedCount === 0 && (
+          <div className="text-center py-4">
+            <Award className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">
+              Starte mit deinem ersten Date um Badges zu verdienen!
             </p>
           </div>
         )}

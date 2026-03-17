@@ -76,31 +76,94 @@ export const initializeUserPoints = async (): Promise<boolean> => {
 };
 
 /**
- * Calculate level from total points
- * Level progression: Level = floor(sqrt(points / 100)) + 1
+ * Level thresholds – fixed values for full control & transparency
+ */
+export const LEVEL_THRESHOLDS = [
+  { level: 1, points: 0, name: 'Newbie', icon: '🌱' },
+  { level: 2, points: 150, name: 'Explorer', icon: '🗺️' },
+  { level: 3, points: 500, name: 'Regular', icon: '⭐' },
+  { level: 4, points: 1000, name: 'Expert', icon: '💎' },
+  { level: 5, points: 2000, name: 'Master', icon: '🏅' },
+  { level: 6, points: 3500, name: 'Legend', icon: '👑' },
+  { level: 7, points: 5500, name: 'VIP', icon: '🔥' },
+] as const;
+
+/**
+ * Calculate level from total points using fixed thresholds
  */
 export const calculateLevel = (totalPoints: number): number => {
-  return Math.floor(Math.sqrt(totalPoints / 100)) + 1;
+  let level = 1;
+  for (const threshold of LEVEL_THRESHOLDS) {
+    if (totalPoints >= threshold.points) {
+      level = threshold.level;
+    } else {
+      break;
+    }
+  }
+  return level;
+};
+
+/**
+ * Get level info (name, icon) for a given level
+ */
+export const getLevelInfo = (level: number) => {
+  const info = LEVEL_THRESHOLDS.find(t => t.level === level);
+  return info || LEVEL_THRESHOLDS[0];
 };
 
 /**
  * Calculate points needed for next level
  */
 export const getPointsForNextLevel = (currentLevel: number): number => {
-  return (currentLevel * currentLevel) * 100;
+  const next = LEVEL_THRESHOLDS.find(t => t.level === currentLevel + 1);
+  if (!next) return LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1].points; // max level
+  return next.points;
 };
 
 /**
  * Get progress percentage to next level
  */
 export const getLevelProgress = (totalPoints: number, currentLevel: number): number => {
-  const currentLevelPoints = ((currentLevel - 1) * (currentLevel - 1)) * 100;
-  const nextLevelPoints = getPointsForNextLevel(currentLevel);
+  const currentThreshold = LEVEL_THRESHOLDS.find(t => t.level === currentLevel);
+  const nextThreshold = LEVEL_THRESHOLDS.find(t => t.level === currentLevel + 1);
+
+  if (!nextThreshold) return 100; // max level reached
+
+  const currentLevelPoints = currentThreshold?.points ?? 0;
+  const nextLevelPoints = nextThreshold.points;
   const progressPoints = totalPoints - currentLevelPoints;
   const pointsNeeded = nextLevelPoints - currentLevelPoints;
-  
+
   return Math.min(100, Math.max(0, (progressPoints / pointsNeeded) * 100));
 };
+
+/**
+ * Point sources with their values
+ */
+export const POINT_SOURCES = {
+  // Date ratings (existing)
+  rating_base: { points: 10, label: 'Date bewertet' },
+  rating_venue: { points: 5, label: 'Venue bewertet' },
+  rating_recommend: { points: 5, label: 'Empfehlung abgegeben' },
+  rating_text: { points: 10, label: 'Kommentar geschrieben' },
+  rating_speed_bonus: { points: 10, label: 'Speed-Bonus (< 24h)' },
+  // Profile & setup
+  profile_complete: { points: 20, label: 'Profil vervollständigt' },
+  preferences_set: { points: 15, label: 'Präferenzen gesetzt' },
+  // Dating actions
+  date_planned: { points: 10, label: 'Date geplant' },
+  date_accepted: { points: 5, label: 'Date angenommen' },
+  // Daily engagement
+  mood_checkin: { points: 5, label: 'Mood Check-In' },
+  weekly_streak_bonus: { points: 25, label: '7-Tage Streak Bonus' },
+  // Vouchers
+  voucher_redeemed: { points: 15, label: 'Voucher eingelöst' },
+  // Referrals (existing)
+  referral_signup: { points: 25, label: 'Freund eingeladen (Signup)' },
+  referral_completed: { points: 50, label: 'Freund eingeladen (erstes Date)' },
+  referee_signup: { points: 10, label: 'Einladung angenommen' },
+  referee_completed: { points: 25, label: 'Erstes Date abgeschlossen' },
+} as const;
 
 /**
  * Fetch leaderboard data using secure leaderboard_view
@@ -155,80 +218,138 @@ export const BADGE_DEFINITIONS: Record<string, {
   description: string;
   icon: string;
   requirement: string;
+  category: 'rating' | 'social' | 'engagement' | 'exploration' | 'referral';
 }> = {
+  // Rating badges
   'first_reviewer': {
     name: 'First Steps',
-    description: 'Completed your first date rating',
+    description: 'Deine erste Date-Bewertung abgegeben',
     icon: '⭐',
-    requirement: 'Rate 1 date'
+    requirement: '1 Date bewerten',
+    category: 'rating',
   },
   'speed_demon': {
     name: 'Speed Demon',
-    description: 'Rated within 24 hours of the date',
+    description: 'Innerhalb von 24 Stunden bewertet',
     icon: '⚡',
-    requirement: 'Rate within 24h'
+    requirement: 'Bewertung < 24h',
+    category: 'rating',
   },
   'consistent_reviewer': {
     name: 'Getting Consistent',
-    description: 'Maintained a 3-day rating streak',
+    description: '3-Tage Bewertungs-Streak erreicht',
     icon: '🔥',
-    requirement: '3-day streak'
+    requirement: '3-Tage Streak',
+    category: 'rating',
   },
   'review_master': {
     name: 'Review Master',
-    description: 'Maintained a 7-day rating streak',
+    description: '7-Tage Bewertungs-Streak erreicht',
     icon: '🏆',
-    requirement: '7-day streak'
+    requirement: '7-Tage Streak',
+    category: 'rating',
   },
   'date_night_hero': {
     name: 'Date Night Hero',
-    description: 'Completed 10 date ratings',
+    description: '10 Date-Bewertungen abgegeben',
     icon: '💝',
-    requirement: '10 ratings'
+    requirement: '10 Bewertungen',
+    category: 'rating',
   },
   'social_butterfly': {
     name: 'Social Butterfly',
-    description: 'Completed 25 date ratings',
+    description: '25 Date-Bewertungen abgegeben',
     icon: '🦋',
-    requirement: '25 ratings'
+    requirement: '25 Bewertungen',
+    category: 'rating',
   },
   'legend': {
-    name: 'Legend',
-    description: 'Completed 50 date ratings',
+    name: 'Legende',
+    description: '50 Date-Bewertungen abgegeben',
     icon: '👑',
-    requirement: '50 ratings'
+    requirement: '50 Bewertungen',
+    category: 'rating',
   },
   'perfect_pair': {
     name: 'Perfect Pair',
-    description: 'Both partners rated together 5 times',
+    description: 'Beide Partner haben 5× zusammen bewertet',
     icon: '💕',
-    requirement: 'Both rate 5 times'
+    requirement: '5× gemeinsam bewertet',
+    category: 'rating',
+  },
+  // Exploration badges
+  'explorer': {
+    name: 'Explorer',
+    description: '5 verschiedene Venues besucht',
+    icon: '🗺️',
+    requirement: '5 Venues besucht',
+    category: 'exploration',
+  },
+  'foodie': {
+    name: 'Foodie',
+    description: '3 verschiedene Küchen ausprobiert',
+    icon: '🍽️',
+    requirement: '3 Küchen-Typen',
+    category: 'exploration',
+  },
+  // Engagement badges
+  'planner': {
+    name: 'Planner',
+    description: '10 Dates geplant',
+    icon: '🎯',
+    requirement: '10 Dates geplant',
+    category: 'engagement',
+  },
+  'deal_hunter': {
+    name: 'Deal Hunter',
+    description: '5 Vouchers eingelöst',
+    icon: '🎟️',
+    requirement: '5 Vouchers eingelöst',
+    category: 'engagement',
+  },
+  'committed': {
+    name: 'Committed',
+    description: '30-Tage Login-Streak erreicht',
+    icon: '📅',
+    requirement: '30-Tage Streak',
+    category: 'engagement',
+  },
+  'chatterbox': {
+    name: 'Chatterbox',
+    description: '50 Chat-Nachrichten gesendet',
+    icon: '💬',
+    requirement: '50 Nachrichten',
+    category: 'social',
   },
   // Referral badges
   'first_referral': {
     name: 'Ambassador',
-    description: 'Referred your first friend',
+    description: 'Ersten Freund eingeladen',
     icon: '🤝',
-    requirement: 'Refer 1 friend'
+    requirement: '1 Freund einladen',
+    category: 'referral',
   },
   'social_recruiter': {
     name: 'Social Recruiter',
-    description: 'Referred 5 friends',
+    description: '5 Freunde eingeladen',
     icon: '📣',
-    requirement: 'Refer 5 friends'
+    requirement: '5 Freunde einladen',
+    category: 'referral',
   },
   'community_builder': {
     name: 'Community Builder',
-    description: 'Referred 10 friends',
+    description: '10 Freunde eingeladen',
     icon: '🏗️',
-    requirement: 'Refer 10 friends'
+    requirement: '10 Freunde einladen',
+    category: 'referral',
   },
   'super_connector': {
     name: 'Super Connector',
-    description: 'Referred 25 friends',
-    icon: '⭐',
-    requirement: 'Refer 25 friends'
-  }
+    description: '25 Freunde eingeladen',
+    icon: '🌟',
+    requirement: '25 Freunde einladen',
+    category: 'referral',
+  },
 };
 
 /**
@@ -239,6 +360,7 @@ export const getBadgeInfo = (badgeId: string) => {
     name: badgeId,
     description: 'Achievement unlocked',
     icon: '🏅',
-    requirement: 'Special achievement'
+    requirement: 'Special achievement',
+    category: 'engagement' as const,
   };
 };
