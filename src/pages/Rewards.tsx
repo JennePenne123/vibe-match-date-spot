@@ -5,7 +5,7 @@ import { useUserPoints } from '@/hooks/useUserPoints';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Gift, Ticket, Crown, Sparkles, Star, Lock } from 'lucide-react';
+import { ArrowLeft, Gift, Ticket, Crown, Star, Lock } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { toast } from '@/hooks/use-toast';
 
@@ -15,7 +15,7 @@ interface RewardItem {
   title: string;
   description: string;
   cost: number;
-  category: 'voucher' | 'premium' | 'cosmetic';
+  category: 'voucher' | 'premium';
   color: string;
   bg: string;
 }
@@ -61,26 +61,6 @@ const rewards: RewardItem[] = [
     color: 'text-amber-600',
     bg: 'bg-amber-600/10',
   },
-  {
-    id: 'badge-vip',
-    icon: Star,
-    title: 'VIP Badge',
-    description: 'Exklusives VIP-Badge für dein Profil.',
-    cost: 1500,
-    category: 'cosmetic',
-    color: 'text-purple-500',
-    bg: 'bg-purple-500/10',
-  },
-  {
-    id: 'badge-sparkle',
-    icon: Sparkles,
-    title: 'Sparkle-Rahmen',
-    description: 'Ein glitzernder Profilrahmen, der Aufmerksamkeit erregt.',
-    cost: 2000,
-    category: 'cosmetic',
-    color: 'text-rose-500',
-    bg: 'bg-rose-500/10',
-  },
 ];
 
 export default function Rewards() {
@@ -123,10 +103,9 @@ export default function Rewards() {
   const categoryLabels: Record<string, string> = {
     voucher: t('rewards.vouchers', 'Gutscheine'),
     premium: t('rewards.premium', 'Premium'),
-    cosmetic: t('rewards.cosmetic', 'Kosmetisch'),
   };
 
-  const categories = ['voucher', 'premium', 'cosmetic'] as const;
+  const categories = ['voucher', 'premium'] as const;
 
   return (
     <div className="min-h-screen bg-background">
