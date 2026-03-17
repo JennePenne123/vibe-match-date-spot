@@ -89,7 +89,7 @@ export const useUserPoints = () => {
                 createElement(IconComponent, { className: `h-4 w-4 ${info.color}` })
               ),
               `Neues Badge: ${info.name}`
-            ),
+            ) as unknown as string,
             description: info.description,
           });
         }, index * 1500);
@@ -103,7 +103,7 @@ export const useUserPoints = () => {
                 createElement(Award, { className: 'h-4 w-4 text-primary' })
               ),
               'Weitere Badges freigeschaltet!'
-            ),
+            ) as unknown as string,
             description: `Du hast ${newBadges.length - 3} weitere Badges verdient. Schau in dein Profil!`,
           });
         }, 3 * 1500);
