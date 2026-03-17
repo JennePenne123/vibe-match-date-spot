@@ -157,3 +157,4 @@
 6. **Admin-Zugänge vor Launch konfigurieren** – Admin-Rollen in `user_roles` für finale Nutzer setzen
 7. **Sentry vor Launch einrichten** – Konto erstellen, DSN hinterlegen, SDK integrieren
 8. **DSGVO-Check für implizites Tracking** – Datenschutzerklärung + Consent prüfen
+9. **KI-Support-Agent** – AI-gestützter First-Line-Support im Settings-Bereich (ersetzt FAQ-Accordion), Fallback auf E-Mail
