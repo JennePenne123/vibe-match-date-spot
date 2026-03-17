@@ -237,8 +237,8 @@ export default function Rewards() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground">7 Tage Premium</p>
-                  <p className="text-xs text-muted-foreground line-clamp-1">
-                    Voucher für Top-3 AI-Matches & unbegrenzt einlösen
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    Exklusive Venue-Rabatte bei deinen Top-Matches & kein monatliches Einlöse-Limit
                   </p>
                 </div>
                 <Button
