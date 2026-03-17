@@ -1036,6 +1036,41 @@ export type Database = {
         }
         Relationships: []
       }
+      reward_redemptions: {
+        Row: {
+          created_at: string
+          id: string
+          points_spent: number
+          reward_type: string
+          user_id: string
+          voucher_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points_spent?: number
+          reward_type: string
+          user_id: string
+          voucher_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points_spent?: number
+          reward_type?: string
+          user_id?: string
+          voucher_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_redemptions_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "vouchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_points: {
         Row: {
           badges: Json
@@ -1043,6 +1078,7 @@ export type Database = {
           id: string
           last_review_date: string | null
           level: number
+          premium_until: string | null
           referral_code: string | null
           referral_count: number
           referral_points_earned: number
@@ -1057,6 +1093,7 @@ export type Database = {
           id?: string
           last_review_date?: string | null
           level?: number
+          premium_until?: string | null
           referral_code?: string | null
           referral_count?: number
           referral_points_earned?: number
@@ -1071,6 +1108,7 @@ export type Database = {
           id?: string
           last_review_date?: string | null
           level?: number
+          premium_until?: string | null
           referral_code?: string | null
           referral_count?: number
           referral_points_earned?: number
