@@ -13,6 +13,7 @@ function ScrollToTop() {
   return null;
 }
 import { ThemeProvider } from "next-themes";
+import AdminRouteGuard from "./components/AdminRouteGuard";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -175,13 +176,13 @@ const App = () => (
                     <Route path="/partner/profile" element={<LazyPage><PartnerProfile /></LazyPage>} />
                     <Route path="/partner/city-rankings" element={<LazyPage><PartnerCityRankings /></LazyPage>} />
                     
-                    {/* Admin Routes */}
-                    <Route path="/admin" element={<LazyPage><AdminDashboard /></LazyPage>} />
-                    <Route path="/admin/analytics" element={<LazyPage><AdminAnalytics /></LazyPage>} />
-                    <Route path="/admin/users" element={<LazyPage><AdminUsers /></LazyPage>} />
-                    <Route path="/admin/moderation" element={<LazyPage><AdminModeration /></LazyPage>} />
-                    <Route path="/admin/health" element={<LazyPage><AdminSystemHealth /></LazyPage>} />
-                    <Route path="/admin/reports" element={<LazyPage><AdminModeration /></LazyPage>} />
+                    {/* Admin Routes – protected by role check */}
+                    <Route path="/admin" element={<LazyPage><AdminRouteGuard><AdminDashboard /></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/analytics" element={<LazyPage><AdminRouteGuard><AdminAnalytics /></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/users" element={<LazyPage><AdminRouteGuard><AdminUsers /></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/moderation" element={<LazyPage><AdminRouteGuard><AdminModeration /></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/health" element={<LazyPage><AdminRouteGuard><AdminSystemHealth /></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/reports" element={<LazyPage><AdminRouteGuard><AdminModeration /></AdminRouteGuard></LazyPage>} />
                     
                     {/* Demo routes */}
                     <Route path="/demo/ai-venue-card" element={<LazyPageNoLayout><AIVenueCardDemo /></LazyPageNoLayout>} />
