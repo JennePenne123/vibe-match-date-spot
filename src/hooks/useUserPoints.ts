@@ -77,7 +77,7 @@ export const useUserPoints = () => {
         const info = getBadgeInfo(badgeId);
         setTimeout(() => {
           toast({
-            title: `${info.icon} Neues Badge: ${info.name}`,
+            title: `Neues Badge: ${info.name}`,
             description: info.description,
           });
         }, index * 1500);
@@ -86,7 +86,7 @@ export const useUserPoints = () => {
       if (newBadges.length > 3) {
         setTimeout(() => {
           toast({
-            title: '🏅 Weitere Badges freigeschaltet!',
+            title: 'Weitere Badges freigeschaltet!',
             description: `Du hast ${newBadges.length - 3} weitere Badges verdient. Schau in dein Profil!`,
           });
         }, 3 * 1500);
