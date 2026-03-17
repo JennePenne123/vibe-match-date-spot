@@ -279,6 +279,48 @@ export default function Rewards() {
             </Card>
           </div>
         </div>
+
+        {/* Redemption History */}
+        {history.length > 0 && (
+          <div className="px-4 pb-6 mt-4">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <History className="w-3.5 h-3.5" />
+              Letzte Einlösungen
+            </h2>
+            <div className="space-y-2">
+              {history.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 py-2 px-3 rounded-lg bg-muted/30"
+                >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted/50">
+                    {item.reward_type === 'premium' ? (
+                      <Crown className="w-4 h-4 text-amber-500" />
+                    ) : (
+                      <Ticket className="w-4 h-4 text-emerald-500" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-foreground truncate">
+                      {item.reward_type === 'premium'
+                        ? '7 Tage Premium'
+                        : item.voucher_title
+                          ? `${item.venue_name} · ${item.voucher_title}`
+                          : 'Venue-Voucher'}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-2.5 h-2.5" />
+                      {new Date(item.created_at).toLocaleDateString('de-DE')}
+                    </p>
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    -{item.points_spent.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
