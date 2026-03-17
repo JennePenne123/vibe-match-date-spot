@@ -32,6 +32,7 @@ export function AdminSidebar() {
 
   const moderationItems = [
     { title: t('adminNav.moderation', 'Moderation'), url: '/admin/moderation', icon: Shield },
+    { title: t('adminNav.errorMonitoring', 'Error Monitoring'), url: '/admin/errors', icon: Bug },
     { title: t('adminNav.reports', 'Reports'), url: '/admin/reports', icon: Flag },
     { title: t('adminNav.systemHealth', 'System Health'), url: '/admin/health', icon: Activity },
   ]
