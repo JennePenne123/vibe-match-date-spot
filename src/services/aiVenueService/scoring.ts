@@ -252,6 +252,7 @@ export const calculateVenueAIScore = async (
       venue: venue.name,
       baseScore: `${Math.round(baseScore * 100)}%`,
       contextualScore: `${Math.round(weightedContextual * 100)}%`,
+      moodModifier: moodModifier !== 0 ? `${moodModifier > 0 ? '+' : ''}${Math.round(moodModifier * 100)}% (${moodLabel})` : 'none',
       confidenceBoost: `+${Math.round(confidenceBoost * 100)}%`,
       finalScore: `${Math.round(finalScore)}%`,
       learningApplied: learnedWeights.hasLearningData,
