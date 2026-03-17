@@ -76,31 +76,94 @@ export const initializeUserPoints = async (): Promise<boolean> => {
 };
 
 /**
- * Calculate level from total points
- * Level progression: Level = floor(sqrt(points / 100)) + 1
+ * Level thresholds – fixed values for full control & transparency
+ */
+export const LEVEL_THRESHOLDS = [
+  { level: 1, points: 0, name: 'Newbie', icon: '🌱' },
+  { level: 2, points: 150, name: 'Explorer', icon: '🗺️' },
+  { level: 3, points: 500, name: 'Regular', icon: '⭐' },
+  { level: 4, points: 1000, name: 'Expert', icon: '💎' },
+  { level: 5, points: 2000, name: 'Master', icon: '🏅' },
+  { level: 6, points: 3500, name: 'Legend', icon: '👑' },
+  { level: 7, points: 5500, name: 'VIP', icon: '🔥' },
+] as const;
+
+/**
+ * Calculate level from total points using fixed thresholds
  */
 export const calculateLevel = (totalPoints: number): number => {
-  return Math.floor(Math.sqrt(totalPoints / 100)) + 1;
+  let level = 1;
+  for (const threshold of LEVEL_THRESHOLDS) {
+    if (totalPoints >= threshold.points) {
+      level = threshold.level;
+    } else {
+      break;
+    }
+  }
+  return level;
+};
+
+/**
+ * Get level info (name, icon) for a given level
+ */
+export const getLevelInfo = (level: number) => {
+  const info = LEVEL_THRESHOLDS.find(t => t.level === level);
+  return info || LEVEL_THRESHOLDS[0];
 };
 
 /**
  * Calculate points needed for next level
  */
 export const getPointsForNextLevel = (currentLevel: number): number => {
-  return (currentLevel * currentLevel) * 100;
+  const next = LEVEL_THRESHOLDS.find(t => t.level === currentLevel + 1);
+  if (!next) return LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1].points; // max level
+  return next.points;
 };
 
 /**
  * Get progress percentage to next level
  */
 export const getLevelProgress = (totalPoints: number, currentLevel: number): number => {
-  const currentLevelPoints = ((currentLevel - 1) * (currentLevel - 1)) * 100;
-  const nextLevelPoints = getPointsForNextLevel(currentLevel);
+  const currentThreshold = LEVEL_THRESHOLDS.find(t => t.level === currentLevel);
+  const nextThreshold = LEVEL_THRESHOLDS.find(t => t.level === currentLevel + 1);
+
+  if (!nextThreshold) return 100; // max level reached
+
+  const currentLevelPoints = currentThreshold?.points ?? 0;
+  const nextLevelPoints = nextThreshold.points;
   const progressPoints = totalPoints - currentLevelPoints;
   const pointsNeeded = nextLevelPoints - currentLevelPoints;
-  
+
   return Math.min(100, Math.max(0, (progressPoints / pointsNeeded) * 100));
 };
+
+/**
+ * Point sources with their values
+ */
+export const POINT_SOURCES = {
+  // Date ratings (existing)
+  rating_base: { points: 10, label: 'Date bewertet' },
+  rating_venue: { points: 5, label: 'Venue bewertet' },
+  rating_recommend: { points: 5, label: 'Empfehlung abgegeben' },
+  rating_text: { points: 10, label: 'Kommentar geschrieben' },
+  rating_speed_bonus: { points: 10, label: 'Speed-Bonus (< 24h)' },
+  // Profile & setup
+  profile_complete: { points: 20, label: 'Profil vervollständigt' },
+  preferences_set: { points: 15, label: 'Präferenzen gesetzt' },
+  // Dating actions
+  date_planned: { points: 10, label: 'Date geplant' },
+  date_accepted: { points: 5, label: 'Date angenommen' },
+  // Daily engagement
+  mood_checkin: { points: 5, label: 'Mood Check-In' },
+  weekly_streak_bonus: { points: 25, label: '7-Tage Streak Bonus' },
+  // Vouchers
+  voucher_redeemed: { points: 15, label: 'Voucher eingelöst' },
+  // Referrals (existing)
+  referral_signup: { points: 25, label: 'Freund eingeladen (Signup)' },
+  referral_completed: { points: 50, label: 'Freund eingeladen (erstes Date)' },
+  referee_signup: { points: 10, label: 'Einladung angenommen' },
+  referee_completed: { points: 25, label: 'Erstes Date abgeschlossen' },
+} as const;
 
 /**
  * Fetch leaderboard data using secure leaderboard_view
