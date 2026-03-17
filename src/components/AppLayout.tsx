@@ -27,6 +27,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const isPartnerRoute = location.pathname.startsWith('/partner')
+  const isAdminRoute = location.pathname.startsWith('/admin')
 
   // Track previous path for slide direction
   const prevPath = useRef(location.pathname)
