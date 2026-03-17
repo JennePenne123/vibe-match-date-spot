@@ -103,10 +103,9 @@ export default function Rewards() {
   const categoryLabels: Record<string, string> = {
     voucher: t('rewards.vouchers', 'Gutscheine'),
     premium: t('rewards.premium', 'Premium'),
-    cosmetic: t('rewards.cosmetic', 'Kosmetisch'),
   };
 
-  const categories = ['voucher', 'premium', 'cosmetic'] as const;
+  const categories = ['voucher', 'premium'] as const;
 
   return (
     <div className="min-h-screen bg-background">
