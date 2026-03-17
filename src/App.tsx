@@ -37,6 +37,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const AIRecommendations = lazy(() => import("./pages/AIRecommendations"));
 const SmartDatePlanning = lazy(() => import("./pages/SmartDatePlanning"));
 const AIInsights = lazy(() => import("./pages/AIInsights"));
+const Rewards = lazy(() => import("./pages/Rewards"));
 
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
