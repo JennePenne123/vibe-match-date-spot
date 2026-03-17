@@ -134,6 +134,7 @@ const App = () => (
                     <Route path="/ai-recommendations" element={<LazyPage><AIRecommendations /></LazyPage>} />
                     <Route path="/ai-insights" element={<LazyPage><AIInsights /></LazyPage>} />
                     <Route path="/plan-date" element={<LazyPage><SmartDatePlanning /></LazyPage>} />
+                    <Route path="/rewards" element={<LazyPage><Rewards /></LazyPage>} />
                     
                     {/* Debug route */}
                     <Route path="/debug" element={<LazyPage><Debug /></LazyPage>} />

@@ -56,6 +56,22 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
         </CardContent>
       </Card>
 
+      {/* Reward Shop */}
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50 overflow-hidden">
+        <CardContent className="p-2">
+          <button
+            onClick={() => navigate('/rewards')}
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all text-left group"
+          >
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-amber-500/10">
+              <Gift className="w-4 h-4 text-amber-500" />
+            </div>
+            <span className="flex-1 text-sm font-medium text-foreground">{t('profile.rewardShop', 'Reward Shop')}</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
+          </button>
+        </CardContent>
+      </Card>
+
       {/* Actions */}
       <div className="space-y-3">
         <Button onClick={() => navigate('/settings')} variant="outline" className="w-full border-border text-foreground hover:bg-accent/50">
