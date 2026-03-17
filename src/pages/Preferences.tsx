@@ -943,12 +943,92 @@ const Preferences = () => {
     </>
   );
 
+  const renderStep5 = () => (
+    <>
+      {/* Culture & Education */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.cultureAndEducation')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.cultureAndEducationDesc')}</p>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {cultureVenues.map((venue) => (
+            <button
+              type="button"
+              key={venue.id}
+              onClick={() => toggleSelection(venue.id, selectedVenueTypes, setSelectedVenueTypes)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
+              <PrefIcon id={venue.id} />
+              <div className="font-medium text-sm mt-1">{venue.name}</div>
+              {venue.desc && <div className="text-xs text-muted-foreground mt-0.5">{venue.desc}</div>}
+              {selectedVenueTypes.includes(venue.id) && (
+                <Check className="w-4 h-4 mx-auto mt-1" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Leisure & Sports */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.leisureAndSports')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.leisureAndSportsDesc')}</p>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {leisureVenues.map((venue) => (
+            <button
+              type="button"
+              key={venue.id}
+              onClick={() => toggleSelection(venue.id, selectedVenueTypes, setSelectedVenueTypes)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
+              <PrefIcon id={venue.id} />
+              <div className="font-medium text-sm mt-1">{venue.name}</div>
+              {venue.desc && <div className="text-xs text-muted-foreground mt-0.5">{venue.desc}</div>}
+              {selectedVenueTypes.includes(venue.id) && (
+                <Check className="w-4 h-4 mx-auto mt-1" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Entertainment */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.entertainmentVenues')}</h2>
+        <p className="text-muted-foreground mb-6">{t('preferences.entertainmentVenuesDesc')}</p>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {entertainmentVenues.map((venue) => (
+            <button
+              type="button"
+              key={venue.id}
+              onClick={() => toggleSelection(venue.id, selectedVenueTypes, setSelectedVenueTypes)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
+            >
+              <PrefIcon id={venue.id} />
+              <div className="font-medium text-sm mt-1">{venue.name}</div>
+              {venue.desc && <div className="text-xs text-muted-foreground mt-0.5">{venue.desc}</div>}
+              {selectedVenueTypes.includes(venue.id) && (
+                <Check className="w-4 h-4 mx-auto mt-1" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1: return renderStep1();
       case 2: return renderStep2();
       case 3: return renderStep3();
       case 4: return renderStep4();
+      case 5: return renderStep5();
       default: return renderStep1();
     }
   };
