@@ -19,6 +19,7 @@ export default function Rewards() {
   const { points, loading: pointsLoading } = useUserPoints();
   const {
     vouchers,
+    history,
     monthlyUsed,
     monthlyLimit,
     isPremium,
