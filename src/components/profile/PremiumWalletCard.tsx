@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Wallet, Ticket, Clock, XCircle, CheckCircle2, Percent, Gift, ChevronRight, Sparkles } from 'lucide-react';
+import { Wallet, Ticket, Clock, XCircle, CheckCircle2, Percent, Gift, ChevronRight, Sparkles, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { VoucherQRDetail } from './VoucherQRDetail';
 
 interface WalletVoucher {
@@ -20,80 +21,10 @@ interface WalletVoucher {
   created_at: string;
   redeemed_at?: string | null;
   status: 'active' | 'redeemed' | 'expired';
-  ai_match_score?: number;
+  source: 'partner' | 'reward_shop';
 }
 
 type WalletTab = 'active' | 'expiring' | 'redeemed' | 'expired';
-
-// Mock data for now – will be replaced with real Supabase queries when subscription system is built
-const mockVouchers: WalletVoucher[] = [
-  {
-    id: '1',
-    title: '20% Off Dinner',
-    code: 'VYBE20A',
-    discount_type: 'percentage',
-    discount_value: 20,
-    venue_name: 'Osteria Francescana',
-    venue_id: 'v1',
-    valid_until: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    status: 'active',
-    ai_match_score: 96,
-  },
-  {
-    id: '2',
-    title: 'Free Dessert',
-    code: 'VYBEFREE',
-    discount_type: 'free_item',
-    discount_value: 0,
-    venue_name: 'Le Petit Bistro',
-    venue_id: 'v2',
-    valid_until: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date(Date.now() - 26 * 24 * 60 * 60 * 1000).toISOString(),
-    status: 'active',
-    ai_match_score: 92,
-  },
-  {
-    id: '3',
-    title: '€15 Off',
-    code: 'VYBE15',
-    discount_type: 'fixed',
-    discount_value: 15,
-    venue_name: 'Sakura Garden',
-    venue_id: 'v3',
-    valid_until: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
-    status: 'active',
-    ai_match_score: 89,
-  },
-  {
-    id: '4',
-    title: '10% Off Brunch',
-    code: 'VYBE10B',
-    discount_type: 'percentage',
-    discount_value: 10,
-    venue_name: 'Golden Brunch Club',
-    venue_id: 'v4',
-    valid_until: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date(Date.now() - 33 * 24 * 60 * 60 * 1000).toISOString(),
-    status: 'expired',
-    ai_match_score: 87,
-  },
-  {
-    id: '5',
-    title: '25% Off Date Night',
-    code: 'VYBEDATE',
-    discount_type: 'percentage',
-    discount_value: 25,
-    venue_name: 'Moonlight Lounge',
-    venue_id: 'v5',
-    valid_until: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
-    redeemed_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-    status: 'redeemed',
-    ai_match_score: 94,
-  },
-];
 
 const EXPIRING_THRESHOLD_DAYS = 7;
 
@@ -199,10 +130,10 @@ function VoucherCard({ voucher, variant, onTap }: { voucher: WalletVoucher; vari
             <p className="text-sm font-semibold truncate">{voucher.title}</p>
             <p className="text-xs text-muted-foreground truncate">{voucher.venue_name}</p>
           </div>
-          {voucher.ai_match_score && !isExpired && !isRedeemed && (
+          {voucher.source === 'reward_shop' && !isExpired && !isRedeemed && (
             <Badge variant="secondary" className="shrink-0 text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-0">
               <Sparkles className="w-2.5 h-2.5 mr-0.5" />
-              {voucher.ai_match_score}%
+              Shop
             </Badge>
           )}
         </div>
@@ -247,7 +178,7 @@ function VoucherCard({ voucher, variant, onTap }: { voucher: WalletVoucher; vari
 
 function EmptyState({ tab }: { tab: WalletTab }) {
   const messages: Record<WalletTab, { icon: React.ReactNode; text: string }> = {
-    active: { icon: <Ticket className="w-8 h-8 text-muted-foreground/40" />, text: 'Keine aktiven Vouchers. Starte einen AI-Match um exklusive Deals zu erhalten!' },
+    active: { icon: <Ticket className="w-8 h-8 text-muted-foreground/40" />, text: 'Keine aktiven Vouchers. Starte einen AI-Match oder löse Punkte im Reward Shop ein!' },
     expiring: { icon: <Clock className="w-8 h-8 text-muted-foreground/40" />, text: 'Keine Vouchers laufen bald ab.' },
     redeemed: { icon: <CheckCircle2 className="w-8 h-8 text-muted-foreground/40" />, text: 'Noch keine Vouchers eingelöst.' },
     expired: { icon: <XCircle className="w-8 h-8 text-muted-foreground/40" />, text: 'Keine abgelaufenen Vouchers.' },
@@ -266,8 +197,62 @@ export function PremiumWalletCard() {
   const [activeTab, setActiveTab] = useState<WalletTab>('active');
   const [direction, setDirection] = useState(0);
   const [selectedVoucher, setSelectedVoucher] = useState<WalletVoucher | null>(null);
+  const [walletVouchers, setWalletVouchers] = useState<WalletVoucher[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const tabOrder: WalletTab[] = ['active', 'expiring', 'redeemed', 'expired'];
+
+  useEffect(() => {
+    if (user) fetchWalletVouchers();
+  }, [user?.id]);
+
+  const fetchWalletVouchers = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      // Fetch voucher_redemptions for this user with voucher + venue details
+      const { data: redemptions, error } = await supabase
+        .from('voucher_redemptions')
+        .select('id, redeemed_at, status, voucher_id, vouchers(id, title, code, discount_type, discount_value, venue_id, valid_until, created_at, venues(name))')
+        .eq('user_id', user.id)
+        .order('redeemed_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching wallet vouchers:', error);
+        setWalletVouchers([]);
+        return;
+      }
+
+      const mapped: WalletVoucher[] = (redemptions || [])
+        .filter((r: any) => r.vouchers)
+        .map((r: any) => {
+          const v = r.vouchers;
+          const isExpired = new Date(v.valid_until) < new Date();
+          const isRedeemed = r.status === 'completed';
+
+          return {
+            id: v.id,
+            title: v.title,
+            code: v.code,
+            discount_type: v.discount_type as 'percentage' | 'fixed' | 'free_item',
+            discount_value: v.discount_value,
+            venue_name: v.venues?.name || 'Venue',
+            venue_id: v.venue_id,
+            valid_until: v.valid_until,
+            created_at: v.created_at,
+            redeemed_at: r.redeemed_at,
+            status: isRedeemed ? 'redeemed' as const : isExpired ? 'expired' as const : 'active' as const,
+            source: 'reward_shop' as const,
+          };
+        });
+
+      setWalletVouchers(mapped);
+    } catch (err) {
+      console.error('Wallet fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleTabChange = (newTab: string) => {
     const oldIndex = tabOrder.indexOf(activeTab);
@@ -276,8 +261,7 @@ export function PremiumWalletCard() {
     setActiveTab(newTab as WalletTab);
   };
 
-  // TODO: Replace with real data from Supabase when subscription system is built
-  const { active, expiring, expired, redeemed } = categorizeVouchers(mockVouchers);
+  const { active, expiring, expired, redeemed } = categorizeVouchers(walletVouchers);
 
   const counts = {
     active: active.length,
@@ -299,61 +283,64 @@ export function PremiumWalletCard() {
             <Wallet className="h-4 w-4 text-primary" />
           </div>
           Meine Wallet
-          <Badge variant="secondary" className="ml-auto text-[10px] bg-primary/10 text-primary border-0 font-semibold">
-            Premium
-          </Badge>
         </CardTitle>
       </CardHeader>
 
       <CardContent className="pt-0">
-        <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="w-full grid grid-cols-4 h-9 bg-muted/50 p-0.5">
-            <TabsTrigger value="active" className="text-[10px] data-[state=active]:bg-card data-[state=active]:shadow-sm px-1">
-              Aktiv {counts.active > 0 && <span className="ml-0.5 text-primary">({counts.active})</span>}
-            </TabsTrigger>
-            <TabsTrigger value="expiring" className="text-[10px] data-[state=active]:bg-card data-[state=active]:shadow-sm px-1 relative">
-              Bald ab
-              {counts.expiring > 0 && (
-                <span className="ml-0.5 text-orange-500">({counts.expiring})</span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="redeemed" className="text-[10px] data-[state=active]:bg-card data-[state=active]:shadow-sm px-1">
-              Eingelöst {counts.redeemed > 0 && <span className="ml-0.5">({counts.redeemed})</span>}
-            </TabsTrigger>
-            <TabsTrigger value="expired" className="text-[10px] data-[state=active]:bg-card data-[state=active]:shadow-sm px-1">
-              Abgelaufen {counts.expired > 0 && <span className="ml-0.5">({counts.expired})</span>}
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="relative overflow-hidden">
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={activeTab}
-                custom={direction}
-                initial={{ x: direction * 80, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: direction * -80, opacity: 0 }}
-                transition={{ duration: 0.25, ease: 'easeInOut' }}
-                className="mt-3 space-y-2.5"
-              >
-                {tabVouchers[activeTab].length === 0 ? (
-                  <EmptyState tab={activeTab} />
-                ) : (
-                  tabVouchers[activeTab].map((voucher, i) => (
-                    <motion.div
-                      key={voucher.id}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.06, duration: 0.2 }}
-                    >
-                      <VoucherCard voucher={voucher} variant={activeTab} onTap={() => setSelectedVoucher(voucher)} />
-                    </motion.div>
-                  ))
-                )}
-              </motion.div>
-            </AnimatePresence>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
-        </Tabs>
+        ) : (
+          <Tabs value={activeTab} onValueChange={handleTabChange}>
+            <TabsList className="w-full grid grid-cols-4 h-9 bg-muted/50 p-0.5">
+              <TabsTrigger value="active" className="text-[10px] data-[state=active]:bg-card data-[state=active]:shadow-sm px-1">
+                Aktiv {counts.active > 0 && <span className="ml-0.5 text-primary">({counts.active})</span>}
+              </TabsTrigger>
+              <TabsTrigger value="expiring" className="text-[10px] data-[state=active]:bg-card data-[state=active]:shadow-sm px-1 relative">
+                Bald ab
+                {counts.expiring > 0 && (
+                  <span className="ml-0.5 text-orange-500">({counts.expiring})</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="redeemed" className="text-[10px] data-[state=active]:bg-card data-[state=active]:shadow-sm px-1">
+                Eingelöst {counts.redeemed > 0 && <span className="ml-0.5">({counts.redeemed})</span>}
+              </TabsTrigger>
+              <TabsTrigger value="expired" className="text-[10px] data-[state=active]:bg-card data-[state=active]:shadow-sm px-1">
+                Abgelaufen {counts.expired > 0 && <span className="ml-0.5">({counts.expired})</span>}
+              </TabsTrigger>
+            </TabsList>
+
+            <div className="relative overflow-hidden">
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={activeTab}
+                  custom={direction}
+                  initial={{ x: direction * 80, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: direction * -80, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  className="mt-3 space-y-2.5"
+                >
+                  {tabVouchers[activeTab].length === 0 ? (
+                    <EmptyState tab={activeTab} />
+                  ) : (
+                    tabVouchers[activeTab].map((voucher, i) => (
+                      <motion.div
+                        key={voucher.id}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.06, duration: 0.2 }}
+                      >
+                        <VoucherCard voucher={voucher} variant={activeTab} onTap={() => setSelectedVoucher(voucher)} />
+                      </motion.div>
+                    ))
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </Tabs>
+        )}
 
         {/* 30-day validity info */}
         <p className="text-[10px] text-muted-foreground text-center mt-4 flex items-center justify-center gap-1">
