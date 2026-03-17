@@ -237,11 +237,15 @@ export const calculateVenueAIScore = async (
     const contextualScore = await calculateContextualFactors(venueId);
     const weightedContextual = applyWeight(contextualScore, weights.time, 'time/context');
 
+    // Apply mood-based modifier
+    const moodModifier = getMoodScoreModifier(venue);
+    const moodLabel = getMoodInfluenceLabel();
+
     // Apply confidence boost from learning data
     const confidenceBoost = getConfidenceBoost(learnedWeights);
     
     // Final AI score (0-100 scale)
-    const rawScore = (baseScore + weightedContextual + confidenceBoost) * 100;
+    const rawScore = (baseScore + weightedContextual + moodModifier + confidenceBoost) * 100;
     const finalScore = Math.max(35, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
