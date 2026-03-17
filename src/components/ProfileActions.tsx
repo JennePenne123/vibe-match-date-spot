@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Settings, Heart, MapPin, ChevronRight, Gift } from 'lucide-react';
+import { Users, Settings, Heart, MapPin, ChevronRight } from 'lucide-react';
 
 interface ProfileActionsProps {
   onLogout: () => void;
@@ -53,22 +53,6 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
             <p>{t('profile.noFriendsYet')}</p>
             <Button onClick={() => navigate('/my-friends')} variant="outline" className="mt-3 border-border text-foreground hover:bg-accent/50">{t('profile.addFriends')}</Button>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Reward Shop */}
-      <Card className="bg-card/50 backdrop-blur-sm border-border/50 overflow-hidden">
-        <CardContent className="p-2">
-          <button
-            onClick={() => navigate('/rewards')}
-            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all text-left group"
-          >
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-amber-500/10">
-              <Gift className="w-4 h-4 text-amber-500" />
-            </div>
-            <span className="flex-1 text-sm font-medium text-foreground">{t('profile.rewardShop', 'Reward Shop')}</span>
-            <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
-          </button>
         </CardContent>
       </Card>
 
