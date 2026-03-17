@@ -15,7 +15,7 @@ interface RewardItem {
   title: string;
   description: string;
   cost: number;
-  category: 'voucher' | 'premium' | 'cosmetic';
+  category: 'voucher' | 'premium';
   color: string;
   bg: string;
 }
