@@ -147,6 +147,35 @@ serve(async (req) => {
         );
       }
 
+      // Award points to the user who redeemed the voucher
+      try {
+        const { data: currentPoints } = await adminClient
+          .from("user_points")
+          .select("total_points, level, badges")
+          .eq("user_id", user_id)
+          .maybeSingle();
+
+        if (currentPoints) {
+          const newTotal = (currentPoints.total_points || 0) + 15;
+          // Calculate level using fixed thresholds
+          const thresholds = [0, 150, 500, 1000, 2000, 3500, 5500];
+          let newLevel = 1;
+          for (let i = thresholds.length - 1; i >= 0; i--) {
+            if (newTotal >= thresholds[i]) {
+              newLevel = i + 1;
+              break;
+            }
+          }
+
+          await adminClient
+            .from("user_points")
+            .update({ total_points: newTotal, level: newLevel })
+            .eq("user_id", user_id);
+        }
+      } catch (pointsError) {
+        console.error("Points award error (non-blocking):", pointsError);
+      }
+
       // current_redemptions is incremented by the trigger `increment_voucher_redemptions`
 
       return new Response(
