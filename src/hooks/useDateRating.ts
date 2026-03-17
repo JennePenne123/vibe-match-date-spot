@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { learnFromFeedback } from '@/services/aiLearningService';
+import { calculateLevel } from '@/services/pointsService';
+import { checkAndAwardBadges } from '@/services/badgeService';
 
 export interface DateRatingData {
   overallRating: number;
@@ -112,14 +114,22 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
         ? (existingPoints?.streak_count || 0) + 1
         : 1;
 
+      const newLevel = calculateLevel(newTotal);
+
       await supabase
         .from('user_points')
         .upsert({
           user_id: user.id,
           total_points: newTotal,
+          level: newLevel,
           streak_count: newStreak,
           last_review_date: today.toISOString(),
         });
+
+      // Check badges asynchronously (non-blocking)
+      checkAndAwardBadges(user.id).catch(err =>
+        console.error('⚠️ Badge check failed (non-blocking):', err)
+      );
 
       // AI learning from predicted vs actual
       if (options?.venueId) {
