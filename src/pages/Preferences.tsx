@@ -183,7 +183,7 @@ const Preferences = () => {
   
   // Multi-step state management
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const totalSteps = 5;
   
   // Step 1: Cuisine & Vibes (existing)
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
@@ -201,6 +201,8 @@ const Preferences = () => {
   // Step 4: Special Requirements & Home Location
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
+
+  // Step 5: Venue Types (Experiences beyond dining)
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
