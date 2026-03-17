@@ -481,8 +481,26 @@ useEffect(() => {
     );
   };
 
+  const haveSameSelections = (currentValues: string[], templateValues: string[]) => {
+    if (currentValues.length !== templateValues.length) return false;
+
+    const sortedCurrentValues = [...currentValues].sort();
+    const sortedTemplateValues = [...templateValues].sort();
+
+    return sortedCurrentValues.every((value, index) => value === sortedTemplateValues[index]);
+  };
+
+  const isTemplateCurrentlySelected = (template: typeof quickStartTemplates[number]) => {
+    return selectedTemplateId === template.id || (
+      haveSameSelections(selectedCuisines, template.cuisines) &&
+      haveSameSelections(selectedVibes, template.vibes) &&
+      haveSameSelections(selectedPriceRange, template.priceRange) &&
+      haveSameSelections(selectedTimePreferences, template.timePreferences)
+    );
+  };
+
   const applyQuickStartTemplate = (template: typeof quickStartTemplates[0]) => {
-    const isDeselecting = selectedTemplateId === template.id;
+    const isDeselecting = isTemplateCurrentlySelected(template);
     
     if (isDeselecting) {
       // Deselect: clear all preferences
