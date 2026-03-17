@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { LayoutDashboard, BarChart3, Shield, Users, Flag, Activity, LogOut, ArrowLeft } from 'lucide-react'
+import { LayoutDashboard, BarChart3, Shield, Users, Flag, Activity, LogOut, ArrowLeft, Bug } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
