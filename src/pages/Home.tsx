@@ -23,7 +23,7 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  // Handle authentication redirect + onboarding + mood check
+  // Handle authentication redirect + mood check first, then onboarding
   React.useEffect(() => {
     if (authLoading || !user) {
       if (!authLoading && !user) {
@@ -33,7 +33,13 @@ const Home: React.FC = () => {
       return;
     }
 
-    // Check if user has preferences set (onboarding check)
+    // 1. Mood check first (quick emotional icebreaker)
+    if (!hasMoodToday()) {
+      navigate('/mood', { replace: true });
+      return;
+    }
+
+    // 2. Then check if preferences are set (onboarding)
     const checkOnboarding = async () => {
       try {
         const { data } = await supabase
@@ -42,18 +48,11 @@ const Home: React.FC = () => {
           .eq('user_id', user.id)
           .maybeSingle();
 
-        // No preferences at all, or empty cuisines → send to onboarding
         if (!data || !data.preferred_cuisines || data.preferred_cuisines.length === 0) {
           navigate('/preferences?onboarding=true', { replace: true });
-          return;
         }
       } catch (error) {
         console.error('Error checking preferences:', error);
-      }
-
-      // Preferences exist → check mood
-      if (!hasMoodToday()) {
-        navigate('/mood', { replace: true });
       }
     };
 

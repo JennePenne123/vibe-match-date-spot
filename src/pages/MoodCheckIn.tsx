@@ -117,7 +117,26 @@ const MoodCheckIn: React.FC = () => {
       );
     }
     setAnimateOut(true);
-    setTimeout(() => navigate('/home', { replace: true }), 350);
+    // Check if user needs preferences onboarding
+    setTimeout(async () => {
+      if (user) {
+        try {
+          const { data } = await supabase
+            .from('user_preferences')
+            .select('id, preferred_cuisines')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (!data || !data.preferred_cuisines || data.preferred_cuisines.length === 0) {
+            navigate('/preferences?onboarding=true', { replace: true });
+            return;
+          }
+        } catch (error) {
+          console.error('Error checking preferences after mood:', error);
+        }
+      }
+      navigate('/home', { replace: true });
+    }, 350);
   };
 
   const handleMoodSelect = (mood: DailyMood) => {
