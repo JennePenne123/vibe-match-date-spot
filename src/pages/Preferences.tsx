@@ -203,6 +203,8 @@ const Preferences = () => {
   const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
 
   // Step 5: Venue Types (Experiences beyond dining)
+  const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
+
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
