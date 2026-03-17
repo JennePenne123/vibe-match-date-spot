@@ -145,7 +145,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         >
           {children}
         </div>
-        {!isPartnerRoute && <MobileBottomNav />}
+        {!isPartnerRoute && !isAdminRoute && <MobileBottomNav />}
       </div>
     )
   }
