@@ -13,6 +13,7 @@ function ScrollToTop() {
   return null;
 }
 import { ThemeProvider } from "next-themes";
+import AdminRouteGuard from "./components/AdminRouteGuard";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
