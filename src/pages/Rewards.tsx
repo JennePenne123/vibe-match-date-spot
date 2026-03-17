@@ -5,7 +5,7 @@ import { useUserPoints } from '@/hooks/useUserPoints';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Gift, Ticket, Crown, Sparkles, Star, Lock } from 'lucide-react';
+import { ArrowLeft, Gift, Ticket, Crown, Star, Lock } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { toast } from '@/hooks/use-toast';
 
