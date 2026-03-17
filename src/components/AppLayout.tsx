@@ -153,7 +153,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider defaultOpen={isDesktop}>
       <div className="min-h-screen flex w-full bg-background">
-        {isPartnerRoute ? <PartnerSidebar /> : <AppSidebar />}
+        {isAdminRoute ? <AdminSidebar /> : isPartnerRoute ? <PartnerSidebar /> : <AppSidebar />}
         
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header with sidebar trigger */}

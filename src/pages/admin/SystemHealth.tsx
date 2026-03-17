@@ -16,7 +16,7 @@ const SystemHealth: React.FC = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from('request_logs')
-        .select('function_name, was_rate_limited, abuse_score, timestamp')
+        .select('id, function_name, was_rate_limited, abuse_score, timestamp')
         .order('timestamp', { ascending: false })
         .limit(100);
       return data || [];
