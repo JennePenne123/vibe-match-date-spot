@@ -471,7 +471,7 @@ const Preferences = () => {
         }
       }
       
-      navigate('/friends');
+      navigate(isOnboarding ? '/home' : '/friends');
     } else {
       nextStep();
     }
