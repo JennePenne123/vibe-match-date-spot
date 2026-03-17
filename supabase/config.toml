@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.redeem-voucher]
 verify_jwt = true
+
+[functions.check-streaks]
+verify_jwt = false
