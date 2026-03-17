@@ -120,10 +120,19 @@
 ## 🔐 Admin Dashboard (implementiert – 17. März 2026)
 
 - **Routen**: `/admin/*` mit eigener AdminSidebar
-- **Seiten**: Dashboard (KPIs), Analytics (Charts), Nutzer-Übersicht, Content-Moderation, System Health
+- **Seiten**: Dashboard (KPIs), Analytics (Charts), Nutzer-Übersicht, Content-Moderation, System Health, **Error Monitoring**
 - **Zugangsschutz**: `AdminRouteGuard` prüft `admin`-Rolle via `user_roles`-Tabelle, Nicht-Admins werden zu `/home` umgeleitet
 - **Pre-Launch TODO**: Admin-Zugänge (Rollen) für finale Nutzer in der `user_roles`-Tabelle anlegen bevor die App live geht
 - **Nicht in normaler Navigation sichtbar** – nur über Direktlink `/admin` erreichbar
+
+## 🐛 Error Monitoring (implementiert – 17. März 2026)
+
+- **In-App Logging**: `error_logs`-Tabelle in Supabase mit 4 Fehlertypen (JS, API, UI, Performance)
+- **ErrorMonitoringService**: Globale Handler für `window.onerror`, `unhandledrejection`, `PerformanceObserver` (Long Tasks >200ms)
+- **ErrorBoundary-Integration**: UI-Fehler werden automatisch in die DB geloggt
+- **Admin-Seite** `/admin/errors`: Statistiken (24h), Filter nach Typ, Stack Traces, Severity-Badges
+- **Deduplizierung**: Gleiche Fehler innerhalb 5s werden nur einmal geloggt
+- **Pre-Launch TODO**: Sentry-Konto erstellen (sentry.io, Free-Tier), React-Projekt anlegen, DSN als `VITE_SENTRY_DSN` in der Codebase hinterlegen und Sentry SDK integrieren
 
 ---
 
@@ -135,3 +144,4 @@
 4. **Stripe Integration** – Premium-Subscription aufsetzen
 5. **Partner Redemption-Übersicht** – Eingelöste Vouchers im Partner-Dashboard
 6. **Admin-Zugänge vor Launch konfigurieren** – Admin-Rollen in `user_roles` für finale Nutzer setzen
+7. **Sentry vor Launch einrichten** – Konto erstellen, DSN hinterlegen, SDK integrieren
