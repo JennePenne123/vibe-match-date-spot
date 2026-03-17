@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Crown, TrendingUp } from 'lucide-react';
+import { Crown, TrendingUp, Gift } from 'lucide-react';
 import { getLeaderboard, type LeaderboardEntry } from '@/services/pointsService';
 import { useAuth } from '@/contexts/AuthContext';
 import SafeComponent from '@/components/SafeComponent';
