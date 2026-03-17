@@ -551,6 +551,7 @@ const Preferences = () => {
       case 2: return <Clock className="w-5 h-5" />;
       case 3: return <Coffee className="w-5 h-5" />;
       case 4: return <MapPin className="w-5 h-5" />;
+      case 5: return <Ticket className="w-5 h-5" />;
       default: return <Heart className="w-5 h-5" />;
     }
   };
