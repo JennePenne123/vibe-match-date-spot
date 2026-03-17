@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Sun, Coffee, Moon } from 'lucide-react';
 
@@ -116,7 +117,26 @@ const MoodCheckIn: React.FC = () => {
       );
     }
     setAnimateOut(true);
-    setTimeout(() => navigate('/home', { replace: true }), 350);
+    // Check if user needs preferences onboarding
+    setTimeout(async () => {
+      if (user) {
+        try {
+          const { data } = await supabase
+            .from('user_preferences')
+            .select('id, preferred_cuisines')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (!data || !data.preferred_cuisines || data.preferred_cuisines.length === 0) {
+            navigate('/preferences?onboarding=true', { replace: true });
+            return;
+          }
+        } catch (error) {
+          console.error('Error checking preferences after mood:', error);
+        }
+      }
+      navigate('/home', { replace: true });
+    }, 350);
   };
 
   const handleMoodSelect = (mood: DailyMood) => {
