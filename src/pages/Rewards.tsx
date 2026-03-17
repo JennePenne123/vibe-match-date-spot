@@ -61,26 +61,6 @@ const rewards: RewardItem[] = [
     color: 'text-amber-600',
     bg: 'bg-amber-600/10',
   },
-  {
-    id: 'badge-vip',
-    icon: Star,
-    title: 'VIP Badge',
-    description: 'Exklusives VIP-Badge für dein Profil.',
-    cost: 1500,
-    category: 'cosmetic',
-    color: 'text-purple-500',
-    bg: 'bg-purple-500/10',
-  },
-  {
-    id: 'badge-sparkle',
-    icon: Sparkles,
-    title: 'Sparkle-Rahmen',
-    description: 'Ein glitzernder Profilrahmen, der Aufmerksamkeit erregt.',
-    cost: 2000,
-    category: 'cosmetic',
-    color: 'text-rose-500',
-    bg: 'bg-rose-500/10',
-  },
 ];
 
 export default function Rewards() {
