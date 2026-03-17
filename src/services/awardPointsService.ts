@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { POINT_SOURCES, calculateLevel } from './pointsService';
+import { checkAndAwardBadges } from './badgeService';
 
 type PointSourceKey = keyof typeof POINT_SOURCES;
 
@@ -7,11 +8,12 @@ type PointSourceKey = keyof typeof POINT_SOURCES;
  * Award points to the current user for a specific action.
  * Handles duplicate-safe awarding for one-time actions (profile_complete, preferences_set).
  * Updates level automatically based on new total.
+ * After awarding points, automatically checks and awards any new badges.
  */
 export const awardPoints = async (
   source: PointSourceKey,
   options?: { skipDuplicateCheck?: boolean }
-): Promise<{ success: boolean; newTotal?: number; levelUp?: boolean }> => {
+): Promise<{ success: boolean; newTotal?: number; levelUp?: boolean; newBadges?: string[] }> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { success: false };
@@ -57,7 +59,10 @@ export const awardPoints = async (
 
     console.log(`Awarded ${pointDef.points} points for "${source}". Total: ${newTotal}, Level: ${newLevel}${levelUp ? ' (LEVEL UP!)' : ''}`);
 
-    return { success: true, newTotal, levelUp };
+    // Check and award badges asynchronously (non-blocking)
+    const newBadges = await checkAndAwardBadges(user.id);
+
+    return { success: true, newTotal, levelUp, newBadges };
   } catch (err) {
     console.error('awardPoints error:', err);
     return { success: false };

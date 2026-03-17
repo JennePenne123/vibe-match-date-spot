@@ -16,6 +16,7 @@ import { ThemeSettingsCard } from '@/components/profile/ThemeSettingsCard';
 import { PremiumWalletCard } from '@/components/profile/PremiumWalletCard';
 import ActivityFeed from '@/components/profile/ActivityFeed';
 import { useUserPoints } from '@/hooks/useUserPoints';
+import { checkAndAwardProfileComplete } from '@/services/profileCompletionService';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const Profile = () => {
   const [editedName, setEditedName] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
 
-  React.useEffect(() => { if (user && !loading) refreshProfile(); }, []);
+  React.useEffect(() => { if (user && !loading) { refreshProfile(); checkAndAwardProfileComplete(); } }, []);
   React.useEffect(() => {
     if (!loading && !user) { navigate('/'); return; }
     if (user) { setEditedName(user.name || ''); setEditedEmail(user.email || ''); }
