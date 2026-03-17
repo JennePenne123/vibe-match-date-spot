@@ -117,6 +117,16 @@
 
 ---
 
+## 🔐 Admin Dashboard (implementiert – 17. März 2026)
+
+- **Routen**: `/admin/*` mit eigener AdminSidebar
+- **Seiten**: Dashboard (KPIs), Analytics (Charts), Nutzer-Übersicht, Content-Moderation, System Health
+- **Zugangsschutz**: `AdminRouteGuard` prüft `admin`-Rolle via `user_roles`-Tabelle, Nicht-Admins werden zu `/home` umgeleitet
+- **Pre-Launch TODO**: Admin-Zugänge (Rollen) für finale Nutzer in der `user_roles`-Tabelle anlegen bevor die App live geht
+- **Nicht in normaler Navigation sichtbar** – nur über Direktlink `/admin` erreichbar
+
+---
+
 ## 🏗️ Nächste sinnvolle Schritte
 
 1. **Wallet mit echten Daten** – Mock-Vouchers durch Supabase-Queries ersetzen
@@ -124,3 +134,4 @@
 3. **Route Code Splitting** – Alle Haupt-Routes lazy-loaden (Performance-Gewinn)
 4. **Stripe Integration** – Premium-Subscription aufsetzen
 5. **Partner Redemption-Übersicht** – Eingelöste Vouchers im Partner-Dashboard
+6. **Admin-Zugänge vor Launch konfigurieren** – Admin-Rollen in `user_roles` für finale Nutzer setzen
