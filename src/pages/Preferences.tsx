@@ -360,6 +360,34 @@ const Preferences = () => {
     { id: 'non_smoking', name: t('preferences.access_non_smoking'), emoji: '🚭' }
   ];
 
+  // Step 5: Venue Types
+  const cultureVenues: Preference[] = [
+    { id: 'museum', name: t('preferences.venue_museum'), emoji: '🏛️', desc: t('preferences.venue_museumDesc') },
+    { id: 'gallery', name: t('preferences.venue_gallery'), emoji: '🎨', desc: t('preferences.venue_galleryDesc') },
+    { id: 'theater_venue', name: t('preferences.venue_theater'), emoji: '🎭', desc: t('preferences.venue_theaterDesc') },
+    { id: 'cinema', name: t('preferences.venue_cinema'), emoji: '🎬', desc: t('preferences.venue_cinemaDesc') },
+    { id: 'concert_hall', name: t('preferences.venue_concert'), emoji: '🎵', desc: t('preferences.venue_concertDesc') },
+    { id: 'exhibition', name: t('preferences.venue_exhibition'), emoji: '🎟️', desc: t('preferences.venue_exhibitionDesc') },
+  ];
+
+  const leisureVenues: Preference[] = [
+    { id: 'mini_golf', name: t('preferences.venue_mini_golf'), emoji: '⛳', desc: t('preferences.venue_mini_golfDesc') },
+    { id: 'bowling', name: t('preferences.venue_bowling'), emoji: '🎳', desc: t('preferences.venue_bowlingDesc') },
+    { id: 'escape_room', name: t('preferences.venue_escape_room'), emoji: '🔐', desc: t('preferences.venue_escape_roomDesc') },
+    { id: 'climbing', name: t('preferences.venue_climbing'), emoji: '🧗', desc: t('preferences.venue_climbingDesc') },
+    { id: 'swimming', name: t('preferences.venue_swimming'), emoji: '🏊', desc: t('preferences.venue_swimmingDesc') },
+    { id: 'hiking', name: t('preferences.venue_hiking'), emoji: '🥾', desc: t('preferences.venue_hikingDesc') },
+    { id: 'cycling', name: t('preferences.venue_cycling'), emoji: '🚴', desc: t('preferences.venue_cyclingDesc') },
+  ];
+
+  const entertainmentVenues: Preference[] = [
+    { id: 'karaoke', name: t('preferences.venue_karaoke'), emoji: '🎤', desc: t('preferences.venue_karaokeDesc') },
+    { id: 'comedy_club', name: t('preferences.venue_comedy'), emoji: '😂', desc: t('preferences.venue_comedyDesc') },
+    { id: 'arcade', name: t('preferences.venue_arcade'), emoji: '🕹️', desc: t('preferences.venue_arcadeDesc') },
+    { id: 'live_event', name: t('preferences.venue_live_event'), emoji: '✨', desc: t('preferences.venue_live_eventDesc') },
+    { id: 'spa_wellness', name: t('preferences.venue_spa'), emoji: '🧖', desc: t('preferences.venue_spaDesc') },
+  ];
+
   // Toggle functions
   const toggleSelection = (item: string, selectedItems: string[], setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>) => {
     setSelectedItems(prev =>
