@@ -226,6 +226,14 @@ export const useInvitations = () => {
         )
       );
 
+      // Award points for accepting a date
+      try {
+        const { awardPoints } = await import('@/services/awardPointsService');
+        await awardPoints('date_accepted');
+      } catch (e) {
+        console.error('Failed to award date_accepted points:', e);
+      }
+
       if (invitation?.sender_id) {
         await createNotificationForSender(invitation.sender_id, {
           type: 'invitation_accepted',
