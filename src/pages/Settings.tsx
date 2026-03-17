@@ -338,6 +338,75 @@ const Settings = () => {
             </CardContent>
           </Card>
 
+          {/* Support & Hilfe */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base text-foreground">
+                <HelpCircle className="w-4 h-4 text-primary" />
+                {t('settings.support', 'Hilfe & Support')}
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {t('settings.supportDesc', 'Häufige Fragen und Kontaktmöglichkeiten')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="faq-1" className="border-border/50">
+                  <AccordionTrigger className="text-sm text-foreground hover:no-underline py-2">
+                    {t('settings.faq1Question', 'Wie funktioniert das AI-Matching?')}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">
+                    {t('settings.faq1Answer', 'VybePulse analysiert deine Präferenzen (Küche, Vibe, Preis, Zeiten) und vergleicht sie mit deinem Date-Partner. Je mehr ihr übereinstimmt, desto höher der Match-Score. Die AI lernt auch aus deinem Feedback und wird immer besser.')}
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="faq-2" className="border-border/50">
+                  <AccordionTrigger className="text-sm text-foreground hover:no-underline py-2">
+                    {t('settings.faq2Question', 'Was sind Vouchers und wie löse ich sie ein?')}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">
+                    {t('settings.faq2Answer', 'Vouchers sind Rabattgutscheine von Partner-Venues. Du findest sie in deinem Wallet (Profil). Zeige den QR-Code einfach im Restaurant vor – der Partner scannt ihn und der Rabatt wird automatisch angewendet.')}
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="faq-3" className="border-border/50">
+                  <AccordionTrigger className="text-sm text-foreground hover:no-underline py-2">
+                    {t('settings.faq3Question', 'Kann ich mein Konto pausieren?')}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">
+                    {t('settings.faq3Answer', 'Ja! Aktiviere einfach den Pause-Schalter oben in den Einstellungen. Dein Konto bleibt bestehen, du erhältst aber keine Benachrichtigungen und bist für andere nicht sichtbar. Du kannst jederzeit wieder aktivieren.')}
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="faq-4" className="border-border/50">
+                  <AccordionTrigger className="text-sm text-foreground hover:no-underline py-2">
+                    {t('settings.faq4Question', 'Wie kann ich meine Daten exportieren oder löschen?')}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">
+                    {t('settings.faq4Answer', 'Unter "Daten exportieren" kannst du all deine Daten als JSON herunterladen. Wenn du dein Konto komplett löschen möchtest, findest du die Option ganz unten auf dieser Seite im Bereich "Gefahrenzone".')}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+
+              <Separator className="bg-border/50" />
+
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  {t('settings.supportEmailHint', 'Keine passende Antwort gefunden? Schreib uns direkt:')}
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full border-border text-foreground hover:bg-accent/50"
+                  onClick={() => {
+                    const subject = encodeURIComponent('VybePulse Support');
+                    const body = encodeURIComponent(`Hallo VybePulse-Team,\n\n[Beschreibe dein Anliegen hier]\n\n---\nUser-ID: ${user.id}\nApp-Version: 1.0\n`);
+                    window.open(`mailto:support@vybepulse.de?subject=${subject}&body=${body}`, '_blank');
+                  }}
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  {t('settings.contactSupport', 'Support kontaktieren')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <Separator className="bg-border/50" />
 
           {/* Data Export */}
