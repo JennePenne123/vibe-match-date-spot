@@ -2,74 +2,33 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserPoints } from '@/hooks/useUserPoints';
+import { useRewardShop } from '@/hooks/useRewardShop';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Gift, Ticket, Crown, Star, Lock } from 'lucide-react';
+import { ArrowLeft, Gift, Ticket, Crown, Star, Lock, Loader2, Sparkles } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { toast } from '@/hooks/use-toast';
 
-interface RewardItem {
-  id: string;
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  cost: number;
-  category: 'voucher' | 'premium';
-  color: string;
-  bg: string;
-}
-
-const rewards: RewardItem[] = [
-  {
-    id: 'voucher-10',
-    icon: Ticket,
-    title: '10% Venue-Rabatt',
-    description: 'Erhalte einen 10% Gutschein für ein beliebiges Partner-Venue.',
-    cost: 500,
-    category: 'voucher',
-    color: 'text-emerald-500',
-    bg: 'bg-emerald-500/10',
-  },
-  {
-    id: 'voucher-20',
-    icon: Ticket,
-    title: '20% Venue-Rabatt',
-    description: 'Erhalte einen 20% Gutschein für ein beliebiges Partner-Venue.',
-    cost: 1000,
-    category: 'voucher',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-600/10',
-  },
-  {
-    id: 'premium-week',
-    icon: Crown,
-    title: '7 Tage Premium',
-    description: 'Schalte für eine Woche erweiterte AI-Empfehlungen frei.',
-    cost: 750,
-    category: 'premium',
-    color: 'text-amber-500',
-    bg: 'bg-amber-500/10',
-  },
-  {
-    id: 'premium-month',
-    icon: Crown,
-    title: '30 Tage Premium',
-    description: 'Ein ganzer Monat Premium-Zugang mit allen Features.',
-    cost: 2500,
-    category: 'premium',
-    color: 'text-amber-600',
-    bg: 'bg-amber-600/10',
-  },
-];
+const PREMIUM_7_DAY_COST = 750;
 
 export default function Rewards() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const { points, loading: pointsLoading } = useUserPoints();
+  const {
+    vouchers,
+    monthlyUsed,
+    monthlyLimit,
+    isPremium,
+    premiumUntil,
+    loading: shopLoading,
+    redeeming,
+    redeemReward,
+  } = useRewardShop();
 
-  if (authLoading || pointsLoading) {
+  if (authLoading || pointsLoading || shopLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoadingSpinner />
@@ -83,29 +42,71 @@ export default function Rewards() {
   }
 
   const totalPoints = points?.total_points ?? 0;
+  const remainingRedemptions = isPremium ? Infinity : monthlyLimit - monthlyUsed;
 
-  const handleRedeem = (reward: RewardItem) => {
-    if (totalPoints < reward.cost) {
+  const handleRedeemVoucher = async (voucherId: string, pointsCost: number) => {
+    if (!isPremium && remainingRedemptions <= 0) {
       toast({
-        title: t('rewards.notEnoughPoints', 'Nicht genug Punkte'),
-        description: t('rewards.needMore', 'Dir fehlen {{count}} Punkte für diese Belohnung.', { count: reward.cost - totalPoints }),
+        title: 'Monatslimit erreicht',
+        description: `Du hast diesen Monat bereits ${monthlyLimit} Rewards eingelöst. Werde Premium für unbegrenztes Einlösen!`,
         variant: 'destructive',
       });
       return;
     }
-    // TODO: Implement actual redemption via Supabase
-    toast({
-      title: t('rewards.comingSoon', 'Bald verfügbar'),
-      description: t('rewards.comingSoonDesc', 'Das Einlösen von Rewards wird bald freigeschaltet!'),
-    });
+    if (totalPoints < pointsCost) {
+      toast({
+        title: 'Nicht genug Punkte',
+        description: `Dir fehlen ${pointsCost - totalPoints} Punkte.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const result = await redeemReward('voucher', voucherId);
+    if (result.success) {
+      toast({
+        title: '🎉 Voucher eingelöst!',
+        description: `Code: ${result.data?.voucher?.code}. Du findest ihn in deinem Profil.`,
+      });
+    } else {
+      toast({ title: 'Fehler', description: result.error, variant: 'destructive' });
+    }
   };
 
-  const categoryLabels: Record<string, string> = {
-    voucher: t('rewards.vouchers', 'Gutscheine'),
-    premium: t('rewards.premium', 'Premium'),
+  const handleRedeemPremium = async () => {
+    if (!isPremium && remainingRedemptions <= 0) {
+      toast({
+        title: 'Monatslimit erreicht',
+        description: 'Diesen Monat sind keine Einlösungen mehr möglich.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    if (totalPoints < PREMIUM_7_DAY_COST) {
+      toast({
+        title: 'Nicht genug Punkte',
+        description: `Dir fehlen ${PREMIUM_7_DAY_COST - totalPoints} Punkte.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const result = await redeemReward('premium');
+    if (result.success) {
+      toast({
+        title: '👑 Premium aktiviert!',
+        description: `Premium läuft bis ${new Date(result.data?.premium_until).toLocaleDateString('de-DE')}.`,
+      });
+    } else {
+      toast({ title: 'Fehler', description: result.error, variant: 'destructive' });
+    }
   };
 
-  const categories = ['voucher', 'premium'] as const;
+  const formatDiscount = (type: string, value: number) => {
+    if (type === 'percentage') return `${value}%`;
+    if (type === 'fixed') return `${value}€`;
+    return 'Gratis-Item';
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -129,8 +130,8 @@ export default function Rewards() {
           </div>
         </div>
 
-        {/* Points Banner */}
-        <div className="px-4 pt-4">
+        {/* Points & Status Banner */}
+        <div className="px-4 pt-4 space-y-3">
           <Card className="bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 border-primary/20">
             <CardContent className="p-4 text-center">
               <p className="text-sm text-muted-foreground">{t('rewards.yourPoints', 'Dein Guthaben')}</p>
@@ -140,46 +141,142 @@ export default function Rewards() {
               </p>
             </CardContent>
           </Card>
+
+          {/* Monthly limit indicator */}
+          <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
+            <span>
+              {isPremium ? (
+                <span className="flex items-center gap-1 text-amber-500 font-medium">
+                  <Crown className="w-3 h-3" /> Premium – unbegrenzt einlösen
+                </span>
+              ) : (
+                `${monthlyUsed}/${monthlyLimit} Einlösungen diesen Monat`
+              )}
+            </span>
+            {isPremium && premiumUntil && (
+              <span>bis {new Date(premiumUntil).toLocaleDateString('de-DE')}</span>
+            )}
+          </div>
         </div>
 
-        {/* Rewards by category */}
-        <div className="px-4 pb-6 space-y-5 mt-4">
-          {categories.map((cat) => (
-            <div key={cat}>
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                {categoryLabels[cat]}
-              </h2>
-              <div className="space-y-3">
-                {rewards
-                  .filter((r) => r.category === cat)
-                  .map((reward) => {
-                    const canAfford = totalPoints >= reward.cost;
-                    return (
-                      <Card key={reward.id} className={`bg-card/50 backdrop-blur-sm border-border/50 transition-all ${!canAfford ? 'opacity-60' : ''}`}>
-                        <CardContent className="p-4 flex items-center gap-3">
-                          <div className={`flex items-center justify-center w-10 h-10 rounded-xl ${reward.bg}`}>
-                            <reward.icon className={`w-5 h-5 ${reward.color}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground">{reward.title}</p>
-                            <p className="text-xs text-muted-foreground line-clamp-1">{reward.description}</p>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant={canAfford ? 'default' : 'outline'}
-                            onClick={() => handleRedeem(reward)}
-                            className={canAfford ? 'bg-primary text-primary-foreground' : ''}
-                          >
+        {/* Venue Vouchers */}
+        <div className="px-4 pb-2 mt-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            {t('rewards.vouchers', 'Venue-Gutscheine')}
+          </h2>
+
+          {vouchers.length === 0 ? (
+            <Card className="bg-card/50 border-border/50">
+              <CardContent className="p-6 text-center">
+                <Ticket className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  Aktuell keine Voucher verfügbar. Schau bald wieder vorbei!
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {vouchers.map((voucher) => {
+                const canAfford = totalPoints >= voucher.points_cost;
+                const canRedeem = isPremium || remainingRedemptions > 0;
+                const disabled = !canAfford || !canRedeem;
+
+                return (
+                  <Card
+                    key={voucher.id}
+                    className={`bg-card/50 backdrop-blur-sm border-border/50 transition-all ${disabled ? 'opacity-60' : ''}`}
+                  >
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10">
+                        <Ticket className="w-5 h-5 text-emerald-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">
+                          {formatDiscount(voucher.discount_type, voucher.discount_value)} Rabatt
+                        </p>
+                        <p className="text-xs text-muted-foreground line-clamp-1">
+                          {voucher.venue_name} · {voucher.title}
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={canAfford && canRedeem ? 'default' : 'outline'}
+                        disabled={disabled || redeeming}
+                        onClick={() => handleRedeemVoucher(voucher.id, voucher.points_cost)}
+                        className={canAfford && canRedeem ? 'bg-primary text-primary-foreground' : ''}
+                      >
+                        {redeeming ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <>
                             {!canAfford && <Lock className="w-3 h-3 mr-1" />}
-                            {reward.cost.toLocaleString()}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-              </div>
+                            {voucher.points_cost.toLocaleString()}
+                          </>
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-          ))}
+          )}
+        </div>
+
+        {/* Premium Section */}
+        <div className="px-4 pb-6 mt-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            {t('rewards.premium', 'Premium')}
+          </h2>
+          <div className="space-y-3">
+            {/* 7 Days via Points */}
+            <Card className={`bg-card/50 backdrop-blur-sm border-border/50 transition-all ${totalPoints < PREMIUM_7_DAY_COST ? 'opacity-60' : ''}`}>
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-500/10">
+                  <Crown className="w-5 h-5 text-amber-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">7 Tage Premium</p>
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    Voucher für Top-3 AI-Matches & unbegrenzt einlösen
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant={totalPoints >= PREMIUM_7_DAY_COST ? 'default' : 'outline'}
+                  disabled={totalPoints < PREMIUM_7_DAY_COST || redeeming}
+                  onClick={handleRedeemPremium}
+                  className={totalPoints >= PREMIUM_7_DAY_COST ? 'bg-primary text-primary-foreground' : ''}
+                >
+                  {redeeming ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <>
+                      {totalPoints < PREMIUM_7_DAY_COST && <Lock className="w-3 h-3 mr-1" />}
+                      {PREMIUM_7_DAY_COST.toLocaleString()}
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* 30 Days via Stripe (coming soon) */}
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 opacity-60">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-600/10">
+                  <Sparkles className="w-5 h-5 text-amber-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">30 Tage Premium</p>
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    Per Abo · Punkte-Rabatt möglich
+                  </p>
+                </div>
+                <Badge variant="outline" className="text-xs">
+                  Bald
+                </Badge>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
