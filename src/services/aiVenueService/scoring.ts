@@ -270,7 +270,9 @@ export const calculateVenueAIScore = async (
       weight_multipliers: learnedWeights.hasLearningData ? learnedWeights.weights : null,
       is_collaborative: !!partnerPrefs,
       partner_id: partnerPrefs ? partnerId : null,
-      shared_matches: sharedMatches
+      shared_matches: sharedMatches,
+      mood_modifier: moodModifier !== 0 ? moodModifier : null,
+      mood_label: moodLabel
     };
 
     const { error: insertError } = await supabase
