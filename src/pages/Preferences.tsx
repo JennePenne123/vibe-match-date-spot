@@ -150,6 +150,8 @@ interface QuickTemplate {
 
 const Preferences = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isOnboarding = searchParams.get('onboarding') === 'true';
   const { t } = useTranslation();
   const { updateCuisines, updateVibes } = useApp();
   const { user } = useAuth();
