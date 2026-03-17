@@ -36,7 +36,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     preselectedFriendId: preselectedFriend?.id
   });
 
-  // Custom setter that tracks manual navigation
+  // Custom setter that tracks manual navigation + scroll to top
   const setCurrentStep = (step: PlanningStep) => {
     console.log('🔧 Planning Steps - setCurrentStep called:', {
       from: currentStep,
@@ -46,6 +46,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     });
     setHasManuallyNavigated(true);
     setCurrentStepInternal(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Sync currentStep with initialStep changes, but don't force regression from advanced steps
