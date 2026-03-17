@@ -701,7 +701,13 @@ useEffect(() => {
               key={item.id}
               onClick={() => toggleSelection(item.id, selectedItems, setSelectedItems, category)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-3 md:p-4 rounded-xl border-2 transition-none relative min-h-[80px] select-none bg-card border-border text-foreground"
+              className={cn(
+                "p-3 md:p-4 rounded-xl border-2 transition-none relative min-h-[80px] select-none",
+                isSelected
+                  ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/20"
+                  : "border-border bg-card text-foreground",
+                isShared && isSelected && "border-green-500 bg-green-500/10 ring-1 ring-green-500/20"
+              )}
             >
               <div className="text-xl md:text-2xl mb-1">{item.emoji}</div>
               <div className="font-medium text-sm md:text-base">{item.name}</div>
@@ -711,7 +717,10 @@ useEffect(() => {
                 </div>
               )}
               {isSelected && (
-                <Check className="w-3 h-3 md:w-4 md:h-4 absolute top-2 right-2" />
+                <Check className={cn(
+                  "w-3 h-3 md:w-4 md:h-4 absolute top-2 right-2",
+                  isShared ? "text-green-500" : "text-primary"
+                )} />
               )}
             </button>
           );
