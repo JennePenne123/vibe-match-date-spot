@@ -77,7 +77,7 @@ export const useUserPoints = () => {
         const info = getBadgeInfo(badgeId);
         setTimeout(() => {
           toast({
-            title: `${info.icon} Neues Badge: ${info.name}`,
+            title: `Neues Badge: ${info.name}`,
             description: info.description,
           });
         }, index * 1500);

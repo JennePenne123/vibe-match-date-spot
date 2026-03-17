@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, TrendingUp, Zap } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, icons } from 'lucide-react';
 import { getLevelProgress, getPointsForNextLevel, getLevelInfo, LEVEL_THRESHOLDS } from '@/services/pointsService';
 
 interface PointsCardProps {
@@ -10,6 +10,20 @@ interface PointsCardProps {
   level: number;
   streakCount: number;
 }
+
+const LevelIcon = ({ iconName, color, bg }: { iconName: string; color: string; bg: string }) => {
+  const pascalName = iconName
+    .split('-')
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+    .join('') as keyof typeof icons;
+  const LucideIcon = icons[pascalName];
+  if (!LucideIcon) return null;
+  return (
+    <div className={`${bg} rounded-md p-1 inline-flex`}>
+      <LucideIcon className={`h-4 w-4 ${color}`} />
+    </div>
+  );
+};
 
 export const PointsCard: React.FC<PointsCardProps> = ({
   totalPoints,
@@ -39,7 +53,7 @@ export const PointsCard: React.FC<PointsCardProps> = ({
           </div>
           <div className="text-right">
             <Badge variant="secondary" className="text-sm px-3 py-1 gap-1.5">
-              <span>{levelInfo.icon}</span>
+              <LevelIcon iconName={levelInfo.lucideIcon} color={levelInfo.color} bg={levelInfo.bg} />
               Level {level} – {levelInfo.name}
             </Badge>
             {!isMaxLevel && (

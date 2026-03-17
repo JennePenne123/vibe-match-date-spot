@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Award, Lock } from 'lucide-react';
-import { BADGE_DEFINITIONS, getBadgeInfo } from '@/services/pointsService';
+import { Award, Lock, icons } from 'lucide-react';
+import { BADGE_DEFINITIONS } from '@/services/pointsService';
 
 interface BadgesCardProps {
   badges: string[];
@@ -18,11 +18,26 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const CATEGORY_ORDER = ['rating', 'exploration', 'engagement', 'social', 'referral'];
 
+const BadgeIcon = ({ iconName, color, bg, size = 'h-8 w-8' }: { iconName: string; color: string; bg: string; size?: string }) => {
+  const pascalName = iconName
+    .split('-')
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+    .join('') as keyof typeof icons;
+  const LucideIcon = icons[pascalName];
+
+  if (!LucideIcon) return <Award className={`${size} ${color}`} />;
+
+  return (
+    <div className={`${bg} rounded-lg p-1.5 shrink-0`}>
+      <LucideIcon className={`${size} ${color}`} />
+    </div>
+  );
+};
+
 export const BadgesCard: React.FC<BadgesCardProps> = ({ badges }) => {
   const allBadgeIds = Object.keys(BADGE_DEFINITIONS);
   const earnedSet = new Set(badges);
 
-  // Group all badges by category
   const grouped = CATEGORY_ORDER.map(cat => ({
     category: cat,
     label: CATEGORY_LABELS[cat] || cat,
@@ -62,9 +77,11 @@ export const BadgesCard: React.FC<BadgesCardProps> = ({ badges }) => {
                 >
                   <div className="flex items-start gap-2">
                     {badge.earned ? (
-                      <span className="text-2xl">{badge.icon}</span>
+                      <BadgeIcon iconName={badge.lucideIcon} color={badge.color} bg={badge.bg} />
                     ) : (
-                      <Lock className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
+                      <div className="bg-muted/50 rounded-lg p-1.5 shrink-0">
+                        <Lock className="h-5 w-5 text-muted-foreground" />
+                      </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <p className={`font-semibold text-sm truncate ${!badge.earned ? 'text-muted-foreground' : ''}`}>
@@ -81,7 +98,6 @@ export const BadgesCard: React.FC<BadgesCardProps> = ({ badges }) => {
           </div>
         ))}
 
-        {/* Empty State */}
         {earnedCount === 0 && (
           <div className="text-center py-4">
             <Award className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
