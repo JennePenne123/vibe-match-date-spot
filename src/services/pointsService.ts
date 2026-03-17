@@ -79,13 +79,13 @@ export const initializeUserPoints = async (): Promise<boolean> => {
  * Level thresholds – fixed values for full control & transparency
  */
 export const LEVEL_THRESHOLDS = [
-  { level: 1, points: 0, name: 'Newbie', icon: '🌱' },
-  { level: 2, points: 150, name: 'Explorer', icon: '🗺️' },
-  { level: 3, points: 500, name: 'Regular', icon: '⭐' },
-  { level: 4, points: 1000, name: 'Expert', icon: '💎' },
-  { level: 5, points: 2000, name: 'Master', icon: '🏅' },
-  { level: 6, points: 3500, name: 'Legend', icon: '👑' },
-  { level: 7, points: 5500, name: 'VIP', icon: '🔥' },
+  { level: 1, points: 0, name: 'Newbie', lucideIcon: 'sprout' as const, color: 'text-green-500', bg: 'bg-green-500/15' },
+  { level: 2, points: 150, name: 'Explorer', lucideIcon: 'compass' as const, color: 'text-blue-500', bg: 'bg-blue-500/15' },
+  { level: 3, points: 500, name: 'Regular', lucideIcon: 'star' as const, color: 'text-yellow-500', bg: 'bg-yellow-500/15' },
+  { level: 4, points: 1000, name: 'Expert', lucideIcon: 'gem' as const, color: 'text-purple-500', bg: 'bg-purple-500/15' },
+  { level: 5, points: 2000, name: 'Master', lucideIcon: 'medal' as const, color: 'text-amber-500', bg: 'bg-amber-500/15' },
+  { level: 6, points: 3500, name: 'Legend', lucideIcon: 'crown' as const, color: 'text-orange-500', bg: 'bg-orange-500/15' },
+  { level: 7, points: 5500, name: 'VIP', lucideIcon: 'flame' as const, color: 'text-red-500', bg: 'bg-red-500/15' },
 ] as const;
 
 /**
