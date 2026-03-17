@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, createElement } from 'react';
 import { getUserPoints, initializeUserPoints, getBadgeInfo, type UserPoints } from '@/services/pointsService';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { icons, Award } from 'lucide-react';
 
 const SEEN_BADGES_KEY = 'seen_badges';
 
