@@ -1,160 +1,172 @@
 
-# VybePulse – Projekt-Übersicht & Roadmap
+# VybePulse – Gesamt-Projektübersicht & Roadmap
+
+**Stand: 17. März 2026** | **Geschätzter Fortschritt: ~70%**
 
 ---
 
-## ✅ Heutige Session – Zusammenfassung (16. März 2026)
+## 🎯 Projektziel
 
-### 1. QR-Code Voucher-Redemption System (komplett)
-- **Wallet QR-Detail**: Neuer Dialog zeigt QR-Code mit signiertem Payload (`vybe_user_voucher`) beim Tippen auf aktive Voucher
-- **Edge Function `redeem-voucher`**: Validiert Partner-JWT, prüft Einmaligkeit via `voucher_redemptions`, markiert Voucher als eingelöst
-- **Partner QR-Scanner erweitert**: Erkennt automatisch den QR-Typ:
-  - `vybe_user_voucher` → Einlösung via Edge Function
-  - `vybe_partner` → Partner-Netzwerk-Verbindung
-- **UX-Iteration**: QR-Dialog von custom framer-motion Overlay zu sauberem Radix Dialog umgebaut – klar schließbar mit X-Button, korrekte Größe auf Mobile
-- **„Fenster schließen"-Button entfernt** – X oben rechts reicht
-
-### 2. Profil-Header bereinigt
-- E-Mail-Adresse unter dem Nutzernamen entfernt (Privacy-Verbesserung)
-
-### 3. Swipe-Navigation Fix
-- Bug behoben: `NAV_ORDER` in `AppLayout.tsx` nutzte `/plan-date` statt `/preferences` (= tatsächliche Route der Bottom-Nav)
-- Swipe zwischen Home ↔ Chats ↔ Plan Date ↔ Profile sollte jetzt funktionieren
+VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisierte Venue-Empfehlungen liefert, basierend auf beidseitigen Präferenzen, AI-Matching und kontinuierlichem Feedback-Learning.
 
 ---
 
-## 📊 Performance-Analyse & Empfehlungen
+## ✅ Fertiggestellte Features (~70%)
 
-### Aktueller Stand
+### 🏠 User-Frontend
+- **Landing Page** mit Auth-Modal (Google, Apple, E-Mail)
+- **Onboarding** (3-Step Carousel)
+- **Home** mit Quick-Start Templates, AI-Empfehlungen, Upcoming Dates, Pending Ratings
+- **4-Tab Bottom-Nav** (Home, Plan Date, Chats, Profile) mit Swipe-Gesten
+- **Modernes Dark-Design** (Slate-900/Indigo Farbschema)
+- **6-Sprachen i18n** (DE, EN, FR, ES, IT, AR)
+- **PWA-Support** (Service Worker, Offline-Banner, Push Notifications)
+- **Responsive Mobile-First** Design (402px optimiert)
 
-| Bereich | Status | Details |
-|---------|--------|---------|
-| **Bundle Size** | ⚠️ Mittel | ~40+ direkte Imports in App.tsx; nur Demo-Routes lazy-loaded |
-| **Code Splitting** | 🟡 Teilweise | 7 Demo/Debug-Routes lazy, aber alle 20+ Haupt-Routes eagerly geladen |
-| **Venue Cache** | ✅ Gut | 30-min LRU-Cache für Venue-Suchen |
-| **Skeleton Loaders** | ✅ Gut | 6+ Varianten für perceived performance |
-| **PWA/Offline** | ✅ Gut | Service Worker mit network-first Caching |
-| **DB-Indexing** | ✅ Gut | Indexes auf friendships, feedback, etc. |
-| **Session Cleanup** | ✅ Gut | Automatische Bereinigung stale Sessions |
+### 🤖 KI-Engine
+- **AI-Matching-Algorithmus** mit gewichteten Scoring-Faktoren (Küche, Vibe, Preis, Timing, Rating)
+- **Collaborative Scoring** für beidseitige Präferenzen mit Shared-Bonus-System
+- **Feedback-Loop**: AI lernt aus Ratings und passt Gewichte an (`user_preference_vectors`)
+- **Mood Check-In** mit Score-Modifier
+- **Implizite Signale**: Dwell Time, Scroll Depth, Repeat Views, Voucher-Klicks → fließen in Scoring ein
+- **Contextual Factors**: Tageszeit, Saison
+- **Compatibility Scores** zwischen User-Paaren
 
-### 🔴 Kritische Optimierungen (sollten bald umgesetzt werden)
+### 📅 Date-Planning
+- **Smart Date Planner** (Solo + Collaborative Mode)
+- **6-Step Planning Flow**: Partner → Präferenzen → AI-Matching → Review → Proposal → Einladung
+- **Date Proposals** mit Ablaufdatum
+- **Realtime Collaborative Sessions** (beide Partner setzen Präferenzen)
+- **Date Invitations** mit Status-Tracking (pending → accepted → completed)
+- **Invitation Messenger** (Chat pro Einladung)
 
-#### 1. Aggressive Route-basiertes Code Splitting
-**Problem**: 20+ Seiten werden im initialen Bundle geladen – der User sieht aber nur die Landing Page.
-**Lösung**: Alle geschützten Routes lazy-loaden (Home, Profile, Chats, Preferences, etc.)
-**Erwartete Verbesserung**: ~40-60% kleineres initiales Bundle, deutlich schnellere First Paint
+### 🏪 Venue-System
+- **Venue-Suche** (Foursquare + Google Places Integration)
+- **Venue Detail Pages** mit Fotos, Ratings, Öffnungszeiten, Karte
+- **Venue Feedback** (Like/Dislike/Super Like/Skip)
+- **30-min LRU Venue-Cache**
+- **Map View** mit Clustered Markers (Leaflet)
 
-#### 2. Dependency-Audit
-**Problem**: Große Abhängigkeiten wie `recharts`, `qrcode.react`, `framer-motion`, `i18next` werden global geladen.
-**Lösung**:
-- `recharts` nur in Chart-Komponenten lazy importieren
-- `qrcode.react` nur in QR-Komponenten lazy importieren
-- Tree-shaking prüfen für lucide-react Icons
-**Erwartete Verbesserung**: ~100-200KB weniger im Haupt-Bundle
+### 🎟️ Voucher & Rewards
+- **QR-Code Voucher-System** (Wallet → QR anzeigen → Partner scannt → Edge Function validiert)
+- **Gamification**: Punkte, Badges, Streaks, Leaderboard, Levels
+- **Reward Shop** mit Einlösung
+- **Referral-System** mit Codes + Punkten
 
-#### 3. React Query Optimierung
-**Problem**: Aktuell `staleTime: 5min` global – aber manche Daten (Profil, Preferences) ändern sich selten.
-**Lösung**: Differenzierte staleTime pro Query-Typ:
-- Profil/Preferences: 30min
-- Invitations/Chats: 30sec (real-time relevant)
-- Venues: via Cache-Service (bereits vorhanden)
+### 👔 Partner-Portal
+- **Dashboard** mit KPIs
+- **Venue Management** (Fotos, Details, Öffnungszeiten)
+- **Voucher-Erstellung & -Verwaltung** (mit Analytics)
+- **QR-Scanner** (User-Voucher einlösen + Partner-Netzwerk)
+- **City Rankings** (Venue-Performance nach Stadt)
+- **Reports** mit PDF-Export
+- **Partner-Netzwerk** (exklusive Vouchers zwischen Partnern)
+- **Guest Feedback Widget**
 
-### 🟡 Mittlere Priorität
+### 🔐 Admin Dashboard
+- **Dashboard** mit KPIs
+- **Analytics** (Charts)
+- **Nutzer-Übersicht**
+- **Content-Moderation**
+- **System Health**
+- **Error Monitoring** (4 Fehlertypen, Statistiken, Filter, Stack Traces)
+- **Zugangsschutz** via `AdminRouteGuard` + `user_roles`
 
-#### 4. Image-Optimierung
-- Venue-Bilder sollten mit `loading="lazy"` und `srcSet` für responsive Größen geladen werden
-- Avatar-Uploads auf max 500KB komprimieren vor Upload
-- WebP-Format bevorzugen
+### 🛡️ Infrastruktur & Security
+- **Supabase Backend**: Auth, RLS, Edge Functions, Realtime
+- **RLS-Policies** auf allen Tabellen (inkl. SECURITY DEFINER für Rollen)
+- **Rate Limiting** auf Edge Functions
+- **Error Monitoring Service** (JS, API, UI, Performance Fehler → DB)
+- **Input Sanitization** (DOMPurify)
+- **Session Cleanup** (automatisch)
+- **OSRM Routing** Integration
 
-#### 5. Supabase Realtime-Kanäle konsolidieren
-- Aktuell potenziell mehrere Subscriptions aktiv (Invitations, Sessions, Vouchers)
-- Gemeinsamen Channel mit Filter nutzen statt separate Subscriptions
-
-#### 6. Animation Performance
-- `framer-motion` Animationen auf `will-change: transform` beschränken
-- Komplexe Animationen auf `GPU-composited properties` (transform, opacity) limitieren
-- `AnimatePresence` nur wo nötig einsetzen
-
-### 🟢 Nice-to-Have
-
-#### 7. Preloading kritischer Routes
-- Nach Login: `/home` und `/profile` prefetchen
-- Link-Prefetching bei Hover auf Nav-Items
-
-#### 8. Bundle-Analyse automatisieren
-- `vite-plugin-visualizer` einbauen für regelmäßige Bundle-Checks
-- Budget-Limits setzen (z.B. max 500KB initial JS)
-
----
-
-## 📋 Offene Punkte aus früheren Sessions
-
-### Premium / Subscription Plan (TODO)
-- **Zahlungsanbieter**: Stripe
-- **Free-Tier**: Venue-Empfehlungen mit AI-Matching (keine Vouchers)
-- **Premium-Tier**: Exklusive Vouchers für Top-3 AI-Match Venues
-- **Preise & weitere Benefits**: Noch offen
-
-### Implementation Plan (wenn Details feststehen)
-1. `user_subscriptions`-Tabelle erstellen
-2. Stripe aktivieren via Lovable Stripe-Integration
-3. Paywall-Gating: Voucher-Badges nur für Premium-User
-4. Premium-Upsell UI für Free-User
-5. Pricing-Page & Checkout-Flow
-6. Webhook für Subscription-Status-Updates
-
-### Voucher-Redemption via QR-Code ✅
-- QR-Code in Wallet → ✅ implementiert
-- QR-Scanner im Partner-Dashboard → ✅ implementiert (erkennt User-Voucher + Partner-Codes)
-- Edge Function `redeem-voucher` → ✅ implementiert
-- **Offen**: Push-Notifications bei erfolgreicher Einlösung (User + Partner)
-- **Offen**: Wallet mit echten Supabase-Daten statt Mock-Daten verbinden
-
-### Bekannte Issues (niedrige Priorität)
-- Auth-Redirect Inkonsistenz (manche Seiten → `/register-login` statt `/?auth=required`)
-- Input `autoComplete`-Attribute fehlen im Auth-Modal
-- Deprecated PWA Meta-Tag in `index.html`
+### ⚙️ Account & Settings
+- **E-Mail & Passwort ändern** (mit Re-Auth)
+- **Konto pausieren/reaktivieren**
+- **DSGVO-Datenexport** (JSON)
+- **Konto löschen** (mit manueller Bestätigung)
+- **Push-Notification Einstellungen**
+- **Sprachauswahl**
+- **Support-Bereich** (FAQ-Accordion + E-Mail-Fallback)
+- **Rechtliche Seiten** (Impressum, Datenschutz, AGB)
 
 ---
 
-## 🔐 Admin Dashboard (implementiert – 17. März 2026)
+## 🔧 Offene Aufgaben vor Launch (~30%)
 
-- **Routen**: `/admin/*` mit eigener AdminSidebar
-- **Seiten**: Dashboard (KPIs), Analytics (Charts), Nutzer-Übersicht, Content-Moderation, System Health, **Error Monitoring**
-- **Zugangsschutz**: `AdminRouteGuard` prüft `admin`-Rolle via `user_roles`-Tabelle, Nicht-Admins werden zu `/home` umgeleitet
-- **Pre-Launch TODO**: Admin-Zugänge (Rollen) für finale Nutzer in der `user_roles`-Tabelle anlegen bevor die App live geht
-- **Nicht in normaler Navigation sichtbar** – nur über Direktlink `/admin` erreichbar
+### 🔴 Kritisch (Must-Have für Launch)
 
-## 🐛 Error Monitoring (implementiert – 17. März 2026)
+| # | Aufgabe | Aufwand | Beschreibung |
+|---|---------|---------|--------------|
+| 1 | **Wallet mit echten Daten** | Mittel | Mock-Vouchers durch Supabase-Queries ersetzen |
+| 2 | **Google Places API konfigurieren** | Klein | API-Key im Dashboard einrichten, Venue-Suche live schalten |
+| 3 | **Route Code Splitting** | Klein | Alle Haupt-Routes lazy-loaden → ~50% kleineres Bundle |
+| 4 | **Produktions-Assets** | Klein | OG-Images, App-Icons, Favicon finalisieren |
+| 5 | **Auth-Redirect Konsistenz** | Klein | Alle Seiten einheitlich → `/?auth=required` |
+| 6 | **Admin-Zugänge konfigurieren** | Klein | Admin-Rollen in `user_roles` für finale Nutzer setzen |
+| 7 | **Security Hardening** | Klein | OTP-Ablauf <10min, Leaked Password Protection, autoComplete-Attribute |
 
-- **In-App Logging**: `error_logs`-Tabelle in Supabase mit 4 Fehlertypen (JS, API, UI, Performance)
-- **ErrorMonitoringService**: Globale Handler für `window.onerror`, `unhandledrejection`, `PerformanceObserver` (Long Tasks >200ms)
-- **ErrorBoundary-Integration**: UI-Fehler werden automatisch in die DB geloggt
-- **Admin-Seite** `/admin/errors`: Statistiken (24h), Filter nach Typ, Stack Traces, Severity-Badges
-- **Deduplizierung**: Gleiche Fehler innerhalb 5s werden nur einmal geloggt
-- **Pre-Launch TODO**: Sentry-Konto erstellen (sentry.io, Free-Tier), React-Projekt anlegen, DSN als `VITE_SENTRY_DSN` in der Codebase hinterlegen und Sentry SDK integrieren
+### 🟡 Wichtig (Sollte vor Launch)
+
+| # | Aufgabe | Aufwand | Beschreibung |
+|---|---------|---------|--------------|
+| 8 | **DSGVO-Update Datenschutzerklärung** | Klein | Implizites Tracking dokumentieren, Consent prüfen |
+| 9 | **Sentry Integration** | Klein | Konto erstellen, DSN hinterlegen, SDK einbinden |
+| 10 | **Redemption Push-Notifications** | Mittel | Push bei Voucher-Einlösung (User + Partner) |
+| 11 | **Image-Optimierung** | Klein | lazy loading, srcSet, WebP, Avatar-Komprimierung |
+| 12 | **React Query Tuning** | Klein | Differenzierte staleTime pro Query-Typ |
+
+### 🟢 Post-Launch / Nice-to-Have
+
+| # | Aufgabe | Aufwand | Beschreibung |
+|---|---------|---------|--------------|
+| 13 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
+| 14 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
+| 15 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
+| 16 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
+| 17 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
+| 18 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
 
 ---
 
-## 📡 Implizite Signale (implementiert – 17. März 2026)
+## 📊 Fortschritts-Einschätzung
 
-- **Signal-Service** (`implicitSignalsService.ts`): Buffered tracking mit 10s Flush-Intervall
-- **Signaltypen**: Venue Dwell Time, Scroll Depth, Repeat Views, Voucher Clicks/Ignores, Planning Abandonment, App Usage Time
-- **Hooks**: `useVenueImplicitTracking` (VenueDetail), `useAppUsageTracking` (App-Level)
-- **AI-Integration**: `getImplicitSignalBoost()` fließt in Venue-Scoring ein (+/- bis zu 10%)
-- **Speicherung**: Über bestehende `user_venue_feedback`-Tabelle mit `implicit: true` Context
-- **Pre-Launch TODO**: ⚠️ **DSGVO/Privacy**: Datenschutzerklärung aktualisieren! Implizites Tracking muss transparent kommuniziert werden. Prüfen ob Opt-In/Opt-Out nötig (Art. 6 DSGVO – berechtigtes Interesse vs. Einwilligung). Ggf. Cookie-Banner/Consent-Manager erweitern.
+```
+Gesamt-Fortschritt: ████████████████████░░░░░░░░░░ ~70%
+
+Frontend UI/UX:     █████████████████████████████░ ~95%
+KI-Engine:          ████████████████████████░░░░░░ ~80%
+Date-Planning:      █████████████████████████████░ ~95%
+Venue-System:       ██████████████████████░░░░░░░░ ~75% (echte API-Anbindung fehlt)
+Voucher/Rewards:    ████████████████████░░░░░░░░░░ ~65% (Wallet noch Mock-Daten)
+Partner-Portal:     █████████████████████████░░░░░ ~85%
+Admin Dashboard:    █████████████████████████████░ ~95%
+Security/Infra:     ████████████████████████░░░░░░ ~80%
+Monetarisierung:    ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~10% (Stripe noch nicht)
+Performance:        ██████████████████░░░░░░░░░░░░ ~60% (Code Splitting offen)
+DSGVO/Legal:        ████████████████████░░░░░░░░░░ ~65% (implizites Tracking-Update)
+```
+
+### Zeitliche Einschätzung bis Launch (Sommer 2026)
+- **Kritische Aufgaben (1-7)**: ~2-3 Sessions
+- **Wichtige Aufgaben (8-12)**: ~2 Sessions
+- **Gesamt bis MVP-Launch**: ~4-5 Sessions
+- **Post-Launch Features**: Laufend nach Priorität
 
 ---
 
-## 🏗️ Nächste sinnvolle Schritte
+## 🏗️ Technologie-Stack
 
-1. **Wallet mit echten Daten** – Mock-Vouchers durch Supabase-Queries ersetzen
-2. **Redemption-Notifications** – Push bei Voucher-Einlösung
-3. **Route Code Splitting** – Alle Haupt-Routes lazy-loaden (Performance-Gewinn)
-4. **Stripe Integration** – Premium-Subscription aufsetzen
-5. **Partner Redemption-Übersicht** – Eingelöste Vouchers im Partner-Dashboard
-6. **Admin-Zugänge vor Launch konfigurieren** – Admin-Rollen in `user_roles` für finale Nutzer setzen
-7. **Sentry vor Launch einrichten** – Konto erstellen, DSN hinterlegen, SDK integrieren
-8. **DSGVO-Check für implizites Tracking** – Datenschutzerklärung + Consent prüfen
-9. **KI-Support-Agent** – AI-gestützter First-Line-Support im Settings-Bereich (ersetzt FAQ-Accordion), Fallback auf E-Mail
+| Bereich | Technologie |
+|---------|-------------|
+| Frontend | React 18 + TypeScript + Vite |
+| Styling | Tailwind CSS + shadcn/ui + Framer Motion |
+| Backend | Supabase (Auth, DB, Realtime, Edge Functions, Storage) |
+| AI/ML | Custom Scoring Engine + Edge Functions (OpenAI-ready) |
+| Maps | Leaflet + OSRM Routing |
+| Venues | Foursquare API + Google Places API |
+| i18n | i18next (6 Sprachen) |
+| PWA | Service Worker + Push Notifications |
+| Monitoring | Error Monitoring Service (Sentry geplant) |
+| Payments | Stripe (geplant) |
