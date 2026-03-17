@@ -86,7 +86,7 @@ export const useUserPoints = () => {
       if (newBadges.length > 3) {
         setTimeout(() => {
           toast({
-            title: '🏅 Weitere Badges freigeschaltet!',
+            title: 'Weitere Badges freigeschaltet!',
             description: `Du hast ${newBadges.length - 3} weitere Badges verdient. Schau in dein Profil!`,
           });
         }, 3 * 1500);
