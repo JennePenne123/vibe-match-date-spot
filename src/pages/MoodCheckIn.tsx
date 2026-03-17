@@ -95,12 +95,19 @@ const MoodCheckIn: React.FC = () => {
     }
   }, [navigate]);
 
-  const saveMoodAndContinue = (mood: DailyMood | null) => {
+  const saveMoodAndContinue = async (mood: DailyMood | null) => {
     if (mood) {
       localStorage.setItem(
         MOOD_STORAGE_KEY,
         JSON.stringify({ mood, date: new Date().toISOString().split('T')[0] })
       );
+      // Award points for mood check-in
+      try {
+        const { awardPoints } = await import('@/services/awardPointsService');
+        await awardPoints('mood_checkin');
+      } catch (e) {
+        console.error('Failed to award mood check-in points:', e);
+      }
     } else {
       // Skipped – still mark as checked so we don't show again today
       localStorage.setItem(

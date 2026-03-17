@@ -226,6 +226,14 @@ export const useInvitations = () => {
         )
       );
 
+      // Award points for accepting a date
+      try {
+        const { awardPoints } = await import('@/services/awardPointsService');
+        await awardPoints('date_accepted');
+      } catch (e) {
+        console.error('Failed to award date_accepted points:', e);
+      }
+
       if (invitation?.sender_id) {
         await createNotificationForSender(invitation.sender_id, {
           type: 'invitation_accepted',
@@ -402,6 +410,14 @@ export const useInvitations = () => {
         invitationId: data.id,
         senderName: user.email?.split('@')[0] || 'Friend'
       });
+
+      // Award points for planning a date
+      try {
+        const { awardPoints } = await import('@/services/awardPointsService');
+        await awardPoints('date_planned');
+      } catch (e) {
+        console.error('Failed to award date_planned points:', e);
+      }
 
       return true;
     } catch (error) {

@@ -444,6 +444,14 @@ const Preferences = () => {
             }, { onConflict: 'user_id' });
           
           if (error) throw error;
+
+          // Award points for setting preferences
+          try {
+            const { awardPoints } = await import('@/services/awardPointsService');
+            await awardPoints('preferences_set');
+          } catch (e) {
+            console.error('Failed to award preferences points:', e);
+          }
           
           toast({
             title: t('preferences.prefsSaved'),
