@@ -184,6 +184,7 @@ const App = () => (
                     <Route path="/admin/moderation" element={<LazyPage><AdminRouteGuard><AdminModeration /></AdminRouteGuard></LazyPage>} />
                     <Route path="/admin/health" element={<LazyPage><AdminRouteGuard><AdminSystemHealth /></AdminRouteGuard></LazyPage>} />
                     <Route path="/admin/reports" element={<LazyPage><AdminRouteGuard><AdminModeration /></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/errors" element={<LazyPage><AdminRouteGuard><AdminErrors /></AdminRouteGuard></LazyPage>} />
                     
                     {/* Demo routes */}
                     <Route path="/demo/ai-venue-card" element={<LazyPageNoLayout><AIVenueCardDemo /></LazyPageNoLayout>} />
