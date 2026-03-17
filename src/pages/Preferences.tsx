@@ -562,6 +562,7 @@ const Preferences = () => {
       case 2: return true; // Optional step
       case 3: return true; // Optional step
       case 4: return true; // Optional step
+      case 5: return true; // Optional step
       default: return false;
     }
   };
