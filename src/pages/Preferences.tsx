@@ -105,6 +105,27 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
   public_transport: { icon: TrainFront,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   pet_friendly:     { icon: Dog,             bg: 'bg-amber-500/15', fg: 'text-amber-500' },
   non_smoking:      { icon: CigaretteOff,   bg: 'bg-red-500/15', fg: 'text-red-500' },
+  // Venue types – Kultur & Bildung
+  museum:           { icon: Landmark,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  gallery:          { icon: Palette,         bg: 'bg-fuchsia-500/15', fg: 'text-fuchsia-500' },
+  theater_venue:    { icon: Drama,           bg: 'bg-purple-500/15', fg: 'text-purple-500' },
+  cinema:           { icon: Film,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  concert_hall:     { icon: Music4,          bg: 'bg-rose-500/15', fg: 'text-rose-500' },
+  exhibition:       { icon: Ticket,          bg: 'bg-teal-500/15', fg: 'text-teal-500' },
+  // Venue types – Freizeit & Sport
+  mini_golf:        { icon: Target,          bg: 'bg-green-500/15', fg: 'text-green-500' },
+  bowling:          { icon: Trophy,          bg: 'bg-orange-500/15', fg: 'text-orange-500' },
+  escape_room:      { icon: Lock,            bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
+  climbing:         { icon: Mountain,        bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
+  swimming:         { icon: Waves,           bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
+  hiking:           { icon: Footprints,      bg: 'bg-lime-500/15', fg: 'text-lime-500' },
+  cycling:          { icon: Bike,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
+  // Venue types – Unterhaltung
+  karaoke:          { icon: Headphones,      bg: 'bg-pink-500/15', fg: 'text-pink-500' },
+  comedy_club:      { icon: Smile,           bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
+  arcade:           { icon: Gamepad2,        bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+  live_event:       { icon: Sparkles,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  spa_wellness:     { icon: Building2,       bg: 'bg-teal-500/15', fg: 'text-teal-500' },
   // Templates
   template_romantic: { icon: Heart,          bg: 'bg-pink-500/15', fg: 'text-pink-500' },
   template_casual:   { icon: Coffee,         bg: 'bg-amber-500/15', fg: 'text-amber-500' },
