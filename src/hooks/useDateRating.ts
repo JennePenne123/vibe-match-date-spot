@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { learnFromFeedback } from '@/services/aiLearningService';
+import { calculateLevel } from '@/services/pointsService';
+import { checkAndAwardBadges } from '@/services/badgeService';
 
 export interface DateRatingData {
   overallRating: number;
