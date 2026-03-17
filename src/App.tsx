@@ -38,6 +38,9 @@ const AIRecommendations = lazy(() => import("./pages/AIRecommendations"));
 const SmartDatePlanning = lazy(() => import("./pages/SmartDatePlanning"));
 const AIInsights = lazy(() => import("./pages/AIInsights"));
 const Rewards = lazy(() => import("./pages/Rewards"));
+const Impressum = lazy(() => import("./pages/Impressum"));
+const Datenschutz = lazy(() => import("./pages/Datenschutz"));
+const AGB = lazy(() => import("./pages/AGB"));
 
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
@@ -135,6 +138,11 @@ const App = () => (
                     <Route path="/ai-insights" element={<LazyPage><AIInsights /></LazyPage>} />
                     <Route path="/plan-date" element={<LazyPage><SmartDatePlanning /></LazyPage>} />
                     <Route path="/rewards" element={<LazyPage><Rewards /></LazyPage>} />
+                    
+                    {/* Legal pages – accessible without auth */}
+                    <Route path="/impressum" element={<LazyPageNoLayout><Impressum /></LazyPageNoLayout>} />
+                    <Route path="/datenschutz" element={<LazyPageNoLayout><Datenschutz /></LazyPageNoLayout>} />
+                    <Route path="/agb" element={<LazyPageNoLayout><AGB /></LazyPageNoLayout>} />
                     
                     {/* Debug route */}
                     <Route path="/debug" element={<LazyPage><Debug /></LazyPage>} />

@@ -209,6 +209,11 @@ export default function LandingDemo() {
               <img src="/icon-192.png" alt="VybePulse" className="w-8 h-8 rounded-xl shadow-gentle-md animate-logo-pulse group-hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.3s' }} />
               <span className="text-xl font-semibold text-foreground">VybePulse</span>
             </Link>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <Link to="/impressum" className="hover:text-foreground transition-colors">Impressum</Link>
+              <Link to="/datenschutz" className="hover:text-foreground transition-colors">Datenschutz</Link>
+              <Link to="/agb" className="hover:text-foreground transition-colors">AGB</Link>
+            </div>
             <p className="text-sm text-muted-foreground">{t('landing.footer')}</p>
           </div>
         </div>
