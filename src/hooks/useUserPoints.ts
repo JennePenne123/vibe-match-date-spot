@@ -76,9 +76,20 @@ export const useUserPoints = () => {
       // Show toasts with a slight delay between each (max 3)
       newBadges.slice(0, 3).forEach((badgeId, index) => {
         const info = getBadgeInfo(badgeId);
+        const pascalName = info.lucideIcon
+          .split('-')
+          .map((s: string) => s.charAt(0).toUpperCase() + s.slice(1))
+          .join('') as keyof typeof icons;
+        const IconComponent = icons[pascalName] || Award;
+
         setTimeout(() => {
           toast({
-            title: `Neues Badge: ${info.name}`,
+            title: createElement('span', { className: 'flex items-center gap-2' },
+              createElement('span', { className: `${info.bg} rounded-md p-1 inline-flex` },
+                createElement(IconComponent, { className: `h-4 w-4 ${info.color}` })
+              ),
+              `Neues Badge: ${info.name}`
+            ),
             description: info.description,
           });
         }, index * 1500);
@@ -87,7 +98,12 @@ export const useUserPoints = () => {
       if (newBadges.length > 3) {
         setTimeout(() => {
           toast({
-            title: 'Weitere Badges freigeschaltet!',
+            title: createElement('span', { className: 'flex items-center gap-2' },
+              createElement('span', { className: 'bg-primary/15 rounded-md p-1 inline-flex' },
+                createElement(Award, { className: 'h-4 w-4 text-primary' })
+              ),
+              'Weitere Badges freigeschaltet!'
+            ),
             description: `Du hast ${newBadges.length - 3} weitere Badges verdient. Schau in dein Profil!`,
           });
         }, 3 * 1500);
