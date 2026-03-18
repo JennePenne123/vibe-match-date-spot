@@ -183,6 +183,7 @@ const VenueCard = ({
             src={venueImage} 
             alt={venue.name}
             className="w-16 h-16 rounded-lg object-cover"
+            loading="lazy"
           />
           {venue.discount && (
             <div className="absolute -top-1 -right-1 bg-orange-500 rounded-full p-1">
