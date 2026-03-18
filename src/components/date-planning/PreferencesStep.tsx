@@ -531,25 +531,46 @@ useEffect(() => {
     
     setLoading(true);
     try {
-      // Update user preferences using upsert with conflict resolution
-      const { error: prefError } = await supabase
-        .from('user_preferences')
-        .upsert({
-          user_id: user.id,
-          preferred_cuisines: selectedCuisines,
-          preferred_vibes: selectedVibes,
-          preferred_price_range: selectedPriceRange,
-          preferred_times: selectedTimePreferences,
-          max_distance: maxDistance,
-          dietary_restrictions: selectedDietary,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id'
-        });
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError || !authData.user) {
+        throw authError || new Error('Not authenticated');
+      }
 
-      if (prefError) {
-        console.error('Error saving user preferences:', prefError);
-        throw prefError;
+      const currentUserId = authData.user.id;
+      const preferencePayload = {
+        user_id: currentUserId,
+        preferred_cuisines: selectedCuisines,
+        preferred_vibes: selectedVibes,
+        preferred_price_range: selectedPriceRange,
+        preferred_times: selectedTimePreferences,
+        max_distance: maxDistance,
+        dietary_restrictions: selectedDietary,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data: existingPreference, error: existingPreferenceError } = await supabase
+        .from('user_preferences')
+        .select('id')
+        .eq('user_id', currentUserId)
+        .maybeSingle();
+
+      if (existingPreferenceError) {
+        console.error('Error checking existing user preferences:', existingPreferenceError);
+        throw existingPreferenceError;
+      }
+
+      const preferenceMutation = existingPreference
+        ? await supabase
+            .from('user_preferences')
+            .update(preferencePayload)
+            .eq('user_id', currentUserId)
+        : await supabase
+            .from('user_preferences')
+            .insert(preferencePayload);
+
+      if (preferenceMutation.error) {
+        console.error('Error saving user preferences:', preferenceMutation.error);
+        throw preferenceMutation.error;
       }
 
       // Update session flags for collaborative mode

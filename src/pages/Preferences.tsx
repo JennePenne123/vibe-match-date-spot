@@ -488,21 +488,42 @@ const Preferences = () => {
       if (user) {
         setIsSaving(true);
         try {
-          const { error } = await supabase
+          const { data: authData, error: authError } = await supabase.auth.getUser();
+          if (authError || !authData.user) {
+            throw authError || new Error('Not authenticated');
+          }
+
+          const currentUserId = authData.user.id;
+          const preferencePayload = {
+            user_id: currentUserId,
+            home_latitude: homeLatitude,
+            home_longitude: homeLongitude,
+            home_address: homeAddress || null,
+            preferred_cuisines: selectedCuisines.length > 0 ? selectedCuisines : null,
+            preferred_vibes: selectedVibes.length > 0 ? selectedVibes : null,
+            preferred_price_range: selectedPriceRange.length > 0 ? selectedPriceRange : null,
+            preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
+            dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
+          };
+
+          const { data: existingPreference, error: existingPreferenceError } = await supabase
             .from('user_preferences')
-            .upsert({
-              user_id: user.id,
-              home_latitude: homeLatitude,
-              home_longitude: homeLongitude,
-              home_address: homeAddress || null,
-              preferred_cuisines: selectedCuisines.length > 0 ? selectedCuisines : null,
-              preferred_vibes: selectedVibes.length > 0 ? selectedVibes : null,
-              preferred_price_range: selectedPriceRange.length > 0 ? selectedPriceRange : null,
-              preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
-              dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
-            }, { onConflict: 'user_id' });
-          
-          if (error) throw error;
+            .select('id')
+            .eq('user_id', currentUserId)
+            .maybeSingle();
+
+          if (existingPreferenceError) throw existingPreferenceError;
+
+          const preferenceMutation = existingPreference
+            ? await supabase
+                .from('user_preferences')
+                .update(preferencePayload)
+                .eq('user_id', currentUserId)
+            : await supabase
+                .from('user_preferences')
+                .insert(preferencePayload);
+
+          if (preferenceMutation.error) throw preferenceMutation.error;
 
           // Initialize AI preference vectors from selections (cold-start solution)
           try {
