@@ -35,6 +35,9 @@
     "noResults": "No chats found",
     "you": "You"
   },
+  "chat": {
+    "newDate": "New Date"
+  },
   "greeting": {
     "morning": "Good Morning",
     "afternoon": "Good Afternoon",
