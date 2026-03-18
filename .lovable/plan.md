@@ -28,6 +28,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **AI-Matching-Algorithmus** mit gewichteten Scoring-Faktoren (Küche, Vibe, Preis, Timing, Rating)
 - **Collaborative Scoring** für beidseitige Präferenzen mit Shared-Bonus-System
 - **Feedback-Loop**: AI lernt aus Ratings und passt Gewichte an (`user_preference_vectors`)
+- **Cold-Start-Lösung**: Onboarding-Präferenzen werden automatisch in initiale `feature_weights` und Preference-Vektoren konvertiert (`preferenceInitService.ts`)
 - **Mood Check-In** mit Score-Modifier
 - **Implizite Signale**: Dwell Time, Scroll Depth, Repeat Views, Voucher-Klicks → fließen in Scoring ein
 - **Contextual Factors**: Tageszeit, Saison
