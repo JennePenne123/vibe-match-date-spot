@@ -504,6 +504,22 @@ const Preferences = () => {
           
           if (error) throw error;
 
+          // Initialize AI preference vectors from selections (cold-start solution)
+          try {
+            const { initializePreferenceVectors } = await import('@/services/preferenceInitService');
+            await initializePreferenceVectors(user.id, {
+              cuisines: selectedCuisines,
+              vibes: selectedVibes,
+              priceRange: selectedPriceRange,
+              times: selectedTimePreferences,
+              dietary: selectedDietary,
+              activities: selectedActivities,
+              venueTypes: selectedVenueTypes,
+            });
+          } catch (e) {
+            console.error('Failed to initialize preference vectors:', e);
+          }
+
           // Award points for setting preferences
           try {
             const { awardPoints } = await import('@/services/awardPointsService');
