@@ -318,7 +318,7 @@ const VenueCard = ({
           </div>
           
           {venue.isOpen !== undefined && (
-            <div className={`flex items-center gap-1 text-sm ${venue.isOpen ? 'text-green-600' : 'text-red-600'}`}>
+          <div className={`flex items-center gap-1 text-sm ${venue.isOpen ? 'text-emerald-500' : 'text-destructive'}`}>
               <Clock className="w-4 h-4" />
               <span>{venue.isOpen ? 'Open now' : 'Currently closed'}</span>
             </div>
