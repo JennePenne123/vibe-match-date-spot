@@ -57,7 +57,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       const timer = setTimeout(() => {
         setIsAnimating(false)
         setSlideDirection(null)
-      }, 350)
+      }, 280)
       prevPath.current = location.pathname
       return () => clearTimeout(timer)
     }
