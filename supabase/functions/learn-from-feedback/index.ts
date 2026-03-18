@@ -7,16 +7,39 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+/**
+ * Calculates adaptive learning rate based on rating count.
+ * Early ratings have MORE impact (exploration), later ratings less (exploitation).
+ */
+function getLearningRate(totalRatings: number): number {
+  if (totalRatings <= 3) return 0.25;   // First 3 ratings: aggressive learning
+  if (totalRatings <= 8) return 0.15;   // Next 5: moderate learning
+  if (totalRatings <= 20) return 0.10;  // Settling phase
+  return 0.05;                           // Stable: fine-tuning only
+}
+
+/**
+ * Adjusts a single weight toward a target direction.
+ * Uses adaptive learning rate and clamps to [0.3, 2.5].
+ */
+function adjustWeight(current: number, direction: 'boost' | 'reduce' | 'neutral', learningRate: number, strength: number = 1.0): number {
+  if (direction === 'neutral') return current;
+  
+  const delta = direction === 'boost' 
+    ? learningRate * strength 
+    : -learningRate * strength;
+  
+  return Math.max(0.3, Math.min(2.5, current + delta));
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Rate limiting with logging for database operations
   const identifier = getRateLimitIdentifier(req);
   const rateLimitResult = await checkRateLimitWithLogging(identifier, 'learn-from-feedback', RATE_LIMITS.DATABASE_OP, req);
   if (!rateLimitResult.allowed) {
-    console.log(`🚫 LEARN-FROM-FEEDBACK: Rate limit ${rateLimitResult.count}/${rateLimitResult.limit}`);
     return rateLimitResponse(corsHeaders);
   }
 
@@ -25,86 +48,68 @@ serve(async (req) => {
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    // 1. Extract and verify JWT token
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // 2. Create client with anon key for auth verification
     const authClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } }
     });
     
     const { data: { user }, error: authError } = await authClient.auth.getUser();
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     const { 
-      userId, 
-      partnerId, 
-      venueId, 
-      invitationId,
-      predictedScore,
-      predictedFactors,
-      actualRating,
-      venueRating,
-      aiAccuracyRating,
-      wouldRecommend,
-      contextData
+      userId, partnerId, venueId, invitationId,
+      predictedScore, predictedFactors,
+      actualRating, venueRating, aiAccuracyRating,
+      wouldRecommend, contextData
     } = await req.json();
 
-    // 3. Validate userId matches authenticated user
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: 'userId is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (!userId || userId !== user.id) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    if (userId !== user.id) {
-      return new Response(
-        JSON.stringify({ error: 'Forbidden: Cannot submit feedback for other users' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // 4. Now safe to use service role for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     console.log('📚 Learning from feedback:', { userId, venueId, predictedScore, actualRating });
 
-    // Calculate prediction error (how far off was the AI)
+    // Calculate prediction error
     const normalizedActualRating = actualRating ? (actualRating / 5) * 100 : null;
     const predictionError = normalizedActualRating !== null 
-      ? Math.abs(predictedScore - normalizedActualRating)
-      : null;
+      ? Math.abs(predictedScore - normalizedActualRating) : null;
 
-    // Determine success/failure factors based on rating
+    // Determine success/failure factors
     const isSuccess = actualRating && actualRating >= 4;
+    const isFailure = actualRating && actualRating <= 2;
     const successFactors: string[] = [];
     const failureFactors: string[] = [];
 
+    // Parse which factors actually matched
+    let hadCuisineMatch = false;
+    let hadVibeMatch = false;
+    let hadPriceMatch = false;
+
     if (predictedFactors) {
-      const factors = typeof predictedFactors === 'string' 
-        ? JSON.parse(predictedFactors) 
-        : predictedFactors;
-      
+      const factors = typeof predictedFactors === 'string' ? JSON.parse(predictedFactors) : predictedFactors;
+      hadCuisineMatch = factors.cuisine_match === true || (factors.matchingCuisines?.length > 0);
+      hadVibeMatch = (factors.vibe_matches?.length > 0) || (factors.matchingVibes?.length > 0);
+      hadPriceMatch = factors.price_match === true || factors.priceMatch === true;
+
       if (isSuccess) {
-        successFactors.push(...(factors.matchingCuisines || []));
-        successFactors.push(...(factors.matchingVibes || []));
-        if (factors.priceMatch) successFactors.push('price_match');
-      } else if (actualRating && actualRating < 3) {
-        failureFactors.push(...(factors.matchingCuisines || []));
-        failureFactors.push(...(factors.matchingVibes || []));
-        if (!factors.priceMatch) failureFactors.push('price_mismatch');
+        if (hadCuisineMatch) successFactors.push('cuisine_match');
+        if (hadVibeMatch) successFactors.push('vibe_match');
+        if (hadPriceMatch) successFactors.push('price_match');
+      } else if (isFailure) {
+        if (!hadCuisineMatch) failureFactors.push('cuisine_mismatch');
+        if (!hadVibeMatch) failureFactors.push('vibe_mismatch');
+        if (!hadPriceMatch) failureFactors.push('price_mismatch');
       }
     }
 
@@ -135,7 +140,7 @@ serve(async (req) => {
       throw learningError;
     }
 
-    // Update user preference vectors with learning metrics
+    // --- ADAPTIVE WEIGHT UPDATE ---
     const { data: existingVector } = await supabase
       .from('user_preference_vectors')
       .select('*')
@@ -147,27 +152,43 @@ serve(async (req) => {
       (predictionError !== null && predictionError < 20 ? 1 : 0);
     const aiAccuracy = totalRatings > 0 ? (successfulPredictions / totalRatings) * 100 : 0;
 
-    // Update feature weights based on success/failure
-    let featureWeights = existingVector?.feature_weights || {
-      cuisine: 1.0,
-      vibe: 1.0,
-      price: 1.0,
-      rating: 1.0,
-      distance: 1.0
+    const oldWeights = (existingVector?.feature_weights as Record<string, number>) || {
+      cuisine: 1.0, vibe: 1.0, price: 1.0, rating: 1.0, distance: 1.0, time: 1.0
     };
 
-    // Adjust weights based on feedback
+    const lr = getLearningRate(totalRatings);
+    console.log(`🧠 Learning rate: ${lr} (totalRatings: ${totalRatings})`);
+
+    const newWeights = { ...oldWeights };
+
     if (isSuccess) {
-      // Boost weights for factors that led to success
-      if (successFactors.length > 0) {
-        featureWeights.cuisine = Math.min(2.0, (featureWeights.cuisine || 1.0) * 1.05);
-        featureWeights.vibe = Math.min(2.0, (featureWeights.vibe || 1.0) * 1.05);
+      // BOOST factors that matched AND led to a good date
+      newWeights.cuisine = adjustWeight(oldWeights.cuisine || 1.0, hadCuisineMatch ? 'boost' : 'neutral', lr);
+      newWeights.vibe = adjustWeight(oldWeights.vibe || 1.0, hadVibeMatch ? 'boost' : 'neutral', lr);
+      newWeights.price = adjustWeight(oldWeights.price || 1.0, hadPriceMatch ? 'boost' : 'neutral', lr);
+      // If highly rated, also boost general rating weight
+      if (actualRating === 5) {
+        newWeights.rating = adjustWeight(oldWeights.rating || 1.0, 'boost', lr, 0.5);
       }
-    } else if (actualRating && actualRating < 3) {
-      // Reduce weights for factors that led to failure
-      featureWeights.cuisine = Math.max(0.5, (featureWeights.cuisine || 1.0) * 0.95);
-      featureWeights.vibe = Math.max(0.5, (featureWeights.vibe || 1.0) * 0.95);
+    } else if (isFailure) {
+      // REDUCE factors that matched but STILL led to a bad date (wrong signal)
+      // BOOST factors that didn't match (they might be more important than we thought)
+      newWeights.cuisine = adjustWeight(oldWeights.cuisine || 1.0, hadCuisineMatch ? 'reduce' : 'boost', lr, 0.7);
+      newWeights.vibe = adjustWeight(oldWeights.vibe || 1.0, hadVibeMatch ? 'reduce' : 'boost', lr, 0.7);
+      newWeights.price = adjustWeight(oldWeights.price || 1.0, hadPriceMatch ? 'reduce' : 'boost', lr, 0.7);
     }
+    // Ratings of 3 (neutral) → no weight changes
+
+    // Log weight changes
+    const weightChanges: Record<string, string> = {};
+    for (const key of Object.keys(newWeights)) {
+      const old = (oldWeights[key] || 1.0);
+      const diff = newWeights[key] - old;
+      if (Math.abs(diff) > 0.001) {
+        weightChanges[key] = `${old.toFixed(2)} → ${newWeights[key].toFixed(2)} (${diff > 0 ? '+' : ''}${diff.toFixed(2)})`;
+      }
+    }
+    console.log('⚖️ Weight changes:', weightChanges);
 
     // Upsert preference vectors
     const { error: vectorError } = await supabase
@@ -177,7 +198,7 @@ serve(async (req) => {
         total_ratings: totalRatings,
         successful_predictions: successfulPredictions,
         ai_accuracy: aiAccuracy,
-        feature_weights: featureWeights,
+        feature_weights: newWeights,
         last_updated: new Date().toISOString()
       }, { onConflict: 'user_id' });
 
@@ -185,13 +206,12 @@ serve(async (req) => {
       console.error('Error updating preference vectors:', vectorError);
     }
 
-    // Calculate improvement percentage for response
-    const improvementPercent = Math.min(5, totalRatings * 0.5);
+    // Calculate improvement stats
+    const improvementPercent = Math.min(15, totalRatings * 1.5);
 
     console.log('✅ Learning complete:', { 
-      totalRatings, 
-      aiAccuracy: aiAccuracy.toFixed(1),
-      improvementPercent 
+      totalRatings, aiAccuracy: aiAccuracy.toFixed(1), 
+      weightChanges, improvementPercent 
     });
 
     return new Response(JSON.stringify({
@@ -202,7 +222,9 @@ serve(async (req) => {
         aiAccuracy: aiAccuracy.toFixed(1),
         improvementPercent: improvementPercent.toFixed(1),
         predictionError: predictionError?.toFixed(1) || null
-      }
+      },
+      weightChanges,
+      newWeights
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

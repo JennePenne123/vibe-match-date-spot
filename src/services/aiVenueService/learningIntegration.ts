@@ -93,8 +93,8 @@ const getWeightValue = (
     return 1.0; // Default neutral weight
   }
   
-  // Clamp weights to reasonable range (0.5x to 2.0x multiplier)
-  return Math.max(0.5, Math.min(2.0, storedWeights[key]));
+  // Clamp weights to match edge function range (0.3x to 2.5x multiplier)
+  return Math.max(0.3, Math.min(2.5, storedWeights[key]));
 };
 
 /**

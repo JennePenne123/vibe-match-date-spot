@@ -12,6 +12,13 @@ export interface DateRatingData {
   wouldRecommendVenue: boolean | null;
 }
 
+export interface LearningImpact {
+  weightChanges: Record<string, string>;
+  totalRatings: number;
+  aiAccuracy: string;
+  improvementPercent: string;
+}
+
 export interface DateRatingOptions {
   venueId?: string;
   partnerId?: string;
@@ -22,6 +29,7 @@ export interface DateRatingOptions {
 export const useDateRating = (invitationId: string, options?: DateRatingOptions) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [learningImpact, setLearningImpact] = useState<LearningImpact | null>(null);
   const [ratingData, setRatingData] = useState<DateRatingData>({
     overallRating: 0,
     venueRating: 0,
@@ -132,9 +140,10 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
       );
 
       // AI learning from predicted vs actual
+      let impact: LearningImpact | null = null;
       if (options?.venueId) {
         try {
-          await learnFromFeedback({
+          const result = await learnFromFeedback({
             userId: user.id,
             partnerId: options.partnerId,
             venueId: options.venueId,
@@ -148,6 +157,15 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
               feedbackText: ratingData.feedbackText,
             },
           });
+          if (result) {
+            impact = {
+              weightChanges: (result as any).weightChanges || {},
+              totalRatings: (result as any).totalRatings || result.totalRatings,
+              aiAccuracy: (result as any).aiAccuracy || result.aiAccuracy,
+              improvementPercent: (result as any).improvementPercent || result.improvementPercent,
+            };
+            setLearningImpact(impact);
+          }
         } catch (err) {
           console.error('⚠️ AI learning failed (non-blocking):', err);
         }
@@ -185,6 +203,7 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
   return {
     ratingData,
     isSubmitting,
+    learningImpact,
     updateRatingData,
     canSubmit,
     submitRating,

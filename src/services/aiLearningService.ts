@@ -73,7 +73,7 @@ export interface LearnFromFeedbackParams {
   contextData?: Record<string, unknown>;
 }
 
-export const learnFromFeedback = async (params: LearnFromFeedbackParams): Promise<LearningMetrics | null> => {
+export const learnFromFeedback = async (params: LearnFromFeedbackParams): Promise<(LearningMetrics & { weightChanges?: Record<string, string>; newWeights?: Record<string, number> }) | null> => {
   try {
     console.log('📚 Sending feedback to AI learning system:', params.venueId);
 
@@ -87,7 +87,11 @@ export const learnFromFeedback = async (params: LearnFromFeedbackParams): Promis
     }
 
     console.log('✅ AI learning response:', data);
-    return data.metrics;
+    return {
+      ...data.metrics,
+      weightChanges: data.weightChanges,
+      newWeights: data.newWeights,
+    };
   } catch (err) {
     console.error('Failed to learn from feedback:', err);
     return null;
