@@ -29,6 +29,7 @@ export interface DateRatingOptions {
 export const useDateRating = (invitationId: string, options?: DateRatingOptions) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [learningImpact, setLearningImpact] = useState<LearningImpact | null>(null);
   const [ratingData, setRatingData] = useState<DateRatingData>({
     overallRating: 0,
     venueRating: 0,
