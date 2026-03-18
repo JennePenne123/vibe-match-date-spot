@@ -103,7 +103,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 2 | **Google Places API konfigurieren** | Klein | API-Key im Dashboard einrichten, Venue-Suche live schalten |
 | 3 | **Route Code Splitting** | Klein | Alle Haupt-Routes lazy-loaden → ~50% kleineres Bundle |
 | 4 | **Produktions-Assets** | Klein | OG-Images, App-Icons, Favicon finalisieren |
-| 5 | **Auth-Redirect Konsistenz** | Klein | Alle Seiten einheitlich → `/?auth=required` |
+| 5 | ~~**Auth-Redirect Konsistenz**~~ | ✅ Erledigt | Alle Seiten einheitlich → `/?auth=required` |
 | 6 | **Admin-Zugänge konfigurieren** | Klein | Admin-Rollen in `user_roles` für finale Nutzer setzen |
 | 7 | **Security Hardening** | Klein | OTP-Ablauf <10min, Leaked Password Protection, autoComplete-Attribute |
 
