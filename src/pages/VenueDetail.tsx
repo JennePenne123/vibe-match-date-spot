@@ -53,6 +53,7 @@ const VenueDetail = () => {
             src={appVenue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'}
             alt={appVenue.name}
             className="w-full h-64 object-cover"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           
