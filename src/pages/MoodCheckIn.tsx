@@ -85,7 +85,7 @@ const MoodCheckIn: React.FC = () => {
   // Redirect if not logged in
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/', { replace: true });
+      navigate('/?auth=required', { replace: true });
     }
   }, [user, loading, navigate]);
 
