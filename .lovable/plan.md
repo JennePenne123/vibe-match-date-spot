@@ -1,7 +1,7 @@
 
 # VybePulse – Gesamt-Projektübersicht & Roadmap
 
-**Stand: 18. März 2026** | **Geschätzter Fortschritt: ~75%**
+**Stand: 18. März 2026** | **Geschätzter Fortschritt: ~77%**
 
 ---
 
@@ -11,7 +11,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## ✅ Fertiggestellte Features (~75%)
+## ✅ Fertiggestellte Features (~77%)
 
 ### 🏠 User-Frontend
 - **Landing Page** mit Auth-Modal (Google, Apple, E-Mail)
@@ -28,11 +28,13 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **AI-Matching-Algorithmus** mit gewichteten Scoring-Faktoren (Küche, Vibe, Preis, Timing, Rating)
 - **Collaborative Scoring** für beidseitige Präferenzen mit Shared-Bonus-System
 - **Feedback-Loop**: AI lernt aus Ratings und passt Gewichte an (`user_preference_vectors`)
-- **Cold-Start-Lösung**: Onboarding-Präferenzen werden automatisch in initiale `feature_weights` und Preference-Vektoren konvertiert (`preferenceInitService.ts`)
+- **Cold-Start-Lösung**: Onboarding-Präferenzen → initiale `feature_weights` + Preference-Vektoren
 - **Mood Check-In** mit Score-Modifier
-- **Implizite Signale**: Dwell Time, Scroll Depth, Repeat Views, Voucher-Klicks → fließen in Scoring ein
-- **Contextual Factors**: Tageszeit, Saison
+- **Implizite Signale**: Dwell Time, Scroll Depth, Repeat Views, Voucher-Klicks → Scoring-Integration
+- **Beschleunigte Gewichtsanpassung**: Stärkere Adjustments bei wenig Datenpunkten für schnelleres Lernen
+- **Contextual Factors**: Tageszeit, Saison (Wetter-Integration geplant)
 - **Compatibility Scores** zwischen User-Paaren
+- **AI Edge Function** für Venue-Reasoning (Top-N Enhancement, optional aktivierbar)
 
 ### 📅 Date-Planning
 - **Smart Date Planner** (Solo + Collaborative Mode)
@@ -78,7 +80,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 ### 🛡️ Infrastruktur & Security
 - **Supabase Backend**: Auth, RLS, Edge Functions, Realtime
 - **RLS-Policies** auf allen Tabellen (inkl. SECURITY DEFINER für Rollen)
-- **Rate Limiting** auf Edge Functions
+- **Rate Limiting** auf Edge Functions (mit Request-Logging)
 - **Error Monitoring Service** (JS, API, UI, Performance Fehler → DB)
 - **Input Sanitization** (DOMPurify)
 - **Session Cleanup** (automatisch)
@@ -98,7 +100,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## 🔧 Offene Aufgaben vor Launch (~25%)
+## 🔧 Offene Aufgaben vor Launch (~23%)
 
 ### 🔴 Kritisch (Must-Have für Launch)
 
@@ -116,49 +118,52 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 8 | **DSGVO-Update Datenschutzerklärung** | 🟡 Offen | Implizites Tracking dokumentieren, Consent prüfen |
+| 8 | **DSGVO-Update Datenschutzerklärung** | 🟡 Offen | Implizites Tracking dokumentieren, Consent/Opt-Out prüfen |
 | 9 | **Sentry Integration** | 🟡 Offen | Konto erstellen, DSN hinterlegen, SDK einbinden |
 | 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner |
 | 11 | **Image-Optimierung** | 🟡 Offen | lazy loading, srcSet, WebP, Avatar-Komprimierung |
 | 12 | **React Query Tuning** | 🟡 Offen | Differenzierte staleTime pro Query-Typ |
-| 13 | **VAPID-Keys einrichten** | 📋 Manuell | `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` als Edge Function Secrets. Keys via `npx web-push generate-vapid-keys` |
+| 13 | **VAPID-Keys einrichten** | 📋 Manuell | `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` als Edge Function Secrets |
+| 14 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
 
 ### 🟢 Post-Launch / Nice-to-Have
 
 | # | Aufgabe | Aufwand | Beschreibung |
 |---|---------|---------|--------------|
-| 14 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
-| 15 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
-| 16 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
-| 17 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
-| 18 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
-| 19 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
+| 15 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
+| 16 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
+| 17 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
+| 18 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
+| 19 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
+| 20 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
+| 21 | **DSGVO Opt-Out für implizite Signale** | Klein | Toggle in Settings zum Deaktivieren von Tracking |
+| 22 | **Feedback-Impact-Anzeige** | Klein | Hinweis auf Home wenn sich Empfehlungen durch Feedback verändert haben |
 
 ---
 
 ## 📊 Fortschritts-Einschätzung
 
 ```
-Gesamt-Fortschritt: ██████████████████████░░░░░░░░ ~75%
+Gesamt-Fortschritt: ███████████████████████░░░░░░░ ~77%
 
 Frontend UI/UX:     ██████████████████████████████ ~98%
-KI-Engine:          ████████████████████████░░░░░░ ~80%
+KI-Engine:          █████████████████████████░░░░░ ~85%
 Date-Planning:      █████████████████████████████░ ~95%
 Venue-System:       ██████████████████████░░░░░░░░ ~75% (echte API-Anbindung fehlt)
-Voucher/Rewards:    ██████████████████████░░░░░░░░ ~70% (Wallet noch Mock-Daten, Push ✅)
+Voucher/Rewards:    ██████████████████████░░░░░░░░ ~70% (Wallet noch Mock-Daten)
 Partner-Portal:     █████████████████████████░░░░░ ~85%
 Admin Dashboard:    █████████████████████████████░ ~95%
-Security/Infra:     ██████████████████████████░░░░ ~85% (Auth-Redirects ✅, VAPID offen)
+Security/Infra:     ██████████████████████████░░░░ ~85% (VAPID offen)
 Monetarisierung:    ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~10% (Stripe noch nicht)
 Performance:        ██████████████████░░░░░░░░░░░░ ~60% (Code Splitting offen)
-DSGVO/Legal:        ████████████████████░░░░░░░░░░ ~65% (implizites Tracking-Update)
+DSGVO/Legal:        ████████████████████░░░░░░░░░░ ~65% (Tracking-Update offen)
 ```
 
 ### Zeitliche Einschätzung bis Launch (Sommer 2026)
 - **Kritische Aufgaben (1-4)**: ~2 Sessions (Code-Änderungen)
 - **Manuelle Aufgaben (6, 7, 13)**: Jederzeit im Dashboard erledigbar
-- **Wichtige Aufgaben (8, 9, 11, 12)**: ~2 Sessions
-- **Gesamt bis MVP-Launch**: ~4 Sessions
+- **Wichtige Aufgaben (8, 9, 11, 12, 14)**: ~3 Sessions
+- **Gesamt bis MVP-Launch**: ~5 Sessions
 - **Post-Launch Features**: Laufend nach Priorität
 
 ---
@@ -170,7 +175,7 @@ DSGVO/Legal:        ████████████████████
 | Frontend | React 18 + TypeScript + Vite |
 | Styling | Tailwind CSS + shadcn/ui + Framer Motion |
 | Backend | Supabase (Auth, DB, Realtime, Edge Functions, Storage) |
-| AI/ML | Custom Scoring Engine + Edge Functions (OpenAI-ready) |
+| AI/ML | Custom Scoring Engine + Edge Functions (Gemini via Lovable AI Gateway) |
 | Maps | Leaflet + OSRM Routing |
 | Venues | Foursquare API + Google Places API |
 | i18n | i18next (6 Sprachen) |
