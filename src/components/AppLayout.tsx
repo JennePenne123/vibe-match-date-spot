@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
@@ -13,8 +13,6 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 // Tab order for directional slide
 const NAV_ORDER = ['/home', '/preferences', '/chats', '/profile']
 
-// Routes where swipe navigation should be disabled (complex touch interactions)
-const SWIPE_DISABLED_ROUTES = ['/preferences', '/plan-date']
 
 function getNavIndex(path: string) {
   const idx = NAV_ORDER.indexOf(path)
@@ -37,12 +35,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
 
-  // Swipe state
-  const touchStartX = useRef(0)
-  const touchCurrentX = useRef(0)
-  const [dragOffset, setDragOffset] = useState(0)
-  const isDragging = useRef(false)
-  const contentRef = useRef<HTMLDivElement>(null)
 
   // Determine slide direction on route change
   useEffect(() => {
@@ -65,59 +57,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
     prevPath.current = location.pathname
   }, [location.pathname])
 
-  const isSwipeDisabled = SWIPE_DISABLED_ROUTES.some(r => location.pathname.startsWith(r))
-
-  // Swipe handlers
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (isSwipeDisabled) return
-    touchStartX.current = e.touches[0].clientX
-    touchCurrentX.current = e.touches[0].clientX
-    isDragging.current = true
-  }, [isSwipeDisabled])
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isDragging.current || isSwipeDisabled) return
-    touchCurrentX.current = e.touches[0].clientX
-    const diff = touchCurrentX.current - touchStartX.current
-    const currentIdx = getNavIndex(location.pathname)
-
-    // Dampen at edges
-    if (currentIdx <= 0 && diff > 0) {
-      setDragOffset(diff * 0.15)
-    } else if (currentIdx >= NAV_ORDER.length - 1 && diff < 0) {
-      setDragOffset(diff * 0.15)
-    } else {
-      setDragOffset(diff * 0.4)
-    }
-  }, [location.pathname, isSwipeDisabled])
-
-  const handleTouchEnd = useCallback(() => {
-    if (!isDragging.current || isSwipeDisabled) return
-    isDragging.current = false
-
-    const diff = touchCurrentX.current - touchStartX.current
-    const currentIdx = getNavIndex(location.pathname)
-    const THRESHOLD = 80
-
-    if (Math.abs(diff) > THRESHOLD && currentIdx >= 0) {
-      if (diff < -THRESHOLD && currentIdx < NAV_ORDER.length - 1) {
-        navigate(NAV_ORDER[currentIdx + 1])
-      } else if (diff > THRESHOLD && currentIdx > 0) {
-        navigate(NAV_ORDER[currentIdx - 1])
-      }
-    }
-
-    setDragOffset(0)
-  }, [location.pathname, navigate, isSwipeDisabled])
-
-  // Slide animation style
+  // Slide animation style (only for route change transitions, no drag)
   const getContentStyle = (): React.CSSProperties => {
-    if (dragOffset !== 0) {
-      return {
-        transform: `translateX(${dragOffset}px)`,
-        transition: 'none',
-      }
-    }
     if (isAnimating && slideDirection) {
       return {
         animation: `nav-slide-${slideDirection} 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
@@ -140,11 +81,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           }
         `}</style>
         <div
-          ref={contentRef}
           style={getContentStyle()}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
           className="will-change-transform"
         >
           {children}
