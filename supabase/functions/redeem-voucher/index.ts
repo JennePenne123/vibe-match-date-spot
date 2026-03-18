@@ -7,8 +7,33 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Helper: Send push notification (non-blocking)
+async function sendRedemptionPush(
+  adminClient: any,
+  userId: string,
+  title: string,
+  body: string,
+  url: string = "/profile"
+) {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({ userId, title, body, url, type: "voucher_redeemed" }),
+    });
+    console.log(`[redeem-voucher] Push sent to user ${userId}`);
+  } catch (err) {
+    console.error("[redeem-voucher] Push notification failed (non-blocking):", err);
+  }
+}
+
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
