@@ -54,6 +54,14 @@ const HomeContent: React.FC = () => {
       if (title?.includes('Invitation') || title?.includes('sent')) handleInvitationSent();
       navigate('/home', { replace: true, state: {} });
     }
+
+    // Handle preselected partner from chat "New Date" action
+    if (location.state?.startPlanning && location.state?.preselectedPartnerId) {
+      const partnerId = location.state.preselectedPartnerId;
+      setSelectedPartnerId(partnerId);
+      setShowProposalCreation(true);
+      navigate('/home', { replace: true, state: {} });
+    }
   }, [location.state, toast, navigate, handleInvitationSent]);
 
   if (showProposalCreation && selectedPartnerId) {
