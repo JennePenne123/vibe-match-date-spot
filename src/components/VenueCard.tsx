@@ -234,7 +234,7 @@ const VenueCard = ({
               {venuePriceRange}
             </div>
             {showMatchScore && venue.matchScore && (
-              <Badge className="bg-green-500 text-white text-xs">
+              <Badge className="bg-primary text-primary-foreground text-xs">
                 {venue.matchScore}% match
               </Badge>
             )}
