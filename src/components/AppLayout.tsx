@@ -35,12 +35,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
 
-  // Swipe state
-  const touchStartX = useRef(0)
-  const touchCurrentX = useRef(0)
-  const [dragOffset, setDragOffset] = useState(0)
-  const isDragging = useRef(false)
-  const contentRef = useRef<HTMLDivElement>(null)
 
   // Determine slide direction on route change
   useEffect(() => {
