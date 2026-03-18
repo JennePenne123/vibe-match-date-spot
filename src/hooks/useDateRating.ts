@@ -12,6 +12,13 @@ export interface DateRatingData {
   wouldRecommendVenue: boolean | null;
 }
 
+export interface LearningImpact {
+  weightChanges: Record<string, string>;
+  totalRatings: number;
+  aiAccuracy: string;
+  improvementPercent: string;
+}
+
 export interface DateRatingOptions {
   venueId?: string;
   partnerId?: string;
