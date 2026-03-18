@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,8 @@ import { Clock, MapPin, Check, X, DollarSign, Calendar, Info, MessageCircle, XCi
 import { DateRatingPrompt } from '@/components/DateRatingPrompt';
 import { getInitials } from '@/lib/utils';
 import { DisplayData } from './types';
+import AddToCalendarButton from '@/components/AddToCalendarButton';
+import { CalendarEvent } from '@/utils/calendarExport';
 
 interface DateInviteCardDetailsProps {
   displayData: DisplayData;
