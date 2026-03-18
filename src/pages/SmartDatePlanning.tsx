@@ -148,7 +148,7 @@ const SmartDatePlanning: React.FC = () => {
   // If accessed directly without session data, redirect to home
   if (!fromProposal || !sessionId) {
     console.log('SmartDatePlanning - No collaborative session found, redirecting to home');
-    window.location.href = '/home';
+    navigate('/home', { replace: true });
     return null;
   }
 
