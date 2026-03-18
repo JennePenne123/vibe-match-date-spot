@@ -116,6 +116,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner (erfordert VAPID-Keys für echte Zustellung) |
 | 11 | **Image-Optimierung** | Klein | lazy loading, srcSet, WebP, Avatar-Komprimierung |
 | 12 | **React Query Tuning** | Klein | Differenzierte staleTime pro Query-Typ |
+| 13 | **VAPID-Keys einrichten** | Klein | Manuell: `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` als Edge Function Secrets hinzufügen. Keys generieren z.B. via `npx web-push generate-vapid-keys`. Nötig für echte Push-Zustellung. |
 
 ### 🟢 Post-Launch / Nice-to-Have
 
