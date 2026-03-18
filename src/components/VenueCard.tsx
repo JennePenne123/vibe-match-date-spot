@@ -163,7 +163,7 @@ const VenueCard = ({
               {venue.isOpen !== undefined && (
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  <span className={venue.isOpen ? "text-green-600" : "text-red-600"}>
+                  <span className={venue.isOpen ? "text-emerald-500" : "text-destructive"}>
                     {venue.isOpen ? "Open" : "Closed"}
                   </span>
                 </div>
@@ -183,6 +183,7 @@ const VenueCard = ({
             src={venueImage} 
             alt={venue.name}
             className="w-16 h-16 rounded-lg object-cover"
+            loading="lazy"
           />
           {venue.discount && (
             <div className="absolute -top-1 -right-1 bg-orange-500 rounded-full p-1">
@@ -220,7 +221,7 @@ const VenueCard = ({
               <span>• {venueNeighborhood}</span>
             )}
             {venue.isOpen !== undefined && (
-              <span className={`flex items-center gap-1 ${venue.isOpen ? 'text-green-500' : 'text-red-500'}`}>
+              <span className={`flex items-center gap-1 ${venue.isOpen ? 'text-emerald-500' : 'text-destructive'}`}>
                 • <Clock className="w-3 h-3" />
                 {venue.isOpen ? 'Open' : 'Closed'}
               </span>
@@ -233,7 +234,7 @@ const VenueCard = ({
               {venuePriceRange}
             </div>
             {showMatchScore && venue.matchScore && (
-              <Badge className="bg-green-500 text-white text-xs">
+              <Badge className="bg-primary text-primary-foreground text-xs">
                 {venue.matchScore}% match
               </Badge>
             )}
@@ -254,7 +255,7 @@ const VenueCard = ({
         />
         {showMatchScore && venue.matchScore && (
           <div className="absolute top-3 left-3">
-            <Badge className="bg-green-500 text-white font-semibold">
+            <Badge className="bg-primary text-primary-foreground font-semibold">
               <Sparkles className="w-3 h-3 mr-1" />
               {venue.matchScore}% match
             </Badge>
@@ -317,7 +318,7 @@ const VenueCard = ({
           </div>
           
           {venue.isOpen !== undefined && (
-            <div className={`flex items-center gap-1 text-sm ${venue.isOpen ? 'text-green-600' : 'text-red-600'}`}>
+          <div className={`flex items-center gap-1 text-sm ${venue.isOpen ? 'text-emerald-500' : 'text-destructive'}`}>
               <Clock className="w-4 h-4" />
               <span>{venue.isOpen ? 'Open now' : 'Currently closed'}</span>
             </div>

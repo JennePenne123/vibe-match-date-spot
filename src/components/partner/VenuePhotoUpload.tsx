@@ -144,7 +144,7 @@ export const VenuePhotoUpload: React.FC<VenuePhotoUploadProps> = ({
         <div className="grid grid-cols-3 gap-2">
           {existingPhotos.map((photo, index) => (
             <div key={index} className="relative group aspect-square rounded-lg overflow-hidden bg-muted">
-              <img src={photo.url} alt={`Foto ${index + 1}`} className="w-full h-full object-cover" />
+              <img src={photo.url} alt={`Foto ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
               {!photo.isGooglePhoto && (
                 <button
                   onClick={() => handleDelete(index)}

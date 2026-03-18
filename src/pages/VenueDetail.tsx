@@ -53,6 +53,7 @@ const VenueDetail = () => {
             src={appVenue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'}
             alt={appVenue.name}
             className="w-full h-64 object-cover"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           
@@ -86,7 +87,7 @@ const VenueDetail = () => {
 
           {/* Match Score */}
           <div className="absolute bottom-4 left-4">
-            <Badge className="bg-green-500 text-white font-semibold text-base px-3 py-1">
+            <Badge className="bg-primary text-primary-foreground font-semibold text-base px-3 py-1">
               <Sparkles className="w-4 h-4 mr-2" />
               {appVenue.matchScore}% Perfect Match
             </Badge>
@@ -95,9 +96,9 @@ const VenueDetail = () => {
           {/* Open Status */}
           {appVenue.isOpen !== undefined && (
             <div className="absolute bottom-4 right-4">
-              <Badge className={appVenue.isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"}>
-                {appVenue.isOpen ? "Open Now" : "Closed"}
-              </Badge>
+            <Badge className={appVenue.isOpen ? "bg-emerald-500 dark:bg-emerald-600 text-white" : "bg-destructive text-destructive-foreground"}>
+              {appVenue.isOpen ? "Open Now" : "Closed"}
+            </Badge>
             </div>
           )}
         </div>
