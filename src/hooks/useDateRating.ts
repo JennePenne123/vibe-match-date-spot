@@ -203,6 +203,7 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
   return {
     ratingData,
     isSubmitting,
+    learningImpact,
     updateRatingData,
     canSubmit,
     submitRating,
