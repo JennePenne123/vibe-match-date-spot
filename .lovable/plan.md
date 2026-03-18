@@ -1,7 +1,7 @@
 
 # VybePulse – Gesamt-Projektübersicht & Roadmap
 
-**Stand: 17. März 2026** | **Geschätzter Fortschritt: ~70%**
+**Stand: 18. März 2026** | **Geschätzter Fortschritt: ~75%**
 
 ---
 
@@ -11,17 +11,18 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## ✅ Fertiggestellte Features (~70%)
+## ✅ Fertiggestellte Features (~75%)
 
 ### 🏠 User-Frontend
 - **Landing Page** mit Auth-Modal (Google, Apple, E-Mail)
 - **Onboarding** (3-Step Carousel)
 - **Home** mit Quick-Start Templates, AI-Empfehlungen, Upcoming Dates, Pending Ratings
-- **4-Tab Bottom-Nav** (Home, Plan Date, Chats, Profile) mit Swipe-Gesten
+- **4-Tab Bottom-Nav** (Home, Plan Date, Chats, Profile) mit Slide-Animationen
 - **Modernes Dark-Design** (Slate-900/Indigo Farbschema)
 - **6-Sprachen i18n** (DE, EN, FR, ES, IT, AR)
 - **PWA-Support** (Service Worker, Offline-Banner, Push Notifications)
 - **Responsive Mobile-First** Design (402px optimiert)
+- **SEO-optimiert** (OG-Tags, JSON-LD, Meta-Descriptions, robots.txt)
 
 ### 🤖 KI-Engine
 - **AI-Matching-Algorithmus** mit gewichteten Scoring-Faktoren (Küche, Vibe, Preis, Timing, Rating)
@@ -50,8 +51,9 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 ### 🎟️ Voucher & Rewards
 - **QR-Code Voucher-System** (Wallet → QR anzeigen → Partner scannt → Edge Function validiert)
 - **Gamification**: Punkte, Badges, Streaks, Leaderboard, Levels
-- **Reward Shop** mit Einlösung
+- **Reward Shop** mit Einlösung (monatliche Limits, Premium-Zugang)
 - **Referral-System** mit Codes + Punkten
+- **Push-Notifications bei Voucher-Einlösung** (User + Partner + Voucher-Ersteller)
 
 ### 👔 Partner-Portal
 - **Dashboard** mit KPIs
@@ -80,6 +82,8 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Input Sanitization** (DOMPurify)
 - **Session Cleanup** (automatisch)
 - **OSRM Routing** Integration
+- **Auth-Redirect Konsistenz** → alle Seiten → `/?auth=required` ✅
+- **autoComplete-Attribute** auf Auth-Formularen ✅
 
 ### ⚙️ Account & Settings
 - **E-Mail & Passwort ändern** (mit Re-Auth)
@@ -93,66 +97,67 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## 🔧 Offene Aufgaben vor Launch (~30%)
+## 🔧 Offene Aufgaben vor Launch (~25%)
 
 ### 🔴 Kritisch (Must-Have für Launch)
 
-| # | Aufgabe | Aufwand | Beschreibung |
-|---|---------|---------|--------------|
-| 1 | **Wallet mit echten Daten** | Mittel | Mock-Vouchers durch Supabase-Queries ersetzen |
-| 2 | **Google Places API konfigurieren** | Klein | API-Key im Dashboard einrichten, Venue-Suche live schalten |
-| 3 | **Route Code Splitting** | Klein | Alle Haupt-Routes lazy-loaden → ~50% kleineres Bundle |
-| 4 | **Produktions-Assets** | Klein | OG-Images, App-Icons, Favicon finalisieren |
+| # | Aufgabe | Status | Beschreibung |
+|---|---------|--------|--------------|
+| 1 | **Wallet mit echten Daten** | 🔴 Offen | Mock-Vouchers durch Supabase-Queries ersetzen |
+| 2 | **Google Places API konfigurieren** | 🔴 Offen | API-Key im Dashboard einrichten, Venue-Suche live schalten |
+| 3 | **Route Code Splitting** | 🔴 Offen | Alle Haupt-Routes lazy-loaden → ~50% kleineres Bundle |
+| 4 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons, Favicon finalisieren |
 | 5 | ~~**Auth-Redirect Konsistenz**~~ | ✅ Erledigt | Alle Seiten einheitlich → `/?auth=required` |
-| 6 | **Admin-Zugänge konfigurieren** | Klein | Manuell: `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor ausführen. User-UUIDs unter Supabase → Auth → Users nachschlagen. |
-| 7 | **Security Hardening** | Klein | OTP-Ablauf <10min, Leaked Password Protection, autoComplete-Attribute |
+| 6 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor |
+| 7 | **Security Hardening** | 📋 Manuell | OTP-Ablauf <10min, Leaked Password Protection im Supabase Dashboard |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
-| # | Aufgabe | Aufwand | Beschreibung |
-|---|---------|---------|--------------|
-| 8 | **DSGVO-Update Datenschutzerklärung** | Klein | Implizites Tracking dokumentieren, Consent prüfen |
-| 9 | **Sentry Integration** | Klein | Konto erstellen, DSN hinterlegen, SDK einbinden |
-| 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner (erfordert VAPID-Keys für echte Zustellung) |
-| 11 | **Image-Optimierung** | Klein | lazy loading, srcSet, WebP, Avatar-Komprimierung |
-| 12 | **React Query Tuning** | Klein | Differenzierte staleTime pro Query-Typ |
-| 13 | **VAPID-Keys einrichten** | Klein | Manuell: `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` als Edge Function Secrets hinzufügen. Keys generieren z.B. via `npx web-push generate-vapid-keys`. Nötig für echte Push-Zustellung. |
+| # | Aufgabe | Status | Beschreibung |
+|---|---------|--------|--------------|
+| 8 | **DSGVO-Update Datenschutzerklärung** | 🟡 Offen | Implizites Tracking dokumentieren, Consent prüfen |
+| 9 | **Sentry Integration** | 🟡 Offen | Konto erstellen, DSN hinterlegen, SDK einbinden |
+| 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner |
+| 11 | **Image-Optimierung** | 🟡 Offen | lazy loading, srcSet, WebP, Avatar-Komprimierung |
+| 12 | **React Query Tuning** | 🟡 Offen | Differenzierte staleTime pro Query-Typ |
+| 13 | **VAPID-Keys einrichten** | 📋 Manuell | `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` als Edge Function Secrets. Keys via `npx web-push generate-vapid-keys` |
 
 ### 🟢 Post-Launch / Nice-to-Have
 
 | # | Aufgabe | Aufwand | Beschreibung |
 |---|---------|---------|--------------|
-| 13 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
-| 14 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
-| 15 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
-| 16 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
-| 17 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
-| 18 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
+| 14 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
+| 15 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
+| 16 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
+| 17 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
+| 18 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
+| 19 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
 
 ---
 
 ## 📊 Fortschritts-Einschätzung
 
 ```
-Gesamt-Fortschritt: ████████████████████░░░░░░░░░░ ~70%
+Gesamt-Fortschritt: ██████████████████████░░░░░░░░ ~75%
 
-Frontend UI/UX:     █████████████████████████████░ ~95%
+Frontend UI/UX:     ██████████████████████████████ ~98%
 KI-Engine:          ████████████████████████░░░░░░ ~80%
 Date-Planning:      █████████████████████████████░ ~95%
 Venue-System:       ██████████████████████░░░░░░░░ ~75% (echte API-Anbindung fehlt)
-Voucher/Rewards:    ████████████████████░░░░░░░░░░ ~65% (Wallet noch Mock-Daten)
+Voucher/Rewards:    ██████████████████████░░░░░░░░ ~70% (Wallet noch Mock-Daten, Push ✅)
 Partner-Portal:     █████████████████████████░░░░░ ~85%
 Admin Dashboard:    █████████████████████████████░ ~95%
-Security/Infra:     ████████████████████████░░░░░░ ~80%
+Security/Infra:     ██████████████████████████░░░░ ~85% (Auth-Redirects ✅, VAPID offen)
 Monetarisierung:    ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~10% (Stripe noch nicht)
 Performance:        ██████████████████░░░░░░░░░░░░ ~60% (Code Splitting offen)
 DSGVO/Legal:        ████████████████████░░░░░░░░░░ ~65% (implizites Tracking-Update)
 ```
 
 ### Zeitliche Einschätzung bis Launch (Sommer 2026)
-- **Kritische Aufgaben (1-7)**: ~2-3 Sessions
-- **Wichtige Aufgaben (8-12)**: ~2 Sessions
-- **Gesamt bis MVP-Launch**: ~4-5 Sessions
+- **Kritische Aufgaben (1-4)**: ~2 Sessions (Code-Änderungen)
+- **Manuelle Aufgaben (6, 7, 13)**: Jederzeit im Dashboard erledigbar
+- **Wichtige Aufgaben (8, 9, 11, 12)**: ~2 Sessions
+- **Gesamt bis MVP-Launch**: ~4 Sessions
 - **Post-Launch Features**: Laufend nach Priorität
 
 ---
