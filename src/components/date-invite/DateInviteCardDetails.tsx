@@ -158,11 +158,25 @@ const DateInviteCardDetails = ({
             )}
             
             {dateStatus !== 'completed' && (
-              <div className="text-center py-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
-                <p className="text-sm text-green-700 dark:text-green-300">
-                  ✅ Date Confirmed! See you there!
-                </p>
-              </div>
+              <>
+                <div className="text-center py-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    ✅ Date Confirmed! See you there!
+                  </p>
+                </div>
+                <AddToCalendarButton
+                  event={{
+                    title: `Date with ${displayData.friendName} – ${displayData.venueName}`,
+                    description: displayData.message || undefined,
+                    location: displayData.venueAddress || displayData.location || undefined,
+                    startDate: displayData.time ? new Date(displayData.time) : new Date(),
+                    durationMinutes: 120,
+                  }}
+                  variant="outline"
+                  size="default"
+                  className="w-full"
+                />
+              </>
             )}
             
             {hasCancel && (
