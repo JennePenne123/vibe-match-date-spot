@@ -56,7 +56,7 @@ const DateInviteCardDetails = ({
         {/* Venue Photos */}
         <div className="relative">
           <div className="relative rounded-lg overflow-hidden">
-            <img src={displayData.venueImage} alt={displayData.venueName} className="w-full h-48 object-cover" />
+            <img src={displayData.venueImage} alt={displayData.venueName} className="w-full h-48 object-cover" loading="lazy" />
           </div>
           <div className="absolute top-3 left-3">
             <Badge className="bg-pink-500 text-white">

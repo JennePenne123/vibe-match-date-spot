@@ -96,9 +96,9 @@ const VenueDetail = () => {
           {/* Open Status */}
           {appVenue.isOpen !== undefined && (
             <div className="absolute bottom-4 right-4">
-              <Badge className={appVenue.isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"}>
-                {appVenue.isOpen ? "Open Now" : "Closed"}
-              </Badge>
+            <Badge className={appVenue.isOpen ? "bg-emerald-500 dark:bg-emerald-600 text-white" : "bg-destructive text-destructive-foreground"}>
+              {appVenue.isOpen ? "Open Now" : "Closed"}
+            </Badge>
             </div>
           )}
         </div>

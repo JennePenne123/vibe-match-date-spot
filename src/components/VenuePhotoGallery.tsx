@@ -30,8 +30,8 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
 
   if (!photos || photos.length === 0) {
     return (
-      <div className={`${maxHeight} bg-gray-200 rounded-lg flex items-center justify-center ${className}`}>
-        <span className="text-gray-500">No photos available</span>
+      <div className={`${maxHeight} bg-muted rounded-lg flex items-center justify-center ${className}`}>
+        <span className="text-muted-foreground">No photos available</span>
       </div>
     );
   }
@@ -57,7 +57,7 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
   return (
     <div className={`relative ${className}`}>
       {/* Main Photo */}
-      <div className={`relative ${maxHeight} rounded-lg overflow-hidden bg-gray-100`}>
+      <div className={`relative ${maxHeight} rounded-lg overflow-hidden bg-muted`}>
         <img
           src={currentPhoto.url}
           alt={`${venueName} - Photo ${currentPhotoIndex + 1}`}
@@ -70,8 +70,8 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
         
         {/* Loading state */}
         {imageLoading && (
-          <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-muted-foreground/40 border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
 
@@ -82,7 +82,7 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
               variant="secondary"
               size="sm"
               onClick={prevPhoto}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white shadow-md rounded-full w-8 h-8 p-0"
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/90 hover:bg-background shadow-md rounded-full w-8 h-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
@@ -91,7 +91,7 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
               variant="secondary"
               size="sm"
               onClick={nextPhoto}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white shadow-md rounded-full w-8 h-8 p-0"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/90 hover:bg-background shadow-md rounded-full w-8 h-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -107,13 +107,14 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
 
         {/* Google Photos badge */}
         {currentPhoto.isGooglePhoto && (
-          <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs flex items-center gap-1">
+          <div className="absolute top-2 left-2 bg-background/90 px-2 py-1 rounded text-xs flex items-center gap-1">
             <img 
               src="https://developers.google.com/static/maps/images/google_on_white.png" 
               alt="Google" 
               className="w-3 h-3"
+              loading="lazy"
             />
-            <span className="text-gray-700">Photos</span>
+            <span className="text-muted-foreground">Photos</span>
           </div>
         )}
       </div>
@@ -128,13 +129,14 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
               className={`flex-shrink-0 w-16 h-12 rounded overflow-hidden border-2 transition-all ${
                 index === currentPhotoIndex 
                   ? 'border-primary shadow-md' 
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-border hover:border-border/80'
               }`}
             >
               <img
                 src={photo.url}
                 alt={`Thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             </button>
           ))}
@@ -143,7 +145,7 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
 
       {/* Attribution */}
       {currentPhoto.attribution && (
-        <div className="mt-1 text-xs text-gray-500 flex items-center gap-1">
+        <div className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
           <ExternalLink className="w-3 h-3" />
           <span>Photo by {currentPhoto.attribution}</span>
         </div>
