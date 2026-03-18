@@ -113,7 +113,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 |---|---------|---------|--------------|
 | 8 | **DSGVO-Update Datenschutzerklärung** | Klein | Implizites Tracking dokumentieren, Consent prüfen |
 | 9 | **Sentry Integration** | Klein | Konto erstellen, DSN hinterlegen, SDK einbinden |
-| 10 | **Redemption Push-Notifications** | Mittel | Push bei Voucher-Einlösung (User + Partner) |
+| 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner (erfordert VAPID-Keys für echte Zustellung) |
 | 11 | **Image-Optimierung** | Klein | lazy loading, srcSet, WebP, Avatar-Komprimierung |
 | 12 | **React Query Tuning** | Klein | Differenzierte staleTime pro Query-Typ |
 

@@ -7,8 +7,33 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Helper: Send push notification (non-blocking)
+async function sendRedemptionPush(
+  adminClient: any,
+  userId: string,
+  title: string,
+  body: string,
+  url: string = "/profile"
+) {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({ userId, title, body, url, type: "voucher_redeemed" }),
+    });
+    console.log(`[redeem-voucher] Push sent to user ${userId}`);
+  } catch (err) {
+    console.error("[redeem-voucher] Push notification failed (non-blocking):", err);
+  }
+}
+
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -178,6 +203,38 @@ serve(async (req) => {
 
       // current_redemptions is incremented by the trigger `increment_voucher_redemptions`
 
+      const venueName = (voucher.venues as any)?.name || "Venue";
+
+      // Send push notifications (non-blocking, fire-and-forget)
+      // 1. Notify the USER that their voucher was redeemed
+      sendRedemptionPush(
+        adminClient,
+        user_id,
+        "Voucher eingelöst! 🎉",
+        `Dein ${voucher.discount_value}${voucher.discount_type === 'percentage' ? '%' : '€'} Gutschein bei ${venueName} wurde erfolgreich eingelöst.`,
+        "/profile"
+      );
+
+      // 2. Notify the PARTNER about the redemption
+      sendRedemptionPush(
+        adminClient,
+        scanningUser.id,
+        "Voucher-Einlösung 🎟️",
+        `Ein Gast hat den Gutschein „${voucher.title}" (${voucher.discount_value}${voucher.discount_type === 'percentage' ? '%' : '€'}) bei ${venueName} eingelöst.`,
+        "/partner/vouchers"
+      );
+
+      // 3. Also notify the voucher creator (if different from scanner)
+      if (voucher.partner_id && voucher.partner_id !== scanningUser.id) {
+        sendRedemptionPush(
+          adminClient,
+          voucher.partner_id,
+          "Voucher-Einlösung 🎟️",
+          `Ihr Gutschein „${voucher.title}" wurde bei ${venueName} eingelöst.`,
+          "/partner/vouchers"
+        );
+      }
+
       return new Response(
         JSON.stringify({
           status: "success",
@@ -186,7 +243,7 @@ serve(async (req) => {
             title: voucher.title,
             discount_type: voucher.discount_type,
             discount_value: voucher.discount_value,
-            venue_name: (voucher.venues as any)?.name || "Venue",
+            venue_name: venueName,
             code: voucher.code,
           },
         }),
