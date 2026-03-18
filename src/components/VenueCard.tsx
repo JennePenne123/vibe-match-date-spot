@@ -255,7 +255,7 @@ const VenueCard = ({
         />
         {showMatchScore && venue.matchScore && (
           <div className="absolute top-3 left-3">
-            <Badge className="bg-green-500 text-white font-semibold">
+            <Badge className="bg-primary text-primary-foreground font-semibold">
               <Sparkles className="w-3 h-3 mr-1" />
               {venue.matchScore}% match
             </Badge>

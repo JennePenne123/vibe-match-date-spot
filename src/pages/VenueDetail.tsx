@@ -87,7 +87,7 @@ const VenueDetail = () => {
 
           {/* Match Score */}
           <div className="absolute bottom-4 left-4">
-            <Badge className="bg-green-500 text-white font-semibold text-base px-3 py-1">
+            <Badge className="bg-primary text-primary-foreground font-semibold text-base px-3 py-1">
               <Sparkles className="w-4 h-4 mr-2" />
               {appVenue.matchScore}% Perfect Match
             </Badge>
