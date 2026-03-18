@@ -120,7 +120,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     }
     if (isAnimating && slideDirection) {
       return {
-        animation: `nav-slide-${slideDirection} 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
+        animation: `nav-slide-${slideDirection} 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
       }
     }
     return {}
