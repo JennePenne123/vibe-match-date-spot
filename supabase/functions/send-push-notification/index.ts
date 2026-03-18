@@ -12,7 +12,7 @@ interface PushPayload {
   title: string;
   body: string;
   url?: string;
-  type?: 'invitation_received' | 'invitation_accepted' | 'invitation_declined' | 'date_reminder';
+  type?: 'invitation_received' | 'invitation_accepted' | 'invitation_declined' | 'date_reminder' | 'voucher_redeemed';
   actions?: Array<{ action: string; title: string }>;
 }
 
