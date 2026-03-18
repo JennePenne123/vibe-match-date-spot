@@ -38,6 +38,10 @@
   "chat": {
     "newDate": "New Date"
   },
+  "calendar": {
+    "addToCalendar": "Add to Calendar",
+    "downloadICS": "Apple / .ics File"
+  },
   "greeting": {
     "morning": "Good Morning",
     "afternoon": "Good Afternoon",
