@@ -21,7 +21,7 @@ const Venues = () => {
 
   const filters = ['Italian', 'Japanese', 'Mexican', 'American', 'Romantic', 'Casual', 'Nightlife'];
 
-  React.useEffect(() => { if (!loading && !user) navigate('/'); }, [loading, user, navigate]);
+  React.useEffect(() => { if (!loading && !user) navigate('/?auth=required', { replace: true }); }, [loading, user, navigate]);
 
   useEffect(() => {
     const saved = localStorage.getItem('likedVenues');

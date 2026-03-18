@@ -29,7 +29,7 @@ const Profile = () => {
 
   React.useEffect(() => { if (user && !loading) { refreshProfile(); checkAndAwardProfileComplete(); } }, []);
   React.useEffect(() => {
-    if (!loading && !user) { navigate('/'); return; }
+    if (!loading && !user) { navigate('/?auth=required', { replace: true }); return; }
     if (user) { setEditedName(user.name || ''); setEditedEmail(user.email || ''); }
   }, [user, loading, navigate]);
 

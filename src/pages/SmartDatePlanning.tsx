@@ -148,7 +148,7 @@ const SmartDatePlanning: React.FC = () => {
   // If accessed directly without session data, redirect to home
   if (!fromProposal || !sessionId) {
     console.log('SmartDatePlanning - No collaborative session found, redirecting to home');
-    window.location.href = '/home';
+    navigate('/home', { replace: true });
     return null;
   }
 
@@ -160,21 +160,9 @@ const SmartDatePlanning: React.FC = () => {
 
   // Redirect to login if no user
   if (!user) {
-    console.log('SmartDatePlanning - No user, redirecting to login');
-    return (
-      <div className="min-h-screen bg-background p-6">
-        <div className={isMobile ? "max-w-md mx-auto text-center" : "max-w-lg mx-auto text-center"}>
-          <h1 className="text-2xl font-bold text-foreground mb-4">Authentication Required</h1>
-          <p className="text-muted-foreground mb-6">Please sign in to use the Smart Date Planner.</p>
-          <button 
-            onClick={() => window.location.href = '/?auth=required'}
-            className="bg-primary text-primary-foreground px-6 py-2 rounded hover:bg-primary/90"
-          >
-            Sign In
-          </button>
-        </div>
-      </div>
-    );
+    console.log('SmartDatePlanning - No user, redirecting to auth');
+    navigate('/?auth=required', { replace: true });
+    return null;
   }
 
   const { displayName, firstName } = userInfo;
