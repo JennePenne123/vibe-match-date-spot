@@ -81,11 +81,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           }
         `}</style>
         <div
-          ref={contentRef}
           style={getContentStyle()}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
           className="will-change-transform"
         >
           {children}
