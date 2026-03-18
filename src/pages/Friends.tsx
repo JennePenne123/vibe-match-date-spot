@@ -23,7 +23,7 @@ const Friends = () => {
   const { toast } = useToast();
 
   if (!isDemoMode && !user) {
-    navigate('/');
+    navigate('/?auth=required', { replace: true });
     return null;
   }
 
