@@ -131,11 +131,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <div className="min-h-screen w-full bg-background pb-16">
         <style>{`
           @keyframes nav-slide-left {
-            0% { transform: translateX(30%); opacity: 0.4; }
+            0% { transform: translateX(18%); opacity: 0.6; }
             100% { transform: translateX(0); opacity: 1; }
           }
           @keyframes nav-slide-right {
-            0% { transform: translateX(-30%); opacity: 0.4; }
+            0% { transform: translateX(-18%); opacity: 0.6; }
             100% { transform: translateX(0); opacity: 1; }
           }
         `}</style>
