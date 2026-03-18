@@ -13,6 +13,9 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 // Tab order for directional slide
 const NAV_ORDER = ['/home', '/preferences', '/chats', '/profile']
 
+// Routes where swipe navigation should be disabled (complex touch interactions)
+const SWIPE_DISABLED_ROUTES = ['/preferences', '/plan-date']
+
 function getNavIndex(path: string) {
   const idx = NAV_ORDER.indexOf(path)
   return idx >= 0 ? idx : -1
