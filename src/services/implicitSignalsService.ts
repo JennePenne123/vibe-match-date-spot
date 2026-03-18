@@ -48,7 +48,8 @@ export const recordSignal = (signal: ImplicitSignal): void => {
 };
 
 /**
- * Flush buffered signals to Supabase
+ * Flush buffered signals to Supabase.
+ * Aggregates ALL signal types per venue into a composite context object.
  */
 const flushSignals = async (): Promise<void> => {
   if (flushTimeout) {
@@ -65,48 +66,82 @@ const flushSignals = async (): Promise<void> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Store as venue feedback with implicit signal context
-    const feedbackEntries = signalsToFlush
-      .filter(s => s.venue_id) // Only store venue-related signals
-      .map(s => ({
-        user_id: user.id,
-        venue_id: s.venue_id!,
-        feedback_type: 'interested' as const, // Map to existing feedback type
-        context: {
-          implicit: true,
-          signal_type: s.signal_type,
-          signal_value: s.value,
+    // Group signals by venue and merge all signal types
+    const venueSignalMap = new Map<string, Record<string, any>>();
+
+    for (const s of signalsToFlush) {
+      if (!s.venue_id) continue;
+
+      if (!venueSignalMap.has(s.venue_id)) {
+        venueSignalMap.set(s.venue_id, { signals: {}, updated_at: new Date().toISOString() });
+      }
+
+      const entry = venueSignalMap.get(s.venue_id)!;
+      const existing = entry.signals[s.signal_type];
+
+      // Keep the strongest signal per type, but accumulate counts
+      if (!existing || s.value > existing.value) {
+        entry.signals[s.signal_type] = {
+          value: s.value,
           raw_value: s.raw_value,
+          count: (existing?.count || 0) + 1,
+          last_recorded: new Date().toISOString(),
           ...s.metadata,
-          recorded_at: new Date().toISOString(),
-        },
-        updated_at: new Date().toISOString(),
-      }));
-
-    if (feedbackEntries.length === 0) return;
-
-    // Batch upsert - use the strongest signal per venue
-    const venueSignals = new Map<string, typeof feedbackEntries[0]>();
-    for (const entry of feedbackEntries) {
-      const existing = venueSignals.get(entry.venue_id);
-      if (!existing || (entry.context as any).signal_value > (existing.context as any).signal_value) {
-        venueSignals.set(entry.venue_id, entry);
+        };
+      } else {
+        existing.count = (existing.count || 0) + 1;
       }
     }
 
-    for (const entry of venueSignals.values()) {
+    // Upsert with merged context containing ALL signal types
+    for (const [venueId, signalData] of venueSignalMap) {
+      // First try to read existing context to merge with it
+      const { data: existing } = await supabase
+        .from('user_venue_feedback')
+        .select('context')
+        .eq('user_id', user.id)
+        .eq('venue_id', venueId)
+        .maybeSingle();
+
+      const existingCtx = (existing?.context as any) || {};
+      const existingSignals = existingCtx.signals || {};
+
+      // Deep merge: keep higher values, accumulate counts
+      const mergedSignals = { ...existingSignals };
+      for (const [type, newData] of Object.entries(signalData.signals)) {
+        const old = mergedSignals[type];
+        if (!old || (newData as any).value > old.value) {
+          mergedSignals[type] = {
+            ...(newData as any),
+            count: ((old?.count || 0) + ((newData as any).count || 1)),
+          };
+        } else {
+          old.count = (old.count || 0) + ((newData as any).count || 1);
+        }
+      }
+
       await supabase
         .from('user_venue_feedback')
-        .upsert(entry, { onConflict: 'user_id,venue_id' })
+        .upsert({
+          user_id: user.id,
+          venue_id: venueId,
+          feedback_type: 'interested',
+          context: {
+            implicit: true,
+            signals: mergedSignals,
+            signal_count: Object.keys(mergedSignals).length,
+            last_updated: new Date().toISOString(),
+          },
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id,venue_id' })
         .select();
     }
 
     if (import.meta.env.DEV) {
-      console.log(`📡 Implicit signals flushed: ${venueSignals.size} venue signals`);
+      console.log(`📡 Implicit signals flushed: ${venueSignalMap.size} venues, ${signalsToFlush.length} signals`);
     }
   } catch (error) {
     console.error('Error flushing implicit signals:', error);
-    // Re-add failed signals back to buffer
     signalBuffer.push(...signalsToFlush);
   }
 };
@@ -121,7 +156,6 @@ const flushSignals = async (): Promise<void> => {
 export const trackVenueViewStart = (venueId: string): void => {
   venueViewTimestamps.set(venueId, Date.now());
   
-  // Track repeat views
   const count = (venueViewCounts.get(venueId) || 0) + 1;
   venueViewCounts.set(venueId, count);
   
@@ -129,7 +163,7 @@ export const trackVenueViewStart = (venueId: string): void => {
     recordSignal({
       signal_type: 'repeat_venue_view',
       venue_id: venueId,
-      value: Math.min(count / 5, 1), // Normalize: 5+ views = max signal
+      value: Math.min(count / 4, 1), // 4+ views = max signal (was 5)
       raw_value: count,
       metadata: { view_count: count },
     });
@@ -147,11 +181,10 @@ export const trackVenueViewEnd = (venueId: string): void => {
   const dwellTimeSec = dwellTimeMs / 1000;
   venueViewTimestamps.delete(venueId);
 
-  // Only record meaningful dwell times (> 3 seconds, < 10 minutes)
   if (dwellTimeSec < 3 || dwellTimeSec > 600) return;
 
-  // Normalize: 30+ seconds = strong interest signal
-  const normalizedValue = Math.min(dwellTimeSec / 30, 1);
+  // Normalize with a curve: 15s = 0.5, 45s = 0.85, 90s+ = ~1.0
+  const normalizedValue = Math.min(1, 1 - Math.exp(-dwellTimeSec / 30));
 
   recordSignal({
     signal_type: 'venue_dwell',
@@ -166,7 +199,7 @@ export const trackVenueViewEnd = (venueId: string): void => {
  * Track scroll depth on venue detail page
  */
 export const trackScrollDepth = (venueId: string, depthPercent: number): void => {
-  if (depthPercent < 25) return; // Only track meaningful scroll
+  if (depthPercent < 20) return; // Lower threshold (was 25)
 
   recordSignal({
     signal_type: 'venue_scroll_depth',
@@ -184,7 +217,7 @@ export const trackVoucherInteraction = (venueId: string, clicked: boolean): void
   recordSignal({
     signal_type: clicked ? 'voucher_click' : 'voucher_ignore',
     venue_id: venueId,
-    value: clicked ? 0.8 : 0.2,
+    value: clicked ? 0.9 : 0.3,
     raw_value: clicked ? 1 : 0,
     metadata: { voucher_clicked: clicked },
   });
@@ -197,7 +230,7 @@ export const trackPlanningAbandon = (step: string, venueId?: string): void => {
   recordSignal({
     signal_type: 'planning_abandon',
     venue_id: venueId,
-    value: 0.3, // Negative signal
+    value: 0.4, // Negative signal
     raw_value: 1,
     metadata: { abandoned_at_step: step },
   });
@@ -228,8 +261,34 @@ export const trackUsageTime = (): void => {
 // ============================================================================
 
 /**
- * Get aggregated implicit signals for a user-venue pair
- * Used by the scoring engine to boost/penalize scores
+ * Signal type weights for scoring.
+ * Positive signals boost, negative signals penalize.
+ * Max total boost is capped at ±10%.
+ */
+const SIGNAL_WEIGHTS: Record<string, { weight: number; direction: 'positive' | 'negative' }> = {
+  'venue_dwell':        { weight: 0.06, direction: 'positive' },   // Long dwell = interest
+  'repeat_venue_view':  { weight: 0.08, direction: 'positive' },   // Repeat views = strong interest
+  'venue_scroll_depth': { weight: 0.04, direction: 'positive' },   // Deep scroll = engagement
+  'voucher_click':      { weight: 0.05, direction: 'positive' },   // Price-conscious but interested
+  'voucher_ignore':     { weight: 0.02, direction: 'negative' },   // Saw but skipped
+  'planning_abandon':   { weight: 0.04, direction: 'negative' },   // Abandoned = not interested
+};
+
+/**
+ * Time decay factor: signals lose 50% strength after 14 days
+ */
+function getDecayFactor(lastRecorded: string | undefined): number {
+  if (!lastRecorded) return 0.5;
+  const ageMs = Date.now() - new Date(lastRecorded).getTime();
+  const ageDays = ageMs / (1000 * 60 * 60 * 24);
+  // Exponential decay with half-life of 14 days
+  return Math.exp(-0.693 * ageDays / 14);
+}
+
+/**
+ * Get aggregated implicit signal boost for a user-venue pair.
+ * Reads ALL stored signal types and computes a composite score.
+ * Returns a value between -0.10 and +0.10 (±10%).
  */
 export const getImplicitSignalBoost = async (
   userId: string,
@@ -248,20 +307,40 @@ export const getImplicitSignalBoost = async (
     const context = data.context as any;
     if (!context?.implicit) return 0;
 
-    const signalValue = context.signal_value || 0;
-    const signalType = context.signal_type as ImplicitSignalType;
+    const signals = context.signals;
+    if (!signals || typeof signals !== 'object') {
+      // Legacy format: single signal
+      const signalValue = context.signal_value || 0;
+      const signalType = context.signal_type as string;
+      const config = SIGNAL_WEIGHTS[signalType];
+      if (!config) return 0;
+      const boost = signalValue * config.weight;
+      return config.direction === 'negative' ? -boost : boost;
+    }
 
-    // Weight different signal types
-    const typeWeights: Record<string, number> = {
-      'venue_dwell': 0.08,         // Long dwell = +8% max
-      'repeat_venue_view': 0.10,   // Repeat views = +10% max
-      'venue_scroll_depth': 0.05,  // Deep scroll = +5% max
-      'voucher_click': 0.06,       // Voucher click = +6%
-      'voucher_ignore': -0.02,     // Ignored voucher = -2%
-    };
+    // New format: aggregate all signal types
+    let totalBoost = 0;
 
-    const weight = typeWeights[signalType] || 0.03;
-    return signalValue * weight;
+    for (const [signalType, signalData] of Object.entries(signals)) {
+      const config = SIGNAL_WEIGHTS[signalType];
+      if (!config) continue;
+
+      const data = signalData as any;
+      const value = data.value || 0;
+      const decay = getDecayFactor(data.last_recorded);
+      const countBonus = Math.min((data.count || 1) * 0.1, 0.5); // More interactions = stronger signal, capped
+
+      const signalStrength = value * config.weight * decay * (1 + countBonus);
+
+      if (config.direction === 'negative') {
+        totalBoost -= signalStrength;
+      } else {
+        totalBoost += signalStrength;
+      }
+    }
+
+    // Clamp to ±10%
+    return Math.max(-0.10, Math.min(0.10, totalBoost));
   } catch {
     return 0;
   }
@@ -272,12 +351,9 @@ export const getImplicitSignalBoost = async (
  */
 export const flushOnUnload = (): void => {
   if (signalBuffer.length > 0) {
-    // Use sendBeacon for reliable delivery on page unload
-    const payload = JSON.stringify(signalBuffer);
     if (import.meta.env.DEV) {
       console.log('📡 Flushing signals on unload:', signalBuffer.length);
     }
-    // Fallback: just flush normally (sendBeacon would need a dedicated endpoint)
     flushSignals();
   }
 };
