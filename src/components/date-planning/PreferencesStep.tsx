@@ -787,13 +787,329 @@ useEffect(() => {
     }
   };
 
-  const renderPreferenceGrid = (
+  // Compact chip renderer for preference selections
+  const renderChipGrid = (
     items: Preference[], 
     selectedItems: string[], 
     setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>,
-    category: keyof UserPreferences,
-    gridCols = "grid-cols-1 sm:grid-cols-2"
+    category: keyof UserPreferences
   ) => {
+    return (
+      <div className="flex flex-wrap gap-2">
+        {items.map((item) => {
+          const isSelected = selectedItems.includes(item.id);
+          return (
+            <button
+              type="button"
+              key={item.id}
+              onClick={() => toggleSelection(item.id, selectedItems, setSelectedItems, category)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm transition-none select-none",
+                isSelected
+                  ? "border-primary bg-primary/10 text-foreground"
+                  : "border-border bg-card text-muted-foreground"
+              )}
+            >
+              <span>{item.emoji}</span>
+              <span className="font-medium">{item.name}</span>
+              {isSelected && <Check className="w-3 h-3 ml-0.5" />}
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // When duration changes, auto-suggest matching time preferences and price range
+  const handleDurationSelect = (durationId: string) => {
+    const isDeselecting = selectedDuration === durationId;
+    setSelectedDuration(isDeselecting ? null : durationId);
+    
+    if (!isDeselecting) {
+      const model = durationModels.find(d => d.id === durationId);
+      if (model) {
+        if (!userModifiedTimePrefs) {
+          setSelectedTimePreferences(model.suggestTimes);
+        }
+        if (selectedPriceRange.length === 0) {
+          setSelectedPriceRange(model.suggestPrice);
+        }
+        if (model.excludeVibes.length > 0) {
+          setSelectedVibes(prev => prev.filter(v => !model.excludeVibes.includes(v)));
+        }
+        if (selectedTemplateId) {
+          const currentTemplate = allQuickStartTemplates.find(t => t.id === selectedTemplateId);
+          if (currentTemplate && !currentTemplate.fitsDuration.includes(durationId)) {
+            setSelectedTemplateId(null);
+          }
+        }
+      }
+    }
+  };
+
+  const renderDurationStep = () => (
+    <div className="space-y-4">
+      <h2 className="text-base md:text-lg font-bold mb-1">Wie viel Zeit hast du?</h2>
+      <p className="text-muted-foreground text-sm mb-4">Das hilft der KI, passende Vorschläge zu filtern</p>
+      <div className="grid grid-cols-1 gap-3">
+        {durationModels.map((model) => {
+          const isSelected = selectedDuration === model.id;
+          return (
+            <button
+              type="button"
+              key={model.id}
+              onClick={() => handleDurationSelect(model.id)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className={cn(
+                "p-4 md:p-5 rounded-xl border-2 text-left transition-none select-none relative",
+                isSelected
+                  ? "border-primary bg-primary/5"
+                  : "border-border bg-card"
+              )}
+            >
+              <div className="flex items-center gap-4">
+                <div className="text-2xl md:text-3xl flex-shrink-0">{model.emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm md:text-base">{model.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground leading-tight mt-0.5">{model.desc}</p>
+                </div>
+                {isSelected && (
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                    <Check className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // Step 2: Combined Food + Vibe + Budget with compact chips
+  const renderPreferencesStep = () => (
+    <div className="space-y-6">
+      {/* Quick Start Templates as pills */}
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Quick Start</h3>
+        <div className="flex flex-wrap gap-2">
+          {learnedTemplate && (
+            <button
+              type="button"
+              onClick={() => applyQuickStartTemplate(learnedTemplate)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className={cn(
+                "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
+                isTemplateCurrentlySelected(learnedTemplate)
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-card"
+              )}
+            >
+              <span>{learnedTemplate.emoji}</span>
+              <span className="font-medium">{learnedTemplate.title}</span>
+              <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">KI</Badge>
+              {isTemplateCurrentlySelected(learnedTemplate) && <Check className="w-3 h-3" />}
+            </button>
+          )}
+          {quickStartTemplates.map((template) => (
+            <button
+              type="button"
+              key={template.id}
+              onClick={() => applyQuickStartTemplate(template)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className={cn(
+                "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
+                isTemplateCurrentlySelected(template)
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-card"
+              )}
+            >
+              <span>{template.emoji}</span>
+              <span className="font-medium">{template.title}</span>
+              {isTemplateCurrentlySelected(template) && <Check className="w-3 h-3" />}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Cuisine Chips */}
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Küche</h3>
+        {renderChipGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines')}
+      </div>
+
+      {/* Vibe Chips */}
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Vibe</h3>
+        {selectedDurationModel?.excludeVibes.length ? (
+          <p className="text-xs text-muted-foreground mb-2 italic">
+            Einige Vibes wurden basierend auf deinem Zeitmodell ausgeblendet
+          </p>
+        ) : null}
+        {renderChipGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
+      </div>
+
+      {/* Budget Chips */}
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Budget</h3>
+        {selectedDurationModel && selectedPriceRange.length > 0 && (
+          <p className="text-xs text-muted-foreground mb-2 italic">
+            Vorauswahl basierend auf „{selectedDurationModel.title}"
+          </p>
+        )}
+        {renderChipGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range')}
+      </div>
+    </div>
+  );
+
+  // Step 3: Date/Time + Advanced (collapsible) + Submit
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const renderConfirmStep = () => (
+    <div className="space-y-6">
+      {/* Date & Time Selection */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Wann geht's los?</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Datum</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal h-10",
+                    !selectedDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <span className="truncate">
+                    {selectedDate ? format(selectedDate, "PPP") : "Datum wählen"}
+                  </span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date);
+                    setUserModifiedDate(true);
+                  }}
+                  disabled={(date) => date < new Date()}
+                  initialFocus
+                  className="pointer-events-auto"
+                  defaultMonth={selectedDate || (initialProposedDate ? new Date(initialProposedDate) : undefined)}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-2 block">Uhrzeit</label>
+            <Select value={selectedTime} onValueChange={(time) => {
+              setSelectedTime(time);
+              setUserModifiedTime(true);
+            }}>
+              <SelectTrigger className="h-10">
+                <SelectValue placeholder="Uhrzeit wählen" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 24 }, (_, i) => {
+                  const hour = i.toString().padStart(2, '0');
+                  return (
+                    <SelectItem key={`${hour}:00`} value={`${hour}:00`}>
+                      {hour}:00
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {prefilledFromProposal && (selectedDate || selectedTime) && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded-md p-2">
+            <Sparkles className="w-3 h-3" />
+            <span>Vorausgefüllt aus deinem Proposal</span>
+          </div>
+        )}
+      </div>
+
+      {/* Time Preference Chips */}
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Tageszeit</h3>
+        {renderChipGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times')}
+      </div>
+
+      {/* Summary of selections */}
+      {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
+        <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Deine Auswahl</p>
+          <div className="flex flex-wrap gap-1.5">
+            {selectedDuration && (
+              <Badge variant="outline" className="text-xs">
+                {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
+              </Badge>
+            )}
+            {selectedCuisines.map(c => (
+              <Badge key={c} variant="outline" className="text-xs">
+                {cuisines.find(x => x.id === c)?.emoji} {c}
+              </Badge>
+            ))}
+            {selectedVibes.map(v => (
+              <Badge key={v} variant="outline" className="text-xs">
+                {allVibes.find(x => x.id === v)?.emoji} {v}
+              </Badge>
+            ))}
+            {selectedPriceRange.map(p => (
+              <Badge key={p} variant="outline" className="text-xs">{p}</Badge>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Advanced Options (collapsible) */}
+      <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+        <CollapsibleTrigger asChild>
+          <button
+            type="button"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full"
+          >
+            <Settings className="w-4 h-4" />
+            <span>Erweiterte Optionen</span>
+            <ChevronDown className={cn("w-4 h-4 ml-auto transition-transform", showAdvanced && "rotate-180")} />
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="space-y-5 pt-4">
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Entfernung</h3>
+            <div className="space-y-3">
+              <Slider
+                value={[maxDistance]}
+                onValueChange={(value) => setMaxDistance(value[0])}
+                max={50}
+                min={1}
+                step={1}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>1 km</span>
+                <span className="font-medium text-foreground">{maxDistance} km</span>
+                <span>50 km</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Diät / Unverträglichkeiten</h3>
+            {renderChipGrid(dietaryRequirements, selectedDietary, setSelectedDietary, 'dietary_restrictions')}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
     // Only show matches in collaborative mode when partner has set preferences
     const shouldShowMatches = planningMode === 'collaborative' && 
                              collaborativeSession?.hasPartnerSetPreferences;
