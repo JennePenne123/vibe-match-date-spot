@@ -186,11 +186,11 @@ const calculateUserScore = (
 
 // Calculate shared preference bonus for collaborative scoring
 const calculateSharedBonus = (
-  userMatches: { cuisine: boolean; price: boolean; vibes: string[] },
-  partnerMatches: { cuisine: boolean; price: boolean; vibes: string[] }
-): { bonus: number; sharedMatches: { cuisine: boolean; price: boolean; vibes: string[] } } => {
+  userMatches: { cuisine: boolean; price: boolean; vibes: string[]; activities: string[]; venueType: boolean },
+  partnerMatches: { cuisine: boolean; price: boolean; vibes: string[]; activities: string[]; venueType: boolean }
+): { bonus: number; sharedMatches: { cuisine: boolean; price: boolean; vibes: string[]; activities: boolean; venueType: boolean } } => {
   let bonus = 0;
-  const sharedMatches = { cuisine: false, price: false, vibes: [] as string[] };
+  const sharedMatches = { cuisine: false, price: false, vibes: [] as string[], activities: false, venueType: false };
 
   // Both users match cuisine: +15% bonus
   if (userMatches.cuisine && partnerMatches.cuisine) {
@@ -213,6 +213,21 @@ const calculateSharedBonus = (
       bonus += 0.10;
       sharedMatches.vibes.push(vibe);
     }
+  }
+
+  // Both users match activities: +10% bonus
+  if (userMatches.activities.length > 0 && partnerMatches.activities.length > 0) {
+    const sharedActs = userMatches.activities.filter(a => partnerMatches.activities.includes(a));
+    if (sharedActs.length > 0) {
+      bonus += 0.10;
+      sharedMatches.activities = true;
+    }
+  }
+
+  // Both users match venue type: +5% bonus
+  if (userMatches.venueType && partnerMatches.venueType) {
+    bonus += 0.05;
+    sharedMatches.venueType = true;
   }
 
   return { bonus, sharedMatches };
