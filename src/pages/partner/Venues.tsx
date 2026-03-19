@@ -244,6 +244,20 @@ function PartnerVenueMap({ partnerships }: { partnerships: Partnership[] }) {
   const { t } = useTranslation();
   const venuesWithCoords = partnerships.filter(p => p.venues.latitude && p.venues.longitude);
 
+  const [MapContainer, setMapContainer] = useState<any>(null);
+  const [TileLayer, setTileLayer] = useState<any>(null);
+  const [MarkerComp, setMarkerComp] = useState<any>(null);
+  const [PopupComp, setPopupComp] = useState<any>(null);
+
+  useEffect(() => {
+    import('react-leaflet').then((mod) => {
+      setMapContainer(() => mod.MapContainer);
+      setTileLayer(() => mod.TileLayer);
+      setMarkerComp(() => mod.Marker);
+      setPopupComp(() => mod.Popup);
+    });
+  }, []);
+
   if (venuesWithCoords.length === 0) {
     return (
       <Card className="text-center py-12">
@@ -256,21 +270,6 @@ function PartnerVenueMap({ partnerships }: { partnerships: Partnership[] }) {
       </Card>
     );
   }
-
-  // Lazy load map
-  const [MapContainer, setMapContainer] = useState<any>(null);
-  const [TileLayer, setTileLayer] = useState<any>(null);
-  const [Marker, setMarker] = useState<any>(null);
-  const [Popup, setPopup] = useState<any>(null);
-
-  useEffect(() => {
-    import('react-leaflet').then((mod) => {
-      setMapContainer(() => mod.MapContainer);
-      setTileLayer(() => mod.TileLayer);
-      setMarker(() => mod.Marker);
-      setPopup(() => mod.Popup);
-    });
-  }, []);
 
   if (!MapContainer) return <div className="h-[400px] rounded-xl bg-muted animate-pulse" />;
 
@@ -287,15 +286,15 @@ function PartnerVenueMap({ partnerships }: { partnerships: Partnership[] }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {venuesWithCoords.map((p) => (
-          <Marker key={p.id} position={[p.venues.latitude!, p.venues.longitude!]}>
-            <Popup>
+          <MarkerComp key={p.id} position={[p.venues.latitude!, p.venues.longitude!]}>
+            <PopupComp>
               <div className="text-sm">
                 <p className="font-semibold">{p.venues.name}</p>
                 <p className="text-xs text-muted-foreground">{p.venues.address}</p>
                 {p.venues.cuisine_type && <p className="text-xs mt-1">{p.venues.cuisine_type}</p>}
               </div>
-            </Popup>
-          </Marker>
+            </PopupComp>
+          </MarkerComp>
         ))}
       </MapContainer>
     </div>
