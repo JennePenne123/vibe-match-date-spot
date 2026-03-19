@@ -747,8 +747,18 @@ useEffect(() => {
   };
 
   const nextStep = () => {
-    // Validate step 2 before proceeding
-    if (currentStep === 2 && !canProceedFromStep2()) {
+    // Validate step 1: duration must be selected
+    if (currentStep === 1 && !selectedDuration) {
+      toast({
+        title: "Zeitmodell wählen",
+        description: "Bitte wähle zuerst, wie viel Zeit du dir nehmen möchtest.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate step 3 before proceeding (was step 2)
+    if (currentStep === 3 && !canProceedFromStep2()) {
       toast({
         title: "Date and Time Required",
         description: "Please select both a preferred date and time to continue.",
@@ -770,20 +780,22 @@ useEffect(() => {
 
   const getStepTitle = () => {
     switch (currentStep) {
-      case 1: return 'Food & Vibe';
-      case 2: return 'Budget & Timing';
-      case 3: return 'Distance & Diet';
-      case 4: return 'Review & Submit';
+      case 1: return 'Zeitmodell';
+      case 2: return 'Food & Vibe';
+      case 3: return 'Budget & Timing';
+      case 4: return 'Distance & Diet';
+      case 5: return 'Review & Submit';
       default: return 'Preferences';
     }
   };
 
   const getStepIcon = () => {
     switch (currentStep) {
-      case 1: return <Heart className="w-5 h-5" />;
-      case 2: return <DollarSign className="w-5 h-5" />;
-      case 3: return <MapPin className="w-5 h-5" />;
-      case 4: return <Check className="w-5 h-5" />;
+      case 1: return <Clock className="w-5 h-5" />;
+      case 2: return <Heart className="w-5 h-5" />;
+      case 3: return <DollarSign className="w-5 h-5" />;
+      case 4: return <MapPin className="w-5 h-5" />;
+      case 5: return <Check className="w-5 h-5" />;
       default: return <Heart className="w-5 h-5" />;
     }
   };
