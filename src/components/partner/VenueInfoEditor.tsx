@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Plus, X } from 'lucide-react';
+import { Loader2, Save, Plus, X, Sparkles, Tag } from 'lucide-react';
 
 const CUISINE_OPTIONS = [
   'Italian', 'Japanese', 'Mexican', 'Indian', 'French', 'Thai',
@@ -21,6 +21,27 @@ const PRICE_OPTIONS = [
   { value: '$$$', label: '$$$ – Gehoben' },
   { value: '$$$$', label: '$$$$ – Luxus' },
 ];
+
+/** Suggested keywords grouped by category – these directly boost AI matching */
+const KEYWORD_SUGGESTIONS: Record<string, string[]> = {
+  'Atmosphäre': [
+    'romantisch', 'gemütlich', 'trendy', 'elegant', 'lively', 'chill', 'intimate',
+    'bohemian', 'rustic', 'modern', 'luxus', 'hip', 'cozy', 'upscale',
+  ],
+  'Location': [
+    'rooftop', 'terrasse', 'outdoor', 'waterfront', 'garden', 'biergarten',
+    'panorama', 'view', 'altstadt', 'downtown', 'lounge', 'cellar', 'gewölbe',
+  ],
+  'Angebot': [
+    'cocktail', 'wine bar', 'craft beer', 'live music', 'jazz', 'brunch',
+    'fine dining', 'tapas', 'sushi', 'vegan', 'organic', 'tasting',
+    'happy hour', 'late night', 'seafood', 'gourmet',
+  ],
+  'Aktivitäten': [
+    'karaoke', 'comedy', 'bowling', 'escape room', 'arcade', 'mini golf',
+    'spa', 'wellness', 'gallery', 'theater', 'museum', 'live entertainment',
+  ],
+};
 
 interface VenueInfoEditorProps {
   venueId: string;
@@ -51,6 +72,7 @@ export const VenueInfoEditor: React.FC<VenueInfoEditorProps> = ({
   const [address, setAddress] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     setDescription(currentData?.description || '');
@@ -62,11 +84,26 @@ export const VenueInfoEditor: React.FC<VenueInfoEditorProps> = ({
     setTags(currentData?.tags || []);
   }, [currentData]);
 
+  const availableSuggestions = useMemo(() => {
+    const result: Record<string, string[]> = {};
+    for (const [category, keywords] of Object.entries(KEYWORD_SUGGESTIONS)) {
+      const filtered = keywords.filter(kw => !tags.includes(kw));
+      if (filtered.length > 0) result[category] = filtered;
+    }
+    return result;
+  }, [tags]);
+
   const addTag = () => {
     const trimmed = newTag.trim().toLowerCase();
     if (trimmed && !tags.includes(trimmed)) {
       setTags(prev => [...prev, trimmed]);
       setNewTag('');
+    }
+  };
+
+  const addSuggestedTag = (keyword: string) => {
+    if (!tags.includes(keyword)) {
+      setTags(prev => [...prev, keyword]);
     }
   };
 
@@ -184,14 +221,29 @@ export const VenueInfoEditor: React.FC<VenueInfoEditorProps> = ({
         </div>
       </div>
 
-      {/* Tags */}
-      <div className="space-y-1.5">
-        <Label className="text-sm">Tags / Vibes</Label>
+      {/* Tags / Keywords */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm flex items-center gap-1.5">
+            <Tag className="w-3.5 h-3.5" />
+            Tags & Keywords
+          </Label>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setShowSuggestions(!showSuggestions)}
+            className="h-6 px-2 text-xs gap-1 text-primary"
+          >
+            <Sparkles className="w-3 h-3" />
+            {showSuggestions ? 'Ausblenden' : 'Vorschläge'}
+          </Button>
+        </div>
+
         <div className="flex gap-2">
           <Input
             value={newTag}
             onChange={e => setNewTag(e.target.value)}
-            placeholder="z.B. romantisch, rooftop..."
+            placeholder="z.B. romantisch, rooftop, live music..."
             className="h-8 text-sm"
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTag())}
           />
@@ -199,6 +251,8 @@ export const VenueInfoEditor: React.FC<VenueInfoEditorProps> = ({
             <Plus className="w-3.5 h-3.5" />
           </Button>
         </div>
+
+        {/* Current tags */}
         {tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {tags.map((tag, index) => (
@@ -211,6 +265,35 @@ export const VenueInfoEditor: React.FC<VenueInfoEditorProps> = ({
             ))}
           </div>
         )}
+
+        {/* Keyword suggestions */}
+        {showSuggestions && Object.keys(availableSuggestions).length > 0 && (
+          <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-3">
+            <p className="text-xs text-muted-foreground">
+              💡 Diese Keywords helfen der KI, dein Venue besser zu matchen:
+            </p>
+            {Object.entries(availableSuggestions).map(([category, keywords]) => (
+              <div key={category} className="space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">{category}</span>
+                <div className="flex flex-wrap gap-1">
+                  {keywords.map(kw => (
+                    <button
+                      key={kw}
+                      onClick={() => addSuggestedTag(kw)}
+                      className="text-xs px-2 py-0.5 rounded-full border border-border bg-background hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-colors"
+                    >
+                      + {kw}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <p className="text-xs text-muted-foreground">
+          Tags verbessern die KI-Empfehlungen – je passender die Keywords, desto öfter wird dein Venue vorgeschlagen.
+        </p>
       </div>
 
       {/* Save */}
