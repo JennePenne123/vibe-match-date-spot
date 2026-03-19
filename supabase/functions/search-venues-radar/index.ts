@@ -30,6 +30,36 @@ const CUISINE_TO_RADAR_CATEGORIES: Record<string, string> = {
   'Burger': 'burger-joint',
 };
 
+// Venue type mapping to Radar categories
+const VENUE_TYPE_TO_RADAR: Record<string, string[]> = {
+  'museum': ['museum'],
+  'gallery': ['art-gallery'],
+  'theater_venue': ['theater', 'performing-arts-venue'],
+  'cinema': ['movie-theater'],
+  'concert_hall': ['music-venue', 'concert-hall'],
+  'exhibition': ['museum', 'convention-center'],
+  'mini_golf': ['mini-golf-course'],
+  'bowling': ['bowling-alley'],
+  'escape_room': ['entertainment'],
+  'climbing': ['rock-climbing', 'gym'],
+  'swimming': ['pool', 'water-park'],
+  'hiking': ['trail', 'park'],
+  'cycling': ['bike-shop', 'park'],
+  'karaoke': ['karaoke-bar'],
+  'comedy_club': ['comedy-club'],
+  'arcade': ['arcade'],
+  'live_event': ['event-space', 'music-venue'],
+  'spa_wellness': ['spa', 'gym'],
+};
+
+// Activity to Radar categories
+const ACTIVITY_TO_RADAR: Record<string, string[]> = {
+  'cocktails': ['cocktail-bar', 'wine-bar', 'bar'],
+  'cultural_act': ['museum', 'art-gallery', 'theater'],
+  'active': ['gym', 'sports-center', 'bowling-alley'],
+  'nightlife_act': ['nightclub', 'bar', 'lounge'],
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
