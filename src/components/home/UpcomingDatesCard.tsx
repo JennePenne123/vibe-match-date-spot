@@ -17,11 +17,7 @@ const UpcomingDatesCard: React.FC = () => {
 
   // Filter and get upcoming dates (accepted/scheduled) regardless of direction
   const upcomingDates = React.useMemo(() => {
-    console.log('📅 UPCOMING DATES DEBUG - Raw invitations:', invitations);
-    console.log('📅 UPCOMING DATES DEBUG - Total invitations count:', invitations?.length);
-    
     if (!invitations || invitations.length === 0) {
-      console.log('📅 UPCOMING DATES DEBUG - No invitations found');
       return [];
     }
     
