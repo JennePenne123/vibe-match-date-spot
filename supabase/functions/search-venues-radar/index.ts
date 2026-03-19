@@ -80,14 +80,24 @@ serve(async (req) => {
       .filter(Boolean)
       .join(',');
 
-    // Build Radar search URL
-    // Always use broad 'food-beverage' to get diverse results
-    // Specific cuisine filtering happens client-side with fuzzy matching
+    // Build Radar search URL - use specific dine-in categories to exclude
+    // supermarkets, delivery services, grocery stores etc.
+    const dineInCategories = [
+      'restaurant', 'cafe', 'bar', 'coffee-shop', 'bakery',
+      'italian-restaurant', 'french-restaurant', 'japanese-restaurant',
+      'chinese-restaurant', 'thai-restaurant', 'mexican-restaurant',
+      'indian-restaurant', 'american-restaurant', 'mediterranean-restaurant',
+      'seafood-restaurant', 'steakhouse', 'asian-restaurant',
+      'pizza-place', 'burger-joint', 'vegetarian-restaurant',
+      'wine-bar', 'cocktail-bar', 'pub', 'brewery', 'ice-cream-shop',
+      'dessert-shop', 'brunch-restaurant', 'bistro'
+    ].join(',');
+
     const searchParams = new URLSearchParams({
       near: `${validLat},${validLng}`,
       radius: validRadius.toString(),
       limit: validLimit.toString(),
-      categories: 'food-beverage',
+      categories: dineInCategories,
     });
 
     const searchUrl = `https://api.radar.io/v1/search/places?${searchParams}`;
