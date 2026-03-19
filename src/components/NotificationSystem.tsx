@@ -44,7 +44,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
 
             if (newInvitation.status === 'accepted') {
               toast({
-                title: "Date Accepted! 🎉",
+                title: "Date Accepted!",
                 description: `${recipientName} accepted your date invitation! Time to start planning the details.`,
                 duration: 8000,
                 action: (
@@ -55,7 +55,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
               });
             } else if (newInvitation.status === 'declined') {
               toast({
-                title: "Invitation Response 💙",
+                title: "Invitation Response",
                 description: `${recipientName} isn't available for this date. Don't worry - maybe try a different time or venue!`,
                 duration: 6000,
                 action: (
@@ -94,7 +94,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
           const senderName = sender?.name || 'A friend';
 
           toast({
-            title: "New Date Invitation! 💌",
+            title: "New Date Invitation!",
             description: `${senderName} sent you a date invitation. Check it out and respond!`,
             duration: 8000,
             action: (
