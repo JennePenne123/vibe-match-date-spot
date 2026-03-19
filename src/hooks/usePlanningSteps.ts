@@ -62,7 +62,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     });
     
     // CRITICAL: Don't interfere with manual step transitions during AI analysis and results phases
-    const advancedSteps = ['review-matches', 'plan-together', 'create-invitation'];
+    const advancedSteps = ['plan-together', 'create-invitation'];
     if (advancedSteps.includes(currentStep)) {
       console.log('🔧 Planning Steps - SKIPPING sync for advanced step:', currentStep);
       return;
