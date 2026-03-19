@@ -471,26 +471,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
               </div>
             )}
 
-            {currentStep === 'review-matches' && selectedPartner && (
-              <div className="animate-fade-in">
-                <MatchReview
-                  compatibilityScore={compatibilityScore || 0}
-                  partnerName={selectedPartner.name}
-                  partnerId={selectedPartnerId}
-                  venueCount={venueRecommendations?.length || 0}
-                  onContinueToPlanning={handleContinueToPlanning}
-                  error={datePlanningError || undefined}
-                  onRetrySearch={() => {
-                    console.log('Retrying venue search...');
-                  }}
-                  sessionId={collaborativeSession?.id || currentSession?.id}
-                  isCollaborative={true}
-                  hasPartnerSetPreferences={currentSession?.both_preferences_complete || false}
-                  isWaitingForPartner={!(currentSession?.both_preferences_complete || false)}
-                />
-              </div>
-            )}
-
             {currentStep === 'plan-together' && selectedPartner && (
               <div className="animate-fade-in">
                 <PlanTogether

@@ -140,7 +140,7 @@ export const useSmartDatePlannerState = ({
         
         // If user was on invitation step, move them back to venue selection
         if (currentStep === 'create-invitation') {
-          setCurrentStep('review-matches');
+          setCurrentStep('plan-together');
         }
       }
     }
