@@ -212,24 +212,50 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="venue_id"
-              render={({ field }) => (
+              name="venue_ids"
+              render={() => (
                 <FormItem>
-                  <FormLabel>Venue</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a venue" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {venues.map((venue) => (
-                        <SelectItem key={venue.id} value={venue.id}>
-                          {venue.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Venues {venues.length > 1 && `(${form.watch('venue_ids')?.length || 0}/${venues.length} ausgewählt)`}</FormLabel>
+                  <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto border rounded-md p-3">
+                    {venues.length > 1 && (
+                      <div className="flex items-center space-x-2 pb-2 border-b mb-1">
+                        <Checkbox
+                          checked={form.watch('venue_ids')?.length === venues.length}
+                          onCheckedChange={(checked) => {
+                            form.setValue('venue_ids', checked ? venues.map(v => v.id) : []);
+                          }}
+                        />
+                        <span className="text-sm font-medium">Alle auswählen</span>
+                      </div>
+                    )}
+                    {venues.map((venue) => (
+                      <FormField
+                        key={venue.id}
+                        control={form.control}
+                        name="venue_ids"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(venue.id)}
+                                onCheckedChange={(checked) => {
+                                  return checked
+                                    ? field.onChange([...(field.value || []), venue.id])
+                                    : field.onChange(field.value?.filter((id: string) => id !== venue.id));
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal cursor-pointer text-sm">
+                              {venue.name}
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </div>
+                  <FormDescription>
+                    {venues.length > 1 ? 'Wähle einen oder mehrere Standorte für den Gutschein' : 'Dein Venue wird automatisch ausgewählt'}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
