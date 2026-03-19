@@ -9,7 +9,7 @@ export const API_CONFIG = {
   // API toggles
   useRadar: true,          // Primary search (100K free calls/month)
   useFoursquare: true,     // Enrichment: photos, tips, ratings
-  useGooglePlaces: false,  // Disabled – only for on-demand enrichment if needed
+  useGooglePlaces: true,   // Enabled as fallback for niche venue types (museums, bowling, etc.)
   
   // Search strategy
   venueSearchStrategy: 'radar-foursquare' as VenueSearchStrategy,
@@ -42,7 +42,7 @@ export const API_CONFIG = {
   // Daily budget caps (cost control)
   maxRadarCallsPerDay: 3000,     // Well within 100K/month free tier
   maxFoursquareCallsPerDay: 150, // Conservative for 200/day free tier
-  maxGooglePlacesCallsPerDay: 0, // Disabled
+  maxGooglePlacesCallsPerDay: 100, // Limited fallback for niche venues (~$1.70/day max)
   
   // AI Enhancement
   aiEnhancementEnabled: false,

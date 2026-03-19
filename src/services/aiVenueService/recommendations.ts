@@ -339,6 +339,69 @@ async function getVenuesRadarFoursquare(
     const fsqVenues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
     venues = mergeAndDeduplicateVenues(venues, fsqVenues);
   }
+
+  // Step 4: Google Places fallback for niche venue types
+  // If user wants non-restaurant venues (museums, bowling, etc.) and results are sparse
+  if (userLocation) {
+    const { data: userPrefs } = await supabase
+      .from('user_preferences')
+      .select('preferred_venue_types, preferred_activities')
+      .eq('user_id', userId)
+      .single();
+
+    const nicheTypes = (userPrefs as any)?.preferred_venue_types || [];
+    const nicheActivities = (userPrefs as any)?.preferred_activities || [];
+    const hasNichePreferences = nicheTypes.length > 0 || nicheActivities.length > 0;
+
+    // Check how many results match niche categories
+    const nicheKeywords = [...nicheTypes, ...nicheActivities].map((t: string) => t.replace(/_/g, ' ').toLowerCase());
+    const nicheMatches = venues.filter((v: any) => {
+      const text = [(v.name || ''), (v.description || ''), ...(v.tags || [])].join(' ').toLowerCase();
+      return nicheKeywords.some(kw => text.includes(kw));
+    });
+
+    if (hasNichePreferences && nicheMatches.length < 3) {
+      console.log('🔍 Google Places fallback: only', nicheMatches.length, 'niche matches from Radar/FSQ, fetching from Google...');
+      
+      // Map niche types to Google Places types
+      const googleTypesMap: Record<string, string> = {
+        'museum': 'museum',
+        'gallery': 'art_gallery',
+        'theater_venue': 'movie_theater',
+        'cinema': 'movie_theater',
+        'concert_hall': 'night_club',
+        'bowling': 'bowling_alley',
+        'swimming': 'swimming_pool',
+        'spa_wellness': 'spa',
+        'arcade': 'amusement_park',
+        'mini_golf': 'amusement_park',
+        'karaoke': 'night_club',
+        'comedy_club': 'night_club',
+        'climbing': 'gym',
+        'escape_room': 'amusement_park',
+      };
+
+      const googleTypes = [...nicheTypes, ...nicheActivities]
+        .map((t: string) => googleTypesMap[t])
+        .filter(Boolean);
+
+      if (googleTypes.length > 0) {
+        try {
+          const googleVenues = await getVenuesFromGooglePlaces(userId, 10, {
+            ...userLocation,
+            // Pass types as part of the search
+          });
+          
+          if (googleVenues.length > 0) {
+            console.log('✅ Google Places fallback found', googleVenues.length, 'additional venues');
+            venues = mergeAndDeduplicateVenues(venues, googleVenues);
+          }
+        } catch (err) {
+          console.warn('⚠️ Google Places fallback failed:', err instanceof Error ? err.message : 'Unknown error');
+        }
+      }
+    }
+  }
   
   return venues;
 }
