@@ -1,6 +1,38 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /**
+ * Area-to-vibe mapping: each area category maps to venue tags, vibes, and keywords
+ * that boost matching when a user selects that area type
+ */
+export const AREA_VIBE_MAP: Record<string, { vibes: string[]; keywords: string[]; priceHint?: string[] }> = {
+  'downtown': {
+    vibes: ['trendy', 'urban', 'modern', 'lively', 'hip', 'bustling'],
+    keywords: ['rooftop', 'lounge', 'cocktail', 'nightlife', 'club', 'skyline', 'downtown', 'zentrum', 'city', 'innenstadt'],
+    priceHint: ['$$', '$$$'],
+  },
+  'waterfront': {
+    vibes: ['scenic', 'relaxed', 'romantic', 'peaceful', 'chill'],
+    keywords: ['seafood', 'harbour', 'harbor', 'hafen', 'lake', 'see', 'river', 'water', 'sunset', 'terrace', 'outdoor', 'pier', 'beach'],
+    priceHint: ['$$', '$$$'],
+  },
+  'arts-district': {
+    vibes: ['creative', 'artsy', 'bohemian', 'cultural', 'eclectic', 'indie'],
+    keywords: ['gallery', 'jazz', 'live music', 'theater', 'museum', 'art', 'vintage', 'craft', 'studio', 'alternative'],
+    priceHint: ['$', '$$'],
+  },
+  'oldtown': {
+    vibes: ['cozy', 'charming', 'traditional', 'intimate', 'historic', 'rustic'],
+    keywords: ['wine', 'cafe', 'bistro', 'historic', 'altstadt', 'traditional', 'classic', 'old', 'brauhaus', 'tavern'],
+    priceHint: ['$$'],
+  },
+  'uptown': {
+    vibes: ['upscale', 'elegant', 'sophisticated', 'premium', 'luxury', 'exclusive'],
+    keywords: ['fine dining', 'michelin', 'champagne', 'gourmet', 'tasting', 'omakase', 'premium', 'exclusive', 'sterne'],
+    priceHint: ['$$$', '$$$$'],
+  },
+};
+
+/**
  * Fuzzy cuisine matching - handles partial matches and related categories
  */
 function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: string[]): number {
