@@ -44,7 +44,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
 
             if (newInvitation.status === 'accepted') {
               toast({
-                title: "Date Accepted! 🎉",
+                title: "Date Accepted!",
                 description: `${recipientName} accepted your date invitation! Time to start planning the details.`,
                 duration: 8000,
                 action: (
