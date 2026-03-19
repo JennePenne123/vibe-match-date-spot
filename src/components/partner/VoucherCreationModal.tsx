@@ -85,7 +85,7 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
       code: '',
       discount_type: 'percentage',
       discount_value: 10,
-      venue_id: '',
+      venue_ids: [],
       valid_from: new Date(),
       valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
       max_redemptions: '' as any,
