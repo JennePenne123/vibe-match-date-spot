@@ -433,14 +433,16 @@ async function getVenuesFromRadar(
     });
     return [];
   }
-};
+}
 
 /**
  * Fetch venues from Foursquare
+ */
+async function getVenuesFromFoursquare(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
+) {
   const timer = apiUsageService.createTimer('foursquare', '/search-venues-foursquare');
   
   try {
