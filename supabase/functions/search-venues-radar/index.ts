@@ -127,36 +127,60 @@ serve(async (req) => {
     const places = searchData.places || [];
     console.log('✅ RADAR: Found', places.length, 'places');
 
+    // Blocklist: filter out non-dine-in venues
+    const blockedCategories = [
+      'grocery', 'supermarket', 'convenience-store', 'gas-station',
+      'food-delivery', 'catering', 'food-truck', 'vending-machine',
+      'liquor-store', 'discount-store', 'department-store', 'drugstore',
+      'market', 'deli', 'butcher', 'wholesale',
+    ];
+    const blockedNames = [
+      'netto', 'aldi', 'lidl', 'rewe', 'edeka', 'penny', 'kaufland',
+      'lieferando', 'delivery hero', 'wolt', 'uber eats', 'domino',
+      'pizza hut delivery', 'just eat', 'flink', 'gorillas', 'getir',
+    ];
+
     // Transform Radar data to our venue schema
-    const venues = places.map((place: any) => {
-      // Determine cuisine type from categories
-      const cuisineType = determineCuisineType(place, sanitizedCuisines);
+    const venues = places
+      .filter((place: any) => {
+        const cats = (place.categories || []).map((c: string) => c.toLowerCase());
+        const name = (place.name || '').toLowerCase();
+        // Exclude if any blocked category or name matches
+        const hasBlockedCat = cats.some((cat: string) => 
+          blockedCategories.some(b => cat.includes(b))
+        );
+        const hasBlockedName = blockedNames.some(b => name.includes(b));
+        if (hasBlockedCat || hasBlockedName) {
+          console.log(`🚫 RADAR: Excluded non-venue: ${place.name}`);
+        }
+        return !hasBlockedCat && !hasBlockedName;
+      })
+      .map((place: any) => {
+        const cuisineType = determineCuisineType(place, sanitizedCuisines);
+        const isChain = !!place.chain;
+        const chainName = place.chain?.name || null;
 
-      // Map Radar chain info
-      const isChain = !!place.chain;
-      const chainName = place.chain?.name || null;
-
-      return {
-        venue_id: place._id,
-        radar_id: place._id,
-        name: place.name,
-        address: place.location?.formattedAddress || `${place.location?.addressLabel || ''}, ${place.location?.city || ''}`,
-        latitude: place.location?.coordinates?.[1] || place.location?.latitude,
-        longitude: place.location?.coordinates?.[0] || place.location?.longitude,
-        cuisine_type: cuisineType,
-        price_range: '$$', // Radar doesn't provide price data, default
-        rating: 0, // Radar doesn't provide ratings
-        photos: [], // Radar doesn't provide photos (use Foursquare for enrichment)
-        description: place.categories?.map((c: string) => c.replace(/-/g, ' ')).join(', ') || '',
-        phone: '',
-        website: '',
-        opening_hours: null,
-        tags: place.categories || [],
-        chain: chainName,
-        is_chain: isChain,
-        source: 'radar',
-      };
-    });
+        return {
+          venue_id: place._id,
+          radar_id: place._id,
+          name: place.name,
+          address: place.location?.formattedAddress || `${place.location?.addressLabel || ''}, ${place.location?.city || ''}`,
+          latitude: place.location?.coordinates?.[1] || place.location?.latitude,
+          longitude: place.location?.coordinates?.[0] || place.location?.longitude,
+          cuisine_type: cuisineType,
+          price_range: '$$',
+          rating: 0,
+          photos: [],
+          description: place.categories?.map((c: string) => c.replace(/-/g, ' ')).join(', ') || '',
+          phone: '',
+          website: '',
+          opening_hours: null,
+          tags: place.categories || [],
+          chain: chainName,
+          is_chain: isChain,
+          source: 'radar',
+        };
+      });
 
     // Save to database
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
