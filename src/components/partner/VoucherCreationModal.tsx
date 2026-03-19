@@ -43,7 +43,7 @@ const voucherSchema = z.object({
   code: z.string().min(3, 'Code must be at least 3 characters').max(50).regex(/^[A-Z0-9_-]+$/, 'Code must contain only uppercase letters, numbers, hyphens, and underscores'),
   discount_type: z.enum(['percentage', 'fixed', 'free_item']),
   discount_value: z.number().min(0.01, 'Discount value must be greater than 0'),
-  venue_id: z.string().min(1, 'Venue is required'),
+  venue_ids: z.array(z.string()).min(1, 'Mindestens ein Venue auswählen'),
   valid_from: z.date(),
   valid_until: z.date(),
   max_redemptions: z.number().int().positive().optional().or(z.literal('')),
@@ -85,7 +85,7 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
       code: '',
       discount_type: 'percentage',
       discount_value: 10,
-      venue_id: '',
+      venue_ids: [],
       valid_from: new Date(),
       valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
       max_redemptions: '' as any,
@@ -134,9 +134,9 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
       if (venuesError) throw venuesError;
       setVenues(venuesData || []);
 
-      // Auto-select first venue if only one
+      // Auto-select all venues if only one
       if (venuesData && venuesData.length === 1) {
-        form.setValue('venue_id', venuesData[0].id);
+        form.setValue('venue_ids', [venuesData[0].id]);
       }
     } catch (error) {
       console.error('Error fetching venues:', error);
@@ -154,12 +154,13 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase.from('vouchers').insert({
+      // Create voucher for each selected venue
+      const inserts = values.venue_ids.map((venueId) => ({
         partner_id: user.id,
-        venue_id: values.venue_id,
+        venue_id: venueId,
         title: values.title,
         description: values.description || null,
-        code: values.code,
+        code: values.venue_ids.length > 1 ? `${values.code}-${venueId.slice(0, 4).toUpperCase()}` : values.code,
         discount_type: values.discount_type,
         discount_value: values.discount_value,
         valid_from: values.valid_from.toISOString(),
@@ -170,13 +171,16 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
         applicable_times: values.applicable_times,
         terms_conditions: values.terms_conditions || null,
         status: 'active',
-      });
+      }));
 
+      const { error } = await supabase.from('vouchers').insert(inserts);
       if (error) throw error;
 
       toast({
         title: 'Success',
-        description: 'Voucher created successfully',
+        description: values.venue_ids.length > 1
+          ? `Gutschein für ${values.venue_ids.length} Venues erstellt`
+          : 'Voucher created successfully',
       });
 
       form.reset();
@@ -208,24 +212,50 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="venue_id"
-              render={({ field }) => (
+              name="venue_ids"
+              render={() => (
                 <FormItem>
-                  <FormLabel>Venue</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a venue" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {venues.map((venue) => (
-                        <SelectItem key={venue.id} value={venue.id}>
-                          {venue.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Venues {venues.length > 1 && `(${form.watch('venue_ids')?.length || 0}/${venues.length} ausgewählt)`}</FormLabel>
+                  <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto border rounded-md p-3">
+                    {venues.length > 1 && (
+                      <div className="flex items-center space-x-2 pb-2 border-b mb-1">
+                        <Checkbox
+                          checked={form.watch('venue_ids')?.length === venues.length}
+                          onCheckedChange={(checked) => {
+                            form.setValue('venue_ids', checked ? venues.map(v => v.id) : []);
+                          }}
+                        />
+                        <span className="text-sm font-medium">Alle auswählen</span>
+                      </div>
+                    )}
+                    {venues.map((venue) => (
+                      <FormField
+                        key={venue.id}
+                        control={form.control}
+                        name="venue_ids"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(venue.id)}
+                                onCheckedChange={(checked) => {
+                                  return checked
+                                    ? field.onChange([...(field.value || []), venue.id])
+                                    : field.onChange(field.value?.filter((id: string) => id !== venue.id));
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal cursor-pointer text-sm">
+                              {venue.name}
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </div>
+                  <FormDescription>
+                    {venues.length > 1 ? 'Wähle einen oder mehrere Standorte für den Gutschein' : 'Dein Venue wird automatisch ausgewählt'}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
