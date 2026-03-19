@@ -1365,7 +1365,7 @@ useEffect(() => {
             {currentStep < totalSteps ? (
               <Button 
                 onClick={nextStep}
-                disabled={currentStep === 2 && !canProceedFromStep2()}
+                disabled={(currentStep === 1 && !selectedDuration) || (currentStep === 3 && !canProceedFromStep2())}
                 className="w-full sm:w-auto"
               >
                 Next
