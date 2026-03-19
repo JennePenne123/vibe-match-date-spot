@@ -1,11 +1,42 @@
 import { supabase } from '@/integrations/supabase/client';
 
+/**
+ * Fuzzy cuisine matching - handles partial matches and related categories
+ */
+function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: string[]): number {
+  if (!venueCuisine || !preferredCuisines?.length) return 0;
+  
+  const vc = venueCuisine.toLowerCase().trim();
+  
+  // Exact match
+  if (preferredCuisines.some(c => c.toLowerCase().trim() === vc)) return 1.0;
+  
+  // Partial / contains match (e.g. "Italian Restaurant" matches "Italian")
+  if (preferredCuisines.some(c => vc.includes(c.toLowerCase()) || c.toLowerCase().includes(vc))) return 0.8;
+  
+  // Related cuisine groups
+  const cuisineGroups: Record<string, string[]> = {
+    'asian': ['chinese', 'japanese', 'thai', 'korean', 'vietnamese', 'asian', 'sushi', 'ramen', 'wok'],
+    'european': ['italian', 'french', 'spanish', 'greek', 'mediterranean', 'german', 'portuguese'],
+    'american': ['american', 'burger', 'bbq', 'steakhouse', 'diner', 'grill'],
+    'cafe': ['café', 'cafe', 'coffee', 'bakery', 'brunch', 'breakfast'],
+    'bar': ['bar', 'pub', 'cocktail', 'wine bar', 'lounge'],
+  };
+  
+  for (const [, members] of Object.entries(cuisineGroups)) {
+    const venueInGroup = members.some(m => vc.includes(m));
+    const prefInGroup = preferredCuisines.some(p => members.some(m => p.toLowerCase().includes(m)));
+    if (venueInGroup && prefInGroup) return 0.5;
+  }
+  
+  return 0;
+}
+
 // Filter venues by user preferences to improve matching
 export const filterVenuesByPreferences = async (userId: string, venues: any[]) => {
   try {
-    console.log('🎯 PREFERENCE FILTER: Filtering venues for user:', userId);
+    console.log('🎯 PREFERENCE FILTER: Filtering', venues.length, 'venues for user:', userId);
     
-    // Get user preferences
     const { data: userPrefs, error: prefsError } = await supabase
       .from('user_preferences')
       .select('*')
@@ -21,100 +52,82 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[]) =
       cuisines: userPrefs.preferred_cuisines,
       priceRanges: userPrefs.preferred_price_range,
       vibes: userPrefs.preferred_vibes,
-      dietary: userPrefs.dietary_restrictions
     });
 
-    // Score venues based on preference matches
+    // Score all venues - don't filter out, just rank
     const scoredVenues = venues.map(venue => {
-      console.log(`🎯 PREFERENCE FILTER: Processing venue:`, {
-        name: venue.name || venue.venue_name,
-        id: venue.id,
-        venue_id: venue.venue_id,
-        placeId: venue.placeId,
-        all_keys: Object.keys(venue)
-      });
-
       let score = 0;
-      let maxScore = 0;
+      const maxScore = 100;
 
-      // Cuisine matching (40% weight)
-      maxScore += 40;
-      if (userPrefs.preferred_cuisines?.includes(venue.cuisine_type)) {
-        score += 40;
-        console.log(`✅ CUISINE MATCH: ${venue.name} matches ${venue.cuisine_type}`);
-      }
+      // Cuisine matching (40% weight) - fuzzy
+      const cuisineScore = cuisineMatchScore(
+        venue.cuisine_type, 
+        userPrefs.preferred_cuisines || []
+      );
+      score += cuisineScore * 40;
 
-      // Price range matching (30% weight)
-      maxScore += 30;
+      // Price range matching (25% weight)
       if (userPrefs.preferred_price_range?.includes(venue.price_range)) {
-        score += 30;
-        console.log(`✅ PRICE MATCH: ${venue.name} matches ${venue.price_range}`);
+        score += 25;
+      } else if (venue.price_range) {
+        // Adjacent price ranges get partial credit
+        const priceOrder = ['$', '$$', '$$$', '$$$$'];
+        const venueIdx = priceOrder.indexOf(venue.price_range);
+        const prefIdxes = (userPrefs.preferred_price_range || []).map((p: string) => priceOrder.indexOf(p));
+        const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
+        if (minDist === 1) score += 15; // Adjacent price
       }
 
-      // Vibe/tag matching (20% weight)
-      maxScore += 20;
-      if (venue.tags && userPrefs.preferred_vibes) {
-        const vibeMatches = venue.tags.filter(tag => 
-          userPrefs.preferred_vibes.includes(tag)
+      // Vibe/tag matching (20% weight) - fuzzy
+      if (venue.tags && userPrefs.preferred_vibes?.length) {
+        const venueTags = venue.tags.map((t: string) => t.toLowerCase());
+        const prefVibes = userPrefs.preferred_vibes.map((v: string) => v.toLowerCase());
+        const vibeMatches = venueTags.filter((tag: string) => 
+          prefVibes.some((vibe: string) => tag.includes(vibe) || vibe.includes(tag))
         );
         if (vibeMatches.length > 0) {
-          score += 20;
-          console.log(`✅ VIBE MATCH: ${venue.name} matches vibes:`, vibeMatches);
+          score += Math.min(20, vibeMatches.length * 10);
         }
       }
 
-      // Dietary restrictions (10% weight)
-      maxScore += 10;
-      if (userPrefs.dietary_restrictions?.length > 0) {
-        // Check if venue supports dietary restrictions
-        const supportsDietary = venue.tags?.some(tag => 
-          ['vegetarian', 'vegan', 'gluten-free', 'halal'].includes(tag.toLowerCase())
-        );
-        if (supportsDietary || userPrefs.dietary_restrictions.length === 0) {
-          score += 10;
-        }
-      } else {
-        score += 10; // No restrictions = full score
+      // Rating bonus (10% weight)
+      if (venue.rating && venue.rating >= 4.0) {
+        score += 10;
+      } else if (venue.rating && venue.rating >= 3.5) {
+        score += 5;
       }
 
-      const matchPercentage = maxScore > 0 ? (score / maxScore) * 100 : 50;
-      
-      // CRITICAL: Preserve the venue ID field explicitly
+      // Base score - every venue gets at least 5 points to avoid being completely excluded
+      score = Math.max(5, score);
+
       const scoredVenue = {
         ...venue,
-        preferenceScore: matchPercentage
+        preferenceScore: (score / maxScore) * 100
       };
 
-      // Ensure venue_id is preserved - try multiple ID sources
       if (!scoredVenue.venue_id && (venue.id || venue.placeId)) {
         scoredVenue.venue_id = venue.id || venue.placeId;
-        console.log(`🔧 PREFERENCE FILTER: Assigned venue_id from fallback:`, scoredVenue.venue_id);
       }
-
-      console.log(`🎯 PREFERENCE FILTER: Scored venue result:`, {
-        name: scoredVenue.name || scoredVenue.venue_name,
-        venue_id: scoredVenue.venue_id,
-        preferenceScore: scoredVenue.preferenceScore
-      });
 
       return scoredVenue;
     });
 
-    // Sort by preference score and return venues with at least some match
-    const filteredVenues = scoredVenues
-      .filter(venue => venue.preferenceScore >= 25) // At least 25% match
-      .sort((a, b) => b.preferenceScore - a.preferenceScore);
+    // Sort by preference score, return ALL venues (no filtering threshold)
+    const sorted = scoredVenues.sort((a, b) => b.preferenceScore - a.preferenceScore);
 
-    console.log(`🎯 PREFERENCE FILTER: Filtered ${venues.length} -> ${filteredVenues.length} venues`);
-    console.log('🎯 TOP MATCHES:', filteredVenues.slice(0, 5).map(v => 
+    console.log(`🎯 PREFERENCE FILTER: Scored ${venues.length} venues`);
+    console.log('🎯 TOP MATCHES:', sorted.slice(0, 5).map(v => 
+      `${v.name}: ${Math.round(v.preferenceScore)}%`
+    ));
+    console.log('🎯 BOTTOM MATCHES:', sorted.slice(-3).map(v => 
       `${v.name}: ${Math.round(v.preferenceScore)}%`
     ));
 
-    // Return at least 10 venues if available, otherwise all filtered
-    return filteredVenues.slice(0, Math.max(10, filteredVenues.length));
+    // Return up to 30 venues to give variety
+    return sorted.slice(0, 30);
   } catch (error) {
     console.error('❌ PREFERENCE FILTER: Error filtering venues:', error);
-    return venues; // Return original venues if filtering fails
+    return venues;
   }
 };
 
@@ -127,7 +140,6 @@ export const filterVenuesByCollaborativePreferences = async (
   try {
     console.log('🤝 COLLABORATIVE FILTER: Filtering for users:', userId, 'and', partnerId);
     
-    // Get both users' preferences
     const { data: userPrefs } = await supabase
       .from('user_preferences')
       .select('*')
@@ -145,61 +157,47 @@ export const filterVenuesByCollaborativePreferences = async (
       return filterVenuesByPreferences(userId, venues);
     }
 
-    console.log('🤝 COLLABORATIVE FILTER: Both users preferences loaded');
-
-    // Score venues based on combined preferences
     const collaborativeScoredVenues = venues.map(venue => {
-      console.log(`🤝 COLLABORATIVE FILTER: Processing venue:`, {
-        name: venue.name || venue.venue_name,
-        id: venue.id,
-        venue_id: venue.venue_id,
-        placeId: venue.placeId,
-        all_keys: Object.keys(venue)
-      });
-
-      let userScore = 0;
-      let partnerScore = 0;
+      // Fuzzy cuisine scoring for both users
+      const userCuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
+      const partnerCuisineScore = cuisineMatchScore(venue.cuisine_type, partnerPrefs.preferred_cuisines || []);
+      
+      let userScore = userCuisineScore * 40;
+      let partnerScore = partnerCuisineScore * 40;
       let sharedScore = 0;
 
-      // Check individual matches
-      const userCuisineMatch = userPrefs.preferred_cuisines?.includes(venue.cuisine_type);
-      const partnerCuisineMatch = partnerPrefs.preferred_cuisines?.includes(venue.cuisine_type);
+      // Shared cuisine bonus
+      if (userCuisineScore > 0 && partnerCuisineScore > 0) {
+        sharedScore += 50 * Math.min(userCuisineScore, partnerCuisineScore);
+      }
+
+      // Price matching
       const userPriceMatch = userPrefs.preferred_price_range?.includes(venue.price_range);
       const partnerPriceMatch = partnerPrefs.preferred_price_range?.includes(venue.price_range);
-
-      // Individual scoring
-      if (userCuisineMatch) userScore += 40;
-      if (partnerCuisineMatch) partnerScore += 40;
       if (userPriceMatch) userScore += 30;
       if (partnerPriceMatch) partnerScore += 30;
+      if (userPriceMatch && partnerPriceMatch) sharedScore += 30;
 
-      // Shared preferences bonus (highly weighted)
-      if (userCuisineMatch && partnerCuisineMatch) {
-        sharedScore += 50;
-        console.log(`🎉 SHARED CUISINE: ${venue.name} - both love ${venue.cuisine_type}`);
-      }
-      if (userPriceMatch && partnerPriceMatch) {
-        sharedScore += 30;
-        console.log(`🎉 SHARED PRICE: ${venue.name} - both okay with ${venue.price_range}`);
-      }
-
-      // Vibe matching
-      if (venue.tags && userPrefs.preferred_vibes && partnerPrefs.preferred_vibes) {
-        const userVibeMatches = venue.tags.filter(tag => userPrefs.preferred_vibes.includes(tag));
-        const partnerVibeMatches = venue.tags.filter(tag => partnerPrefs.preferred_vibes.includes(tag));
-        const sharedVibeMatches = userVibeMatches.filter(tag => partnerVibeMatches.includes(tag));
+      // Vibe matching - fuzzy
+      if (venue.tags) {
+        const venueTags = venue.tags.map((t: string) => t.toLowerCase());
+        const userVibes = (userPrefs.preferred_vibes || []).map((v: string) => v.toLowerCase());
+        const partnerVibes = (partnerPrefs.preferred_vibes || []).map((v: string) => v.toLowerCase());
         
-        if (sharedVibeMatches.length > 0) {
-          sharedScore += 20;
-          console.log(`🎉 SHARED VIBE: ${venue.name} - both like:`, sharedVibeMatches);
-        }
+        const userVibeMatch = venueTags.some((tag: string) => 
+          userVibes.some((v: string) => tag.includes(v) || v.includes(tag))
+        );
+        const partnerVibeMatch = venueTags.some((tag: string) => 
+          partnerVibes.some((v: string) => tag.includes(v) || v.includes(tag))
+        );
+        
+        if (userVibeMatch) userScore += 20;
+        if (partnerVibeMatch) partnerScore += 20;
+        if (userVibeMatch && partnerVibeMatch) sharedScore += 20;
       }
 
-      // Calculate final collaborative score
-      // Heavily weight shared preferences, moderately weight individual
-      const collaborativeScore = (sharedScore * 1.5 + (userScore + partnerScore) * 0.5) / 2;
-      
-      // CRITICAL: Preserve the venue ID field explicitly
+      const collaborativeScore = Math.max(5, (sharedScore * 1.5 + (userScore + partnerScore) * 0.5) / 2);
+
       const collaborativeVenue = {
         ...venue,
         collaborativeScore,
@@ -208,32 +206,22 @@ export const filterVenuesByCollaborativePreferences = async (
         sharedScore
       };
 
-      // Ensure venue_id is preserved - try multiple ID sources
       if (!collaborativeVenue.venue_id && (venue.id || venue.placeId)) {
         collaborativeVenue.venue_id = venue.id || venue.placeId;
-        console.log(`🔧 COLLABORATIVE FILTER: Assigned venue_id from fallback:`, collaborativeVenue.venue_id);
       }
-
-      console.log(`🤝 COLLABORATIVE FILTER: Scored venue result:`, {
-        name: collaborativeVenue.name || collaborativeVenue.venue_name,
-        venue_id: collaborativeVenue.venue_id,
-        collaborativeScore: collaborativeVenue.collaborativeScore
-      });
 
       return collaborativeVenue;
     });
 
-    // Sort by collaborative score
-    const filteredVenues = collaborativeScoredVenues
-      .filter(venue => venue.collaborativeScore >= 20) // Minimum collaborative threshold
+    const sorted = collaborativeScoredVenues
       .sort((a, b) => b.collaborativeScore - a.collaborativeScore);
 
     console.log(`🤝 COLLABORATIVE FILTER: Scored ${venues.length} venues`);
-    console.log('🤝 TOP COLLABORATIVE MATCHES:', filteredVenues.slice(0, 5).map(v => 
+    console.log('🤝 TOP MATCHES:', sorted.slice(0, 5).map(v => 
       `${v.name}: ${Math.round(v.collaborativeScore)}% (shared: ${Math.round(v.sharedScore)}%)`
     ));
 
-    return filteredVenues.slice(0, Math.max(15, filteredVenues.length));
+    return sorted.slice(0, 30);
   } catch (error) {
     console.error('❌ COLLABORATIVE FILTER: Error:', error);
     return filterVenuesByPreferences(userId, venues);

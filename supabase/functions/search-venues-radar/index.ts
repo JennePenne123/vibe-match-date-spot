@@ -81,12 +81,13 @@ serve(async (req) => {
       .join(',');
 
     // Build Radar search URL
+    // Always use broad 'food-beverage' to get diverse results
+    // Specific cuisine filtering happens client-side with fuzzy matching
     const searchParams = new URLSearchParams({
       near: `${validLat},${validLng}`,
       radius: validRadius.toString(),
       limit: validLimit.toString(),
-      // Always search for food/drink places
-      ...(categories ? { categories } : { categories: 'food-beverage' }),
+      categories: 'food-beverage',
     });
 
     const searchUrl = `https://api.radar.io/v1/search/places?${searchParams}`;
