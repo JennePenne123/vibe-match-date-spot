@@ -120,7 +120,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [autoNavigating, setAutoNavigating] = useState(false);
   const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-  const [learnedTemplate, setLearnedTemplate] = useState<typeof quickStartTemplates[0] | null>(null);
+  const [learnedTemplate, setLearnedTemplate] = useState<{ id: string; title: string; emoji: string; description: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[]; fitsDuration?: string[] } | null>(null);
   
   // Track user modifications to prevent overwriting their choices
   const [userModifiedDate, setUserModifiedDate] = useState(false);
