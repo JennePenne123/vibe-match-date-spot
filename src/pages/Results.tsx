@@ -16,8 +16,8 @@ const Results = () => {
   const { user } = useAuth();
   const { points } = useUserPoints();
   
-  const isPremium = points?.premium_until 
-    ? new Date(points.premium_until) > new Date() 
+  const isPremium = (points as any)?.premium_until 
+    ? new Date((points as any).premium_until) > new Date() 
     : false;
 
   // Check if coming from Smart Date Planning
