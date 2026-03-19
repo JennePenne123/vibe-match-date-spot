@@ -62,11 +62,11 @@ export const getAIVenueRecommendations = async (
       throw new Error('No venues in database. Please use the debug tools to create test venues first.');
     }
 
-    // Filter venues by preferences
+    // Filter venues by preferences (now includes area-based scoring)
     if (partnerId) {
       venues = await filterVenuesByCollaborativePreferences(userId, partnerId, venues);
     } else {
-      venues = await filterVenuesByPreferences(userId, venues);
+      venues = await filterVenuesByPreferences(userId, venues, selectedArea);
     }
 
     const recommendations: AIVenueRecommendation[] = [];
