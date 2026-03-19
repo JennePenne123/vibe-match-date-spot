@@ -83,7 +83,7 @@ serve(async (req) => {
       );
     }
 
-    const { latitude, longitude, cuisines, radius = 5000, limit = 20 } = await req.json();
+    const { latitude, longitude, cuisines, radius = 5000, limit = 20, venueTypes = [], activities = [] } = await req.json();
 
     // Validate coordinates
     const validLat = parseFloat(latitude);
@@ -98,7 +98,7 @@ serve(async (req) => {
     const validRadius = Math.min(Math.max(parseInt(String(radius)) || 5000, 500), 50000);
     const validLimit = Math.min(Math.max(parseInt(String(limit)) || 20, 1), 100);
 
-    console.log('🔍 RADAR: Searching venues', { latitude: validLat, longitude: validLng, cuisines, radius: validRadius, limit: validLimit });
+    console.log('🔍 RADAR: Searching venues', { latitude: validLat, longitude: validLng, cuisines, venueTypes, activities, radius: validRadius, limit: validLimit });
 
     // Map cuisines to Radar categories
     const sanitizedCuisines = Array.isArray(cuisines)
@@ -110,8 +110,7 @@ serve(async (req) => {
       .filter(Boolean)
       .join(',');
 
-    // Build Radar search URL - use specific dine-in categories to exclude
-    // supermarkets, delivery services, grocery stores etc.
+    // Build base dine-in categories
     const dineInCategories = [
       'restaurant', 'cafe', 'bar', 'coffee-shop', 'bakery',
       'italian-restaurant', 'french-restaurant', 'japanese-restaurant',
@@ -121,13 +120,35 @@ serve(async (req) => {
       'pizza-place', 'burger-joint', 'vegetarian-restaurant',
       'wine-bar', 'cocktail-bar', 'pub', 'brewery', 'ice-cream-shop',
       'dessert-shop', 'brunch-restaurant', 'bistro'
-    ].join(',');
+    ];
+
+    // Add venue type categories
+    const venueTypeCategories = new Set<string>();
+    if (Array.isArray(venueTypes)) {
+      for (const vt of venueTypes) {
+        const radarCats = VENUE_TYPE_TO_RADAR[vt];
+        if (radarCats) radarCats.forEach(c => venueTypeCategories.add(c));
+      }
+    }
+
+    // Add activity categories  
+    if (Array.isArray(activities)) {
+      for (const act of activities) {
+        const radarCats = ACTIVITY_TO_RADAR[act];
+        if (radarCats) radarCats.forEach(c => venueTypeCategories.add(c));
+      }
+    }
+
+    // Merge all categories
+    const allCategories = [...new Set([...dineInCategories, ...venueTypeCategories])].join(',');
+
+    console.log('📋 RADAR: Extended categories count:', dineInCategories.length + venueTypeCategories.size);
 
     const searchParams = new URLSearchParams({
       near: `${validLat},${validLng}`,
       radius: validRadius.toString(),
       limit: validLimit.toString(),
-      categories: dineInCategories,
+      categories: allCategories,
     });
 
     const searchUrl = `https://api.radar.io/v1/search/places?${searchParams}`;
