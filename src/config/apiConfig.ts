@@ -42,7 +42,7 @@ export const API_CONFIG = {
   // Daily budget caps (cost control)
   maxRadarCallsPerDay: 3000,     // Well within 100K/month free tier
   maxFoursquareCallsPerDay: 150, // Conservative for 200/day free tier
-  maxGooglePlacesCallsPerDay: 0, // Disabled
+  maxGooglePlacesCallsPerDay: 100, // Limited fallback for niche venues (~$1.70/day max)
   
   // AI Enhancement
   aiEnhancementEnabled: false,
