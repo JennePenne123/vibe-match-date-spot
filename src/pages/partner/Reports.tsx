@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Sparkles, FileText, Download, FileSpreadsheet, TrendingUp, TrendingDown, Euro, BarChart3, Calendar, LogIn } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import LanguageSelector from '@/components/LanguageSelector';
+
 import { supabase } from '@/integrations/supabase/client';
 import { format, startOfMonth, endOfMonth, subMonths, parseISO } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
