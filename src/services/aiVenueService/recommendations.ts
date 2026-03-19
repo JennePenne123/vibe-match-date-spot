@@ -87,12 +87,19 @@ export const getAIVenueRecommendations = async (
         continue; // Skip venues without valid IDs
       }
 
+      // Extract best image from photos array or image_url
+      const photosArray = Array.isArray(venue.photos) ? venue.photos : [];
+      const firstPhotoUrl = photosArray.length > 0 
+        ? (typeof photosArray[0] === 'string' ? photosArray[0] : photosArray[0]?.url)
+        : undefined;
+      const bestImage = venue.image_url || venue.image || firstPhotoUrl;
+
       const recommendation: AIVenueRecommendation = {
         venue_id: cleanVenueId,
         venue_name: venue.name,
         venue_address: venue.address || venue.location || venue.vicinity || 'Address not available',
-        venue_image: venue.image_url || venue.image,
-        venue_photos: venue.photos || [],
+        venue_image: bestImage,
+        venue_photos: photosArray,
         ai_score: aiScore,
         match_factors: scoreData?.match_factors || {},
         contextual_score: scoreData?.contextual_score || 0,
