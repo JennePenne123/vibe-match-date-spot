@@ -515,7 +515,9 @@ async function getVenuesFromFoursquare(
         longitude: userLocation.longitude,
         cuisines: userPrefs.preferred_cuisines || [],
         radius: (userPrefs.max_distance || 10) * 1000,
-        limit
+        limit,
+        venueTypes: (userPrefs as any).preferred_venue_types || [],
+        activities: (userPrefs as any).preferred_activities || [],
       }
     });
     
