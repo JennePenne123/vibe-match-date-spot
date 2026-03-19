@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, Clock } from 'lucide-react';
+import { Camera, Clock, Info } from 'lucide-react';
 import { VenuePhotoUpload } from './VenuePhotoUpload';
 import { VenueDetailsEditor } from './VenueDetailsEditor';
+import { VenueInfoEditor } from './VenueInfoEditor';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface VenueManagementSheetProps {
@@ -29,7 +30,7 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
     setLoading(true);
     const { data } = await supabase
       .from('venues')
-      .select('photos, opening_hours, menu_highlights')
+      .select('photos, opening_hours, menu_highlights, description, cuisine_type, price_range, website, phone, address, tags')
       .eq('id', venueId)
       .maybeSingle();
     setVenueData(data);
@@ -59,17 +60,36 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
             <LoadingSpinner />
           </div>
         ) : (
-          <Tabs defaultValue="photos" className="mt-4">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs defaultValue="info" className="mt-4">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="info" className="gap-1.5 text-xs">
+                <Info className="w-3.5 h-3.5" />
+                Info
+              </TabsTrigger>
               <TabsTrigger value="photos" className="gap-1.5 text-xs">
                 <Camera className="w-3.5 h-3.5" />
                 Fotos
               </TabsTrigger>
               <TabsTrigger value="details" className="gap-1.5 text-xs">
                 <Clock className="w-3.5 h-3.5" />
-                Zeiten & Karte
+                Zeiten
               </TabsTrigger>
             </TabsList>
+            <TabsContent value="info" className="mt-4">
+              <VenueInfoEditor
+                venueId={venueId}
+                currentData={{
+                  description: venueData?.description,
+                  cuisine_type: venueData?.cuisine_type,
+                  price_range: venueData?.price_range,
+                  website: venueData?.website,
+                  phone: venueData?.phone,
+                  address: venueData?.address,
+                  tags: venueData?.tags,
+                }}
+                onUpdated={handleUpdated}
+              />
+            </TabsContent>
             <TabsContent value="photos" className="mt-4">
               <VenuePhotoUpload
                 venueId={venueId}
