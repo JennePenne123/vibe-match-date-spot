@@ -134,21 +134,79 @@ const Results = () => {
             </p>
           </div>
 
+          {/* Premium Voucher Banner */}
+          {!isPremium && (
+            <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                  <Crown className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-amber-900 dark:text-amber-100 text-sm">
+                    Premium: Exklusive Voucher für deine Top 3 Matches
+                  </h3>
+                  <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
+                    Als Premium-Mitglied erhältst du Rabatt-Voucher für die 3 bestbewerteten Venues.
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => navigate('/rewards')}
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 shrink-0"
+                >
+                  <Crown className="w-3 h-3 mr-1" />
+                  Upgrade
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* AIVenueCard Components */}
           <div className="space-y-6">
-            {recommendations.map((recommendation, index) => (
-              <AIVenueCard
-                key={recommendation.venue_id}
-                recommendation={recommendation}
-                onSelect={handleVenueSelect}
-                showAIInsights={true}
-                compact={false}
-                sessionContext={{
-                  sessionId: isFromSmartPlanning ? smartPlanningState.sessionId : 'current-session',
-                  partnerId: isFromSmartPlanning ? smartPlanningState.partnerId : 'current-partner'
-                }}
-              />
-            ))}
+            {recommendations.map((recommendation, index) => {
+              const isTop3 = index < 3;
+              const venueVouchers = isTop3 && isPremium 
+                ? (vouchers.get(recommendation.venue_id) || []) 
+                : [];
+              
+              return (
+                <div key={recommendation.venue_id} className="relative">
+                  {/* Top 3 Premium Badge */}
+                  {isTop3 && (
+                    <div className="absolute -top-2 -left-1 z-10">
+                      <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold shadow-md ${
+                        isPremium 
+                          ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white' 
+                          : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {isPremium ? (
+                          <>
+                            <Crown className="w-3 h-3" />
+                            Top {index + 1} Match
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="w-3 h-3" />
+                            Top {index + 1}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <AIVenueCard
+                    recommendation={recommendation}
+                    onSelect={handleVenueSelect}
+                    showAIInsights={true}
+                    compact={false}
+                    sessionContext={{
+                      sessionId: isFromSmartPlanning ? smartPlanningState.sessionId : 'current-session',
+                      partnerId: isFromSmartPlanning ? smartPlanningState.partnerId : 'current-partner'
+                    }}
+                    vouchers={venueVouchers}
+                  />
+                </div>
+              );
+            })}
           </div>
 
           {/* No Results */}
