@@ -20,11 +20,11 @@ const Area = () => {
   };
 
   const areas = [
-    { id: 'downtown', name: 'Downtown', description: 'Urban vibes with trendy restaurants and rooftop bars', time: '10-15 min drive', venues: 24 },
-    { id: 'waterfront', name: 'Waterfront', description: 'Scenic views with seafood and sunset spots', time: '15-20 min drive', venues: 18 },
-    { id: 'arts-district', name: 'Arts District', description: 'Creative atmosphere with galleries and jazz clubs', time: '8-12 min drive', venues: 16 },
-    { id: 'oldtown', name: 'Old Town', description: 'Historic charm with cozy cafes and wine bars', time: '12-18 min drive', venues: 22 },
-    { id: 'uptown', name: 'Uptown', description: 'Upscale dining and sophisticated cocktail lounges', time: '5-10 min drive', venues: 19 },
+    { id: 'downtown', name: 'Downtown', description: 'Trendige Restaurants, Rooftop-Bars & urbanes Nightlife', time: '10-15 min', venues: 24 },
+    { id: 'waterfront', name: 'Waterfront', description: 'Seafood, Sunset-Spots & entspannte Terrassen am Wasser', time: '15-20 min', venues: 18 },
+    { id: 'arts-district', name: 'Arts District', description: 'Galerien, Live-Musik, Jazz-Clubs & kreative Atmosphäre', time: '8-12 min', venues: 16 },
+    { id: 'oldtown', name: 'Old Town', description: 'Gemütliche Cafés, Weinstuben & historischer Charme', time: '12-18 min', venues: 22 },
+    { id: 'uptown', name: 'Uptown', description: 'Fine Dining, Cocktail-Lounges & gehobenes Ambiente', time: '5-10 min', venues: 19 },
   ];
 
   // Request location when component mounts

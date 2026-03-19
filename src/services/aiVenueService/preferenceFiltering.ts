@@ -1,6 +1,38 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /**
+ * Area-to-vibe mapping: each area category maps to venue tags, vibes, and keywords
+ * that boost matching when a user selects that area type
+ */
+export const AREA_VIBE_MAP: Record<string, { vibes: string[]; keywords: string[]; priceHint?: string[] }> = {
+  'downtown': {
+    vibes: ['trendy', 'urban', 'modern', 'lively', 'hip', 'bustling'],
+    keywords: ['rooftop', 'lounge', 'cocktail', 'nightlife', 'club', 'skyline', 'downtown', 'zentrum', 'city', 'innenstadt'],
+    priceHint: ['$$', '$$$'],
+  },
+  'waterfront': {
+    vibes: ['scenic', 'relaxed', 'romantic', 'peaceful', 'chill'],
+    keywords: ['seafood', 'harbour', 'harbor', 'hafen', 'lake', 'see', 'river', 'water', 'sunset', 'terrace', 'outdoor', 'pier', 'beach'],
+    priceHint: ['$$', '$$$'],
+  },
+  'arts-district': {
+    vibes: ['creative', 'artsy', 'bohemian', 'cultural', 'eclectic', 'indie'],
+    keywords: ['gallery', 'jazz', 'live music', 'theater', 'museum', 'art', 'vintage', 'craft', 'studio', 'alternative'],
+    priceHint: ['$', '$$'],
+  },
+  'oldtown': {
+    vibes: ['cozy', 'charming', 'traditional', 'intimate', 'historic', 'rustic'],
+    keywords: ['wine', 'cafe', 'bistro', 'historic', 'altstadt', 'traditional', 'classic', 'old', 'brauhaus', 'tavern'],
+    priceHint: ['$$'],
+  },
+  'uptown': {
+    vibes: ['upscale', 'elegant', 'sophisticated', 'premium', 'luxury', 'exclusive'],
+    keywords: ['fine dining', 'michelin', 'champagne', 'gourmet', 'tasting', 'omakase', 'premium', 'exclusive', 'sterne'],
+    priceHint: ['$$$', '$$$$'],
+  },
+};
+
+/**
  * Fuzzy cuisine matching - handles partial matches and related categories
  */
 function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: string[]): number {
@@ -33,7 +65,7 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
 }
 
 // Filter venues by user preferences to improve matching
-export const filterVenuesByPreferences = async (userId: string, venues: any[]) => {
+export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string) => {
   try {
     console.log('🎯 PREFERENCE FILTER: Filtering', venues.length, 'venues for user:', userId);
     
@@ -141,6 +173,31 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[]) =
           searchText.includes(diet.toLowerCase().replace('_', ' '))
         );
         if (dietMatch) score += 5;
+      }
+
+      // Area/neighborhood vibe matching (10% weight)
+      if (selectedArea && AREA_VIBE_MAP[selectedArea]) {
+        const areaConfig = AREA_VIBE_MAP[selectedArea];
+        const searchText = [
+          ...(venue.tags || []), venue.name || '', venue.description || '', venue.address || '', venue.cuisine_type || ''
+        ].map((s: string) => s.toLowerCase()).join(' ');
+
+        // Keyword match (main signal)
+        const keywordHits = areaConfig.keywords.filter(kw => searchText.includes(kw));
+        if (keywordHits.length > 0) {
+          score += Math.min(7, keywordHits.length * 3);
+        }
+
+        // Vibe match
+        const vibeHits = areaConfig.vibes.filter(v => searchText.includes(v));
+        if (vibeHits.length > 0) {
+          score += Math.min(3, vibeHits.length * 2);
+        }
+
+        // Price hint bonus (subtle)
+        if (areaConfig.priceHint?.includes(venue.price_range)) {
+          score += 2;
+        }
       }
 
       // Base score - every venue gets at least 5 points
