@@ -96,7 +96,10 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [hasCompletedAllSteps, setHasCompletedAllSteps] = useState(false);
-  const totalSteps = 4;
+  const totalSteps = 5;
+  
+  // Duration model state
+  const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   
   // Timeout fallback state
   const [aiAnalysisStartTime, setAiAnalysisStartTime] = useState<number | null>(null);
