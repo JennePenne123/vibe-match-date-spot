@@ -1,45 +1,53 @@
 /**
  * API Configuration for Venue Search
- * Controls which APIs are used and search strategy
+ * Strategy: Radar (primary search, 100K free/month) + Foursquare (enrichment: photos, tips, ratings)
  */
 
-export type VenueSearchStrategy = 'parallel' | 'google-first' | 'foursquare-first';
+export type VenueSearchStrategy = 'radar-foursquare' | 'foursquare-only' | 'parallel';
 
 export const API_CONFIG = {
   // API toggles
-  useGooglePlaces: true,
-  useFoursquare: true,
+  useRadar: true,          // Primary search (100K free calls/month)
+  useFoursquare: true,     // Enrichment: photos, tips, ratings
+  useGooglePlaces: false,  // Disabled – only for on-demand enrichment if needed
   
-  // Search strategy: 'parallel' | 'google-first' | 'foursquare-first'
-  venueSearchStrategy: 'parallel' as VenueSearchStrategy,
+  // Search strategy
+  venueSearchStrategy: 'radar-foursquare' as VenueSearchStrategy,
   
   // Data merging
-  mergeVenueData: true, // Combine data from both APIs for same venue
+  mergeVenueData: true,
   
   // Limits
   maxVenuesPerSource: 20,
   maxTotalVenues: 30,
   
   // Deduplication
-  deduplicationThreshold: 50, // meters - venues within this distance are considered duplicates
-  nameSimilarityThreshold: 0.8, // 0-1 - how similar names must be to be considered same venue
+  deduplicationThreshold: 50,
+  nameSimilarityThreshold: 0.8,
   
   // Caching
-  venueDetailsCacheDuration: 24 * 60 * 60 * 1000, // 24 hours in ms
-  tipsCacheDuration: 6 * 60 * 60 * 1000, // 6 hours in ms
+  venueDetailsCacheDuration: 24 * 60 * 60 * 1000, // 24 hours
+  tipsCacheDuration: 6 * 60 * 60 * 1000, // 6 hours
+  enrichmentCacheDuration: 24 * 60 * 60 * 1000, // 24 hours for Foursquare enrichment
   
   // Timeouts
-  googlePlacesTimeout: 10000, // 10 seconds
-  foursquareTimeout: 10000, // 10 seconds
+  radarTimeout: 10000,
+  foursquareTimeout: 10000,
+  googlePlacesTimeout: 10000,
   
   // Fallback behavior
-  requireAtLeastOneSource: true, // If true, fail if both APIs fail
-  minVenuesForSuccess: 3, // Minimum venues needed to consider search successful
+  requireAtLeastOneSource: true,
+  minVenuesForSuccess: 3,
   
-  // AI Enhancement (Point 1: AI Edge Function Integration)
-  aiEnhancementEnabled: false, // Set to true to enable AI reasoning for top venues
-  aiEnhancementTopN: 3, // Number of top venues to enhance with AI
-  aiEnhancementCostPerCall: 0.01, // Estimated cost per AI enhancement call
+  // Daily budget caps (cost control)
+  maxRadarCallsPerDay: 3000,     // Well within 100K/month free tier
+  maxFoursquareCallsPerDay: 150, // Conservative for 200/day free tier
+  maxGooglePlacesCallsPerDay: 0, // Disabled
+  
+  // AI Enhancement
+  aiEnhancementEnabled: false,
+  aiEnhancementTopN: 3,
+  aiEnhancementCostPerCall: 0.01,
 };
 
 /**
@@ -50,9 +58,10 @@ export const FEATURE_FLAGS = {
   showFoursquarePhotos: true,
   showVerifiedBadge: true,
   showDetailedCategories: true,
+  showChainDetection: true,  // Radar chain detection
   enableDebugLogging: true,
   
   // AI Pipeline features
   enableAIPipelineVisualization: true,
-  enableAIEnhancement: false, // Matches aiEnhancementEnabled
+  enableAIEnhancement: false,
 };

@@ -202,10 +202,10 @@ const getVenuesFromMultipleSources = async (
   const strategy = API_CONFIG.venueSearchStrategy;
   let venues: any[] = [];
   
-  if (strategy === 'google-first') {
-    venues = await getVenuesGoogleFirst(userId, limit, userLocation);
-  } else if (strategy === 'foursquare-first') {
-    venues = await getVenuesFoursquareFirst(userId, limit, userLocation);
+  if (strategy === 'radar-foursquare') {
+    venues = await getVenuesRadarFoursquare(userId, limit, userLocation);
+  } else if (strategy === 'foursquare-only') {
+    venues = await getVenuesFoursquareOnly(userId, limit, userLocation);
   } else {
     venues = await getVenuesParallel(userId, limit, userLocation);
   }
@@ -223,80 +223,76 @@ const getVenuesFromMultipleSources = async (
 };
 
 /**
- * Parallel strategy: Call both APIs simultaneously
+ * Radar + Foursquare strategy: Radar for primary search, Foursquare for enrichment (photos, tips, ratings)
  */
-const getVenuesParallel = async (
+async function getVenuesRadarFoursquare(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
+) {
+  // Step 1: Get venues from Radar (primary, high free tier)
+  let venues = await getVenuesFromRadar(userId, limit, userLocation).catch(() => []);
+  
+  // Step 2: Enrich with Foursquare data (photos, tips, ratings)
+  if (venues.length > 0 && API_CONFIG.useFoursquare && userLocation) {
+    const fsqVenues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
+  }
+  
+  // Step 3: If Radar returned nothing, fall back to Foursquare-only
+  if (venues.length < API_CONFIG.minVenuesForSuccess && API_CONFIG.useFoursquare && userLocation) {
+    console.log('⚠️ Radar returned few results, falling back to Foursquare-only');
+    const fsqVenues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
+  }
+  
+  return venues;
+}
+
+/**
+ * Foursquare-only strategy
+ */
+async function getVenuesFoursquareOnly(
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) {
+  if (API_CONFIG.useFoursquare && userLocation) {
+    return await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
+  }
+  return [];
+}
+
+/**
+ * Parallel strategy: Call multiple APIs simultaneously
+ */
+async function getVenuesParallel(
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) {
   const promises: Promise<any[]>[] = [];
   
-  if (API_CONFIG.useGooglePlaces) {
-    promises.push(getVenuesFromGooglePlaces(userId, limit, userLocation).catch(() => []));
+  if (API_CONFIG.useRadar && userLocation) {
+    promises.push(getVenuesFromRadar(userId, limit, userLocation).catch(() => []));
   }
   
   if (API_CONFIG.useFoursquare && userLocation) {
     promises.push(getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []));
   }
   
+  if (API_CONFIG.useGooglePlaces) {
+    promises.push(getVenuesFromGooglePlaces(userId, limit, userLocation).catch(() => []));
+  }
+  
   const results = await Promise.all(promises);
-  const [googleVenues = [], foursquareVenues = []] = results;
-  
-  return mergeAndDeduplicateVenues(googleVenues, foursquareVenues);
-};
-
-/**
- * Google-first strategy
- */
-const getVenuesGoogleFirst = async (
-  userId: string,
-  limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
-  let venues: any[] = [];
-  
-  if (API_CONFIG.useGooglePlaces) {
-    venues = await getVenuesFromGooglePlaces(userId, limit, userLocation).catch(() => []);
+  let merged: any[] = [];
+  for (const result of results) {
+    merged = mergeAndDeduplicateVenues(merged, result);
   }
   
-  if (venues.length >= API_CONFIG.minVenuesForSuccess) {
-    return venues;
-  }
-  
-  if (API_CONFIG.useFoursquare && userLocation) {
-    const fsqVenues = await getVenuesFromFoursquare(userId, limit - venues.length, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
-  }
-  
-  return venues;
-};
-
-/**
- * Foursquare-first strategy
- */
-const getVenuesFoursquareFirst = async (
-  userId: string,
-  limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
-  let venues: any[] = [];
-  
-  if (API_CONFIG.useFoursquare && userLocation) {
-    venues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
-  }
-  
-  if (venues.length >= API_CONFIG.minVenuesForSuccess) {
-    return venues;
-  }
-  
-  if (API_CONFIG.useGooglePlaces) {
-    const googleVenues = await getVenuesFromGooglePlaces(userId, limit - venues.length, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, googleVenues);
-  }
-  
-  return venues;
-};
+  return merged;
+}
 
 /**
  * Merge and deduplicate venues from multiple sources
@@ -370,13 +366,83 @@ function enrichVenueWithFoursquare(googleVenue: any, fsqVenue: any): void {
 }
 
 /**
- * Fetch venues from Foursquare
+ * Fetch venues from Radar (primary search – 100K free calls/month)
  */
-const getVenuesFromFoursquare = async (
+async function getVenuesFromRadar(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
+) {
+  const timer = apiUsageService.createTimer('radar', '/search-venues-radar');
+  
+  try {
+    if (!userLocation?.latitude || !userLocation?.longitude) {
+      return [];
+    }
+    
+    const { data: userPrefs } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (!userPrefs) {
+      await timer.end({ status: 400, cacheHit: false, userId, metadata: { error: 'No user preferences' } });
+      return [];
+    }
+    
+    const { data, error } = await supabase.functions.invoke('search-venues-radar', {
+      body: {
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        cuisines: userPrefs.preferred_cuisines || [],
+        radius: (userPrefs.max_distance || 10) * 1000,
+        limit
+      }
+    });
+    
+    if (error) {
+      await timer.end({ 
+        status: 500, 
+        cacheHit: false, 
+        userId,
+        metadata: { error: error.message }
+      });
+      return [];
+    }
+    
+    const venues = data?.venues || [];
+    await timer.end({ 
+      status: 200, 
+      cacheHit: false, 
+      userId,
+      metadata: { 
+        venueCount: venues.length,
+        chainsDetected: venues.filter((v: any) => v.is_chain).length,
+        location: `${userLocation.latitude.toFixed(4)},${userLocation.longitude.toFixed(4)}`
+      }
+    });
+    
+    return venues;
+  } catch (err) {
+    await timer.end({ 
+      status: 500, 
+      cacheHit: false, 
+      userId,
+      metadata: { error: err instanceof Error ? err.message : 'Unknown error' }
+    });
+    return [];
+  }
+}
+
+/**
+ * Fetch venues from Foursquare
+ */
+async function getVenuesFromFoursquare(
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) {
   const timer = apiUsageService.createTimer('foursquare', '/search-venues-foursquare');
   
   try {
@@ -436,16 +502,16 @@ const getVenuesFromFoursquare = async (
     });
     return [];
   }
-};
+}
 
 /**
  * Fetch venues from Google Places
  */
-const getVenuesFromGooglePlaces = async (
+async function getVenuesFromGooglePlaces(
   userId: string, 
   limit: number, 
   userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
+) {
   const timer = apiUsageService.createTimer('google_places', '/search-venues');
   
   try {
@@ -541,7 +607,7 @@ const getVenuesFromGooglePlaces = async (
   } catch (error) {
     throw error;
   }
-};
+}
 
 /**
  * Transform and save Google Places venues to database
