@@ -502,16 +502,16 @@ async function getVenuesFromFoursquare(
     });
     return [];
   }
-};
+}
 
 /**
  * Fetch venues from Google Places
  */
-const getVenuesFromGooglePlaces = async (
+async function getVenuesFromGooglePlaces(
   userId: string, 
   limit: number, 
   userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
+) {
   const timer = apiUsageService.createTimer('google_places', '/search-venues');
   
   try {
