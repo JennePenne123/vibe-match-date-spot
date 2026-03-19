@@ -64,6 +64,8 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
           className={`w-full h-full object-cover transition-opacity duration-300 ${
             imageLoading ? 'opacity-0' : 'opacity-100'
           }`}
+          loading="lazy"
+          decoding="async"
           onLoad={() => setImageLoading(false)}
           onError={() => setImageLoading(false)}
         />
