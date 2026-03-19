@@ -45,7 +45,7 @@ const VenueDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24">
       <div className="max-w-md mx-auto">
         {/* Header Image */}
         <div className="relative">
