@@ -45,17 +45,20 @@ const VenueDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24">
       <div className="max-w-md mx-auto">
         {/* Header Image */}
         <div className="relative">
           <img
-            src={appVenue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'}
+            src={appVenue.image_url || `https://source.unsplash.com/800x400/?restaurant,${encodeURIComponent(appVenue.name)}`}
             alt={appVenue.name}
             className="w-full h-64 object-cover"
             loading="eager"
             decoding="async"
             fetchPriority="high"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=400&fit=crop';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           
