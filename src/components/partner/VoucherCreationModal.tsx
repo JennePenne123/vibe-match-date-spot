@@ -154,12 +154,13 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase.from('vouchers').insert({
+      // Create voucher for each selected venue
+      const inserts = values.venue_ids.map((venueId) => ({
         partner_id: user.id,
-        venue_id: values.venue_id,
+        venue_id: venueId,
         title: values.title,
         description: values.description || null,
-        code: values.code,
+        code: values.venue_ids.length > 1 ? `${values.code}-${venueId.slice(0, 4).toUpperCase()}` : values.code,
         discount_type: values.discount_type,
         discount_value: values.discount_value,
         valid_from: values.valid_from.toISOString(),
@@ -170,13 +171,16 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
         applicable_times: values.applicable_times,
         terms_conditions: values.terms_conditions || null,
         status: 'active',
-      });
+      }));
 
+      const { error } = await supabase.from('vouchers').insert(inserts);
       if (error) throw error;
 
       toast({
         title: 'Success',
-        description: 'Voucher created successfully',
+        description: values.venue_ids.length > 1
+          ? `Gutschein für ${values.venue_ids.length} Venues erstellt`
+          : 'Voucher created successfully',
       });
 
       form.reset();
