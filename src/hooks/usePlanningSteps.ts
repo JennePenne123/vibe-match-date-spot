@@ -142,11 +142,8 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
           setSelectedPartnerId('');
         }
         break;
-      case 'review-matches': 
-        setCurrentStepInternal('set-preferences'); 
-        break;
       case 'plan-together': 
-        setCurrentStepInternal('review-matches'); 
+        setCurrentStepInternal('set-preferences'); 
         break;
       case 'create-invitation': 
         setCurrentStepInternal('plan-together'); 

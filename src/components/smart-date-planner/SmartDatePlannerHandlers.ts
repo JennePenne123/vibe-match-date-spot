@@ -498,8 +498,8 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       console.log('✅ MANUAL TRIGGER - Venue recommendations:', state.venueRecommendations?.length || 0);
       
       // Ensure step transition happens
-      console.log('🎯 MANUAL TRIGGER - FORCING step transition to review-matches');
-      setCurrentStep('review-matches');
+      console.log('🎯 MANUAL TRIGGER - FORCING step transition to plan-together');
+      setCurrentStep('plan-together');
       
       toast({
         title: 'Analysis Complete!',
