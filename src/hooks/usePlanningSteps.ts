@@ -70,7 +70,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     
       // Only sync if we haven't manually navigated and need to move forward (not backward)  
       if (!hasManuallyNavigated && currentStep !== expectedStep) {
-        const stepOrder = ['select-partner', 'set-preferences', 'review-matches', 'plan-together', 'create-invitation'];
+        const stepOrder = ['select-partner', 'set-preferences', 'plan-together', 'create-invitation'];
         const currentIndex = stepOrder.indexOf(currentStep);
         const expectedIndex = stepOrder.indexOf(expectedStep);
       
