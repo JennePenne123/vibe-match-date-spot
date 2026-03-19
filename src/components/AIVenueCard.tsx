@@ -132,26 +132,12 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           className="transition-transform duration-300 hover:scale-105"
         />
           
-        {/* AI Score Overlay with Context Bonus */}
-        <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
-          <Badge className="bg-white/95 backdrop-blur-sm text-gray-900 font-bold border-0 shadow-sm">
-            <Brain className="w-3 h-3 mr-1 text-purple-600" />
-            {Math.round(ai_score)}%
+        {/* AI Match Score Overlay */}
+        <div className="absolute top-3 right-3">
+          <Badge className={`${getScoreColor(displayScore)} font-bold border-0 shadow-sm text-sm px-2.5 py-1`}>
+            <Sparkles className="w-3.5 h-3.5 mr-1" />
+            {displayScore}% Match
           </Badge>
-          {contextual_score > 0 && (
-            <Badge className="bg-white/95 backdrop-blur-sm text-purple-700 text-xs border-0 shadow-sm">
-              <TrendingUp className="w-3 h-3 mr-0.5" />
-              +{(contextual_score * 100).toFixed(0)}%
-            </Badge>
-          )}
-        </div>
-
-        {/* Confidence Indicator */}
-        <div className="absolute top-3 left-3">
-          <div className="flex items-center bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-            <div className={`w-2 h-2 rounded-full ${confidenceInfo.color} mr-1`}></div>
-            <span className="text-xs font-medium text-gray-700">{confidenceInfo.text}</span>
-          </div>
         </div>
 
         {/* Voucher badges */}
