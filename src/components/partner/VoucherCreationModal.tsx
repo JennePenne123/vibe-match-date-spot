@@ -43,7 +43,7 @@ const voucherSchema = z.object({
   code: z.string().min(3, 'Code must be at least 3 characters').max(50).regex(/^[A-Z0-9_-]+$/, 'Code must contain only uppercase letters, numbers, hyphens, and underscores'),
   discount_type: z.enum(['percentage', 'fixed', 'free_item']),
   discount_value: z.number().min(0.01, 'Discount value must be greater than 0'),
-  venue_id: z.string().min(1, 'Venue is required'),
+  venue_ids: z.array(z.string()).min(1, 'Mindestens ein Venue auswählen'),
   valid_from: z.date(),
   valid_until: z.date(),
   max_redemptions: z.number().int().positive().optional().or(z.literal('')),
