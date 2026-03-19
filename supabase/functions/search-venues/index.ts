@@ -97,17 +97,30 @@ serve(async (req) => {
 
     // 4. Build Google Places Request with validated inputs
     const baseUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+    
+    // Use the first valid type from request, default to 'restaurant'
+    const primaryType = validTypes[0] || 'restaurant';
+    
     const searchParams = new URLSearchParams({
       location: `${validLatitude},${validLongitude}`,
       radius: validRadius.toString(),
-      type: 'restaurant',
+      type: primaryType,
       key: apiKey,
       language: 'de'
     });
 
     // Add cuisine-based keyword search with sanitized inputs
+    // Also support additional types as keywords for niche venues
+    const keywordParts: string[] = [];
     if (sanitizedCuisines && sanitizedCuisines.length > 0) {
-      const keywords = sanitizedCuisines.join(' OR ');
+      keywordParts.push(...sanitizedCuisines);
+    }
+    // Add remaining types as keywords (e.g. 'bowling_alley', 'museum')
+    if (validTypes.length > 1) {
+      keywordParts.push(...validTypes.slice(1).map((t: string) => t.replace(/_/g, ' ')));
+    }
+    if (keywordParts.length > 0) {
+      const keywords = keywordParts.join(' OR ');
       searchParams.append('keyword', keywords);
       console.log('🔍 SEARCH VENUES: Using keyword search:', keywords);
     }
