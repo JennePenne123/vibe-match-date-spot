@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useFriends } from '@/hooks/useFriends';
 
-export type PlanningStep = 'select-partner' | 'set-preferences' | 'review-matches' | 'plan-together' | 'create-invitation';
+export type PlanningStep = 'select-partner' | 'set-preferences' | 'plan-together' | 'create-invitation';
 
 interface UsePlanningStepsProps {
   preselectedFriend?: { id: string; name: string } | null;
