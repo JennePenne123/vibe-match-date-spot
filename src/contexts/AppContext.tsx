@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { getAIVenueRecommendations, type AIVenueRecommendation } from '@/services/aiVenueService';
 
 interface UserLocation {
   latitude: number;
@@ -22,6 +23,9 @@ interface Venue {
   rating?: number;
   image_url?: string;
   tags?: string[];
+  opening_hours?: string[];
+  isOpen?: boolean;
+  matchScore?: number;
 }
 
 interface AppState {
@@ -60,6 +64,61 @@ const initialState: AppState = {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const normalizeValue = (value: string) => value.trim().toLowerCase();
+
+const recommendationToVenue = (recommendation: AIVenueRecommendation): Venue => ({
+  id: recommendation.venue_id,
+  name: recommendation.venue_name,
+  description: recommendation.ai_reasoning,
+  address: recommendation.venue_address,
+  latitude: recommendation.latitude,
+  longitude: recommendation.longitude,
+  cuisine_type: recommendation.cuisine_type,
+  price_range: recommendation.priceRange,
+  rating: recommendation.rating,
+  image_url: recommendation.venue_image,
+  tags: recommendation.amenities || [],
+  opening_hours: recommendation.operatingHours,
+  phone: undefined,
+  website: undefined,
+  isOpen: recommendation.isOpen,
+  matchScore: Math.round(recommendation.ai_score * 100)
+});
+
+const applyVenueFilters = (venues: Venue[], selectedCuisines: string[], selectedVibes: string[]) => {
+  const normalizedCuisines = selectedCuisines.map(normalizeValue);
+  const normalizedVibes = selectedVibes.map(normalizeValue);
+
+  return venues.filter((venue) => {
+    const venueCuisine = normalizeValue(venue.cuisine_type || '');
+    const venueTags = (venue.tags || []).map(normalizeValue);
+
+    const matchesCuisine = normalizedCuisines.length === 0 || normalizedCuisines.some((cuisine) => {
+      return venueCuisine.includes(cuisine) || cuisine.includes(venueCuisine);
+    });
+
+    const matchesVibe = normalizedVibes.length === 0 || normalizedVibes.some((vibe) => {
+      return venueTags.some((tag) => tag.includes(vibe) || vibe.includes(tag));
+    });
+
+    return matchesCuisine && matchesVibe;
+  });
+};
+
+const fetchFallbackVenues = async (selectedCuisines: string[], selectedVibes: string[]): Promise<Venue[]> => {
+  const { data, error } = await supabase
+    .from('venues')
+    .select('*')
+    .eq('is_active', true)
+    .limit(100);
+
+  if (error) {
+    throw error;
+  }
+
+  return applyVenueFilters((data || []) as Venue[], selectedCuisines, selectedVibes);
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [appState, setAppState] = useState<AppState>(initialState);
 
@@ -94,10 +153,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return;
     }
 
-    // Firefox-specific handling to prevent flickering
     const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
     
-    // Check if we're in a secure context (required for geolocation)
     if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
       const error = 'Location access requires HTTPS. Please use a secure connection.';
       console.error(error);
@@ -105,17 +162,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return;
     }
 
-    // Firefox-specific configuration to prevent issues
     const options: PositionOptions = {
-      enableHighAccuracy: false, // Disable high accuracy for Firefox to prevent flickering
-      timeout: isFirefox ? 20000 : 10000, // Longer timeout for Firefox
-      maximumAge: isFirefox ? 600000 : 300000 // 10 minutes for Firefox, 5 for others
+      enableHighAccuracy: false,
+      timeout: isFirefox ? 20000 : 10000,
+      maximumAge: isFirefox ? 600000 : 300000
     };
 
     console.log('🦊 Firefox detected:', isFirefox, 'Using options:', options);
 
     try {
-      // For Firefox, check permissions first to avoid popup issues
       if (isFirefox && 'permissions' in navigator) {
         try {
           const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
@@ -143,7 +198,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         address: undefined as string | undefined
       };
 
-      // Try to get city name using reverse geocoding
       try {
         const response = await fetch(
           `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`
@@ -204,47 +258,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         location: appState.userLocation
       });
 
-      // Query venues from Supabase
-      let query = supabase
-        .from('venues')
-        .select('*')
-        .eq('is_active', true);
+      let venues: Venue[] = [];
+      const { data: { user } } = await supabase.auth.getUser();
 
-      // Filter by cuisine if specified
-      if (appState.selectedCuisines.length > 0) {
-        query = query.in('cuisine_type', appState.selectedCuisines);
+      if (user && appState.userLocation?.latitude && appState.userLocation?.longitude) {
+        try {
+          const recommendations = await getAIVenueRecommendations(user.id, undefined, 20, appState.userLocation);
+          venues = recommendations.map(recommendationToVenue);
+          console.log(`✅ AI venue pipeline returned ${venues.length} venues`);
+        } catch (aiError) {
+          console.error('Error fetching AI venue recommendations:', aiError);
+        }
       }
 
-      const { data: venues, error } = await query;
-
-      if (error) {
-        console.error('Error fetching venues:', error);
-        setAppState(prev => ({ 
-          ...prev, 
-          venues: [],
-          isLoading: false 
-        }));
-        return;
+      if (venues.length === 0) {
+        console.log('⚠️ Falling back to stored venues');
+        venues = await fetchFallbackVenues(appState.selectedCuisines, appState.selectedVibes);
       }
 
-      // Filter by vibes/tags if specified
-      let filteredVenues = venues || [];
-      if (appState.selectedVibes.length > 0) {
-        filteredVenues = filteredVenues.filter(venue =>
-          appState.selectedVibes.some(vibe =>
-            venue.tags?.some(tag => tag.toLowerCase().includes(vibe.toLowerCase()))
-          )
-        );
-      }
-
-      console.log(`Returning ${filteredVenues.length} venues`);
+      console.log(`Returning ${venues.length} venues`);
 
       setAppState(prev => ({ 
         ...prev, 
-        venues: filteredVenues,
+        venues,
         isLoading: false 
       }));
-
     } catch (error) {
       console.error('Error generating recommendations:', error);
       
