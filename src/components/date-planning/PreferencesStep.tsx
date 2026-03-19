@@ -1110,9 +1110,6 @@ useEffect(() => {
       </Collapsible>
     </div>
   );
-    // Only show matches in collaborative mode when partner has set preferences
-    const shouldShowMatches = planningMode === 'collaborative' && 
-                             collaborativeSession?.hasPartnerSetPreferences;
     const sharedItems = shouldShowMatches ? getSharedPreferences(category) : [];
 
     return (
