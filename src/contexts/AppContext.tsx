@@ -66,24 +66,33 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const normalizeValue = (value: string) => value.trim().toLowerCase();
 
-const recommendationToVenue = (recommendation: AIVenueRecommendation): Venue => ({
-  id: recommendation.venue_id,
-  name: recommendation.venue_name,
-  description: recommendation.ai_reasoning,
-  address: recommendation.venue_address,
-  latitude: recommendation.latitude,
-  longitude: recommendation.longitude,
-  cuisine_type: recommendation.cuisine_type,
-  price_range: recommendation.priceRange,
-  rating: recommendation.rating,
-  image_url: recommendation.venue_image,
-  tags: recommendation.amenities || [],
-  opening_hours: recommendation.operatingHours,
-  phone: undefined,
-  website: undefined,
-  isOpen: recommendation.isOpen,
-  matchScore: Math.round(recommendation.ai_score * 100)
-});
+const recommendationToVenue = (recommendation: AIVenueRecommendation): Venue => {
+  // Try to get image from venue_image, then from venue_photos array
+  const photoUrl = recommendation.venue_photos?.length 
+    ? (typeof recommendation.venue_photos[0] === 'string' 
+        ? recommendation.venue_photos[0] 
+        : (recommendation.venue_photos[0] as any)?.url)
+    : undefined;
+  
+  return {
+    id: recommendation.venue_id,
+    name: recommendation.venue_name,
+    description: recommendation.ai_reasoning,
+    address: recommendation.venue_address,
+    latitude: recommendation.latitude,
+    longitude: recommendation.longitude,
+    cuisine_type: recommendation.cuisine_type,
+    price_range: recommendation.priceRange,
+    rating: recommendation.rating,
+    image_url: recommendation.venue_image || photoUrl,
+    tags: recommendation.amenities || [],
+    opening_hours: recommendation.operatingHours,
+    phone: undefined,
+    website: undefined,
+    isOpen: recommendation.isOpen,
+    matchScore: Math.round(recommendation.ai_score * 100)
+  };
+};
 
 const applyVenueFilters = (venues: Venue[], selectedCuisines: string[], selectedVibes: string[]) => {
   const normalizedCuisines = selectedCuisines.map(normalizeValue);
