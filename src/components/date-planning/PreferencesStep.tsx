@@ -1145,7 +1145,18 @@ useEffect(() => {
       <h2 className="text-lg font-bold mb-4">Review Your Preferences</h2>
       
       <div className="space-y-4">
-        {/* Cuisines */}
+        {/* Duration */}
+        {selectedDuration && (
+          <div>
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Zeitmodell
+            </h3>
+            <Badge variant="secondary">
+              {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
+            </Badge>
+          </div>
+        )}
         {selectedCuisines.length > 0 && (
           <div>
             <h3 className="font-semibold mb-2 flex items-center gap-2">
