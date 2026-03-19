@@ -87,9 +87,51 @@ const Profile = () => {
           <ActivityFeed />
 
           {!pointsLoading && points && <PointsCard totalPoints={points.total_points} level={points.level} streakCount={points.streak_count} />}
-          {!pointsLoading && points && <BadgesCard badges={Array.isArray(points.badges) ? points.badges : []} />}
-          <ReferralCard />
-          <AILearningCard />
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
+                <span className="flex items-center gap-2 font-semibold">
+                  <Award className="h-5 w-5 text-primary" />
+                  Achievements
+                </span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              {!pointsLoading && points && <BadgesCard badges={Array.isArray(points.badges) ? points.badges : []} />}
+            </CollapsibleContent>
+          </Collapsible>
+
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
+                <span className="flex items-center gap-2 font-semibold">
+                  <Brain className="h-5 w-5 text-primary" />
+                  AI Learning
+                </span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <AILearningCard />
+            </CollapsibleContent>
+          </Collapsible>
+
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
+                <span className="flex items-center gap-2 font-semibold">
+                  <Gift className="h-5 w-5 text-primary" />
+                  Referral Program
+                </span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <ReferralCard />
+            </CollapsibleContent>
+          </Collapsible>
+
           <LeaderboardCard />
           <ProfileActions onLogout={logout} />
         </div>
