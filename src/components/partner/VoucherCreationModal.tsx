@@ -134,9 +134,9 @@ export default function VoucherCreationModal({ open, onOpenChange, onSuccess }: 
       if (venuesError) throw venuesError;
       setVenues(venuesData || []);
 
-      // Auto-select first venue if only one
+      // Auto-select all venues if only one
       if (venuesData && venuesData.length === 1) {
-        form.setValue('venue_id', venuesData[0].id);
+        form.setValue('venue_ids', [venuesData[0].id]);
       }
     } catch (error) {
       console.error('Error fetching venues:', error);
