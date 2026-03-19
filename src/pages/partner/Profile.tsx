@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Save, Building2, Globe, Phone, Mail, MapPin, FileText } from 'lucide-react';
+import LanguageSelector from '@/components/LanguageSelector';
 import { toast } from '@/hooks/use-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -142,7 +143,7 @@ export default function PartnerProfilePage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-2xl">
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 pb-24 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={() => navigate('/partner')}>
@@ -311,6 +312,9 @@ export default function PartnerProfilePage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Language */}
+      <LanguageSelector />
 
       {/* Save Button */}
       <Button
