@@ -1217,6 +1217,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          accessibility_needs: string[] | null
           created_at: string
           dietary_restrictions: string[] | null
           home_address: string | null
@@ -1224,14 +1225,19 @@ export type Database = {
           home_longitude: number | null
           id: string
           max_distance: number | null
+          preferred_activities: string[] | null
           preferred_cuisines: string[] | null
+          preferred_duration: string | null
+          preferred_entertainment: string[] | null
           preferred_price_range: string[] | null
           preferred_times: string[] | null
+          preferred_venue_types: string[] | null
           preferred_vibes: string[] | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          accessibility_needs?: string[] | null
           created_at?: string
           dietary_restrictions?: string[] | null
           home_address?: string | null
@@ -1239,14 +1245,19 @@ export type Database = {
           home_longitude?: number | null
           id?: string
           max_distance?: number | null
+          preferred_activities?: string[] | null
           preferred_cuisines?: string[] | null
+          preferred_duration?: string | null
+          preferred_entertainment?: string[] | null
           preferred_price_range?: string[] | null
           preferred_times?: string[] | null
+          preferred_venue_types?: string[] | null
           preferred_vibes?: string[] | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          accessibility_needs?: string[] | null
           created_at?: string
           dietary_restrictions?: string[] | null
           home_address?: string | null
@@ -1254,9 +1265,13 @@ export type Database = {
           home_longitude?: number | null
           id?: string
           max_distance?: number | null
+          preferred_activities?: string[] | null
           preferred_cuisines?: string[] | null
+          preferred_duration?: string | null
+          preferred_entertainment?: string[] | null
           preferred_price_range?: string[] | null
           preferred_times?: string[] | null
+          preferred_venue_types?: string[] | null
           preferred_vibes?: string[] | null
           updated_at?: string
           user_id?: string
