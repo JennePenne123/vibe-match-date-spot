@@ -170,12 +170,35 @@ export const getAIVenueRecommendations = async (
       }
     }
 
-    // Sort by AI score and validate
+    // Sort by AI score, then apply diversity filter
     const sortedRecommendations = recommendations
-      .sort((a, b) => b.ai_score - a.ai_score)
-      .slice(0, limit);
+      .sort((a, b) => b.ai_score - a.ai_score);
 
-    return validateRecommendations(sortedRecommendations);
+    // Diversity: limit max 3 venues per cuisine_type to avoid monotony
+    const diverseRecommendations: AIVenueRecommendation[] = [];
+    const cuisineCount: Record<string, number> = {};
+    const MAX_PER_CUISINE = 3;
+
+    for (const rec of sortedRecommendations) {
+      const cuisine = (rec.cuisine_type || 'Other').toLowerCase();
+      cuisineCount[cuisine] = (cuisineCount[cuisine] || 0) + 1;
+      if (cuisineCount[cuisine] <= MAX_PER_CUISINE) {
+        diverseRecommendations.push(rec);
+      }
+      if (diverseRecommendations.length >= limit) break;
+    }
+
+    // If diversity filter removed too many, backfill from remaining
+    if (diverseRecommendations.length < limit) {
+      for (const rec of sortedRecommendations) {
+        if (!diverseRecommendations.includes(rec)) {
+          diverseRecommendations.push(rec);
+        }
+        if (diverseRecommendations.length >= limit) break;
+      }
+    }
+
+    return validateRecommendations(diverseRecommendations);
   } catch (error) {
     console.error('Failed to get venue recommendations:', error);
     throw new Error(error instanceof Error ? error.message : 'Failed to get venue recommendations');
@@ -227,16 +250,29 @@ const getVenuesFromMultipleSources = async (
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) => {
-  // Check cache first if we have location
+  // Fetch user preferences for cache key differentiation
+  const { data: userPrefs } = await supabase
+    .from('user_preferences')
+    .select('preferred_cuisines, preferred_vibes, preferred_price_range, preferred_activities, preferred_venue_types')
+    .eq('user_id', userId)
+    .single();
+
+  const cacheCuisines = userPrefs?.preferred_cuisines || [];
+  const cacheVibes = userPrefs?.preferred_vibes || [];
+  const cachePriceRange = userPrefs?.preferred_price_range || [];
+
+  // Check cache first if we have location — now includes preferences in key
   if (userLocation?.latitude && userLocation?.longitude) {
     const cachedVenues = venueCacheService.getCachedSearch(
       userLocation.latitude,
-      userLocation.longitude
+      userLocation.longitude,
+      cacheCuisines,
+      cachePriceRange,
+      cacheVibes
     );
     if (cachedVenues && cachedVenues.length > 0) {
       console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
       
-      // Log cache hit as a "free" API call
       await apiUsageService.logApiCall({
         api_name: 'venue_cache',
         endpoint: '/cached-search',
@@ -265,12 +301,15 @@ const getVenuesFromMultipleSources = async (
     venues = await getVenuesParallel(userId, limit, userLocation);
   }
   
-  // Store in cache after fetching
+  // Store in cache after fetching — now includes preferences in key
   if (venues.length > 0 && userLocation?.latitude && userLocation?.longitude) {
     venueCacheService.setCachedSearch(
       userLocation.latitude,
       userLocation.longitude,
-      venues
+      venues,
+      cacheCuisines,
+      cachePriceRange,
+      cacheVibes
     );
   }
   
