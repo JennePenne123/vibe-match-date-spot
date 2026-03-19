@@ -175,6 +175,31 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         if (dietMatch) score += 5;
       }
 
+      // Area/neighborhood vibe matching (10% weight)
+      if (selectedArea && AREA_VIBE_MAP[selectedArea]) {
+        const areaConfig = AREA_VIBE_MAP[selectedArea];
+        const searchText = [
+          ...(venue.tags || []), venue.name || '', venue.description || '', venue.address || '', venue.cuisine_type || ''
+        ].map((s: string) => s.toLowerCase()).join(' ');
+
+        // Keyword match (main signal)
+        const keywordHits = areaConfig.keywords.filter(kw => searchText.includes(kw));
+        if (keywordHits.length > 0) {
+          score += Math.min(7, keywordHits.length * 3);
+        }
+
+        // Vibe match
+        const vibeHits = areaConfig.vibes.filter(v => searchText.includes(v));
+        if (vibeHits.length > 0) {
+          score += Math.min(3, vibeHits.length * 2);
+        }
+
+        // Price hint bonus (subtle)
+        if (areaConfig.priceHint?.includes(venue.price_range)) {
+          score += 2;
+        }
+      }
+
       // Base score - every venue gets at least 5 points
       score = Math.max(5, score);
 
