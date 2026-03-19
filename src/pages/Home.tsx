@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import HomeHeader from '@/components/HomeHeader';
 import HomeContent from '@/components/HomeContent';
 import SkeletonLoader from '@/components/SkeletonLoader';
@@ -15,31 +15,38 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, refreshProfile } = useAuth();
   const { isMobile } = useBreakpoint();
+  const hasRefreshedProfile = useRef(false);
+  const hasCheckedOnboarding = useRef(false);
 
-  // Refresh profile on mount to get latest avatar data
+  // Refresh profile once on mount
   React.useEffect(() => {
-    if (user && !authLoading) {
+    if (user && !authLoading && !hasRefreshedProfile.current) {
+      hasRefreshedProfile.current = true;
       refreshProfile();
     }
-  }, []);
+  }, [user, authLoading]);
 
-  // Handle authentication redirect + mood check first, then onboarding
+  // Handle authentication redirect + mood check + onboarding (run once)
   React.useEffect(() => {
-    if (authLoading || !user) {
-      if (!authLoading && !user) {
-        console.log('No authenticated user found, redirecting to login');
-        navigate('/?auth=required', { replace: true });
-      }
+    if (authLoading) return;
+    
+    if (!user) {
+      console.log('No authenticated user found, redirecting to login');
+      navigate('/?auth=required', { replace: true });
       return;
     }
 
-    // 1. Mood check first (quick emotional icebreaker)
+    // Only check onboarding once per mount
+    if (hasCheckedOnboarding.current) return;
+    hasCheckedOnboarding.current = true;
+
+    // 1. Mood check first
     if (!hasMoodToday()) {
       navigate('/mood', { replace: true });
       return;
     }
 
-    // 2. Then check if preferences are set (onboarding)
+    // 2. Check if preferences are set (onboarding)
     const checkOnboarding = async () => {
       try {
         const { data } = await supabase
@@ -67,20 +74,9 @@ const Home: React.FC = () => {
     const firstName = safeFirstWord(displayName, 'User');
     
     return { displayName, firstName };
-  }, [user]);
+  }, [user?.id, user?.name, user?.avatar_url]);
 
-  // Early returns for loading and unauthenticated states
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className={isMobile ? "max-w-md mx-auto" : "max-w-none px-6"}>
-          <SkeletonLoader variant="home-dashboard" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!user || !userInfo) {
+  if (authLoading || !user || !userInfo) {
     return (
       <div className="min-h-screen bg-background">
         <div className={isMobile ? "max-w-md mx-auto" : "max-w-none px-6"}>
