@@ -96,7 +96,10 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [hasCompletedAllSteps, setHasCompletedAllSteps] = useState(false);
-  const totalSteps = 4;
+  const totalSteps = 5;
+  
+  // Duration model state
+  const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   
   // Timeout fallback state
   const [aiAnalysisStartTime, setAiAnalysisStartTime] = useState<number | null>(null);
@@ -117,7 +120,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [autoNavigating, setAutoNavigating] = useState(false);
   const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-  const [learnedTemplate, setLearnedTemplate] = useState<typeof quickStartTemplates[0] | null>(null);
+  const [learnedTemplate, setLearnedTemplate] = useState<{ id: string; title: string; emoji: string; description: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[]; fitsDuration?: string[] } | null>(null);
   
   // Track user modifications to prevent overwriting their choices
   const [userModifiedDate, setUserModifiedDate] = useState(false);
@@ -303,7 +306,49 @@ useEffect(() => {
     { id: 'Korean', name: 'Korean', emoji: '🍲' }
   ];
 
-  const vibes: Preference[] = [
+  // Duration model definitions
+  const durationModels = [
+    { 
+      id: 'quick', 
+      title: 'Quick & Sweet', 
+      emoji: '⚡', 
+      desc: '1-2 hours – Coffee, Lunch, Snack',
+      excludeVibes: ['lively'],
+      suggestTimes: ['morning', 'lunch', 'afternoon'],
+      suggestPrice: ['$', '$$']
+    },
+    { 
+      id: 'relaxed', 
+      title: 'Relaxed Afternoon', 
+      emoji: '☀️', 
+      desc: '2-4 hours – Brunch, Café, Walk',
+      excludeVibes: [] as string[],
+      suggestTimes: ['lunch', 'afternoon'],
+      suggestPrice: ['$$', '$$$']
+    },
+    { 
+      id: 'evening', 
+      title: 'Full Evening', 
+      emoji: '🌆', 
+      desc: '4+ hours – Dinner, Drinks, Bar',
+      excludeVibes: [] as string[],
+      suggestTimes: ['evening', 'night'],
+      suggestPrice: ['$$', '$$$', '$$$$']
+    },
+    { 
+      id: 'adventure', 
+      title: 'All-Day Adventure', 
+      emoji: '🗺️', 
+      desc: 'Full day – Multiple stops, exploring',
+      excludeVibes: [] as string[],
+      suggestTimes: ['morning', 'lunch', 'afternoon', 'evening'],
+      suggestPrice: ['$', '$$', '$$$']
+    }
+  ];
+
+  const selectedDurationModel = durationModels.find(d => d.id === selectedDuration);
+
+  const allVibes: Preference[] = [
     { id: 'romantic', name: 'Romantic', emoji: '💕', desc: 'Intimate and cozy' },
     { id: 'casual', name: 'Casual', emoji: '😊', desc: 'Relaxed and comfortable' },
     { id: 'outdoor', name: 'Outdoor', emoji: '🌳', desc: 'Fresh air and nature' },
@@ -312,6 +357,11 @@ useEffect(() => {
     { id: 'cozy', name: 'Cozy', emoji: '🕯️', desc: 'Warm and intimate' }
   ];
 
+  // Filter vibes based on duration model
+  const vibes = selectedDurationModel
+    ? allVibes.filter(v => !selectedDurationModel.excludeVibes.includes(v.id))
+    : allVibes;
+
   const priceRanges: Preference[] = [
     { id: '$', name: 'Budget', emoji: '💰', desc: 'Up to $15 per person' },
     { id: '$$', name: 'Moderate', emoji: '💳', desc: '$15-30 per person' },
@@ -319,13 +369,16 @@ useEffect(() => {
     { id: '$$$$', name: 'Luxury', emoji: '👑', desc: 'Over $50 per person' }
   ];
 
-  const timePreferences: Preference[] = [
+  const allTimePreferences: Preference[] = [
     { id: 'morning', name: 'Morning', emoji: '🌅', desc: '9:00-12:00' },
     { id: 'lunch', name: 'Lunch', emoji: '☀️', desc: '12:00-15:00' },
     { id: 'afternoon', name: 'Afternoon', emoji: '🌤️', desc: '15:00-18:00' },
     { id: 'evening', name: 'Evening', emoji: '🌆', desc: '18:00-21:00' },
     { id: 'night', name: 'Night', emoji: '🌙', desc: 'After 21:00' }
   ];
+
+  // Highlight suggested times based on duration, but show all
+  const timePreferences = allTimePreferences;
 
   const dietaryRequirements: Preference[] = [
     { id: 'vegetarian', name: 'Vegetarian', emoji: '🥬' },
@@ -336,7 +389,7 @@ useEffect(() => {
     { id: 'kosher', name: 'Kosher', emoji: '✡️' }
   ];
 
-  const quickStartTemplates = [
+  const allQuickStartTemplates = [
     {
       id: 'romantic-dinner',
       title: 'Romantic Dinner',
@@ -345,7 +398,8 @@ useEffect(() => {
       cuisines: ['Italian', 'French'],
       vibes: ['romantic', 'upscale'],
       priceRange: ['$$$', '$$$$'],
-      timePreferences: ['evening']
+      timePreferences: ['evening'],
+      fitsDuration: ['evening', 'adventure']
     },
     {
       id: 'casual-brunch',
@@ -355,7 +409,8 @@ useEffect(() => {
       cuisines: ['American', 'Mediterranean'],
       vibes: ['casual', 'cozy'],
       priceRange: ['$', '$$'],
-      timePreferences: ['morning', 'lunch']
+      timePreferences: ['morning', 'lunch'],
+      fitsDuration: ['quick', 'relaxed', 'adventure']
     },
     {
       id: 'trendy-cocktail',
@@ -365,9 +420,26 @@ useEffect(() => {
       cuisines: ['American'],
       vibes: ['lively', 'upscale'],
       priceRange: ['$$', '$$$'],
-      timePreferences: ['evening', 'night']
+      timePreferences: ['evening', 'night'],
+      fitsDuration: ['evening']
+    },
+    {
+      id: 'coffee-walk',
+      title: 'Coffee & Walk',
+      emoji: '☕🚶',
+      description: 'Quick coffee and a stroll – easy and spontaneous',
+      cuisines: ['American', 'Italian'],
+      vibes: ['casual', 'outdoor'],
+      priceRange: ['$'],
+      timePreferences: ['morning', 'afternoon'],
+      fitsDuration: ['quick']
     }
   ];
+
+  // Filter templates by selected duration
+  const quickStartTemplates = selectedDuration
+    ? allQuickStartTemplates.filter(t => t.fitsDuration.includes(selectedDuration))
+    : allQuickStartTemplates;
 
   // Load partner preferences for compatibility
   useEffect(() => {
@@ -490,7 +562,7 @@ useEffect(() => {
     return sortedCurrentValues.every((value, index) => value === sortedTemplateValues[index]);
   };
 
-  const isTemplateCurrentlySelected = (template: typeof quickStartTemplates[number]) => {
+  const isTemplateCurrentlySelected = (template: { id: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[] }) => {
     return selectedTemplateId === template.id || (
       haveSameSelections(selectedCuisines, template.cuisines) &&
       haveSameSelections(selectedVibes, template.vibes) &&
@@ -499,7 +571,7 @@ useEffect(() => {
     );
   };
 
-  const applyQuickStartTemplate = (template: typeof quickStartTemplates[0]) => {
+  const applyQuickStartTemplate = (template: { id: string; title: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[] }) => {
     const isDeselecting = isTemplateCurrentlySelected(template);
     
     if (isDeselecting) {
@@ -675,8 +747,18 @@ useEffect(() => {
   };
 
   const nextStep = () => {
-    // Validate step 2 before proceeding
-    if (currentStep === 2 && !canProceedFromStep2()) {
+    // Validate step 1: duration must be selected
+    if (currentStep === 1 && !selectedDuration) {
+      toast({
+        title: "Zeitmodell wählen",
+        description: "Bitte wähle zuerst, wie viel Zeit du dir nehmen möchtest.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate step 3 before proceeding (was step 2)
+    if (currentStep === 3 && !canProceedFromStep2()) {
       toast({
         title: "Date and Time Required",
         description: "Please select both a preferred date and time to continue.",
@@ -698,20 +780,22 @@ useEffect(() => {
 
   const getStepTitle = () => {
     switch (currentStep) {
-      case 1: return 'Food & Vibe';
-      case 2: return 'Budget & Timing';
-      case 3: return 'Distance & Diet';
-      case 4: return 'Review & Submit';
+      case 1: return 'Zeitmodell';
+      case 2: return 'Food & Vibe';
+      case 3: return 'Budget & Timing';
+      case 4: return 'Distance & Diet';
+      case 5: return 'Review & Submit';
       default: return 'Preferences';
     }
   };
 
   const getStepIcon = () => {
     switch (currentStep) {
-      case 1: return <Heart className="w-5 h-5" />;
-      case 2: return <DollarSign className="w-5 h-5" />;
-      case 3: return <MapPin className="w-5 h-5" />;
-      case 4: return <Check className="w-5 h-5" />;
+      case 1: return <Clock className="w-5 h-5" />;
+      case 2: return <Heart className="w-5 h-5" />;
+      case 3: return <DollarSign className="w-5 h-5" />;
+      case 4: return <MapPin className="w-5 h-5" />;
+      case 5: return <Check className="w-5 h-5" />;
       default: return <Heart className="w-5 h-5" />;
     }
   };
@@ -759,12 +843,86 @@ useEffect(() => {
     );
   };
 
+  // When duration changes, auto-suggest matching time preferences and price range
+  const handleDurationSelect = (durationId: string) => {
+    const isDeselecting = selectedDuration === durationId;
+    setSelectedDuration(isDeselecting ? null : durationId);
+    
+    if (!isDeselecting) {
+      const model = durationModels.find(d => d.id === durationId);
+      if (model) {
+        // Auto-set suggested time preferences (user can still change)
+        if (!userModifiedTimePrefs) {
+          setSelectedTimePreferences(model.suggestTimes);
+        }
+        // Auto-set suggested price range
+        if (selectedPriceRange.length === 0) {
+          setSelectedPriceRange(model.suggestPrice);
+        }
+        // Remove vibes that don't fit this duration
+        if (model.excludeVibes.length > 0) {
+          setSelectedVibes(prev => prev.filter(v => !model.excludeVibes.includes(v)));
+        }
+        // Clear template if it doesn't fit this duration
+        if (selectedTemplateId) {
+          const currentTemplate = allQuickStartTemplates.find(t => t.id === selectedTemplateId);
+          if (currentTemplate && !currentTemplate.fitsDuration.includes(durationId)) {
+            setSelectedTemplateId(null);
+          }
+        }
+      }
+    }
+  };
+
+  const renderDurationStep = () => (
+    <div className="space-y-4">
+      <h2 className="text-base md:text-lg font-bold mb-1">Wie viel Zeit hast du?</h2>
+      <p className="text-muted-foreground text-sm mb-4">Das hilft der KI, passende Vorschläge zu filtern</p>
+      <div className="grid grid-cols-1 gap-3">
+        {durationModels.map((model) => {
+          const isSelected = selectedDuration === model.id;
+          return (
+            <button
+              type="button"
+              key={model.id}
+              onClick={() => handleDurationSelect(model.id)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className={cn(
+                "p-4 md:p-5 rounded-xl border-2 text-left transition-none select-none relative",
+                isSelected
+                  ? "border-primary bg-primary/5"
+                  : "border-border bg-card hover:border-muted-foreground/30"
+              )}
+            >
+              <div className="flex items-center gap-4">
+                <div className="text-2xl md:text-3xl flex-shrink-0">{model.emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm md:text-base">{model.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground leading-tight mt-0.5">{model.desc}</p>
+                </div>
+                {isSelected && (
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                    <Check className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   const renderStep1 = () => (
     <>
       {/* Quick Start Section */}
       <div className="mb-6 md:mb-8">
         <h2 className="text-base md:text-lg font-bold mb-2">Quick Start</h2>
-        <p className="text-muted-foreground text-sm mb-3 md:mb-4">Or choose a ready-made template</p>
+        <p className="text-muted-foreground text-sm mb-3 md:mb-4">
+          {selectedDuration 
+            ? `Templates passend zu "${durationModels.find(d => d.id === selectedDuration)?.title}"`
+            : 'Or choose a ready-made template'}
+        </p>
         <div className="grid grid-cols-1 gap-2 md:gap-3">
           {/* AI-learned personalized template */}
           {learnedTemplate && (
@@ -797,7 +955,7 @@ useEffect(() => {
               </div>
             </button>
           )}
-          {quickStartTemplates.map((template) => (
+          {quickStartTemplates.length > 0 ? quickStartTemplates.map((template) => (
             <button
               type="button"
               key={template.id}
@@ -823,7 +981,9 @@ useEffect(() => {
                 )}
               </div>
             </button>
-          ))}
+          )) : (
+            <p className="text-sm text-muted-foreground italic py-2">Keine passenden Templates für dieses Zeitmodell.</p>
+          )}
         </div>
       </div>
 
@@ -839,6 +999,11 @@ useEffect(() => {
         <div>
           <h2 className="text-base md:text-lg font-bold mb-2">What's the vibe you're going for?</h2>
           <p className="text-muted-foreground text-sm mb-3 md:mb-4">Choose the atmosphere you want</p>
+          {selectedDurationModel?.excludeVibes.length ? (
+            <p className="text-xs text-muted-foreground mb-2 italic">
+              Einige Vibes wurden basierend auf deinem Zeitmodell ausgeblendet
+            </p>
+          ) : null}
           {renderPreferenceGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
         </div>
       </div>
@@ -980,7 +1145,18 @@ useEffect(() => {
       <h2 className="text-lg font-bold mb-4">Review Your Preferences</h2>
       
       <div className="space-y-4">
-        {/* Cuisines */}
+        {/* Duration */}
+        {selectedDuration && (
+          <div>
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Zeitmodell
+            </h3>
+            <Badge variant="secondary">
+              {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
+            </Badge>
+          </div>
+        )}
         {selectedCuisines.length > 0 && (
           <div>
             <h3 className="font-semibold mb-2 flex items-center gap-2">
@@ -1170,10 +1346,11 @@ useEffect(() => {
           </div>
         </CardHeader>
         <CardContent className="px-4 md:px-6 pb-4 md:pb-6 space-y-4 md:space-y-6">
-          {currentStep === 1 && renderStep1()}
-          {currentStep === 2 && renderStep2()}
-          {currentStep === 3 && renderStep3()}
-          {currentStep === 4 && renderStep4()}
+          {currentStep === 1 && renderDurationStep()}
+          {currentStep === 2 && renderStep1()}
+          {currentStep === 3 && renderStep2()}
+          {currentStep === 4 && renderStep3()}
+          {currentStep === 5 && renderStep4()}
 
           <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
             <Button
@@ -1188,7 +1365,7 @@ useEffect(() => {
             {currentStep < totalSteps ? (
               <Button 
                 onClick={nextStep}
-                disabled={currentStep === 2 && !canProceedFromStep2()}
+                disabled={(currentStep === 1 && !selectedDuration) || (currentStep === 3 && !canProceedFromStep2())}
                 className="w-full sm:w-auto"
               >
                 Next
