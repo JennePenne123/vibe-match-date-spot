@@ -843,12 +843,86 @@ useEffect(() => {
     );
   };
 
+  // When duration changes, auto-suggest matching time preferences and price range
+  const handleDurationSelect = (durationId: string) => {
+    const isDeselecting = selectedDuration === durationId;
+    setSelectedDuration(isDeselecting ? null : durationId);
+    
+    if (!isDeselecting) {
+      const model = durationModels.find(d => d.id === durationId);
+      if (model) {
+        // Auto-set suggested time preferences (user can still change)
+        if (!userModifiedTimePrefs) {
+          setSelectedTimePreferences(model.suggestTimes);
+        }
+        // Auto-set suggested price range
+        if (selectedPriceRange.length === 0) {
+          setSelectedPriceRange(model.suggestPrice);
+        }
+        // Remove vibes that don't fit this duration
+        if (model.excludeVibes.length > 0) {
+          setSelectedVibes(prev => prev.filter(v => !model.excludeVibes.includes(v)));
+        }
+        // Clear template if it doesn't fit this duration
+        if (selectedTemplateId) {
+          const currentTemplate = allQuickStartTemplates.find(t => t.id === selectedTemplateId);
+          if (currentTemplate && !currentTemplate.fitsDuration.includes(durationId)) {
+            setSelectedTemplateId(null);
+          }
+        }
+      }
+    }
+  };
+
+  const renderDurationStep = () => (
+    <div className="space-y-4">
+      <h2 className="text-base md:text-lg font-bold mb-1">Wie viel Zeit hast du?</h2>
+      <p className="text-muted-foreground text-sm mb-4">Das hilft der KI, passende Vorschläge zu filtern</p>
+      <div className="grid grid-cols-1 gap-3">
+        {durationModels.map((model) => {
+          const isSelected = selectedDuration === model.id;
+          return (
+            <button
+              type="button"
+              key={model.id}
+              onClick={() => handleDurationSelect(model.id)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+              className={cn(
+                "p-4 md:p-5 rounded-xl border-2 text-left transition-none select-none relative",
+                isSelected
+                  ? "border-primary bg-primary/5"
+                  : "border-border bg-card hover:border-muted-foreground/30"
+              )}
+            >
+              <div className="flex items-center gap-4">
+                <div className="text-2xl md:text-3xl flex-shrink-0">{model.emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm md:text-base">{model.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground leading-tight mt-0.5">{model.desc}</p>
+                </div>
+                {isSelected && (
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                    <Check className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   const renderStep1 = () => (
     <>
       {/* Quick Start Section */}
       <div className="mb-6 md:mb-8">
         <h2 className="text-base md:text-lg font-bold mb-2">Quick Start</h2>
-        <p className="text-muted-foreground text-sm mb-3 md:mb-4">Or choose a ready-made template</p>
+        <p className="text-muted-foreground text-sm mb-3 md:mb-4">
+          {selectedDuration 
+            ? `Templates passend zu "${durationModels.find(d => d.id === selectedDuration)?.title}"`
+            : 'Or choose a ready-made template'}
+        </p>
         <div className="grid grid-cols-1 gap-2 md:gap-3">
           {/* AI-learned personalized template */}
           {learnedTemplate && (
@@ -881,7 +955,7 @@ useEffect(() => {
               </div>
             </button>
           )}
-          {quickStartTemplates.map((template) => (
+          {quickStartTemplates.length > 0 ? quickStartTemplates.map((template) => (
             <button
               type="button"
               key={template.id}
@@ -907,7 +981,9 @@ useEffect(() => {
                 )}
               </div>
             </button>
-          ))}
+          )) : (
+            <p className="text-sm text-muted-foreground italic py-2">Keine passenden Templates für dieses Zeitmodell.</p>
+          )}
         </div>
       </div>
 
@@ -923,6 +999,11 @@ useEffect(() => {
         <div>
           <h2 className="text-base md:text-lg font-bold mb-2">What's the vibe you're going for?</h2>
           <p className="text-muted-foreground text-sm mb-3 md:mb-4">Choose the atmosphere you want</p>
+          {selectedDurationModel?.excludeVibes.length ? (
+            <p className="text-xs text-muted-foreground mb-2 italic">
+              Einige Vibes wurden basierend auf deinem Zeitmodell ausgeblendet
+            </p>
+          ) : null}
           {renderPreferenceGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
         </div>
       </div>
