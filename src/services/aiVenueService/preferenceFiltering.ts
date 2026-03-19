@@ -59,26 +59,25 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[]) =
       let score = 0;
       const maxScore = 100;
 
-      // Cuisine matching (40% weight) - fuzzy
+      // Cuisine matching (30% weight) - fuzzy
       const cuisineScore = cuisineMatchScore(
         venue.cuisine_type, 
         userPrefs.preferred_cuisines || []
       );
-      score += cuisineScore * 40;
+      score += cuisineScore * 30;
 
-      // Price range matching (25% weight)
+      // Price range matching (20% weight)
       if (userPrefs.preferred_price_range?.includes(venue.price_range)) {
-        score += 25;
+        score += 20;
       } else if (venue.price_range) {
-        // Adjacent price ranges get partial credit
         const priceOrder = ['$', '$$', '$$$', '$$$$'];
         const venueIdx = priceOrder.indexOf(venue.price_range);
         const prefIdxes = (userPrefs.preferred_price_range || []).map((p: string) => priceOrder.indexOf(p));
         const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
-        if (minDist === 1) score += 15; // Adjacent price
+        if (minDist === 1) score += 12;
       }
 
-      // Vibe/tag matching (20% weight) - fuzzy
+      // Vibe/tag matching (15% weight) - fuzzy
       if (venue.tags && userPrefs.preferred_vibes?.length) {
         const venueTags = venue.tags.map((t: string) => t.toLowerCase());
         const prefVibes = userPrefs.preferred_vibes.map((v: string) => v.toLowerCase());
@@ -86,8 +85,46 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[]) =
           prefVibes.some((vibe: string) => tag.includes(vibe) || vibe.includes(tag))
         );
         if (vibeMatches.length > 0) {
-          score += Math.min(20, vibeMatches.length * 10);
+          score += Math.min(15, vibeMatches.length * 8);
         }
+      }
+
+      // Activity matching (10% weight) - NEW
+      if (userPrefs.preferred_activities?.length && venue.tags) {
+        const activityTagMap: Record<string, string[]> = {
+          'dining': ['restaurant', 'dining', 'food'],
+          'cocktails': ['bar', 'cocktail', 'drinks', 'lounge'],
+          'cultural_act': ['museum', 'gallery', 'art', 'theater'],
+          'active': ['sport', 'bowling', 'climbing', 'fitness'],
+          'nightlife_act': ['club', 'party', 'nightlife'],
+        };
+        const searchText = [...venue.tags, venue.cuisine_type || '', venue.description || '']
+          .map((s: string) => s.toLowerCase()).join(' ');
+        const actMatch = (userPrefs.preferred_activities as string[]).some((act: string) => {
+          const keywords = activityTagMap[act] || [act.toLowerCase()];
+          return keywords.some(kw => searchText.includes(kw));
+        });
+        if (actMatch) score += 10;
+      }
+
+      // Venue type matching (10% weight) - NEW
+      if (userPrefs.preferred_venue_types?.length) {
+        const venueTypeKeywords: Record<string, string[]> = {
+          'museum': ['museum'], 'gallery': ['gallery', 'galerie'],
+          'theater_venue': ['theater', 'theatre'], 'cinema': ['cinema', 'kino'],
+          'bowling': ['bowling'], 'escape_room': ['escape room'],
+          'climbing': ['climbing', 'klettern', 'bouldering'],
+          'spa_wellness': ['spa', 'wellness', 'sauna'],
+          'karaoke': ['karaoke'], 'comedy_club': ['comedy'],
+          'arcade': ['arcade'], 'mini_golf': ['mini golf', 'minigolf'],
+        };
+        const searchText = [...(venue.tags || []), venue.name || '', venue.cuisine_type || '', venue.description || '']
+          .map((s: string) => s.toLowerCase()).join(' ');
+        const typeMatch = (userPrefs.preferred_venue_types as string[]).some((vt: string) => {
+          const keywords = venueTypeKeywords[vt] || [vt.toLowerCase().replace('_', ' ')];
+          return keywords.some(kw => searchText.includes(kw));
+        });
+        if (typeMatch) score += 10;
       }
 
       // Rating bonus (10% weight)
@@ -97,7 +134,16 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[]) =
         score += 5;
       }
 
-      // Base score - every venue gets at least 5 points to avoid being completely excluded
+      // Dietary compatibility bonus (5%) - NEW
+      if (userPrefs.dietary_restrictions?.length && venue.tags) {
+        const searchText = [...venue.tags, venue.description || ''].map((s: string) => s.toLowerCase()).join(' ');
+        const dietMatch = (userPrefs.dietary_restrictions as string[]).some((diet: string) => 
+          searchText.includes(diet.toLowerCase().replace('_', ' '))
+        );
+        if (dietMatch) score += 5;
+      }
+
+      // Base score - every venue gets at least 5 points
       score = Math.max(5, score);
 
       const scoredVenue = {
