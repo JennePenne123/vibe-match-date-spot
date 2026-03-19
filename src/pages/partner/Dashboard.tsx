@@ -57,35 +57,36 @@ export default function PartnerDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
             {t('partner.dashboard')}
           </h1>
-          <p className="text-muted-foreground mt-2">{t('partner.dashboardDesc')}</p>
+          <p className="text-muted-foreground text-sm mt-1">{t('partner.dashboardDesc')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => navigate('/partner/profile')}>
             <UserCog className="w-4 h-4 mr-1" />
-            {t('partner.profile.editButton', 'Profil bearbeiten')}
+            <span className="hidden sm:inline">{t('partner.profile.editButton', 'Profil bearbeiten')}</span>
+            <span className="sm:hidden">{t('partner.profile.editButton', 'Profil')}</span>
           </Button>
-          <Badge variant="default" className="text-sm">
+          <Badge variant="default" className="text-xs">
             <Sparkles className="w-3 h-3 mr-1" />
             {t('partner.venuePartner')}
           </Badge>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <Card variant="glass" className="group hover:scale-105 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">{t('partner.activeVouchers')}</CardTitle>
             <Gift className="w-4 h-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('partner.activeVouchersDesc')}</p>
+          <CardContent className="pt-0 md:pt-0">
+            <div className="text-2xl md:text-3xl font-bold">0</div>
+            <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{t('partner.activeVouchersDesc')}</p>
           </CardContent>
         </Card>
 
@@ -94,9 +95,9 @@ export default function PartnerDashboard() {
             <CardTitle className="text-sm font-medium">{t('partner.totalRedemptions')}</CardTitle>
             <Users className="w-4 h-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('partner.totalRedemptionsDesc')}</p>
+          <CardContent className="pt-0 md:pt-0">
+            <div className="text-2xl md:text-3xl font-bold">0</div>
+            <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{t('partner.totalRedemptionsDesc')}</p>
           </CardContent>
         </Card>
 
@@ -105,9 +106,9 @@ export default function PartnerDashboard() {
             <CardTitle className="text-sm font-medium">{t('partner.thisMonth')}</CardTitle>
             <TrendingUp className="w-4 h-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('partner.thisMonthDesc')}</p>
+          <CardContent className="pt-0 md:pt-0">
+            <div className="text-2xl md:text-3xl font-bold">0</div>
+            <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{t('partner.thisMonthDesc')}</p>
           </CardContent>
         </Card>
 
@@ -116,9 +117,9 @@ export default function PartnerDashboard() {
             <CardTitle className="text-sm font-medium">{t('partner.managedVenues')}</CardTitle>
             <Sparkles className="w-4 h-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('partner.managedVenuesDesc')}</p>
+          <CardContent className="pt-0 md:pt-0">
+            <div className="text-2xl md:text-3xl font-bold">0</div>
+            <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{t('partner.managedVenuesDesc')}</p>
           </CardContent>
         </Card>
       </div>
@@ -133,7 +134,7 @@ export default function PartnerDashboard() {
       <RedemptionChart />
 
       {/* Quick Links */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/reports')}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">

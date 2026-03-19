@@ -5,6 +5,7 @@ import { AppSidebar } from './AppSidebar'
 import { PartnerSidebar } from './PartnerSidebar'
 import { AdminSidebar } from './AdminSidebar'
 import { MobileBottomNav } from './MobileBottomNav'
+import { PartnerMobileBottomNav } from './PartnerMobileBottomNav'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { Menu, Sparkles } from 'lucide-react'
@@ -80,13 +81,32 @@ export default function AppLayout({ children }: AppLayoutProps) {
             100% { transform: translateX(0); opacity: 1; }
           }
         `}</style>
+
+        {/* Partner mobile header */}
+        {isPartnerRoute && (
+          <header className="sticky top-0 z-40 flex items-center justify-between h-12 px-4 border-b border-border/40 bg-card/90 backdrop-blur-xl">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-gradient-primary flex items-center justify-center">
+                <Sparkles className="w-3.5 h-3.5 text-white" />
+              </div>
+              <span className="font-semibold text-sm text-foreground">Partner Portal</span>
+            </div>
+            <ThemeToggle />
+          </header>
+        )}
+
         <div
           style={getContentStyle()}
           className="will-change-transform"
         >
           {children}
         </div>
-        {!isPartnerRoute && !isAdminRoute && <MobileBottomNav />}
+
+        {isPartnerRoute ? (
+          <PartnerMobileBottomNav />
+        ) : isAdminRoute ? null : (
+          <MobileBottomNav />
+        )}
       </div>
     )
   }
