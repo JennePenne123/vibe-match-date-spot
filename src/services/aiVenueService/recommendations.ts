@@ -225,11 +225,11 @@ const getVenuesFromMultipleSources = async (
 /**
  * Radar + Foursquare strategy: Radar for primary search, Foursquare for enrichment (photos, tips, ratings)
  */
-const getVenuesRadarFoursquare = async (
+async function getVenuesRadarFoursquare(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
+) {
   // Step 1: Get venues from Radar (primary, high free tier)
   let venues = await getVenuesFromRadar(userId, limit, userLocation).catch(() => []);
   
@@ -247,30 +247,30 @@ const getVenuesRadarFoursquare = async (
   }
   
   return venues;
-};
+}
 
 /**
  * Foursquare-only strategy
  */
-const getVenuesFoursquareOnly = async (
+async function getVenuesFoursquareOnly(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
+) {
   if (API_CONFIG.useFoursquare && userLocation) {
     return await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
   }
   return [];
-};
+}
 
 /**
  * Parallel strategy: Call multiple APIs simultaneously
  */
-const getVenuesParallel = async (
+async function getVenuesParallel(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
+) {
   const promises: Promise<any[]>[] = [];
   
   if (API_CONFIG.useRadar && userLocation) {
@@ -292,7 +292,7 @@ const getVenuesParallel = async (
   }
   
   return merged;
-};
+}
 
 /**
  * Merge and deduplicate venues from multiple sources
