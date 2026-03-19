@@ -44,7 +44,7 @@ const VENUE_TYPE_TO_RADAR: Record<string, string[]> = {
   'climbing': ['rock-climbing', 'gym'],
   'swimming': ['pool', 'water-park'],
   'hiking': ['trail', 'park'],
-  'cycling': ['bike-shop', 'park'],
+  
   'karaoke': ['karaoke-bar'],
   'comedy_club': ['comedy-club'],
   'arcade': ['arcade'],

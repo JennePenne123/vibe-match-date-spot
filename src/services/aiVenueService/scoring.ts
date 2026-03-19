@@ -114,7 +114,7 @@ const calculateUserScore = (
       'climbing': ['climbing', 'klettern', 'bouldering', 'boulderhalle'],
       'swimming': ['swimming', 'pool', 'schwimmbad', 'therme'],
       'hiking': ['hiking', 'wandern', 'trail'],
-      'cycling': ['cycling', 'bike', 'fahrrad'],
+      
       'karaoke': ['karaoke'],
       'comedy_club': ['comedy', 'comedy club', 'stand-up'],
       'arcade': ['arcade', 'spielhalle', 'gaming'],
