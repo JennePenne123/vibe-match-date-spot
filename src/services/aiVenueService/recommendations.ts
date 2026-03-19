@@ -70,21 +70,54 @@ export const getAIVenueRecommendations = async (
 
     const recommendations: AIVenueRecommendation[] = [];
 
-    // Calculate AI scores for each venue
+    // Fetch user preferences once (avoid N+1 queries)
+    const { data: userPrefs } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    // Build recommendations using the preferenceScore from filtering + local scoring
     for (const venue of venues) {
-      // Ensure venue has a valid ID
       if (!venue.id) {
         venue.id = `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       }
-      
-      const aiScore = await calculateVenueAIScore(venue.id, userId, partnerId);
-      const scoreData = await getStoredAIScore(venue.id, userId);
 
-      // Extract clean venue ID with priority order
       const cleanVenueId = extractVenueId(venue);
+      if (!cleanVenueId) continue;
+
+      // Use the preferenceScore from filtering as the primary score (0-100)
+      // This already accounts for cuisine, price, vibe, and rating matching
+      const prefScore = venue.preferenceScore || venue.collaborativeScore || 50;
       
-      if (!cleanVenueId) {
-        continue; // Skip venues without valid IDs
+      // Apply contextual bonuses
+      let contextBonus = 0;
+      const hour = new Date().getHours();
+      if (hour >= 18 && hour <= 21) contextBonus += 5; // Dinner
+      else if (hour >= 11 && hour <= 14) contextBonus += 3; // Lunch
+
+      // Rating bonus
+      const ratingBonus = venue.rating ? Math.min((venue.rating - 3.0) * 3, 10) : 0;
+
+      // Compute final score: preference-driven with small contextual adjustments
+      const finalScore = Math.max(15, Math.min(98, prefScore + contextBonus + ratingBonus));
+
+      // Generate reasoning based on actual matches
+      const matchReasons: string[] = [];
+      if (userPrefs?.preferred_cuisines?.some((c: string) => 
+        venue.cuisine_type?.toLowerCase().includes(c.toLowerCase()) ||
+        c.toLowerCase().includes(venue.cuisine_type?.toLowerCase() || '')
+      )) {
+        matchReasons.push(`Passt zu deiner Lieblingsküche: ${venue.cuisine_type}`);
+      }
+      if (userPrefs?.preferred_price_range?.includes(venue.price_range)) {
+        matchReasons.push(`Preisklasse ${venue.price_range} passt`);
+      }
+      if (venue.rating && venue.rating >= 4.0) {
+        matchReasons.push(`Top bewertet (${venue.rating}⭐)`);
+      }
+      if (matchReasons.length === 0) {
+        matchReasons.push('Entdecke etwas Neues in deiner Nähe');
       }
 
       // Extract best image from photos array or image_url
@@ -100,11 +133,17 @@ export const getAIVenueRecommendations = async (
         venue_address: venue.address || venue.location || venue.vicinity || 'Address not available',
         venue_image: bestImage,
         venue_photos: photosArray,
-        ai_score: aiScore,
-        match_factors: scoreData?.match_factors || {},
-        contextual_score: scoreData?.contextual_score || 0,
-        ai_reasoning: generateAIReasoning(venue, scoreData?.match_factors, aiScore),
-        confidence_level: calculateConfidenceLevel(aiScore, scoreData?.match_factors),
+        ai_score: finalScore / 100,
+        match_factors: {
+          cuisine_match: !!userPrefs?.preferred_cuisines?.some((c: string) => 
+            venue.cuisine_type?.toLowerCase().includes(c.toLowerCase())
+          ),
+          price_match: !!userPrefs?.preferred_price_range?.includes(venue.price_range),
+          preference_score: prefScore,
+        },
+        contextual_score: contextBonus / 100,
+        ai_reasoning: matchReasons.join(' • '),
+        confidence_level: calculateConfidenceLevel(finalScore, {}),
         distance: calculateDistanceFromHamburg(venue),
         neighborhood: extractNeighborhood(venue.address || venue.location || venue.vicinity),
         isOpen: determineOpenStatus(venue.opening_hours || venue.openNow),
