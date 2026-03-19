@@ -95,9 +95,9 @@ export default function PartnerDashboard() {
             <CardTitle className="text-sm font-medium">{t('partner.totalRedemptions')}</CardTitle>
             <Users className="w-4 h-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('partner.totalRedemptionsDesc')}</p>
+          <CardContent className="pt-0 md:pt-0">
+            <div className="text-2xl md:text-3xl font-bold">0</div>
+            <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{t('partner.totalRedemptionsDesc')}</p>
           </CardContent>
         </Card>
 
