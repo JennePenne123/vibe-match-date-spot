@@ -227,16 +227,29 @@ const getVenuesFromMultipleSources = async (
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) => {
-  // Check cache first if we have location
+  // Fetch user preferences for cache key differentiation
+  const { data: userPrefs } = await supabase
+    .from('user_preferences')
+    .select('preferred_cuisines, preferred_vibes, preferred_price_range, preferred_activities, preferred_venue_types')
+    .eq('user_id', userId)
+    .single();
+
+  const cacheCuisines = userPrefs?.preferred_cuisines || [];
+  const cacheVibes = userPrefs?.preferred_vibes || [];
+  const cachePriceRange = userPrefs?.preferred_price_range || [];
+
+  // Check cache first if we have location — now includes preferences in key
   if (userLocation?.latitude && userLocation?.longitude) {
     const cachedVenues = venueCacheService.getCachedSearch(
       userLocation.latitude,
-      userLocation.longitude
+      userLocation.longitude,
+      cacheCuisines,
+      cachePriceRange,
+      cacheVibes
     );
     if (cachedVenues && cachedVenues.length > 0) {
       console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
       
-      // Log cache hit as a "free" API call
       await apiUsageService.logApiCall({
         api_name: 'venue_cache',
         endpoint: '/cached-search',
@@ -265,12 +278,15 @@ const getVenuesFromMultipleSources = async (
     venues = await getVenuesParallel(userId, limit, userLocation);
   }
   
-  // Store in cache after fetching
+  // Store in cache after fetching — now includes preferences in key
   if (venues.length > 0 && userLocation?.latitude && userLocation?.longitude) {
     venueCacheService.setCachedSearch(
       userLocation.latitude,
       userLocation.longitude,
-      venues
+      venues,
+      cacheCuisines,
+      cachePriceRange,
+      cacheVibes
     );
   }
   
