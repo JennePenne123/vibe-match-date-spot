@@ -25,7 +25,7 @@ const Results = () => {
   const venues = isFromSmartPlanning ? (smartPlanningState.venues || []) : appState.venues;
 
   // Use Smart Date Planning recommendations if available, otherwise convert venues
-  const recommendations: AIVenueRecommendation[] = isFromSmartPlanning && smartPlanningState.venueRecommendations
+  const recommendations: AIVenueRecommendation[] = (isFromSmartPlanning && smartPlanningState.venueRecommendations
     ? smartPlanningState.venueRecommendations
     : venues.map(venue => ({
         venue_id: venue.id,
@@ -43,7 +43,8 @@ const Results = () => {
         contextual_score: 0,
         ai_reasoning: (venue as any).description || `${venue.cuisine_type || 'Restaurant'} in deiner Nähe`,
         confidence_level: 0.7
-      }));
+      }))
+  ).sort((a, b) => b.ai_score - a.ai_score);
 
   const handleVenueSelect = (venueId: string) => {
     if (isFromSmartPlanning) {
