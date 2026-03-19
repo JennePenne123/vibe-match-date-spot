@@ -57,20 +57,21 @@ export default function PartnerDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
             {t('partner.dashboard')}
           </h1>
-          <p className="text-muted-foreground mt-2">{t('partner.dashboardDesc')}</p>
+          <p className="text-muted-foreground text-sm mt-1">{t('partner.dashboardDesc')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => navigate('/partner/profile')}>
             <UserCog className="w-4 h-4 mr-1" />
-            {t('partner.profile.editButton', 'Profil bearbeiten')}
+            <span className="hidden sm:inline">{t('partner.profile.editButton', 'Profil bearbeiten')}</span>
+            <span className="sm:hidden">{t('partner.profile.editButton', 'Profil')}</span>
           </Button>
-          <Badge variant="default" className="text-sm">
+          <Badge variant="default" className="text-xs">
             <Sparkles className="w-3 h-3 mr-1" />
             {t('partner.venuePartner')}
           </Badge>
