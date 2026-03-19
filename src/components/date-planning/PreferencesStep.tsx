@@ -758,16 +758,6 @@ useEffect(() => {
       return;
     }
 
-    // Validate step 3 before proceeding (was step 2)
-    if (currentStep === 3 && !canProceedFromStep2()) {
-      toast({
-        title: "Date and Time Required",
-        description: "Please select both a preferred date and time to continue.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -782,10 +772,8 @@ useEffect(() => {
   const getStepTitle = () => {
     switch (currentStep) {
       case 1: return 'Zeitmodell';
-      case 2: return 'Food & Vibe';
-      case 3: return 'Budget & Timing';
-      case 4: return 'Distance & Diet';
-      case 5: return 'Review & Submit';
+      case 2: return 'Essen, Vibe & Budget';
+      case 3: return 'Wann & Los';
       default: return 'Preferences';
     }
   };
@@ -794,9 +782,7 @@ useEffect(() => {
     switch (currentStep) {
       case 1: return <Clock className="w-5 h-5" />;
       case 2: return <Heart className="w-5 h-5" />;
-      case 3: return <DollarSign className="w-5 h-5" />;
-      case 4: return <MapPin className="w-5 h-5" />;
-      case 5: return <Check className="w-5 h-5" />;
+      case 3: return <CalendarIcon className="w-5 h-5" />;
       default: return <Heart className="w-5 h-5" />;
     }
   };
