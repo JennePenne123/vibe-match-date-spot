@@ -1,15 +1,24 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, Users } from 'lucide-react';
+import { ArrowLeft, Sparkles, Users, Crown, Lock } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
+import { useAuth } from '@/contexts/AuthContext';
+import { useVenueVouchers } from '@/hooks/useVenueVouchers';
+import { useUserPoints } from '@/hooks/useUserPoints';
 
 const Results = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { appState } = useApp();
+  const { user } = useAuth();
+  const { points } = useUserPoints();
+  
+  const isPremium = points?.premium_until 
+    ? new Date(points.premium_until) > new Date() 
+    : false;
 
   // Check if coming from Smart Date Planning
   const smartPlanningState = location.state as {
