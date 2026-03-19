@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useFriends } from '@/hooks/useFriends';
 
-export type PlanningStep = 'select-partner' | 'set-preferences' | 'review-matches' | 'plan-together' | 'create-invitation';
+export type PlanningStep = 'select-partner' | 'set-preferences' | 'plan-together' | 'create-invitation';
 
 interface UsePlanningStepsProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -62,7 +62,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     });
     
     // CRITICAL: Don't interfere with manual step transitions during AI analysis and results phases
-    const advancedSteps = ['review-matches', 'plan-together', 'create-invitation'];
+    const advancedSteps = ['plan-together', 'create-invitation'];
     if (advancedSteps.includes(currentStep)) {
       console.log('🔧 Planning Steps - SKIPPING sync for advanced step:', currentStep);
       return;
@@ -70,7 +70,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     
       // Only sync if we haven't manually navigated and need to move forward (not backward)  
       if (!hasManuallyNavigated && currentStep !== expectedStep) {
-        const stepOrder = ['select-partner', 'set-preferences', 'review-matches', 'plan-together', 'create-invitation'];
+        const stepOrder = ['select-partner', 'set-preferences', 'plan-together', 'create-invitation'];
         const currentIndex = stepOrder.indexOf(currentStep);
         const expectedIndex = stepOrder.indexOf(expectedStep);
       
@@ -94,35 +94,27 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
   // Remove auto-advance logic - collaborative mode handles this differently
 
   const getStepProgress = () => {
-    // Collaborative mode only: skip partner selection if preselected, so 4 steps: preferences -> review -> plan-together -> invitation
+    // 3 steps with preselected friend: preferences -> venues -> invitation
+    // 4 steps without: select-partner -> preferences -> venues -> invitation
     const progress = preselectedFriend
       ? (() => {
           switch (currentStep) {
-            case 'select-partner': return 0; // Should not be shown with preselected friend
-            case 'set-preferences': return 25;
-            case 'review-matches': return 50;
-            case 'plan-together': return 75;
+            case 'select-partner': return 0;
+            case 'set-preferences': return 33;
+            case 'plan-together': return 66;
             case 'create-invitation': return 100;
             default: return 0;
           }
         })()
       : (() => {
-          // No preselected friend: 5 steps: select -> preferences -> review -> plan-together -> invitation
           switch (currentStep) {
-            case 'select-partner': return 20;
-            case 'set-preferences': return 40;
-            case 'review-matches': return 60;
-            case 'plan-together': return 80;
+            case 'select-partner': return 25;
+            case 'set-preferences': return 50;
+            case 'plan-together': return 75;
             case 'create-invitation': return 100;
             default: return 0;
           }
         })();
-    
-    console.log('🚀 Progress calculation:', {
-      currentStep,
-      planningMode,
-      progress
-    });
     
     return progress;
   };
@@ -150,11 +142,8 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
           setSelectedPartnerId('');
         }
         break;
-      case 'review-matches': 
-        setCurrentStepInternal('set-preferences'); 
-        break;
       case 'plan-together': 
-        setCurrentStepInternal('review-matches'); 
+        setCurrentStepInternal('set-preferences'); 
         break;
       case 'create-invitation': 
         setCurrentStepInternal('plan-together'); 
