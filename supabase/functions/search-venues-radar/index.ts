@@ -110,17 +110,21 @@ serve(async (req) => {
       .filter(Boolean)
       .join(',');
 
-    // Build base dine-in categories
-    const dineInCategories = [
-      'restaurant', 'cafe', 'bar', 'coffee-shop', 'bakery',
-      'italian-restaurant', 'french-restaurant', 'japanese-restaurant',
-      'chinese-restaurant', 'thai-restaurant', 'mexican-restaurant',
-      'indian-restaurant', 'american-restaurant', 'mediterranean-restaurant',
-      'seafood-restaurant', 'steakhouse', 'asian-restaurant',
-      'pizza-place', 'burger-joint', 'vegetarian-restaurant',
-      'wine-bar', 'cocktail-bar', 'pub', 'brewery', 'ice-cream-shop',
-      'dessert-shop', 'brunch-restaurant', 'bistro'
-    ];
+    // Build categories based on user preferences instead of always sending all 28 types
+    const preferredCategories = new Set<string>();
+    
+    // Always include broad restaurant category as baseline
+    preferredCategories.add('restaurant');
+    
+    // Add user's specific cuisine categories (from mapping)
+    if (categories) {
+      categories.split(',').forEach((c: string) => preferredCategories.add(c));
+    }
+    
+    // If user has no specific cuisine preferences, add common dine-in categories
+    if (sanitizedCuisines.length === 0) {
+      ['cafe', 'bar', 'coffee-shop', 'bakery', 'bistro', 'pub', 'wine-bar', 'cocktail-bar'].forEach(c => preferredCategories.add(c));
+    }
 
     // Add venue type categories
     const venueTypeCategories = new Set<string>();
@@ -139,10 +143,10 @@ serve(async (req) => {
       }
     }
 
-    // Merge all categories
-    const allCategories = [...new Set([...dineInCategories, ...venueTypeCategories])].join(',');
+    // Merge all categories — only what user actually wants
+    const allCategories = [...new Set([...preferredCategories, ...venueTypeCategories])].join(',');
 
-    console.log('📋 RADAR: Extended categories count:', dineInCategories.length + venueTypeCategories.size);
+    console.log('📋 RADAR: Targeted categories count:', preferredCategories.size + venueTypeCategories.size, '(preferred:', preferredCategories.size, '+ venueTypes:', venueTypeCategories.size, ')');
 
     const searchParams = new URLSearchParams({
       near: `${validLat},${validLng}`,

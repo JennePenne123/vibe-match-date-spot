@@ -170,12 +170,35 @@ export const getAIVenueRecommendations = async (
       }
     }
 
-    // Sort by AI score and validate
+    // Sort by AI score, then apply diversity filter
     const sortedRecommendations = recommendations
-      .sort((a, b) => b.ai_score - a.ai_score)
-      .slice(0, limit);
+      .sort((a, b) => b.ai_score - a.ai_score);
 
-    return validateRecommendations(sortedRecommendations);
+    // Diversity: limit max 3 venues per cuisine_type to avoid monotony
+    const diverseRecommendations: AIVenueRecommendation[] = [];
+    const cuisineCount: Record<string, number> = {};
+    const MAX_PER_CUISINE = 3;
+
+    for (const rec of sortedRecommendations) {
+      const cuisine = (rec.cuisine_type || 'Other').toLowerCase();
+      cuisineCount[cuisine] = (cuisineCount[cuisine] || 0) + 1;
+      if (cuisineCount[cuisine] <= MAX_PER_CUISINE) {
+        diverseRecommendations.push(rec);
+      }
+      if (diverseRecommendations.length >= limit) break;
+    }
+
+    // If diversity filter removed too many, backfill from remaining
+    if (diverseRecommendations.length < limit) {
+      for (const rec of sortedRecommendations) {
+        if (!diverseRecommendations.includes(rec)) {
+          diverseRecommendations.push(rec);
+        }
+        if (diverseRecommendations.length >= limit) break;
+      }
+    }
+
+    return validateRecommendations(diverseRecommendations);
   } catch (error) {
     console.error('Failed to get venue recommendations:', error);
     throw new Error(error instanceof Error ? error.message : 'Failed to get venue recommendations');
