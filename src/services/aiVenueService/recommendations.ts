@@ -202,10 +202,10 @@ const getVenuesFromMultipleSources = async (
   const strategy = API_CONFIG.venueSearchStrategy;
   let venues: any[] = [];
   
-  if (strategy === 'google-first') {
-    venues = await getVenuesGoogleFirst(userId, limit, userLocation);
-  } else if (strategy === 'foursquare-first') {
-    venues = await getVenuesFoursquareFirst(userId, limit, userLocation);
+  if (strategy === 'radar-foursquare') {
+    venues = await getVenuesRadarFoursquare(userId, limit, userLocation);
+  } else if (strategy === 'foursquare-only') {
+    venues = await getVenuesFoursquareOnly(userId, limit, userLocation);
   } else {
     venues = await getVenuesParallel(userId, limit, userLocation);
   }
