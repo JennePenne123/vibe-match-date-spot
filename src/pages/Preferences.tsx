@@ -504,6 +504,11 @@ const Preferences = () => {
             preferred_price_range: selectedPriceRange.length > 0 ? selectedPriceRange : null,
             preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
             dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
+            preferred_activities: selectedActivities.length > 0 ? selectedActivities : null,
+            preferred_entertainment: selectedEntertainment.length > 0 ? selectedEntertainment : null,
+            preferred_duration: selectedDuration || null,
+            accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
+            preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
           };
 
           const { data: existingPreference, error: existingPreferenceError } = await supabase
