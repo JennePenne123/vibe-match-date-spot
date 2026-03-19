@@ -109,6 +109,9 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
     // onFeedbackChange?.(venue_id, feedbackType);
   };
 
+  // Calculate display score (handle both 0-1 and 0-100 ranges)
+  const displayScore = ai_score <= 1 ? Math.round(ai_score * 100) : Math.round(ai_score);
+
   // Get AI score color based on score
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-100';
@@ -116,15 +119,6 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
     if (score >= 40) return 'text-yellow-600 bg-yellow-100';
     return 'text-red-600 bg-red-100';
   };
-
-  // Get confidence level indicator - optimized for shorter text
-  const getConfidenceIndicator = (confidence: number) => {
-    if (confidence >= 0.8) return { text: 'High', color: 'bg-green-500' };
-    if (confidence >= 0.6) return { text: 'Med', color: 'bg-yellow-500' };
-    return { text: 'Low', color: 'bg-red-500' };
-  };
-
-  const confidenceInfo = getConfidenceIndicator(confidence_level);
 
   return (
     <Card className="venue-ai-card border-0 shadow-md hover:shadow-lg transition-shadow">
