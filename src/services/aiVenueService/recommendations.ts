@@ -366,9 +366,77 @@ function enrichVenueWithFoursquare(googleVenue: any, fsqVenue: any): void {
 }
 
 /**
- * Fetch venues from Foursquare
+ * Fetch venues from Radar (primary search – 100K free calls/month)
  */
-const getVenuesFromFoursquare = async (
+const getVenuesFromRadar = async (
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) => {
+  const timer = apiUsageService.createTimer('radar', '/search-venues-radar');
+  
+  try {
+    if (!userLocation?.latitude || !userLocation?.longitude) {
+      return [];
+    }
+    
+    const { data: userPrefs } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (!userPrefs) {
+      await timer.end({ status: 400, cacheHit: false, userId, metadata: { error: 'No user preferences' } });
+      return [];
+    }
+    
+    const { data, error } = await supabase.functions.invoke('search-venues-radar', {
+      body: {
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        cuisines: userPrefs.preferred_cuisines || [],
+        radius: (userPrefs.max_distance || 10) * 1000,
+        limit
+      }
+    });
+    
+    if (error) {
+      await timer.end({ 
+        status: 500, 
+        cacheHit: false, 
+        userId,
+        metadata: { error: error.message }
+      });
+      return [];
+    }
+    
+    const venues = data?.venues || [];
+    await timer.end({ 
+      status: 200, 
+      cacheHit: false, 
+      userId,
+      metadata: { 
+        venueCount: venues.length,
+        chainsDetected: venues.filter((v: any) => v.is_chain).length,
+        location: `${userLocation.latitude.toFixed(4)},${userLocation.longitude.toFixed(4)}`
+      }
+    });
+    
+    return venues;
+  } catch (err) {
+    await timer.end({ 
+      status: 500, 
+      cacheHit: false, 
+      userId,
+      metadata: { error: err instanceof Error ? err.message : 'Unknown error' }
+    });
+    return [];
+  }
+};
+
+/**
+ * Fetch venues from Foursquare
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
