@@ -1110,13 +1110,8 @@ useEffect(() => {
       </Collapsible>
     </div>
   );
-    const sharedItems = shouldShowMatches ? getSharedPreferences(category) : [];
 
-    return (
-      <div className={`grid ${gridCols} gap-3 md:gap-4`}>
-        {items.map((item) => {
-          const isSelected = selectedItems.includes(item.id);
-          const isShared = sharedItems.includes(item.id);
+
 
           return (
             <button
