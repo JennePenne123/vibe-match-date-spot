@@ -55,6 +55,12 @@ const Results = () => {
       }))
   ).sort((a, b) => b.ai_score - a.ai_score);
 
+  // Fetch vouchers for top 3 venue IDs
+  const top3VenueIds = useMemo(() => 
+    recommendations.slice(0, 3).map(r => r.venue_id).filter(Boolean),
+    [recommendations]
+  );
+  const { vouchers } = useVenueVouchers(top3VenueIds);
   const handleVenueSelect = (venueId: string) => {
     if (isFromSmartPlanning) {
       // Navigate back to Smart Date Planning with selected venue
