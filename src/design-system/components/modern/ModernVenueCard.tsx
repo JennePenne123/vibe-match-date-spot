@@ -133,6 +133,7 @@ export const ModernVenueCard: React.FC<ModernVenueCardProps> = ({
           alt={name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
+          decoding="async"
         />
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />

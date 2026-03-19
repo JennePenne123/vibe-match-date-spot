@@ -54,6 +54,8 @@ const VenueDetail = () => {
             alt={appVenue.name}
             className="w-full h-64 object-cover"
             loading="eager"
+            decoding="async"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           
