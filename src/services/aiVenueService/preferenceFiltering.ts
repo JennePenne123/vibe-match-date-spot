@@ -6,28 +6,51 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export const AREA_VIBE_MAP: Record<string, { vibes: string[]; keywords: string[]; priceHint?: string[] }> = {
   'downtown': {
-    vibes: ['trendy', 'urban', 'modern', 'lively', 'hip', 'bustling'],
-    keywords: ['rooftop', 'lounge', 'cocktail', 'nightlife', 'club', 'skyline', 'downtown', 'zentrum', 'city', 'innenstadt'],
+    vibes: ['trendy', 'urban', 'modern', 'lively', 'hip', 'bustling', 'energetic', 'vibrant', 'cosmopolitan', 'stylish', 'happening'],
+    keywords: [
+      'rooftop', 'lounge', 'cocktail', 'nightlife', 'club', 'skyline', 'downtown', 'zentrum', 'city', 'innenstadt',
+      'bar', 'tapas', 'street food', 'food hall', 'neon', 'late night', 'dj', 'speakeasy', 'mixology',
+      'happy hour', 'afterwork', 'penthouse', 'highrise', 'central', 'metropolitan', 'popup', 'brunch spot',
+    ],
     priceHint: ['$$', '$$$'],
   },
   'waterfront': {
-    vibes: ['scenic', 'relaxed', 'romantic', 'peaceful', 'chill'],
-    keywords: ['seafood', 'harbour', 'harbor', 'hafen', 'lake', 'see', 'river', 'water', 'sunset', 'terrace', 'outdoor', 'pier', 'beach'],
+    vibes: ['scenic', 'relaxed', 'romantic', 'peaceful', 'chill', 'serene', 'breezy', 'idyllic', 'tranquil', 'coastal'],
+    keywords: [
+      'seafood', 'harbour', 'harbor', 'hafen', 'lake', 'see', 'river', 'water', 'sunset', 'terrace', 'outdoor',
+      'pier', 'beach', 'boat', 'yacht', 'promenade', 'deck', 'ocean', 'marina', 'fish', 'oyster', 'sushi',
+      'sundowner', 'biergarten', 'garden', 'canal', 'ufer', 'steg', 'panorama', 'view', 'aussicht', 'alster',
+    ],
     priceHint: ['$$', '$$$'],
   },
   'arts-district': {
-    vibes: ['creative', 'artsy', 'bohemian', 'cultural', 'eclectic', 'indie'],
-    keywords: ['gallery', 'jazz', 'live music', 'theater', 'museum', 'art', 'vintage', 'craft', 'studio', 'alternative'],
+    vibes: ['creative', 'artsy', 'bohemian', 'cultural', 'eclectic', 'indie', 'underground', 'experimental', 'funky', 'unconventional', 'alternative'],
+    keywords: [
+      'gallery', 'jazz', 'live music', 'theater', 'museum', 'art', 'vintage', 'craft', 'studio', 'alternative',
+      'poetry', 'slam', 'open mic', 'vinyl', 'bookshop', 'comic', 'tattoo', 'graffiti', 'street art', 'mural',
+      'improv', 'cabaret', 'burlesque', 'atelier', 'werkstatt', 'kultur', 'szene', 'flea market', 'flohmarkt',
+      'brewery', 'craft beer', 'natural wine', 'vegan', 'organic', 'second hand',
+    ],
     priceHint: ['$', '$$'],
   },
   'oldtown': {
-    vibes: ['cozy', 'charming', 'traditional', 'intimate', 'historic', 'rustic'],
-    keywords: ['wine', 'cafe', 'bistro', 'historic', 'altstadt', 'traditional', 'classic', 'old', 'brauhaus', 'tavern'],
+    vibes: ['cozy', 'charming', 'traditional', 'intimate', 'historic', 'rustic', 'nostalgic', 'warm', 'gemütlich', 'heimelig', 'klassisch'],
+    keywords: [
+      'wine', 'cafe', 'bistro', 'historic', 'altstadt', 'traditional', 'classic', 'old', 'brauhaus', 'tavern',
+      'weinstube', 'kneipe', 'gasthof', 'ratskeller', 'candle', 'fireplace', 'kamin', 'cellar', 'gewölbe',
+      'cobblestone', 'market square', 'marktplatz', 'church', 'dom', 'bakery', 'bäckerei', 'konditorei',
+      'patisserie', 'tea', 'chocolate', 'fondue', 'raclette', 'regional', 'heimat', 'handmade', 'hausgemacht',
+    ],
     priceHint: ['$$'],
   },
   'uptown': {
-    vibes: ['upscale', 'elegant', 'sophisticated', 'premium', 'luxury', 'exclusive'],
-    keywords: ['fine dining', 'michelin', 'champagne', 'gourmet', 'tasting', 'omakase', 'premium', 'exclusive', 'sterne'],
+    vibes: ['upscale', 'elegant', 'sophisticated', 'premium', 'luxury', 'exclusive', 'refined', 'glamorous', 'chic', 'opulent', 'distinguished'],
+    keywords: [
+      'fine dining', 'michelin', 'champagne', 'gourmet', 'tasting', 'omakase', 'premium', 'exclusive', 'sterne',
+      'caviar', 'truffle', 'wagyu', 'lobster', 'wine pairing', 'sommelier', 'degustation', 'prix fixe',
+      'private dining', 'valet', 'concierge', 'terrace suite', 'rooftop bar', 'cigar', 'cognac', 'whisky',
+      'spa', 'wellness', 'boutique', 'designer', 'five star', 'luxus', 'edel', 'haute cuisine', 'amuse bouche',
+    ],
     priceHint: ['$$$', '$$$$'],
   },
 };
