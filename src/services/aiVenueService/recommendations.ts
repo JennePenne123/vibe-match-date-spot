@@ -223,7 +223,48 @@ const getVenuesFromMultipleSources = async (
 };
 
 /**
- * Parallel strategy: Call both APIs simultaneously
+ * Radar + Foursquare strategy: Radar for primary search, Foursquare for enrichment (photos, tips, ratings)
+ */
+const getVenuesRadarFoursquare = async (
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) => {
+  // Step 1: Get venues from Radar (primary, high free tier)
+  let venues = await getVenuesFromRadar(userId, limit, userLocation).catch(() => []);
+  
+  // Step 2: Enrich with Foursquare data (photos, tips, ratings)
+  if (venues.length > 0 && API_CONFIG.useFoursquare && userLocation) {
+    const fsqVenues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
+  }
+  
+  // Step 3: If Radar returned nothing, fall back to Foursquare-only
+  if (venues.length < API_CONFIG.minVenuesForSuccess && API_CONFIG.useFoursquare && userLocation) {
+    console.log('⚠️ Radar returned few results, falling back to Foursquare-only');
+    const fsqVenues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
+  }
+  
+  return venues;
+};
+
+/**
+ * Foursquare-only strategy
+ */
+const getVenuesFoursquareOnly = async (
+  userId: string,
+  limit: number,
+  userLocation?: { latitude: number; longitude: number; address?: string }
+) => {
+  if (API_CONFIG.useFoursquare && userLocation) {
+    return await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
+  }
+  return [];
+};
+
+/**
+ * Parallel strategy: Call multiple APIs simultaneously
  */
 const getVenuesParallel = async (
   userId: string,
@@ -232,70 +273,25 @@ const getVenuesParallel = async (
 ) => {
   const promises: Promise<any[]>[] = [];
   
-  if (API_CONFIG.useGooglePlaces) {
-    promises.push(getVenuesFromGooglePlaces(userId, limit, userLocation).catch(() => []));
+  if (API_CONFIG.useRadar && userLocation) {
+    promises.push(getVenuesFromRadar(userId, limit, userLocation).catch(() => []));
   }
   
   if (API_CONFIG.useFoursquare && userLocation) {
     promises.push(getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []));
   }
   
+  if (API_CONFIG.useGooglePlaces) {
+    promises.push(getVenuesFromGooglePlaces(userId, limit, userLocation).catch(() => []));
+  }
+  
   const results = await Promise.all(promises);
-  const [googleVenues = [], foursquareVenues = []] = results;
-  
-  return mergeAndDeduplicateVenues(googleVenues, foursquareVenues);
-};
-
-/**
- * Google-first strategy
- */
-const getVenuesGoogleFirst = async (
-  userId: string,
-  limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
-  let venues: any[] = [];
-  
-  if (API_CONFIG.useGooglePlaces) {
-    venues = await getVenuesFromGooglePlaces(userId, limit, userLocation).catch(() => []);
+  let merged: any[] = [];
+  for (const result of results) {
+    merged = mergeAndDeduplicateVenues(merged, result);
   }
   
-  if (venues.length >= API_CONFIG.minVenuesForSuccess) {
-    return venues;
-  }
-  
-  if (API_CONFIG.useFoursquare && userLocation) {
-    const fsqVenues = await getVenuesFromFoursquare(userId, limit - venues.length, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
-  }
-  
-  return venues;
-};
-
-/**
- * Foursquare-first strategy
- */
-const getVenuesFoursquareFirst = async (
-  userId: string,
-  limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
-  let venues: any[] = [];
-  
-  if (API_CONFIG.useFoursquare && userLocation) {
-    venues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
-  }
-  
-  if (venues.length >= API_CONFIG.minVenuesForSuccess) {
-    return venues;
-  }
-  
-  if (API_CONFIG.useGooglePlaces) {
-    const googleVenues = await getVenuesFromGooglePlaces(userId, limit - venues.length, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, googleVenues);
-  }
-  
-  return venues;
+  return merged;
 };
 
 /**
