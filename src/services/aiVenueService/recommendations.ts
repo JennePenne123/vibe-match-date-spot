@@ -1,6 +1,6 @@
 import { calculateVenueAIScore, calculateConfidenceLevel } from './scoring';
 import { getActiveVenues, getStoredAIScore } from './fetching';
-import { filterVenuesByPreferences, filterVenuesByCollaborativePreferences } from './preferenceFiltering';
+import { filterVenuesByPreferences, filterVenuesByCollaborativePreferences, AREA_VIBE_MAP } from './preferenceFiltering';
 import { calculateDistanceFromHamburg } from './helperFunctions';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
