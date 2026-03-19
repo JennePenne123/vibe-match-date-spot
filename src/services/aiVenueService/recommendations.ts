@@ -126,6 +126,17 @@ export const getAIVenueRecommendations = async (
       if ((userPrefs as any)?.preferred_activities?.some((act: string) => venueText.includes(act.replace('_', ' ')))) {
         matchReasons.push('Passt zu deinen Aktivitäten');
       }
+      // Area vibe match reasoning
+      if (selectedArea && AREA_VIBE_MAP[selectedArea]) {
+        const areaConfig = AREA_VIBE_MAP[selectedArea];
+        const areaNames: Record<string, string> = {
+          'downtown': 'Downtown', 'waterfront': 'Waterfront', 'arts-district': 'Arts District',
+          'oldtown': 'Old Town', 'uptown': 'Uptown'
+        };
+        if (areaConfig.keywords.some(kw => venueText.includes(kw)) || areaConfig.vibes.some(v => venueText.includes(v))) {
+          matchReasons.push(`Passt zum ${areaNames[selectedArea] || selectedArea}-Vibe`);
+        }
+      }
       if (matchReasons.length === 0) {
         matchReasons.push('Entdecke etwas Neues in deiner Nähe');
       }
