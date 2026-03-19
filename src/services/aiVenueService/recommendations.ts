@@ -368,11 +368,11 @@ function enrichVenueWithFoursquare(googleVenue: any, fsqVenue: any): void {
 /**
  * Fetch venues from Radar (primary search – 100K free calls/month)
  */
-const getVenuesFromRadar = async (
+async function getVenuesFromRadar(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
-) => {
+) {
   const timer = apiUsageService.createTimer('radar', '/search-venues-radar');
   
   try {
