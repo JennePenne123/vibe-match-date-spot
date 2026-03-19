@@ -55,7 +55,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
               });
             } else if (newInvitation.status === 'declined') {
               toast({
-                title: "Invitation Response 💙",
+                title: "Invitation Response",
                 description: `${recipientName} isn't available for this date. Don't worry - maybe try a different time or venue!`,
                 duration: 6000,
                 action: (
