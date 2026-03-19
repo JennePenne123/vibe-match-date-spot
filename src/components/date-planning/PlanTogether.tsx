@@ -157,7 +157,7 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
               )}
             </div>
           ) : (
-            venueRecommendations.map((venue, index) => {
+            [...venueRecommendations].sort((a, b) => b.ai_score - a.ai_score).map((venue, index) => {
               const venueId = getVenueId(venue);
               
               if (!venueId) {
