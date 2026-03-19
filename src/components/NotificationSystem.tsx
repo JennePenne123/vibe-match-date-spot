@@ -94,7 +94,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
           const senderName = sender?.name || 'A friend';
 
           toast({
-            title: "New Date Invitation! 💌",
+            title: "New Date Invitation!",
             description: `${senderName} sent you a date invitation. Check it out and respond!`,
             duration: 8000,
             action: (
