@@ -313,6 +313,9 @@ export default function PartnerProfilePage() {
         </CardContent>
       </Card>
 
+      {/* Language */}
+      <LanguageSelector />
+
       {/* Save Button */}
       <Button
         onClick={handleSave}

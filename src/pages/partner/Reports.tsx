@@ -529,7 +529,7 @@ export default function PartnerReports() {
         </>
       )}
 
-      <LanguageSelector />
+      
     </div>
   );
 }
