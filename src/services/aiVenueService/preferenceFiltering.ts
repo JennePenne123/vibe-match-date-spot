@@ -65,7 +65,7 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
 }
 
 // Filter venues by user preferences to improve matching
-export const filterVenuesByPreferences = async (userId: string, venues: any[]) => {
+export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string) => {
   try {
     console.log('🎯 PREFERENCE FILTER: Filtering', venues.length, 'venues for user:', userId);
     
