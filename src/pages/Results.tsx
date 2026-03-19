@@ -81,8 +81,51 @@ const Results = () => {
   };
 
   if (venues.length === 0) {
-    navigate(isFromSmartPlanning ? `/plan-date/${smartPlanningState?.sessionId}` : '/area');
-    return null;
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="max-w-md mx-auto">
+          <div className="bg-card p-4 pt-12 shadow-sm">
+            <div className="flex items-center justify-between">
+              <Button
+                onClick={() => navigate(isFromSmartPlanning ? `/plan-date/${smartPlanningState?.sessionId}` : '/area')}
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:bg-muted"
+              >
+                <ArrowLeft className="w-6 h-6" />
+              </Button>
+              <h1 className="text-xl font-semibold text-foreground">AI Recommendations</h1>
+              <div className="w-10" />
+            </div>
+          </div>
+          <div className="px-6 py-16 text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
+              <Sparkles className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground">Keine Venues gefunden</h2>
+            <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+              {!user 
+                ? 'Bitte melde dich an, damit die KI personalisierte Empfehlungen für dich finden kann.'
+                : 'In dieser Area wurden leider keine passenden Venues gefunden. Versuche eine andere Area oder passe deine Präferenzen an.'}
+            </p>
+            <div className="flex flex-col gap-3 pt-4">
+              {!user && (
+                <Button onClick={() => navigate('/')} className="bg-gradient-primary text-primary-foreground hover:opacity-90">
+                  Anmelden
+                </Button>
+              )}
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/area')}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Andere Area wählen
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
