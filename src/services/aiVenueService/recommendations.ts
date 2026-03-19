@@ -116,6 +116,15 @@ export const getAIVenueRecommendations = async (
       if (venue.rating && venue.rating >= 4.0) {
         matchReasons.push(`Top bewertet (${venue.rating}⭐)`);
       }
+      // New category matches
+      const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase()).join(' ');
+      const venueText = [venueTags, (venue.name || '').toLowerCase(), (venue.description || '').toLowerCase()].join(' ');
+      if ((userPrefs as any)?.preferred_venue_types?.some((vt: string) => venueText.includes(vt.replace('_', ' ')))) {
+        matchReasons.push('Passt zu deinen Erlebnis-Präferenzen');
+      }
+      if ((userPrefs as any)?.preferred_activities?.some((act: string) => venueText.includes(act.replace('_', ' ')))) {
+        matchReasons.push('Passt zu deinen Aktivitäten');
+      }
       if (matchReasons.length === 0) {
         matchReasons.push('Entdecke etwas Neues in deiner Nähe');
       }
