@@ -1335,10 +1335,11 @@ useEffect(() => {
           </div>
         </CardHeader>
         <CardContent className="px-4 md:px-6 pb-4 md:pb-6 space-y-4 md:space-y-6">
-          {currentStep === 1 && renderStep1()}
-          {currentStep === 2 && renderStep2()}
-          {currentStep === 3 && renderStep3()}
-          {currentStep === 4 && renderStep4()}
+          {currentStep === 1 && renderDurationStep()}
+          {currentStep === 2 && renderStep1()}
+          {currentStep === 3 && renderStep2()}
+          {currentStep === 4 && renderStep3()}
+          {currentStep === 5 && renderStep4()}
 
           <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
             <Button
