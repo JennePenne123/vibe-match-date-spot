@@ -102,34 +102,20 @@ export default function PartnerVouchers() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 space-y-6 overflow-x-hidden">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
-              Manage Vouchers
-            </h1>
-            {loading && !connected ? (
-              <Badge variant="secondary" className="animate-pulse flex items-center gap-2">
-                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse" />
-                Connecting...
-              </Badge>
-            ) : connected ? (
-              <Badge className="bg-green-500 text-white animate-pulse flex items-center gap-2">
-                <div className="w-2 h-2 bg-white rounded-full" />
-                Live
-              </Badge>
-            ) : (
-              <Badge variant="secondary">Offline</Badge>
-            )}
-          </div>
-          <p className="text-muted-foreground mt-2">
-            Create and manage special offers for your venues
-          </p>
+      <div className="space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
+            Manage Vouchers
+          </h1>
+          <Button size="sm" className="gap-1.5 shrink-0" onClick={() => setCreateModalOpen(true)}>
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Create Voucher</span>
+            <span className="sm:hidden">New</span>
+          </Button>
         </div>
-        <Button className="gap-2" onClick={() => setCreateModalOpen(true)}>
-          <Plus className="w-4 h-4" />
-          Create Voucher
-        </Button>
+        <p className="text-muted-foreground text-sm">
+          Create and manage special offers for your venues
+        </p>
       </div>
 
       {loading ? (
