@@ -121,7 +121,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 8 | **DSGVO-Update Datenschutzerklärung** | 🟡 Offen | Implizites Tracking dokumentieren, Consent/Opt-Out prüfen |
 | 9 | **Sentry Integration** | 🟡 Offen | Konto erstellen, DSN hinterlegen, SDK einbinden |
 | 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner |
-| 11 | **Image-Optimierung** | 🟡 Offen | lazy loading, srcSet, WebP, Avatar-Komprimierung |
+| 11 | ~~**Image-Optimierung**~~ | ✅ Erledigt | lazy loading, decoding=async, fetchPriority auf LCP-Elementen |
 | 12 | **React Query Tuning** | 🟡 Offen | Differenzierte staleTime pro Query-Typ |
 | 13 | **VAPID-Keys einrichten** | 📋 Manuell | `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` als Edge Function Secrets |
 | 14 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
