@@ -306,7 +306,49 @@ useEffect(() => {
     { id: 'Korean', name: 'Korean', emoji: '🍲' }
   ];
 
-  const vibes: Preference[] = [
+  // Duration model definitions
+  const durationModels = [
+    { 
+      id: 'quick', 
+      title: 'Quick & Sweet', 
+      emoji: '⚡', 
+      desc: '1-2 hours – Coffee, Lunch, Snack',
+      excludeVibes: ['lively'],
+      suggestTimes: ['morning', 'lunch', 'afternoon'],
+      suggestPrice: ['$', '$$']
+    },
+    { 
+      id: 'relaxed', 
+      title: 'Relaxed Afternoon', 
+      emoji: '☀️', 
+      desc: '2-4 hours – Brunch, Café, Walk',
+      excludeVibes: [] as string[],
+      suggestTimes: ['lunch', 'afternoon'],
+      suggestPrice: ['$$', '$$$']
+    },
+    { 
+      id: 'evening', 
+      title: 'Full Evening', 
+      emoji: '🌆', 
+      desc: '4+ hours – Dinner, Drinks, Bar',
+      excludeVibes: [] as string[],
+      suggestTimes: ['evening', 'night'],
+      suggestPrice: ['$$', '$$$', '$$$$']
+    },
+    { 
+      id: 'adventure', 
+      title: 'All-Day Adventure', 
+      emoji: '🗺️', 
+      desc: 'Full day – Multiple stops, exploring',
+      excludeVibes: [] as string[],
+      suggestTimes: ['morning', 'lunch', 'afternoon', 'evening'],
+      suggestPrice: ['$', '$$', '$$$']
+    }
+  ];
+
+  const selectedDurationModel = durationModels.find(d => d.id === selectedDuration);
+
+  const allVibes: Preference[] = [
     { id: 'romantic', name: 'Romantic', emoji: '💕', desc: 'Intimate and cozy' },
     { id: 'casual', name: 'Casual', emoji: '😊', desc: 'Relaxed and comfortable' },
     { id: 'outdoor', name: 'Outdoor', emoji: '🌳', desc: 'Fresh air and nature' },
@@ -315,6 +357,11 @@ useEffect(() => {
     { id: 'cozy', name: 'Cozy', emoji: '🕯️', desc: 'Warm and intimate' }
   ];
 
+  // Filter vibes based on duration model
+  const vibes = selectedDurationModel
+    ? allVibes.filter(v => !selectedDurationModel.excludeVibes.includes(v.id))
+    : allVibes;
+
   const priceRanges: Preference[] = [
     { id: '$', name: 'Budget', emoji: '💰', desc: 'Up to $15 per person' },
     { id: '$$', name: 'Moderate', emoji: '💳', desc: '$15-30 per person' },
@@ -322,13 +369,16 @@ useEffect(() => {
     { id: '$$$$', name: 'Luxury', emoji: '👑', desc: 'Over $50 per person' }
   ];
 
-  const timePreferences: Preference[] = [
+  const allTimePreferences: Preference[] = [
     { id: 'morning', name: 'Morning', emoji: '🌅', desc: '9:00-12:00' },
     { id: 'lunch', name: 'Lunch', emoji: '☀️', desc: '12:00-15:00' },
     { id: 'afternoon', name: 'Afternoon', emoji: '🌤️', desc: '15:00-18:00' },
     { id: 'evening', name: 'Evening', emoji: '🌆', desc: '18:00-21:00' },
     { id: 'night', name: 'Night', emoji: '🌙', desc: 'After 21:00' }
   ];
+
+  // Highlight suggested times based on duration, but show all
+  const timePreferences = allTimePreferences;
 
   const dietaryRequirements: Preference[] = [
     { id: 'vegetarian', name: 'Vegetarian', emoji: '🥬' },
@@ -339,7 +389,7 @@ useEffect(() => {
     { id: 'kosher', name: 'Kosher', emoji: '✡️' }
   ];
 
-  const quickStartTemplates = [
+  const allQuickStartTemplates = [
     {
       id: 'romantic-dinner',
       title: 'Romantic Dinner',
@@ -348,7 +398,8 @@ useEffect(() => {
       cuisines: ['Italian', 'French'],
       vibes: ['romantic', 'upscale'],
       priceRange: ['$$$', '$$$$'],
-      timePreferences: ['evening']
+      timePreferences: ['evening'],
+      fitsDuration: ['evening', 'adventure']
     },
     {
       id: 'casual-brunch',
@@ -358,7 +409,8 @@ useEffect(() => {
       cuisines: ['American', 'Mediterranean'],
       vibes: ['casual', 'cozy'],
       priceRange: ['$', '$$'],
-      timePreferences: ['morning', 'lunch']
+      timePreferences: ['morning', 'lunch'],
+      fitsDuration: ['quick', 'relaxed', 'adventure']
     },
     {
       id: 'trendy-cocktail',
@@ -368,9 +420,26 @@ useEffect(() => {
       cuisines: ['American'],
       vibes: ['lively', 'upscale'],
       priceRange: ['$$', '$$$'],
-      timePreferences: ['evening', 'night']
+      timePreferences: ['evening', 'night'],
+      fitsDuration: ['evening']
+    },
+    {
+      id: 'coffee-walk',
+      title: 'Coffee & Walk',
+      emoji: '☕🚶',
+      description: 'Quick coffee and a stroll – easy and spontaneous',
+      cuisines: ['American', 'Italian'],
+      vibes: ['casual', 'outdoor'],
+      priceRange: ['$'],
+      timePreferences: ['morning', 'afternoon'],
+      fitsDuration: ['quick']
     }
   ];
+
+  // Filter templates by selected duration
+  const quickStartTemplates = selectedDuration
+    ? allQuickStartTemplates.filter(t => t.fitsDuration.includes(selectedDuration))
+    : allQuickStartTemplates;
 
   // Load partner preferences for compatibility
   useEffect(() => {
