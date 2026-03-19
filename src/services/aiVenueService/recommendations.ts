@@ -43,7 +43,8 @@ export const getAIVenueRecommendations = async (
   userId: string,
   partnerId?: string,
   limit: number = 10,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  selectedArea?: string
 ): Promise<AIVenueRecommendation[]> => {
   try {
     // Get venues using hybrid multi-source strategy
