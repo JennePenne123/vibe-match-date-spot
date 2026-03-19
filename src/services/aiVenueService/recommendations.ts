@@ -607,7 +607,7 @@ async function getVenuesFromGooglePlaces(
   } catch (error) {
     throw error;
   }
-};
+}
 
 /**
  * Transform and save Google Places venues to database
