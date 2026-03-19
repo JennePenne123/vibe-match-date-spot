@@ -31,19 +31,18 @@ const Results = () => {
         venue_id: venue.id,
         venue_name: venue.name,
         venue_address: venue.address || 'Address not available',
-        venue_image: venue.image_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
-        ai_score: (venue as any).matchScore ? (venue as any).matchScore / 100 : (Math.floor(Math.random() * 30) + 70) / 100,
+        venue_image: venue.image_url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+        ai_score: (venue as any).matchScore ? (venue as any).matchScore / 100 : 0.5,
         match_factors: {
-          cuisine_match: venue.cuisine_type === 'italian' || venue.cuisine_type === 'asian',
+          cuisine_match: true,
           price_match: true,
-          vibe_matches: venue.tags || ['romantic', 'cozy'],
-          rating: venue.rating || 4.5,
+          vibe_matches: venue.tags || [],
+          rating: venue.rating || 0,
           price_range: venue.price_range || '$$',
-          rating_bonus: 0.1
         },
-        contextual_score: Math.random() * 0.2, // 0-20% bonus
-        ai_reasoning: `This venue matches your preferences for ${venue.cuisine_type || 'great'} cuisine and ${venue.tags?.[0] || 'romantic'} atmosphere. Perfect for your date style!`,
-        confidence_level: Math.random() * 0.3 + 0.7 // 70-100% confidence
+        contextual_score: 0,
+        ai_reasoning: (venue as any).description || `${venue.cuisine_type || 'Restaurant'} in deiner Nähe`,
+        confidence_level: 0.7
       }));
 
   const handleVenueSelect = (venueId: string) => {
