@@ -31,6 +31,33 @@ const CUISINE_TO_FSQ_CATEGORIES: Record<string, string> = {
   'Burger': '13028'
 };
 
+// Venue type to Foursquare category IDs
+const VENUE_TYPE_TO_FSQ: Record<string, string[]> = {
+  'museum': ['10027'],           // Museum
+  'gallery': ['10025'],          // Art Gallery
+  'theater_venue': ['10024'],    // Performing Arts Venue
+  'cinema': ['10032'],           // Movie Theater
+  'concert_hall': ['10039'],     // Music Venue
+  'exhibition': ['10027'],       // Museum/Exhibition
+  'mini_golf': ['18010'],        // Mini Golf
+  'bowling': ['13004'],          // Bowling Alley
+  'escape_room': ['10056'],      // Entertainment
+  'climbing': ['18021'],         // Rock Climbing
+  'swimming': ['18023'],         // Pool
+  'karaoke': ['10043'],          // Karaoke
+  'comedy_club': ['10041'],      // Comedy Club
+  'arcade': ['10001'],           // Arcade
+  'spa_wellness': ['11130'],     // Spa
+};
+
+// Activity to Foursquare categories
+const ACTIVITY_TO_FSQ: Record<string, string[]> = {
+  'cocktails': ['13003', '13017'],  // Bar, Cocktail Bar
+  'cultural_act': ['10027', '10025', '10024'], // Museum, Gallery, Theater
+  'active': ['18000', '18021'],     // Sports, Climbing
+  'nightlife_act': ['10032', '10043'], // Nightclub, Karaoke
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -50,19 +77,36 @@ serve(async (req) => {
       throw new Error('FOURSQUARE_API_KEY not configured');
     }
 
-    const { latitude, longitude, cuisines, radius = 5000, limit = 20 } = await req.json();
+    const { latitude, longitude, cuisines, radius = 5000, limit = 20, venueTypes = [], activities = [] } = await req.json();
 
     if (!latitude || !longitude) {
       throw new Error('Latitude and longitude are required');
     }
 
-    console.log('🔍 FOURSQUARE: Searching venues', { latitude, longitude, cuisines, radius, limit });
+    console.log('🔍 FOURSQUARE: Searching venues', { latitude, longitude, cuisines, venueTypes, activities, radius, limit });
 
     // Map cuisines to Foursquare category IDs
-    const categoryIds = cuisines
-      ?.map((cuisine: string) => CUISINE_TO_FSQ_CATEGORIES[cuisine])
-      .filter(Boolean)
-      .join(',') || '';
+    const cuisineCatIds = (cuisines || [])
+      .map((cuisine: string) => CUISINE_TO_FSQ_CATEGORIES[cuisine])
+      .filter(Boolean);
+
+    // Add venue type category IDs
+    if (Array.isArray(venueTypes)) {
+      for (const vt of venueTypes) {
+        const ids = VENUE_TYPE_TO_FSQ[vt];
+        if (ids) cuisineCatIds.push(...ids);
+      }
+    }
+
+    // Add activity category IDs
+    if (Array.isArray(activities)) {
+      for (const act of activities) {
+        const ids = ACTIVITY_TO_FSQ[act];
+        if (ids) cuisineCatIds.push(...ids);
+      }
+    }
+
+    const categoryIds = [...new Set(cuisineCatIds)].join(',');
 
     // Build search parameters
     const searchParams = new URLSearchParams({

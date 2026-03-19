@@ -220,7 +220,7 @@ const Preferences = () => {
       try {
         const { data } = await supabase
           .from('user_preferences')
-          .select('home_latitude, home_longitude, home_address, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions')
+          .select('home_latitude, home_longitude, home_address, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types')
           .eq('user_id', user.id)
           .single();
         
@@ -233,6 +233,11 @@ const Preferences = () => {
           if (data.preferred_price_range) setSelectedPriceRange(data.preferred_price_range);
           if (data.preferred_times) setSelectedTimePreferences(data.preferred_times);
           if (data.dietary_restrictions) setSelectedDietary(data.dietary_restrictions);
+          if ((data as any).preferred_activities) setSelectedActivities((data as any).preferred_activities);
+          if ((data as any).preferred_entertainment) setSelectedEntertainment((data as any).preferred_entertainment);
+          if ((data as any).preferred_duration) setSelectedDuration((data as any).preferred_duration);
+          if ((data as any).accessibility_needs) setSelectedAccessibility((data as any).accessibility_needs);
+          if ((data as any).preferred_venue_types) setSelectedVenueTypes((data as any).preferred_venue_types);
         }
       } catch (error) {
         console.log('No existing preferences found');
@@ -504,6 +509,11 @@ const Preferences = () => {
             preferred_price_range: selectedPriceRange.length > 0 ? selectedPriceRange : null,
             preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
             dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
+            preferred_activities: selectedActivities.length > 0 ? selectedActivities : null,
+            preferred_entertainment: selectedEntertainment.length > 0 ? selectedEntertainment : null,
+            preferred_duration: selectedDuration || null,
+            accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
+            preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
           };
 
           const { data: existingPreference, error: existingPreferenceError } = await supabase
