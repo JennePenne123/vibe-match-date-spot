@@ -562,7 +562,7 @@ useEffect(() => {
     return sortedCurrentValues.every((value, index) => value === sortedTemplateValues[index]);
   };
 
-  const isTemplateCurrentlySelected = (template: typeof quickStartTemplates[number]) => {
+  const isTemplateCurrentlySelected = (template: { id: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[] }) => {
     return selectedTemplateId === template.id || (
       haveSameSelections(selectedCuisines, template.cuisines) &&
       haveSameSelections(selectedVibes, template.vibes) &&
@@ -571,7 +571,7 @@ useEffect(() => {
     );
   };
 
-  const applyQuickStartTemplate = (template: typeof quickStartTemplates[0]) => {
+  const applyQuickStartTemplate = (template: { id: string; title: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[] }) => {
     const isDeselecting = isTemplateCurrentlySelected(template);
     
     if (isDeselecting) {
