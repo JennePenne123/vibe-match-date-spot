@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useFriends } from '@/hooks/useFriends';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap } from 'lucide-react';
+import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2 } from 'lucide-react';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
@@ -12,6 +12,7 @@ import DateProposalCreation from '@/components/date-planning/DateProposalCreatio
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { supabase } from '@/integrations/supabase/client';
 
 const QUOTES = [
   '„Das Leben ist zu kurz für schlechte Dates." ✨',
