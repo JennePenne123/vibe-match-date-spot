@@ -10,6 +10,7 @@ export const API_CONFIG = {
   useRadar: true,          // Primary search (100K free calls/month)
   useFoursquare: true,     // Enrichment: photos, tips, ratings
   useGooglePlaces: true,   // Enabled as fallback for niche venue types (museums, bowling, etc.)
+  useTripAdvisor: true,    // Enrichment: TripAdvisor reviews
   
   // Search strategy
   venueSearchStrategy: 'radar-foursquare' as VenueSearchStrategy,
