@@ -488,101 +488,104 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   // ── Step renderers ────────────────────────────────────────────────
 
-  const renderDurationStep = () => (
-    <div className="space-y-4">
-      <h2 className="text-base md:text-lg font-bold mb-1">Wie viel Zeit hast du?</h2>
-      <p className="text-muted-foreground text-sm mb-4">Das hilft der KI, passende Vorschläge zu filtern</p>
-      <div className="grid grid-cols-1 gap-3">
-        {durationModels.map((model) => {
-          const isSelected = selectedDuration === model.id;
-          return (
-            <button
-              type="button" key={model.id}
-              onClick={() => handleDurationSelect(model.id)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className={cn(
-                "p-4 md:p-5 rounded-xl border-2 text-left transition-none select-none relative",
-                isSelected ? "border-primary bg-primary/5" : "border-border bg-card"
-              )}
-            >
-              <div className="flex items-center gap-4">
-                <div className="text-2xl md:text-3xl flex-shrink-0">{model.emoji}</div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sm md:text-base">{model.title}</h3>
-                  <p className="text-xs md:text-sm text-muted-foreground leading-tight mt-0.5">{model.desc}</p>
-                </div>
-                {isSelected && (
-                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                    <Check className="w-4 h-4 text-primary-foreground" />
-                  </div>
-                )}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  const renderPreferencesStep = () => (
+  const renderCombinedStep = () => (
     <div className="space-y-6">
-      {/* Quick Start Templates */}
+      {/* Duration Models */}
       <div>
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Quick Start</h3>
-        <div className="flex flex-wrap gap-2">
-          {learnedTemplate && (
-            <button type="button" onClick={() => applyQuickStartTemplate(learnedTemplate)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className={cn(
-                "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
-                isTemplateCurrentlySelected(learnedTemplate) ? "border-primary bg-primary/10" : "border-border bg-card"
-              )}
-            >
-              <span>{learnedTemplate.emoji}</span>
-              <span className="font-medium">{learnedTemplate.title}</span>
-              <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">KI</Badge>
-              {isTemplateCurrentlySelected(learnedTemplate) && <Check className="w-3 h-3" />}
-            </button>
-          )}
-          {quickStartTemplates.map((t) => (
-            <button type="button" key={t.id} onClick={() => applyQuickStartTemplate(t)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className={cn(
-                "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
-                isTemplateCurrentlySelected(t) ? "border-primary bg-primary/10" : "border-border bg-card"
-              )}
-            >
-              <span>{t.emoji}</span>
-              <span className="font-medium">{t.title}</span>
-              {isTemplateCurrentlySelected(t) && <Check className="w-3 h-3" />}
-            </button>
-          ))}
+        <h2 className="text-base md:text-lg font-bold mb-1">Wie viel Zeit hast du?</h2>
+        <p className="text-muted-foreground text-sm mb-3">Das hilft der KI, passende Vorschläge zu filtern</p>
+        <div className="grid grid-cols-2 gap-2">
+          {durationModels.map((model) => {
+            const isSelected = selectedDuration === model.id;
+            return (
+              <button
+                type="button" key={model.id}
+                onClick={() => handleDurationSelect(model.id)}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
+                className={cn(
+                  "p-3 rounded-xl border-2 text-left transition-none select-none relative",
+                  isSelected ? "border-primary bg-primary/5" : "border-border bg-card"
+                )}
+              >
+                <div className="flex items-start gap-2.5">
+                  <div className="text-xl flex-shrink-0 mt-0.5">{model.emoji}</div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm">{model.title}</h3>
+                    <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{model.desc}</p>
+                  </div>
+                  {isSelected && (
+                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Cuisine */}
-      <div>
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Küche</h3>
-        {renderChipGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines')}
-      </div>
+      {/* Quick Start Templates */}
+      {selectedDuration && (
+        <>
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Quick Start</h3>
+            <div className="flex flex-wrap gap-2">
+              {learnedTemplate && (
+                <button type="button" onClick={() => applyQuickStartTemplate(learnedTemplate)}
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                  className={cn(
+                    "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
+                    isTemplateCurrentlySelected(learnedTemplate) ? "border-primary bg-primary/10" : "border-border bg-card"
+                  )}
+                >
+                  <span>{learnedTemplate.emoji}</span>
+                  <span className="font-medium">{learnedTemplate.title}</span>
+                  <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">KI</Badge>
+                  {isTemplateCurrentlySelected(learnedTemplate) && <Check className="w-3 h-3" />}
+                </button>
+              )}
+              {quickStartTemplates.map((t) => (
+                <button type="button" key={t.id} onClick={() => applyQuickStartTemplate(t)}
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                  className={cn(
+                    "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
+                    isTemplateCurrentlySelected(t) ? "border-primary bg-primary/10" : "border-border bg-card"
+                  )}
+                >
+                  <span>{t.emoji}</span>
+                  <span className="font-medium">{t.title}</span>
+                  {isTemplateCurrentlySelected(t) && <Check className="w-3 h-3" />}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {/* Vibes */}
-      <div>
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Vibe</h3>
-        {selectedDurationModel?.excludeVibes.length ? (
-          <p className="text-xs text-muted-foreground mb-2 italic">Einige Vibes basierend auf Zeitmodell ausgeblendet</p>
-        ) : null}
-        {renderChipGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
-      </div>
+          {/* Cuisine */}
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Küche</h3>
+            {renderChipGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines')}
+          </div>
 
-      {/* Budget */}
-      <div>
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Budget</h3>
-        {selectedDurationModel && selectedPriceRange.length > 0 && (
-          <p className="text-xs text-muted-foreground mb-2 italic">Vorauswahl basierend auf „{selectedDurationModel.title}"</p>
-        )}
-        {renderChipGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range')}
-      </div>
+          {/* Vibes */}
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Vibe</h3>
+            {selectedDurationModel?.excludeVibes.length ? (
+              <p className="text-xs text-muted-foreground mb-2 italic">Einige Vibes basierend auf Zeitmodell ausgeblendet</p>
+            ) : null}
+            {renderChipGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
+          </div>
+
+          {/* Budget */}
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Budget</h3>
+            {selectedDurationModel && selectedPriceRange.length > 0 && (
+              <p className="text-xs text-muted-foreground mb-2 italic">Vorauswahl basierend auf „{selectedDurationModel.title}"</p>
+            )}
+            {renderChipGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range')}
+          </div>
+        </>
+      )}
     </div>
   );
 
