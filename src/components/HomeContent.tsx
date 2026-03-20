@@ -73,7 +73,7 @@ const HomeContent: React.FC = () => {
       });
       if (error) throw error;
       if (data?.venue_id) {
-        toast({ title: '✨ KI-Empfehlung', description: data.reason || 'Hier ist unser Tipp für dich!', duration: 4000 });
+        toast({ title: t('home.aiTipTitle'), description: data.reason || t('home.aiTipFallback'), duration: 4000 });
         navigate(`/venue/${data.venue_id}`);
       } else {
         toast({ title: 'Keine Venues gefunden', description: 'Aktuell haben wir leider keine passenden Empfehlungen.', variant: 'destructive' });
