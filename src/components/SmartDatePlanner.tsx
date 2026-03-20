@@ -199,6 +199,19 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
               {/* Steps */}
               <ErrorBoundaryWrapper silent>
                 <div className="animate-fade-in">
+                  {currentStep === 'select-partner' && (
+                    <PartnerSelection
+                      friends={friends}
+                      selectedPartnerId={selectedPartnerId}
+                      selectedPartnerIds={selectedPartnerIds}
+                      dateMode={dateMode}
+                      loading={loading}
+                      onPartnerChange={(id) => setSelectedPartnerId(id)}
+                      onPartnerIdsChange={setSelectedPartnerIds}
+                      onDateModeChange={setDateMode}
+                      onContinue={handlePartnerContinue}
+                    />
+                  )}
                   {currentStep === 'set-preferences' && preferencesStepContent}
                   {currentStep === 'plan-together' && venueStepContent}
                   {currentStep === 'create-invitation' && selectedPartner && renderInvitationStep()}
