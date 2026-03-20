@@ -192,6 +192,7 @@ const App = () => (
           <AuthProvider>
             <AppProvider>
               <NotificationSystem>
+                <ServiceWorkerCacheReset />
                 <OfflineBanner />
                 <PushNotificationPrompt />
                 <AppUsageTracker />
