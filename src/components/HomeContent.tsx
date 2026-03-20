@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useFriends } from '@/hooks/useFriends';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap } from 'lucide-react';
+import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2 } from 'lucide-react';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
@@ -12,6 +12,7 @@ import DateProposalCreation from '@/components/date-planning/DateProposalCreatio
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { supabase } from '@/integrations/supabase/client';
 
 const QUOTES = [
   '„Das Leben ist zu kurz für schlechte Dates." ✨',
@@ -56,6 +57,34 @@ const HomeContent: React.FC = () => {
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
   const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
   const [invitationSentTrigger, setInvitationSentTrigger] = useState(0);
+  const [loadingTipIndex, setLoadingTipIndex] = useState<number | null>(null);
+
+  const handleTipClick = async (tip: typeof CITY_TIPS[0], index: number) => {
+    if (loadingTipIndex !== null) return;
+    setLoadingTipIndex(index);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke('ai-quick-tip', {
+        body: {
+          tipTitle: tip.title,
+          tipCategory: tip.label,
+          userId: session?.user?.id || null,
+        },
+      });
+      if (error) throw error;
+      if (data?.venue_id) {
+        toast({ title: '✨ KI-Empfehlung', description: data.reason || 'Hier ist unser Tipp für dich!', duration: 4000 });
+        navigate(`/venue/${data.venue_id}`);
+      } else {
+        toast({ title: 'Keine Venues gefunden', description: 'Aktuell haben wir leider keine passenden Empfehlungen.', variant: 'destructive' });
+      }
+    } catch (err) {
+      console.error('Quick tip error:', err);
+      toast({ title: 'Fehler', description: 'Der KI-Tipp konnte nicht geladen werden.', variant: 'destructive' });
+    } finally {
+      setLoadingTipIndex(null);
+    }
+  };
 
   const handleCollaborativePlanning = () => setShowPartnerSelection(true);
   const handlePartnerSelectionContinue = () => {
@@ -193,16 +222,28 @@ const HomeContent: React.FC = () => {
           <div className={isDesktop ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-3"}>
             {[getDailyIndex(0), getDailyIndex(3)].map((idx, i) => {
               const tip = CITY_TIPS[idx];
+              const isLoading = loadingTipIndex === i;
               return (
-                <Card key={i} className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-default">
+                <Card
+                  key={i}
+                  onClick={() => handleTipClick(tip, i)}
+                  className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
+                >
                   <CardContent className="p-4 flex items-start gap-3">
                     <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors shrink-0">
-                      <tip.icon className="w-4 h-4 text-primary" />
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                      ) : (
+                        <tip.icon className="w-4 h-4 text-primary" />
+                      )}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
                           {tip.label}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Tipp für dich →
                         </span>
                       </div>
                       <p className="text-sm font-medium text-foreground">{tip.title}</p>

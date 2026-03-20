@@ -59,3 +59,6 @@ verify_jwt = true
 
 [functions.search-venues-tripadvisor]
 verify_jwt = true
+
+[functions.ai-quick-tip]
+verify_jwt = true
