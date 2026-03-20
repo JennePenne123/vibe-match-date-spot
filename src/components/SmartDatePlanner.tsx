@@ -84,6 +84,13 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     dateMode, setDateMode, selectedPartnerIds, setSelectedPartnerIds,
   } = state;
 
+  const handlePartnerContinue = () => {
+    if (selectedPartnerId) {
+      // TODO: create collaborative session for the selected partner if needed
+      setCurrentStep('set-preferences');
+    }
+  };
+
   const { handlePreferencesComplete, handleVenueSelection, handleSendInvitation, handleStartFromScratch, handleManualContinue } = handlers;
 
   // Session recovery
