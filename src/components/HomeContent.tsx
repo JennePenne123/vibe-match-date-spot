@@ -13,11 +13,34 @@ import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
-const DATE_TIPS = [
-  { icon: MapPin, title: 'Neue Orte entdecken', desc: 'Unsere AI findet versteckte Perlen in deiner Nähe' },
-  { icon: Heart, title: 'Gemeinsam planen', desc: 'Stimmt eure Vorlieben ab für das perfekte Date' },
-  { icon: Zap, title: 'Spontan sein', desc: 'Lass dich von unseren Vorschlägen überraschen' },
+const QUOTES = [
+  '„Das Leben ist zu kurz für schlechte Dates." ✨',
+  '„Gemeinsame Erlebnisse sind das schönste Geschenk." 💫',
+  '„Jeder Tag ist eine neue Chance, etwas Besonderes zu erleben." 🌟',
+  '„Die besten Erinnerungen entstehen spontan." 🎯',
+  '„Zusammen entdecken, zusammen wachsen." 🌱',
+  '„Ein gutes Date beginnt mit Neugier." 💡',
+  '„Kleine Abenteuer machen das Leben groß." 🚀',
 ];
+
+const CITY_TIPS: { title: string; desc: string; icon: typeof MapPin; label: string }[] = [
+  { icon: MapPin, label: 'Heute', title: 'Street-Food-Markt entdecken', desc: 'Probiert euch durch lokale Köstlichkeiten unter freiem Himmel' },
+  { icon: Heart, label: 'Morgen', title: 'Sunset-Spaziergang am Fluss', desc: 'Golden Hour genießen — perfekt für entspannte Gespräche' },
+  { icon: Zap, label: 'Heute', title: 'Pop-up Gallery besuchen', desc: 'Kunst & Kultur als Inspiration für euren Abend' },
+  { icon: MapPin, label: 'Morgen', title: 'Geheimtipp-Café ausprobieren', desc: 'Specialty Coffee in gemütlichem Ambiente — ideal für ein Nachmittags-Date' },
+  { icon: Heart, label: 'Heute', title: 'Rooftop-Bar mit Ausblick', desc: 'Cocktails mit Panoramablick auf die Stadt' },
+  { icon: Zap, label: 'Morgen', title: 'Kochkurs für Zwei', desc: 'Gemeinsam kochen verbindet — und schmeckt!' },
+  { icon: MapPin, label: 'Heute', title: 'Vintage-Markt durchstöbern', desc: 'Schätze finden und dabei Quality-Time genießen' },
+  { icon: Heart, label: 'Morgen', title: 'Botanischer Garten erkunden', desc: 'Ruhe & Natur mitten in der Stadt — unterschätzt romantisch' },
+  { icon: Zap, label: 'Heute', title: 'Live-Musik in der Altstadt', desc: 'Jazz, Indie oder Klassik — lasst euch überraschen' },
+  { icon: MapPin, label: 'Morgen', title: 'Brunch-Spot entdecken', desc: 'Gemütlich in den Tag starten mit Avocado-Toast & Co.' },
+];
+
+const getDailyIndex = (offset: number) => {
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  return (dayOfYear + offset) % CITY_TIPS.length;
+};
 
 const HomeContent: React.FC = () => {
   const navigate = useNavigate();
@@ -153,25 +176,42 @@ const HomeContent: React.FC = () => {
           </>
         )}
 
-        {/* AI Inspiration Tips */}
+        {/* Daily Inspiration */}
         <div className="space-y-3">
+          {/* Quote */}
+          <Card className="border-0 bg-gradient-to-r from-accent/30 via-accent/10 to-transparent">
+            <CardContent className="py-4 px-5">
+              <p className="text-sm italic text-muted-foreground leading-relaxed text-center">
+                {QUOTES[getDailyIndex(0) % QUOTES.length]}
+              </p>
+            </CardContent>
+          </Card>
+
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1">
-            Inspiration
+            Was geht in deiner Stadt
           </h3>
-          <div className={isDesktop ? "grid grid-cols-3 gap-4" : "grid grid-cols-1 gap-3"}>
-            {DATE_TIPS.map((tip, i) => (
-              <Card key={i} className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-default">
-                <CardContent className="p-4 flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors shrink-0">
-                    <tip.icon className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground">{tip.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className={isDesktop ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-3"}>
+            {[getDailyIndex(0), getDailyIndex(3)].map((idx, i) => {
+              const tip = CITY_TIPS[idx];
+              return (
+                <Card key={i} className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-default">
+                  <CardContent className="p-4 flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors shrink-0">
+                      <tip.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                          {tip.label}
+                        </span>
+                      </div>
+                      <p className="text-sm font-medium text-foreground">{tip.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
