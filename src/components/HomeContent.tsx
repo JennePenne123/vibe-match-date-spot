@@ -86,7 +86,8 @@ const HomeContent: React.FC = () => {
     }
   };
 
-  const handleCollaborativePlanning = () => navigate('/preferences');
+  const handleSoloPlanning = () => navigate('/preferences');
+  const handleGroupPlanning = () => setShowPartnerSelection(true);
   const handlePartnerSelectionContinue = () => {
     if (selectedPartnerId) { setShowPartnerSelection(false); setShowProposalCreation(true); }
   };
