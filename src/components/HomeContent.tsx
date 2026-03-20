@@ -250,7 +250,7 @@ const HomeContent: React.FC = () => {
                           {tip.label}
                         </span>
                         <span className="text-[10px] text-muted-foreground">
-                          Tipp für dich →
+                          {t('home.tipForYou')}
                         </span>
                       </div>
                       <p className="text-sm font-medium text-foreground">{tip.title}</p>
