@@ -12,6 +12,8 @@ type PreferenceSnapshot = {
   preferred_times?: string[] | null;
   preferred_venue_types?: string[] | null;
   preferred_vibes?: string[] | null;
+  personality_traits?: Record<string, number> | null;
+  relationship_goal?: string | null;
 };
 
 const hasSelections = (value?: string[] | null) => Array.isArray(value) && value.length > 0;
