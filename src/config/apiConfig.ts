@@ -35,6 +35,7 @@ export const API_CONFIG = {
   radarTimeout: 10000,
   foursquareTimeout: 10000,
   googlePlacesTimeout: 10000,
+  tripAdvisorTimeout: 10000,
   
   // Fallback behavior
   requireAtLeastOneSource: true,
