@@ -7,33 +7,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { bowlChopsticks } from '@lucide/lab';
 import { Skeleton } from '@/components/ui/skeleton';
+import { bowlChopsticks } from '@lucide/lab';
 import {
-  ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
-  Icon,
-  // Cuisine icons
+  ArrowLeft, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
+  Icon, ChevronDown, Save,
   Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup,
-  // Vibe icons
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
-  // Price icons
   PiggyBank, CreditCard, Gem, Crown,
-  // Time icons
   Sunrise, Sun, CloudSun, Sunset, MoonStar, Clock3,
-  // Duration icons
   Zap, Hourglass, Timer, Shuffle,
-  // Activity icons
   Wine, Tent, Martini, Palette, Dumbbell, PartyPopper,
-  // Entertainment icons
   Guitar, Headphones, MessageCircle, Gamepad2, Music4, Tv,
-  // Dietary icons
   Salad, Sprout, WheatOff, MilkOff, CircleDot, Star,
-  // Accessibility icons
   Accessibility, ParkingCircle, TrainFront, Dog, CigaretteOff,
-  // Template icons
-  Sparkles,
-  // Venue type icons (Step 5)
-  Landmark, Film, Ticket, Trophy, Waves, Mountain, Drama,
+  Sparkles, Ticket,
+  Landmark, Film, Trophy, Waves, Mountain, Drama,
   Footprints, Target, Lock, Bike, Building2,
   type LucideIcon
 } from 'lucide-react';
@@ -41,9 +30,8 @@ import { cn } from '@/lib/utils';
 
 const MapPreview = lazy(() => import('@/components/MapPreview'));
 
-// Icon + color mapping for each preference ID
+// Icon + color mapping
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
-  // Cuisines — each icon chosen to represent the cuisine's most iconic element
   italian:        { icon: Pizza,           bg: 'bg-red-500/15', fg: 'text-red-500' },
   japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
   mexican:        { icon: Flame,           bg: 'bg-yellow-600/15', fg: 'text-yellow-600' },
@@ -54,65 +42,55 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
   thai:           { icon: CookingPot,      bg: 'bg-lime-500/15', fg: 'text-lime-500' },
   chinese:        { icon: null, labIcon: bowlChopsticks, bg: 'bg-rose-500/15', fg: 'text-rose-500' },
   korean:         { icon: CookingPot,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
-  // Vibes
   romantic:       { icon: HeartHandshake,  bg: 'bg-pink-500/15', fg: 'text-pink-500' },
   casual:         { icon: Smile,           bg: 'bg-sky-500/15', fg: 'text-sky-500' },
   outdoor:        { icon: TreePine,        bg: 'bg-green-500/15', fg: 'text-green-500' },
   nightlife:      { icon: Moon,            bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
   cultural:       { icon: Theater,         bg: 'bg-purple-500/15', fg: 'text-purple-500' },
   adventurous:    { icon: Compass,         bg: 'bg-teal-500/15', fg: 'text-teal-500' },
-  // Prices
   budget:         { icon: PiggyBank,       bg: 'bg-green-500/15', fg: 'text-green-500' },
   moderate:       { icon: CreditCard,      bg: 'bg-blue-500/15', fg: 'text-blue-500' },
   upscale:        { icon: Gem,             bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
   luxury:         { icon: Crown,           bg: 'bg-amber-500/15', fg: 'text-amber-500' },
-  // Times
   brunch:         { icon: Sunrise,         bg: 'bg-orange-400/15', fg: 'text-orange-400' },
   lunch:          { icon: Sun,             bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
   afternoon:      { icon: CloudSun,        bg: 'bg-amber-400/15', fg: 'text-amber-400' },
   dinner:         { icon: Sunset,          bg: 'bg-orange-600/15', fg: 'text-orange-600' },
   evening:        { icon: MoonStar,        bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
   flexible:       { icon: Clock3,          bg: 'bg-slate-400/15', fg: 'text-slate-400' },
-  // Durations
   quick:          { icon: Zap,             bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
   relaxed:        { icon: Hourglass,       bg: 'bg-teal-500/15', fg: 'text-teal-500' },
   extended:       { icon: Timer,           bg: 'bg-blue-500/15', fg: 'text-blue-500' },
   spontaneous:    { icon: Shuffle,         bg: 'bg-purple-400/15', fg: 'text-purple-400' },
-  // Activities
   dining:         { icon: Wine,            bg: 'bg-red-500/15', fg: 'text-red-500' },
   dining_plus:    { icon: Tent,            bg: 'bg-pink-500/15', fg: 'text-pink-500' },
   cocktails:      { icon: Martini,         bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   cultural_act:   { icon: Palette,         bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
   active:         { icon: Dumbbell,        bg: 'bg-rose-500/15', fg: 'text-rose-500' },
   nightlife_act:  { icon: PartyPopper,     bg: 'bg-fuchsia-500/15', fg: 'text-fuchsia-500' },
-  // Entertainment
   live_music:          { icon: Guitar,         bg: 'bg-red-500/15', fg: 'text-red-500' },
   dj_playlist:         { icon: Headphones,     bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
   quiet_conversation:  { icon: MessageCircle,  bg: 'bg-sky-500/15', fg: 'text-sky-500' },
   games:               { icon: Gamepad2,       bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
   dancing:             { icon: Music4,         bg: 'bg-pink-500/15', fg: 'text-pink-500' },
   sports_viewing:      { icon: Tv,             bg: 'bg-blue-500/15', fg: 'text-blue-500' },
-  // Dietary
   vegetarian:     { icon: Salad,           bg: 'bg-green-500/15', fg: 'text-green-500' },
   vegan:          { icon: Sprout,          bg: 'bg-lime-500/15', fg: 'text-lime-500' },
   gluten_free:    { icon: WheatOff,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
   dairy_free:     { icon: MilkOff,         bg: 'bg-sky-400/15', fg: 'text-sky-400' },
   halal:          { icon: CircleDot,       bg: 'bg-emerald-600/15', fg: 'text-emerald-600' },
   kosher:         { icon: Star,            bg: 'bg-blue-600/15', fg: 'text-blue-600' },
-  // Accessibility
   wheelchair:       { icon: Accessibility,   bg: 'bg-blue-500/15', fg: 'text-blue-500' },
   parking:          { icon: ParkingCircle,   bg: 'bg-sky-500/15', fg: 'text-sky-500' },
   public_transport: { icon: TrainFront,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   pet_friendly:     { icon: Dog,             bg: 'bg-amber-500/15', fg: 'text-amber-500' },
-  non_smoking:      { icon: CigaretteOff,   bg: 'bg-red-500/15', fg: 'text-red-500' },
-  // Venue types – Kultur & Bildung
+  non_smoking:      { icon: CigaretteOff,    bg: 'bg-red-500/15', fg: 'text-red-500' },
   museum:           { icon: Landmark,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
   gallery:          { icon: Palette,         bg: 'bg-fuchsia-500/15', fg: 'text-fuchsia-500' },
   theater_venue:    { icon: Drama,           bg: 'bg-purple-500/15', fg: 'text-purple-500' },
   cinema:           { icon: Film,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
   concert_hall:     { icon: Music4,          bg: 'bg-rose-500/15', fg: 'text-rose-500' },
   exhibition:       { icon: Ticket,          bg: 'bg-teal-500/15', fg: 'text-teal-500' },
-  // Venue types – Freizeit & Sport
   mini_golf:        { icon: Target,          bg: 'bg-green-500/15', fg: 'text-green-500' },
   bowling:          { icon: Trophy,          bg: 'bg-orange-500/15', fg: 'text-orange-500' },
   escape_room:      { icon: Lock,            bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
@@ -120,13 +98,11 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
   swimming:         { icon: Waves,           bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
   hiking:           { icon: Footprints,      bg: 'bg-lime-500/15', fg: 'text-lime-500' },
   cycling:          { icon: Bike,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
-  // Venue types – Unterhaltung
   karaoke:          { icon: Headphones,      bg: 'bg-pink-500/15', fg: 'text-pink-500' },
   comedy_club:      { icon: Smile,           bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
   arcade:           { icon: Gamepad2,        bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   live_event:       { icon: Sparkles,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
   spa_wellness:     { icon: Building2,       bg: 'bg-teal-500/15', fg: 'text-teal-500' },
-  // Templates
   template_romantic: { icon: Heart,          bg: 'bg-pink-500/15', fg: 'text-pink-500' },
   template_casual:   { icon: Coffee,         bg: 'bg-amber-500/15', fg: 'text-amber-500' },
   template_trendy:   { icon: Sparkles,       bg: 'bg-violet-500/15', fg: 'text-violet-500' },
@@ -135,42 +111,128 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
 function PrefIcon({ id, size = 'md' }: { id: string; size?: 'sm' | 'md' | 'lg' }) {
   const config = prefIconMap[id];
   if (!config) return null;
-  const sizeClasses = {
-    sm: 'w-8 h-8 [&_svg]:w-4 [&_svg]:h-4',
-    md: 'w-10 h-10 [&_svg]:w-5 [&_svg]:h-5',
-    lg: 'w-12 h-12 [&_svg]:w-6 [&_svg]:h-6',
-  };
+  const sizeClasses = { sm: 'w-8 h-8 [&_svg]:w-4 [&_svg]:h-4', md: 'w-10 h-10 [&_svg]:w-5 [&_svg]:h-5', lg: 'w-12 h-12 [&_svg]:w-6 [&_svg]:h-6' };
   return (
-    <div className={cn(
-      'rounded-xl flex items-center justify-center flex-shrink-0',
-      config.bg, sizeClasses[size]
-    )}>
-      {config.labIcon ? (
-        <Icon iconNode={config.labIcon} className={cn(config.fg)} />
-      ) : config.icon ? (
-        <config.icon className={cn(config.fg)} />
-      ) : null}
+    <div className={cn('rounded-xl flex items-center justify-center flex-shrink-0', config.bg, sizeClasses[size])}>
+      {config.labIcon ? <Icon iconNode={config.labIcon} className={cn(config.fg)} /> : config.icon ? <config.icon className={cn(config.fg)} /> : null}
     </div>
   );
 }
 
-interface Preference {
-  id: string;
-  name: string;
-  emoji: string;
-  desc?: string;
+interface Preference { id: string; name: string; emoji: string; desc?: string; }
+
+// --- Accordion Section Component ---
+function AccordionSection({ title, icon, selectedCount, children, defaultOpen = false }: {
+  title: string; icon: React.ReactNode; selectedCount: number; children: React.ReactNode; defaultOpen?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border border-border rounded-2xl overflow-hidden bg-card">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-4 select-none"
+        style={{ WebkitTapHighlightColor: 'transparent' }}
+      >
+        <div className="flex items-center gap-3">
+          {icon}
+          <span className="font-semibold text-foreground">{title}</span>
+          {selectedCount > 0 && (
+            <span className="text-xs font-medium bg-primary/15 text-primary px-2 py-0.5 rounded-full">
+              {selectedCount}
+            </span>
+          )}
+        </div>
+        <ChevronDown className={cn('w-5 h-5 text-muted-foreground transition-transform duration-200', isOpen && 'rotate-180')} />
+      </button>
+      <div
+        className="grid transition-[grid-template-rows] duration-300 ease-out"
+        style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
+      >
+        <div className="overflow-hidden">
+          <div className="px-4 pb-4">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-interface QuickTemplate {
-  id: string;
-  title: string;
-  emoji: string;
-  description: string;
-  cuisines: string[];
-  vibes: string[];
-  priceRange: number[];
-  timePreference?: string;
-  activities?: string[];
+// --- Grid selection (icons + checkmark) ---
+function SelectionGrid({ items, selected, onToggle, columns = 2 }: {
+  items: Preference[]; selected: string[]; onToggle: (id: string) => void; columns?: number;
+}) {
+  return (
+    <div className={cn('grid gap-2.5', columns === 2 ? 'grid-cols-2' : 'grid-cols-3')}>
+      {items.map((item) => (
+        <button
+          type="button"
+          key={item.id}
+          onClick={() => onToggle(item.id)}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+          className="p-3 rounded-xl border border-border bg-background text-foreground select-none active:scale-[0.97] transition-transform"
+        >
+          <PrefIcon id={item.id} size="sm" />
+          <div className="font-medium text-xs mt-1.5">{item.name}</div>
+          {selected.includes(item.id) && <Check className="w-4 h-4 mx-auto mt-1 text-primary" />}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// --- List selection (icon + label + desc + checkmark) ---
+function SelectionList({ items, selected, onToggle, iconMap }: {
+  items: Preference[]; selected: string[]; onToggle: (id: string) => void; iconMap?: Record<string, string>;
+}) {
+  return (
+    <div className="space-y-2">
+      {items.map((item) => (
+        <button
+          type="button"
+          key={item.id}
+          onClick={() => onToggle(item.id)}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+          className="w-full p-3 rounded-xl border border-border bg-background text-foreground select-none flex items-center gap-3 active:scale-[0.98] transition-transform"
+        >
+          <PrefIcon id={iconMap?.[item.id] || item.id} size="sm" />
+          <div className="flex-1 text-left">
+            <div className="font-medium text-sm">{item.name}</div>
+            {item.desc && <div className="text-xs text-muted-foreground">{item.desc}</div>}
+          </div>
+          {selected.includes(item.id) && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// --- Single selection list ---
+function SingleSelectionList({ items, selected, onToggle }: {
+  items: Preference[]; selected: string; onToggle: (id: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      {items.map((item) => (
+        <button
+          type="button"
+          key={item.id}
+          onClick={() => onToggle(item.id)}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+          className="w-full p-3 rounded-xl border border-border bg-background text-foreground select-none flex items-center gap-3 active:scale-[0.98] transition-transform"
+        >
+          <PrefIcon id={item.id} size="sm" />
+          <div className="flex-1 text-left">
+            <div className="font-medium text-sm">{item.name}</div>
+            {item.desc && <div className="text-xs text-muted-foreground">{item.desc}</div>}
+          </div>
+          {selected === item.id && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 const Preferences = () => {
@@ -180,31 +242,17 @@ const Preferences = () => {
   const { t } = useTranslation();
   const { updateCuisines, updateVibes } = useApp();
   const { user } = useAuth();
-  
-  // Multi-step state management
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 5;
-  
-  // Step 1: Cuisine & Vibes (existing)
+
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
-  
-  // Step 2: Budget & Timing
   const [selectedPriceRange, setSelectedPriceRange] = useState<string[]>([]);
   const [selectedTimePreferences, setSelectedTimePreferences] = useState<string[]>([]);
   const [selectedDuration, setSelectedDuration] = useState<string>('');
-  
-  // Step 3: Activities & Entertainment
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [selectedEntertainment, setSelectedEntertainment] = useState<string[]>([]);
-  
-  // Step 4: Special Requirements & Home Location
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
-
-  // Step 5: Venue Types (Experiences beyond dining)
   const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
-
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
@@ -212,18 +260,15 @@ const Preferences = () => {
   const [locationError, setLocationError] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load existing preferences on mount
   useEffect(() => {
     const loadExistingPreferences = async () => {
       if (!user) return;
-      
       try {
         const { data } = await supabase
           .from('user_preferences')
           .select('home_latitude, home_longitude, home_address, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types')
           .eq('user_id', user.id)
           .single();
-        
         if (data) {
           if (data.home_latitude) setHomeLatitude(data.home_latitude);
           if (data.home_longitude) setHomeLongitude(data.home_longitude);
@@ -243,46 +288,82 @@ const Preferences = () => {
         console.log('No existing preferences found');
       }
     };
-    
     loadExistingPreferences();
   }, [user]);
 
-  // Quick Templates
-  const quickTemplates: QuickTemplate[] = [
-    {
-      id: 'romantic',
-      title: t('preferences.romanticDinner'),
-      emoji: '💕',
-      description: t('preferences.romanticDinnerDesc'),
-      cuisines: ['italian', 'french'],
-      vibes: ['romantic'],
-      priceRange: [2, 3],
-      timePreference: 'dinner',
-      activities: ['dining']
-    },
-    {
-      id: 'casual',
-      title: t('preferences.casualBrunch'),
-      emoji: '☕',
-      description: t('preferences.casualBrunchDesc'),
-      cuisines: ['american'],
-      vibes: ['casual'],
-      priceRange: [1, 2],
-      timePreference: 'brunch',
-      activities: ['dining']
-    },
-    {
-      id: 'trendy',
-      title: t('preferences.trendyCocktail'),
-      emoji: '🍸',
-      description: t('preferences.trendyCocktailDesc'),
-      cuisines: ['modern'],
-      vibes: ['nightlife'],
-      priceRange: [2, 3],
-      timePreference: 'evening',
-      activities: ['cocktails']
+  const toggleSelection = (item: string, selectedItems: string[], setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setSelectedItems(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
+  };
+
+  const toggleSingleSelection = (item: string, setSelectedItem: React.Dispatch<React.SetStateAction<string>>) => {
+    setSelectedItem(prev => prev === item ? '' : item);
+  };
+
+  const useCurrentLocation = async () => {
+    setIsLocating(true);
+    setLocationError('');
+    if (!navigator.geolocation) { setLocationError(t('preferences.locationNotSupported')); setIsLocating(false); return; }
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+      });
+      setHomeLatitude(position.coords.latitude);
+      setHomeLongitude(position.coords.longitude);
+      try {
+        const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`);
+        if (response.ok) {
+          const data = await response.json();
+          setHomeAddress([data.city, data.principalSubdivision, data.countryName].filter(Boolean).join(', ') || 'Current Location');
+        } else { setHomeAddress('Current Location'); }
+      } catch { setHomeAddress('Current Location'); }
+    } catch { setLocationError(t('preferences.locationError')); }
+    finally { setIsLocating(false); }
+  };
+
+  const clearHomeLocation = () => { setHomeAddress(''); setHomeLatitude(null); setHomeLongitude(null); setLocationError(''); };
+
+  const handleSave = async () => {
+    updateCuisines(selectedCuisines);
+    updateVibes(selectedVibes);
+    if (user) {
+      setIsSaving(true);
+      try {
+        const { data: authData, error: authError } = await supabase.auth.getUser();
+        if (authError || !authData.user) throw authError || new Error('Not authenticated');
+        const currentUserId = authData.user.id;
+        const preferencePayload = {
+          user_id: currentUserId,
+          home_latitude: homeLatitude, home_longitude: homeLongitude, home_address: homeAddress || null,
+          preferred_cuisines: selectedCuisines.length > 0 ? selectedCuisines : null,
+          preferred_vibes: selectedVibes.length > 0 ? selectedVibes : null,
+          preferred_price_range: selectedPriceRange.length > 0 ? selectedPriceRange : null,
+          preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
+          dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
+          preferred_activities: selectedActivities.length > 0 ? selectedActivities : null,
+          preferred_entertainment: selectedEntertainment.length > 0 ? selectedEntertainment : null,
+          preferred_duration: selectedDuration || null,
+          accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
+          preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
+        };
+        const { data: existing, error: existErr } = await supabase.from('user_preferences').select('id').eq('user_id', currentUserId).maybeSingle();
+        if (existErr) throw existErr;
+        const mutation = existing
+          ? await supabase.from('user_preferences').update(preferencePayload).eq('user_id', currentUserId)
+          : await supabase.from('user_preferences').insert(preferencePayload);
+        if (mutation.error) throw mutation.error;
+        try {
+          const { initializePreferenceVectors } = await import('@/services/preferenceInitService');
+          await initializePreferenceVectors(user.id, { cuisines: selectedCuisines, vibes: selectedVibes, priceRange: selectedPriceRange, times: selectedTimePreferences, dietary: selectedDietary, activities: selectedActivities, venueTypes: selectedVenueTypes });
+        } catch (e) { console.error('Failed to initialize preference vectors:', e); }
+        try { const { awardPoints } = await import('@/services/awardPointsService'); await awardPoints('preferences_set'); } catch (e) { console.error('Failed to award preferences points:', e); }
+        toast({ title: t('preferences.prefsSaved'), description: t('preferences.prefsSavedDesc') });
+      } catch (error) {
+        console.error('Error saving preferences:', error);
+        toast({ variant: 'destructive', title: t('preferences.prefsError'), description: t('preferences.prefsErrorDesc') });
+      } finally { setIsSaving(false); }
     }
-  ];
+    navigate(isOnboarding ? '/home' : '/friends');
+  };
 
   // Data definitions
   const cuisines: Preference[] = [
@@ -295,875 +376,205 @@ const Preferences = () => {
     { id: 'american', name: t('preferences.cuisine_american'), emoji: '🍔' },
     { id: 'thai', name: t('preferences.cuisine_thai'), emoji: '🍜' },
     { id: 'chinese', name: t('preferences.cuisine_chinese'), emoji: '🥢' },
-    { id: 'korean', name: t('preferences.cuisine_korean'), emoji: '🍲' }
+    { id: 'korean', name: t('preferences.cuisine_korean'), emoji: '🍲' },
   ];
-
   const vibes: Preference[] = [
     { id: 'romantic', name: t('preferences.vibe_romantic'), emoji: '💕', desc: t('preferences.vibe_romanticDesc') },
     { id: 'casual', name: t('preferences.vibe_casual'), emoji: '😊', desc: t('preferences.vibe_casualDesc') },
     { id: 'outdoor', name: t('preferences.vibe_outdoor'), emoji: '🌳', desc: t('preferences.vibe_outdoorDesc') },
     { id: 'nightlife', name: t('preferences.vibe_nightlife'), emoji: '🌃', desc: t('preferences.vibe_nightlifeDesc') },
     { id: 'cultural', name: t('preferences.vibe_cultural'), emoji: '🎭', desc: t('preferences.vibe_culturalDesc') },
-    { id: 'adventurous', name: t('preferences.vibe_adventurous'), emoji: '🗺️', desc: t('preferences.vibe_adventurousDesc') }
+    { id: 'adventurous', name: t('preferences.vibe_adventurous'), emoji: '🗺️', desc: t('preferences.vibe_adventurousDesc') },
   ];
-
   const priceRanges: Preference[] = [
     { id: 'budget', name: t('preferences.price_budget'), emoji: '💰', desc: t('preferences.price_budgetDesc') },
     { id: 'moderate', name: t('preferences.price_moderate'), emoji: '💳', desc: t('preferences.price_moderateDesc') },
     { id: 'upscale', name: t('preferences.price_upscale'), emoji: '💎', desc: t('preferences.price_upscaleDesc') },
-    { id: 'luxury', name: t('preferences.price_luxury'), emoji: '👑', desc: t('preferences.price_luxuryDesc') }
+    { id: 'luxury', name: t('preferences.price_luxury'), emoji: '👑', desc: t('preferences.price_luxuryDesc') },
   ];
-
   const timePreferences: Preference[] = [
     { id: 'brunch', name: t('preferences.time_brunch'), emoji: '🌅', desc: t('preferences.time_brunchDesc') },
     { id: 'lunch', name: t('preferences.time_lunch'), emoji: '☀️', desc: t('preferences.time_lunchDesc') },
     { id: 'afternoon', name: t('preferences.time_afternoon'), emoji: '🌤️', desc: t('preferences.time_afternoonDesc') },
     { id: 'dinner', name: t('preferences.time_dinner'), emoji: '🌆', desc: t('preferences.time_dinnerDesc') },
     { id: 'evening', name: t('preferences.time_evening'), emoji: '🌙', desc: t('preferences.time_eveningDesc') },
-    { id: 'flexible', name: t('preferences.time_flexible'), emoji: '🕐', desc: t('preferences.time_flexibleDesc') }
+    { id: 'flexible', name: t('preferences.time_flexible'), emoji: '🕐', desc: t('preferences.time_flexibleDesc') },
   ];
-
   const durations: Preference[] = [
     { id: 'quick', name: t('preferences.duration_quick'), emoji: '⚡', desc: t('preferences.duration_quickDesc') },
     { id: 'relaxed', name: t('preferences.duration_relaxed'), emoji: '⏰', desc: t('preferences.duration_relaxedDesc') },
     { id: 'extended', name: t('preferences.duration_extended'), emoji: '🕐', desc: t('preferences.duration_extendedDesc') },
-    { id: 'spontaneous', name: t('preferences.duration_spontaneous'), emoji: '🤷', desc: t('preferences.duration_spontaneousDesc') }
+    { id: 'spontaneous', name: t('preferences.duration_spontaneous'), emoji: '🤷', desc: t('preferences.duration_spontaneousDesc') },
   ];
-
   const activities: Preference[] = [
     { id: 'dining', name: t('preferences.activity_dining'), emoji: '🍽️', desc: t('preferences.activity_diningDesc') },
     { id: 'dining_plus', name: t('preferences.activity_dining_plus'), emoji: '🎪', desc: t('preferences.activity_dining_plusDesc') },
     { id: 'cocktails', name: t('preferences.activity_cocktails'), emoji: '🍸', desc: t('preferences.activity_cocktailsDesc') },
     { id: 'cultural', name: t('preferences.activity_cultural'), emoji: '🎨', desc: t('preferences.activity_culturalDesc') },
     { id: 'active', name: t('preferences.activity_active'), emoji: '🎳', desc: t('preferences.activity_activeDesc') },
-    { id: 'nightlife', name: t('preferences.activity_nightlife'), emoji: '🎉', desc: t('preferences.activity_nightlifeDesc') }
+    { id: 'nightlife', name: t('preferences.activity_nightlife'), emoji: '🎉', desc: t('preferences.activity_nightlifeDesc') },
   ];
-
   const entertainment: Preference[] = [
     { id: 'live_music', name: t('preferences.ent_live_music'), emoji: '🎵' },
     { id: 'dj_playlist', name: t('preferences.ent_dj_playlist'), emoji: '🎧' },
     { id: 'quiet_conversation', name: t('preferences.ent_quiet_conversation'), emoji: '💬' },
     { id: 'games', name: t('preferences.ent_games'), emoji: '🎮' },
     { id: 'dancing', name: t('preferences.ent_dancing'), emoji: '💃' },
-    { id: 'sports_viewing', name: t('preferences.ent_sports_viewing'), emoji: '📺' }
+    { id: 'sports_viewing', name: t('preferences.ent_sports_viewing'), emoji: '📺' },
   ];
-
   const dietaryRequirements: Preference[] = [
     { id: 'vegetarian', name: t('preferences.dietary_vegetarian'), emoji: '🥬' },
     { id: 'vegan', name: t('preferences.dietary_vegan'), emoji: '🌱' },
     { id: 'gluten_free', name: t('preferences.dietary_gluten_free'), emoji: '🚫' },
     { id: 'dairy_free', name: t('preferences.dietary_dairy_free'), emoji: '🥛' },
     { id: 'halal', name: t('preferences.dietary_halal'), emoji: '☪️' },
-    { id: 'kosher', name: t('preferences.dietary_kosher'), emoji: '✡️' }
+    { id: 'kosher', name: t('preferences.dietary_kosher'), emoji: '✡️' },
   ];
-
   const accessibilityNeeds: Preference[] = [
     { id: 'wheelchair', name: t('preferences.access_wheelchair'), emoji: '♿' },
     { id: 'parking', name: t('preferences.access_parking'), emoji: '🅿️' },
     { id: 'public_transport', name: t('preferences.access_public_transport'), emoji: '🚇' },
     { id: 'pet_friendly', name: t('preferences.access_pet_friendly'), emoji: '🐕' },
-    { id: 'non_smoking', name: t('preferences.access_non_smoking'), emoji: '🚭' }
+    { id: 'non_smoking', name: t('preferences.access_non_smoking'), emoji: '🚭' },
+  ];
+  const allVenueTypes: Preference[] = [
+    { id: 'museum', name: t('preferences.venue_museum'), emoji: '🏛️' },
+    { id: 'gallery', name: t('preferences.venue_gallery'), emoji: '🎨' },
+    { id: 'theater_venue', name: t('preferences.venue_theater'), emoji: '🎭' },
+    { id: 'cinema', name: t('preferences.venue_cinema'), emoji: '🎬' },
+    { id: 'concert_hall', name: t('preferences.venue_concert'), emoji: '🎵' },
+    { id: 'exhibition', name: t('preferences.venue_exhibition'), emoji: '🎟️' },
+    { id: 'mini_golf', name: t('preferences.venue_mini_golf'), emoji: '⛳' },
+    { id: 'bowling', name: t('preferences.venue_bowling'), emoji: '🎳' },
+    { id: 'escape_room', name: t('preferences.venue_escape_room'), emoji: '🔐' },
+    { id: 'climbing', name: t('preferences.venue_climbing'), emoji: '🧗' },
+    { id: 'swimming', name: t('preferences.venue_swimming'), emoji: '🏊' },
+    { id: 'hiking', name: t('preferences.venue_hiking'), emoji: '🥾' },
+    { id: 'cycling', name: t('preferences.venue_cycling'), emoji: '🚴' },
+    { id: 'karaoke', name: t('preferences.venue_karaoke'), emoji: '🎤' },
+    { id: 'comedy_club', name: t('preferences.venue_comedy'), emoji: '😂' },
+    { id: 'arcade', name: t('preferences.venue_arcade'), emoji: '🕹️' },
+    { id: 'live_event', name: t('preferences.venue_live_event'), emoji: '✨' },
+    { id: 'spa_wellness', name: t('preferences.venue_spa'), emoji: '🧖' },
   ];
 
-  // Step 5: Venue Types
-  const cultureVenues: Preference[] = [
-    { id: 'museum', name: t('preferences.venue_museum'), emoji: '🏛️', desc: t('preferences.venue_museumDesc') },
-    { id: 'gallery', name: t('preferences.venue_gallery'), emoji: '🎨', desc: t('preferences.venue_galleryDesc') },
-    { id: 'theater_venue', name: t('preferences.venue_theater'), emoji: '🎭', desc: t('preferences.venue_theaterDesc') },
-    { id: 'cinema', name: t('preferences.venue_cinema'), emoji: '🎬', desc: t('preferences.venue_cinemaDesc') },
-    { id: 'concert_hall', name: t('preferences.venue_concert'), emoji: '🎵', desc: t('preferences.venue_concertDesc') },
-    { id: 'exhibition', name: t('preferences.venue_exhibition'), emoji: '🎟️', desc: t('preferences.venue_exhibitionDesc') },
-  ];
+  const activityIconMap: Record<string, string> = { cultural: 'cultural_act', nightlife: 'nightlife_act' };
 
-  const leisureVenues: Preference[] = [
-    { id: 'mini_golf', name: t('preferences.venue_mini_golf'), emoji: '⛳', desc: t('preferences.venue_mini_golfDesc') },
-    { id: 'bowling', name: t('preferences.venue_bowling'), emoji: '🎳', desc: t('preferences.venue_bowlingDesc') },
-    { id: 'escape_room', name: t('preferences.venue_escape_room'), emoji: '🔐', desc: t('preferences.venue_escape_roomDesc') },
-    { id: 'climbing', name: t('preferences.venue_climbing'), emoji: '🧗', desc: t('preferences.venue_climbingDesc') },
-    { id: 'swimming', name: t('preferences.venue_swimming'), emoji: '🏊', desc: t('preferences.venue_swimmingDesc') },
-    { id: 'hiking', name: t('preferences.venue_hiking'), emoji: '🥾', desc: t('preferences.venue_hikingDesc') },
-    { id: 'cycling', name: t('preferences.venue_cycling'), emoji: '🚴', desc: t('preferences.venue_cyclingDesc') },
-  ];
-
-  const entertainmentVenues: Preference[] = [
-    { id: 'karaoke', name: t('preferences.venue_karaoke'), emoji: '🎤', desc: t('preferences.venue_karaokeDesc') },
-    { id: 'comedy_club', name: t('preferences.venue_comedy'), emoji: '😂', desc: t('preferences.venue_comedyDesc') },
-    { id: 'arcade', name: t('preferences.venue_arcade'), emoji: '🕹️', desc: t('preferences.venue_arcadeDesc') },
-    { id: 'live_event', name: t('preferences.venue_live_event'), emoji: '✨', desc: t('preferences.venue_live_eventDesc') },
-    { id: 'spa_wellness', name: t('preferences.venue_spa'), emoji: '🧖', desc: t('preferences.venue_spaDesc') },
-  ];
-
-  // Toggle functions
-  const toggleSelection = (item: string, selectedItems: string[], setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>) => {
-    setSelectedItems(prev =>
-      prev.includes(item)
-        ? prev.filter(i => i !== item)
-        : [...prev, item]
-    );
-  };
-
-  const toggleSingleSelection = (item: string, setSelectedItem: React.Dispatch<React.SetStateAction<string>>) => {
-    setSelectedItem(prev => prev === item ? '' : item);
-  };
-
-  // Quick template application
-  const applyQuickTemplate = (template: QuickTemplate) => {
-    setSelectedCuisines(template.cuisines);
-    setSelectedVibes(template.vibes);
-    if (template.timePreference) {
-      setSelectedTimePreferences([template.timePreference]);
-    }
-    if (template.activities) {
-      setSelectedActivities(template.activities);
-    }
-  };
-
-  // Location functions
-  const useCurrentLocation = async () => {
-    setIsLocating(true);
-    setLocationError('');
-    
-    if (!navigator.geolocation) {
-      setLocationError(t('preferences.locationNotSupported'));
-      setIsLocating(false);
-      return;
-    }
-    
-    try {
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: false,
-          timeout: 10000,
-          maximumAge: 300000
-        });
-      });
-      
-      setHomeLatitude(position.coords.latitude);
-      setHomeLongitude(position.coords.longitude);
-      
-      // Reverse geocode to get address
-      try {
-        const response = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          const addressParts = [data.city, data.principalSubdivision, data.countryName].filter(Boolean);
-          setHomeAddress(addressParts.join(', ') || 'Current Location');
-        } else {
-          setHomeAddress('Current Location');
-        }
-      } catch {
-        setHomeAddress('Current Location');
-      }
-    } catch (error) {
-      setLocationError(t('preferences.locationError'));
-    } finally {
-      setIsLocating(false);
-    }
-  };
-
-  const clearHomeLocation = () => {
-    setHomeAddress('');
-    setHomeLatitude(null);
-    setHomeLongitude(null);
-    setLocationError('');
-  };
-
-  // Navigation functions
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleNext = async () => {
-    if (currentStep === totalSteps) {
-      // Update local context
-      updateCuisines(selectedCuisines);
-      updateVibes(selectedVibes);
-      
-      // Save preferences to database if user is logged in
-      if (user) {
-        setIsSaving(true);
-        try {
-          const { data: authData, error: authError } = await supabase.auth.getUser();
-          if (authError || !authData.user) {
-            throw authError || new Error('Not authenticated');
-          }
-
-          const currentUserId = authData.user.id;
-          const preferencePayload = {
-            user_id: currentUserId,
-            home_latitude: homeLatitude,
-            home_longitude: homeLongitude,
-            home_address: homeAddress || null,
-            preferred_cuisines: selectedCuisines.length > 0 ? selectedCuisines : null,
-            preferred_vibes: selectedVibes.length > 0 ? selectedVibes : null,
-            preferred_price_range: selectedPriceRange.length > 0 ? selectedPriceRange : null,
-            preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
-            dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
-            preferred_activities: selectedActivities.length > 0 ? selectedActivities : null,
-            preferred_entertainment: selectedEntertainment.length > 0 ? selectedEntertainment : null,
-            preferred_duration: selectedDuration || null,
-            accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
-            preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
-          };
-
-          const { data: existingPreference, error: existingPreferenceError } = await supabase
-            .from('user_preferences')
-            .select('id')
-            .eq('user_id', currentUserId)
-            .maybeSingle();
-
-          if (existingPreferenceError) throw existingPreferenceError;
-
-          const preferenceMutation = existingPreference
-            ? await supabase
-                .from('user_preferences')
-                .update(preferencePayload)
-                .eq('user_id', currentUserId)
-            : await supabase
-                .from('user_preferences')
-                .insert(preferencePayload);
-
-          if (preferenceMutation.error) throw preferenceMutation.error;
-
-          // Initialize AI preference vectors from selections (cold-start solution)
-          try {
-            const { initializePreferenceVectors } = await import('@/services/preferenceInitService');
-            await initializePreferenceVectors(user.id, {
-              cuisines: selectedCuisines,
-              vibes: selectedVibes,
-              priceRange: selectedPriceRange,
-              times: selectedTimePreferences,
-              dietary: selectedDietary,
-              activities: selectedActivities,
-              venueTypes: selectedVenueTypes,
-            });
-          } catch (e) {
-            console.error('Failed to initialize preference vectors:', e);
-          }
-
-          // Award points for setting preferences
-          try {
-            const { awardPoints } = await import('@/services/awardPointsService');
-            await awardPoints('preferences_set');
-          } catch (e) {
-            console.error('Failed to award preferences points:', e);
-          }
-          
-          toast({
-            title: t('preferences.prefsSaved'),
-            description: t('preferences.prefsSavedDesc'),
-          });
-        } catch (error) {
-          console.error('Error saving preferences:', error);
-          toast({
-            variant: 'destructive',
-            title: t('preferences.prefsError'),
-            description: t('preferences.prefsErrorDesc'),
-          });
-        } finally {
-          setIsSaving(false);
-        }
-      }
-      
-      navigate(isOnboarding ? '/home' : '/friends');
-    } else {
-      nextStep();
-    }
-  };
-
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case 1: return t('preferences.foodAndVibe');
-      case 2: return t('preferences.budgetAndTiming');
-      case 3: return t('preferences.activities');
-      case 4: return t('preferences.specialNeeds');
-      case 5: return t('preferences.experiences');
-      default: return t('preferences.foodAndVibe');
-    }
-  };
-
-  const getStepIcon = () => {
-    switch (currentStep) {
-      case 1: return <Heart className="w-5 h-5" />;
-      case 2: return <Clock className="w-5 h-5" />;
-      case 3: return <Coffee className="w-5 h-5" />;
-      case 4: return <MapPin className="w-5 h-5" />;
-      case 5: return <Ticket className="w-5 h-5" />;
-      default: return <Heart className="w-5 h-5" />;
-    }
-  };
-
-  const isStepValid = () => {
-    switch (currentStep) {
-      case 1: return selectedCuisines.length > 0 || selectedVibes.length > 0;
-      case 2: return true; // Optional step
-      case 3: return true; // Optional step
-      case 4: return true; // Optional step
-      case 5: return true; // Optional step
-      default: return false;
-    }
-  };
-
-  // Render functions for each step
-  const renderStep1 = () => (
-    <>
-      {/* Quick Templates */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-foreground mb-2">{t('preferences.quickStart')}</h2>
-        <p className="text-muted-foreground mb-4">{t('preferences.orChooseTemplate')}</p>
-        <div className="grid grid-cols-1 gap-3">
-          {quickTemplates.map((template) => (
-            <button
-              type="button"
-              key={template.id}
-              onClick={() => applyQuickTemplate(template)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-4 rounded-xl border-2 border-border bg-card transition-none text-left select-none"
-            >
-              <div className="flex items-center gap-3">
-                <PrefIcon id={'template_' + template.id} size="lg" />
-                <div>
-                  <div className="font-semibold text-foreground">{template.title}</div>
-                  <div className="text-sm text-muted-foreground">{template.description}</div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Cuisine Selection */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatCraving')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.chooseCuisines')}</p>
-        
-        <div className="grid grid-cols-2 gap-3">
-          {cuisines.map((cuisine) => (
-            <button
-              type="button"
-              key={cuisine.id}
-              onClick={() => toggleSelection(cuisine.id, selectedCuisines, setSelectedCuisines)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <PrefIcon id={cuisine.id} />
-              <div className="font-medium text-sm">{cuisine.name}</div>
-              {selectedCuisines.includes(cuisine.id) && (
-                <Check className="w-4 h-4 mx-auto mt-1" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Vibe Selection */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatVibe')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.chooseAtmosphere')}</p>
-        
-        <div className="space-y-3">
-          {vibes.map((vibe) => (
-            <button
-              type="button"
-              key={vibe.id}
-              onClick={() => toggleSelection(vibe.id, selectedVibes, setSelectedVibes)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <div className="flex items-center gap-4">
-                <PrefIcon id={vibe.id} />
-                <div className="flex-1 text-left">
-                  <div className="font-semibold">{vibe.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {vibe.desc}
-                  </div>
-                </div>
-                {selectedVibes.includes(vibe.id) && (
-                  <Check className="w-5 h-5" />
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-
-  const renderStep2 = () => (
-    <>
-      {/* Price Range */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatBudget')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.selectPriceRange')}</p>
-        
-        <div className="space-y-3">
-          {priceRanges.map((price) => (
-            <button
-              type="button"
-              key={price.id}
-              onClick={() => toggleSelection(price.id, selectedPriceRange, setSelectedPriceRange)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <div className="flex items-center gap-4">
-                <PrefIcon id={price.id} />
-                <div className="flex-1 text-left">
-                  <div className="font-semibold">{price.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {price.desc}
-                  </div>
-                </div>
-                {selectedPriceRange.includes(price.id) && (
-                  <Check className="w-5 h-5" />
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Time Preferences */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whenBest')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.chooseTiming')}</p>
-        
-        <div className="grid grid-cols-2 gap-3">
-          {timePreferences.map((time) => (
-            <button
-              type="button"
-              key={time.id}
-              onClick={() => toggleSelection(time.id, selectedTimePreferences, setSelectedTimePreferences)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <PrefIcon id={time.id} />
-              <div className="font-medium text-sm">{time.name}</div>
-              <div className="text-xs text-muted-foreground">
-                {time.desc}
-              </div>
-              {selectedTimePreferences.includes(time.id) && (
-                <Check className="w-4 h-4 mx-auto mt-1" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Duration */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.howLong')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.chooseDuration')}</p>
-        
-        <div className="space-y-3">
-          {durations.map((duration) => (
-            <button
-              type="button"
-              key={duration.id}
-              onClick={() => toggleSingleSelection(duration.id, setSelectedDuration)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <div className="flex items-center gap-4">
-                <PrefIcon id={duration.id} />
-                <div className="flex-1 text-left">
-                  <div className="font-semibold">{duration.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {duration.desc}
-                  </div>
-                </div>
-                {selectedDuration === duration.id && (
-                  <Check className="w-5 h-5" />
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-
-  const renderStep3 = () => (
-    <>
-      {/* Activities */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatActivity')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.whatToDo')}</p>
-        
-        <div className="space-y-3">
-          {activities.map((activity) => (
-            <button
-              type="button"
-              key={activity.id}
-              onClick={() => toggleSelection(activity.id, selectedActivities, setSelectedActivities)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <div className="flex items-center gap-4">
-                <PrefIcon id={activity.id === 'cultural' ? 'cultural_act' : activity.id === 'nightlife' ? 'nightlife_act' : activity.id} />
-                <div className="flex-1 text-left">
-                  <div className="font-semibold">{activity.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {activity.desc}
-                  </div>
-                </div>
-                {selectedActivities.includes(activity.id) && (
-                  <Check className="w-5 h-5" />
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Entertainment */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.whatEntertainment')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.howEntertained')}</p>
-        
-        <div className="grid grid-cols-2 gap-3">
-          {entertainment.map((ent) => (
-            <button
-              type="button"
-              key={ent.id}
-              onClick={() => toggleSelection(ent.id, selectedEntertainment, setSelectedEntertainment)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <PrefIcon id={ent.id} />
-              <div className="font-medium text-sm">{ent.name}</div>
-              {selectedEntertainment.includes(ent.id) && (
-                <Check className="w-4 h-4 mx-auto mt-1" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-
-  const renderStep4 = () => (
-    <>
-      {/* Home Location */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.homeLocation')}</h2>
-        <p className="text-muted-foreground mb-4">{t('preferences.setDefaultLocation')}</p>
-        
-        {/* Use Current Location Button */}
-        <Button
-          onClick={useCurrentLocation}
-          disabled={isLocating}
-          variant="outline"
-          className="w-full mb-4 h-12 border-primary text-primary hover:bg-primary/10"
-        >
-          {isLocating ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              {t('preferences.gettingLocation')}
-            </>
-          ) : (
-            <>
-              <Navigation className="w-4 h-4 mr-2" />
-              {t('preferences.useCurrentLocation')}
-            </>
-          )}
-        </Button>
-        
-        {/* Manual Address Input */}
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder={t('preferences.enterAddress')}
-            value={homeAddress}
-            onChange={(e) => setHomeAddress(e.target.value)}
-            className="w-full h-12 pl-10"
-          />
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        </div>
-        
-        {/* Display Coordinates and Map if Set */}
-        {homeLatitude && homeLongitude && (
-          <>
-            <div className="mt-3 p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  <span className="text-sm text-green-800 dark:text-green-300">
-                    {t('preferences.locationSaved')} {homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}
-                  </span>
-                </div>
-                <Button
-                  onClick={clearHomeLocation}
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-            
-            {/* Map Preview */}
-            <div className="mt-4">
-              <Suspense fallback={<Skeleton className="h-[180px] w-full rounded-lg" />}>
-                <MapPreview 
-                  latitude={homeLatitude}
-                  longitude={homeLongitude}
-                  address={homeAddress}
-                  height="180px"
-                  zoom={14}
-                />
-              </Suspense>
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                {t('preferences.yourSavedLocation')}
-              </p>
-            </div>
-          </>
-        )}
-        
-        {/* Error Display */}
-        {locationError && (
-          <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
-            <p className="text-sm text-red-600 dark:text-red-400">{locationError}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Dietary Requirements */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.dietaryRequirements')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.letUsKnow')}</p>
-        
-        <div className="grid grid-cols-2 gap-3">
-          {dietaryRequirements.map((dietary) => (
-            <button
-              type="button"
-              key={dietary.id}
-              onClick={() => toggleSelection(dietary.id, selectedDietary, setSelectedDietary)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <PrefIcon id={dietary.id} />
-              <div className="font-medium text-sm">{dietary.name}</div>
-              {selectedDietary.includes(dietary.id) && (
-                <Check className="w-4 h-4 mx-auto mt-1" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Accessibility */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.specialNeedsTitle')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.accessibilityFeatures')}</p>
-        
-        <div className="space-y-3">
-          {accessibilityNeeds.map((access) => (
-            <button
-              type="button"
-              key={access.id}
-              onClick={() => toggleSelection(access.id, selectedAccessibility, setSelectedAccessibility)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="w-full p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <div className="flex items-center gap-4">
-                <PrefIcon id={access.id} />
-                <div className="font-semibold">{access.name}</div>
-                {selectedAccessibility.includes(access.id) && (
-                  <Check className="w-5 h-5 ml-auto" />
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-
-  const renderStep5 = () => (
-    <>
-      {/* Culture & Education */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.cultureAndEducation')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.cultureAndEducationDesc')}</p>
-        
-        <div className="grid grid-cols-2 gap-3">
-          {cultureVenues.map((venue) => (
-            <button
-              type="button"
-              key={venue.id}
-              onClick={() => toggleSelection(venue.id, selectedVenueTypes, setSelectedVenueTypes)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <PrefIcon id={venue.id} />
-              <div className="font-medium text-sm mt-1">{venue.name}</div>
-              {venue.desc && <div className="text-xs text-muted-foreground mt-0.5">{venue.desc}</div>}
-              {selectedVenueTypes.includes(venue.id) && (
-                <Check className="w-4 h-4 mx-auto mt-1" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Leisure & Sports */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.leisureAndSports')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.leisureAndSportsDesc')}</p>
-        
-        <div className="grid grid-cols-2 gap-3">
-          {leisureVenues.map((venue) => (
-            <button
-              type="button"
-              key={venue.id}
-              onClick={() => toggleSelection(venue.id, selectedVenueTypes, setSelectedVenueTypes)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <PrefIcon id={venue.id} />
-              <div className="font-medium text-sm mt-1">{venue.name}</div>
-              {venue.desc && <div className="text-xs text-muted-foreground mt-0.5">{venue.desc}</div>}
-              {selectedVenueTypes.includes(venue.id) && (
-                <Check className="w-4 h-4 mx-auto mt-1" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Entertainment */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{t('preferences.entertainmentVenues')}</h2>
-        <p className="text-muted-foreground mb-6">{t('preferences.entertainmentVenuesDesc')}</p>
-        
-        <div className="grid grid-cols-2 gap-3">
-          {entertainmentVenues.map((venue) => (
-            <button
-              type="button"
-              key={venue.id}
-              onClick={() => toggleSelection(venue.id, selectedVenueTypes, setSelectedVenueTypes)}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-              className="p-4 rounded-xl border-2 transition-none bg-card border-border text-foreground select-none"
-            >
-              <PrefIcon id={venue.id} />
-              <div className="font-medium text-sm mt-1">{venue.name}</div>
-              {venue.desc && <div className="text-xs text-muted-foreground mt-0.5">{venue.desc}</div>}
-              {selectedVenueTypes.includes(venue.id) && (
-                <Check className="w-4 h-4 mx-auto mt-1" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-
-  const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 1: return renderStep1();
-      case 2: return renderStep2();
-      case 3: return renderStep3();
-      case 4: return renderStep4();
-      case 5: return renderStep5();
-      default: return renderStep1();
-    }
-  };
+  const totalSelected = selectedCuisines.length + selectedVibes.length + selectedPriceRange.length +
+    selectedTimePreferences.length + (selectedDuration ? 1 : 0) + selectedActivities.length +
+    selectedEntertainment.length + selectedDietary.length + selectedAccessibility.length + selectedVenueTypes.length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 pt-12 bg-card shadow-sm">
-          <Button
-            onClick={currentStep === 1 ? () => navigate('/welcome') : prevStep}
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:bg-accent"
-          >
-            <ArrowLeft className="w-6 h-6" />
+        <div className="flex items-center gap-3 p-4 pt-12 bg-card shadow-sm sticky top-0 z-10">
+          <Button onClick={() => navigate(-1)} variant="ghost" size="icon" className="text-muted-foreground flex-shrink-0">
+            <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              {getStepIcon()}
-              <h1 className="text-xl font-semibold text-foreground">{getStepTitle()}</h1>
-            </div>
-            <p className="text-sm text-muted-foreground">{t('preferences.step', { current: currentStep, total: totalSteps })}</p>
-          </div>
-          <div className="w-10" />
-        </div>
-
-        {/* Progress Bar */}
-        <div className="px-6 mb-8 pt-4">
-          <div className="bg-muted rounded-full h-2">
-            <div 
-              className="bg-gradient-primary rounded-full h-2 transition-all duration-300" 
-              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="px-6 pb-8">
-          {/* Dynamic Step Content */}
-          {renderCurrentStep()}
-
-          {/* Navigation Buttons */}
-          <div className="flex gap-3">
-            {currentStep > 1 && (
-              <Button
-                onClick={prevStep}
-                variant="outline"
-                className="flex-1 h-12 border-primary text-primary hover:bg-primary/10"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {t('common.back')}
-              </Button>
+          <div className="flex-1">
+            <h1 className="text-lg font-semibold text-foreground">{t('preferences.title') || 'Deine Präferenzen'}</h1>
+            {totalSelected > 0 && (
+              <p className="text-xs text-muted-foreground">{totalSelected} ausgewählt</p>
             )}
-            
-            <Button
-              onClick={handleNext}
-              disabled={!isStepValid() || isSaving}
-              className={`h-12 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold disabled:opacity-50 ${
-                currentStep === 1 ? 'w-full' : 'flex-1'
-              }`}
-            >
-              {isSaving ? (
+          </div>
+        </div>
+
+        {/* Accordion Sections */}
+        <div className="px-4 py-5 space-y-3 pb-32">
+
+          {/* 1. Küche */}
+          <AccordionSection title={t('preferences.whatCraving') || 'Küche'} icon={<Heart className="w-5 h-5 text-pink-500" />} selectedCount={selectedCuisines.length} defaultOpen>
+            <SelectionGrid items={cuisines} selected={selectedCuisines} onToggle={(id) => toggleSelection(id, selectedCuisines, setSelectedCuisines)} />
+          </AccordionSection>
+
+          {/* 2. Vibe */}
+          <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length}>
+            <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
+          </AccordionSection>
+
+          {/* 3. Budget */}
+          <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length}>
+            <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
+          </AccordionSection>
+
+          {/* 4. Zeitpräferenz */}
+          <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
+            <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
+          </AccordionSection>
+
+          {/* 5. Dauer */}
+          <AccordionSection title={t('preferences.howLong') || 'Dauer'} icon={<Timer className="w-5 h-5 text-teal-500" />} selectedCount={selectedDuration ? 1 : 0}>
+            <SingleSelectionList items={durations} selected={selectedDuration} onToggle={(id) => toggleSingleSelection(id, setSelectedDuration)} />
+          </AccordionSection>
+
+          {/* 6. Aktivitäten */}
+          <AccordionSection title={t('preferences.whatActivity') || 'Aktivitäten'} icon={<Coffee className="w-5 h-5 text-orange-500" />} selectedCount={selectedActivities.length}>
+            <SelectionList items={activities} selected={selectedActivities} onToggle={(id) => toggleSelection(id, selectedActivities, setSelectedActivities)} iconMap={activityIconMap} />
+          </AccordionSection>
+
+          {/* 7. Entertainment */}
+          <AccordionSection title={t('preferences.whatEntertainment') || 'Entertainment'} icon={<Guitar className="w-5 h-5 text-red-500" />} selectedCount={selectedEntertainment.length}>
+            <SelectionGrid items={entertainment} selected={selectedEntertainment} onToggle={(id) => toggleSelection(id, selectedEntertainment, setSelectedEntertainment)} />
+          </AccordionSection>
+
+          {/* 8. Ernährung */}
+          <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
+            <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
+          </AccordionSection>
+
+          {/* 9. Barrierefreiheit */}
+          <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
+            <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
+          </AccordionSection>
+
+          {/* 10. Venue-Typen */}
+          <AccordionSection title={t('preferences.experiences') || 'Erlebnisse'} icon={<Ticket className="w-5 h-5 text-purple-500" />} selectedCount={selectedVenueTypes.length}>
+            <SelectionGrid items={allVenueTypes} selected={selectedVenueTypes} onToggle={(id) => toggleSelection(id, selectedVenueTypes, setSelectedVenueTypes)} columns={3} />
+          </AccordionSection>
+
+          {/* 11. Standort */}
+          <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0}>
+            <div className="space-y-3">
+              <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
+                {isLocating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.gettingLocation')}</> : <><Navigation className="w-4 h-4 mr-2" />{t('preferences.useCurrentLocation')}</>}
+              </Button>
+              <div className="relative">
+                <Input type="text" placeholder={t('preferences.enterAddress')} value={homeAddress} onChange={(e) => setHomeAddress(e.target.value)} className="w-full h-11 pl-9 text-sm" />
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              </div>
+              {homeLatitude && homeLongitude && (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {t('preferences.saving')}
+                  <div className="p-2.5 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <span className="text-xs text-green-800 dark:text-green-300">{homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}</span>
+                    </div>
+                    <Button onClick={clearHomeLocation} variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive h-7 w-7 p-0">
+                      <X className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                  <Suspense fallback={<Skeleton className="h-[140px] w-full rounded-lg" />}>
+                    <MapPreview latitude={homeLatitude} longitude={homeLongitude} address={homeAddress} height="140px" zoom={14} />
+                  </Suspense>
                 </>
-              ) : currentStep === totalSteps ? (
-                t('preferences.findDates')
-              ) : (
-                t('common.next')
               )}
-              {!isSaving && <ArrowRight className="w-4 h-4 ml-2" />}
+              {locationError && (
+                <div className="p-2.5 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
+                  <p className="text-xs text-red-600 dark:text-red-400">{locationError}</p>
+                </div>
+              )}
+            </div>
+          </AccordionSection>
+        </div>
+
+        {/* Sticky Save Button */}
+        <div className="fixed bottom-0 left-0 right-0 z-20 bg-background/80 backdrop-blur-lg border-t border-border p-4">
+          <div className="max-w-md mx-auto">
+            <Button onClick={handleSave} disabled={isSaving} className="w-full h-12 bg-primary text-primary-foreground font-semibold text-base">
+              {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.saving')}</> : <><Save className="w-4 h-4 mr-2" />{t('preferences.findDates') || 'Speichern & weiter'}</>}
             </Button>
           </div>
-
-          {/* Skip Option for Optional Steps */}
-          {currentStep > 1 && (
-            <div className="text-center mt-4">
-              <Button
-                onClick={handleNext}
-                variant="ghost"
-                className="text-muted-foreground hover:text-foreground"
-                disabled={isSaving}
-              >
-                {t('preferences.skipStep')}
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     </div>
