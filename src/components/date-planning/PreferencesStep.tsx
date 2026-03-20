@@ -828,46 +828,52 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   return (
     <SafeComponent>
       <Card>
-        <CardHeader className="px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
-          <div className="space-y-3 md:space-y-0 md:flex md:items-center md:justify-between">
-            <CardTitle className="flex flex-wrap items-center gap-2 text-lg md:text-xl">
-              {getStepIcon()}
-              <span className="font-bold">{getStepTitle()}</span>
-              {planningMode === 'collaborative' && status.userCompleted && (
-                <Badge variant="secondary" className="text-xs">
-                  <CheckCircle className="w-3 h-3 mr-1" /> Saved
-                </Badge>
-              )}
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">Step {currentStep} / {totalSteps}</Badge>
-              {planningMode === 'collaborative' && (
-                <div className="flex items-center gap-1">
-                  <div className={cn("w-2 h-2 rounded-full", status.userCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
-                  <div className={cn("w-2 h-2 rounded-full", status.partnerCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
-                </div>
-              )}
+        {currentStep > 0 && (
+          <CardHeader className="px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
+            <div className="space-y-3 md:space-y-0 md:flex md:items-center md:justify-between">
+              <CardTitle className="flex flex-wrap items-center gap-2 text-lg md:text-xl">
+                {getStepIcon()}
+                <span className="font-bold">{getStepTitle()}</span>
+                {planningMode === 'collaborative' && status.userCompleted && (
+                  <Badge variant="secondary" className="text-xs">
+                    <CheckCircle className="w-3 h-3 mr-1" /> Saved
+                  </Badge>
+                )}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">Step {currentStep} / {totalSteps}</Badge>
+                {planningMode === 'collaborative' && (
+                  <div className="flex items-center gap-1">
+                    <div className={cn("w-2 h-2 rounded-full", status.userCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
+                    <div className={cn("w-2 h-2 rounded-full", status.partnerCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </CardHeader>
+          </CardHeader>
+        )}
         <CardContent className="px-4 md:px-6 pb-4 md:pb-6 space-y-4 md:space-y-6">
+          {currentStep === 0 && renderConfirmationStep()}
           {currentStep === 1 && renderCombinedStep()}
           {currentStep === 2 && renderConfirmStep()}
 
-          <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
-            <Button onClick={prevStep} variant="outline" disabled={currentStep === 1} className="w-full sm:w-auto">
-              Zurück
-            </Button>
-            
-            {currentStep < totalSteps ? (
-              <Button onClick={nextStep} disabled={currentStep === 1 && !selectedDuration} className="w-full sm:w-auto">
-                Weiter
+          {currentStep > 0 && (
+            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
+              <Button onClick={prevStep} variant="outline" disabled={currentStep === 1 && !onboardingPrefs} className="w-full sm:w-auto">
+                Zurück
               </Button>
-            ) : (
-              <Button onClick={submitPreferences} disabled={loading} className="w-full sm:w-auto">
-                {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</>) : '🚀 Los geht\'s'}
-              </Button>
-            )}
+              
+              {currentStep < totalSteps ? (
+                <Button onClick={nextStep} disabled={currentStep === 1 && !selectedDuration} className="w-full sm:w-auto">
+                  Weiter
+                </Button>
+              ) : (
+                <Button onClick={submitPreferences} disabled={loading} className="w-full sm:w-auto">
+                  {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</>) : '🚀 Los geht\'s'}
+                </Button>
+              )}
+            </div>
+          )}
           </div>
         </CardContent>
       </Card>
