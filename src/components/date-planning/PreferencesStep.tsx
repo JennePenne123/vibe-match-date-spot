@@ -442,18 +442,16 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   const getStepTitle = () => {
     switch (currentStep) {
-      case 1: return 'Zeitmodell';
-      case 2: return 'Essen, Vibe & Budget';
-      case 3: return 'Wann & Los';
+      case 1: return 'Dein Date planen';
+      case 2: return 'Wann & Los';
       default: return 'Preferences';
     }
   };
 
   const getStepIcon = () => {
     switch (currentStep) {
-      case 1: return <Clock className="w-5 h-5" />;
-      case 2: return <Heart className="w-5 h-5" />;
-      case 3: return <CalendarIcon className="w-5 h-5" />;
+      case 1: return <Heart className="w-5 h-5" />;
+      case 2: return <CalendarIcon className="w-5 h-5" />;
       default: return <Heart className="w-5 h-5" />;
     }
   };
