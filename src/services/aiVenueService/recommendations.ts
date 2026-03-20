@@ -186,12 +186,21 @@ export const getAIVenueRecommendations = async (
     const sortedRecommendations = recommendations
       .sort((a, b) => b.ai_score - a.ai_score);
 
+    // Quality gate: Top 3 must have ≥75% match score
+    // Venues below threshold are demoted out of the top 3
+    const MIN_TOP3_SCORE = 0.75;
+    const qualifiedTop3 = sortedRecommendations.filter(r => r.ai_score >= MIN_TOP3_SCORE);
+    const belowThreshold = sortedRecommendations.filter(r => r.ai_score < MIN_TOP3_SCORE);
+    
+    // Rebuild: qualified venues first (sorted by score), then the rest
+    const qualitySorted = [...qualifiedTop3, ...belowThreshold];
+
     // Diversity: limit max 3 venues per cuisine_type to avoid monotony
     const diverseRecommendations: AIVenueRecommendation[] = [];
     const cuisineCount: Record<string, number> = {};
     const MAX_PER_CUISINE = 3;
 
-    for (const rec of sortedRecommendations) {
+    for (const rec of qualitySorted) {
       const cuisine = (rec.cuisine_type || 'Other').toLowerCase();
       cuisineCount[cuisine] = (cuisineCount[cuisine] || 0) + 1;
       if (cuisineCount[cuisine] <= MAX_PER_CUISINE) {
@@ -202,13 +211,16 @@ export const getAIVenueRecommendations = async (
 
     // If diversity filter removed too many, backfill from remaining
     if (diverseRecommendations.length < limit) {
-      for (const rec of sortedRecommendations) {
+      for (const rec of qualitySorted) {
         if (!diverseRecommendations.includes(rec)) {
           diverseRecommendations.push(rec);
         }
         if (diverseRecommendations.length >= limit) break;
       }
     }
+
+    console.log(`🏆 TOP 3 QUALITY: ${qualifiedTop3.slice(0, 3).length}/3 venues meet ≥75% threshold`, 
+      qualifiedTop3.slice(0, 3).map(r => `${r.venue_name}: ${Math.round(r.ai_score * 100)}%`));
 
     return validateRecommendations(diverseRecommendations);
   } catch (error) {
