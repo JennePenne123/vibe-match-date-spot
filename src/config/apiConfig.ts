@@ -45,6 +45,7 @@ export const API_CONFIG = {
   maxRadarCallsPerDay: 3000,     // Well within 100K/month free tier
   maxFoursquareCallsPerDay: 150, // Conservative for 200/day free tier
   maxGooglePlacesCallsPerDay: 100, // Limited fallback for niche venues (~$1.70/day max)
+  maxTripAdvisorCallsPerDay: 100,  // Free tier: 5000/month ≈ ~166/day
   
   // AI Enhancement
   aiEnhancementEnabled: false,
