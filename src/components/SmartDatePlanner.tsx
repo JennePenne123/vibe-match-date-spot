@@ -9,6 +9,7 @@ import PlanTogether from '@/components/date-planning/PlanTogether';
 import InvitationCreation from '@/components/date-planning/InvitationCreation';
 import PlanningHeader from '@/components/date-planning/PlanningHeader';
 import PreferencesStep from '@/components/date-planning/PreferencesStep';
+import PartnerSelection from '@/components/date-planning/PartnerSelection';
 
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
 import { createSmartDatePlannerHandlers } from '@/components/smart-date-planner/SmartDatePlannerHandlers';
