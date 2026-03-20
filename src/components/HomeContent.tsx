@@ -181,7 +181,7 @@ const HomeContent: React.FC = () => {
               className="mt-4 w-full sm:w-auto shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300 gap-2"
             >
               <ArrowRight className="w-4 h-4" />
-              Date planen
+              {t('home.heroCta')}
             </Button>
             <button
               onClick={handleGroupPlanning}
