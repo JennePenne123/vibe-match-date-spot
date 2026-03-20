@@ -10,6 +10,7 @@ export const API_CONFIG = {
   useRadar: true,          // Primary search (100K free calls/month)
   useFoursquare: true,     // Enrichment: photos, tips, ratings
   useGooglePlaces: true,   // Enabled as fallback for niche venue types (museums, bowling, etc.)
+  useTripAdvisor: true,    // Enrichment: TripAdvisor reviews
   
   // Search strategy
   venueSearchStrategy: 'radar-foursquare' as VenueSearchStrategy,
@@ -34,6 +35,7 @@ export const API_CONFIG = {
   radarTimeout: 10000,
   foursquareTimeout: 10000,
   googlePlacesTimeout: 10000,
+  tripAdvisorTimeout: 10000,
   
   // Fallback behavior
   requireAtLeastOneSource: true,
@@ -43,6 +45,7 @@ export const API_CONFIG = {
   maxRadarCallsPerDay: 3000,     // Well within 100K/month free tier
   maxFoursquareCallsPerDay: 150, // Conservative for 200/day free tier
   maxGooglePlacesCallsPerDay: 100, // Limited fallback for niche venues (~$1.70/day max)
+  maxTripAdvisorCallsPerDay: 100,  // Free tier: 5000/month ≈ ~166/day
   
   // AI Enhancement
   aiEnhancementEnabled: false,
