@@ -59,36 +59,12 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   // Use session partner as the preselected friend
   const effectivePreselectedFriend = sessionPartner;
   
-  console.log('🔍 SmartDatePlanner - Session and Partner Debug:', {
-    fromProposal,
-    sessionId,
-    hasCollaborativeSession: !!collaborativeSession,
-    collaborativeSession: collaborativeSession ? {
-      id: collaborativeSession.id,
-      initiator_id: collaborativeSession.initiator_id,
-      partner_id: collaborativeSession.partner_id,
-      both_preferences_complete: collaborativeSession.both_preferences_complete
-    } : null,
-    isUserInitiator,
-    sessionPartner,
-    effectivePreselectedFriend,
-    allFriendsCount: allFriends.length
-  });
-  
   const state = useSmartDatePlannerState({ 
     preselectedFriend: effectivePreselectedFriend,
-    planningMode: 'collaborative', // Force collaborative mode only
+    planningMode: 'collaborative',
     sessionId
   });
-  
-  console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
-  console.log('🔍 SmartDatePlanner - RENDER STATE CHECK:', {
-    currentStep: state.currentStep,
-    hasVenueRecommendations: !!(state.venueRecommendations && state.venueRecommendations.length > 0),
-    venueCount: state.venueRecommendations?.length || 0,
-    aiAnalyzing: state.aiAnalyzing,
-    compatibilityScore: state.compatibilityScore
-  });
+
   const handlers = createSmartDatePlannerHandlers({
     ...state,
     collaborativeSession,
