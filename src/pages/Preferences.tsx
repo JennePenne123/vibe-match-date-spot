@@ -505,9 +505,6 @@ const Preferences = () => {
                 <SelectionGrid items={cuisines} selected={selectedCuisines} onToggle={(id) => toggleSelection(id, selectedCuisines, setSelectedCuisines)} />
               </AccordionSection>
 
-              <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length}>
-                <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
-              </AccordionSection>
 
               <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
                 <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
@@ -539,7 +536,11 @@ const Preferences = () => {
           {/* Step 3: Praktisches */}
           {step === 2 && (
             <>
-              <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length} defaultOpen>
+              <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length} defaultOpen>
+                <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
+              </AccordionSection>
+
+              <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
                 <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
               </AccordionSection>
 
