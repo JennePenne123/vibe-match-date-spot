@@ -756,7 +756,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           <CollaborativeWaitingState
             partnerName={partnerName} sessionId={sessionId}
             hasPartnerSetPreferences={status.partnerCompleted} isWaitingForPartner
-            hasCurrentUserSetPreferences={status.userCompleted} currentUserName={user?.user_metadata?.name || 'Du'}
+            hasCurrentUserSetPreferences={status.userCompleted} currentUserName={user?.name || 'Du'}
           />
           <Card className="border-primary/20">
             <CardContent className="p-4">

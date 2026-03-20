@@ -117,7 +117,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   };
 
   if (friendsError || datePlanningError || planningStepsError) {
-    return <SmartDatePlannerError friendsError={friendsError} datePlanningError={dataPlanningError} planningStepsError={planningStepsError} onBackToHome={() => navigate('/home')} />;
+    return <SmartDatePlannerError friendsError={friendsError} datePlanningError={datePlanningError} planningStepsError={planningStepsError} onBackToHome={() => navigate('/home')} />;
   }
 
   if (!user) {
