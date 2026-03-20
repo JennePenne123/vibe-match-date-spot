@@ -90,11 +90,10 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const { user } = useAuth();
   
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0); // 0 = confirm onboarding prefs, 1 = customize, 2 = date/time
+  const [currentStep, setCurrentStep] = useState(0); // 0 = confirm onboarding prefs, 1 = all-in-one preferences
   const [hasCompletedAllSteps, setHasCompletedAllSteps] = useState(false);
   const [onboardingPrefs, setOnboardingPrefs] = useState<UserPreferences | null>(null);
   const [onboardingLoaded, setOnboardingLoaded] = useState(false);
-  const totalSteps = 2;
   
   // Duration model state
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
@@ -453,46 +452,23 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   // ── Navigation ────────────────────────────────────────────────────
 
-  const nextStep = () => {
-    if (currentStep === 1 && !selectedDuration) {
-      toast({ title: 'Zeitmodell wählen', description: 'Bitte wähle zuerst, wie viel Zeit du dir nehmen möchtest.', variant: 'destructive' });
-      return;
-    }
-    if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      // If going back from customize and onboarding prefs exist, go to confirmation
-      if (currentStep === 1 && onboardingPrefs) {
-        setCurrentStep(0);
-      } else if (currentStep > 1) {
-        setCurrentStep(currentStep - 1);
-      }
-    }
-  };
-
   const handleKeepPreferences = () => {
     if (!onboardingPrefs) return;
-    // Auto-fill all selections from onboarding
     setSelectedCuisines(onboardingPrefs.preferred_cuisines);
     setSelectedVibes(onboardingPrefs.preferred_vibes);
     setSelectedPriceRange(onboardingPrefs.preferred_price_range);
     setSelectedTimePreferences(onboardingPrefs.preferred_times);
     setMaxDistance(onboardingPrefs.max_distance);
     setSelectedDietary(onboardingPrefs.dietary_restrictions);
-    // Auto-select a matching duration model
     const times = onboardingPrefs.preferred_times;
     if (times.includes('evening') || times.includes('night')) setSelectedDuration('evening');
     else if (times.includes('morning') || times.includes('lunch')) setSelectedDuration('relaxed');
     else setSelectedDuration('relaxed');
-    // Skip to date/time step
-    setCurrentStep(2);
-    toast({ title: 'Vorlieben übernommen!', description: 'Wähle jetzt noch Datum & Uhrzeit.' });
+    setCurrentStep(1);
+    toast({ title: 'Vorlieben übernommen!', description: 'Passe sie an oder starte direkt.' });
   };
 
   const handleCustomize = () => {
-    // Pre-fill with onboarding data but let user modify
     if (onboardingPrefs) {
       setSelectedCuisines(onboardingPrefs.preferred_cuisines);
       setSelectedVibes(onboardingPrefs.preferred_vibes);
@@ -508,7 +484,6 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     switch (currentStep) {
       case 0: return 'Deine Vorlieben';
       case 1: return 'Dein Date planen';
-      case 2: return 'Wann & Los';
       default: return 'Preferences';
     }
   };
@@ -517,7 +492,6 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     switch (currentStep) {
       case 0: return <Sparkles className="w-5 h-5" />;
       case 1: return <Heart className="w-5 h-5" />;
-      case 2: return <CalendarIcon className="w-5 h-5" />;
       default: return <Heart className="w-5 h-5" />;
     }
   };
@@ -619,7 +593,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   };
 
 
-  const renderCombinedStep = () => (
+  const renderAllInOnePage = () => (
     <div className="space-y-6">
       {/* Duration Models */}
       <div>
@@ -717,11 +691,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           </div>
         </>
       )}
-    </div>
-  );
 
-  const renderConfirmStep = () => (
-    <div className="space-y-6">
       {/* Date & Time */}
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Wann geht's los?</h3>
@@ -768,23 +738,6 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         {renderChipGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times')}
       </div>
 
-      {/* Selection summary */}
-      {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
-        <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">Deine Auswahl</p>
-          <div className="flex flex-wrap gap-1.5">
-            {selectedDuration && (
-              <Badge variant="outline" className="text-xs">
-                {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
-              </Badge>
-            )}
-            {selectedCuisines.map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {c}</Badge>)}
-            {selectedVibes.map(v => <Badge key={v} variant="outline" className="text-xs">{allVibes.find(x => x.id === v)?.emoji} {v}</Badge>)}
-            {selectedPriceRange.map(p => <Badge key={p} variant="outline" className="text-xs">{p}</Badge>)}
-          </div>
-        </div>
-      )}
-
       {/* Advanced Options */}
       <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
         <CollapsibleTrigger asChild>
@@ -807,6 +760,23 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           </div>
         </CollapsibleContent>
       </Collapsible>
+
+      {/* Selection summary */}
+      {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
+        <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Deine Auswahl</p>
+          <div className="flex flex-wrap gap-1.5">
+            {selectedDuration && (
+              <Badge variant="outline" className="text-xs">
+                {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
+              </Badge>
+            )}
+            {selectedCuisines.map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {c}</Badge>)}
+            {selectedVibes.map(v => <Badge key={v} variant="outline" className="text-xs">{allVibes.find(x => x.id === v)?.emoji} {v}</Badge>)}
+            {selectedPriceRange.map(p => <Badge key={p} variant="outline" className="text-xs">{p}</Badge>)}
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -840,38 +810,30 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                   </Badge>
                 )}
               </CardTitle>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">Step {currentStep} / {totalSteps}</Badge>
-                {planningMode === 'collaborative' && (
-                  <div className="flex items-center gap-1">
-                    <div className={cn("w-2 h-2 rounded-full", status.userCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
-                    <div className={cn("w-2 h-2 rounded-full", status.partnerCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
-                  </div>
-                )}
-              </div>
+              {planningMode === 'collaborative' && (
+                <div className="flex items-center gap-1">
+                  <div className={cn("w-2 h-2 rounded-full", status.userCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
+                  <div className={cn("w-2 h-2 rounded-full", status.partnerCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
+                </div>
+              )}
             </div>
           </CardHeader>
         )}
         <CardContent className="px-4 md:px-6 pb-4 md:pb-6 space-y-4 md:space-y-6">
           {currentStep === 0 && renderConfirmationStep()}
-          {currentStep === 1 && renderCombinedStep()}
-          {currentStep === 2 && renderConfirmStep()}
+          {currentStep === 1 && renderAllInOnePage()}
 
-          {currentStep > 0 && (
+          {currentStep === 1 && (
             <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
-              <Button onClick={prevStep} variant="outline" disabled={currentStep === 1 && !onboardingPrefs} className="w-full sm:w-auto">
-                Zurück
-              </Button>
+              {onboardingPrefs ? (
+                <Button onClick={() => setCurrentStep(0)} variant="outline" className="w-full sm:w-auto">
+                  Zurück
+                </Button>
+              ) : <div />}
               
-              {currentStep < totalSteps ? (
-                <Button onClick={nextStep} disabled={currentStep === 1 && !selectedDuration} className="w-full sm:w-auto">
-                  Weiter
-                </Button>
-              ) : (
-                <Button onClick={submitPreferences} disabled={loading} className="w-full sm:w-auto">
-                  {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</>) : '🚀 Los geht\'s'}
-                </Button>
-              )}
+              <Button onClick={submitPreferences} disabled={loading || !selectedDuration} className="w-full sm:w-auto">
+                {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</>) : '🚀 Los geht\'s'}
+              </Button>
             </div>
           )}
         </CardContent>
