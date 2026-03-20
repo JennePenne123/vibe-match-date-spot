@@ -461,10 +461,52 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
   };
 
-  const prevStep = () => { if (currentStep > 1) setCurrentStep(currentStep - 1); };
+  const prevStep = () => {
+    if (currentStep > 0) {
+      // If going back from customize and onboarding prefs exist, go to confirmation
+      if (currentStep === 1 && onboardingPrefs) {
+        setCurrentStep(0);
+      } else if (currentStep > 1) {
+        setCurrentStep(currentStep - 1);
+      }
+    }
+  };
+
+  const handleKeepPreferences = () => {
+    if (!onboardingPrefs) return;
+    // Auto-fill all selections from onboarding
+    setSelectedCuisines(onboardingPrefs.preferred_cuisines);
+    setSelectedVibes(onboardingPrefs.preferred_vibes);
+    setSelectedPriceRange(onboardingPrefs.preferred_price_range);
+    setSelectedTimePreferences(onboardingPrefs.preferred_times);
+    setMaxDistance(onboardingPrefs.max_distance);
+    setSelectedDietary(onboardingPrefs.dietary_restrictions);
+    // Auto-select a matching duration model
+    const times = onboardingPrefs.preferred_times;
+    if (times.includes('evening') || times.includes('night')) setSelectedDuration('evening');
+    else if (times.includes('morning') || times.includes('lunch')) setSelectedDuration('relaxed');
+    else setSelectedDuration('relaxed');
+    // Skip to date/time step
+    setCurrentStep(2);
+    toast({ title: 'Vorlieben übernommen!', description: 'Wähle jetzt noch Datum & Uhrzeit.' });
+  };
+
+  const handleCustomize = () => {
+    // Pre-fill with onboarding data but let user modify
+    if (onboardingPrefs) {
+      setSelectedCuisines(onboardingPrefs.preferred_cuisines);
+      setSelectedVibes(onboardingPrefs.preferred_vibes);
+      setSelectedPriceRange(onboardingPrefs.preferred_price_range);
+      setSelectedTimePreferences(onboardingPrefs.preferred_times);
+      setMaxDistance(onboardingPrefs.max_distance);
+      setSelectedDietary(onboardingPrefs.dietary_restrictions);
+    }
+    setCurrentStep(1);
+  };
 
   const getStepTitle = () => {
     switch (currentStep) {
+      case 0: return 'Deine Vorlieben';
       case 1: return 'Dein Date planen';
       case 2: return 'Wann & Los';
       default: return 'Preferences';
@@ -473,6 +515,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   const getStepIcon = () => {
     switch (currentStep) {
+      case 0: return <Sparkles className="w-5 h-5" />;
       case 1: return <Heart className="w-5 h-5" />;
       case 2: return <CalendarIcon className="w-5 h-5" />;
       default: return <Heart className="w-5 h-5" />;
