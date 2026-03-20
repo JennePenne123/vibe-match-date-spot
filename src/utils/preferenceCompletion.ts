@@ -12,6 +12,8 @@ type PreferenceSnapshot = {
   preferred_times?: string[] | null;
   preferred_venue_types?: string[] | null;
   preferred_vibes?: string[] | null;
+  personality_traits?: Record<string, number> | null;
+  relationship_goal?: string | null;
 };
 
 const hasSelections = (value?: string[] | null) => Array.isArray(value) && value.length > 0;
@@ -37,6 +39,8 @@ export const hasCompletedPreferenceSetup = (preferences: PreferenceSnapshot | nu
     hasSelections(preferences.accessibility_needs) ||
     hasSelections(preferences.preferred_venue_types) ||
     Boolean(preferences.preferred_duration) ||
-    hasSavedLocation(preferences)
+    hasSavedLocation(preferences) ||
+    Boolean(preferences.personality_traits) ||
+    Boolean(preferences.relationship_goal)
   );
 };
