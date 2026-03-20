@@ -57,8 +57,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     return partner ? { id: partner.id, name: partner.name } : null;
   }, [collaborativeSession, allFriends, isUserInitiator]);
   
-  // Use session partner as the preselected friend
-  const effectivePreselectedFriend = sessionPartner;
+  // Use session partner as the preselected friend, but support direct plan-date entry too
+  const effectivePreselectedFriend = sessionPartner ?? preselectedFriend;
   
   const state = useSmartDatePlannerState({ 
     preselectedFriend: effectivePreselectedFriend,

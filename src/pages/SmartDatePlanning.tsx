@@ -172,7 +172,11 @@ const SmartDatePlanning: React.FC = () => {
           )}
           
           <ErrorBoundary level="component" silent={true}>
-            <SmartDatePlanner sessionId={sessionId} fromProposal={fromProposal} />
+            <SmartDatePlanner
+              sessionId={sessionId ?? ''}
+              fromProposal={isProposalFlow}
+              preselectedFriend={preselectedFriend}
+            />
           </ErrorBoundary>
         </div>
       </div>
