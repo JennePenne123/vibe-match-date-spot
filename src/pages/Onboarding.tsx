@@ -1,237 +1,292 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+
+import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
+import PersonalitySliders, { type PersonalityTraits } from '@/components/onboarding/PersonalitySliders';
+import RelationshipGoal from '@/components/onboarding/RelationshipGoal';
+import LifestylePicks, { type LifestyleData } from '@/components/onboarding/LifestylePicks';
+import ExperienceScenarios, { type ScenarioAnswers, scenarios } from '@/components/onboarding/ExperienceScenarios';
+import FoodVibeQuickPick from '@/components/onboarding/FoodVibeQuickPick';
 
 import onboarding1 from '@/assets/onboarding-1.png';
-import onboarding2 from '@/assets/onboarding-2.png';
-import onboarding3 from '@/assets/onboarding-3.png';
 
-const SWIPE_THRESHOLD = 50;
-const TRANSITION_MS = 400;
-
-const screens = [
-  {
-    titleKey: 'onboarding.screen1Title',
-    descKey: 'onboarding.screen1Desc',
-    image: onboarding1,
-    gradient: 'from-pink-500/30 via-rose-500/20 to-violet-500/30',
-    ring: 'ring-pink-400/30',
-    accentGradient: 'from-pink-400 to-rose-500',
-  },
-  {
-    titleKey: 'onboarding.screen2Title',
-    descKey: 'onboarding.screen2Desc',
-    image: onboarding2,
-    gradient: 'from-indigo-500/30 via-blue-500/20 to-purple-500/30',
-    ring: 'ring-indigo-400/30',
-    accentGradient: 'from-indigo-400 to-purple-500',
-  },
-  {
-    titleKey: 'onboarding.screen3Title',
-    descKey: 'onboarding.screen3Desc',
-    image: onboarding3,
-    gradient: 'from-violet-500/30 via-purple-500/20 to-indigo-500/30',
-    ring: 'ring-violet-400/30',
-    accentGradient: 'from-violet-400 to-indigo-500',
-  },
-];
+const TOTAL_STEPS = 5;
 
 const Onboarding = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
-  const [currentScreen, setCurrentScreen] = useState(0);
-  const [dragOffset, setDragOffset] = useState(0);
+  const { user } = useAuth();
+  const [step, setStep] = useState(0); // 0 = welcome, 1-5 = steps
   const [isAnimating, setIsAnimating] = useState(false);
-  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const touchStartX = useRef(0);
-  const isDragging = useRef(false);
-  const isHorizontalSwipe = useRef<boolean | null>(null);
+  // Step 1: Personality
+  const [personality, setPersonality] = useState<PersonalityTraits>({
+    spontaneity: 50, adventure: 50, social_energy: 50,
+  });
 
-  const goTo = useCallback((index: number, direction: 'left' | 'right') => {
+  // Step 2: Relationship Goal
+  const [relationshipGoal, setRelationshipGoal] = useState('');
+
+  // Step 3: Lifestyle
+  const [lifestyle, setLifestyle] = useState<LifestyleData>({
+    chronotype: '', budget_style: '', mobility: '',
+  });
+
+  // Step 4: Scenarios
+  const [scenarioAnswers, setScenarioAnswers] = useState<ScenarioAnswers>({});
+
+  // Step 5: Food & Vibes
+  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+  const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
+
+  const animateTransition = useCallback((nextStep: number) => {
     if (isAnimating) return;
-    setSlideDirection(direction);
     setIsAnimating(true);
     setTimeout(() => {
-      setCurrentScreen(index);
-      setSlideDirection(null);
+      setStep(nextStep);
       setIsAnimating(false);
-    }, TRANSITION_MS);
+    }, 250);
   }, [isAnimating]);
 
+  const derivePreferencesFromScenarios = (): { vibes: string[]; activities: string[] } => {
+    const derivedVibes = new Set<string>();
+    const derivedActivities = new Set<string>();
+
+    for (const scenario of scenarios) {
+      const choice = scenarioAnswers[scenario.id];
+      if (!choice) continue;
+      const opt = choice === 'a' ? scenario.optionA : scenario.optionB;
+      opt.tags.forEach((tag) => {
+        if (['romantic', 'casual', 'outdoor', 'nightlife', 'cultural', 'adventurous'].includes(tag)) {
+          derivedVibes.add(tag);
+        } else {
+          derivedActivities.add(tag);
+        }
+      });
+    }
+
+    return { vibes: Array.from(derivedVibes), activities: Array.from(derivedActivities) };
+  };
+
+  const handleFinish = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+
+    try {
+      const { vibes: scenarioVibes, activities: scenarioActivities } = derivePreferencesFromScenarios();
+
+      // Merge scenario-derived vibes with explicitly selected vibes
+      const mergedVibes = Array.from(new Set([...selectedVibes, ...scenarioVibes]));
+      const mergedActivities = Array.from(new Set(scenarioActivities));
+
+      // Map lifestyle budget to price range
+      const priceRangeMap: Record<string, string[]> = {
+        saver: ['budget'],
+        balanced: ['budget', 'moderate'],
+        spender: ['moderate', 'upscale', 'luxury'],
+      };
+      const derivedPriceRange = priceRangeMap[lifestyle.budget_style] || ['moderate'];
+
+      // Map chronotype to preferred times
+      const timeMap: Record<string, string[]> = {
+        morning: ['brunch', 'lunch', 'afternoon'],
+        evening: ['dinner', 'evening'],
+      };
+      const derivedTimes = timeMap[lifestyle.chronotype] || ['flexible'];
+
+      if (user) {
+        const currentUserId = user.id;
+
+        const preferencePayload = {
+          user_id: currentUserId,
+          preferred_cuisines: selectedCuisines.length > 0 ? selectedCuisines : null,
+          preferred_vibes: mergedVibes.length > 0 ? mergedVibes : null,
+          preferred_price_range: derivedPriceRange,
+          preferred_times: derivedTimes,
+          preferred_activities: mergedActivities.length > 0 ? mergedActivities : null,
+          personality_traits: personality,
+          relationship_goal: relationshipGoal || null,
+          lifestyle_data: lifestyle,
+        };
+
+        // Upsert preference (select → update/insert pattern per memory)
+        const { data: existing } = await supabase
+          .from('user_preferences')
+          .select('id')
+          .eq('user_id', currentUserId)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase
+            .from('user_preferences')
+            .update(preferencePayload)
+            .eq('user_id', currentUserId);
+        } else {
+          await supabase
+            .from('user_preferences')
+            .insert(preferencePayload);
+        }
+
+        // Initialize AI preference vectors
+        try {
+          const { initializePreferenceVectors } = await import('@/services/preferenceInitService');
+          await initializePreferenceVectors(currentUserId, {
+            cuisines: selectedCuisines,
+            vibes: mergedVibes,
+            priceRange: derivedPriceRange,
+            times: derivedTimes,
+            dietary: [],
+            activities: mergedActivities,
+          });
+        } catch (e) {
+          console.error('Failed to init vectors:', e);
+        }
+
+        // Award points
+        try {
+          const { awardPoints } = await import('@/services/awardPointsService');
+          await awardPoints('preferences_set');
+        } catch (e) {
+          console.error('Failed to award points:', e);
+        }
+      }
+
+      navigate('/mood', { replace: true });
+    } catch (error) {
+      console.error('Error saving onboarding data:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Fehler beim Speichern',
+        description: 'Bitte versuche es erneut.',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleNext = () => {
-    if (currentScreen < screens.length - 1) goTo(currentScreen + 1, 'left');
-    else navigate('/?auth=required');
-  };
-  const handlePrevious = () => {
-    if (currentScreen > 0) goTo(currentScreen - 1, 'right');
-  };
-  const handleSkip = () => navigate('/?auth=required');
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    if (isAnimating) return;
-    touchStartX.current = e.touches[0].clientX;
-    isDragging.current = true;
-    isHorizontalSwipe.current = null;
-  };
-  const onTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging.current || isAnimating) return;
-    const dx = e.touches[0].clientX - touchStartX.current;
-    const dy = e.touches[0].clientY - (e.touches[0].clientY); // simplified
-    if (isHorizontalSwipe.current === null && Math.abs(dx) > 8) {
-      isHorizontalSwipe.current = true;
+    if (step === TOTAL_STEPS) {
+      handleFinish();
+    } else {
+      animateTransition(step + 1);
     }
-    if (!isHorizontalSwipe.current) return;
-    const atEdge = (dx > 0 && currentScreen === 0) || (dx < 0 && currentScreen === screens.length - 1);
-    setDragOffset(atEdge ? dx * 0.25 : dx);
-  };
-  const onTouchEnd = () => {
-    if (!isDragging.current) return;
-    isDragging.current = false;
-    if (Math.abs(dragOffset) > SWIPE_THRESHOLD) {
-      if (dragOffset < 0 && currentScreen < screens.length - 1) goTo(currentScreen + 1, 'left');
-      else if (dragOffset > 0 && currentScreen > 0) goTo(currentScreen - 1, 'right');
-      else if (dragOffset < 0 && currentScreen === screens.length - 1) navigate('/?auth=required');
-    }
-    setDragOffset(0);
   };
 
-  const currentScreenData = screens[currentScreen];
+  const handleBack = () => {
+    if (step > 0) animateTransition(step - 1);
+  };
 
-  const getSlideStyle = (): React.CSSProperties => {
-    if (dragOffset !== 0) return { transform: `translateX(${dragOffset}px)`, transition: 'none' };
-    if (slideDirection === 'left') return { animation: `onb-slide-out-left ${TRANSITION_MS}ms cubic-bezier(0.4,0,0.2,1) forwards` };
-    if (slideDirection === 'right') return { animation: `onb-slide-out-right ${TRANSITION_MS}ms cubic-bezier(0.4,0,0.2,1) forwards` };
-    return { animation: `onb-slide-enter ${TRANSITION_MS}ms cubic-bezier(0.4,0,0.2,1) forwards` };
+  const handleSkip = () => navigate('/mood', { replace: true });
+
+  const getNextLabel = () => {
+    if (step === 0) return 'Los geht\'s';
+    if (step === TOTAL_STEPS) return isSaving ? 'Speichern...' : 'Fertig!';
+    return 'Weiter';
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 overflow-hidden select-none relative">
-      <style>{`
-        @keyframes onb-slide-out-left {
-          0% { transform: translateX(0); opacity: 1; }
-          100% { transform: translateX(-60px); opacity: 0; }
-        }
-        @keyframes onb-slide-out-right {
-          0% { transform: translateX(0); opacity: 1; }
-          100% { transform: translateX(60px); opacity: 0; }
-        }
-        @keyframes onb-slide-enter {
-          0% { transform: translateX(30px); opacity: 0; }
-          100% { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes onb-float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
-        @keyframes onb-ring-pulse {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(1.08); }
-        }
-      `}</style>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-between p-4 select-none relative overflow-hidden">
+      {/* Subtle background */}
+      <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 -right-20 w-72 h-72 bg-accent/5 rounded-full blur-3xl" />
 
-      {/* Animated gradient background blobs */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${currentScreenData.gradient} transition-all duration-700 ease-out`} />
-      <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 -right-20 w-72 h-72 bg-accent/10 rounded-full blur-3xl" />
+      <div className="w-full max-w-md mx-auto relative z-10 flex flex-col flex-1">
+        {/* Skip button */}
+        {step > 0 && (
+          <div className="flex justify-end mb-2">
+            <Button onClick={handleSkip} variant="ghost" size="sm" className="text-muted-foreground text-xs">
+              Überspringen
+            </Button>
+          </div>
+        )}
 
-      <div className="w-full max-w-md mx-auto relative z-10">
-        {/* Skip */}
-        <div className="flex justify-end mb-3">
-          <Button onClick={handleSkip} variant="ghost" className="text-muted-foreground hover:text-foreground text-sm">
-            {t('common.skip')}
+        {/* Progress bar (only on actual steps) */}
+        {step > 0 && (
+          <div className="mb-4">
+            <OnboardingProgress currentStep={step} totalSteps={TOTAL_STEPS} />
+          </div>
+        )}
+
+        {/* Content area */}
+        <div
+          className={`flex-1 overflow-y-auto pb-4 transition-all duration-250 ease-out ${
+            isAnimating ? 'opacity-0 translate-y-3' : 'opacity-100 translate-y-0'
+          }`}
+        >
+          {step === 0 && <WelcomeScreen />}
+          {step === 1 && <PersonalitySliders traits={personality} onChange={setPersonality} />}
+          {step === 2 && <RelationshipGoal selected={relationshipGoal} onChange={setRelationshipGoal} />}
+          {step === 3 && <LifestylePicks data={lifestyle} onChange={setLifestyle} />}
+          {step === 4 && <ExperienceScenarios answers={scenarioAnswers} onChange={setScenarioAnswers} />}
+          {step === 5 && (
+            <FoodVibeQuickPick
+              selectedCuisines={selectedCuisines}
+              selectedVibes={selectedVibes}
+              onCuisinesChange={setSelectedCuisines}
+              onVibesChange={setSelectedVibes}
+            />
+          )}
+        </div>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between pt-3 border-t border-border/20">
+          <Button
+            onClick={handleBack}
+            variant="ghost"
+            size="sm"
+            disabled={isAnimating || step === 0}
+            className={`text-muted-foreground transition-opacity ${step === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Zurück
+          </Button>
+
+          <Button
+            onClick={handleNext}
+            disabled={isAnimating || isSaving}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 transition-transform active:scale-[0.96]"
+          >
+            {getNextLabel()}
+            {step < TOTAL_STEPS && <ArrowRight className="w-4 h-4 ml-1.5" />}
+            {step === TOTAL_STEPS && <Sparkles className="w-4 h-4 ml-1.5" />}
           </Button>
         </div>
-
-        {/* Glass Card */}
-        <div
-          className="relative rounded-3xl border border-border/30 bg-card/60 backdrop-blur-xl shadow-gentle-lg p-6 touch-pan-y"
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
-          <div style={getSlideStyle()} className="will-change-transform">
-            {/* Illustration with animated ring */}
-            <div className="relative mx-auto w-48 h-48 mb-6 flex items-center justify-center">
-              {/* Pulsing ring */}
-              <div
-                className={`absolute inset-0 rounded-full ring-2 ${currentScreenData.ring}`}
-                style={{ animation: 'onb-ring-pulse 3s ease-in-out infinite' }}
-              />
-              {/* Floating image */}
-              <img
-                src={currentScreenData.image}
-                alt=""
-                className="w-40 h-40 object-contain drop-shadow-lg"
-                style={{ animation: 'onb-float 4s ease-in-out infinite' }}
-              />
-            </div>
-
-            {/* Title */}
-            <h1 className="text-2xl font-bold text-foreground mb-3 text-center">
-              {t(currentScreenData.titleKey)}
-            </h1>
-
-            {/* Description in glass box */}
-            <div className="rounded-2xl bg-muted/30 backdrop-blur-sm border border-border/20 px-4 py-3 mb-6">
-              <p className="text-sm text-muted-foreground text-center leading-relaxed">
-                {t(currentScreenData.descKey)}
-              </p>
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="flex items-center gap-2 justify-center mb-5">
-            {screens.map((screen, index) => (
-              <div
-                key={index}
-                className={`h-1.5 rounded-full transition-all duration-300 ease-out overflow-hidden ${
-                  index === currentScreen ? 'w-8' : 'w-2 bg-muted-foreground/20'
-                }`}
-              >
-                {index === currentScreen && (
-                  <div className={`h-full w-full rounded-full bg-gradient-to-r ${screen.accentGradient}`} />
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Navigation */}
-          <div className="flex justify-between items-center">
-            <Button
-              onClick={handlePrevious}
-              variant="ghost"
-              size="sm"
-              disabled={isAnimating}
-              className={`text-muted-foreground hover:text-foreground transition-opacity duration-200 ${
-                currentScreen === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'
-              }`}
-            >
-              <ArrowLeft className="w-4 h-4 mr-1.5" />
-              {t('common.back')}
-            </Button>
-            <Button
-              onClick={handleNext}
-              disabled={isAnimating}
-              className={`bg-gradient-to-r ${currentScreenData.accentGradient} text-white hover:opacity-90 font-semibold px-6 shadow-glow-primary transition-transform duration-200 active:scale-95`}
-            >
-              {currentScreen === screens.length - 1 ? t('common.getStarted') : t('common.next')}
-              <ArrowRight className="w-4 h-4 ml-1.5" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Swipe hint */}
-        {currentScreen === 0 && !isAnimating && (
-          <p className="text-center text-xs text-muted-foreground/60 mt-4 animate-fade-in">
-            ← {t('onboarding.swipeHint', 'Swipe to navigate')} →
-          </p>
-        )}
       </div>
     </div>
   );
 };
+
+function WelcomeScreen() {
+  return (
+    <div className="flex flex-col items-center justify-center flex-1 text-center px-4 py-12">
+      <div className="relative w-40 h-40 mb-8">
+        <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse" />
+        <img
+          src={onboarding1}
+          alt="Welcome"
+          className="w-full h-full object-contain relative z-10"
+        />
+      </div>
+
+      <h1 className="text-2xl font-bold text-foreground mb-3">
+        Willkommen bei VybePulse
+      </h1>
+
+      <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+        In 2 Minuten lernen wir dich kennen – damit wir dir von Anfang an die besten Date-Ideen vorschlagen können.
+      </p>
+
+      <div className="flex items-center gap-2 mt-6 text-xs text-muted-foreground/60">
+        <Sparkles className="w-3.5 h-3.5" />
+        <span>5 kurze Schritte · Kein richtig oder falsch</span>
+      </div>
+    </div>
+  );
+}
 
 export default Onboarding;
