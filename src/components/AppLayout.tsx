@@ -71,7 +71,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   if (isMobile) {
     return (
-      <div className={cn("min-h-screen w-full bg-background", isAdminRoute ? "overflow-x-hidden pb-16" : "pb-16")}>
+      <div className={cn("min-h-screen w-full bg-background", isAdminRoute ? "overflow-x-hidden pb-20" : "pb-20")}>
         <style>{`
           @keyframes nav-slide-left {
             0% { transform: translateX(18%); opacity: 0.6; }
