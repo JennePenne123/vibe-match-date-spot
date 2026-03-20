@@ -42,16 +42,7 @@ const SmartDatePlanning: React.FC = () => {
   const { session: collaborativeSession } = useCollaborativeSession(sessionId);
   const { createPlanningSession, getActiveSession } = useSessionManagement();
   
-  console.log('SmartDatePlanning - Navigation state:', { 
-    sessionId, 
-    fromProposal, 
-    planningMode,
-    sessionExists: !!collaborativeSession,
-    sessionStatus: collaborativeSession?.session_status,
-    userRole: collaborativeSession ? (collaborativeSession.initiator_id === user?.id ? 'initiator' : 'partner') : 'unknown'
-  });
   
-  // Enhanced guardrail: Join existing session or inherit preferences 
   useEffect(() => {
     if (!user || !collaborativeSession || !sessionId) return;
     
@@ -60,21 +51,6 @@ const SmartDatePlanning: React.FC = () => {
     const isCompleted = collaborativeSession.session_status === 'completed';
     const isInactive = collaborativeSession.session_status !== 'active';
     
-    console.log('🔄 SESSION GUARDRAIL: Checking session validity:', {
-      sessionId,
-      userRole,
-      sessionStatus: collaborativeSession.session_status,
-      isExpired,
-      isCompleted,
-      isInactive,
-      hasInitiatorPrefs: !!collaborativeSession.initiator_preferences,
-      hasPartnerPrefs: !!collaborativeSession.partner_preferences,
-      initiatorComplete: collaborativeSession.initiator_preferences_complete,
-      partnerComplete: collaborativeSession.partner_preferences_complete,
-      bothComplete: collaborativeSession.both_preferences_complete
-    });
-    
-    // Check if user needs to inherit preferences when joining existing session
     const userHasNoPreferences = userRole === 'initiator' 
       ? !collaborativeSession.initiator_preferences_complete || !collaborativeSession.initiator_preferences
       : !collaborativeSession.partner_preferences_complete || !collaborativeSession.partner_preferences;
@@ -82,10 +58,7 @@ const SmartDatePlanning: React.FC = () => {
     const sessionIsValid = !isExpired && !isCompleted && !isInactive;
     
     if (sessionIsValid && userHasNoPreferences && !sessionStorage.getItem(`inherit-${sessionId}-${user.id}`)) {
-      console.log('🔄 SESSION GUARDRAIL: Valid session but user needs preferences, attempting inheritance');
       sessionStorage.setItem(`inherit-${sessionId}-${user.id}`, 'attempted');
-      
-      // Reload to trigger preference sync
       window.location.reload();
       return;
     }
@@ -118,13 +91,12 @@ const SmartDatePlanning: React.FC = () => {
             });
           } else {
             // No existing session, create new one
-            console.log('🔄 SESSION GUARDRAIL: No active session found, creating fresh session');
             return createPlanningSession(partnerId, undefined, 'collaborative', true);
           }
         })
         .then((newSession) => {
           if (newSession?.id) {
-            console.log('✅ SESSION GUARDRAIL: Created fresh session:', newSession.id);
+            
             navigate('/plan-date', {
               state: {
                 sessionId: newSession.id,
@@ -140,34 +112,34 @@ const SmartDatePlanning: React.FC = () => {
           sessionStorage.removeItem(`guardrail-${sessionId}`);
         });
     } else if (sessionIsValid) {
-      console.log('✅ SESSION GUARDRAIL: Session is valid, allowing user to join');
+      
     }
   }, [user, collaborativeSession, sessionId, createPlanningSession, navigate, getActiveSession]);
   
   // CRITICAL: Collaborative planning requires coming from an accepted proposal
   // If accessed directly without session data, redirect to home
   if (!fromProposal || !sessionId) {
-    console.log('SmartDatePlanning - No collaborative session found, redirecting to home');
+    
     navigate('/home', { replace: true });
     return null;
   }
 
   // Show loading spinner while auth is loading
   if (loading) {
-    console.log('SmartDatePlanning - Auth loading, showing spinner');
+    
     return <LoadingSpinner />;
   }
 
   // Redirect to login if no user
   if (!user) {
-    console.log('SmartDatePlanning - No user, redirecting to auth');
+    
     navigate('/?auth=required', { replace: true });
     return null;
   }
 
   const { displayName, firstName } = userInfo;
 
-  console.log('SmartDatePlanning - Rendering with user:', { displayName, firstName });
+  
 
   return (
     <ErrorBoundary level="page" silent={true}>

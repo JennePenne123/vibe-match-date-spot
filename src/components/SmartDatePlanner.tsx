@@ -59,36 +59,12 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   // Use session partner as the preselected friend
   const effectivePreselectedFriend = sessionPartner;
   
-  console.log('🔍 SmartDatePlanner - Session and Partner Debug:', {
-    fromProposal,
-    sessionId,
-    hasCollaborativeSession: !!collaborativeSession,
-    collaborativeSession: collaborativeSession ? {
-      id: collaborativeSession.id,
-      initiator_id: collaborativeSession.initiator_id,
-      partner_id: collaborativeSession.partner_id,
-      both_preferences_complete: collaborativeSession.both_preferences_complete
-    } : null,
-    isUserInitiator,
-    sessionPartner,
-    effectivePreselectedFriend,
-    allFriendsCount: allFriends.length
-  });
-  
   const state = useSmartDatePlannerState({ 
     preselectedFriend: effectivePreselectedFriend,
-    planningMode: 'collaborative', // Force collaborative mode only
+    planningMode: 'collaborative',
     sessionId
   });
-  
-  console.log('🔧 SmartDatePlanner - MAIN RENDER - currentStep:', state.currentStep, 'effectivePreselectedFriend:', !!effectivePreselectedFriend);
-  console.log('🔍 SmartDatePlanner - RENDER STATE CHECK:', {
-    currentStep: state.currentStep,
-    hasVenueRecommendations: !!(state.venueRecommendations && state.venueRecommendations.length > 0),
-    venueCount: state.venueRecommendations?.length || 0,
-    aiAnalyzing: state.aiAnalyzing,
-    compatibilityScore: state.compatibilityScore
-  });
+
   const handlers = createSmartDatePlannerHandlers({
     ...state,
     collaborativeSession,
@@ -99,17 +75,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   const [proposalDateISO, setProposalDateISO] = useState<string | undefined>();
   useEffect(() => {
     const loadProposalDate = async () => {
-      console.log('🔍 PROPOSAL DATE FETCH:', { fromProposal, sessionId });
-      
-      if (!fromProposal || !sessionId) {
-        console.log('⚠️ PROPOSAL DATE FETCH: Skipping - fromProposal:', fromProposal, 'sessionId:', sessionId);
-        return;
-      }
+      if (!fromProposal || !sessionId) return;
       
       try {
-        console.log('📡 PROPOSAL DATE FETCH: Step 1 - Fetching session participants...');
-        
-        // First, get the session to find out who the participants are
         const { data: sessionData, error: sessionError } = await supabase
           .from('date_planning_sessions')
           .select('initiator_id, partner_id')
@@ -117,16 +85,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
           .single();
         
         if (sessionError) throw sessionError;
+        if (!sessionData) return;
         
-        if (!sessionData) {
-          console.warn('⚠️ PROPOSAL DATE FETCH: Session not found');
-          return;
-        }
-        
-        console.log('📡 PROPOSAL DATE FETCH: Step 2 - Session participants:', sessionData);
-        
-        // Now find the proposal between these two users
-        // Check both directions since we don't know who proposed
         const { data, error } = await supabase
           .from('date_proposals')
           .select('proposed_date')
@@ -134,23 +94,15 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
           .eq('status', 'accepted')
           .order('created_at', { ascending: false })
           .limit(1);
-          
-        console.log('📊 PROPOSAL DATE FETCH: Query result:', { data, error });
         
         if (error) throw error;
         
         const row = Array.isArray(data) ? data?.[0] : (data as any);
-        
-        console.log('📝 PROPOSAL DATE FETCH: Parsed row:', row);
-        
         if (row?.proposed_date) {
-          console.log('✅ PROPOSAL DATE FETCH: Setting proposalDateISO to:', row.proposed_date);
           setProposalDateISO(row.proposed_date);
-        } else {
-          console.warn('⚠️ PROPOSAL DATE FETCH: No proposed_date found in row');
         }
       } catch (err) {
-        console.error('❌ PROPOSAL DATE FETCH: Failed to load proposal proposed_date:', err);
+        console.error('Failed to load proposal date:', err);
       }
     };
     loadProposalDate();
@@ -208,18 +160,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       !collaborativeSession.ai_compatibility_score &&
       state.currentStep === 'set-preferences';
     
-    console.log('🔧 SMART PLANNER: Session Recovery Check:', {
-      sessionId: collaborativeSession.id,
-      both_complete: collaborativeSession.both_preferences_complete,
-      has_ai_score: !!collaborativeSession.ai_compatibility_score,
-      current_step: state.currentStep,
-      has_location: !!state.userLocation,
-      should_auto_trigger: shouldAutoTriggerRecovery
-    });
-    
-    // Enhanced recovery with location - use manual trigger with location
     if (shouldAutoTriggerRecovery && state.userLocation && triggerAIAnalysisManually) {
-      console.log('🚀 SMART PLANNER: AUTO-TRIGGERING AI ANALYSIS for session recovery with location');
       // Small delay to ensure all state is settled
       setTimeout(() => {
         triggerAIAnalysisManually(state.userLocation);
@@ -295,16 +236,12 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
         <div className={isMobile ? "max-w-md mx-auto p-6 space-y-8" : "max-w-6xl mx-auto p-6"}>
           {/* Header */}
           <ErrorBoundaryWrapper silent={true}>
-            {(() => {
-              const progressValue = getStepProgress();
-              console.log('🔍 SmartDatePlanner progress value:', progressValue, 'currentStep:', currentStep);
-              return <PlanningHeader 
-                progress={progressValue} 
-                planningMode={'collaborative'} 
-                showStartFromScratch={!!effectivePreselectedFriend}
-                onStartFromScratch={handleStartFromScratch}
-              />;
-            })()}
+            <PlanningHeader 
+              progress={getStepProgress()} 
+              planningMode={'collaborative'} 
+              showStartFromScratch={!!effectivePreselectedFriend}
+              onStartFromScratch={handleStartFromScratch}
+            />
           </ErrorBoundaryWrapper>
 
           {/* Location Display */}
