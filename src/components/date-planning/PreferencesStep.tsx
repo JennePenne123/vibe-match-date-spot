@@ -874,7 +874,6 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
               )}
             </div>
           )}
-          </div>
         </CardContent>
       </Card>
 
