@@ -462,9 +462,9 @@ const Preferences = () => {
 
   const [step, setStep] = useState(0);
   const steps = [
-    { title: 'Geschmack', subtitle: 'Was isst du gerne?', icon: <Heart className="w-5 h-5 text-pink-500" /> },
-    { title: 'Stimmung & Stil', subtitle: 'Wie soll sich dein Date anfühlen?', icon: <HeartHandshake className="w-5 h-5 text-rose-500" /> },
-    { title: 'Praktisches', subtitle: 'Wann, wie lange & wo?', icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
+    { title: t('home.wizardStep1'), subtitle: t('home.wizardStep1Desc'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
+    { title: t('home.wizardStep2'), subtitle: t('home.wizardStep2Desc'), icon: <HeartHandshake className="w-5 h-5 text-rose-500" /> },
+    { title: t('home.wizardStep3'), subtitle: t('home.wizardStep3Desc'), icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
   ];
 
   const canGoNext = step < 2;
@@ -593,12 +593,12 @@ const Preferences = () => {
           <div className="max-w-md mx-auto flex gap-3">
             {canGoBack && (
               <Button onClick={() => setStep(s => s - 1)} variant="outline" className="h-12 px-6">
-                <ArrowLeft className="w-4 h-4 mr-1" /> Zurück
+                <ArrowLeft className="w-4 h-4 mr-1" /> {t('home.wizardBack')}
               </Button>
             )}
             {canGoNext ? (
               <Button onClick={() => setStep(s => s + 1)} className="flex-1 h-12 font-semibold text-base">
-                Weiter <ArrowRight className="w-4 h-4 ml-1" />
+                {t('home.wizardNext')} <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             ) : (
               <Button onClick={handleSave} disabled={isSaving} className="flex-1 h-12 font-semibold text-base">

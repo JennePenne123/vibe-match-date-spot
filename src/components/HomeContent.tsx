@@ -73,14 +73,14 @@ const HomeContent: React.FC = () => {
       });
       if (error) throw error;
       if (data?.venue_id) {
-        toast({ title: '✨ KI-Empfehlung', description: data.reason || 'Hier ist unser Tipp für dich!', duration: 4000 });
+        toast({ title: t('home.aiTipTitle'), description: data.reason || t('home.aiTipFallback'), duration: 4000 });
         navigate(`/venue/${data.venue_id}`);
       } else {
-        toast({ title: 'Keine Venues gefunden', description: 'Aktuell haben wir leider keine passenden Empfehlungen.', variant: 'destructive' });
+        toast({ title: t('home.aiTipNoVenues'), description: t('home.aiTipNoVenuesDesc'), variant: 'destructive' });
       }
     } catch (err) {
       console.error('Quick tip error:', err);
-      toast({ title: 'Fehler', description: 'Der KI-Tipp konnte nicht geladen werden.', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('home.aiTipError'), variant: 'destructive' });
     } finally {
       setLoadingTipIndex(null);
     }
@@ -163,10 +163,10 @@ const HomeContent: React.FC = () => {
                   AI-powered
                 </div>
                 <h2 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
-                  Plane dein nächstes Date
+                  {t('home.heroTitle')}
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                  Finde den perfekten Ort — abgestimmt auf eure Vorlieben.
+                  {t('home.heroSubtitle')}
                 </p>
               </div>
               {!isMobile && (
@@ -181,14 +181,14 @@ const HomeContent: React.FC = () => {
               className="mt-4 w-full sm:w-auto shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300 gap-2"
             >
               <ArrowRight className="w-4 h-4" />
-              Date planen
+              {t('home.heroCta')}
             </Button>
             <button
               onClick={handleGroupPlanning}
               className="mt-2 w-full sm:w-auto text-sm text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1.5"
             >
               <Users className="w-3.5 h-3.5" />
-              Oder als Gruppe einladen
+              {t('home.heroGroupCta')}
             </button>
           </CardContent>
         </Card>
@@ -224,7 +224,7 @@ const HomeContent: React.FC = () => {
           </Card>
 
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1">
-            Was geht in deiner Stadt
+            {t('home.cityTipsTitle')}
           </h3>
           <div className={isDesktop ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-3"}>
             {[getDailyIndex(0), getDailyIndex(3)].map((idx, i) => {
@@ -250,7 +250,7 @@ const HomeContent: React.FC = () => {
                           {tip.label}
                         </span>
                         <span className="text-[10px] text-muted-foreground">
-                          Tipp für dich →
+                          {t('home.tipForYou')}
                         </span>
                       </div>
                       <p className="text-sm font-medium text-foreground">{tip.title}</p>
