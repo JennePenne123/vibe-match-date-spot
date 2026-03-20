@@ -236,16 +236,12 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
         <div className={isMobile ? "max-w-md mx-auto p-6 space-y-8" : "max-w-6xl mx-auto p-6"}>
           {/* Header */}
           <ErrorBoundaryWrapper silent={true}>
-            {(() => {
-              const progressValue = getStepProgress();
-              console.log('🔍 SmartDatePlanner progress value:', progressValue, 'currentStep:', currentStep);
-              return <PlanningHeader 
-                progress={progressValue} 
-                planningMode={'collaborative'} 
-                showStartFromScratch={!!effectivePreselectedFriend}
-                onStartFromScratch={handleStartFromScratch}
-              />;
-            })()}
+            <PlanningHeader 
+              progress={getStepProgress()} 
+              planningMode={'collaborative'} 
+              showStartFromScratch={!!effectivePreselectedFriend}
+              onStartFromScratch={handleStartFromScratch}
+            />
           </ErrorBoundaryWrapper>
 
           {/* Location Display */}
