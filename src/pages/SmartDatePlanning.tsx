@@ -132,7 +132,7 @@ const SmartDatePlanning: React.FC = () => {
 
   // Redirect to login if no user
   if (!user) {
-    console.log('SmartDatePlanning - No user, redirecting to auth');
+    
     navigate('/?auth=required', { replace: true });
     return null;
   }
