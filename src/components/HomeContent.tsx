@@ -57,6 +57,34 @@ const HomeContent: React.FC = () => {
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
   const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
   const [invitationSentTrigger, setInvitationSentTrigger] = useState(0);
+  const [loadingTipIndex, setLoadingTipIndex] = useState<number | null>(null);
+
+  const handleTipClick = async (tip: typeof CITY_TIPS[0], index: number) => {
+    if (loadingTipIndex !== null) return;
+    setLoadingTipIndex(index);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke('ai-quick-tip', {
+        body: {
+          tipTitle: tip.title,
+          tipCategory: tip.label,
+          userId: session?.user?.id || null,
+        },
+      });
+      if (error) throw error;
+      if (data?.venue_id) {
+        toast({ title: '✨ KI-Empfehlung', description: data.reason || 'Hier ist unser Tipp für dich!', duration: 4000 });
+        navigate(`/venue/${data.venue_id}`);
+      } else {
+        toast({ title: 'Keine Venues gefunden', description: 'Aktuell haben wir leider keine passenden Empfehlungen.', variant: 'destructive' });
+      }
+    } catch (err) {
+      console.error('Quick tip error:', err);
+      toast({ title: 'Fehler', description: 'Der KI-Tipp konnte nicht geladen werden.', variant: 'destructive' });
+    } finally {
+      setLoadingTipIndex(null);
+    }
+  };
 
   const handleCollaborativePlanning = () => setShowPartnerSelection(true);
   const handlePartnerSelectionContinue = () => {
