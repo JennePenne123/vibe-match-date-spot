@@ -42,14 +42,6 @@ const SmartDatePlanning: React.FC = () => {
   const { session: collaborativeSession } = useCollaborativeSession(sessionId);
   const { createPlanningSession, getActiveSession } = useSessionManagement();
   
-  console.log('SmartDatePlanning - Navigation state:', { 
-    sessionId, 
-    fromProposal, 
-    planningMode,
-    sessionExists: !!collaborativeSession,
-    sessionStatus: collaborativeSession?.session_status,
-    userRole: collaborativeSession ? (collaborativeSession.initiator_id === user?.id ? 'initiator' : 'partner') : 'unknown'
-  });
   
   // Enhanced guardrail: Join existing session or inherit preferences 
   useEffect(() => {
