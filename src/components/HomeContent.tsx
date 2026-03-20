@@ -80,7 +80,7 @@ const HomeContent: React.FC = () => {
       }
     } catch (err) {
       console.error('Quick tip error:', err);
-      toast({ title: 'Fehler', description: 'Der KI-Tipp konnte nicht geladen werden.', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('home.aiTipError'), variant: 'destructive' });
     } finally {
       setLoadingTipIndex(null);
     }
