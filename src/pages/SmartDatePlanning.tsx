@@ -137,7 +137,6 @@ const SmartDatePlanning: React.FC = () => {
   // CRITICAL: Collaborative planning requires coming from an accepted proposal
   // If accessed directly without session data, redirect to home
   if (!fromProposal || !sessionId) {
-    
     navigate('/home', { replace: true });
     return null;
   }
