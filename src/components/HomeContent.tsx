@@ -188,7 +188,7 @@ const HomeContent: React.FC = () => {
               className="mt-2 w-full sm:w-auto text-sm text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1.5"
             >
               <Users className="w-3.5 h-3.5" />
-              Oder als Gruppe einladen
+              {t('home.heroGroupCta')}
             </button>
           </CardContent>
         </Card>
