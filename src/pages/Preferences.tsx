@@ -593,7 +593,7 @@ const Preferences = () => {
           <div className="max-w-md mx-auto flex gap-3">
             {canGoBack && (
               <Button onClick={() => setStep(s => s - 1)} variant="outline" className="h-12 px-6">
-                <ArrowLeft className="w-4 h-4 mr-1" /> Zurück
+                <ArrowLeft className="w-4 h-4 mr-1" /> {t('home.wizardBack')}
               </Button>
             )}
             {canGoNext ? (
