@@ -222,16 +222,28 @@ const HomeContent: React.FC = () => {
           <div className={isDesktop ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-3"}>
             {[getDailyIndex(0), getDailyIndex(3)].map((idx, i) => {
               const tip = CITY_TIPS[idx];
+              const isLoading = loadingTipIndex === i;
               return (
-                <Card key={i} className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-default">
+                <Card
+                  key={i}
+                  onClick={() => handleTipClick(tip, i)}
+                  className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
+                >
                   <CardContent className="p-4 flex items-start gap-3">
                     <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors shrink-0">
-                      <tip.icon className="w-4 h-4 text-primary" />
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                      ) : (
+                        <tip.icon className="w-4 h-4 text-primary" />
+                      )}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
                           {tip.label}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Tipp für dich →
                         </span>
                       </div>
                       <p className="text-sm font-medium text-foreground">{tip.title}</p>
