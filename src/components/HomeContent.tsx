@@ -166,7 +166,7 @@ const HomeContent: React.FC = () => {
                   {t('home.heroTitle')}
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                  Finde den perfekten Ort — abgestimmt auf eure Vorlieben.
+                  {t('home.heroSubtitle')}
                 </p>
               </div>
               {!isMobile && (
