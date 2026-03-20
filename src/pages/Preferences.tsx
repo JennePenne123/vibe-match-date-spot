@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { bowlChopsticks } from '@lucide/lab';
 import {
-  ArrowLeft, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
+  ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
   Icon, ChevronDown, Save,
   Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup,
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
@@ -460,120 +460,150 @@ const Preferences = () => {
 
   const activityIconMap: Record<string, string> = { cultural: 'cultural_act', nightlife: 'nightlife_act' };
 
-  const totalSelected = selectedCuisines.length + selectedVibes.length + selectedPriceRange.length +
-    selectedTimePreferences.length + (selectedDuration ? 1 : 0) + selectedActivities.length +
-    selectedEntertainment.length + selectedDietary.length + selectedAccessibility.length + selectedVenueTypes.length;
+  const [step, setStep] = useState(0);
+  const steps = [
+    { title: 'Geschmack', subtitle: 'Was isst du gerne?', icon: <Heart className="w-5 h-5 text-pink-500" /> },
+    { title: 'Stimmung & Stil', subtitle: 'Wie soll sich dein Date anfühlen?', icon: <HeartHandshake className="w-5 h-5 text-rose-500" /> },
+    { title: 'Praktisches', subtitle: 'Wann, wie lange & wo?', icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
+  ];
+
+  const canGoNext = step < 2;
+  const canGoBack = step > 0;
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 pt-12 bg-card shadow-sm sticky top-0 z-10">
-          <Button onClick={() => navigate(-1)} variant="ghost" size="icon" className="text-muted-foreground flex-shrink-0">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold text-foreground">{t('preferences.title') || 'Deine Präferenzen'}</h1>
-            {totalSelected > 0 && (
-              <p className="text-xs text-muted-foreground">{totalSelected} ausgewählt</p>
-            )}
+        <div className="p-4 pt-12 bg-card shadow-sm sticky top-0 z-10 space-y-3">
+          <div className="flex items-center gap-3">
+            <Button onClick={() => canGoBack ? setStep(s => s - 1) : navigate(-1)} variant="ghost" size="icon" className="text-muted-foreground flex-shrink-0">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex-1">
+              <h1 className="text-lg font-semibold text-foreground">{steps[step].title}</h1>
+              <p className="text-xs text-muted-foreground">{steps[step].subtitle}</p>
+            </div>
+            <span className="text-xs font-medium text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+              {step + 1}/3
+            </span>
+          </div>
+          {/* Progress bar */}
+          <div className="flex gap-1.5">
+            {steps.map((_, i) => (
+              <div key={i} className={cn('h-1 rounded-full flex-1 transition-colors duration-300', i <= step ? 'bg-primary' : 'bg-muted')} />
+            ))}
           </div>
         </div>
 
-        {/* Accordion Sections */}
+        {/* Step content */}
         <div className="px-4 py-5 space-y-3 pb-32">
 
-          {/* 1. Küche */}
-          <AccordionSection title={t('preferences.whatCraving') || 'Küche'} icon={<Heart className="w-5 h-5 text-pink-500" />} selectedCount={selectedCuisines.length} defaultOpen>
-            <SelectionGrid items={cuisines} selected={selectedCuisines} onToggle={(id) => toggleSelection(id, selectedCuisines, setSelectedCuisines)} />
-          </AccordionSection>
+          {/* Step 1: Geschmack */}
+          {step === 0 && (
+            <>
+              <AccordionSection title={t('preferences.whatCraving') || 'Küche'} icon={<Heart className="w-5 h-5 text-pink-500" />} selectedCount={selectedCuisines.length} defaultOpen>
+                <SelectionGrid items={cuisines} selected={selectedCuisines} onToggle={(id) => toggleSelection(id, selectedCuisines, setSelectedCuisines)} />
+              </AccordionSection>
 
-          {/* 2. Vibe */}
-          <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length}>
-            <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
-          </AccordionSection>
+              <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length}>
+                <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
+              </AccordionSection>
 
-          {/* 3. Budget */}
-          <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length}>
-            <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
-          </AccordionSection>
+              <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
+                <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
+              </AccordionSection>
+            </>
+          )}
 
-          {/* 4. Zeitpräferenz */}
-          <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
-            <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
-          </AccordionSection>
+          {/* Step 2: Stimmung & Stil */}
+          {step === 1 && (
+            <>
+              <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
+                <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
+              </AccordionSection>
 
-          {/* 5. Dauer */}
-          <AccordionSection title={t('preferences.howLong') || 'Dauer'} icon={<Timer className="w-5 h-5 text-teal-500" />} selectedCount={selectedDuration ? 1 : 0}>
-            <SingleSelectionList items={durations} selected={selectedDuration} onToggle={(id) => toggleSingleSelection(id, setSelectedDuration)} />
-          </AccordionSection>
+              <AccordionSection title={t('preferences.whatActivity') || 'Aktivitäten'} icon={<Coffee className="w-5 h-5 text-orange-500" />} selectedCount={selectedActivities.length}>
+                <SelectionList items={activities} selected={selectedActivities} onToggle={(id) => toggleSelection(id, selectedActivities, setSelectedActivities)} iconMap={activityIconMap} />
+              </AccordionSection>
 
-          {/* 6. Aktivitäten */}
-          <AccordionSection title={t('preferences.whatActivity') || 'Aktivitäten'} icon={<Coffee className="w-5 h-5 text-orange-500" />} selectedCount={selectedActivities.length}>
-            <SelectionList items={activities} selected={selectedActivities} onToggle={(id) => toggleSelection(id, selectedActivities, setSelectedActivities)} iconMap={activityIconMap} />
-          </AccordionSection>
+              <AccordionSection title={t('preferences.whatEntertainment') || 'Entertainment'} icon={<Guitar className="w-5 h-5 text-red-500" />} selectedCount={selectedEntertainment.length}>
+                <SelectionGrid items={entertainment} selected={selectedEntertainment} onToggle={(id) => toggleSelection(id, selectedEntertainment, setSelectedEntertainment)} />
+              </AccordionSection>
 
-          {/* 7. Entertainment */}
-          <AccordionSection title={t('preferences.whatEntertainment') || 'Entertainment'} icon={<Guitar className="w-5 h-5 text-red-500" />} selectedCount={selectedEntertainment.length}>
-            <SelectionGrid items={entertainment} selected={selectedEntertainment} onToggle={(id) => toggleSelection(id, selectedEntertainment, setSelectedEntertainment)} />
-          </AccordionSection>
+              <AccordionSection title={t('preferences.experiences') || 'Erlebnisse'} icon={<Ticket className="w-5 h-5 text-purple-500" />} selectedCount={selectedVenueTypes.length}>
+                <SelectionGrid items={allVenueTypes} selected={selectedVenueTypes} onToggle={(id) => toggleSelection(id, selectedVenueTypes, setSelectedVenueTypes)} columns={3} />
+              </AccordionSection>
+            </>
+          )}
 
-          {/* 8. Ernährung */}
-          <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
-            <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
-          </AccordionSection>
+          {/* Step 3: Praktisches */}
+          {step === 2 && (
+            <>
+              <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length} defaultOpen>
+                <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
+              </AccordionSection>
 
-          {/* 9. Barrierefreiheit */}
-          <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
-            <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
-          </AccordionSection>
+              <AccordionSection title={t('preferences.howLong') || 'Dauer'} icon={<Timer className="w-5 h-5 text-teal-500" />} selectedCount={selectedDuration ? 1 : 0}>
+                <SingleSelectionList items={durations} selected={selectedDuration} onToggle={(id) => toggleSingleSelection(id, setSelectedDuration)} />
+              </AccordionSection>
 
-          {/* 10. Venue-Typen */}
-          <AccordionSection title={t('preferences.experiences') || 'Erlebnisse'} icon={<Ticket className="w-5 h-5 text-purple-500" />} selectedCount={selectedVenueTypes.length}>
-            <SelectionGrid items={allVenueTypes} selected={selectedVenueTypes} onToggle={(id) => toggleSelection(id, selectedVenueTypes, setSelectedVenueTypes)} columns={3} />
-          </AccordionSection>
+              <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
+                <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
+              </AccordionSection>
 
-          {/* 11. Standort */}
-          <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0}>
-            <div className="space-y-3">
-              <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
-                {isLocating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.gettingLocation')}</> : <><Navigation className="w-4 h-4 mr-2" />{t('preferences.useCurrentLocation')}</>}
-              </Button>
-              <div className="relative">
-                <Input type="text" placeholder={t('preferences.enterAddress')} value={homeAddress} onChange={(e) => setHomeAddress(e.target.value)} className="w-full h-11 pl-9 text-sm" />
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              </div>
-              {homeLatitude && homeLongitude && (
-                <>
-                  <div className="p-2.5 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                      <span className="text-xs text-green-800 dark:text-green-300">{homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}</span>
-                    </div>
-                    <Button onClick={clearHomeLocation} variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive h-7 w-7 p-0">
-                      <X className="w-3.5 h-3.5" />
-                    </Button>
+              <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0}>
+                <div className="space-y-3">
+                  <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
+                    {isLocating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.gettingLocation')}</> : <><Navigation className="w-4 h-4 mr-2" />{t('preferences.useCurrentLocation')}</>}
+                  </Button>
+                  <div className="relative">
+                    <Input type="text" placeholder={t('preferences.enterAddress')} value={homeAddress} onChange={(e) => setHomeAddress(e.target.value)} className="w-full h-11 pl-9 text-sm" />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   </div>
-                  <Suspense fallback={<Skeleton className="h-[140px] w-full rounded-lg" />}>
-                    <MapPreview latitude={homeLatitude} longitude={homeLongitude} address={homeAddress} height="140px" zoom={14} />
-                  </Suspense>
-                </>
-              )}
-              {locationError && (
-                <div className="p-2.5 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
-                  <p className="text-xs text-red-600 dark:text-red-400">{locationError}</p>
+                  {homeLatitude && homeLongitude && (
+                    <>
+                      <div className="p-2.5 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          <span className="text-xs text-green-800 dark:text-green-300">{homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}</span>
+                        </div>
+                        <Button onClick={clearHomeLocation} variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive h-7 w-7 p-0">
+                          <X className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                      <Suspense fallback={<Skeleton className="h-[140px] w-full rounded-lg" />}>
+                        <MapPreview latitude={homeLatitude} longitude={homeLongitude} address={homeAddress} height="140px" zoom={14} />
+                      </Suspense>
+                    </>
+                  )}
+                  {locationError && (
+                    <div className="p-2.5 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
+                      <p className="text-xs text-red-600 dark:text-red-400">{locationError}</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </AccordionSection>
+              </AccordionSection>
+            </>
+          )}
         </div>
 
-        {/* Sticky Save Button */}
+        {/* Sticky bottom buttons */}
         <div className="fixed bottom-0 left-0 right-0 z-20 bg-background/80 backdrop-blur-lg border-t border-border p-4">
-          <div className="max-w-md mx-auto">
-            <Button onClick={handleSave} disabled={isSaving} className="w-full h-12 bg-primary text-primary-foreground font-semibold text-base">
-              {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.saving')}</> : <><Save className="w-4 h-4 mr-2" />{t('preferences.findDates') || 'Speichern & weiter'}</>}
-            </Button>
+          <div className="max-w-md mx-auto flex gap-3">
+            {canGoBack && (
+              <Button onClick={() => setStep(s => s - 1)} variant="outline" className="h-12 px-6">
+                <ArrowLeft className="w-4 h-4 mr-1" /> Zurück
+              </Button>
+            )}
+            {canGoNext ? (
+              <Button onClick={() => setStep(s => s + 1)} className="flex-1 h-12 font-semibold text-base">
+                Weiter <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+            ) : (
+              <Button onClick={handleSave} disabled={isSaving} className="flex-1 h-12 font-semibold text-base">
+                {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.saving')}</> : <><Save className="w-4 h-4 mr-2" />{t('preferences.findDates') || 'Speichern & weiter'}</>}
+              </Button>
+            )}
           </div>
         </div>
       </div>
