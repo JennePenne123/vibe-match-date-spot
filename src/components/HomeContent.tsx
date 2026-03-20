@@ -13,11 +13,34 @@ import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
-const DATE_TIPS = [
-  { icon: MapPin, title: 'Neue Orte entdecken', desc: 'Unsere AI findet versteckte Perlen in deiner Nähe' },
-  { icon: Heart, title: 'Gemeinsam planen', desc: 'Stimmt eure Vorlieben ab für das perfekte Date' },
-  { icon: Zap, title: 'Spontan sein', desc: 'Lass dich von unseren Vorschlägen überraschen' },
+const QUOTES = [
+  '„Das Leben ist zu kurz für schlechte Dates." ✨',
+  '„Gemeinsame Erlebnisse sind das schönste Geschenk." 💫',
+  '„Jeder Tag ist eine neue Chance, etwas Besonderes zu erleben." 🌟',
+  '„Die besten Erinnerungen entstehen spontan." 🎯',
+  '„Zusammen entdecken, zusammen wachsen." 🌱',
+  '„Ein gutes Date beginnt mit Neugier." 💡',
+  '„Kleine Abenteuer machen das Leben groß." 🚀',
 ];
+
+const CITY_TIPS: { title: string; desc: string; icon: typeof MapPin; label: string }[] = [
+  { icon: MapPin, label: 'Heute', title: 'Street-Food-Markt entdecken', desc: 'Probiert euch durch lokale Köstlichkeiten unter freiem Himmel' },
+  { icon: Heart, label: 'Morgen', title: 'Sunset-Spaziergang am Fluss', desc: 'Golden Hour genießen — perfekt für entspannte Gespräche' },
+  { icon: Zap, label: 'Heute', title: 'Pop-up Gallery besuchen', desc: 'Kunst & Kultur als Inspiration für euren Abend' },
+  { icon: MapPin, label: 'Morgen', title: 'Geheimtipp-Café ausprobieren', desc: 'Specialty Coffee in gemütlichem Ambiente — ideal für ein Nachmittags-Date' },
+  { icon: Heart, label: 'Heute', title: 'Rooftop-Bar mit Ausblick', desc: 'Cocktails mit Panoramablick auf die Stadt' },
+  { icon: Zap, label: 'Morgen', title: 'Kochkurs für Zwei', desc: 'Gemeinsam kochen verbindet — und schmeckt!' },
+  { icon: MapPin, label: 'Heute', title: 'Vintage-Markt durchstöbern', desc: 'Schätze finden und dabei Quality-Time genießen' },
+  { icon: Heart, label: 'Morgen', title: 'Botanischer Garten erkunden', desc: 'Ruhe & Natur mitten in der Stadt — unterschätzt romantisch' },
+  { icon: Zap, label: 'Heute', title: 'Live-Musik in der Altstadt', desc: 'Jazz, Indie oder Klassik — lasst euch überraschen' },
+  { icon: MapPin, label: 'Morgen', title: 'Brunch-Spot entdecken', desc: 'Gemütlich in den Tag starten mit Avocado-Toast & Co.' },
+];
+
+const getDailyIndex = (offset: number) => {
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  return (dayOfYear + offset) % CITY_TIPS.length;
+};
 
 const HomeContent: React.FC = () => {
   const navigate = useNavigate();
