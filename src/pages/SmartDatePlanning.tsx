@@ -139,7 +139,7 @@ const SmartDatePlanning: React.FC = () => {
 
   const { displayName, firstName } = userInfo;
 
-  console.log('SmartDatePlanning - Rendering with user:', { displayName, firstName });
+  
 
   return (
     <ErrorBoundary level="page" silent={true}>
