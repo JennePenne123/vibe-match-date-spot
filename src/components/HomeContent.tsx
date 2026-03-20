@@ -163,7 +163,7 @@ const HomeContent: React.FC = () => {
                   AI-powered
                 </div>
                 <h2 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
-                  Plane dein nächstes Date
+                  {t('home.heroTitle')}
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
                   Finde den perfekten Ort — abgestimmt auf eure Vorlieben.
