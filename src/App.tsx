@@ -29,6 +29,64 @@ function AppUsageTracker() {
   return null;
 }
 
+function ServiceWorkerCacheReset() {
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('caches' in window)) {
+      return;
+    }
+
+    const RESET_KEY = 'vybe-sw-reset-v2';
+    let hasReloaded = false;
+
+    const handleControllerChange = () => {
+      if (hasReloaded) return;
+      hasReloaded = true;
+      window.location.reload();
+    };
+
+    const resetCaches = async () => {
+      if (sessionStorage.getItem(RESET_KEY) === 'done') return;
+      sessionStorage.setItem(RESET_KEY, 'done');
+
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+
+        await Promise.all(
+          registrations.map(async (registration) => {
+            await registration.update().catch(() => undefined);
+            registration.waiting?.postMessage({ type: 'CLEAR_CACHE' });
+            registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
+            registration.active?.postMessage({ type: 'CLEAR_CACHE' });
+          })
+        );
+
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames
+            .filter((cacheName) => cacheName.startsWith('vybepulse-'))
+            .map((cacheName) => caches.delete(cacheName))
+        );
+
+        if (navigator.serviceWorker.controller && !hasReloaded) {
+          hasReloaded = true;
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Failed to reset service worker cache:', error);
+      }
+    };
+
+    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+    void resetCaches();
+
+    return () => {
+      navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+    };
+  }, []);
+
+  return null;
+}
+
 // Only Landing is eagerly loaded (first screen users see)
 import Landing from "./pages/Landing";
 
