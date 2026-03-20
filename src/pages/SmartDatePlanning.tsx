@@ -58,7 +58,7 @@ const SmartDatePlanning: React.FC = () => {
   
 
   useEffect(() => {
-    if (!sessionId || !fromProposal) return;
+    if (!isProposalFlow || !sessionId) return;
 
     const currentSessionIdInUrl = searchParams.get('sessionId');
     const currentFromProposalInUrl = searchParams.get('fromProposal');
@@ -69,7 +69,7 @@ const SmartDatePlanning: React.FC = () => {
       replace: true,
       state: location.state,
     });
-  }, [sessionId, fromProposal, searchParams, navigate, buildPlanDateUrl, planningMode, location.state]);
+  }, [isProposalFlow, sessionId, searchParams, navigate, buildPlanDateUrl, planningMode, location.state]);
 
   useEffect(() => {
     if (!user || !collaborativeSession || !sessionId) return;
