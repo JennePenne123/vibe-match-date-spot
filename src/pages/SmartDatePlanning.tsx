@@ -96,7 +96,7 @@ const SmartDatePlanning: React.FC = () => {
         })
         .then((newSession) => {
           if (newSession?.id) {
-            console.log('✅ SESSION GUARDRAIL: Created fresh session:', newSession.id);
+            
             navigate('/plan-date', {
               state: {
                 sessionId: newSession.id,
