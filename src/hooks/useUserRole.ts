@@ -21,16 +21,19 @@ export const useUserRole = () => {
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+          .eq('user_id', user.id);
 
         if (error) {
           console.error('Error fetching user role:', error);
           setRole('regular');
+        } else if (data && data.length > 0) {
+          // Prioritize: admin > venue_partner > regular
+          const roles = data.map(d => d.role as UserRole);
+          if (roles.includes('admin')) setRole('admin');
+          else if (roles.includes('venue_partner')) setRole('venue_partner');
+          else setRole('regular');
         } else {
-          setRole((data?.role as UserRole) || 'regular');
+          setRole('regular');
         }
       } catch (error) {
         console.error('Error in fetchUserRole:', error);
