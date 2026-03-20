@@ -97,7 +97,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         <div
           style={getContentStyle()}
-          className="will-change-transform"
+          className={cn("will-change-transform", isAdminRoute && "overflow-x-hidden")}
         >
           {children}
         </div>
