@@ -39,6 +39,8 @@ export const hasCompletedPreferenceSetup = (preferences: PreferenceSnapshot | nu
     hasSelections(preferences.accessibility_needs) ||
     hasSelections(preferences.preferred_venue_types) ||
     Boolean(preferences.preferred_duration) ||
-    hasSavedLocation(preferences)
+    hasSavedLocation(preferences) ||
+    Boolean(preferences.personality_traits) ||
+    Boolean(preferences.relationship_goal)
   );
 };
