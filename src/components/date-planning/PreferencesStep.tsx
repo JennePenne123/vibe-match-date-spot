@@ -720,9 +720,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           </div>
         </CardHeader>
         <CardContent className="px-4 md:px-6 pb-4 md:pb-6 space-y-4 md:space-y-6">
-          {currentStep === 1 && renderDurationStep()}
-          {currentStep === 2 && renderPreferencesStep()}
-          {currentStep === 3 && renderConfirmStep()}
+          {currentStep === 1 && renderCombinedStep()}
+          {currentStep === 2 && renderConfirmStep()}
 
           <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
             <Button onClick={prevStep} variant="outline" disabled={currentStep === 1} className="w-full sm:w-auto">
