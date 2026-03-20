@@ -224,7 +224,7 @@ const HomeContent: React.FC = () => {
           </Card>
 
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1">
-            Was geht in deiner Stadt
+            {t('home.cityTipsTitle')}
           </h3>
           <div className={isDesktop ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-3"}>
             {[getDailyIndex(0), getDailyIndex(3)].map((idx, i) => {
