@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { bowlChopsticks } from '@lucide/lab';
 import {
-  ArrowLeft, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
+  ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
   Icon, ChevronDown, Save,
   Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup,
   HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
