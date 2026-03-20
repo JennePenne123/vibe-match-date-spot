@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import SmartDatePlanner from '@/components/SmartDatePlanner';
 import { useCollaborativeSession } from '@/hooks/useCollaborativeSession';
@@ -17,7 +17,18 @@ const SmartDatePlanning: React.FC = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isMobile } = useBreakpoint();
+
+  const buildPlanDateUrl = React.useCallback((nextSessionId: string, nextPlanningMode = 'collaborative') => {
+    const params = new URLSearchParams({
+      sessionId: nextSessionId,
+      fromProposal: 'true',
+      planningMode: nextPlanningMode,
+    });
+
+    return `/plan-date?${params.toString()}`;
+  }, []);
   
   // Get user display info - MUST be called before any conditional returns
   const userInfo = React.useMemo(() => {
@@ -34,15 +45,29 @@ const SmartDatePlanning: React.FC = () => {
   }, [user]);
   
   // Get navigation state for collaborative sessions
-  const sessionId = location.state?.sessionId;
-  const fromProposal = location.state?.fromProposal;
-  const planningMode = location.state?.planningMode;
+  const sessionId = location.state?.sessionId ?? searchParams.get('sessionId');
+  const fromProposal = location.state?.fromProposal ?? searchParams.get('fromProposal') === 'true';
+  const planningMode = location.state?.planningMode ?? searchParams.get('planningMode') ?? 'collaborative';
   
   // Get session data to check if it needs reset
   const { session: collaborativeSession } = useCollaborativeSession(sessionId);
   const { createPlanningSession, getActiveSession } = useSessionManagement();
   
-  
+
+  useEffect(() => {
+    if (!sessionId || !fromProposal) return;
+
+    const currentSessionIdInUrl = searchParams.get('sessionId');
+    const currentFromProposalInUrl = searchParams.get('fromProposal');
+
+    if (currentSessionIdInUrl === sessionId && currentFromProposalInUrl === 'true') return;
+
+    navigate(buildPlanDateUrl(sessionId, planningMode), {
+      replace: true,
+      state: location.state,
+    });
+  }, [sessionId, fromProposal, searchParams, navigate, buildPlanDateUrl, planningMode, location.state]);
+
   useEffect(() => {
     if (!user || !collaborativeSession || !sessionId) return;
     
@@ -63,25 +88,22 @@ const SmartDatePlanning: React.FC = () => {
       return;
     }
     
-    // Only create fresh session if session is truly invalid (expired, completed, or corrupted)
     const needsFreshSession = isExpired || isCompleted || isInactive;
     
     if (needsFreshSession && !sessionStorage.getItem(`guardrail-${sessionId}`)) {
       console.log('🔄 SESSION GUARDRAIL: Session is invalid, looking for existing active session first');
       
-      // Mark this session as processed to prevent loops
       sessionStorage.setItem(`guardrail-${sessionId}`, 'processed');
       
       const partnerId = collaborativeSession.initiator_id === user.id 
         ? collaborativeSession.partner_id 
         : collaborativeSession.initiator_id;
       
-      // First try to find existing active session with this partner
       getActiveSession(partnerId)
         .then((existingSession) => {
           if (existingSession && existingSession.id !== sessionId) {
             console.log('✅ SESSION GUARDRAIL: Found existing active session, joining:', existingSession.id);
-            navigate('/plan-date', {
+            navigate(buildPlanDateUrl(existingSession.id), {
               state: {
                 sessionId: existingSession.id,
                 fromProposal: true,
@@ -90,14 +112,12 @@ const SmartDatePlanning: React.FC = () => {
               replace: true
             });
           } else {
-            // No existing session, create new one
             return createPlanningSession(partnerId, undefined, 'collaborative', true);
           }
         })
         .then((newSession) => {
           if (newSession?.id) {
-            
-            navigate('/plan-date', {
+            navigate(buildPlanDateUrl(newSession.id), {
               state: {
                 sessionId: newSession.id,
                 fromProposal: true,
@@ -111,15 +131,12 @@ const SmartDatePlanning: React.FC = () => {
           console.error('❌ SESSION GUARDRAIL: Failed to handle session:', error);
           sessionStorage.removeItem(`guardrail-${sessionId}`);
         });
-    } else if (sessionIsValid) {
-      
     }
-  }, [user, collaborativeSession, sessionId, createPlanningSession, navigate, getActiveSession]);
+  }, [user, collaborativeSession, sessionId, createPlanningSession, navigate, getActiveSession, buildPlanDateUrl]);
   
   // CRITICAL: Collaborative planning requires coming from an accepted proposal
   // If accessed directly without session data, redirect to home
   if (!fromProposal || !sessionId) {
-    
     navigate('/home', { replace: true });
     return null;
   }

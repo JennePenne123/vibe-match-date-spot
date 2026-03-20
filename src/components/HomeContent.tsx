@@ -38,7 +38,15 @@ const HomeContent: React.FC = () => {
     toast({ title: t('home.proposalSentTitle'), description: t('home.proposalSentDesc'), duration: 3000 });
   };
   const handleProposalAccepted = (sessionId: string) => {
-    navigate('/plan-date', { state: { sessionId, planningMode: 'collaborative', fromProposal: true } });
+    const params = new URLSearchParams({
+      sessionId,
+      planningMode: 'collaborative',
+      fromProposal: 'true',
+    });
+
+    navigate(`/plan-date?${params.toString()}`, {
+      state: { sessionId, planningMode: 'collaborative', fromProposal: true }
+    });
   };
   const handleInvitationSent = useCallback(() => {
     setInvitationSentTrigger(prev => prev + 1);
