@@ -554,6 +554,71 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   // ── Step renderers ────────────────────────────────────────────────
 
+  const renderConfirmationStep = () => {
+    if (!onboardingPrefs) return null;
+    const allVibesMap: Record<string, string> = { romantic: '💕 Romantic', casual: '😊 Casual', outdoor: '🌳 Outdoor', upscale: '✨ Upscale', lively: '🎉 Lively', cozy: '🕯️ Cozy', nightlife: '🌙 Nightlife', cultural: '🎭 Cultural', adventurous: '🗺️ Adventurous' };
+    const cuisineEmojis: Record<string, string> = { Italian: '🍝', Japanese: '🍣', Mexican: '🌮', French: '🥐', Indian: '🍛', Mediterranean: '🫒', American: '🍔', Thai: '🍜', Chinese: '🥢', Korean: '🍲' };
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-3">
+            <Sparkles className="w-7 h-7 text-primary" />
+          </div>
+          <h2 className="text-lg font-bold text-foreground mb-1">Deine Vorlieben stehen schon!</h2>
+          <p className="text-sm text-muted-foreground">Basierend auf deinem Onboarding – möchtest du sie übernehmen oder heute anders?</p>
+        </div>
+
+        {/* Preference summary */}
+        <div className="bg-muted/50 rounded-xl p-4 space-y-3 border border-border">
+          {onboardingPrefs.preferred_cuisines.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Küche</p>
+              <div className="flex flex-wrap gap-1.5">
+                {onboardingPrefs.preferred_cuisines.map(c => (
+                  <Badge key={c} variant="secondary" className="text-xs">{cuisineEmojis[c] || '🍽️'} {c}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+          {onboardingPrefs.preferred_vibes.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Vibe</p>
+              <div className="flex flex-wrap gap-1.5">
+                {onboardingPrefs.preferred_vibes.map(v => (
+                  <Badge key={v} variant="secondary" className="text-xs">{allVibesMap[v] || v}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+          {onboardingPrefs.preferred_price_range.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Budget</p>
+              <div className="flex flex-wrap gap-1.5">
+                {onboardingPrefs.preferred_price_range.map(p => (
+                  <Badge key={p} variant="secondary" className="text-xs">{p}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Action buttons */}
+        <div className="grid grid-cols-1 gap-3">
+          <Button onClick={handleKeepPreferences} className="w-full h-12 text-base font-semibold transition-transform active:scale-[0.97]">
+            <Check className="w-5 h-5 mr-2" />
+            So übernehmen
+          </Button>
+          <Button onClick={handleCustomize} variant="outline" className="w-full h-12 text-base transition-transform active:scale-[0.97]">
+            <Settings className="w-4 h-4 mr-2" />
+            Heute anders
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+
   const renderCombinedStep = () => (
     <div className="space-y-6">
       {/* Duration Models */}
