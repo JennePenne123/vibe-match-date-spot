@@ -48,6 +48,9 @@ const SmartDatePlanning: React.FC = () => {
   const sessionId = location.state?.sessionId ?? searchParams.get('sessionId');
   const fromProposal = location.state?.fromProposal ?? searchParams.get('fromProposal') === 'true';
   const planningMode = location.state?.planningMode ?? searchParams.get('planningMode') ?? 'collaborative';
+  const preselectedFriend = location.state?.preselectedFriend ?? null;
+  const isProposalFlow = Boolean(fromProposal && sessionId);
+  const hasInvalidProposalState = Boolean(fromProposal && !sessionId);
   
   // Get session data to check if it needs reset
   const { session: collaborativeSession } = useCollaborativeSession(sessionId);
