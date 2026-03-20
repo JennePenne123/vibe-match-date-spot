@@ -77,10 +77,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   const {
     user, friends, friendsError, datePlanningError, planningStepsError,
     currentSession, loading, compatibilityScore, venueRecommendations,
-    currentStep, selectedPartnerId, setCurrentStep, getStepProgress, goBack,
+    currentStep, selectedPartnerId, setCurrentStep, setSelectedPartnerId, getStepProgress, goBack,
     selectedVenueId, invitationMessage, setInvitationMessage, aiAnalyzing,
     selectedPartner, selectedVenue, navigate, userLocation, locationError,
     locationRequested, requestLocation,
+    dateMode, setDateMode, selectedPartnerIds, setSelectedPartnerIds,
   } = state;
 
   const { handlePreferencesComplete, handleVenueSelection, handleSendInvitation, handleStartFromScratch, handleManualContinue } = handlers;
