@@ -5,6 +5,7 @@ import { AppSidebar } from './AppSidebar'
 import { PartnerSidebar } from './PartnerSidebar'
 import { AdminSidebar } from './AdminSidebar'
 import { MobileBottomNav } from './MobileBottomNav'
+import { AdminMobileBottomNav } from './AdminMobileBottomNav'
 import { PartnerMobileBottomNav } from './PartnerMobileBottomNav'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
@@ -70,7 +71,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   if (isMobile) {
     return (
-      <div className={cn("min-h-screen w-full bg-background", isAdminRoute ? "overflow-x-hidden" : "pb-16")}>
+      <div className={cn("min-h-screen w-full bg-background", isAdminRoute ? "overflow-x-hidden pb-16" : "pb-16")}>
         <style>{`
           @keyframes nav-slide-left {
             0% { transform: translateX(18%); opacity: 0.6; }
@@ -104,7 +105,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         {isPartnerRoute ? (
           <PartnerMobileBottomNav />
-        ) : isAdminRoute ? null : (
+        ) : isAdminRoute ? (
+          <AdminMobileBottomNav />
+        ) : (
           <MobileBottomNav />
         )}
       </div>
