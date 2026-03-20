@@ -9,6 +9,7 @@ import PlanTogether from '@/components/date-planning/PlanTogether';
 import InvitationCreation from '@/components/date-planning/InvitationCreation';
 import PlanningHeader from '@/components/date-planning/PlanningHeader';
 import PreferencesStep from '@/components/date-planning/PreferencesStep';
+import PartnerSelection from '@/components/date-planning/PartnerSelection';
 
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
 import { createSmartDatePlannerHandlers } from '@/components/smart-date-planner/SmartDatePlannerHandlers';
@@ -76,11 +77,19 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   const {
     user, friends, friendsError, datePlanningError, planningStepsError,
     currentSession, loading, compatibilityScore, venueRecommendations,
-    currentStep, selectedPartnerId, setCurrentStep, getStepProgress, goBack,
+    currentStep, selectedPartnerId, setCurrentStep, setSelectedPartnerId, getStepProgress, goBack,
     selectedVenueId, invitationMessage, setInvitationMessage, aiAnalyzing,
     selectedPartner, selectedVenue, navigate, userLocation, locationError,
     locationRequested, requestLocation,
+    dateMode, setDateMode, selectedPartnerIds, setSelectedPartnerIds,
   } = state;
+
+  const handlePartnerContinue = () => {
+    if (selectedPartnerId) {
+      // TODO: create collaborative session for the selected partner if needed
+      setCurrentStep('set-preferences');
+    }
+  };
 
   const { handlePreferencesComplete, handleVenueSelection, handleSendInvitation, handleStartFromScratch, handleManualContinue } = handlers;
 
@@ -190,6 +199,19 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
               {/* Steps */}
               <ErrorBoundaryWrapper silent>
                 <div className="animate-fade-in">
+                  {currentStep === 'select-partner' && (
+                    <PartnerSelection
+                      friends={friends}
+                      selectedPartnerId={selectedPartnerId}
+                      selectedPartnerIds={selectedPartnerIds}
+                      dateMode={dateMode}
+                      loading={loading}
+                      onPartnerChange={(id) => setSelectedPartnerId(id)}
+                      onPartnerIdsChange={setSelectedPartnerIds}
+                      onDateModeChange={setDateMode}
+                      onContinue={handlePartnerContinue}
+                    />
+                  )}
                   {currentStep === 'set-preferences' && preferencesStepContent}
                   {currentStep === 'plan-together' && venueStepContent}
                   {currentStep === 'create-invitation' && selectedPartner && renderInvitationStep()}

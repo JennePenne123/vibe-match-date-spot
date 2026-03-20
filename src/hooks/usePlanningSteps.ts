@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 
-export type PlanningStep = 'set-preferences' | 'plan-together' | 'create-invitation';
+export type PlanningStep = 'select-partner' | 'set-preferences' | 'plan-together' | 'create-invitation';
 
 interface UsePlanningStepsProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -8,7 +8,8 @@ interface UsePlanningStepsProps {
 }
 
 export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborative' }: UsePlanningStepsProps) => {
-  const [currentStep, setCurrentStepInternal] = useState<PlanningStep>('set-preferences');
+  const initialStep: PlanningStep = preselectedFriend ? 'set-preferences' : 'select-partner';
+  const [currentStep, setCurrentStepInternal] = useState<PlanningStep>(initialStep);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
 
   const setCurrentStep = (step: PlanningStep) => {
@@ -18,6 +19,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
 
   const getStepProgress = () => {
     switch (currentStep) {
+      case 'select-partner': return 10;
       case 'set-preferences': return 33;
       case 'plan-together': return 66;
       case 'create-invitation': return 100;
@@ -27,8 +29,15 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
 
   const goBack = (preselectedFriend?: { id: string; name: string } | null, navigate?: (path: string) => void) => {
     switch (currentStep) {
-      case 'set-preferences':
+      case 'select-partner':
         if (navigate) navigate('/home');
+        break;
+      case 'set-preferences':
+        if (preselectedFriend) {
+          if (navigate) navigate('/home');
+        } else {
+          setCurrentStepInternal('select-partner');
+        }
         break;
       case 'plan-together':
         setCurrentStepInternal('set-preferences');
