@@ -75,17 +75,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   const [proposalDateISO, setProposalDateISO] = useState<string | undefined>();
   useEffect(() => {
     const loadProposalDate = async () => {
-      console.log('🔍 PROPOSAL DATE FETCH:', { fromProposal, sessionId });
-      
-      if (!fromProposal || !sessionId) {
-        console.log('⚠️ PROPOSAL DATE FETCH: Skipping - fromProposal:', fromProposal, 'sessionId:', sessionId);
-        return;
-      }
+      if (!fromProposal || !sessionId) return;
       
       try {
-        console.log('📡 PROPOSAL DATE FETCH: Step 1 - Fetching session participants...');
-        
-        // First, get the session to find out who the participants are
         const { data: sessionData, error: sessionError } = await supabase
           .from('date_planning_sessions')
           .select('initiator_id, partner_id')
@@ -93,16 +85,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
           .single();
         
         if (sessionError) throw sessionError;
+        if (!sessionData) return;
         
-        if (!sessionData) {
-          console.warn('⚠️ PROPOSAL DATE FETCH: Session not found');
-          return;
-        }
-        
-        console.log('📡 PROPOSAL DATE FETCH: Step 2 - Session participants:', sessionData);
-        
-        // Now find the proposal between these two users
-        // Check both directions since we don't know who proposed
         const { data, error } = await supabase
           .from('date_proposals')
           .select('proposed_date')
@@ -110,23 +94,15 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
           .eq('status', 'accepted')
           .order('created_at', { ascending: false })
           .limit(1);
-          
-        console.log('📊 PROPOSAL DATE FETCH: Query result:', { data, error });
         
         if (error) throw error;
         
         const row = Array.isArray(data) ? data?.[0] : (data as any);
-        
-        console.log('📝 PROPOSAL DATE FETCH: Parsed row:', row);
-        
         if (row?.proposed_date) {
-          console.log('✅ PROPOSAL DATE FETCH: Setting proposalDateISO to:', row.proposed_date);
           setProposalDateISO(row.proposed_date);
-        } else {
-          console.warn('⚠️ PROPOSAL DATE FETCH: No proposed_date found in row');
         }
       } catch (err) {
-        console.error('❌ PROPOSAL DATE FETCH: Failed to load proposal proposed_date:', err);
+        console.error('Failed to load proposal date:', err);
       }
     };
     loadProposalDate();
