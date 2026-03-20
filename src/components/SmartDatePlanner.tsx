@@ -160,18 +160,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       !collaborativeSession.ai_compatibility_score &&
       state.currentStep === 'set-preferences';
     
-    console.log('🔧 SMART PLANNER: Session Recovery Check:', {
-      sessionId: collaborativeSession.id,
-      both_complete: collaborativeSession.both_preferences_complete,
-      has_ai_score: !!collaborativeSession.ai_compatibility_score,
-      current_step: state.currentStep,
-      has_location: !!state.userLocation,
-      should_auto_trigger: shouldAutoTriggerRecovery
-    });
-    
-    // Enhanced recovery with location - use manual trigger with location
     if (shouldAutoTriggerRecovery && state.userLocation && triggerAIAnalysisManually) {
-      console.log('🚀 SMART PLANNER: AUTO-TRIGGERING AI ANALYSIS for session recovery with location');
       // Small delay to ensure all state is settled
       setTimeout(() => {
         triggerAIAnalysisManually(state.userLocation);
