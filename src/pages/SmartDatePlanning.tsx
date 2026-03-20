@@ -91,7 +91,6 @@ const SmartDatePlanning: React.FC = () => {
             });
           } else {
             // No existing session, create new one
-            console.log('🔄 SESSION GUARDRAIL: No active session found, creating fresh session');
             return createPlanningSession(partnerId, undefined, 'collaborative', true);
           }
         })
