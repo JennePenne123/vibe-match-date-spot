@@ -121,12 +121,12 @@ const MoodCheckIn: React.FC = () => {
         try {
           const { data } = await supabase
             .from('user_preferences')
-            .select('home_address, home_latitude, home_longitude, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types')
+            .select('home_address, home_latitude, home_longitude, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types, personality_traits, relationship_goal')
             .eq('user_id', user.id)
             .maybeSingle();
 
           if (!hasCompletedPreferenceSetup(data)) {
-            navigate('/preferences?onboarding=true', { replace: true });
+            navigate('/welcome', { replace: true });
             return;
           }
         } catch (error) {

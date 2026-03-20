@@ -38,10 +38,12 @@ const Home: React.FC = () => {
     if (hasCheckedOnboarding.current) return;
     hasCheckedOnboarding.current = true;
 
+    // Check mood first, then onboarding
     if (!hasMoodToday()) {
       navigate('/mood', { replace: true });
       return;
     }
+
 
     const checkOnboarding = async () => {
       try {

@@ -181,7 +181,7 @@ const Onboarding = () => {
     if (step > 0) animateTransition(step - 1);
   };
 
-  const handleSkip = () => navigate('/mood', { replace: true });
+  const handleSkip = () => navigate('/home', { replace: true });
 
   const getNextLabel = () => {
     if (step === 0) return 'Los geht\'s';
