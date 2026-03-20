@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import SmartDatePlanner from '@/components/SmartDatePlanner';
 import { useCollaborativeSession } from '@/hooks/useCollaborativeSession';
@@ -17,7 +17,18 @@ const SmartDatePlanning: React.FC = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isMobile } = useBreakpoint();
+
+  const buildPlanDateUrl = React.useCallback((nextSessionId: string, nextPlanningMode = 'collaborative') => {
+    const params = new URLSearchParams({
+      sessionId: nextSessionId,
+      fromProposal: 'true',
+      planningMode: nextPlanningMode,
+    });
+
+    return `/plan-date?${params.toString()}`;
+  }, []);
   
   // Get user display info - MUST be called before any conditional returns
   const userInfo = React.useMemo(() => {
@@ -34,9 +45,9 @@ const SmartDatePlanning: React.FC = () => {
   }, [user]);
   
   // Get navigation state for collaborative sessions
-  const sessionId = location.state?.sessionId;
-  const fromProposal = location.state?.fromProposal;
-  const planningMode = location.state?.planningMode;
+  const sessionId = location.state?.sessionId ?? searchParams.get('sessionId');
+  const fromProposal = location.state?.fromProposal ?? searchParams.get('fromProposal') === 'true';
+  const planningMode = location.state?.planningMode ?? searchParams.get('planningMode') ?? 'collaborative';
   
   // Get session data to check if it needs reset
   const { session: collaborativeSession } = useCollaborativeSession(sessionId);
