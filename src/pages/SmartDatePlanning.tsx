@@ -126,7 +126,7 @@ const SmartDatePlanning: React.FC = () => {
 
   // Show loading spinner while auth is loading
   if (loading) {
-    console.log('SmartDatePlanning - Auth loading, showing spinner');
+    
     return <LoadingSpinner />;
   }
 
