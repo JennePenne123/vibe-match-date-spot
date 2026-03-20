@@ -6,8 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Heart, Clock, Sparkles, Loader2, Check, DollarSign, MapPin, Coffee, Settings, CalendarIcon, CheckCircle, AlertCircle, X, ChevronDown } from 'lucide-react';
+import { Heart, Clock, Sparkles, Loader2, Check, Settings, CalendarIcon, CheckCircle, AlertCircle, X, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -71,40 +70,88 @@ interface DatePreferences {
   preferred_time?: string;
 }
 
+// ── Data definitions ──────────────────────────────────────────────
+
+const cuisines: Preference[] = [
+  { id: 'Italian', name: 'Italienisch', emoji: '🍝' },
+  { id: 'Japanese', name: 'Japanisch', emoji: '🍣' },
+  { id: 'Mexican', name: 'Mexikanisch', emoji: '🌮' },
+  { id: 'French', name: 'Französisch', emoji: '🥐' },
+  { id: 'Indian', name: 'Indisch', emoji: '🍛' },
+  { id: 'Mediterranean', name: 'Mediterran', emoji: '🫒' },
+  { id: 'American', name: 'Amerikanisch', emoji: '🍔' },
+  { id: 'Thai', name: 'Thai', emoji: '🍜' },
+  { id: 'Chinese', name: 'Chinesisch', emoji: '🥢' },
+  { id: 'Korean', name: 'Koreanisch', emoji: '🍲' }
+];
+
+const durationModels = [
+  { id: 'quick', title: 'Quick & Sweet', emoji: '⚡', desc: '1–2 h', excludeVibes: ['lively'], suggestTimes: ['morning', 'lunch', 'afternoon'], suggestPrice: ['$', '$$'] },
+  { id: 'relaxed', title: 'Relaxed', emoji: '☀️', desc: '2–4 h', excludeVibes: [] as string[], suggestTimes: ['lunch', 'afternoon'], suggestPrice: ['$$', '$$$'] },
+  { id: 'evening', title: 'Full Evening', emoji: '🌆', desc: '4+ h', excludeVibes: [] as string[], suggestTimes: ['evening', 'night'], suggestPrice: ['$$', '$$$', '$$$$'] },
+  { id: 'adventure', title: 'All-Day', emoji: '🗺️', desc: 'Ganzer Tag', excludeVibes: [] as string[], suggestTimes: ['morning', 'lunch', 'afternoon', 'evening'], suggestPrice: ['$', '$$', '$$$'] }
+];
+
+const allVibes: Preference[] = [
+  { id: 'romantic', name: 'Romantisch', emoji: '💕' },
+  { id: 'casual', name: 'Casual', emoji: '😊' },
+  { id: 'outdoor', name: 'Outdoor', emoji: '🌳' },
+  { id: 'upscale', name: 'Upscale', emoji: '✨' },
+  { id: 'lively', name: 'Lively', emoji: '🎉' },
+  { id: 'cozy', name: 'Gemütlich', emoji: '🕯️' }
+];
+
+const priceRanges: Preference[] = [
+  { id: '$', name: 'Budget', emoji: '💰' },
+  { id: '$$', name: 'Moderate', emoji: '💳' },
+  { id: '$$$', name: 'Gehoben', emoji: '💎' },
+  { id: '$$$$', name: 'Luxus', emoji: '👑' }
+];
+
+const timePreferences: Preference[] = [
+  { id: 'morning', name: 'Morgens', emoji: '🌅' },
+  { id: 'lunch', name: 'Mittag', emoji: '☀️' },
+  { id: 'afternoon', name: 'Nachmittag', emoji: '🌤️' },
+  { id: 'evening', name: 'Abend', emoji: '🌆' },
+  { id: 'night', name: 'Nacht', emoji: '🌙' }
+];
+
+const dietaryRequirements: Preference[] = [
+  { id: 'vegetarian', name: 'Vegetarisch', emoji: '🥬' },
+  { id: 'vegan', name: 'Vegan', emoji: '🌱' },
+  { id: 'gluten-free', name: 'Glutenfrei', emoji: '🚫' },
+  { id: 'dairy-free', name: 'Laktosefrei', emoji: '🥛' },
+  { id: 'halal', name: 'Halal', emoji: '☪️' },
+  { id: 'kosher', name: 'Koscher', emoji: '✡️' }
+];
+
+const allQuickStartTemplates = [
+  { id: 'romantic-dinner', title: 'Romantic Dinner', emoji: '💕', description: 'Candlelight & fine dining', cuisines: ['Italian', 'French'], vibes: ['romantic', 'upscale'], priceRange: ['$$$', '$$$$'], timePreferences: ['evening'], fitsDuration: ['evening', 'adventure'] },
+  { id: 'casual-brunch', title: 'Casual Brunch', emoji: '☕', description: 'Relaxed & social', cuisines: ['American', 'Mediterranean'], vibes: ['casual', 'cozy'], priceRange: ['$', '$$'], timePreferences: ['morning', 'lunch'], fitsDuration: ['quick', 'relaxed', 'adventure'] },
+  { id: 'trendy-cocktail', title: 'Cocktail Bar', emoji: '🍸', description: 'Stylish drinks & vibes', cuisines: ['American'], vibes: ['lively', 'upscale'], priceRange: ['$$', '$$$'], timePreferences: ['evening', 'night'], fitsDuration: ['evening'] },
+  { id: 'coffee-walk', title: 'Coffee & Walk', emoji: '☕🚶', description: 'Quick & spontaneous', cuisines: ['American', 'Italian'], vibes: ['casual', 'outdoor'], priceRange: ['$'], timePreferences: ['morning', 'afternoon'], fitsDuration: ['quick'] }
+];
+
+// ── Component ──────────────────────────────────────────────────────
+
 const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const {
-    sessionId,
-    partnerId,
-    partnerName,
-    compatibilityScore,
-    aiAnalyzing,
-    onPreferencesComplete,
-    initialProposedDate,
-    planningMode = 'solo',
-    collaborativeSession,
-    onManualContinue,
-    onDisplayVenues,
-    venueRecommendations = []
+    sessionId, partnerId, partnerName, compatibilityScore, aiAnalyzing,
+    onPreferencesComplete, initialProposedDate, planningMode = 'solo',
+    collaborativeSession, onManualContinue, onDisplayVenues, venueRecommendations = []
   } = props;
 
   const { user } = useAuth();
-  
+
+  // Flow state: 'confirm' | 'customize'
+  const [flowState, setFlowState] = useState<'confirm' | 'customize'>('confirm');
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0); // 0 = confirm onboarding prefs, 1 = all-in-one preferences
   const [hasCompletedAllSteps, setHasCompletedAllSteps] = useState(false);
   const [onboardingPrefs, setOnboardingPrefs] = useState<UserPreferences | null>(null);
   const [onboardingLoaded, setOnboardingLoaded] = useState(false);
-  
-  // Duration model state
-  const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
-  
-  // Timeout fallback state
-  const [aiAnalysisStartTime, setAiAnalysisStartTime] = useState<number | null>(null);
-  const [timeoutTriggered, setTimeoutTriggered] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const NAVIGATION_TIMEOUT_MS = 10000;
 
-  // State for all preferences
+  // Selections
+  const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState<string[]>([]);
@@ -113,32 +160,86 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
-  const [partnerPreferences, setPartnerPreferences] = useState<UserPreferences | null>(null);
-  const [autoNavigating, setAutoNavigating] = useState(false);
-  const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [learnedTemplate, setLearnedTemplate] = useState<{ id: string; title: string; emoji: string; description: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[] } | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  
-  // Track user modifications
+
+  // Tracking
   const [userModifiedDate, setUserModifiedDate] = useState(false);
   const [userModifiedTime, setUserModifiedTime] = useState(false);
   const [userModifiedTimePrefs, setUserModifiedTimePrefs] = useState(false);
   const [prefilledFromProposal, setPrefilledFromProposal] = useState(false);
+  const [autoNavigating, setAutoNavigating] = useState(false);
+  const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
 
-  // Helper function to map time string to time preference ID
-  const getTimePreferenceFromTime = (timeString: string): string | null => {
-    if (!timeString) return null;
-    const [hours] = timeString.split(':').map(Number);
-    if (hours >= 9 && hours < 12) return 'morning';
-    if (hours >= 12 && hours < 15) return 'lunch';
-    if (hours >= 15 && hours < 18) return 'afternoon';
-    if (hours >= 18 && hours < 21) return 'evening';
-    if (hours >= 21 || hours < 9) return 'night';
-    return null;
-  };
+  // Timeout
+  const [aiAnalysisStartTime, setAiAnalysisStartTime] = useState<number | null>(null);
+  const [timeoutTriggered, setTimeoutTriggered] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const NAVIGATION_TIMEOUT_MS = 10000;
 
-  // Prefill date/time from proposal
+  // Accordion state
+  const [openSections, setOpenSections] = useState<string[]>([]);
+
+  // ── Derived ──────────────────────────────────────────────────────
+
+  const selectedDurationModel = durationModels.find(d => d.id === selectedDuration);
+  const vibes = selectedDurationModel
+    ? allVibes.filter(v => !selectedDurationModel.excludeVibes.includes(v.id))
+    : allVibes;
+  const quickStartTemplates = selectedDuration
+    ? allQuickStartTemplates.filter(t => t.fitsDuration.includes(selectedDuration))
+    : allQuickStartTemplates;
+
+  // ── Effects ──────────────────────────────────────────────────────
+
+  // Load onboarding preferences
+  useEffect(() => {
+    const load = async () => {
+      if (!user?.id) return;
+      try {
+        const { data, error } = await supabase.from('user_preferences').select('*').eq('user_id', user.id).single();
+        if (error || !data) {
+          setOnboardingLoaded(true);
+          setFlowState('customize');
+          return;
+        }
+        const has = (arr: any) => arr && arr.length > 0;
+        if (has(data.preferred_cuisines) || has(data.preferred_vibes) || has(data.preferred_price_range) || has(data.preferred_times)) {
+          const prefs: UserPreferences = {
+            preferred_cuisines: data.preferred_cuisines || [],
+            preferred_vibes: data.preferred_vibes || [],
+            preferred_price_range: data.preferred_price_range || [],
+            preferred_times: data.preferred_times || [],
+            max_distance: data.max_distance || 15,
+            dietary_restrictions: data.dietary_restrictions || []
+          };
+          setOnboardingPrefs(prefs);
+          setLearnedTemplate({
+            id: 'ai-learned', title: 'Für dich', emoji: '🤖',
+            description: 'Basierend auf deinen Vorlieben',
+            cuisines: prefs.preferred_cuisines, vibes: prefs.preferred_vibes,
+            priceRange: prefs.preferred_price_range, timePreferences: prefs.preferred_times
+          });
+        } else {
+          setFlowState('customize');
+        }
+        setOnboardingLoaded(true);
+      } catch {
+        setOnboardingLoaded(true);
+        setFlowState('customize');
+      }
+    };
+    load();
+  }, [user?.id]);
+
+  // Load partner preferences
+  useEffect(() => {
+    if (!user?.id || !partnerId) return;
+    supabase.from('user_preferences').select('*').eq('user_id', partnerId).single()
+      .then(({ data }) => { /* partner prefs loaded for future use */ });
+  }, [user?.id, partnerId]);
+
+  // Prefill from proposal
   useEffect(() => {
     if (initialProposedDate && !prefilledFromProposal) {
       const dt = new Date(initialProposedDate);
@@ -149,27 +250,27 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
             const hhmm = format(dt, 'HH:mm');
             setSelectedTime(hhmm);
             if (!userModifiedTimePrefs) {
-              const timePref = getTimePreferenceFromTime(hhmm);
-              if (timePref && !selectedTimePreferences.includes(timePref)) {
+              const [hours] = hhmm.split(':').map(Number);
+              let timePref = 'evening';
+              if (hours >= 9 && hours < 12) timePref = 'morning';
+              else if (hours >= 12 && hours < 15) timePref = 'lunch';
+              else if (hours >= 15 && hours < 18) timePref = 'afternoon';
+              else if (hours >= 21 || hours < 9) timePref = 'night';
+              if (!selectedTimePreferences.includes(timePref)) {
                 setSelectedTimePreferences(prev => [...prev, timePref]);
               }
             }
-          } catch (err) {
-            console.error('Failed to format time:', err);
-          }
+          } catch {}
         }
         setPrefilledFromProposal(true);
       }
     }
-  }, [initialProposedDate, prefilledFromProposal, userModifiedDate, userModifiedTime, userModifiedTimePrefs, selectedTimePreferences]);
+  }, [initialProposedDate, prefilledFromProposal]);
 
-  // Track AI analysis timing
+  // AI analysis timing
   useEffect(() => {
-    if (aiAnalyzing && !aiAnalysisStartTime) {
-      setAiAnalysisStartTime(Date.now());
-    } else if (!aiAnalyzing && aiAnalysisStartTime) {
-      setAiAnalysisStartTime(null);
-    }
+    if (aiAnalyzing && !aiAnalysisStartTime) setAiAnalysisStartTime(Date.now());
+    else if (!aiAnalyzing && aiAnalysisStartTime) setAiAnalysisStartTime(null);
   }, [aiAnalyzing, aiAnalysisStartTime]);
 
   // Auto-navigation for collaborative mode
@@ -177,9 +278,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     if (planningMode === 'collaborative' && collaborativeSession && onDisplayVenues && !hasAutoNavigated && !autoNavigating) {
       const userReady = collaborativeSession.hasUserSetPreferences;
       const partnerReady = collaborativeSession.hasPartnerSetPreferences;
-      
       const shouldAutoNavigate = userReady && partnerReady && hasCompletedAllSteps && !aiAnalyzing && venueRecommendations.length > 0;
-      
+
       if (shouldAutoNavigate) {
         setAutoNavigating(true);
         setHasAutoNavigated(true);
@@ -187,7 +287,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         const timer = setTimeout(() => onDisplayVenues(), 2000);
         return () => clearTimeout(timer);
       }
-      
+
       if (userReady && partnerReady && hasCompletedAllSteps && !timeoutRef.current) {
         timeoutRef.current = setTimeout(() => {
           if (!hasAutoNavigated) {
@@ -198,200 +298,83 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           }
         }, NAVIGATION_TIMEOUT_MS);
       }
-      
+
       return () => {
         if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
         setTimeoutTriggered(false);
       };
     }
-  }, [planningMode, collaborativeSession, hasCompletedAllSteps, aiAnalyzing, venueRecommendations.length, onDisplayVenues, hasAutoNavigated, autoNavigating, aiAnalysisStartTime, NAVIGATION_TIMEOUT_MS]);
+  }, [planningMode, collaborativeSession, hasCompletedAllSteps, aiAnalyzing, venueRecommendations.length, onDisplayVenues, hasAutoNavigated, autoNavigating]);
 
-  // ── Data definitions ──────────────────────────────────────────────
+  // ── Handlers ──────────────────────────────────────────────────────
 
-  const cuisines: Preference[] = [
-    { id: 'Italian', name: 'Italian', emoji: '🍝' },
-    { id: 'Japanese', name: 'Japanese', emoji: '🍣' },
-    { id: 'Mexican', name: 'Mexican', emoji: '🌮' },
-    { id: 'French', name: 'French', emoji: '🥐' },
-    { id: 'Indian', name: 'Indian', emoji: '🍛' },
-    { id: 'Mediterranean', name: 'Mediterranean', emoji: '🫒' },
-    { id: 'American', name: 'American', emoji: '🍔' },
-    { id: 'Thai', name: 'Thai', emoji: '🍜' },
-    { id: 'Chinese', name: 'Chinese', emoji: '🥢' },
-    { id: 'Korean', name: 'Korean', emoji: '🍲' }
-  ];
-
-  const durationModels = [
-    { id: 'quick', title: 'Quick & Sweet', emoji: '⚡', desc: '1–2 Stunden – Kaffee, Lunch, Snack', excludeVibes: ['lively'], suggestTimes: ['morning', 'lunch', 'afternoon'], suggestPrice: ['$', '$$'] },
-    { id: 'relaxed', title: 'Relaxed Afternoon', emoji: '☀️', desc: '2–4 Stunden – Brunch, Café, Spaziergang', excludeVibes: [] as string[], suggestTimes: ['lunch', 'afternoon'], suggestPrice: ['$$', '$$$'] },
-    { id: 'evening', title: 'Full Evening', emoji: '🌆', desc: '4+ Stunden – Dinner, Drinks, Bar', excludeVibes: [] as string[], suggestTimes: ['evening', 'night'], suggestPrice: ['$$', '$$$', '$$$$'] },
-    { id: 'adventure', title: 'All-Day Adventure', emoji: '🗺️', desc: 'Ganzer Tag – Mehrere Stops, Entdecken', excludeVibes: [] as string[], suggestTimes: ['morning', 'lunch', 'afternoon', 'evening'], suggestPrice: ['$', '$$', '$$$'] }
-  ];
-
-  const selectedDurationModel = durationModels.find(d => d.id === selectedDuration);
-
-  const allVibes: Preference[] = [
-    { id: 'romantic', name: 'Romantic', emoji: '💕' },
-    { id: 'casual', name: 'Casual', emoji: '😊' },
-    { id: 'outdoor', name: 'Outdoor', emoji: '🌳' },
-    { id: 'upscale', name: 'Upscale', emoji: '✨' },
-    { id: 'lively', name: 'Lively', emoji: '🎉' },
-    { id: 'cozy', name: 'Cozy', emoji: '🕯️' }
-  ];
-
-  const vibes = selectedDurationModel
-    ? allVibes.filter(v => !selectedDurationModel.excludeVibes.includes(v.id))
-    : allVibes;
-
-  const priceRanges: Preference[] = [
-    { id: '$', name: 'Budget', emoji: '💰' },
-    { id: '$$', name: 'Moderate', emoji: '💳' },
-    { id: '$$$', name: 'Upscale', emoji: '💎' },
-    { id: '$$$$', name: 'Luxury', emoji: '👑' }
-  ];
-
-  const timePreferences: Preference[] = [
-    { id: 'morning', name: 'Morning', emoji: '🌅' },
-    { id: 'lunch', name: 'Lunch', emoji: '☀️' },
-    { id: 'afternoon', name: 'Afternoon', emoji: '🌤️' },
-    { id: 'evening', name: 'Evening', emoji: '🌆' },
-    { id: 'night', name: 'Night', emoji: '🌙' }
-  ];
-
-  const dietaryRequirements: Preference[] = [
-    { id: 'vegetarian', name: 'Vegetarian', emoji: '🥬' },
-    { id: 'vegan', name: 'Vegan', emoji: '🌱' },
-    { id: 'gluten-free', name: 'Gluten-Free', emoji: '🚫' },
-    { id: 'dairy-free', name: 'Dairy-Free', emoji: '🥛' },
-    { id: 'halal', name: 'Halal', emoji: '☪️' },
-    { id: 'kosher', name: 'Kosher', emoji: '✡️' }
-  ];
-
-  const allQuickStartTemplates = [
-    { id: 'romantic-dinner', title: 'Romantic Dinner', emoji: '💕', description: 'Candlelight & fine dining', cuisines: ['Italian', 'French'], vibes: ['romantic', 'upscale'], priceRange: ['$$$', '$$$$'], timePreferences: ['evening'], fitsDuration: ['evening', 'adventure'] },
-    { id: 'casual-brunch', title: 'Casual Brunch', emoji: '☕', description: 'Relaxed & social', cuisines: ['American', 'Mediterranean'], vibes: ['casual', 'cozy'], priceRange: ['$', '$$'], timePreferences: ['morning', 'lunch'], fitsDuration: ['quick', 'relaxed', 'adventure'] },
-    { id: 'trendy-cocktail', title: 'Cocktail Bar', emoji: '🍸', description: 'Stylish drinks & vibes', cuisines: ['American'], vibes: ['lively', 'upscale'], priceRange: ['$$', '$$$'], timePreferences: ['evening', 'night'], fitsDuration: ['evening'] },
-    { id: 'coffee-walk', title: 'Coffee & Walk', emoji: '☕🚶', description: 'Quick & spontaneous', cuisines: ['American', 'Italian'], vibes: ['casual', 'outdoor'], priceRange: ['$'], timePreferences: ['morning', 'afternoon'], fitsDuration: ['quick'] }
-  ];
-
-  const quickStartTemplates = selectedDuration
-    ? allQuickStartTemplates.filter(t => t.fitsDuration.includes(selectedDuration))
-    : allQuickStartTemplates;
-
-  // ── Data loading ──────────────────────────────────────────────────
-
-  useEffect(() => { loadPartnerPreferences(); }, [user?.id, partnerId]);
-
-  // Load onboarding preferences to show confirmation screen
-  useEffect(() => {
-    const loadOnboardingPreferences = async () => {
-      if (!user?.id) return;
-      try {
-        const { data, error } = await supabase.from('user_preferences').select('*').eq('user_id', user.id).single();
-        if (error || !data) {
-          setOnboardingLoaded(true);
-          setCurrentStep(1); // No prefs → skip to customize
-          return;
-        }
-        const has = (arr: any) => arr && arr.length > 0;
-        if (has(data.preferred_cuisines) || has(data.preferred_vibes) || has(data.preferred_price_range) || has(data.preferred_times)) {
-          setOnboardingPrefs({
-            preferred_cuisines: data.preferred_cuisines || [],
-            preferred_vibes: data.preferred_vibes || [],
-            preferred_price_range: data.preferred_price_range || [],
-            preferred_times: data.preferred_times || [],
-            max_distance: data.max_distance || 15,
-            dietary_restrictions: data.dietary_restrictions || []
-          });
-          setLearnedTemplate({
-            id: 'ai-learned', title: 'Für dich', emoji: '🤖',
-            description: 'Basierend auf deinen bisherigen Vorlieben',
-            cuisines: data.preferred_cuisines || [], vibes: data.preferred_vibes || [],
-            priceRange: data.preferred_price_range || [], timePreferences: data.preferred_times || []
-          });
-          // Stay on step 0 (confirmation)
-        } else {
-          setCurrentStep(1); // No meaningful prefs → skip to customize
-        }
-        setOnboardingLoaded(true);
-      } catch (err) {
-        console.error('Error loading onboarding preferences:', err);
-        setOnboardingLoaded(true);
-        setCurrentStep(1);
-      }
-    };
-    loadOnboardingPreferences();
-  }, [user?.id]);
-
-  const loadPartnerPreferences = async () => {
-    try {
-      const { data, error } = await supabase.from('user_preferences').select('*').eq('user_id', partnerId).single();
-      if (error && error.code !== 'PGRST116') return;
-      if (data) {
-        setPartnerPreferences({
-          preferred_cuisines: data.preferred_cuisines || [], preferred_vibes: data.preferred_vibes || [],
-          preferred_price_range: data.preferred_price_range || [], preferred_times: data.preferred_times || [],
-          max_distance: data.max_distance || 15, dietary_restrictions: data.dietary_restrictions || []
-        });
-      }
-    } catch (error) { console.error('Error loading partner preferences:', error); }
-  };
-
-  // ── Interaction handlers ──────────────────────────────────────────
-
-  const toggleSelection = (
-    item: string, selectedItems: string[],
-    setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>,
-    category?: keyof UserPreferences
-  ) => {
-    setSelectedItems(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
+  const toggleSelection = (item: string, selected: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, category?: string) => {
+    setter(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
     setSelectedTemplateId(null);
     if (category === 'preferred_times') setUserModifiedTimePrefs(true);
   };
 
-  const haveSameSelections = (a: string[], b: string[]) => {
+  const haveSame = (a: string[], b: string[]) => {
     if (a.length !== b.length) return false;
     const sa = [...a].sort(), sb = [...b].sort();
     return sa.every((v, i) => v === sb[i]);
   };
 
-  const isTemplateCurrentlySelected = (t: { id: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[] }) => {
+  const isTemplateSelected = (t: { id: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[] }) => {
     return selectedTemplateId === t.id || (
-      haveSameSelections(selectedCuisines, t.cuisines) &&
-      haveSameSelections(selectedVibes, t.vibes) &&
-      haveSameSelections(selectedPriceRange, t.priceRange) &&
-      haveSameSelections(selectedTimePreferences, t.timePreferences)
+      haveSame(selectedCuisines, t.cuisines) && haveSame(selectedVibes, t.vibes) &&
+      haveSame(selectedPriceRange, t.priceRange) && haveSame(selectedTimePreferences, t.timePreferences)
     );
   };
 
-  const applyQuickStartTemplate = (t: { id: string; title: string; cuisines: string[]; vibes: string[]; priceRange: string[]; timePreferences: string[] }) => {
-    if (isTemplateCurrentlySelected(t)) {
+  const applyTemplate = (t: typeof allQuickStartTemplates[0]) => {
+    if (isTemplateSelected(t)) {
       setSelectedTemplateId(null); setSelectedCuisines([]); setSelectedVibes([]); setSelectedPriceRange([]); setSelectedTimePreferences([]);
-      toast({ title: 'Template deselected', description: 'All preferences cleared.' });
     } else {
       setSelectedTemplateId(t.id); setSelectedCuisines(t.cuisines); setSelectedVibes(t.vibes); setSelectedPriceRange(t.priceRange); setSelectedTimePreferences(t.timePreferences);
-      toast({ title: `${t.title} applied!`, description: 'You can still customize your preferences.' });
     }
   };
 
-  const handleDurationSelect = (durationId: string) => {
-    const isDeselecting = selectedDuration === durationId;
-    setSelectedDuration(isDeselecting ? null : durationId);
-    if (!isDeselecting) {
-      const model = durationModels.find(d => d.id === durationId);
+  const handleDurationSelect = (id: string) => {
+    const isDeselect = selectedDuration === id;
+    setSelectedDuration(isDeselect ? null : id);
+    if (!isDeselect) {
+      const model = durationModels.find(d => d.id === id);
       if (model) {
         if (!userModifiedTimePrefs) setSelectedTimePreferences(model.suggestTimes);
         if (selectedPriceRange.length === 0) setSelectedPriceRange(model.suggestPrice);
         if (model.excludeVibes.length > 0) setSelectedVibes(prev => prev.filter(v => !model.excludeVibes.includes(v)));
-        if (selectedTemplateId) {
-          const ct = allQuickStartTemplates.find(t => t.id === selectedTemplateId);
-          if (ct && !ct.fitsDuration.includes(durationId)) setSelectedTemplateId(null);
-        }
       }
     }
   };
 
-  // ── Submit ────────────────────────────────────────────────────────
+  const handleKeepPreferences = () => {
+    if (!onboardingPrefs) return;
+    setSelectedCuisines(onboardingPrefs.preferred_cuisines);
+    setSelectedVibes(onboardingPrefs.preferred_vibes);
+    setSelectedPriceRange(onboardingPrefs.preferred_price_range);
+    setSelectedTimePreferences(onboardingPrefs.preferred_times);
+    setMaxDistance(onboardingPrefs.max_distance);
+    setSelectedDietary(onboardingPrefs.dietary_restrictions);
+    const times = onboardingPrefs.preferred_times;
+    if (times.includes('evening') || times.includes('night')) setSelectedDuration('evening');
+    else if (times.includes('morning') || times.includes('lunch')) setSelectedDuration('relaxed');
+    else setSelectedDuration('relaxed');
+    setFlowState('customize');
+    toast({ title: 'Übernommen!', description: 'Passe bei Bedarf an oder starte direkt.' });
+  };
+
+  const handleCustomize = () => {
+    if (onboardingPrefs) {
+      setSelectedCuisines(onboardingPrefs.preferred_cuisines);
+      setSelectedVibes(onboardingPrefs.preferred_vibes);
+      setSelectedPriceRange(onboardingPrefs.preferred_price_range);
+      setSelectedTimePreferences(onboardingPrefs.preferred_times);
+      setMaxDistance(onboardingPrefs.max_distance);
+      setSelectedDietary(onboardingPrefs.dietary_restrictions);
+    }
+    setFlowState('customize');
+  };
 
   const submitPreferences = async () => {
     if (!user?.id) return;
@@ -401,7 +384,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
       if (authError || !authData.user) throw authError || new Error('Not authenticated');
 
       const currentUserId = authData.user.id;
-      const preferencePayload = {
+      const payload = {
         user_id: currentUserId,
         preferred_cuisines: selectedCuisines, preferred_vibes: selectedVibes,
         preferred_price_range: selectedPriceRange, preferred_times: selectedTimePreferences,
@@ -411,29 +394,23 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
       const { data: existing } = await supabase.from('user_preferences').select('id').eq('user_id', currentUserId).maybeSingle();
       const mutation = existing
-        ? await supabase.from('user_preferences').update(preferencePayload).eq('user_id', currentUserId)
-        : await supabase.from('user_preferences').insert(preferencePayload);
+        ? await supabase.from('user_preferences').update(payload).eq('user_id', currentUserId)
+        : await supabase.from('user_preferences').insert(payload);
       if (mutation.error) throw mutation.error;
 
       if (planningMode === 'collaborative' && sessionId) {
         const { data: sessionData } = await supabase.from('date_planning_sessions').select('initiator_id').eq('id', sessionId).single();
         if (sessionData) {
           const isInitiator = sessionData.initiator_id === user.id;
-          const updateField = isInitiator ? 'initiator_preferences_complete' : 'partner_preferences_complete';
-          const prefsField = isInitiator ? 'initiator_preferences' : 'partner_preferences';
           await supabase.from('date_planning_sessions').update({
-            [updateField]: true,
-            [prefsField]: { preferred_cuisines: selectedCuisines, preferred_vibes: selectedVibes, preferred_price_range: selectedPriceRange, preferred_times: selectedTimePreferences, max_distance: maxDistance, dietary_restrictions: selectedDietary },
+            [isInitiator ? 'initiator_preferences_complete' : 'partner_preferences_complete']: true,
+            [isInitiator ? 'initiator_preferences' : 'partner_preferences']: payload,
             updated_at: new Date().toISOString()
           }).eq('id', sessionId);
         }
       }
 
-      if (planningMode === 'collaborative' && collaborativeSession && !collaborativeSession.hasPartnerSetPreferences) {
-        toast({ title: 'Gespeichert!', description: `Warte auf ${partnerName}...` });
-      } else {
-        toast({ title: 'Gespeichert!', description: 'KI-Analyse startet...' });
-      }
+      toast({ title: 'Gespeichert!', description: planningMode === 'collaborative' && collaborativeSession && !collaborativeSession.hasPartnerSetPreferences ? `Warte auf ${partnerName}...` : 'KI-Analyse startet...' });
 
       onPreferencesComplete({
         preferred_cuisines: selectedCuisines, preferred_vibes: selectedVibes,
@@ -450,505 +427,379 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     }
   };
 
-  // ── Navigation ────────────────────────────────────────────────────
+  // ── Helpers ──────────────────────────────────────────────────────
 
-  const handleKeepPreferences = () => {
-    if (!onboardingPrefs) return;
-    setSelectedCuisines(onboardingPrefs.preferred_cuisines);
-    setSelectedVibes(onboardingPrefs.preferred_vibes);
-    setSelectedPriceRange(onboardingPrefs.preferred_price_range);
-    setSelectedTimePreferences(onboardingPrefs.preferred_times);
-    setMaxDistance(onboardingPrefs.max_distance);
-    setSelectedDietary(onboardingPrefs.dietary_restrictions);
-    const times = onboardingPrefs.preferred_times;
-    if (times.includes('evening') || times.includes('night')) setSelectedDuration('evening');
-    else if (times.includes('morning') || times.includes('lunch')) setSelectedDuration('relaxed');
-    else setSelectedDuration('relaxed');
-    setCurrentStep(1);
-    toast({ title: 'Vorlieben übernommen!', description: 'Passe sie an oder starte direkt.' });
-  };
+  const toggleSection = (id: string) => setOpenSections(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
 
-  const handleCustomize = () => {
-    if (onboardingPrefs) {
-      setSelectedCuisines(onboardingPrefs.preferred_cuisines);
-      setSelectedVibes(onboardingPrefs.preferred_vibes);
-      setSelectedPriceRange(onboardingPrefs.preferred_price_range);
-      setSelectedTimePreferences(onboardingPrefs.preferred_times);
-      setMaxDistance(onboardingPrefs.max_distance);
-      setSelectedDietary(onboardingPrefs.dietary_restrictions);
-    }
-    setCurrentStep(1);
-  };
-
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case 0: return 'Deine Vorlieben';
-      case 1: return 'Dein Date planen';
-      default: return 'Preferences';
-    }
-  };
-
-  const getStepIcon = () => {
-    switch (currentStep) {
-      case 0: return <Sparkles className="w-5 h-5" />;
-      case 1: return <Heart className="w-5 h-5" />;
-      default: return <Heart className="w-5 h-5" />;
-    }
-  };
-
-  // ── Chip renderer ─────────────────────────────────────────────────
-
-  const renderChipGrid = (
-    items: Preference[], selectedItems: string[],
-    setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>,
-    category: keyof UserPreferences
-  ) => (
-    <div className="flex flex-wrap gap-2">
-      {items.map((item) => {
-        const isSelected = selectedItems.includes(item.id);
-        return (
-          <button
-            type="button"
-            key={item.id}
-            onClick={() => toggleSelection(item.id, selectedItems, setSelectedItems, category)}
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm transition-none select-none",
-              isSelected ? "border-primary bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground"
-            )}
-          >
-            <span>{item.emoji}</span>
-            <span className="font-medium">{item.name}</span>
-            {isSelected && <Check className="w-3 h-3 ml-0.5" />}
-          </button>
-        );
-      })}
-    </div>
-  );
-
-  // ── Step renderers ────────────────────────────────────────────────
-
-  const renderConfirmationStep = () => {
-    if (!onboardingPrefs) return null;
-    const allVibesMap: Record<string, string> = { romantic: '💕 Romantic', casual: '😊 Casual', outdoor: '🌳 Outdoor', upscale: '✨ Upscale', lively: '🎉 Lively', cozy: '🕯️ Cozy', nightlife: '🌙 Nightlife', cultural: '🎭 Cultural', adventurous: '🗺️ Adventurous' };
-    const cuisineEmojis: Record<string, string> = { Italian: '🍝', Japanese: '🍣', Mexican: '🌮', French: '🥐', Indian: '🍛', Mediterranean: '🫒', American: '🍔', Thai: '🍜', Chinese: '🥢', Korean: '🍲' };
-
-    return (
-      <div className="space-y-6">
-        <div className="text-center">
-          <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-3">
-            <Sparkles className="w-7 h-7 text-primary" />
-          </div>
-          <h2 className="text-lg font-bold text-foreground mb-1">Deine Vorlieben stehen schon!</h2>
-          <p className="text-sm text-muted-foreground">Basierend auf deinem Onboarding – möchtest du sie übernehmen oder heute anders?</p>
-        </div>
-
-        {/* Preference summary */}
-        <div className="bg-muted/50 rounded-xl p-4 space-y-3 border border-border">
-          {onboardingPrefs.preferred_cuisines.length > 0 && (
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Küche</p>
-              <div className="flex flex-wrap gap-1.5">
-                {onboardingPrefs.preferred_cuisines.map(c => (
-                  <Badge key={c} variant="secondary" className="text-xs">{cuisineEmojis[c] || '🍽️'} {c}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
-          {onboardingPrefs.preferred_vibes.length > 0 && (
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Vibe</p>
-              <div className="flex flex-wrap gap-1.5">
-                {onboardingPrefs.preferred_vibes.map(v => (
-                  <Badge key={v} variant="secondary" className="text-xs">{allVibesMap[v] || v}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
-          {onboardingPrefs.preferred_price_range.length > 0 && (
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Budget</p>
-              <div className="flex flex-wrap gap-1.5">
-                {onboardingPrefs.preferred_price_range.map(p => (
-                  <Badge key={p} variant="secondary" className="text-xs">{p}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Action buttons */}
-        <div className="grid grid-cols-1 gap-3">
-          <Button onClick={handleKeepPreferences} className="w-full h-12 text-base font-semibold transition-transform active:scale-[0.97]">
-            <Check className="w-5 h-5 mr-2" />
-            So übernehmen
-          </Button>
-          <Button onClick={handleCustomize} variant="outline" className="w-full h-12 text-base transition-transform active:scale-[0.97]">
-            <Settings className="w-4 h-4 mr-2" />
-            Heute anders
-          </Button>
-        </div>
-      </div>
-    );
-  };
-
-
-  // Helper to build a summary string for collapsed sections
   const buildSummary = (items: string[], allItems: Preference[]) => {
     if (items.length === 0) return 'Keine Auswahl';
     const mapped = items.map(id => {
       const found = allItems.find(x => x.id === id);
       return found ? `${found.emoji} ${found.name}` : id;
     });
-    if (mapped.length <= 3) return mapped.join(', ');
+    if (mapped.length <= 2) return mapped.join(', ');
     return `${mapped.slice(0, 2).join(', ')} +${mapped.length - 2}`;
   };
 
-  // Track which accordion sections are open
-  const [openSections, setOpenSections] = useState<string[]>([]);
-
-  const toggleSection = (id: string) => {
-    setOpenSections(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
-  };
-
-  const isSectionOpen = (id: string) => openSections.includes(id);
-
-  const renderCollapsibleSection = (
-    id: string,
-    icon: React.ReactNode,
-    title: string,
-    summary: string,
-    count: number,
-    children: React.ReactNode
-  ) => {
-    const open = isSectionOpen(id);
-    return (
-      <div className="border border-border rounded-xl overflow-hidden">
-        <button
-          type="button"
-          onClick={() => toggleSection(id)}
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-          className="flex items-center gap-3 w-full p-3.5 text-left select-none hover:bg-muted/30 transition-colors"
-        >
-          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-            {icon}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground">{title}</p>
-            <p className="text-xs text-muted-foreground truncate">{summary}</p>
-          </div>
-          {count > 0 && (
-            <Badge variant="secondary" className="text-xs h-5 px-1.5 flex-shrink-0">
-              {count}
-            </Badge>
-          )}
-          <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform flex-shrink-0", open && "rotate-180")} />
-        </button>
-        {open && (
-          <div className="px-3.5 pb-3.5 pt-1">
-            {children}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderAllInOnePage = () => (
-    <div className="space-y-4">
-      {/* Duration Models - always visible as primary choice */}
-      <div>
-        <h2 className="text-base font-bold mb-1">Wie viel Zeit hast du?</h2>
-        <p className="text-muted-foreground text-sm mb-3">Das hilft der KI, passende Vorschläge zu filtern</p>
-        <div className="grid grid-cols-2 gap-2">
-          {durationModels.map((model) => {
-            const isSelected = selectedDuration === model.id;
-            return (
-              <button
-                type="button" key={model.id}
-                onClick={() => handleDurationSelect(model.id)}
-                style={{ WebkitTapHighlightColor: 'transparent' }}
-                className={cn(
-                  "p-3 rounded-xl border-2 text-left transition-none select-none relative",
-                  isSelected ? "border-primary bg-primary/5" : "border-border bg-card"
-                )}
-              >
-                <div className="flex items-start gap-2.5">
-                  <div className="text-xl flex-shrink-0 mt-0.5">{model.emoji}</div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm">{model.title}</h3>
-                    <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{model.desc}</p>
-                  </div>
-                  {isSelected && (
-                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-primary-foreground" />
-                    </div>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Quick Start Templates */}
-      {selectedDuration && (
-        <>
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Quick Start</h3>
-            <div className="flex flex-wrap gap-2">
-              {learnedTemplate && (
-                <button type="button" onClick={() => applyQuickStartTemplate(learnedTemplate)}
-                  style={{ WebkitTapHighlightColor: 'transparent' }}
-                  className={cn(
-                    "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
-                    isTemplateCurrentlySelected(learnedTemplate) ? "border-primary bg-primary/10" : "border-border bg-card"
-                  )}
-                >
-                  <span>{learnedTemplate.emoji}</span>
-                  <span className="font-medium">{learnedTemplate.title}</span>
-                  <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">KI</Badge>
-                  {isTemplateCurrentlySelected(learnedTemplate) && <Check className="w-3 h-3" />}
-                </button>
-              )}
-              {quickStartTemplates.map((t) => (
-                <button type="button" key={t.id} onClick={() => applyQuickStartTemplate(t)}
-                  style={{ WebkitTapHighlightColor: 'transparent' }}
-                  className={cn(
-                    "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
-                    isTemplateCurrentlySelected(t) ? "border-primary bg-primary/10" : "border-border bg-card"
-                  )}
-                >
-                  <span>{t.emoji}</span>
-                  <span className="font-medium">{t.title}</span>
-                  {isTemplateCurrentlySelected(t) && <Check className="w-3 h-3" />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Collapsible Category Sections */}
-          <div className="space-y-2">
-            {renderCollapsibleSection(
-              'cuisine',
-              <span className="text-sm">🍽️</span>,
-              'Küche',
-              buildSummary(selectedCuisines, cuisines),
-              selectedCuisines.length,
-              renderChipGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines')
-            )}
-
-            {renderCollapsibleSection(
-              'vibes',
-              <span className="text-sm">✨</span>,
-              'Vibe',
-              buildSummary(selectedVibes, allVibes),
-              selectedVibes.length,
-              <>
-                {selectedDurationModel?.excludeVibes.length ? (
-                  <p className="text-xs text-muted-foreground mb-2 italic">Einige Vibes basierend auf Zeitmodell ausgeblendet</p>
-                ) : null}
-                {renderChipGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
-              </>
-            )}
-
-            {renderCollapsibleSection(
-              'budget',
-              <span className="text-sm">💰</span>,
-              'Budget',
-              buildSummary(selectedPriceRange, priceRanges),
-              selectedPriceRange.length,
-              <>
-                {selectedDurationModel && selectedPriceRange.length > 0 && (
-                  <p className="text-xs text-muted-foreground mb-2 italic">Vorauswahl basierend auf „{selectedDurationModel.title}"</p>
-                )}
-                {renderChipGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range')}
-              </>
-            )}
-
-            {renderCollapsibleSection(
-              'time',
-              <span className="text-sm">🕐</span>,
-              'Tageszeit',
-              buildSummary(selectedTimePreferences, timePreferences),
-              selectedTimePreferences.length,
-              renderChipGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times')
-            )}
-
-            {renderCollapsibleSection(
-              'advanced',
-              <Settings className="w-4 h-4 text-muted-foreground" />,
-              'Erweiterte Optionen',
-              `${maxDistance} km${selectedDietary.length > 0 ? ` • ${selectedDietary.length} Diät` : ''}`,
-              selectedDietary.length,
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium mb-2">Entfernung</p>
-                  <Slider value={[maxDistance]} onValueChange={(v) => setMaxDistance(v[0])} max={50} min={1} step={1} className="w-full" />
-                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                    <span>1 km</span><span className="font-medium text-foreground">{maxDistance} km</span><span>50 km</span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium mb-2">Diät / Unverträglichkeiten</p>
-                  {renderChipGrid(dietaryRequirements, selectedDietary, setSelectedDietary, 'dietary_restrictions')}
-                </div>
-              </div>
-            )}
-          </div>
-        </>
-      )}
-
-      {/* Date & Time */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Wann geht's los?</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label className="text-sm font-medium mb-2 block">Datum</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-10", !selectedDate && "text-muted-foreground")}>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  <span className="truncate">{selectedDate ? format(selectedDate, "PPP") : "Datum wählen"}</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={selectedDate} onSelect={(d) => { setSelectedDate(d); setUserModifiedDate(true); }}
-                  disabled={(d) => d < new Date()} initialFocus className="pointer-events-auto"
-                  defaultMonth={selectedDate || (initialProposedDate ? new Date(initialProposedDate) : undefined)} />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div>
-            <label className="text-sm font-medium mb-2 block">Uhrzeit</label>
-            <Select value={selectedTime} onValueChange={(t) => { setSelectedTime(t); setUserModifiedTime(true); }}>
-              <SelectTrigger className="h-10"><SelectValue placeholder="Uhrzeit wählen" /></SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 24 }, (_, i) => {
-                  const h = i.toString().padStart(2, '0');
-                  return <SelectItem key={`${h}:00`} value={`${h}:00`}>{h}:00</SelectItem>;
-                })}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        {prefilledFromProposal && (selectedDate || selectedTime) && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded-md p-2">
-            <Sparkles className="w-3 h-3" /><span>Vorausgefüllt aus deinem Proposal</span>
-          </div>
-        )}
-      </div>
-
-      {/* Selection summary */}
-      {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
-        <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">Deine Auswahl</p>
-          <div className="flex flex-wrap gap-1.5">
-            {selectedDuration && (
-              <Badge variant="outline" className="text-xs">
-                {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
-              </Badge>
-            )}
-            {selectedCuisines.map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {c}</Badge>)}
-            {selectedVibes.map(v => <Badge key={v} variant="outline" className="text-xs">{allVibes.find(x => x.id === v)?.emoji} {v}</Badge>)}
-            {selectedPriceRange.map(p => <Badge key={p} variant="outline" className="text-xs">{p}</Badge>)}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  // ── Status helpers ────────────────────────────────────────────────
-
-  const getCompletionStatus = () => {
+  const status = (() => {
     if (planningMode === 'collaborative' && collaborativeSession) {
       const u = collaborativeSession.hasUserSetPreferences;
       const p = collaborativeSession.hasPartnerSetPreferences;
       return { userCompleted: u, partnerCompleted: p, bothCompleted: u && p, analysisComplete: u && p && !aiAnalyzing && venueRecommendations.length > 0 };
     }
     return { userCompleted: false, partnerCompleted: false, bothCompleted: false, analysisComplete: false };
+  })();
+
+  // ── Renderers ──────────────────────────────────────────────────────
+
+  const renderChip = (item: Preference, isSelected: boolean, onClick: () => void) => (
+    <button
+      type="button" key={item.id} onClick={onClick}
+      style={{ WebkitTapHighlightColor: 'transparent' }}
+      className={cn(
+        "inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm transition-none select-none",
+        isSelected ? "border-primary bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground"
+      )}
+    >
+      <span>{item.emoji}</span>
+      <span className="font-medium">{item.name}</span>
+      {isSelected && <Check className="w-3 h-3 ml-0.5" />}
+    </button>
+  );
+
+  const renderChipGrid = (items: Preference[], selected: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, category: string) => (
+    <div className="flex flex-wrap gap-2">
+      {items.map(item => renderChip(item, selected.includes(item.id), () => toggleSelection(item.id, selected, setter, category)))}
+    </div>
+  );
+
+  const renderSection = (id: string, icon: React.ReactNode, title: string, summary: string, count: number, children: React.ReactNode) => {
+    const open = openSections.includes(id);
+    return (
+      <div key={id} className="border border-border rounded-xl overflow-hidden bg-card">
+        <button
+          type="button" onClick={() => toggleSection(id)}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+          className="flex items-center gap-3 w-full p-3.5 text-left select-none active:scale-[0.98] transition-transform"
+        >
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-muted flex items-center justify-center">{icon}</div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">{title}</p>
+            <p className="text-xs text-muted-foreground truncate">{summary}</p>
+          </div>
+          {count > 0 && <Badge variant="secondary" className="text-xs h-5 px-1.5 flex-shrink-0">{count}</Badge>}
+          <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform flex-shrink-0", open && "rotate-180")} />
+        </button>
+        {open && <div className="px-3.5 pb-3.5 pt-1">{children}</div>}
+      </div>
+    );
   };
 
-  const status = getCompletionStatus();
+  // ── Loading state ──────────────────────────────────────────────────
 
-  // ── Render ────────────────────────────────────────────────────────
+  if (!onboardingLoaded) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // ── Confirmation screen ──────────────────────────────────────────
+
+  if (flowState === 'confirm' && onboardingPrefs) {
+    const cuisineEmojis: Record<string, string> = { Italian: '🍝', Japanese: '🍣', Mexican: '🌮', French: '🥐', Indian: '🍛', Mediterranean: '🫒', American: '🍔', Thai: '🍜', Chinese: '🥢', Korean: '🍲' };
+    const vibeEmojis: Record<string, string> = { romantic: '💕', casual: '😊', outdoor: '🌳', upscale: '✨', lively: '🎉', cozy: '🕯️', nightlife: '🌙', cultural: '🎭', adventurous: '🗺️' };
+
+    return (
+      <SafeComponent>
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="text-center">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-3">
+              <Sparkles className="w-7 h-7 text-primary" />
+            </div>
+            <h2 className="text-lg font-bold text-foreground mb-1">Deine Vorlieben</h2>
+            <p className="text-sm text-muted-foreground">
+              Aus deinem Onboarding — übernehmen oder anpassen?
+            </p>
+          </div>
+
+          {/* Summary */}
+          <div className="bg-muted/50 rounded-xl p-4 space-y-3 border border-border">
+            {onboardingPrefs.preferred_cuisines.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Küche</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {onboardingPrefs.preferred_cuisines.map(c => (
+                    <Badge key={c} variant="secondary" className="text-xs">{cuisineEmojis[c] || '🍽️'} {c}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {onboardingPrefs.preferred_vibes.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Vibe</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {onboardingPrefs.preferred_vibes.map(v => (
+                    <Badge key={v} variant="secondary" className="text-xs">{vibeEmojis[v] || '✨'} {v}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {onboardingPrefs.preferred_price_range.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Budget</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {onboardingPrefs.preferred_price_range.map(p => (
+                    <Badge key={p} variant="secondary" className="text-xs">{p}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {onboardingPrefs.preferred_times.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Tageszeit</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {onboardingPrefs.preferred_times.map(t => (
+                    <Badge key={t} variant="secondary" className="text-xs">{timePreferences.find(tp => tp.id === t)?.emoji || '🕐'} {timePreferences.find(tp => tp.id === t)?.name || t}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="grid grid-cols-1 gap-3">
+            <Button onClick={handleKeepPreferences} className="w-full h-12 text-base font-semibold transition-transform active:scale-[0.97]">
+              <Check className="w-5 h-5 mr-2" />
+              So übernehmen
+            </Button>
+            <Button onClick={handleCustomize} variant="outline" className="w-full h-12 text-base transition-transform active:scale-[0.97]">
+              <Settings className="w-4 h-4 mr-2" />
+              Heute anders
+            </Button>
+          </div>
+        </div>
+      </SafeComponent>
+    );
+  }
+
+  // ── Customize screen (all-in-one with collapsibles) ──────────────
 
   return (
     <SafeComponent>
-      <Card>
-        {currentStep > 0 && (
-          <CardHeader className="px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
-            <div className="space-y-3 md:space-y-0 md:flex md:items-center md:justify-between">
-              <CardTitle className="flex flex-wrap items-center gap-2 text-lg md:text-xl">
-                {getStepIcon()}
-                <span className="font-bold">{getStepTitle()}</span>
-                {planningMode === 'collaborative' && status.userCompleted && (
-                  <Badge variant="secondary" className="text-xs">
-                    <CheckCircle className="w-3 h-3 mr-1" /> Saved
-                  </Badge>
+      <div className="space-y-5">
+        {/* Title */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Heart className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-bold text-foreground">Dein Date planen</h2>
+          </div>
+          {planningMode === 'collaborative' && (
+            <div className="flex items-center gap-1">
+              <div className={cn("w-2 h-2 rounded-full", status.userCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
+              <div className={cn("w-2 h-2 rounded-full", status.partnerCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
+            </div>
+          )}
+        </div>
+
+        {/* Duration */}
+        <div>
+          <p className="text-sm font-semibold text-foreground mb-1">Wie viel Zeit hast du?</p>
+          <p className="text-xs text-muted-foreground mb-3">Hilft der KI, passende Vorschläge zu finden</p>
+          <div className="grid grid-cols-2 gap-2">
+            {durationModels.map((m) => {
+              const sel = selectedDuration === m.id;
+              return (
+                <button key={m.id} type="button" onClick={() => handleDurationSelect(m.id)}
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                  className={cn(
+                    "p-3 rounded-xl border-2 text-left transition-none select-none relative",
+                    sel ? "border-primary bg-primary/5" : "border-border bg-card"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{m.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm leading-tight">{m.title}</p>
+                      <p className="text-[11px] text-muted-foreground">{m.desc}</p>
+                    </div>
+                    {sel && (
+                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3 h-3 text-primary-foreground" />
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Quick Start Templates */}
+        {selectedDuration && (
+          <>
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Quick Start</p>
+              <div className="flex flex-wrap gap-2">
+                {learnedTemplate && (
+                  <button type="button" onClick={() => applyTemplate(learnedTemplate as any)}
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                    className={cn(
+                      "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
+                      isTemplateSelected(learnedTemplate) ? "border-primary bg-primary/10" : "border-border bg-card"
+                    )}
+                  >
+                    <span>{learnedTemplate.emoji}</span>
+                    <span className="font-medium">{learnedTemplate.title}</span>
+                    <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">KI</Badge>
+                    {isTemplateSelected(learnedTemplate) && <Check className="w-3 h-3" />}
+                  </button>
                 )}
-              </CardTitle>
-              {planningMode === 'collaborative' && (
-                <div className="flex items-center gap-1">
-                  <div className={cn("w-2 h-2 rounded-full", status.userCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
-                  <div className={cn("w-2 h-2 rounded-full", status.partnerCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
+                {quickStartTemplates.map(t => (
+                  <button key={t.id} type="button" onClick={() => applyTemplate(t)}
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                    className={cn(
+                      "inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-none select-none",
+                      isTemplateSelected(t) ? "border-primary bg-primary/10" : "border-border bg-card"
+                    )}
+                  >
+                    <span>{t.emoji}</span>
+                    <span className="font-medium">{t.title}</span>
+                    {isTemplateSelected(t) && <Check className="w-3 h-3" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Collapsible Sections */}
+            <div className="space-y-2">
+              {renderSection('cuisine', <span className="text-sm">🍽️</span>, 'Küche',
+                buildSummary(selectedCuisines, cuisines), selectedCuisines.length,
+                renderChipGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines')
+              )}
+              {renderSection('vibes', <span className="text-sm">✨</span>, 'Vibe',
+                buildSummary(selectedVibes, allVibes), selectedVibes.length,
+                <>
+                  {selectedDurationModel?.excludeVibes.length ? (
+                    <p className="text-xs text-muted-foreground mb-2 italic">Einige Vibes basierend auf Zeitmodell ausgeblendet</p>
+                  ) : null}
+                  {renderChipGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
+                </>
+              )}
+              {renderSection('budget', <span className="text-sm">💰</span>, 'Budget',
+                buildSummary(selectedPriceRange, priceRanges), selectedPriceRange.length,
+                renderChipGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range')
+              )}
+              {renderSection('time', <span className="text-sm">🕐</span>, 'Tageszeit',
+                buildSummary(selectedTimePreferences, timePreferences), selectedTimePreferences.length,
+                renderChipGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times')
+              )}
+              {renderSection('advanced', <Settings className="w-4 h-4 text-muted-foreground" />, 'Erweitert',
+                `${maxDistance} km${selectedDietary.length > 0 ? ` · ${selectedDietary.length} Diät` : ''}`, selectedDietary.length,
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium mb-2">Entfernung</p>
+                    <Slider value={[maxDistance]} onValueChange={(v) => setMaxDistance(v[0])} max={50} min={1} step={1} className="w-full" />
+                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                      <span>1 km</span><span className="font-medium text-foreground">{maxDistance} km</span><span>50 km</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-2">Diät / Unverträglichkeiten</p>
+                    {renderChipGrid(dietaryRequirements, selectedDietary, setSelectedDietary, 'dietary_restrictions')}
+                  </div>
                 </div>
               )}
             </div>
-          </CardHeader>
+          </>
         )}
-        <CardContent className="px-4 md:px-6 pb-4 md:pb-6 space-y-4 md:space-y-6">
-          {currentStep === 0 && renderConfirmationStep()}
-          {currentStep === 1 && renderAllInOnePage()}
 
-          {currentStep === 1 && (
-            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
-              {onboardingPrefs ? (
-                <Button onClick={() => setCurrentStep(0)} variant="outline" className="w-full sm:w-auto">
-                  Zurück
-                </Button>
-              ) : <div />}
-              
-              <Button onClick={submitPreferences} disabled={loading || !selectedDuration} className="w-full sm:w-auto">
-                {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</>) : '🚀 Los geht\'s'}
-              </Button>
+        {/* Date & Time */}
+        <div className="space-y-3">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Wann geht's los?</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Datum</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-10", !selectedDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                    <span className="truncate text-xs">{selectedDate ? format(selectedDate, "dd.MM.yy") : "Wählen"}</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={selectedDate} onSelect={(d) => { setSelectedDate(d); setUserModifiedDate(true); }}
+                    disabled={(d) => d < new Date()} initialFocus className="pointer-events-auto"
+                    defaultMonth={selectedDate || (initialProposedDate ? new Date(initialProposedDate) : undefined)} />
+                </PopoverContent>
+              </Popover>
             </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Uhrzeit</label>
+              <Select value={selectedTime} onValueChange={(t) => { setSelectedTime(t); setUserModifiedTime(true); }}>
+                <SelectTrigger className="h-10"><SelectValue placeholder="Wählen" /></SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 24 }, (_, i) => {
+                    const h = i.toString().padStart(2, '0');
+                    return <SelectItem key={`${h}:00`} value={`${h}:00`}>{h}:00</SelectItem>;
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Selection summary */}
+        {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
+          <div className="bg-muted/50 rounded-lg p-3 space-y-2 border border-border">
+            <p className="text-xs font-medium text-muted-foreground">Deine Auswahl</p>
+            <div className="flex flex-wrap gap-1.5">
+              {selectedDuration && (
+                <Badge variant="outline" className="text-xs">
+                  {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
+                </Badge>
+              )}
+              {selectedCuisines.slice(0, 3).map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {c}</Badge>)}
+              {selectedCuisines.length > 3 && <Badge variant="outline" className="text-xs">+{selectedCuisines.length - 3}</Badge>}
+              {selectedVibes.slice(0, 3).map(v => <Badge key={v} variant="outline" className="text-xs">{allVibes.find(x => x.id === v)?.emoji} {v}</Badge>)}
+              {selectedVibes.length > 3 && <Badge variant="outline" className="text-xs">+{selectedVibes.length - 3}</Badge>}
+            </div>
+          </div>
+        )}
+
+        {/* Submit */}
+        <div className="flex items-center gap-3 pt-2">
+          {onboardingPrefs && (
+            <Button onClick={() => setFlowState('confirm')} variant="outline" className="transition-transform active:scale-[0.97]">
+              Zurück
+            </Button>
           )}
-        </CardContent>
-      </Card>
+          <Button onClick={submitPreferences} disabled={loading || !selectedDuration} className="flex-1 h-12 text-base font-semibold transition-transform active:scale-[0.97]">
+            {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</>) : '🚀 Los geht\'s'}
+          </Button>
+        </div>
+      </div>
 
       {/* Collaborative: Waiting for partner */}
-      {planningMode === 'collaborative' && (status.userCompleted || status.partnerCompleted) && (
-        <div className="my-6 border-t border-border" />
+      {planningMode === 'collaborative' && collaborativeSession && status.userCompleted && hasCompletedAllSteps && !status.partnerCompleted && (
+        <div className="mt-6 space-y-4">
+          <div className="border-t border-border" />
+          <CollaborativeWaitingState partnerName={partnerName} sessionId={sessionId}
+            hasPartnerSetPreferences={status.partnerCompleted} isWaitingForPartner={true}
+            hasCurrentUserSetPreferences={status.userCompleted} currentUserName={user?.name || 'Du'} />
+          <Card className="border-primary/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                <h3 className="text-base font-semibold">Deine Präferenzen gespeichert!</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">Warte auf {partnerName}...</p>
+            </CardContent>
+          </Card>
+        </div>
       )}
-
-      {planningMode === 'collaborative' && collaborativeSession && (() => {
-        const userReady = collaborativeSession.hasUserSetPreferences;
-        const partnerReady = collaborativeSession.hasPartnerSetPreferences;
-        if (userReady && hasCompletedAllSteps && !partnerReady) {
-          return (
-            <div className="space-y-4">
-              <CollaborativeWaitingState partnerName={partnerName} sessionId={sessionId}
-                hasPartnerSetPreferences={partnerReady} isWaitingForPartner={true}
-                hasCurrentUserSetPreferences={userReady} currentUserName={user?.name || 'You'} />
-              <Card className="border-primary/20">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <CheckCircle className="h-6 w-6 text-primary" />
-                    <h3 className="text-lg font-semibold">Deine Präferenzen gespeichert!</h3>
-                  </div>
-                  <p className="text-muted-foreground mb-4">Warte auf {partnerName}...</p>
-                  <div className="bg-muted/50 rounded-lg p-3 border border-border">
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Nächster Schritt:</strong> Unsere KI analysiert eure Kompatibilität sobald beide bereit sind.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          );
-        }
-        return null;
-      })()}
 
       {/* AI Analysis Overlay */}
       {planningMode === 'collaborative' && collaborativeSession?.hasUserSetPreferences && collaborativeSession?.hasPartnerSetPreferences && hasCompletedAllSteps && aiAnalyzing && (
@@ -959,18 +810,13 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
               onClick={() => {
                 if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
                 setAiAnalysisStartTime(null);
-                toast({ title: 'Abgebrochen', description: 'Du kannst deine Präferenzen erneut anpassen.' });
               }}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            ><X className="h-4 w-4" /></Button>
             <Card className="border-primary/20 bg-card shadow-lg">
               <CardContent className="p-6 text-center">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <Loader2 className="h-6 w-6 text-primary animate-spin" />
-                  <h3 className="text-lg font-semibold">{timeoutTriggered ? "Dauert etwas länger..." : "KI-Analyse läuft"}</h3>
-                </div>
-                <p className="text-muted-foreground">{timeoutTriggered ? "Wir zeigen dir die besten verfügbaren Ergebnisse." : "Kompatibilität wird analysiert und Venues gesucht..."}</p>
+                <Loader2 className="h-6 w-6 text-primary animate-spin mx-auto mb-3" />
+                <h3 className="text-lg font-semibold mb-1">{timeoutTriggered ? "Dauert etwas länger..." : "KI-Analyse läuft"}</h3>
+                <p className="text-sm text-muted-foreground">{timeoutTriggered ? "Zeige dir die besten Ergebnisse." : "Kompatibilität wird analysiert..."}</p>
               </CardContent>
             </Card>
           </div>
@@ -988,41 +834,28 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                 onClick={() => {
                   if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
                   setAutoNavigating(false); setHasAutoNavigated(false); setAiAnalysisStartTime(null);
-                  toast({ title: 'Auto-Redirect gestoppt', description: 'Nutze den Button um deine Matches manuell zu sehen.' });
                 }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              ><X className="h-4 w-4" /></Button>
               <Card className={cn("bg-card shadow-lg", hasVenues ? "border-primary/20" : "border-muted-foreground/20")}>
                 <CardContent className="p-6 text-center">
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    {autoNavigating ? <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                      : hasVenues ? <CheckCircle className="h-6 w-6 text-primary" />
-                      : <Clock className="h-6 w-6 text-muted-foreground" />}
-                    <h3 className="text-lg font-semibold">
-                      {autoNavigating ? 'Weiterleitung...' : hasVenues ? 'KI-Analyse fertig!' : 'Fast bereit...'}
-                    </h3>
-                  </div>
+                  {autoNavigating ? <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto mb-3" />
+                    : hasVenues ? <CheckCircle className="h-6 w-6 text-primary mx-auto mb-3" />
+                    : <Clock className="h-6 w-6 text-muted-foreground mx-auto mb-3" />}
+                  <h3 className="text-lg font-semibold mb-1">
+                    {autoNavigating ? 'Weiterleitung...' : hasVenues ? 'Analyse fertig!' : 'Fast bereit...'}
+                  </h3>
                   {hasVenues ? (
                     <>
-                      <p className="text-foreground mb-2">{venueRecommendations.length} perfekte Venues für euch gefunden!</p>
-                      {compatibilityScore && (
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Kompatibilität: {typeof compatibilityScore === 'object' ? compatibilityScore.overall_score : compatibilityScore}%
-                        </p>
-                      )}
+                      <p className="text-foreground mb-1">{venueRecommendations.length} Venues gefunden!</p>
                       {!autoNavigating && (
-                        <Button onClick={() => { setHasAutoNavigated(true); onDisplayVenues?.(); }} className="mt-2">Matches ansehen</Button>
+                        <Button onClick={() => { setHasAutoNavigated(true); onDisplayVenues?.(); }} className="mt-3">Matches ansehen</Button>
                       )}
                     </>
                   ) : (
                     <>
-                      <p className="text-muted-foreground mb-4">Wir suchen die besten Venues für euch...</p>
-                      <Button onClick={() => {
-                        if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
-                        setHasAutoNavigated(true); onDisplayVenues?.();
-                      }} variant="outline" className="gap-2">
-                        <AlertCircle className="h-4 w-4" /> Trotzdem weiter
+                      <p className="text-sm text-muted-foreground mb-3">Suche läuft...</p>
+                      <Button onClick={() => { setHasAutoNavigated(true); onDisplayVenues?.(); }} variant="outline" size="sm">
+                        <AlertCircle className="h-4 w-4 mr-1" /> Trotzdem weiter
                       </Button>
                     </>
                   )}
@@ -1037,11 +870,9 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
       {planningMode !== 'collaborative' && aiAnalyzing && (
         <Card className="border-primary/20 mt-6">
           <CardContent className="p-6 text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Loader2 className="h-6 w-6 text-primary animate-spin" />
-              <h3 className="text-lg font-semibold">KI-Analyse läuft</h3>
-            </div>
-            <p className="text-muted-foreground">Analysiere Präferenzen und suche perfekte Venues...</p>
+            <Loader2 className="h-6 w-6 text-primary animate-spin mx-auto mb-3" />
+            <h3 className="text-lg font-semibold mb-1">KI-Analyse läuft</h3>
+            <p className="text-sm text-muted-foreground">Analysiere Präferenzen und suche Venues...</p>
           </CardContent>
         </Card>
       )}
