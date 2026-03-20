@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useBreakpoint } from '@/hooks/use-mobile';
 import { hasMoodToday } from '@/pages/MoodCheckIn';
 import { supabase } from '@/integrations/supabase/client';
+import { hasCompletedPreferenceSetup } from '@/utils/preferenceCompletion';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -18,44 +19,39 @@ const Home: React.FC = () => {
   const hasRefreshedProfile = useRef(false);
   const hasCheckedOnboarding = useRef(false);
 
-  // Refresh profile once on mount
   React.useEffect(() => {
     if (user && !authLoading && !hasRefreshedProfile.current) {
       hasRefreshedProfile.current = true;
       refreshProfile();
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, refreshProfile]);
 
-  // Handle authentication redirect + mood check + onboarding (run once)
   React.useEffect(() => {
     if (authLoading) return;
-    
+
     if (!user) {
       console.log('No authenticated user found, redirecting to login');
       navigate('/?auth=required', { replace: true });
       return;
     }
 
-    // Only check onboarding once per mount
     if (hasCheckedOnboarding.current) return;
     hasCheckedOnboarding.current = true;
 
-    // 1. Mood check first
     if (!hasMoodToday()) {
       navigate('/mood', { replace: true });
       return;
     }
 
-    // 2. Check if preferences are set (onboarding)
     const checkOnboarding = async () => {
       try {
         const { data } = await supabase
           .from('user_preferences')
-          .select('id, preferred_cuisines')
+          .select('home_address, home_latitude, home_longitude, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types')
           .eq('user_id', user.id)
           .maybeSingle();
 
-        if (!data || !data.preferred_cuisines || data.preferred_cuisines.length === 0) {
+        if (!hasCompletedPreferenceSetup(data)) {
           navigate('/preferences?onboarding=true', { replace: true });
         }
       } catch (error) {
@@ -63,7 +59,7 @@ const Home: React.FC = () => {
       }
     };
 
-    checkOnboarding();
+    void checkOnboarding();
   }, [user, authLoading, navigate]);
 
   // Memoize user display logic

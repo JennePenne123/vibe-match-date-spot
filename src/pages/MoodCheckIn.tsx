@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Sun, Coffee, Moon } from 'lucide-react';
+import { hasCompletedPreferenceSetup } from '@/utils/preferenceCompletion';
 
 const MOOD_STORAGE_KEY = 'vybe-daily-mood';
 
@@ -82,14 +83,12 @@ const MoodCheckIn: React.FC = () => {
   const [selectedMood, setSelectedMood] = useState<DailyMood | null>(null);
   const [animateOut, setAnimateOut] = useState(false);
 
-  // Redirect if not logged in
   useEffect(() => {
     if (!loading && !user) {
       navigate('/?auth=required', { replace: true });
     }
   }, [user, loading, navigate]);
 
-  // Already checked in today → go to home
   useEffect(() => {
     if (hasMoodToday()) {
       navigate('/home', { replace: true });
@@ -102,7 +101,6 @@ const MoodCheckIn: React.FC = () => {
         MOOD_STORAGE_KEY,
         JSON.stringify({ mood, date: new Date().toISOString().split('T')[0] })
       );
-      // Award points for mood check-in
       try {
         const { awardPoints } = await import('@/services/awardPointsService');
         await awardPoints('mood_checkin');
@@ -110,24 +108,24 @@ const MoodCheckIn: React.FC = () => {
         console.error('Failed to award mood check-in points:', e);
       }
     } else {
-      // Skipped – still mark as checked so we don't show again today
       localStorage.setItem(
         MOOD_STORAGE_KEY,
         JSON.stringify({ mood: 'skipped', date: new Date().toISOString().split('T')[0] })
       );
     }
+
     setAnimateOut(true);
-    // Check if user needs preferences onboarding
+
     setTimeout(async () => {
       if (user) {
         try {
           const { data } = await supabase
             .from('user_preferences')
-            .select('id, preferred_cuisines')
+            .select('home_address, home_latitude, home_longitude, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types')
             .eq('user_id', user.id)
             .maybeSingle();
 
-          if (!data || !data.preferred_cuisines || data.preferred_cuisines.length === 0) {
+          if (!hasCompletedPreferenceSetup(data)) {
             navigate('/preferences?onboarding=true', { replace: true });
             return;
           }
@@ -135,6 +133,7 @@ const MoodCheckIn: React.FC = () => {
           console.error('Error checking preferences after mood:', error);
         }
       }
+
       navigate('/home', { replace: true });
     }, 350);
   };
