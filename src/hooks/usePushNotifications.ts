@@ -80,6 +80,23 @@ export function usePushNotifications() {
 
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
+      await registration.update();
+
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+
+      registration.addEventListener('updatefound', () => {
+        const installingWorker = registration.installing;
+        if (!installingWorker) return;
+
+        installingWorker.addEventListener('statechange', () => {
+          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            installingWorker.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+
       console.log('Service Worker registered:', registration);
       return registration;
     } catch (error) {
