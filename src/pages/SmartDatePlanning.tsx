@@ -43,7 +43,6 @@ const SmartDatePlanning: React.FC = () => {
   const { createPlanningSession, getActiveSession } = useSessionManagement();
   
   
-  // Enhanced guardrail: Join existing session or inherit preferences 
   useEffect(() => {
     if (!user || !collaborativeSession || !sessionId) return;
     
@@ -52,21 +51,6 @@ const SmartDatePlanning: React.FC = () => {
     const isCompleted = collaborativeSession.session_status === 'completed';
     const isInactive = collaborativeSession.session_status !== 'active';
     
-    console.log('🔄 SESSION GUARDRAIL: Checking session validity:', {
-      sessionId,
-      userRole,
-      sessionStatus: collaborativeSession.session_status,
-      isExpired,
-      isCompleted,
-      isInactive,
-      hasInitiatorPrefs: !!collaborativeSession.initiator_preferences,
-      hasPartnerPrefs: !!collaborativeSession.partner_preferences,
-      initiatorComplete: collaborativeSession.initiator_preferences_complete,
-      partnerComplete: collaborativeSession.partner_preferences_complete,
-      bothComplete: collaborativeSession.both_preferences_complete
-    });
-    
-    // Check if user needs to inherit preferences when joining existing session
     const userHasNoPreferences = userRole === 'initiator' 
       ? !collaborativeSession.initiator_preferences_complete || !collaborativeSession.initiator_preferences
       : !collaborativeSession.partner_preferences_complete || !collaborativeSession.partner_preferences;
@@ -74,10 +58,7 @@ const SmartDatePlanning: React.FC = () => {
     const sessionIsValid = !isExpired && !isCompleted && !isInactive;
     
     if (sessionIsValid && userHasNoPreferences && !sessionStorage.getItem(`inherit-${sessionId}-${user.id}`)) {
-      console.log('🔄 SESSION GUARDRAIL: Valid session but user needs preferences, attempting inheritance');
       sessionStorage.setItem(`inherit-${sessionId}-${user.id}`, 'attempted');
-      
-      // Reload to trigger preference sync
       window.location.reload();
       return;
     }
