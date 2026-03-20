@@ -112,7 +112,7 @@ const SmartDatePlanning: React.FC = () => {
           sessionStorage.removeItem(`guardrail-${sessionId}`);
         });
     } else if (sessionIsValid) {
-      console.log('✅ SESSION GUARDRAIL: Session is valid, allowing user to join');
+      
     }
   }, [user, collaborativeSession, sessionId, createPlanningSession, navigate, getActiveSession]);
   
