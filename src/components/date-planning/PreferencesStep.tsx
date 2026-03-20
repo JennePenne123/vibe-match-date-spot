@@ -593,11 +593,71 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   };
 
 
+  // Helper to build a summary string for collapsed sections
+  const buildSummary = (items: string[], allItems: Preference[]) => {
+    if (items.length === 0) return 'Keine Auswahl';
+    const mapped = items.map(id => {
+      const found = allItems.find(x => x.id === id);
+      return found ? `${found.emoji} ${found.name}` : id;
+    });
+    if (mapped.length <= 3) return mapped.join(', ');
+    return `${mapped.slice(0, 2).join(', ')} +${mapped.length - 2}`;
+  };
+
+  // Track which accordion sections are open
+  const [openSections, setOpenSections] = useState<string[]>([]);
+
+  const toggleSection = (id: string) => {
+    setOpenSections(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
+  };
+
+  const isSectionOpen = (id: string) => openSections.includes(id);
+
+  const renderCollapsibleSection = (
+    id: string,
+    icon: React.ReactNode,
+    title: string,
+    summary: string,
+    count: number,
+    children: React.ReactNode
+  ) => {
+    const open = isSectionOpen(id);
+    return (
+      <div className="border border-border rounded-xl overflow-hidden">
+        <button
+          type="button"
+          onClick={() => toggleSection(id)}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+          className="flex items-center gap-3 w-full p-3.5 text-left select-none hover:bg-muted/30 transition-colors"
+        >
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+            {icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">{title}</p>
+            <p className="text-xs text-muted-foreground truncate">{summary}</p>
+          </div>
+          {count > 0 && (
+            <Badge variant="secondary" className="text-xs h-5 px-1.5 flex-shrink-0">
+              {count}
+            </Badge>
+          )}
+          <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform flex-shrink-0", open && "rotate-180")} />
+        </button>
+        {open && (
+          <div className="px-3.5 pb-3.5 pt-1">
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderAllInOnePage = () => (
-    <div className="space-y-6">
-      {/* Duration Models */}
+    <div className="space-y-4">
+      {/* Duration Models - always visible as primary choice */}
       <div>
-        <h2 className="text-base md:text-lg font-bold mb-1">Wie viel Zeit hast du?</h2>
+        <h2 className="text-base font-bold mb-1">Wie viel Zeit hast du?</h2>
         <p className="text-muted-foreground text-sm mb-3">Das hilft der KI, passende Vorschläge zu filtern</p>
         <div className="grid grid-cols-2 gap-2">
           {durationModels.map((model) => {
@@ -666,28 +726,74 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
             </div>
           </div>
 
-          {/* Cuisine */}
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Küche</h3>
-            {renderChipGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines')}
-          </div>
-
-          {/* Vibes */}
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Vibe</h3>
-            {selectedDurationModel?.excludeVibes.length ? (
-              <p className="text-xs text-muted-foreground mb-2 italic">Einige Vibes basierend auf Zeitmodell ausgeblendet</p>
-            ) : null}
-            {renderChipGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
-          </div>
-
-          {/* Budget */}
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Budget</h3>
-            {selectedDurationModel && selectedPriceRange.length > 0 && (
-              <p className="text-xs text-muted-foreground mb-2 italic">Vorauswahl basierend auf „{selectedDurationModel.title}"</p>
+          {/* Collapsible Category Sections */}
+          <div className="space-y-2">
+            {renderCollapsibleSection(
+              'cuisine',
+              <span className="text-sm">🍽️</span>,
+              'Küche',
+              buildSummary(selectedCuisines, cuisines),
+              selectedCuisines.length,
+              renderChipGrid(cuisines, selectedCuisines, setSelectedCuisines, 'preferred_cuisines')
             )}
-            {renderChipGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range')}
+
+            {renderCollapsibleSection(
+              'vibes',
+              <span className="text-sm">✨</span>,
+              'Vibe',
+              buildSummary(selectedVibes, allVibes),
+              selectedVibes.length,
+              <>
+                {selectedDurationModel?.excludeVibes.length ? (
+                  <p className="text-xs text-muted-foreground mb-2 italic">Einige Vibes basierend auf Zeitmodell ausgeblendet</p>
+                ) : null}
+                {renderChipGrid(vibes, selectedVibes, setSelectedVibes, 'preferred_vibes')}
+              </>
+            )}
+
+            {renderCollapsibleSection(
+              'budget',
+              <span className="text-sm">💰</span>,
+              'Budget',
+              buildSummary(selectedPriceRange, priceRanges),
+              selectedPriceRange.length,
+              <>
+                {selectedDurationModel && selectedPriceRange.length > 0 && (
+                  <p className="text-xs text-muted-foreground mb-2 italic">Vorauswahl basierend auf „{selectedDurationModel.title}"</p>
+                )}
+                {renderChipGrid(priceRanges, selectedPriceRange, setSelectedPriceRange, 'preferred_price_range')}
+              </>
+            )}
+
+            {renderCollapsibleSection(
+              'time',
+              <span className="text-sm">🕐</span>,
+              'Tageszeit',
+              buildSummary(selectedTimePreferences, timePreferences),
+              selectedTimePreferences.length,
+              renderChipGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times')
+            )}
+
+            {renderCollapsibleSection(
+              'advanced',
+              <Settings className="w-4 h-4 text-muted-foreground" />,
+              'Erweiterte Optionen',
+              `${maxDistance} km${selectedDietary.length > 0 ? ` • ${selectedDietary.length} Diät` : ''}`,
+              selectedDietary.length,
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium mb-2">Entfernung</p>
+                  <Slider value={[maxDistance]} onValueChange={(v) => setMaxDistance(v[0])} max={50} min={1} step={1} className="w-full" />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                    <span>1 km</span><span className="font-medium text-foreground">{maxDistance} km</span><span>50 km</span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium mb-2">Diät / Unverträglichkeiten</p>
+                  {renderChipGrid(dietaryRequirements, selectedDietary, setSelectedDietary, 'dietary_restrictions')}
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}
@@ -731,35 +837,6 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           </div>
         )}
       </div>
-
-      {/* Time Preference Chips */}
-      <div>
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Tageszeit</h3>
-        {renderChipGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times')}
-      </div>
-
-      {/* Advanced Options */}
-      <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
-        <CollapsibleTrigger asChild>
-          <button type="button" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full">
-            <Settings className="w-4 h-4" /><span>Erweiterte Optionen</span>
-            <ChevronDown className={cn("w-4 h-4 ml-auto transition-transform", showAdvanced && "rotate-180")} />
-          </button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-5 pt-4">
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Entfernung</h3>
-            <Slider value={[maxDistance]} onValueChange={(v) => setMaxDistance(v[0])} max={50} min={1} step={1} className="w-full" />
-            <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>1 km</span><span className="font-medium text-foreground">{maxDistance} km</span><span>50 km</span>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Diät / Unverträglichkeiten</h3>
-            {renderChipGrid(dietaryRequirements, selectedDietary, setSelectedDietary, 'dietary_restrictions')}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
 
       {/* Selection summary */}
       {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
