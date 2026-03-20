@@ -26,8 +26,14 @@ export const useUserRole = () => {
         if (error) {
           console.error('Error fetching user role:', error);
           setRole('regular');
+        } else if (data && data.length > 0) {
+          // Prioritize: admin > venue_partner > regular
+          const roles = data.map(d => d.role as UserRole);
+          if (roles.includes('admin')) setRole('admin');
+          else if (roles.includes('venue_partner')) setRole('venue_partner');
+          else setRole('regular');
         } else {
-          setRole((data?.role as UserRole) || 'regular');
+          setRole('regular');
         }
       } catch (error) {
         console.error('Error in fetchUserRole:', error);
