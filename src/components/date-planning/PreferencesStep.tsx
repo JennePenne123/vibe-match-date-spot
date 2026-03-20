@@ -90,8 +90,10 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const { user } = useAuth();
   
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0); // 0 = confirm onboarding prefs, 1 = customize, 2 = date/time
   const [hasCompletedAllSteps, setHasCompletedAllSteps] = useState(false);
+  const [onboardingPrefs, setOnboardingPrefs] = useState<UserPreferences | null>(null);
+  const [onboardingLoaded, setOnboardingLoaded] = useState(false);
   const totalSteps = 2;
   
   // Duration model state
@@ -281,24 +283,45 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   useEffect(() => { loadPartnerPreferences(); }, [user?.id, partnerId]);
 
+  // Load onboarding preferences to show confirmation screen
   useEffect(() => {
-    const loadLearnedPreferences = async () => {
+    const loadOnboardingPreferences = async () => {
       if (!user?.id) return;
       try {
         const { data, error } = await supabase.from('user_preferences').select('*').eq('user_id', user.id).single();
-        if (error || !data) return;
+        if (error || !data) {
+          setOnboardingLoaded(true);
+          setCurrentStep(1); // No prefs → skip to customize
+          return;
+        }
         const has = (arr: any) => arr && arr.length > 0;
         if (has(data.preferred_cuisines) || has(data.preferred_vibes) || has(data.preferred_price_range) || has(data.preferred_times)) {
+          setOnboardingPrefs({
+            preferred_cuisines: data.preferred_cuisines || [],
+            preferred_vibes: data.preferred_vibes || [],
+            preferred_price_range: data.preferred_price_range || [],
+            preferred_times: data.preferred_times || [],
+            max_distance: data.max_distance || 15,
+            dietary_restrictions: data.dietary_restrictions || []
+          });
           setLearnedTemplate({
             id: 'ai-learned', title: 'Für dich', emoji: '🤖',
             description: 'Basierend auf deinen bisherigen Vorlieben',
             cuisines: data.preferred_cuisines || [], vibes: data.preferred_vibes || [],
             priceRange: data.preferred_price_range || [], timePreferences: data.preferred_times || []
           });
+          // Stay on step 0 (confirmation)
+        } else {
+          setCurrentStep(1); // No meaningful prefs → skip to customize
         }
-      } catch (err) { console.error('Error loading learned preferences:', err); }
+        setOnboardingLoaded(true);
+      } catch (err) {
+        console.error('Error loading onboarding preferences:', err);
+        setOnboardingLoaded(true);
+        setCurrentStep(1);
+      }
     };
-    loadLearnedPreferences();
+    loadOnboardingPreferences();
   }, [user?.id]);
 
   const loadPartnerPreferences = async () => {
@@ -438,10 +461,52 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
   };
 
-  const prevStep = () => { if (currentStep > 1) setCurrentStep(currentStep - 1); };
+  const prevStep = () => {
+    if (currentStep > 0) {
+      // If going back from customize and onboarding prefs exist, go to confirmation
+      if (currentStep === 1 && onboardingPrefs) {
+        setCurrentStep(0);
+      } else if (currentStep > 1) {
+        setCurrentStep(currentStep - 1);
+      }
+    }
+  };
+
+  const handleKeepPreferences = () => {
+    if (!onboardingPrefs) return;
+    // Auto-fill all selections from onboarding
+    setSelectedCuisines(onboardingPrefs.preferred_cuisines);
+    setSelectedVibes(onboardingPrefs.preferred_vibes);
+    setSelectedPriceRange(onboardingPrefs.preferred_price_range);
+    setSelectedTimePreferences(onboardingPrefs.preferred_times);
+    setMaxDistance(onboardingPrefs.max_distance);
+    setSelectedDietary(onboardingPrefs.dietary_restrictions);
+    // Auto-select a matching duration model
+    const times = onboardingPrefs.preferred_times;
+    if (times.includes('evening') || times.includes('night')) setSelectedDuration('evening');
+    else if (times.includes('morning') || times.includes('lunch')) setSelectedDuration('relaxed');
+    else setSelectedDuration('relaxed');
+    // Skip to date/time step
+    setCurrentStep(2);
+    toast({ title: 'Vorlieben übernommen!', description: 'Wähle jetzt noch Datum & Uhrzeit.' });
+  };
+
+  const handleCustomize = () => {
+    // Pre-fill with onboarding data but let user modify
+    if (onboardingPrefs) {
+      setSelectedCuisines(onboardingPrefs.preferred_cuisines);
+      setSelectedVibes(onboardingPrefs.preferred_vibes);
+      setSelectedPriceRange(onboardingPrefs.preferred_price_range);
+      setSelectedTimePreferences(onboardingPrefs.preferred_times);
+      setMaxDistance(onboardingPrefs.max_distance);
+      setSelectedDietary(onboardingPrefs.dietary_restrictions);
+    }
+    setCurrentStep(1);
+  };
 
   const getStepTitle = () => {
     switch (currentStep) {
+      case 0: return 'Deine Vorlieben';
       case 1: return 'Dein Date planen';
       case 2: return 'Wann & Los';
       default: return 'Preferences';
@@ -450,6 +515,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   const getStepIcon = () => {
     switch (currentStep) {
+      case 0: return <Sparkles className="w-5 h-5" />;
       case 1: return <Heart className="w-5 h-5" />;
       case 2: return <CalendarIcon className="w-5 h-5" />;
       default: return <Heart className="w-5 h-5" />;
@@ -487,6 +553,71 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   );
 
   // ── Step renderers ────────────────────────────────────────────────
+
+  const renderConfirmationStep = () => {
+    if (!onboardingPrefs) return null;
+    const allVibesMap: Record<string, string> = { romantic: '💕 Romantic', casual: '😊 Casual', outdoor: '🌳 Outdoor', upscale: '✨ Upscale', lively: '🎉 Lively', cozy: '🕯️ Cozy', nightlife: '🌙 Nightlife', cultural: '🎭 Cultural', adventurous: '🗺️ Adventurous' };
+    const cuisineEmojis: Record<string, string> = { Italian: '🍝', Japanese: '🍣', Mexican: '🌮', French: '🥐', Indian: '🍛', Mediterranean: '🫒', American: '🍔', Thai: '🍜', Chinese: '🥢', Korean: '🍲' };
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-3">
+            <Sparkles className="w-7 h-7 text-primary" />
+          </div>
+          <h2 className="text-lg font-bold text-foreground mb-1">Deine Vorlieben stehen schon!</h2>
+          <p className="text-sm text-muted-foreground">Basierend auf deinem Onboarding – möchtest du sie übernehmen oder heute anders?</p>
+        </div>
+
+        {/* Preference summary */}
+        <div className="bg-muted/50 rounded-xl p-4 space-y-3 border border-border">
+          {onboardingPrefs.preferred_cuisines.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Küche</p>
+              <div className="flex flex-wrap gap-1.5">
+                {onboardingPrefs.preferred_cuisines.map(c => (
+                  <Badge key={c} variant="secondary" className="text-xs">{cuisineEmojis[c] || '🍽️'} {c}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+          {onboardingPrefs.preferred_vibes.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Vibe</p>
+              <div className="flex flex-wrap gap-1.5">
+                {onboardingPrefs.preferred_vibes.map(v => (
+                  <Badge key={v} variant="secondary" className="text-xs">{allVibesMap[v] || v}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+          {onboardingPrefs.preferred_price_range.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Budget</p>
+              <div className="flex flex-wrap gap-1.5">
+                {onboardingPrefs.preferred_price_range.map(p => (
+                  <Badge key={p} variant="secondary" className="text-xs">{p}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Action buttons */}
+        <div className="grid grid-cols-1 gap-3">
+          <Button onClick={handleKeepPreferences} className="w-full h-12 text-base font-semibold transition-transform active:scale-[0.97]">
+            <Check className="w-5 h-5 mr-2" />
+            So übernehmen
+          </Button>
+          <Button onClick={handleCustomize} variant="outline" className="w-full h-12 text-base transition-transform active:scale-[0.97]">
+            <Settings className="w-4 h-4 mr-2" />
+            Heute anders
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
 
   const renderCombinedStep = () => (
     <div className="space-y-6">
@@ -697,47 +828,52 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   return (
     <SafeComponent>
       <Card>
-        <CardHeader className="px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
-          <div className="space-y-3 md:space-y-0 md:flex md:items-center md:justify-between">
-            <CardTitle className="flex flex-wrap items-center gap-2 text-lg md:text-xl">
-              {getStepIcon()}
-              <span className="font-bold">{getStepTitle()}</span>
-              {planningMode === 'collaborative' && status.userCompleted && (
-                <Badge variant="secondary" className="text-xs">
-                  <CheckCircle className="w-3 h-3 mr-1" /> Saved
-                </Badge>
-              )}
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">Step {currentStep} / {totalSteps}</Badge>
-              {planningMode === 'collaborative' && (
-                <div className="flex items-center gap-1">
-                  <div className={cn("w-2 h-2 rounded-full", status.userCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
-                  <div className={cn("w-2 h-2 rounded-full", status.partnerCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
-                </div>
-              )}
+        {currentStep > 0 && (
+          <CardHeader className="px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
+            <div className="space-y-3 md:space-y-0 md:flex md:items-center md:justify-between">
+              <CardTitle className="flex flex-wrap items-center gap-2 text-lg md:text-xl">
+                {getStepIcon()}
+                <span className="font-bold">{getStepTitle()}</span>
+                {planningMode === 'collaborative' && status.userCompleted && (
+                  <Badge variant="secondary" className="text-xs">
+                    <CheckCircle className="w-3 h-3 mr-1" /> Saved
+                  </Badge>
+                )}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">Step {currentStep} / {totalSteps}</Badge>
+                {planningMode === 'collaborative' && (
+                  <div className="flex items-center gap-1">
+                    <div className={cn("w-2 h-2 rounded-full", status.userCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
+                    <div className={cn("w-2 h-2 rounded-full", status.partnerCompleted ? "bg-primary" : "bg-muted-foreground/30")} />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </CardHeader>
+          </CardHeader>
+        )}
         <CardContent className="px-4 md:px-6 pb-4 md:pb-6 space-y-4 md:space-y-6">
+          {currentStep === 0 && renderConfirmationStep()}
           {currentStep === 1 && renderCombinedStep()}
           {currentStep === 2 && renderConfirmStep()}
 
-          <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
-            <Button onClick={prevStep} variant="outline" disabled={currentStep === 1} className="w-full sm:w-auto">
-              Zurück
-            </Button>
-            
-            {currentStep < totalSteps ? (
-              <Button onClick={nextStep} disabled={currentStep === 1 && !selectedDuration} className="w-full sm:w-auto">
-                Weiter
+          {currentStep > 0 && (
+            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 md:pt-6">
+              <Button onClick={prevStep} variant="outline" disabled={currentStep === 1 && !onboardingPrefs} className="w-full sm:w-auto">
+                Zurück
               </Button>
-            ) : (
-              <Button onClick={submitPreferences} disabled={loading} className="w-full sm:w-auto">
-                {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</>) : '🚀 Los geht\'s'}
-              </Button>
-            )}
-          </div>
+              
+              {currentStep < totalSteps ? (
+                <Button onClick={nextStep} disabled={currentStep === 1 && !selectedDuration} className="w-full sm:w-auto">
+                  Weiter
+                </Button>
+              ) : (
+                <Button onClick={submitPreferences} disabled={loading} className="w-full sm:w-auto">
+                  {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</>) : '🚀 Los geht\'s'}
+                </Button>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
