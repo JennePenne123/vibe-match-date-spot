@@ -593,7 +593,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   };
 
 
-  const renderCombinedStep = () => (
+  const renderAllInOnePage = () => (
     <div className="space-y-6">
       {/* Duration Models */}
       <div>
@@ -691,11 +691,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           </div>
         </>
       )}
-    </div>
-  );
 
-  const renderConfirmStep = () => (
-    <div className="space-y-6">
       {/* Date & Time */}
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Wann geht's los?</h3>
@@ -742,23 +738,6 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         {renderChipGrid(timePreferences, selectedTimePreferences, setSelectedTimePreferences, 'preferred_times')}
       </div>
 
-      {/* Selection summary */}
-      {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
-        <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">Deine Auswahl</p>
-          <div className="flex flex-wrap gap-1.5">
-            {selectedDuration && (
-              <Badge variant="outline" className="text-xs">
-                {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
-              </Badge>
-            )}
-            {selectedCuisines.map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {c}</Badge>)}
-            {selectedVibes.map(v => <Badge key={v} variant="outline" className="text-xs">{allVibes.find(x => x.id === v)?.emoji} {v}</Badge>)}
-            {selectedPriceRange.map(p => <Badge key={p} variant="outline" className="text-xs">{p}</Badge>)}
-          </div>
-        </div>
-      )}
-
       {/* Advanced Options */}
       <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
         <CollapsibleTrigger asChild>
@@ -781,6 +760,23 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           </div>
         </CollapsibleContent>
       </Collapsible>
+
+      {/* Selection summary */}
+      {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
+        <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Deine Auswahl</p>
+          <div className="flex flex-wrap gap-1.5">
+            {selectedDuration && (
+              <Badge variant="outline" className="text-xs">
+                {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
+              </Badge>
+            )}
+            {selectedCuisines.map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {c}</Badge>)}
+            {selectedVibes.map(v => <Badge key={v} variant="outline" className="text-xs">{allVibes.find(x => x.id === v)?.emoji} {v}</Badge>)}
+            {selectedPriceRange.map(p => <Badge key={p} variant="outline" className="text-xs">{p}</Badge>)}
+          </div>
+        </div>
+      )}
     </div>
   );
 
