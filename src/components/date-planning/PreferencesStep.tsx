@@ -283,24 +283,45 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   useEffect(() => { loadPartnerPreferences(); }, [user?.id, partnerId]);
 
+  // Load onboarding preferences to show confirmation screen
   useEffect(() => {
-    const loadLearnedPreferences = async () => {
+    const loadOnboardingPreferences = async () => {
       if (!user?.id) return;
       try {
         const { data, error } = await supabase.from('user_preferences').select('*').eq('user_id', user.id).single();
-        if (error || !data) return;
+        if (error || !data) {
+          setOnboardingLoaded(true);
+          setCurrentStep(1); // No prefs → skip to customize
+          return;
+        }
         const has = (arr: any) => arr && arr.length > 0;
         if (has(data.preferred_cuisines) || has(data.preferred_vibes) || has(data.preferred_price_range) || has(data.preferred_times)) {
+          setOnboardingPrefs({
+            preferred_cuisines: data.preferred_cuisines || [],
+            preferred_vibes: data.preferred_vibes || [],
+            preferred_price_range: data.preferred_price_range || [],
+            preferred_times: data.preferred_times || [],
+            max_distance: data.max_distance || 15,
+            dietary_restrictions: data.dietary_restrictions || []
+          });
           setLearnedTemplate({
             id: 'ai-learned', title: 'Für dich', emoji: '🤖',
             description: 'Basierend auf deinen bisherigen Vorlieben',
             cuisines: data.preferred_cuisines || [], vibes: data.preferred_vibes || [],
             priceRange: data.preferred_price_range || [], timePreferences: data.preferred_times || []
           });
+          // Stay on step 0 (confirmation)
+        } else {
+          setCurrentStep(1); // No meaningful prefs → skip to customize
         }
-      } catch (err) { console.error('Error loading learned preferences:', err); }
+        setOnboardingLoaded(true);
+      } catch (err) {
+        console.error('Error loading onboarding preferences:', err);
+        setOnboardingLoaded(true);
+        setCurrentStep(1);
+      }
     };
-    loadLearnedPreferences();
+    loadOnboardingPreferences();
   }, [user?.id]);
 
   const loadPartnerPreferences = async () => {
