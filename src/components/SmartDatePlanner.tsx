@@ -26,9 +26,10 @@ import { supabase } from '@/integrations/supabase/client';
 interface SmartDatePlannerProps {
   sessionId: string;
   fromProposal: boolean;
+  preselectedFriend?: { id: string; name: string } | null;
 }
 
-const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal }) => {
+const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal, preselectedFriend = null }) => {
   const { isMobile, isDesktop } = useBreakpoint();
   const { friends: allFriends } = useFriends();
   
@@ -56,8 +57,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     return partner ? { id: partner.id, name: partner.name } : null;
   }, [collaborativeSession, allFriends, isUserInitiator]);
   
-  // Use session partner as the preselected friend
-  const effectivePreselectedFriend = sessionPartner;
+  // Use session partner as the preselected friend, but support direct plan-date entry too
+  const effectivePreselectedFriend = sessionPartner ?? preselectedFriend;
   
   const state = useSmartDatePlannerState({ 
     preselectedFriend: effectivePreselectedFriend,

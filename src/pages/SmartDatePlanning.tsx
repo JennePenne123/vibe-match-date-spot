@@ -48,6 +48,9 @@ const SmartDatePlanning: React.FC = () => {
   const sessionId = location.state?.sessionId ?? searchParams.get('sessionId');
   const fromProposal = location.state?.fromProposal ?? searchParams.get('fromProposal') === 'true';
   const planningMode = location.state?.planningMode ?? searchParams.get('planningMode') ?? 'collaborative';
+  const preselectedFriend = location.state?.preselectedFriend ?? null;
+  const isProposalFlow = Boolean(fromProposal && sessionId);
+  const hasInvalidProposalState = Boolean(fromProposal && !sessionId);
   
   // Get session data to check if it needs reset
   const { session: collaborativeSession } = useCollaborativeSession(sessionId);
@@ -55,7 +58,7 @@ const SmartDatePlanning: React.FC = () => {
   
 
   useEffect(() => {
-    if (!sessionId || !fromProposal) return;
+    if (!isProposalFlow || !sessionId) return;
 
     const currentSessionIdInUrl = searchParams.get('sessionId');
     const currentFromProposalInUrl = searchParams.get('fromProposal');
@@ -66,7 +69,7 @@ const SmartDatePlanning: React.FC = () => {
       replace: true,
       state: location.state,
     });
-  }, [sessionId, fromProposal, searchParams, navigate, buildPlanDateUrl, planningMode, location.state]);
+  }, [isProposalFlow, sessionId, searchParams, navigate, buildPlanDateUrl, planningMode, location.state]);
 
   useEffect(() => {
     if (!user || !collaborativeSession || !sessionId) return;
@@ -134,9 +137,7 @@ const SmartDatePlanning: React.FC = () => {
     }
   }, [user, collaborativeSession, sessionId, createPlanningSession, navigate, getActiveSession, buildPlanDateUrl]);
   
-  // CRITICAL: Collaborative planning requires coming from an accepted proposal
-  // If accessed directly without session data, redirect to home
-  if (!fromProposal || !sessionId) {
+  if (hasInvalidProposalState) {
     navigate('/home', { replace: true });
     return null;
   }
@@ -171,7 +172,11 @@ const SmartDatePlanning: React.FC = () => {
           )}
           
           <ErrorBoundary level="component" silent={true}>
-            <SmartDatePlanner sessionId={sessionId} fromProposal={fromProposal} />
+            <SmartDatePlanner
+              sessionId={sessionId ?? ''}
+              fromProposal={isProposalFlow}
+              preselectedFriend={preselectedFriend}
+            />
           </ErrorBoundary>
         </div>
       </div>
