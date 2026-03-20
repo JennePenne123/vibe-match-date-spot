@@ -137,9 +137,7 @@ const SmartDatePlanning: React.FC = () => {
     }
   }, [user, collaborativeSession, sessionId, createPlanningSession, navigate, getActiveSession, buildPlanDateUrl]);
   
-  // CRITICAL: Collaborative planning requires coming from an accepted proposal
-  // If accessed directly without session data, redirect to home
-  if (!fromProposal || !sessionId) {
+  if (hasInvalidProposalState) {
     navigate('/home', { replace: true });
     return null;
   }
