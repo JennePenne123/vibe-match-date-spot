@@ -156,7 +156,7 @@ const Onboarding = () => {
         }
       }
 
-      navigate('/mood', { replace: true });
+      navigate('/home', { replace: true });
     } catch (error) {
       console.error('Error saving onboarding data:', error);
       toast({
