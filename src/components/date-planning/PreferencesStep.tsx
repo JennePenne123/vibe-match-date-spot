@@ -90,8 +90,10 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const { user } = useAuth();
   
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0); // 0 = confirm onboarding prefs, 1 = customize, 2 = date/time
   const [hasCompletedAllSteps, setHasCompletedAllSteps] = useState(false);
+  const [onboardingPrefs, setOnboardingPrefs] = useState<UserPreferences | null>(null);
+  const [onboardingLoaded, setOnboardingLoaded] = useState(false);
   const totalSteps = 2;
   
   // Duration model state
