@@ -1224,7 +1224,9 @@ export type Database = {
           home_latitude: number | null
           home_longitude: number | null
           id: string
+          lifestyle_data: Json | null
           max_distance: number | null
+          personality_traits: Json | null
           preferred_activities: string[] | null
           preferred_cuisines: string[] | null
           preferred_duration: string | null
@@ -1233,6 +1235,7 @@ export type Database = {
           preferred_times: string[] | null
           preferred_venue_types: string[] | null
           preferred_vibes: string[] | null
+          relationship_goal: string | null
           updated_at: string
           user_id: string
         }
@@ -1244,7 +1247,9 @@ export type Database = {
           home_latitude?: number | null
           home_longitude?: number | null
           id?: string
+          lifestyle_data?: Json | null
           max_distance?: number | null
+          personality_traits?: Json | null
           preferred_activities?: string[] | null
           preferred_cuisines?: string[] | null
           preferred_duration?: string | null
@@ -1253,6 +1258,7 @@ export type Database = {
           preferred_times?: string[] | null
           preferred_venue_types?: string[] | null
           preferred_vibes?: string[] | null
+          relationship_goal?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1264,7 +1270,9 @@ export type Database = {
           home_latitude?: number | null
           home_longitude?: number | null
           id?: string
+          lifestyle_data?: Json | null
           max_distance?: number | null
+          personality_traits?: Json | null
           preferred_activities?: string[] | null
           preferred_cuisines?: string[] | null
           preferred_duration?: string | null
@@ -1273,6 +1281,7 @@ export type Database = {
           preferred_times?: string[] | null
           preferred_venue_types?: string[] | null
           preferred_vibes?: string[] | null
+          relationship_goal?: string | null
           updated_at?: string
           user_id?: string
         }
