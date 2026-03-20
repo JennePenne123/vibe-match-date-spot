@@ -105,7 +105,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         {isPartnerRoute ? (
           <PartnerMobileBottomNav />
-        ) : isAdminRoute ? null : (
+        ) : isAdminRoute ? (
+          <AdminMobileBottomNav />
+        ) : (
           <MobileBottomNav />
         )}
       </div>
