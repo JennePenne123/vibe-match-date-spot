@@ -176,25 +176,42 @@ const HomeContent: React.FC = () => {
           </>
         )}
 
-        {/* AI Inspiration Tips */}
+        {/* Daily Inspiration */}
         <div className="space-y-3">
+          {/* Quote */}
+          <Card className="border-0 bg-gradient-to-r from-accent/30 via-accent/10 to-transparent">
+            <CardContent className="py-4 px-5">
+              <p className="text-sm italic text-muted-foreground leading-relaxed text-center">
+                {QUOTES[getDailyIndex(0) % QUOTES.length]}
+              </p>
+            </CardContent>
+          </Card>
+
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1">
-            Inspiration
+            Was geht in deiner Stadt
           </h3>
-          <div className={isDesktop ? "grid grid-cols-3 gap-4" : "grid grid-cols-1 gap-3"}>
-            {DATE_TIPS.map((tip, i) => (
-              <Card key={i} className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-default">
-                <CardContent className="p-4 flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors shrink-0">
-                    <tip.icon className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground">{tip.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className={isDesktop ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-3"}>
+            {[getDailyIndex(0), getDailyIndex(3)].map((idx, i) => {
+              const tip = CITY_TIPS[idx];
+              return (
+                <Card key={i} className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-default">
+                  <CardContent className="p-4 flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors shrink-0">
+                      <tip.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                          {tip.label}
+                        </span>
+                      </div>
+                      <p className="text-sm font-medium text-foreground">{tip.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
