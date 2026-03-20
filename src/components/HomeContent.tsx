@@ -175,15 +175,25 @@ const HomeContent: React.FC = () => {
                 </div>
               )}
             </div>
-            <Button
-              onClick={handleCollaborativePlanning}
-              size="lg"
-              className="mt-4 w-full sm:w-auto shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300 gap-2"
-            >
-              <Users className="w-4 h-4" />
-              Date planen
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            <div className="mt-4 flex flex-col sm:flex-row gap-2.5">
+              <Button
+                onClick={handleSoloPlanning}
+                size="lg"
+                className="flex-1 shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300 gap-2"
+              >
+                <ArrowRight className="w-4 h-4" />
+                Solo planen
+              </Button>
+              <Button
+                onClick={handleGroupPlanning}
+                size="lg"
+                variant="outline"
+                className="flex-1 border-primary/30 text-primary hover:bg-primary/10 transition-all duration-300 gap-2"
+              >
+                <Users className="w-4 h-4" />
+                Gruppe einladen
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
