@@ -285,6 +285,7 @@ const Preferences = () => {
           if ((data as any).preferred_duration) setSelectedDuration((data as any).preferred_duration);
           if ((data as any).accessibility_needs) setSelectedAccessibility((data as any).accessibility_needs);
           if ((data as any).preferred_venue_types) setSelectedVenueTypes((data as any).preferred_venue_types);
+          if ((data as any).lifestyle_data?.preferred_neighborhoods) setSelectedNeighborhoods((data as any).lifestyle_data.preferred_neighborhoods);
         }
       } catch (error) {
         console.log('No existing preferences found');
