@@ -76,7 +76,7 @@ const Results = () => {
     if (isFromSmartPlanning && smartPlanningState.sessionId) {
       navigate(`/plan-date/${smartPlanningState.sessionId}`);
     } else {
-      navigate('/area');
+      navigate('/preferences');
     }
   };
 
@@ -87,7 +87,7 @@ const Results = () => {
           <div className="bg-card p-4 pt-12 shadow-sm">
             <div className="flex items-center justify-between">
               <Button
-                onClick={() => navigate(isFromSmartPlanning ? `/plan-date/${smartPlanningState?.sessionId}` : '/area')}
+                onClick={() => navigate(isFromSmartPlanning ? `/plan-date/${smartPlanningState?.sessionId}` : '/preferences')}
                 variant="ghost"
                 size="icon"
                 className="text-muted-foreground hover:bg-muted"
@@ -116,7 +116,7 @@ const Results = () => {
               )}
               <Button 
                 variant="outline" 
-                onClick={() => navigate('/area')}
+                onClick={() => navigate('/preferences')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Andere Area wählen
