@@ -469,6 +469,14 @@ const Preferences = () => {
     { id: 'spa_wellness', name: t('preferences.venue_spa'), emoji: '🧖' },
   ];
 
+  const neighborhoods: Preference[] = [
+    { id: 'downtown', name: t('preferences.neighborhood_downtown', 'Downtown / City'), emoji: '🏙️', desc: t('preferences.neighborhood_downtownDesc', 'Trendy, urban, Rooftop-Bars') },
+    { id: 'waterfront', name: t('preferences.neighborhood_waterfront', 'Waterfront / Hafen'), emoji: '🌊', desc: t('preferences.neighborhood_waterfrontDesc', 'Seafood, Terrassen, Sunset-Views') },
+    { id: 'arts-district', name: t('preferences.neighborhood_arts', 'Arts District / Szene'), emoji: '🎨', desc: t('preferences.neighborhood_artsDesc', 'Galerien, Live Music, Craft Beer') },
+    { id: 'oldtown', name: t('preferences.neighborhood_oldtown', 'Altstadt / Historisch'), emoji: '🏛️', desc: t('preferences.neighborhood_oldtownDesc', 'Gemütlich, Weinstuben, Tradition') },
+    { id: 'uptown', name: t('preferences.neighborhood_uptown', 'Uptown / Edelviertel'), emoji: '👑', desc: t('preferences.neighborhood_uptownDesc', 'Fine Dining, Champagner, Exklusiv') },
+  ];
+
   const activityIconMap: Record<string, string> = { cultural: 'cultural_act', nightlife: 'nightlife_act' };
 
   const [step, setStep] = useState(0);
