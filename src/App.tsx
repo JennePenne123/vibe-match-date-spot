@@ -96,7 +96,7 @@ const MoodCheckIn = lazy(() => import("./pages/MoodCheckIn"));
 const Home = lazy(() => import("./pages/Home"));
 const Preferences = lazy(() => import("./pages/Preferences"));
 const Friends = lazy(() => import("./pages/Friends"));
-const Area = lazy(() => import("./pages/Area"));
+
 const Results = lazy(() => import("./pages/Results"));
 const VenueDetail = lazy(() => import("./pages/VenueDetail"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -208,7 +208,7 @@ const App = () => (
                     <Route path="/home" element={<LazyPage><Home /></LazyPage>} />
                     <Route path="/preferences" element={<LazyPage><Preferences /></LazyPage>} />
                     <Route path="/friends" element={<LazyPage><Friends /></LazyPage>} />
-                    <Route path="/area" element={<LazyPage><Area /></LazyPage>} />
+                    
                     <Route path="/results" element={<LazyPage><Results /></LazyPage>} />
                     <Route path="/venue/:id" element={<LazyPage><VenueDetail /></LazyPage>} />
                     <Route path="/profile" element={<LazyPage><Profile /></LazyPage>} />
