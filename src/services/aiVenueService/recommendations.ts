@@ -348,23 +348,35 @@ async function getVenuesRadarOverpass(
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) {
-  // Step 1: Get venues from Radar (primary, high free tier)
-  let venues = await getVenuesFromRadar(userId, limit, userLocation).catch(() => []);
+  // Step 1: Query Radar + Overpass IN PARALLEL for maximum speed
+  const promises: Promise<any[]>[] = [];
   
-  // Step 2: Enrich with Overpass/OSM data (free, unlimited)
-  if (API_CONFIG.useOverpass && userLocation) {
-    const osmVenues = await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, osmVenues);
+  if (API_CONFIG.useRadar && userLocation) {
+    promises.push(getVenuesFromRadar(userId, limit, userLocation).catch((err) => {
+      console.warn('⚠️ Radar failed:', err instanceof Error ? err.message : 'Unknown');
+      return [];
+    }));
   }
   
-  // Step 3: If Radar returned nothing, fall back to Overpass-only
-  if (venues.length < API_CONFIG.minVenuesForSuccess && API_CONFIG.useOverpass && userLocation) {
-    console.log('⚠️ Radar returned few results, falling back to Overpass-only');
-    const osmVenues = await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, osmVenues);
+  if (API_CONFIG.useOverpass && userLocation) {
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation).catch((err) => {
+      console.warn('⚠️ Overpass failed:', err instanceof Error ? err.message : 'Unknown');
+      return [];
+    }));
   }
 
-  // Step 4: Google Places fallback for niche venue types
+  const results = await Promise.all(promises);
+  const radarVenues = results[0] || [];
+  const osmVenues = results[1] || [];
+  
+  console.log(`🔀 MERGE: Radar=${radarVenues.length}, Overpass=${osmVenues.length}`);
+  
+  // Merge: Radar as primary (has ratings, chain detection), Overpass enriches with opening hours, website, tags
+  let venues = mergeAndDeduplicateVenues(radarVenues, osmVenues);
+  
+  console.log(`🔀 MERGE: After dedup=${venues.length}`);
+
+  // Step 2: Google Places fallback for niche venue types only if needed
   if (userLocation && API_CONFIG.useGooglePlaces) {
     const { data: userPrefs } = await supabase
       .from('user_preferences')
@@ -511,6 +523,7 @@ function areVenuesDuplicates(v1: any, v2: any): boolean {
  * Enrich primary venue with secondary source data
  */
 function enrichVenueWithSecondary(primaryVenue: any, secondaryVenue: any): void {
+  // Photos
   if (secondaryVenue.photos?.length > 0) {
     primaryVenue.photos = primaryVenue.photos || [];
     const existingUrls = new Set(primaryVenue.photos.map((p: any) => p.url));
@@ -519,25 +532,33 @@ function enrichVenueWithSecondary(primaryVenue: any, secondaryVenue: any): void 
     }
   }
   
-  if (!primaryVenue.description && secondaryVenue.description) {
-    primaryVenue.description = secondaryVenue.description;
-  }
+  // Text fields — prefer non-empty values
+  if (!primaryVenue.description && secondaryVenue.description) primaryVenue.description = secondaryVenue.description;
+  if (!primaryVenue.phone && secondaryVenue.phone) primaryVenue.phone = secondaryVenue.phone;
+  if (!primaryVenue.website && secondaryVenue.website) primaryVenue.website = secondaryVenue.website;
+  if (!primaryVenue.opening_hours && secondaryVenue.opening_hours) primaryVenue.opening_hours = secondaryVenue.opening_hours;
   
-  if (!primaryVenue.phone && secondaryVenue.phone) {
-    primaryVenue.phone = secondaryVenue.phone;
-  }
-  
-  if (!primaryVenue.website && secondaryVenue.website) {
-    primaryVenue.website = secondaryVenue.website;
-  }
-
-  if (!primaryVenue.opening_hours && secondaryVenue.opening_hours) {
-    primaryVenue.opening_hours = secondaryVenue.opening_hours;
+  // OSM-specific enrichment (wheelchair, outdoor seating, wifi etc.)
+  if (secondaryVenue.osm_data) {
+    primaryVenue.osm_data = { ...(primaryVenue.osm_data || {}), ...secondaryVenue.osm_data };
+    // Add accessibility/amenity tags from OSM
+    const enrichTags: string[] = [];
+    if (secondaryVenue.osm_data.wheelchair === 'yes') enrichTags.push('wheelchair accessible');
+    if (secondaryVenue.osm_data.outdoor_seating === 'yes') enrichTags.push('outdoor seating');
+    if (secondaryVenue.osm_data.internet_access === 'wlan' || secondaryVenue.osm_data.internet_access === 'yes') enrichTags.push('wifi');
+    if (enrichTags.length > 0) {
+      primaryVenue.tags = [...new Set([...(primaryVenue.tags || []), ...enrichTags])];
+    }
   }
   
   // Merge tags
   if (secondaryVenue.tags?.length > 0) {
     primaryVenue.tags = [...new Set([...(primaryVenue.tags || []), ...secondaryVenue.tags])];
+  }
+  
+  // Use higher rating if available
+  if (secondaryVenue.rating && (!primaryVenue.rating || primaryVenue.rating === 0)) {
+    primaryVenue.rating = secondaryVenue.rating;
   }
 }
 
