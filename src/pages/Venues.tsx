@@ -32,6 +32,7 @@ interface VenueWithScore extends DBVenue {
 }
 
 const FILTERS = ['Italian', 'Japanese', 'Mexican', 'American', 'Romantic', 'Casual', 'Nightlife'];
+const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
 
 const Venues = () => {
   const navigate = useNavigate();
