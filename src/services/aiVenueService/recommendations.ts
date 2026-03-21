@@ -614,14 +614,14 @@ async function getVenuesFromRadar(
 }
 
 /**
- * Fetch venues from Foursquare
+ * Fetch venues from Overpass/OpenStreetMap (completely free, no API key needed)
  */
-async function getVenuesFromFoursquare(
+async function getVenuesFromOverpass(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) {
-  const timer = apiUsageService.createTimer('foursquare', '/search-venues-foursquare');
+  const timer = apiUsageService.createTimer('overpass', '/search-venues-overpass');
   
   try {
     if (!userLocation?.latitude || !userLocation?.longitude) {
@@ -639,12 +639,12 @@ async function getVenuesFromFoursquare(
       return [];
     }
     
-    const { data, error } = await supabase.functions.invoke('search-venues-foursquare', {
+    const { data, error } = await supabase.functions.invoke('search-venues-overpass', {
       body: {
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
         cuisines: userPrefs.preferred_cuisines || [],
-        radius: (userPrefs.max_distance || 10) * 1000,
+        radius: (userPrefs.max_distance || 25) * 1000,
         limit,
         venueTypes: (userPrefs as any).preferred_venue_types || [],
         activities: (userPrefs as any).preferred_activities || [],
@@ -678,6 +678,11 @@ async function getVenuesFromFoursquare(
       status: 500, 
       cacheHit: false, 
       userId,
+      metadata: { error: err instanceof Error ? err.message : 'Unknown error' }
+    });
+    return [];
+  }
+}
       metadata: { error: err instanceof Error ? err.message : 'Unknown error' }
     });
     return [];
