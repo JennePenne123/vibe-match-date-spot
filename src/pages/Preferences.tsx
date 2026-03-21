@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { bowlChopsticks } from '@lucide/lab';
+import { Waves as WavesIcon, Palette as PaletteIcon, Landmark as LandmarkIcon, Gem as GemIcon } from 'lucide-react';
 import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
   Icon, ChevronDown, Save,
@@ -106,6 +107,11 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
   template_romantic: { icon: Heart,          bg: 'bg-pink-500/15', fg: 'text-pink-500' },
   template_casual:   { icon: Coffee,         bg: 'bg-amber-500/15', fg: 'text-amber-500' },
   template_trendy:   { icon: Sparkles,       bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+  downtown:          { icon: Building2,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+  waterfront:        { icon: WavesIcon,      bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
+  'arts-district':   { icon: PaletteIcon,    bg: 'bg-pink-500/15', fg: 'text-pink-500' },
+  oldtown:           { icon: LandmarkIcon,   bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  uptown:            { icon: GemIcon,        bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
 };
 
 function PrefIcon({ id, size = 'md' }: { id: string; size?: 'sm' | 'md' | 'lg' }) {
@@ -253,6 +259,7 @@ const Preferences = () => {
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
   const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
+  const [selectedNeighborhoods, setSelectedNeighborhoods] = useState<string[]>([]);
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
@@ -266,7 +273,7 @@ const Preferences = () => {
       try {
         const { data } = await supabase
           .from('user_preferences')
-          .select('home_latitude, home_longitude, home_address, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types')
+          .select('home_latitude, home_longitude, home_address, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types, lifestyle_data')
           .eq('user_id', user.id)
           .single();
         if (data) {
@@ -283,6 +290,7 @@ const Preferences = () => {
           if ((data as any).preferred_duration) setSelectedDuration((data as any).preferred_duration);
           if ((data as any).accessibility_needs) setSelectedAccessibility((data as any).accessibility_needs);
           if ((data as any).preferred_venue_types) setSelectedVenueTypes((data as any).preferred_venue_types);
+          if ((data as any).lifestyle_data?.preferred_neighborhoods) setSelectedNeighborhoods((data as any).lifestyle_data.preferred_neighborhoods);
         }
       } catch (error) {
         console.log('No existing preferences found');
@@ -344,6 +352,7 @@ const Preferences = () => {
           preferred_duration: selectedDuration || null,
           accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
           preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
+          lifestyle_data: { preferred_neighborhoods: selectedNeighborhoods.length > 0 ? selectedNeighborhoods : null },
         };
         const { data: existing, error: existErr } = await supabase.from('user_preferences').select('id').eq('user_id', currentUserId).maybeSingle();
         if (existErr) throw existErr;
@@ -457,6 +466,13 @@ const Preferences = () => {
     { id: 'live_event', name: t('preferences.venue_live_event'), emoji: '✨' },
     { id: 'spa_wellness', name: t('preferences.venue_spa'), emoji: '🧖' },
   ];
+  const neighborhoods: Preference[] = [
+    { id: 'downtown', name: t('preferences.neighborhood_downtown', 'Downtown'), emoji: '🏙️', desc: t('preferences.neighborhood_downtownDesc', 'Trendige Restaurants, Rooftop-Bars & urbanes Nightlife') },
+    { id: 'waterfront', name: t('preferences.neighborhood_waterfront', 'Waterfront'), emoji: '🌊', desc: t('preferences.neighborhood_waterfrontDesc', 'Seafood, Sunset-Spots & entspannte Terrassen') },
+    { id: 'arts-district', name: t('preferences.neighborhood_arts', 'Arts District'), emoji: '🎨', desc: t('preferences.neighborhood_artsDesc', 'Galerien, Live-Musik & kreative Atmosphäre') },
+    { id: 'oldtown', name: t('preferences.neighborhood_oldtown', 'Old Town'), emoji: '🏛️', desc: t('preferences.neighborhood_oldtownDesc', 'Gemütliche Cafés, Weinstuben & historischer Charme') },
+    { id: 'uptown', name: t('preferences.neighborhood_uptown', 'Uptown'), emoji: '💎', desc: t('preferences.neighborhood_uptownDesc', 'Fine Dining, Cocktail-Lounges & gehobenes Ambiente') },
+  ];
 
   const activityIconMap: Record<string, string> = { cultural: 'cultural_act', nightlife: 'nightlife_act' };
 
@@ -538,6 +554,10 @@ const Preferences = () => {
             <>
               <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length} defaultOpen>
                 <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
+              </AccordionSection>
+
+              <AccordionSection title={t('preferences.preferredNeighborhood', 'Bevorzugte Viertel')} icon={<Building2 className="w-5 h-5 text-violet-500" />} selectedCount={selectedNeighborhoods.length}>
+                <SelectionList items={neighborhoods} selected={selectedNeighborhoods} onToggle={(id) => toggleSelection(id, selectedNeighborhoods, setSelectedNeighborhoods)} />
               </AccordionSection>
 
               <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
