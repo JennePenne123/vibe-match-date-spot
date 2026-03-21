@@ -120,7 +120,7 @@ const Venues = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, searchRadius]);
 
   useEffect(() => {
     if (searchCenter) loadVenues(searchCenter);
