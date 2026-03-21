@@ -32,11 +32,6 @@ const MapPreview = lazy(() => import('@/components/MapPreview'));
 
 // Icon + color mapping
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
-  downtown:       { icon: Building2,        bg: 'bg-slate-500/15', fg: 'text-slate-500' },
-  waterfront:     { icon: Waves,            bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
-  'arts-district':{ icon: Palette,          bg: 'bg-fuchsia-500/15', fg: 'text-fuchsia-500' },
-  oldtown:        { icon: Landmark,         bg: 'bg-amber-600/15', fg: 'text-amber-600' },
-  uptown:         { icon: Crown,            bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
   italian:        { icon: Pizza,           bg: 'bg-red-500/15', fg: 'text-red-500' },
   japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
   mexican:        { icon: Flame,           bg: 'bg-yellow-600/15', fg: 'text-yellow-600' },
@@ -258,7 +253,6 @@ const Preferences = () => {
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
   const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
-  const [selectedNeighborhoods, setSelectedNeighborhoods] = useState<string[]>([]);
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
@@ -272,7 +266,7 @@ const Preferences = () => {
       try {
         const { data } = await supabase
           .from('user_preferences')
-          .select('home_latitude, home_longitude, home_address, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types, lifestyle_data')
+          .select('home_latitude, home_longitude, home_address, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types')
           .eq('user_id', user.id)
           .single();
         if (data) {
@@ -289,8 +283,6 @@ const Preferences = () => {
           if ((data as any).preferred_duration) setSelectedDuration((data as any).preferred_duration);
           if ((data as any).accessibility_needs) setSelectedAccessibility((data as any).accessibility_needs);
           if ((data as any).preferred_venue_types) setSelectedVenueTypes((data as any).preferred_venue_types);
-          const lifestyle = (data as any).lifestyle_data;
-          if (lifestyle?.preferred_neighborhoods) setSelectedNeighborhoods(lifestyle.preferred_neighborhoods);
         }
       } catch (error) {
         console.log('No existing preferences found');
@@ -352,9 +344,6 @@ const Preferences = () => {
           preferred_duration: selectedDuration || null,
           accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
           preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
-          lifestyle_data: {
-            preferred_neighborhoods: selectedNeighborhoods.length > 0 ? selectedNeighborhoods : [],
-          },
         };
         const { data: existing, error: existErr } = await supabase.from('user_preferences').select('id').eq('user_id', currentUserId).maybeSingle();
         if (existErr) throw existErr;
@@ -469,14 +458,6 @@ const Preferences = () => {
     { id: 'spa_wellness', name: t('preferences.venue_spa'), emoji: '🧖' },
   ];
 
-  const neighborhoods: Preference[] = [
-    { id: 'downtown', name: t('preferences.neighborhood_downtown', 'Downtown / City'), emoji: '🏙️', desc: t('preferences.neighborhood_downtownDesc', 'Trendy, urban, Rooftop-Bars') },
-    { id: 'waterfront', name: t('preferences.neighborhood_waterfront', 'Waterfront / Hafen'), emoji: '🌊', desc: t('preferences.neighborhood_waterfrontDesc', 'Seafood, Terrassen, Sunset-Views') },
-    { id: 'arts-district', name: t('preferences.neighborhood_arts', 'Arts District / Szene'), emoji: '🎨', desc: t('preferences.neighborhood_artsDesc', 'Galerien, Live Music, Craft Beer') },
-    { id: 'oldtown', name: t('preferences.neighborhood_oldtown', 'Altstadt / Historisch'), emoji: '🏛️', desc: t('preferences.neighborhood_oldtownDesc', 'Gemütlich, Weinstuben, Tradition') },
-    { id: 'uptown', name: t('preferences.neighborhood_uptown', 'Uptown / Edelviertel'), emoji: '👑', desc: t('preferences.neighborhood_uptownDesc', 'Fine Dining, Champagner, Exklusiv') },
-  ];
-
   const activityIconMap: Record<string, string> = { cultural: 'cultural_act', nightlife: 'nightlife_act' };
 
   const [step, setStep] = useState(0);
@@ -569,10 +550,6 @@ const Preferences = () => {
 
               <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
                 <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
-              </AccordionSection>
-
-              <AccordionSection title={t('preferences.neighborhood', 'Bevorzugtes Viertel')} icon={<Building2 className="w-5 h-5 text-slate-500" />} selectedCount={selectedNeighborhoods.length}>
-                <SelectionList items={neighborhoods} selected={selectedNeighborhoods} onToggle={(id) => toggleSelection(id, selectedNeighborhoods, setSelectedNeighborhoods)} />
               </AccordionSection>
 
               <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0}>

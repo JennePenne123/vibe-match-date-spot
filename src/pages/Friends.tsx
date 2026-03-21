@@ -6,7 +6,7 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Search, UserPlus, Check, Share2, Copy, Mail, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useFriends } from '@/hooks/useFriends';
 import { getInitials } from '@/lib/utils';
@@ -14,7 +14,7 @@ import { getInitials } from '@/lib/utils';
 const Friends = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { updateInvitedFriends, generateRecommendations, appState } = useApp();
+  const { updateInvitedFriends } = useApp();
   const { friends } = useFriends();
   const [searchParams] = useSearchParams();
   const isDemoMode = searchParams.get('demo') === 'true';
@@ -27,6 +27,7 @@ const Friends = () => {
     return null;
   }
 
+  // Enhanced demo friends data for testing
   const demoFriends = [
     { id: '1', name: 'Sarah Johnson', avatar_url: 'https://ui-avatars.com/api/?name=Sarah+Johnson&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
     { id: '2', name: 'Mike Chen', avatar_url: 'https://ui-avatars.com/api/?name=Mike+Chen&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
@@ -59,17 +60,15 @@ const Friends = () => {
     }
   };
 
-  const handleFindSpots = async () => {
+  const handleNext = () => {
     const finalInvitedIds = isDemoMode ? invitedIds : friends.filter(f => f.isInvited).map(f => f.id);
     updateInvitedFriends(finalInvitedIds);
-    await generateRecommendations();
-    navigate('/results');
+    navigate(isDemoMode ? '/area?demo=true' : '/area');
   };
 
-  const handleSkip = async () => {
+  const handleSkip = () => {
     updateInvitedFriends([]);
-    await generateRecommendations();
-    navigate('/results');
+    navigate(isDemoMode ? '/area?demo=true' : '/area');
   };
 
   const generateReferralLink = () => {
@@ -109,13 +108,12 @@ const Friends = () => {
           </Button>
           <div className="text-center">
             <h1 className="text-xl font-semibold text-foreground">Invite Friends</h1>
-            <p className="text-sm text-muted-foreground">Step 2 of 2</p>
+            <p className="text-sm text-muted-foreground">Step 2 of 3</p>
           </div>
           <Button
             onClick={handleSkip}
             variant="ghost"
             className="text-muted-foreground hover:bg-muted text-sm"
-            disabled={appState.isLoading}
           >
             Skip
           </Button>
@@ -124,7 +122,7 @@ const Friends = () => {
         {/* Progress Bar */}
         <div className="px-6 mb-8 pt-4">
           <div className="bg-muted rounded-full h-2">
-            <div className="bg-gradient-primary rounded-full h-2 w-full transition-all duration-300" />
+            <div className="bg-gradient-primary rounded-full h-2 w-2/3 transition-all duration-300" />
           </div>
         </div>
 
@@ -194,12 +192,14 @@ const Friends = () => {
               })
             ) : (
               <div className="space-y-6">
+                {/* No Friends Found Message */}
                 <div className="text-center py-8">
                   <div className="text-4xl mb-4">👥</div>
                   <h3 className="text-foreground font-semibold mb-2">No friends found</h3>
                   <p className="text-muted-foreground">Invite your friends to join VybePulse!</p>
                 </div>
 
+                {/* Referral Link Section */}
                 <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
                   <div className="text-center mb-4">
                     <div className="bg-primary/10 rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
@@ -209,6 +209,7 @@ const Friends = () => {
                     <p className="text-sm text-muted-foreground">Share your referral link and discover amazing dates together</p>
                   </div>
 
+                  {/* Referral Link Display */}
                   <div className="bg-muted rounded-lg p-3 mb-4">
                     <div className="flex items-center gap-2">
                       <Input
@@ -227,12 +228,21 @@ const Friends = () => {
                     </div>
                   </div>
 
+                  {/* Share Options */}
                   <div className="grid grid-cols-2 gap-3">
-                    <Button onClick={copyReferralLink} variant="outline" className="w-full">
+                    <Button
+                      onClick={copyReferralLink}
+                      variant="outline"
+                      className="w-full"
+                    >
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Link
                     </Button>
-                    <Button onClick={shareViaEmail} variant="outline" className="w-full">
+                    <Button
+                      onClick={shareViaEmail}
+                      variant="outline"
+                      className="w-full"
+                    >
                       <Mail className="w-4 h-4 mr-2" />
                       Email
                     </Button>
@@ -256,23 +266,13 @@ const Friends = () => {
             </div>
           )}
 
-          {/* Find Perfect Spots Button */}
+          {/* Next Button */}
           <Button
-            onClick={handleFindSpots}
-            disabled={appState.isLoading}
-            className="w-full h-12 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold disabled:opacity-50"
+            onClick={handleNext}
+            className="w-full h-12 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold"
           >
-            {appState.isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Finding Perfect Spots...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Find Perfect Spots
-              </>
-            )}
+            Next: Choose Area
+            <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </div>

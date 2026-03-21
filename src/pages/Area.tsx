@@ -1,0 +1,191 @@
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useApp } from '@/contexts/AppContext';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, MapPin, Clock, Sparkles, Loader2, AlertCircle, Navigation, Check, Building2, Waves, Palette, Landmark, Gem } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const Area = () => {
+  const navigate = useNavigate();
+  const { updateArea, generateRecommendations, appState, requestLocation } = useApp();
+  const [selectedArea, setSelectedArea] = useState('');
+
+  const areaIconMap: Record<string, { icon: React.ElementType; bg: string; fg: string }> = {
+    downtown:       { icon: Building2, bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+    waterfront:     { icon: Waves,     bg: 'bg-cyan-500/15',   fg: 'text-cyan-500' },
+    'arts-district': { icon: Palette,  bg: 'bg-pink-500/15',   fg: 'text-pink-500' },
+    oldtown:        { icon: Landmark,  bg: 'bg-amber-500/15',  fg: 'text-amber-500' },
+    uptown:         { icon: Gem,       bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
+  };
+
+  const areas = [
+    { id: 'downtown', name: 'Downtown', description: 'Trendige Restaurants, Rooftop-Bars & urbanes Nightlife', time: '10-15 min', venues: 24 },
+    { id: 'waterfront', name: 'Waterfront', description: 'Seafood, Sunset-Spots & entspannte Terrassen am Wasser', time: '15-20 min', venues: 18 },
+    { id: 'arts-district', name: 'Arts District', description: 'Galerien, Live-Musik, Jazz-Clubs & kreative Atmosphäre', time: '8-12 min', venues: 16 },
+    { id: 'oldtown', name: 'Old Town', description: 'Gemütliche Cafés, Weinstuben & historischer Charme', time: '12-18 min', venues: 22 },
+    { id: 'uptown', name: 'Uptown', description: 'Fine Dining, Cocktail-Lounges & gehobenes Ambiente', time: '5-10 min', venues: 19 },
+  ];
+
+  // Request location when component mounts
+  useEffect(() => {
+    if (!appState.userLocation && !appState.locationError) {
+      requestLocation();
+    }
+  }, []);
+
+  const handleNext = async () => {
+    if (selectedArea) {
+      const selectedAreaData = areas.find(area => area.id === selectedArea);
+      updateArea(selectedAreaData?.name || selectedArea);
+      
+      await generateRecommendations();
+      navigate('/results');
+    }
+  };
+
+  const handleRequestLocation = async () => {
+    await requestLocation();
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="max-w-md mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 pt-12 bg-card shadow-sm">
+          <Button
+            onClick={() => navigate('/friends')}
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:bg-muted"
+            disabled={appState.isLoading}
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </Button>
+          <div className="text-center">
+            <h1 className="text-xl font-semibold text-foreground">Choose Area</h1>
+            <p className="text-sm text-muted-foreground">Step 3 of 3</p>
+          </div>
+          <div className="w-10" />
+        </div>
+
+        {/* Progress Bar */}
+        <div className="px-6 mb-8 pt-4">
+          <div className="bg-muted rounded-full h-2">
+            <div className="bg-gradient-primary rounded-full h-2 w-full transition-all duration-300" />
+          </div>
+        </div>
+
+        <div className="px-6 pb-8">
+          {/* Location Status */}
+          <div className="mb-6">
+            {appState.userLocation ? (
+              <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+                <Navigation className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm text-green-700 dark:text-green-300">Location enabled - finding venues near you</span>
+              </div>
+            ) : appState.locationError ? (
+              <div className="p-3 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-lg">
+                <div className="flex items-start gap-2 mb-2">
+                  <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm text-orange-700 dark:text-orange-300 font-medium">Location Access Needed</p>
+                    <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">{appState.locationError}</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={handleRequestLocation}
+                  size="sm"
+                  className="bg-orange-500 text-white hover:bg-orange-600"
+                >
+                  <Navigation className="w-3 h-3 mr-1" />
+                  Enable Location
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <Loader2 className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" />
+                <span className="text-sm text-blue-700 dark:text-blue-300">Getting your location...</span>
+              </div>
+            )}
+          </div>
+
+          {/* Header Text */}
+          <div className="mb-8 text-center">
+            <h2 className="text-2xl font-bold text-foreground mb-2">Where would you like to go?</h2>
+            <p className="text-muted-foreground">Pick your preferred neighborhood for the perfect date</p>
+          </div>
+
+          {/* Area Selection */}
+          <div className="space-y-3 mb-8">
+            {areas.map((area) => (
+              <button
+                key={area.id}
+                onClick={() => setSelectedArea(area.id)}
+                disabled={appState.isLoading}
+                className={`w-full p-4 rounded-xl border-2 transition-all ${
+                  selectedArea === area.id
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-card border-border text-foreground hover:bg-muted'
+                } ${appState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <div className="flex items-center gap-4">
+                  {(() => {
+                    const iconConfig = areaIconMap[area.id];
+                    if (!iconConfig) return null;
+                    const AreaIcon = iconConfig.icon;
+                    return (
+                      <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', iconConfig.bg)}>
+                        <AreaIcon className={cn('w-5 h-5', iconConfig.fg)} />
+                      </div>
+                    );
+                  })()}
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold">{area.name}</div>
+                    <div className={`text-sm ${selectedArea === area.id ? 'text-primary' : 'text-muted-foreground'}`}>
+                      {area.description}
+                    </div>
+                    <div className={`flex items-center gap-4 text-xs mt-1 ${selectedArea === area.id ? 'text-primary' : 'text-muted-foreground'}`}>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {area.time}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {area.venues} venues
+                      </div>
+                    </div>
+                  </div>
+                  {selectedArea === area.id && (
+                    <Check className="w-5 h-5" />
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Find Spots Button */}
+          <Button
+            onClick={handleNext}
+            disabled={!selectedArea || appState.isLoading}
+            className="w-full h-12 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold disabled:opacity-50"
+          >
+            {appState.isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Finding Perfect Spots...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 mr-2" />
+                Find Perfect Spots
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Area;
