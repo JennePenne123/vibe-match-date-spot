@@ -63,7 +63,7 @@ const Friends = () => {
   const handleNext = () => {
     const finalInvitedIds = isDemoMode ? invitedIds : friends.filter(f => f.isInvited).map(f => f.id);
     updateInvitedFriends(finalInvitedIds);
-    navigate(isDemoMode ? '/area?demo=true' : '/area');
+    navigate(isDemoMode ? '/results?demo=true' : '/results');
   };
 
   const handleSkip = () => {
