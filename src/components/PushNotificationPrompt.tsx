@@ -54,7 +54,7 @@ export const PushNotificationPrompt: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-20 left-4 right-4 md:bottom-4 md:left-auto md:right-4 md:w-96 z-50 animate-in slide-in-from-bottom-4 duration-300">
       <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-2xl p-4 shadow-premium-lg">
         <button
           onClick={handleDismiss}
