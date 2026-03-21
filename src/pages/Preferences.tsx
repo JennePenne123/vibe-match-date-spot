@@ -267,7 +267,7 @@ const Preferences = () => {
       try {
         const { data } = await supabase
           .from('user_preferences')
-          .select('home_latitude, home_longitude, home_address, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types')
+          .select('home_latitude, home_longitude, home_address, preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, preferred_activities, preferred_entertainment, preferred_duration, accessibility_needs, preferred_venue_types, lifestyle_data')
           .eq('user_id', user.id)
           .single();
         if (data) {
