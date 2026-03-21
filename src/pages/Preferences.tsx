@@ -556,7 +556,10 @@ const Preferences = () => {
                 <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
               </AccordionSection>
 
-              <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
+              <AccordionSection title={t('preferences.preferredNeighborhood', 'Bevorzugte Viertel')} icon={<Building2 className="w-5 h-5 text-violet-500" />} selectedCount={selectedNeighborhoods.length}>
+                <SelectionList items={neighborhoods} selected={selectedNeighborhoods} onToggle={(id) => toggleSelection(id, selectedNeighborhoods, setSelectedNeighborhoods)} />
+              </AccordionSection>
+
                 <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
               </AccordionSection>
 
