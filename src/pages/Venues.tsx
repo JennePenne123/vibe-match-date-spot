@@ -168,7 +168,7 @@ const Venues = () => {
           latitude: center.lat,
           longitude: center.lng,
           cuisines: userPrefs?.preferred_cuisines || [],
-          radius: 25000,
+          radius: searchRadius * 1000,
           limit: 40,
           venueTypes: (userPrefs as any)?.preferred_venue_types || [],
           activities: (userPrefs as any)?.preferred_activities || [],
