@@ -87,7 +87,7 @@ const Results = () => {
           <div className="bg-card p-4 pt-12 shadow-sm">
             <div className="flex items-center justify-between">
               <Button
-                onClick={() => navigate(isFromSmartPlanning ? `/plan-date/${smartPlanningState?.sessionId}` : '/area')}
+                onClick={() => navigate(isFromSmartPlanning ? `/plan-date/${smartPlanningState?.sessionId}` : '/preferences')}
                 variant="ghost"
                 size="icon"
                 className="text-muted-foreground hover:bg-muted"
