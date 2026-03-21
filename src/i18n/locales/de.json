@@ -254,7 +254,12 @@
     "findPerfect": "Finde deinen perfekten Date-Spot",
     "searchVenues": "Venues suchen...",
     "venuesFound": "{{count}} Venue(s) gefunden",
-    "myVenues": "Meine Venues"
+    "myVenues": "Meine Venues",
+    "cityPlaceholder": "Stadt oder Ort eingeben...",
+    "backToHome": "Zurück zu meinem Standort",
+    "nearYou": "In deiner Nähe",
+    "noResults": "Keine Venues gefunden",
+    "tryOtherCity": "Versuche eine andere Stadt oder erweitere die Filter"
   },
   "myVenuesPage": {
     "title": "Meine Venues",
