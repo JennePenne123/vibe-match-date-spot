@@ -341,9 +341,9 @@ const getVenuesFromMultipleSources = async (
 };
 
 /**
- * Radar + Foursquare strategy: Radar for primary search, Foursquare for enrichment (photos, tips, ratings)
+ * Radar + Overpass strategy: Radar for primary search, Overpass/OSM for additional coverage (free)
  */
-async function getVenuesRadarFoursquare(
+async function getVenuesRadarOverpass(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
@@ -351,22 +351,21 @@ async function getVenuesRadarFoursquare(
   // Step 1: Get venues from Radar (primary, high free tier)
   let venues = await getVenuesFromRadar(userId, limit, userLocation).catch(() => []);
   
-  // Step 2: Enrich with Foursquare data (photos, tips, ratings)
-  if (venues.length > 0 && API_CONFIG.useFoursquare && userLocation) {
-    const fsqVenues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
+  // Step 2: Enrich with Overpass/OSM data (free, unlimited)
+  if (API_CONFIG.useOverpass && userLocation) {
+    const osmVenues = await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, osmVenues);
   }
   
-  // Step 3: If Radar returned nothing, fall back to Foursquare-only
-  if (venues.length < API_CONFIG.minVenuesForSuccess && API_CONFIG.useFoursquare && userLocation) {
-    console.log('⚠️ Radar returned few results, falling back to Foursquare-only');
-    const fsqVenues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
+  // Step 3: If Radar returned nothing, fall back to Overpass-only
+  if (venues.length < API_CONFIG.minVenuesForSuccess && API_CONFIG.useOverpass && userLocation) {
+    console.log('⚠️ Radar returned few results, falling back to Overpass-only');
+    const osmVenues = await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, osmVenues);
   }
 
   // Step 4: Google Places fallback for niche venue types
-  // If user wants non-restaurant venues (museums, bowling, etc.) and results are sparse
-  if (userLocation) {
+  if (userLocation && API_CONFIG.useGooglePlaces) {
     const { data: userPrefs } = await supabase
       .from('user_preferences')
       .select('preferred_venue_types, preferred_activities')
@@ -377,7 +376,6 @@ async function getVenuesRadarFoursquare(
     const nicheActivities = (userPrefs as any)?.preferred_activities || [];
     const hasNichePreferences = nicheTypes.length > 0 || nicheActivities.length > 0;
 
-    // Check how many results match niche categories
     const nicheKeywords = [...nicheTypes, ...nicheActivities].map((t: string) => t.replace(/_/g, ' ').toLowerCase());
     const nicheMatches = venues.filter((v: any) => {
       const text = [(v.name || ''), (v.description || ''), ...(v.tags || [])].join(' ').toLowerCase();
@@ -385,24 +383,14 @@ async function getVenuesRadarFoursquare(
     });
 
     if (hasNichePreferences && nicheMatches.length < 3) {
-      console.log('🔍 Google Places fallback: only', nicheMatches.length, 'niche matches from Radar/FSQ, fetching from Google...');
+      console.log('🔍 Google Places fallback: only', nicheMatches.length, 'niche matches, fetching from Google...');
       
-      // Map niche types to Google Places types
       const googleTypesMap: Record<string, string> = {
-        'museum': 'museum',
-        'gallery': 'art_gallery',
-        'theater_venue': 'movie_theater',
-        'cinema': 'movie_theater',
-        'concert_hall': 'night_club',
-        'bowling': 'bowling_alley',
-        'swimming': 'swimming_pool',
-        'spa_wellness': 'spa',
-        'arcade': 'amusement_park',
-        'mini_golf': 'amusement_park',
-        'karaoke': 'night_club',
-        'comedy_club': 'night_club',
-        'climbing': 'gym',
-        'escape_room': 'amusement_park',
+        'museum': 'museum', 'gallery': 'art_gallery', 'theater_venue': 'movie_theater',
+        'cinema': 'movie_theater', 'concert_hall': 'night_club', 'bowling': 'bowling_alley',
+        'swimming': 'swimming_pool', 'spa_wellness': 'spa', 'arcade': 'amusement_park',
+        'mini_golf': 'amusement_park', 'karaoke': 'night_club', 'comedy_club': 'night_club',
+        'climbing': 'gym', 'escape_room': 'amusement_park',
       };
 
       const googleTypes = [...nicheTypes, ...nicheActivities]
@@ -411,11 +399,7 @@ async function getVenuesRadarFoursquare(
 
       if (googleTypes.length > 0) {
         try {
-          const googleVenues = await getVenuesFromGooglePlaces(userId, 10, {
-            ...userLocation,
-            // Pass types as part of the search
-          });
-          
+          const googleVenues = await getVenuesFromGooglePlaces(userId, 10, userLocation);
           if (googleVenues.length > 0) {
             console.log('✅ Google Places fallback found', googleVenues.length, 'additional venues');
             venues = mergeAndDeduplicateVenues(venues, googleVenues);
