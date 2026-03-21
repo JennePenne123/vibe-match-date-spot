@@ -99,10 +99,10 @@ const Venues = () => {
         return { ...v, ai_score: scoreMap.get(v.id), distance_km };
       });
 
-      // If we have a center, filter by 50km radius and sort by distance
+      // If we have a center, filter by user-defined radius
       if (center) {
         venuesWithScores = venuesWithScores
-          .filter(v => v.distance_km !== undefined && v.distance_km <= 50);
+          .filter(v => v.distance_km !== undefined && v.distance_km <= searchRadius);
       }
 
       // Sort: AI score first, then distance
