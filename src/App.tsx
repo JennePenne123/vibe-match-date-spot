@@ -208,7 +208,7 @@ const App = () => (
                     <Route path="/home" element={<LazyPage><Home /></LazyPage>} />
                     <Route path="/preferences" element={<LazyPage><Preferences /></LazyPage>} />
                     <Route path="/friends" element={<LazyPage><Friends /></LazyPage>} />
-                    <Route path="/area" element={<LazyPage><Area /></LazyPage>} />
+                    
                     <Route path="/results" element={<LazyPage><Results /></LazyPage>} />
                     <Route path="/venue/:id" element={<LazyPage><VenueDetail /></LazyPage>} />
                     <Route path="/profile" element={<LazyPage><Profile /></LazyPage>} />

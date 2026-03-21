@@ -68,7 +68,7 @@ const Friends = () => {
 
   const handleSkip = () => {
     updateInvitedFriends([]);
-    navigate(isDemoMode ? '/area?demo=true' : '/area');
+    navigate(isDemoMode ? '/results?demo=true' : '/results');
   };
 
   const generateReferralLink = () => {
