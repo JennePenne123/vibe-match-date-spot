@@ -415,15 +415,15 @@ async function getVenuesRadarOverpass(
 }
 
 /**
- * Foursquare-only strategy
+ * Overpass-only strategy
  */
-async function getVenuesFoursquareOnly(
+async function getVenuesOverpassOnly(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) {
-  if (API_CONFIG.useFoursquare && userLocation) {
-    return await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
+  if (API_CONFIG.useOverpass && userLocation) {
+    return await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
   }
   return [];
 }
@@ -442,8 +442,8 @@ async function getVenuesParallel(
     promises.push(getVenuesFromRadar(userId, limit, userLocation).catch(() => []));
   }
   
-  if (API_CONFIG.useFoursquare && userLocation) {
-    promises.push(getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []));
+  if (API_CONFIG.useOverpass && userLocation) {
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation).catch(() => []));
   }
   
   if (API_CONFIG.useGooglePlaces) {
