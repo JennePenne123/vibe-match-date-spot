@@ -523,6 +523,7 @@ function areVenuesDuplicates(v1: any, v2: any): boolean {
  * Enrich primary venue with secondary source data
  */
 function enrichVenueWithSecondary(primaryVenue: any, secondaryVenue: any): void {
+  // Photos
   if (secondaryVenue.photos?.length > 0) {
     primaryVenue.photos = primaryVenue.photos || [];
     const existingUrls = new Set(primaryVenue.photos.map((p: any) => p.url));
@@ -531,25 +532,33 @@ function enrichVenueWithSecondary(primaryVenue: any, secondaryVenue: any): void 
     }
   }
   
-  if (!primaryVenue.description && secondaryVenue.description) {
-    primaryVenue.description = secondaryVenue.description;
-  }
+  // Text fields — prefer non-empty values
+  if (!primaryVenue.description && secondaryVenue.description) primaryVenue.description = secondaryVenue.description;
+  if (!primaryVenue.phone && secondaryVenue.phone) primaryVenue.phone = secondaryVenue.phone;
+  if (!primaryVenue.website && secondaryVenue.website) primaryVenue.website = secondaryVenue.website;
+  if (!primaryVenue.opening_hours && secondaryVenue.opening_hours) primaryVenue.opening_hours = secondaryVenue.opening_hours;
   
-  if (!primaryVenue.phone && secondaryVenue.phone) {
-    primaryVenue.phone = secondaryVenue.phone;
-  }
-  
-  if (!primaryVenue.website && secondaryVenue.website) {
-    primaryVenue.website = secondaryVenue.website;
-  }
-
-  if (!primaryVenue.opening_hours && secondaryVenue.opening_hours) {
-    primaryVenue.opening_hours = secondaryVenue.opening_hours;
+  // OSM-specific enrichment (wheelchair, outdoor seating, wifi etc.)
+  if (secondaryVenue.osm_data) {
+    primaryVenue.osm_data = { ...(primaryVenue.osm_data || {}), ...secondaryVenue.osm_data };
+    // Add accessibility/amenity tags from OSM
+    const enrichTags: string[] = [];
+    if (secondaryVenue.osm_data.wheelchair === 'yes') enrichTags.push('wheelchair accessible');
+    if (secondaryVenue.osm_data.outdoor_seating === 'yes') enrichTags.push('outdoor seating');
+    if (secondaryVenue.osm_data.internet_access === 'wlan' || secondaryVenue.osm_data.internet_access === 'yes') enrichTags.push('wifi');
+    if (enrichTags.length > 0) {
+      primaryVenue.tags = [...new Set([...(primaryVenue.tags || []), ...enrichTags])];
+    }
   }
   
   // Merge tags
   if (secondaryVenue.tags?.length > 0) {
     primaryVenue.tags = [...new Set([...(primaryVenue.tags || []), ...secondaryVenue.tags])];
+  }
+  
+  // Use higher rating if available
+  if (secondaryVenue.rating && (!primaryVenue.rating || primaryVenue.rating === 0)) {
+    primaryVenue.rating = secondaryVenue.rating;
   }
 }
 
