@@ -683,11 +683,8 @@ async function getVenuesFromOverpass(
     return [];
   }
 }
-      metadata: { error: err instanceof Error ? err.message : 'Unknown error' }
-    });
-    return [];
-  }
-}
+
+
 
 /**
  * Fetch venues from Google Places
