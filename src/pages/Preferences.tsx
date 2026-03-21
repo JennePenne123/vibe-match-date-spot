@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { bowlChopsticks } from '@lucide/lab';
+import { Waves as WavesIcon, Palette as PaletteIcon, Landmark as LandmarkIcon, Gem as GemIcon } from 'lucide-react';
 import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
   Icon, ChevronDown, Save,
