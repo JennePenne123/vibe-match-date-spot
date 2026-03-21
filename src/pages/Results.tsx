@@ -76,7 +76,7 @@ const Results = () => {
     if (isFromSmartPlanning && smartPlanningState.sessionId) {
       navigate(`/plan-date/${smartPlanningState.sessionId}`);
     } else {
-      navigate('/area');
+      navigate('/preferences');
     }
   };
 
