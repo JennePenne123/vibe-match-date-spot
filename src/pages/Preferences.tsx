@@ -253,6 +253,7 @@ const Preferences = () => {
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
   const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
+  const [selectedNeighborhoods, setSelectedNeighborhoods] = useState<string[]>([]);
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
