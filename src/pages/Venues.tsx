@@ -278,8 +278,30 @@ const Venues = () => {
             >
               <MapPin className="w-3 h-3 mr-1" />
               {t('venues.backToHome', 'Zurück zu meinem Standort')}
-            </Button>
+          </Button>
           )}
+
+          {/* Radius Selector */}
+          <div className="flex items-center gap-2 mb-3">
+            <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            <span className="text-xs text-muted-foreground whitespace-nowrap">{t('venues.radius', 'Radius')}:</span>
+            <div className="flex gap-1.5 flex-1">
+              {RADIUS_OPTIONS.map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setSearchRadius(r)}
+                  className={cn(
+                    'text-[11px] px-2.5 py-1 rounded-full transition-colors font-medium',
+                    searchRadius === r
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  )}
+                >
+                  {r} km
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Venue Name Search */}
           <div className="relative mb-3">
