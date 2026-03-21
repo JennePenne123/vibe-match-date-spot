@@ -46,6 +46,7 @@ const Venues = () => {
   const [loading, setLoading] = useState(true);
   const [searchingCity, setSearchingCity] = useState(false);
   const [activeCity, setActiveCity] = useState<string | null>(null);
+  const [searchRadius, setSearchRadius] = useState(25);
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
