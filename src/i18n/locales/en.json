@@ -257,6 +257,7 @@
     "myVenues": "My Venues",
     "cityPlaceholder": "Enter city or place...",
     "backToHome": "Back to my location",
+    "radius": "Radius",
     "nearYou": "Near you",
     "noResults": "No venues found",
     "tryOtherCity": "Try another city or adjust your filters"
