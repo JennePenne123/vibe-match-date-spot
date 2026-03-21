@@ -21,7 +21,7 @@ verify_jwt = false
 [functions.search-venues]
 verify_jwt = true
 
-[functions.search-venues-foursquare]
+[functions.search-venues-overpass]
 verify_jwt = true
 
 [functions.process-referral]

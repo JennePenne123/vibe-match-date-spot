@@ -42,7 +42,7 @@ interface ApiUsageStats {
 
 const API_COLORS: Record<string, string> = {
   google_places: '#4285F4',
-  foursquare: '#F94877',
+  overpass: '#2ECC71',
   openai: '#10A37F',
   supabase: '#3ECF8E',
   default: '#6B7280',

@@ -58,9 +58,9 @@ export default function Datenschutz() {
             Wir nutzen Supabase für Authentifizierung, Datenbank und serverseitige Funktionen. Supabase verarbeitet Daten auf Servern in der EU.
           </p>
 
-          <h3>Foursquare / Google Places API</h3>
+          <h3>OpenStreetMap / Overpass API</h3>
           <p className="text-muted-foreground">
-            Für die Venue-Suche werden Standortdaten an Foursquare und/oder Google Places übermittelt.
+            Für die Venue-Suche werden Standortdaten an die OpenStreetMap Overpass API und/oder Google Places übermittelt.
           </p>
 
           <h2>5. KI-gestützte Verarbeitung</h2>
