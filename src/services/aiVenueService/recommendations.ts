@@ -462,23 +462,23 @@ async function getVenuesParallel(
 /**
  * Merge and deduplicate venues from multiple sources
  */
-function mergeAndDeduplicateVenues(googleVenues: any[], foursquareVenues: any[]): any[] {
+function mergeAndDeduplicateVenues(primaryVenues: any[], secondaryVenues: any[]): any[] {
   if (!API_CONFIG.mergeVenueData) {
-    return [...googleVenues, ...foursquareVenues].slice(0, API_CONFIG.maxTotalVenues);
+    return [...primaryVenues, ...secondaryVenues].slice(0, API_CONFIG.maxTotalVenues);
   }
   
-  const merged: any[] = [...googleVenues];
-  const addedIds = new Set(googleVenues.map(v => v.id || v.venue_id));
+  const merged: any[] = [...primaryVenues];
+  const addedIds = new Set(primaryVenues.map(v => v.id || v.venue_id));
   
-  for (const fsqVenue of foursquareVenues) {
-    const matchingVenue = googleVenues.find(gv => areVenuesDuplicates(gv, fsqVenue));
+  for (const newVenue of secondaryVenues) {
+    const matchingVenue = primaryVenues.find(pv => areVenuesDuplicates(pv, newVenue));
     
     if (matchingVenue) {
-      enrichVenueWithFoursquare(matchingVenue, fsqVenue);
+      enrichVenueWithSecondary(matchingVenue, newVenue);
     } else {
-      const venueId = fsqVenue.id || fsqVenue.venue_id;
+      const venueId = newVenue.id || newVenue.venue_id;
       if (!addedIds.has(venueId)) {
-        merged.push(fsqVenue);
+        merged.push(newVenue);
         addedIds.add(venueId);
       }
     }
@@ -508,25 +508,36 @@ function areVenuesDuplicates(v1: any, v2: any): boolean {
 }
 
 /**
- * Enrich Google venue with Foursquare data
+ * Enrich primary venue with secondary source data
  */
-function enrichVenueWithFoursquare(googleVenue: any, fsqVenue: any): void {
-  if (fsqVenue.foursquare_id) googleVenue.foursquare_id = fsqVenue.foursquare_id;
-  
-  if (fsqVenue.photos?.length > 0) {
-    googleVenue.photos = googleVenue.photos || [];
-    const existingUrls = new Set(googleVenue.photos.map((p: any) => p.url));
-    for (const photo of fsqVenue.photos) {
-      if (!existingUrls.has(photo.url)) googleVenue.photos.push(photo);
+function enrichVenueWithSecondary(primaryVenue: any, secondaryVenue: any): void {
+  if (secondaryVenue.photos?.length > 0) {
+    primaryVenue.photos = primaryVenue.photos || [];
+    const existingUrls = new Set(primaryVenue.photos.map((p: any) => p.url));
+    for (const photo of secondaryVenue.photos) {
+      if (!existingUrls.has(photo.url)) primaryVenue.photos.push(photo);
     }
   }
   
-  if (fsqVenue.foursquare_data) {
-    googleVenue.foursquare_data = { ...googleVenue.foursquare_data, ...fsqVenue.foursquare_data };
+  if (!primaryVenue.description && secondaryVenue.description) {
+    primaryVenue.description = secondaryVenue.description;
   }
   
-  if (!googleVenue.description && fsqVenue.description) {
-    googleVenue.description = fsqVenue.description;
+  if (!primaryVenue.phone && secondaryVenue.phone) {
+    primaryVenue.phone = secondaryVenue.phone;
+  }
+  
+  if (!primaryVenue.website && secondaryVenue.website) {
+    primaryVenue.website = secondaryVenue.website;
+  }
+
+  if (!primaryVenue.opening_hours && secondaryVenue.opening_hours) {
+    primaryVenue.opening_hours = secondaryVenue.opening_hours;
+  }
+  
+  // Merge tags
+  if (secondaryVenue.tags?.length > 0) {
+    primaryVenue.tags = [...new Set([...(primaryVenue.tags || []), ...secondaryVenue.tags])];
   }
 }
 
