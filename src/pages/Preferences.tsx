@@ -32,6 +32,11 @@ const MapPreview = lazy(() => import('@/components/MapPreview'));
 
 // Icon + color mapping
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
+  downtown:       { icon: Building2,        bg: 'bg-slate-500/15', fg: 'text-slate-500' },
+  waterfront:     { icon: Waves,            bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
+  'arts-district':{ icon: Palette,          bg: 'bg-fuchsia-500/15', fg: 'text-fuchsia-500' },
+  oldtown:        { icon: Landmark,         bg: 'bg-amber-600/15', fg: 'text-amber-600' },
+  uptown:         { icon: Crown,            bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
   italian:        { icon: Pizza,           bg: 'bg-red-500/15', fg: 'text-red-500' },
   japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
   mexican:        { icon: Flame,           bg: 'bg-yellow-600/15', fg: 'text-yellow-600' },
