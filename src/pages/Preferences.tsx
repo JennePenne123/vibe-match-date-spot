@@ -107,6 +107,11 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
   template_romantic: { icon: Heart,          bg: 'bg-pink-500/15', fg: 'text-pink-500' },
   template_casual:   { icon: Coffee,         bg: 'bg-amber-500/15', fg: 'text-amber-500' },
   template_trendy:   { icon: Sparkles,       bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+  downtown:          { icon: Building2,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
+  waterfront:        { icon: WavesIcon,      bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
+  'arts-district':   { icon: PaletteIcon,    bg: 'bg-pink-500/15', fg: 'text-pink-500' },
+  oldtown:           { icon: LandmarkIcon,   bg: 'bg-amber-500/15', fg: 'text-amber-500' },
+  uptown:            { icon: GemIcon,        bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
 };
 
 function PrefIcon({ id, size = 'md' }: { id: string; size?: 'sm' | 'md' | 'lg' }) {
