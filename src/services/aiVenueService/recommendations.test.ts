@@ -52,7 +52,7 @@ vi.mock('@/services/apiUsageService', () => ({
 vi.mock('@/config/apiConfig', () => ({
   API_CONFIG: {
     useGooglePlaces: true,
-    useFoursquare: true,
+    useOverpass: true,
     venueSearchStrategy: 'parallel',
     mergeVenueData: true,
     maxVenuesPerSource: 20,

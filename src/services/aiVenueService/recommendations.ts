@@ -317,10 +317,10 @@ const getVenuesFromMultipleSources = async (
   const strategy = API_CONFIG.venueSearchStrategy;
   let venues: any[] = [];
   
-  if (strategy === 'radar-foursquare') {
-    venues = await getVenuesRadarFoursquare(userId, limit, userLocation);
-  } else if (strategy === 'foursquare-only') {
-    venues = await getVenuesFoursquareOnly(userId, limit, userLocation);
+  if (strategy === 'radar-overpass') {
+    venues = await getVenuesRadarOverpass(userId, limit, userLocation);
+  } else if (strategy === 'overpass-only') {
+    venues = await getVenuesOverpassOnly(userId, limit, userLocation);
   } else {
     venues = await getVenuesParallel(userId, limit, userLocation);
   }
@@ -341,9 +341,9 @@ const getVenuesFromMultipleSources = async (
 };
 
 /**
- * Radar + Foursquare strategy: Radar for primary search, Foursquare for enrichment (photos, tips, ratings)
+ * Radar + Overpass strategy: Radar for primary search, Overpass/OSM for additional coverage (free)
  */
-async function getVenuesRadarFoursquare(
+async function getVenuesRadarOverpass(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
@@ -351,22 +351,21 @@ async function getVenuesRadarFoursquare(
   // Step 1: Get venues from Radar (primary, high free tier)
   let venues = await getVenuesFromRadar(userId, limit, userLocation).catch(() => []);
   
-  // Step 2: Enrich with Foursquare data (photos, tips, ratings)
-  if (venues.length > 0 && API_CONFIG.useFoursquare && userLocation) {
-    const fsqVenues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
+  // Step 2: Enrich with Overpass/OSM data (free, unlimited)
+  if (API_CONFIG.useOverpass && userLocation) {
+    const osmVenues = await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, osmVenues);
   }
   
-  // Step 3: If Radar returned nothing, fall back to Foursquare-only
-  if (venues.length < API_CONFIG.minVenuesForSuccess && API_CONFIG.useFoursquare && userLocation) {
-    console.log('⚠️ Radar returned few results, falling back to Foursquare-only');
-    const fsqVenues = await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, fsqVenues);
+  // Step 3: If Radar returned nothing, fall back to Overpass-only
+  if (venues.length < API_CONFIG.minVenuesForSuccess && API_CONFIG.useOverpass && userLocation) {
+    console.log('⚠️ Radar returned few results, falling back to Overpass-only');
+    const osmVenues = await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
+    venues = mergeAndDeduplicateVenues(venues, osmVenues);
   }
 
   // Step 4: Google Places fallback for niche venue types
-  // If user wants non-restaurant venues (museums, bowling, etc.) and results are sparse
-  if (userLocation) {
+  if (userLocation && API_CONFIG.useGooglePlaces) {
     const { data: userPrefs } = await supabase
       .from('user_preferences')
       .select('preferred_venue_types, preferred_activities')
@@ -377,7 +376,6 @@ async function getVenuesRadarFoursquare(
     const nicheActivities = (userPrefs as any)?.preferred_activities || [];
     const hasNichePreferences = nicheTypes.length > 0 || nicheActivities.length > 0;
 
-    // Check how many results match niche categories
     const nicheKeywords = [...nicheTypes, ...nicheActivities].map((t: string) => t.replace(/_/g, ' ').toLowerCase());
     const nicheMatches = venues.filter((v: any) => {
       const text = [(v.name || ''), (v.description || ''), ...(v.tags || [])].join(' ').toLowerCase();
@@ -385,24 +383,14 @@ async function getVenuesRadarFoursquare(
     });
 
     if (hasNichePreferences && nicheMatches.length < 3) {
-      console.log('🔍 Google Places fallback: only', nicheMatches.length, 'niche matches from Radar/FSQ, fetching from Google...');
+      console.log('🔍 Google Places fallback: only', nicheMatches.length, 'niche matches, fetching from Google...');
       
-      // Map niche types to Google Places types
       const googleTypesMap: Record<string, string> = {
-        'museum': 'museum',
-        'gallery': 'art_gallery',
-        'theater_venue': 'movie_theater',
-        'cinema': 'movie_theater',
-        'concert_hall': 'night_club',
-        'bowling': 'bowling_alley',
-        'swimming': 'swimming_pool',
-        'spa_wellness': 'spa',
-        'arcade': 'amusement_park',
-        'mini_golf': 'amusement_park',
-        'karaoke': 'night_club',
-        'comedy_club': 'night_club',
-        'climbing': 'gym',
-        'escape_room': 'amusement_park',
+        'museum': 'museum', 'gallery': 'art_gallery', 'theater_venue': 'movie_theater',
+        'cinema': 'movie_theater', 'concert_hall': 'night_club', 'bowling': 'bowling_alley',
+        'swimming': 'swimming_pool', 'spa_wellness': 'spa', 'arcade': 'amusement_park',
+        'mini_golf': 'amusement_park', 'karaoke': 'night_club', 'comedy_club': 'night_club',
+        'climbing': 'gym', 'escape_room': 'amusement_park',
       };
 
       const googleTypes = [...nicheTypes, ...nicheActivities]
@@ -411,11 +399,7 @@ async function getVenuesRadarFoursquare(
 
       if (googleTypes.length > 0) {
         try {
-          const googleVenues = await getVenuesFromGooglePlaces(userId, 10, {
-            ...userLocation,
-            // Pass types as part of the search
-          });
-          
+          const googleVenues = await getVenuesFromGooglePlaces(userId, 10, userLocation);
           if (googleVenues.length > 0) {
             console.log('✅ Google Places fallback found', googleVenues.length, 'additional venues');
             venues = mergeAndDeduplicateVenues(venues, googleVenues);
@@ -431,15 +415,15 @@ async function getVenuesRadarFoursquare(
 }
 
 /**
- * Foursquare-only strategy
+ * Overpass-only strategy
  */
-async function getVenuesFoursquareOnly(
+async function getVenuesOverpassOnly(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) {
-  if (API_CONFIG.useFoursquare && userLocation) {
-    return await getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []);
+  if (API_CONFIG.useOverpass && userLocation) {
+    return await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
   }
   return [];
 }
@@ -458,8 +442,8 @@ async function getVenuesParallel(
     promises.push(getVenuesFromRadar(userId, limit, userLocation).catch(() => []));
   }
   
-  if (API_CONFIG.useFoursquare && userLocation) {
-    promises.push(getVenuesFromFoursquare(userId, limit, userLocation).catch(() => []));
+  if (API_CONFIG.useOverpass && userLocation) {
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation).catch(() => []));
   }
   
   if (API_CONFIG.useGooglePlaces) {
@@ -478,23 +462,23 @@ async function getVenuesParallel(
 /**
  * Merge and deduplicate venues from multiple sources
  */
-function mergeAndDeduplicateVenues(googleVenues: any[], foursquareVenues: any[]): any[] {
+function mergeAndDeduplicateVenues(primaryVenues: any[], secondaryVenues: any[]): any[] {
   if (!API_CONFIG.mergeVenueData) {
-    return [...googleVenues, ...foursquareVenues].slice(0, API_CONFIG.maxTotalVenues);
+    return [...primaryVenues, ...secondaryVenues].slice(0, API_CONFIG.maxTotalVenues);
   }
   
-  const merged: any[] = [...googleVenues];
-  const addedIds = new Set(googleVenues.map(v => v.id || v.venue_id));
+  const merged: any[] = [...primaryVenues];
+  const addedIds = new Set(primaryVenues.map(v => v.id || v.venue_id));
   
-  for (const fsqVenue of foursquareVenues) {
-    const matchingVenue = googleVenues.find(gv => areVenuesDuplicates(gv, fsqVenue));
+  for (const newVenue of secondaryVenues) {
+    const matchingVenue = primaryVenues.find(pv => areVenuesDuplicates(pv, newVenue));
     
     if (matchingVenue) {
-      enrichVenueWithFoursquare(matchingVenue, fsqVenue);
+      enrichVenueWithSecondary(matchingVenue, newVenue);
     } else {
-      const venueId = fsqVenue.id || fsqVenue.venue_id;
+      const venueId = newVenue.id || newVenue.venue_id;
       if (!addedIds.has(venueId)) {
-        merged.push(fsqVenue);
+        merged.push(newVenue);
         addedIds.add(venueId);
       }
     }
@@ -524,25 +508,36 @@ function areVenuesDuplicates(v1: any, v2: any): boolean {
 }
 
 /**
- * Enrich Google venue with Foursquare data
+ * Enrich primary venue with secondary source data
  */
-function enrichVenueWithFoursquare(googleVenue: any, fsqVenue: any): void {
-  if (fsqVenue.foursquare_id) googleVenue.foursquare_id = fsqVenue.foursquare_id;
-  
-  if (fsqVenue.photos?.length > 0) {
-    googleVenue.photos = googleVenue.photos || [];
-    const existingUrls = new Set(googleVenue.photos.map((p: any) => p.url));
-    for (const photo of fsqVenue.photos) {
-      if (!existingUrls.has(photo.url)) googleVenue.photos.push(photo);
+function enrichVenueWithSecondary(primaryVenue: any, secondaryVenue: any): void {
+  if (secondaryVenue.photos?.length > 0) {
+    primaryVenue.photos = primaryVenue.photos || [];
+    const existingUrls = new Set(primaryVenue.photos.map((p: any) => p.url));
+    for (const photo of secondaryVenue.photos) {
+      if (!existingUrls.has(photo.url)) primaryVenue.photos.push(photo);
     }
   }
   
-  if (fsqVenue.foursquare_data) {
-    googleVenue.foursquare_data = { ...googleVenue.foursquare_data, ...fsqVenue.foursquare_data };
+  if (!primaryVenue.description && secondaryVenue.description) {
+    primaryVenue.description = secondaryVenue.description;
   }
   
-  if (!googleVenue.description && fsqVenue.description) {
-    googleVenue.description = fsqVenue.description;
+  if (!primaryVenue.phone && secondaryVenue.phone) {
+    primaryVenue.phone = secondaryVenue.phone;
+  }
+  
+  if (!primaryVenue.website && secondaryVenue.website) {
+    primaryVenue.website = secondaryVenue.website;
+  }
+
+  if (!primaryVenue.opening_hours && secondaryVenue.opening_hours) {
+    primaryVenue.opening_hours = secondaryVenue.opening_hours;
+  }
+  
+  // Merge tags
+  if (secondaryVenue.tags?.length > 0) {
+    primaryVenue.tags = [...new Set([...(primaryVenue.tags || []), ...secondaryVenue.tags])];
   }
 }
 
@@ -619,14 +614,14 @@ async function getVenuesFromRadar(
 }
 
 /**
- * Fetch venues from Foursquare
+ * Fetch venues from Overpass/OpenStreetMap (completely free, no API key needed)
  */
-async function getVenuesFromFoursquare(
+async function getVenuesFromOverpass(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) {
-  const timer = apiUsageService.createTimer('foursquare', '/search-venues-foursquare');
+  const timer = apiUsageService.createTimer('overpass', '/search-venues-overpass');
   
   try {
     if (!userLocation?.latitude || !userLocation?.longitude) {
@@ -644,12 +639,12 @@ async function getVenuesFromFoursquare(
       return [];
     }
     
-    const { data, error } = await supabase.functions.invoke('search-venues-foursquare', {
+    const { data, error } = await supabase.functions.invoke('search-venues-overpass', {
       body: {
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
         cuisines: userPrefs.preferred_cuisines || [],
-        radius: (userPrefs.max_distance || 10) * 1000,
+        radius: (userPrefs.max_distance || 25) * 1000,
         limit,
         venueTypes: (userPrefs as any).preferred_venue_types || [],
         activities: (userPrefs as any).preferred_activities || [],
@@ -688,6 +683,8 @@ async function getVenuesFromFoursquare(
     return [];
   }
 }
+
+
 
 /**
  * Fetch venues from Google Places

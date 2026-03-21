@@ -58,7 +58,7 @@ const features = [
     color: "from-emerald-500 to-teal-600",
     points: [
       "Google Places integration",
-      "Foursquare API fallback",
+      "OpenStreetMap/Overpass API integration (free, unlimited)",
       "Intelligent data enrichment",
     ],
   },
