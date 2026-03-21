@@ -571,6 +571,10 @@ const Preferences = () => {
                 <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
               </AccordionSection>
 
+              <AccordionSection title={t('preferences.neighborhood', 'Bevorzugtes Viertel')} icon={<Building2 className="w-5 h-5 text-slate-500" />} selectedCount={selectedNeighborhoods.length}>
+                <SelectionList items={neighborhoods} selected={selectedNeighborhoods} onToggle={(id) => toggleSelection(id, selectedNeighborhoods, setSelectedNeighborhoods)} />
+              </AccordionSection>
+
               <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0}>
                 <div className="space-y-3">
                   <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
