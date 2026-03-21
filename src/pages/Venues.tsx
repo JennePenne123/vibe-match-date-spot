@@ -32,6 +32,7 @@ interface VenueWithScore extends DBVenue {
 }
 
 const FILTERS = ['Italian', 'Japanese', 'Mexican', 'American', 'Romantic', 'Casual', 'Nightlife'];
+const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
 
 const Venues = () => {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ const Venues = () => {
   const [loading, setLoading] = useState(true);
   const [searchingCity, setSearchingCity] = useState(false);
   const [activeCity, setActiveCity] = useState<string | null>(null);
+  const [searchRadius, setSearchRadius] = useState(25);
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
@@ -97,10 +99,10 @@ const Venues = () => {
         return { ...v, ai_score: scoreMap.get(v.id), distance_km };
       });
 
-      // If we have a center, filter by 50km radius and sort by distance
+      // If we have a center, filter by user-defined radius
       if (center) {
         venuesWithScores = venuesWithScores
-          .filter(v => v.distance_km !== undefined && v.distance_km <= 50);
+          .filter(v => v.distance_km !== undefined && v.distance_km <= searchRadius);
       }
 
       // Sort: AI score first, then distance
@@ -118,7 +120,7 @@ const Venues = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, searchRadius]);
 
   useEffect(() => {
     if (searchCenter) loadVenues(searchCenter);
@@ -166,7 +168,7 @@ const Venues = () => {
           latitude: center.lat,
           longitude: center.lng,
           cuisines: userPrefs?.preferred_cuisines || [],
-          radius: 25000,
+          radius: searchRadius * 1000,
           limit: 40,
           venueTypes: (userPrefs as any)?.preferred_venue_types || [],
           activities: (userPrefs as any)?.preferred_activities || [],
@@ -276,8 +278,30 @@ const Venues = () => {
             >
               <MapPin className="w-3 h-3 mr-1" />
               {t('venues.backToHome', 'Zurück zu meinem Standort')}
-            </Button>
+          </Button>
           )}
+
+          {/* Radius Selector */}
+          <div className="flex items-center gap-2 mb-3">
+            <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            <span className="text-xs text-muted-foreground whitespace-nowrap">{t('venues.radius', 'Radius')}:</span>
+            <div className="flex gap-1.5 flex-1">
+              {RADIUS_OPTIONS.map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setSearchRadius(r)}
+                  className={cn(
+                    'text-[11px] px-2.5 py-1 rounded-full transition-colors font-medium',
+                    searchRadius === r
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  )}
+                >
+                  {r} km
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Venue Name Search */}
           <div className="relative mb-3">
