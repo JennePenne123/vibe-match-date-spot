@@ -347,6 +347,7 @@ const Preferences = () => {
           preferred_duration: selectedDuration || null,
           accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
           preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
+          lifestyle_data: { preferred_neighborhoods: selectedNeighborhoods.length > 0 ? selectedNeighborhoods : null },
         };
         const { data: existing, error: existErr } = await supabase.from('user_preferences').select('id').eq('user_id', currentUserId).maybeSingle();
         if (existErr) throw existErr;
