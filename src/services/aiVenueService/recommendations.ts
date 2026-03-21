@@ -348,23 +348,35 @@ async function getVenuesRadarOverpass(
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) {
-  // Step 1: Get venues from Radar (primary, high free tier)
-  let venues = await getVenuesFromRadar(userId, limit, userLocation).catch(() => []);
+  // Step 1: Query Radar + Overpass IN PARALLEL for maximum speed
+  const promises: Promise<any[]>[] = [];
   
-  // Step 2: Enrich with Overpass/OSM data (free, unlimited)
-  if (API_CONFIG.useOverpass && userLocation) {
-    const osmVenues = await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, osmVenues);
+  if (API_CONFIG.useRadar && userLocation) {
+    promises.push(getVenuesFromRadar(userId, limit, userLocation).catch((err) => {
+      console.warn('⚠️ Radar failed:', err instanceof Error ? err.message : 'Unknown');
+      return [];
+    }));
   }
   
-  // Step 3: If Radar returned nothing, fall back to Overpass-only
-  if (venues.length < API_CONFIG.minVenuesForSuccess && API_CONFIG.useOverpass && userLocation) {
-    console.log('⚠️ Radar returned few results, falling back to Overpass-only');
-    const osmVenues = await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
-    venues = mergeAndDeduplicateVenues(venues, osmVenues);
+  if (API_CONFIG.useOverpass && userLocation) {
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation).catch((err) => {
+      console.warn('⚠️ Overpass failed:', err instanceof Error ? err.message : 'Unknown');
+      return [];
+    }));
   }
 
-  // Step 4: Google Places fallback for niche venue types
+  const results = await Promise.all(promises);
+  const radarVenues = results[0] || [];
+  const osmVenues = results[1] || [];
+  
+  console.log(`🔀 MERGE: Radar=${radarVenues.length}, Overpass=${osmVenues.length}`);
+  
+  // Merge: Radar as primary (has ratings, chain detection), Overpass enriches with opening hours, website, tags
+  let venues = mergeAndDeduplicateVenues(radarVenues, osmVenues);
+  
+  console.log(`🔀 MERGE: After dedup=${venues.length}`);
+
+  // Step 2: Google Places fallback for niche venue types only if needed
   if (userLocation && API_CONFIG.useGooglePlaces) {
     const { data: userPrefs } = await supabase
       .from('user_preferences')
