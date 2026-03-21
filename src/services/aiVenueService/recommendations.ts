@@ -317,10 +317,10 @@ const getVenuesFromMultipleSources = async (
   const strategy = API_CONFIG.venueSearchStrategy;
   let venues: any[] = [];
   
-  if (strategy === 'radar-foursquare') {
-    venues = await getVenuesRadarFoursquare(userId, limit, userLocation);
-  } else if (strategy === 'foursquare-only') {
-    venues = await getVenuesFoursquareOnly(userId, limit, userLocation);
+  if (strategy === 'radar-overpass') {
+    venues = await getVenuesRadarOverpass(userId, limit, userLocation);
+  } else if (strategy === 'overpass-only') {
+    venues = await getVenuesOverpassOnly(userId, limit, userLocation);
   } else {
     venues = await getVenuesParallel(userId, limit, userLocation);
   }
