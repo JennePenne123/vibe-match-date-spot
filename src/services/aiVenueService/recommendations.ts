@@ -636,13 +636,14 @@ async function getVenuesFromRadar(
 
 /**
  * Fetch venues from Overpass/OpenStreetMap (completely free, no API key needed)
+ * Uses client-side API call directly instead of edge function
  */
 async function getVenuesFromOverpass(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) {
-  const timer = apiUsageService.createTimer('overpass', '/search-venues-overpass');
+  const timer = apiUsageService.createTimer('overpass', '/client-overpass');
   
   try {
     if (!userLocation?.latitude || !userLocation?.longitude) {
@@ -660,29 +661,17 @@ async function getVenuesFromOverpass(
       return [];
     }
     
-    const { data, error } = await supabase.functions.invoke('search-venues-overpass', {
-      body: {
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        cuisines: userPrefs.preferred_cuisines || [],
-        radius: (userPrefs.max_distance || 25) * 1000,
-        limit,
-        venueTypes: (userPrefs as any).preferred_venue_types || [],
-        activities: (userPrefs as any).preferred_activities || [],
-      }
-    });
+    const { searchVenuesOverpass } = await import('@/services/overpassSearchService');
+    const radiusMeters = (userPrefs.max_distance || 25) * 1000;
+    const result = await searchVenuesOverpass(
+      userLocation.latitude,
+      userLocation.longitude,
+      radiusMeters,
+      userPrefs.preferred_cuisines || [],
+      limit
+    );
     
-    if (error) {
-      await timer.end({ 
-        status: 500, 
-        cacheHit: false, 
-        userId,
-        metadata: { error: error.message }
-      });
-      return [];
-    }
-    
-    const venues = data?.venues || [];
+    const venues = result.venues || [];
     await timer.end({ 
       status: 200, 
       cacheHit: false, 
