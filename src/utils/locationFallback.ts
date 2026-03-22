@@ -7,18 +7,19 @@ export interface LocationWithSource {
   source: 'user_preferences' | 'browser_geolocation' | 'default';
 }
 
-// Default fallback location (New York City)
+// Default fallback location (Hamburg, Germany — primary market)
 export const DEFAULT_FALLBACK_LOCATION: LocationWithSource = {
-  latitude: 40.7128,
-  longitude: -74.0060,
-  address: 'New York, NY',
+  latitude: 53.5511,
+  longitude: 9.9937,
+  address: 'Hamburg, Germany',
   source: 'default'
 };
 
 // Configurable fallback locations for different regions
 export const REGIONAL_FALLBACKS: Record<string, LocationWithSource> = {
-  us: { latitude: 40.7128, longitude: -74.0060, address: 'New York, NY', source: 'default' },
+  de: { latitude: 53.5511, longitude: 9.9937, address: 'Hamburg, Germany', source: 'default' },
   eu: { latitude: 52.5200, longitude: 13.4050, address: 'Berlin, Germany', source: 'default' },
+  us: { latitude: 40.7128, longitude: -74.0060, address: 'New York, NY', source: 'default' },
   uk: { latitude: 51.5074, longitude: -0.1278, address: 'London, UK', source: 'default' },
   asia: { latitude: 35.6762, longitude: 139.6503, address: 'Tokyo, Japan', source: 'default' },
 };
@@ -52,7 +53,29 @@ export const getLocationFallback = async (userId?: string): Promise<LocationWith
     }
   }
 
-  // 2. Return configurable default
+  // 2. Try browser geolocation
+  if (typeof navigator !== 'undefined' && navigator.geolocation) {
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          timeout: 5000,
+          maximumAge: 300000, // 5 min cache
+          enableHighAccuracy: false,
+        });
+      });
+      console.log('📍 Using browser geolocation');
+      return {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        address: 'Current location',
+        source: 'browser_geolocation',
+      };
+    } catch (geoError) {
+      console.warn('⚠️ Browser geolocation failed:', geoError);
+    }
+  }
+
+  // 3. Return configurable default (Hamburg)
   console.log('📍 Using default fallback location:', DEFAULT_FALLBACK_LOCATION.address);
   return DEFAULT_FALLBACK_LOCATION;
 };
