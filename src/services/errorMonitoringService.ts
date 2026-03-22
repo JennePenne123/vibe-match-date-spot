@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { captureError } from './sentryService';
 
 type ErrorSeverity = 'info' | 'warning' | 'error' | 'critical';
 type ErrorType = 'js_error' | 'api_error' | 'ui_error' | 'performance' | 'unknown';
