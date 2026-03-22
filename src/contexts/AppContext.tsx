@@ -260,19 +260,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAppState(prev => ({ ...prev, isLoading: true }));
     
     try {
+      // If no location in state, try to load from user preferences
+      let location = appState.userLocation;
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!location && user) {
+        console.log('📍 No location in state, loading from user preferences...');
+        const { data: prefs } = await supabase
+          .from('user_preferences')
+          .select('home_latitude, home_longitude, home_address')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (prefs?.home_latitude && prefs?.home_longitude) {
+          location = {
+            latitude: prefs.home_latitude,
+            longitude: prefs.home_longitude,
+            address: prefs.home_address || undefined,
+          };
+          console.log('✅ Loaded location from preferences:', location);
+          setAppState(prev => ({ ...prev, userLocation: location }));
+        }
+      }
+
       console.log('Generating recommendations with:', {
         cuisines: appState.selectedCuisines,
         vibes: appState.selectedVibes,
         area: appState.selectedArea,
-        location: appState.userLocation
+        location
       });
 
       let venues: Venue[] = [];
-      const { data: { user } } = await supabase.auth.getUser();
 
-      if (user && appState.userLocation?.latitude && appState.userLocation?.longitude) {
+      if (user && location?.latitude && location?.longitude) {
         try {
-          const recommendations = await getAIVenueRecommendations(user.id, undefined, 20, appState.userLocation, appState.selectedArea);
+          const recommendations = await getAIVenueRecommendations(user.id, undefined, 20, location, appState.selectedArea);
           venues = recommendations.map(recommendationToVenue);
           console.log(`✅ AI venue pipeline returned ${venues.length} venues`);
         } catch (aiError) {
