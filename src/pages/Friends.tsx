@@ -273,14 +273,6 @@ const Friends = () => {
             </div>
           )}
 
-          {/* Next Button */}
-          <Button
-            onClick={handleNext}
-            className="w-full h-12 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold"
-          >
-            Find Perfect Spots
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
         </div>
       </div>
     </div>
