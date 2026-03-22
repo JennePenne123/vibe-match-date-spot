@@ -4,10 +4,8 @@ export interface LocationWithSource {
   latitude: number;
   longitude: number;
   address: string;
-  source: 'user_preferences' | 'browser_geolocation' | 'default';
+  source: 'user_preferences' | 'browser_geolocation';
 }
-
-export type LocationSource = 'user_preferences' | 'browser_geolocation' | 'none';
 
 /**
  * Get location fallback with priority:
