@@ -1,5 +1,4 @@
 import { calculateGeoDistance } from '@/utils/stringUtils';
-import { DEFAULT_FALLBACK_LOCATION } from '@/utils/locationFallback';
 
 /**
  * Calculate distance from a reference location
@@ -9,9 +8,11 @@ export const calculateDistanceFromLocation = (
   venue: any, 
   referenceLocation?: { latitude: number; longitude: number }
 ): string => {
-  // Use provided reference or default fallback (New York)
-  const refLat = referenceLocation?.latitude ?? DEFAULT_FALLBACK_LOCATION.latitude;
-  const refLng = referenceLocation?.longitude ?? DEFAULT_FALLBACK_LOCATION.longitude;
+  if (!referenceLocation?.latitude || !referenceLocation?.longitude) {
+    return 'Distance unavailable';
+  }
+  const refLat = referenceLocation.latitude;
+  const refLng = referenceLocation.longitude;
   
   if (!venue.latitude || !venue.longitude) return 'Distance unavailable';
   
