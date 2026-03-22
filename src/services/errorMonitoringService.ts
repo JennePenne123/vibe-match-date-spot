@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { captureError } from './sentryService';
 
 type ErrorSeverity = 'info' | 'warning' | 'error' | 'critical';
 type ErrorType = 'js_error' | 'api_error' | 'ui_error' | 'performance' | 'unknown';
@@ -35,9 +36,20 @@ async function logError(payload: ErrorLogPayload): Promise<void> {
   try {
     if (isDuplicate(payload.error_message)) return;
 
+    // Forward to Sentry
+    const error = new Error(payload.error_message);
+    if (payload.error_stack) error.stack = payload.error_stack;
+    captureError(error, {
+      error_type: payload.error_type,
+      component_name: payload.component_name,
+      route: payload.route || window.location.pathname,
+      severity: payload.severity,
+      ...payload.metadata,
+    });
+
     const { data: { user } } = await supabase.auth.getUser();
 
-    const { error } = await supabase.from('error_logs' as any).insert({
+    const { error: dbError } = await supabase.from('error_logs' as any).insert({
       user_id: user?.id || null,
       error_type: payload.error_type,
       error_message: payload.error_message.slice(0, 2000),
@@ -49,8 +61,8 @@ async function logError(payload: ErrorLogPayload): Promise<void> {
       user_agent: navigator.userAgent,
     });
 
-    if (error) {
-      console.error('[ErrorMonitoring] Failed to log error:', error);
+    if (dbError) {
+      console.error('[ErrorMonitoring] Failed to log error:', dbError);
     }
   } catch (e) {
     // Silently fail – don't create error loops
