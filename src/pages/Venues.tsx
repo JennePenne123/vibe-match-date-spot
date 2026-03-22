@@ -175,6 +175,7 @@ const Venues = () => {
   const triggerVenueSearch = async (center: { lat: number; lng: number }) => {
     if (!user) return;
     try {
+      console.log('🔍 Triggering venue search at:', center);
       const { data: userPrefs } = await supabase
         .from('user_preferences')
         .select('preferred_cuisines, preferred_activities, preferred_venue_types')
@@ -191,26 +192,33 @@ const Venues = () => {
         activities: (userPrefs as any)?.preferred_activities || [],
       };
 
+      console.log('🔍 Search payload:', searchPayload);
+
       const [radarResult, overpassResult] = await Promise.allSettled([
         supabase.functions.invoke('search-venues-radar', { body: searchPayload }),
         supabase.functions.invoke('search-venues-overpass', { body: searchPayload }),
       ]);
 
       if (radarResult.status === 'rejected') {
-        console.error('Radar venue search failed:', radarResult.reason);
+        console.error('❌ Radar venue search failed:', radarResult.reason);
       } else if (radarResult.value.error) {
-        console.error('Radar venue search returned error:', radarResult.value.error);
+        console.error('❌ Radar venue search returned error:', radarResult.value.error);
+      } else {
+        console.log('✅ Radar result:', radarResult.value.data);
       }
 
       if (overpassResult.status === 'rejected') {
-        console.error('Overpass venue search failed:', overpassResult.reason);
+        console.error('❌ Overpass venue search failed:', overpassResult.reason);
       } else if (overpassResult.value.error) {
-        console.error('Overpass venue search returned error:', overpassResult.value.error);
+        console.error('❌ Overpass venue search returned error:', overpassResult.value.error);
+      } else {
+        console.log('✅ Overpass result:', overpassResult.value.data);
       }
 
+      // Reload venues after edge functions have inserted data
       await loadVenues(center);
     } catch (err) {
-      console.error('Venue search failed:', err);
+      console.error('❌ Venue search failed:', err);
     }
   };
 
