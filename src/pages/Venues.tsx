@@ -135,7 +135,14 @@ const Venues = () => {
   }, [user, searchRadius]);
 
   useEffect(() => {
-    if (searchCenter) loadVenues(searchCenter);
+    if (searchCenter) {
+      loadVenues(searchCenter);
+      // Trigger external venue search on first load to populate DB
+      if (!initialSearchDone) {
+        setInitialSearchDone(true);
+        triggerVenueSearch(searchCenter);
+      }
+    }
   }, [searchCenter, loadVenues]);
 
   // Geocode a city name via BigDataCloud (free, no key needed)
