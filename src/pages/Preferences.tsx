@@ -621,25 +621,7 @@ const Preferences = () => {
           )}
         </div>
 
-        {/* Sticky bottom buttons */}
-        <div className="fixed bottom-0 left-0 right-0 z-20 bg-background/80 backdrop-blur-lg border-t border-border p-4">
-          <div className="max-w-md mx-auto flex gap-3">
-            {canGoBack && (
-              <Button onClick={() => setStep(s => s - 1)} variant="outline" className="h-12 px-6">
-                <ArrowLeft className="w-4 h-4 mr-1" /> {t('home.wizardBack')}
-              </Button>
-            )}
-            {canGoNext ? (
-              <Button onClick={() => setStep(s => s + 1)} className="flex-1 h-12 font-semibold text-base">
-                {t('home.wizardNext')} <ArrowRight className="w-4 h-4 ml-1" />
-              </Button>
-            ) : (
-              <Button onClick={handleSave} disabled={isSaving} className="flex-1 h-12 font-semibold text-base">
-                {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.saving')}</> : <><Save className="w-4 h-4 mr-2" />{t('preferences.findDates') || 'Speichern & weiter'}</>}
-              </Button>
-            )}
-          </div>
-        </div>
+        {/* Bottom bar removed – buttons are now in the sticky header */}
       </div>
     </div>
   );
