@@ -318,7 +318,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       if (venues.length === 0) {
         console.log('⚠️ Falling back to stored venues');
-        venues = await fetchFallbackVenues(appState.selectedCuisines, appState.selectedVibes);
+        venues = await fetchFallbackVenues(
+          appState.selectedCuisines,
+          appState.selectedVibes,
+          location ? { latitude: location.latitude, longitude: location.longitude } : undefined
+        );
       }
 
       console.log(`Returning ${venues.length} venues`);
