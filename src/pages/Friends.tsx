@@ -97,33 +97,40 @@ const Friends = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 pt-12 bg-card shadow-sm">
-          <Button
-            onClick={() => navigate(isDemoMode ? '/preferences?demo=true' : '/preferences')}
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:bg-muted"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <div className="text-center">
-            <h1 className="text-xl font-semibold text-foreground">Invite Friends</h1>
-            <p className="text-sm text-muted-foreground">Step 2 of 3</p>
+        <div className="p-4 pt-12 bg-card shadow-sm sticky top-0 z-10 space-y-3">
+          <div className="flex items-center justify-between">
+            <Button
+              onClick={() => navigate(isDemoMode ? '/preferences?demo=true' : '/preferences')}
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:bg-muted"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </Button>
+            <div className="text-center">
+              <h1 className="text-xl font-semibold text-foreground">Invite Friends</h1>
+              <p className="text-sm text-muted-foreground">Step 2 of 3</p>
+            </div>
+            <Button
+              onClick={handleSkip}
+              variant="ghost"
+              className="text-muted-foreground hover:bg-muted text-sm"
+            >
+              Skip
+            </Button>
           </div>
-          <Button
-            onClick={handleSkip}
-            variant="ghost"
-            className="text-muted-foreground hover:bg-muted text-sm"
-          >
-            Skip
-          </Button>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="px-6 mb-8 pt-4">
+          {/* Progress Bar */}
           <div className="bg-muted rounded-full h-2">
             <div className="bg-gradient-primary rounded-full h-2 w-2/3 transition-all duration-300" />
           </div>
+          {/* Action Button */}
+          <Button
+            onClick={handleNext}
+            className="w-full h-10 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold text-sm"
+          >
+            Find Perfect Spots
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
         </div>
 
         <div className="px-6 pb-8">
@@ -266,14 +273,6 @@ const Friends = () => {
             </div>
           )}
 
-          {/* Next Button */}
-          <Button
-            onClick={handleNext}
-            className="w-full h-12 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold"
-          >
-            Find Perfect Spots
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
         </div>
       </div>
     </div>
