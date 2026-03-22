@@ -332,7 +332,9 @@ const Preferences = () => {
 
   const clearHomeLocation = () => { setHomeAddress(''); setHomeLatitude(null); setHomeLongitude(null); setLocationError(''); };
 
-  const geocodeAddress = async () => {
+  const geocodeAddress = async (event?: React.SyntheticEvent) => {
+    event?.preventDefault();
+    event?.stopPropagation();
     if (!homeAddress.trim()) return;
     setIsGeocodingAddress(true);
     setLocationError('');
@@ -600,24 +602,25 @@ const Preferences = () => {
                   <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
                     {isLocating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.gettingLocation')}</> : <><Navigation className="w-4 h-4 mr-2" />{t('preferences.useCurrentLocation')}</>}
                   </Button>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
+                  <div className="space-y-2">
+                    <div className="relative">
                       <Input
                         type="text"
                         placeholder={t('preferences.enterAddress')}
                         value={homeAddress}
                         onChange={(e) => setHomeAddress(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); geocodeAddress(); } }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { void geocodeAddress(e); } }}
                         className="w-full h-11 pl-9 text-sm"
                       />
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     </div>
                     <Button
                       type="button"
-                      onClick={geocodeAddress}
+                      onClick={(e) => { void geocodeAddress(e); }}
+                      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
                       disabled={!homeAddress.trim() || isGeocodingAddress}
                       size="sm"
-                      className="h-11 px-4 shrink-0"
+                      className="w-full h-11"
                     >
                       {isGeocodingAddress ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />{t('preferences.confirmLocation', 'Bestätigen')}</>}
                     </Button>
