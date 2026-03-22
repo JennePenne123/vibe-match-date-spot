@@ -22,18 +22,18 @@ const AdminModeration: React.FC = () => {
       </div>
 
       <Tabs defaultValue="feedback" className="w-full">
-        <TabsList className="bg-muted/50">
-          <TabsTrigger value="feedback" className="gap-1.5">
-            <MessageCircle className="w-3.5 h-3.5" />
-            Date-Feedback
+        <TabsList className="bg-muted/50 w-full flex">
+          <TabsTrigger value="feedback" className="gap-1.5 flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">
+            <MessageCircle className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Date-Feedback</span>
           </TabsTrigger>
-          <TabsTrigger value="venues" className="gap-1.5">
-            <MapPin className="w-3.5 h-3.5" />
-            Venue-Verifizierung
+          <TabsTrigger value="venues" className="gap-1.5 flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Verifizierung</span>
           </TabsTrigger>
-          <TabsTrigger value="venue-feedback" className="gap-1.5">
-            <ThumbsUp className="w-3.5 h-3.5" />
-            Venue-Feedback
+          <TabsTrigger value="venue-feedback" className="gap-1.5 flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">
+            <ThumbsUp className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Venue-Feedback</span>
           </TabsTrigger>
         </TabsList>
 
