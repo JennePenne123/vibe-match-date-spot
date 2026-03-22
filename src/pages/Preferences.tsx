@@ -265,6 +265,7 @@ const Preferences = () => {
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
   const [locationError, setLocationError] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -330,6 +331,31 @@ const Preferences = () => {
   };
 
   const clearHomeLocation = () => { setHomeAddress(''); setHomeLatitude(null); setHomeLongitude(null); setLocationError(''); };
+
+  const geocodeAddress = async () => {
+    if (!homeAddress.trim()) return;
+    setIsGeocodingAddress(true);
+    setLocationError('');
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(homeAddress.trim())}&format=json&limit=1&addressdetails=1`,
+        { headers: { 'Accept-Language': 'de' } }
+      );
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const { lat, lon, display_name } = data[0];
+        setHomeLatitude(parseFloat(lat));
+        setHomeLongitude(parseFloat(lon));
+        setHomeAddress(display_name.split(',').slice(0, 3).join(',').trim());
+      } else {
+        setLocationError(t('preferences.addressNotFound', 'Adresse nicht gefunden. Bitte versuche es erneut.'));
+      }
+    } catch {
+      setLocationError(t('preferences.geocodeError', 'Fehler bei der Adresssuche.'));
+    } finally {
+      setIsGeocodingAddress(false);
+    }
+  };
 
   const handleSave = async () => {
     updateCuisines(selectedCuisines);
@@ -574,9 +600,26 @@ const Preferences = () => {
                   <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
                     {isLocating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.gettingLocation')}</> : <><Navigation className="w-4 h-4 mr-2" />{t('preferences.useCurrentLocation')}</>}
                   </Button>
-                  <div className="relative">
-                    <Input type="text" placeholder={t('preferences.enterAddress')} value={homeAddress} onChange={(e) => setHomeAddress(e.target.value)} className="w-full h-11 pl-9 text-sm" />
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        type="text"
+                        placeholder={t('preferences.enterAddress')}
+                        value={homeAddress}
+                        onChange={(e) => setHomeAddress(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && geocodeAddress()}
+                        className="w-full h-11 pl-9 text-sm"
+                      />
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <Button
+                      onClick={geocodeAddress}
+                      disabled={!homeAddress.trim() || isGeocodingAddress}
+                      size="sm"
+                      className="h-11 px-4 shrink-0"
+                    >
+                      {isGeocodingAddress ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />{t('preferences.confirmLocation', 'Bestätigen')}</>}
+                    </Button>
                   </div>
                   {homeLatitude && homeLongitude && (
                     <>
