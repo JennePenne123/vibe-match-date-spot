@@ -69,17 +69,30 @@ const Venues = () => {
     initLocation();
   }, [user, t]);
 
-  // Load venues from DB
+  // Load venues from DB around a concrete map center instead of globally
   const loadVenues = useCallback(async (center?: { lat: number; lng: number }) => {
     if (!user) return;
     setLoading(true);
     try {
-      const { data: venueData, error: venueError } = await supabase
+      let venueQuery = supabase
         .from('venues')
         .select('id, name, address, cuisine_type, price_range, rating, tags, description, image_url, latitude, longitude')
-        .eq('is_active', true)
+        .eq('is_active', true);
+
+      if (center) {
+        const latDelta = searchRadius / 111;
+        const lngDelta = searchRadius / (111 * Math.max(Math.cos(center.lat * Math.PI / 180), 0.1));
+
+        venueQuery = venueQuery
+          .gte('latitude', center.lat - latDelta)
+          .lte('latitude', center.lat + latDelta)
+          .gte('longitude', center.lng - lngDelta)
+          .lte('longitude', center.lng + lngDelta);
+      }
+
+      const { data: venueData, error: venueError } = await venueQuery
         .order('rating', { ascending: false, nullsFirst: false })
-        .limit(100);
+        .limit(300);
 
       if (venueError) throw venueError;
 
@@ -99,13 +112,10 @@ const Venues = () => {
         return { ...v, ai_score: scoreMap.get(v.id), distance_km };
       });
 
-      // If we have a center, filter by user-defined radius
       if (center) {
-        venuesWithScores = venuesWithScores
-          .filter(v => v.distance_km !== undefined && v.distance_km <= searchRadius);
+        venuesWithScores = venuesWithScores.filter(v => v.distance_km !== undefined && v.distance_km <= searchRadius);
       }
 
-      // Sort: AI score first, then distance
       venuesWithScores.sort((a, b) => {
         if (a.ai_score && b.ai_score) return b.ai_score - a.ai_score;
         if (a.ai_score) return -1;
@@ -144,7 +154,6 @@ const Venues = () => {
         setActiveCity(cityName);
         setCityQuery('');
 
-        // Also trigger a Radar search for that location
         await triggerVenueSearch(newCenter);
       }
     } catch (err) {
@@ -163,19 +172,33 @@ const Venues = () => {
         .eq('user_id', user.id)
         .single();
 
-      await supabase.functions.invoke('search-venues-radar', {
-        body: {
-          latitude: center.lat,
-          longitude: center.lng,
-          cuisines: userPrefs?.preferred_cuisines || [],
-          radius: searchRadius * 1000,
-          limit: 40,
-          venueTypes: (userPrefs as any)?.preferred_venue_types || [],
-          activities: (userPrefs as any)?.preferred_activities || [],
-        }
-      });
+      const searchPayload = {
+        latitude: center.lat,
+        longitude: center.lng,
+        cuisines: userPrefs?.preferred_cuisines || [],
+        radius: searchRadius * 1000,
+        limit: 40,
+        venueTypes: (userPrefs as any)?.preferred_venue_types || [],
+        activities: (userPrefs as any)?.preferred_activities || [],
+      };
 
-      // Reload venues after search completes
+      const [radarResult, overpassResult] = await Promise.allSettled([
+        supabase.functions.invoke('search-venues-radar', { body: searchPayload }),
+        supabase.functions.invoke('search-venues-overpass', { body: searchPayload }),
+      ]);
+
+      if (radarResult.status === 'rejected') {
+        console.error('Radar venue search failed:', radarResult.reason);
+      } else if (radarResult.value.error) {
+        console.error('Radar venue search returned error:', radarResult.value.error);
+      }
+
+      if (overpassResult.status === 'rejected') {
+        console.error('Overpass venue search failed:', overpassResult.reason);
+      } else if (overpassResult.value.error) {
+        console.error('Overpass venue search returned error:', overpassResult.value.error);
+      }
+
       await loadVenues(center);
     } catch (err) {
       console.error('Venue search failed:', err);
@@ -185,8 +208,10 @@ const Venues = () => {
   const resetToHome = async () => {
     if (!user) return;
     const loc = await getLocationFallback(user.id);
-    setSearchCenter({ lat: loc.latitude, lng: loc.longitude });
+    const homeCenter = { lat: loc.latitude, lng: loc.longitude };
+    setSearchCenter(homeCenter);
     setActiveCity(loc.address || t('venues.nearYou', 'In deiner Nähe'));
+    await loadVenues(homeCenter);
   };
 
   const toggleFilter = (filter: string) =>
