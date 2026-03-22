@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Search, SlidersHorizontal, MapPin, Star, Sparkles, Heart, Navigation, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getLocationFallback } from '@/utils/locationFallback';
+import { searchVenuesOverpass } from '@/services/overpassSearchService';
 
 interface DBVenue {
   id: string;
