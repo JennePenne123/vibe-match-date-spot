@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { AppUser } from '@/types/app';
 import { useAuthState } from '@/hooks/useAuthState';
@@ -8,6 +8,7 @@ import { updateUserProfile, fetchUserProfile } from '@/utils/userProfileHelpers'
 import { inviteFriendById } from '@/services/friendshipService';
 import { clearUserPreferenceFields } from '@/services/sessionCleanupService';
 import { supabase } from '@/integrations/supabase/client';
+import { setSentryUser, clearSentryUser } from '@/services/sentryService';
 
 interface AuthContextType {
   user: AppUser | null;
