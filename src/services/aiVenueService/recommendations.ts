@@ -55,7 +55,7 @@ export const getAIVenueRecommendations = async (
     
     // Fallback to database venues if all sources fail or no location
     if (!venues || venues.length === 0) {
-      venues = await getActiveVenues(100);
+      venues = await getActiveVenues(100, userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined);
     }
 
     if (!venues || venues.length === 0) {

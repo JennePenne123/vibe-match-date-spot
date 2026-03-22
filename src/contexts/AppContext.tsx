@@ -114,16 +114,30 @@ const applyVenueFilters = (venues: Venue[], selectedCuisines: string[], selected
   });
 };
 
-const fetchFallbackVenues = async (selectedCuisines: string[], selectedVibes: string[]): Promise<Venue[]> => {
-  const { data, error } = await supabase
+const fetchFallbackVenues = async (
+  selectedCuisines: string[],
+  selectedVibes: string[],
+  userLocation?: { latitude: number; longitude: number }
+): Promise<Venue[]> => {
+  let query = supabase
     .from('venues')
     .select('*')
-    .eq('is_active', true)
-    .limit(100);
+    .eq('is_active', true);
 
-  if (error) {
-    throw error;
+  // Filter by bounding box if location available
+  if (userLocation?.latitude && userLocation?.longitude) {
+    const radiusKm = 25;
+    const latDelta = radiusKm / 111;
+    const lngDelta = radiusKm / (111 * Math.cos(userLocation.latitude * Math.PI / 180));
+    query = query
+      .gte('latitude', userLocation.latitude - latDelta)
+      .lte('latitude', userLocation.latitude + latDelta)
+      .gte('longitude', userLocation.longitude - lngDelta)
+      .lte('longitude', userLocation.longitude + lngDelta);
   }
+
+  const { data, error } = await query.limit(100);
+  if (error) throw error;
 
   return applyVenueFilters((data || []) as Venue[], selectedCuisines, selectedVibes);
 };
