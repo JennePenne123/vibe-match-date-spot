@@ -4,32 +4,15 @@ export interface LocationWithSource {
   latitude: number;
   longitude: number;
   address: string;
-  source: 'user_preferences' | 'browser_geolocation' | 'default';
+  source: 'user_preferences' | 'browser_geolocation';
 }
-
-// Default fallback location (Hamburg, Germany — primary market)
-export const DEFAULT_FALLBACK_LOCATION: LocationWithSource = {
-  latitude: 53.5511,
-  longitude: 9.9937,
-  address: 'Hamburg, Germany',
-  source: 'default'
-};
-
-// Configurable fallback locations for different regions
-export const REGIONAL_FALLBACKS: Record<string, LocationWithSource> = {
-  de: { latitude: 53.5511, longitude: 9.9937, address: 'Hamburg, Germany', source: 'default' },
-  eu: { latitude: 52.5200, longitude: 13.4050, address: 'Berlin, Germany', source: 'default' },
-  us: { latitude: 40.7128, longitude: -74.0060, address: 'New York, NY', source: 'default' },
-  uk: { latitude: 51.5074, longitude: -0.1278, address: 'London, UK', source: 'default' },
-  asia: { latitude: 35.6762, longitude: 139.6503, address: 'Tokyo, Japan', source: 'default' },
-};
 
 /**
  * Get location fallback with priority:
  * 1. User's saved home location from preferences
  * 2. Configurable default location
  */
-export const getLocationFallback = async (userId?: string): Promise<LocationWithSource> => {
+export const getLocationFallback = async (userId?: string): Promise<LocationWithSource | null> => {
   // 1. Try user's saved location from preferences if userId provided
   if (userId) {
     try {
@@ -75,9 +58,9 @@ export const getLocationFallback = async (userId?: string): Promise<LocationWith
     }
   }
 
-  // 3. Return configurable default (Hamburg)
-  console.log('📍 Using default fallback location:', DEFAULT_FALLBACK_LOCATION.address);
-  return DEFAULT_FALLBACK_LOCATION;
+  // 3. No fallback — user must set location
+  console.log('📍 No location available — user must set their location in preferences');
+  return null;
 };
 
 /**
