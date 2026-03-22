@@ -332,6 +332,31 @@ const Preferences = () => {
 
   const clearHomeLocation = () => { setHomeAddress(''); setHomeLatitude(null); setHomeLongitude(null); setLocationError(''); };
 
+  const geocodeAddress = async () => {
+    if (!homeAddress.trim()) return;
+    setIsGeocodingAddress(true);
+    setLocationError('');
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(homeAddress.trim())}&format=json&limit=1&addressdetails=1`,
+        { headers: { 'Accept-Language': 'de' } }
+      );
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const { lat, lon, display_name } = data[0];
+        setHomeLatitude(parseFloat(lat));
+        setHomeLongitude(parseFloat(lon));
+        setHomeAddress(display_name.split(',').slice(0, 3).join(',').trim());
+      } else {
+        setLocationError(t('preferences.addressNotFound', 'Adresse nicht gefunden. Bitte versuche es erneut.'));
+      }
+    } catch {
+      setLocationError(t('preferences.geocodeError', 'Fehler bei der Adresssuche.'));
+    } finally {
+      setIsGeocodingAddress(false);
+    }
+  };
+
   const handleSave = async () => {
     updateCuisines(selectedCuisines);
     updateVibes(selectedVibes);
