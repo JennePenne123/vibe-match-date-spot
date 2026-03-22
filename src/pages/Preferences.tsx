@@ -623,20 +623,15 @@ const Preferences = () => {
                     </Button>
                   </div>
                   {homeLatitude && homeLongitude && (
-                    <>
-                      <div className="p-2.5 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                          <span className="text-xs text-green-800 dark:text-green-300">{homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}</span>
-                        </div>
-                        <Button onClick={clearHomeLocation} variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive h-7 w-7 p-0">
-                          <X className="w-3.5 h-3.5" />
-                        </Button>
+                    <div className="p-2.5 bg-success/10 rounded-lg border border-success/20 flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Check className="w-4 h-4 text-success shrink-0" />
+                        <span className="text-xs text-foreground/80 truncate">{homeAddress || `${homeLatitude.toFixed(4)}, ${homeLongitude.toFixed(4)}`}</span>
                       </div>
-                      <Suspense fallback={<Skeleton className="h-[140px] w-full rounded-lg" />}>
-                        <MapPreview latitude={homeLatitude} longitude={homeLongitude} address={homeAddress} height="140px" zoom={14} />
-                      </Suspense>
-                    </>
+                      <Button type="button" onClick={clearHomeLocation} variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive h-7 w-7 p-0 shrink-0">
+                        <X className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
                   )}
                   {locationError && (
                     <div className="p-2.5 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
