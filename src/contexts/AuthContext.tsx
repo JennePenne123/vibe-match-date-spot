@@ -30,6 +30,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, setUser, session, loading } = useAuthState();
 
+  // Sync Sentry user context
+  useEffect(() => {
+    if (user) {
+      setSentryUser(user.id, user.email);
+    } else {
+      clearSentryUser();
+    }
+  }, [user]);
+
   const signUp = async (email: string, password: string, userData?: any) => {
     return await signUpUser(email, password, userData);
   };
