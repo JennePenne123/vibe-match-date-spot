@@ -23,8 +23,6 @@ interface DateRatingModalProps {
   onSuccess?: () => void;
 }
 
-const overallLabels = ['', 'Schlecht', 'Naja', 'Okay', 'Gut', 'Fantastisch'];
-
 const StarRow = ({
   value,
   onChange,
@@ -53,16 +51,17 @@ const StarRow = ({
   </div>
 );
 
-const weightLabelMap: Record<string, string> = {
-  cuisine: 'Küche',
-  vibe: 'Stimmung',
-  price: 'Preis',
-  rating: 'Bewertungen',
-  distance: 'Entfernung',
-  time: 'Zeitpunkt',
+const WEIGHT_LABEL_KEYS: Record<string, string> = {
+  cuisine: 'rating.weightCuisine',
+  vibe: 'rating.weightVibe',
+  price: 'rating.weightPrice',
+  rating: 'rating.weightRating',
+  distance: 'rating.weightDistance',
+  time: 'rating.weightTime',
 };
 
 const LearningImpactCard: React.FC<{ impact: LearningImpact }> = ({ impact }) => {
+  const { t } = useTranslation();
   const changes = Object.entries(impact.weightChanges || {});
   const hasChanges = changes.length > 0;
 
@@ -75,7 +74,7 @@ const LearningImpactCard: React.FC<{ impact: LearningImpact }> = ({ impact }) =>
     >
       <div className="flex items-center gap-2">
         <Brain className="h-5 w-5 text-primary" />
-        <span className="text-sm font-semibold text-primary">AI hat gelernt!</span>
+        <span className="text-sm font-semibold text-primary">{t('rating.aiLearned')}</span>
       </div>
 
       {hasChanges ? (
@@ -88,21 +87,25 @@ const LearningImpactCard: React.FC<{ impact: LearningImpact }> = ({ impact }) =>
               transition={{ delay: 0.2 }}
               className="flex items-center justify-between text-xs"
             >
-              <span className="text-muted-foreground">{weightLabelMap[key] || key}</span>
+              <span className="text-muted-foreground">{t(WEIGHT_LABEL_KEYS[key] || key)}</span>
               <span className="font-mono text-foreground/80">{change}</span>
             </motion.div>
           ))}
         </div>
       ) : (
         <p className="text-xs text-muted-foreground">
-          Neutrale Bewertung – Gewichtungen bleiben stabil.
+          {t('rating.neutralRating')}
         </p>
       )}
 
       <div className="flex items-center gap-2 pt-1 border-t border-primary/10">
         <TrendingUp className="h-3.5 w-3.5 text-primary/70" />
         <span className="text-xs text-muted-foreground">
-          {impact.totalRatings} Bewertungen · {impact.aiAccuracy}% Genauigkeit · ~{impact.improvementPercent}% besser
+          {t('rating.totalRatingsStats', {
+            total: impact.totalRatings,
+            accuracy: impact.aiAccuracy,
+            improvement: impact.improvementPercent,
+          })}
         </span>
       </div>
     </motion.div>
@@ -124,6 +127,9 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
+
+  const overallLabelKeys = ['', 'rating.overallBad', 'rating.overallMeh', 'rating.overallOkay', 'rating.overallGood', 'rating.overallFantastic'];
+
   const {
     ratingData,
     isSubmitting,
@@ -177,9 +183,9 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
                 >
                   🎉
                 </motion.div>
-                <h3 className="text-lg font-semibold">Danke für dein Feedback!</h3>
+                <h3 className="text-lg font-semibold">{t('rating.thankYou')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Deine nächsten Empfehlungen werden besser sein.
+                  {t('rating.betterNext')}
                 </p>
               </div>
 
@@ -187,14 +193,14 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
 
               <Button onClick={handleClose} className="w-full gap-2">
                 <ArrowRight className="h-4 w-4" />
-                Weiter
+                {t('rating.continue')}
               </Button>
             </motion.div>
           ) : (
             <motion.div key="form" initial={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <DialogHeader>
                 <DialogTitle className="text-center">
-                  {t('rating.title', 'Wie war euer Date?')}
+                  {t('rating.title')}
                 </DialogTitle>
               </DialogHeader>
 
@@ -203,21 +209,18 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
                   <div className="flex items-center justify-center">
                     <Badge variant="secondary" className="gap-1.5 px-3 py-1 text-xs bg-accent/10 text-accent border-accent/20">
                       <Zap className="h-3.5 w-3.5" />
-                      {t('rating.speedBonus', '⚡ Speed-Bonus: +10 Extra-Punkte für schnelle Bewertung!')}
+                      {t('rating.speedBonus')}
                     </Badge>
                   </div>
                 )}
 
                 <p className="text-sm text-center text-muted-foreground">
-                  {t('rating.subtitle', 'Bewerte dein Date mit {{partner}} bei {{venue}}', {
-                    partner: partnerName,
-                    venue: venueName,
-                  })}
+                  {t('rating.subtitle', { partner: partnerName, venue: venueName })}
                 </p>
 
                 <div className="flex flex-col items-center gap-2">
                   <label className="text-sm font-medium">
-                    {t('rating.overallLabel', 'Gesamtbewertung')} *
+                    {t('rating.overallLabel')} *
                   </label>
                   <StarRow
                     value={ratingData.overallRating}
@@ -225,7 +228,7 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
                   />
                   {ratingData.overallRating > 0 && (
                     <span className="text-sm font-medium text-accent animate-fade-in">
-                      {overallLabels[ratingData.overallRating]}
+                      {t(overallLabelKeys[ratingData.overallRating])}
                     </span>
                   )}
                 </div>
@@ -233,12 +236,12 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
                 <div className="border-t border-border" />
 
                 <p className="text-xs text-muted-foreground text-center uppercase tracking-wide">
-                  {t('rating.optionalSection', 'Optional – hilft uns, besser zu werden')}
+                  {t('rating.optionalSection')}
                 </p>
 
                 <div className="flex flex-col items-center gap-2">
                   <label className="text-sm font-medium">
-                    {t('rating.venueLabel', 'Wie war das Venue?')}
+                    {t('rating.venueLabel')}
                   </label>
                   <StarRow
                     value={ratingData.venueRating}
@@ -249,7 +252,7 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
 
                 <div className="flex flex-col items-center gap-2">
                   <label className="text-sm font-medium">
-                    {t('rating.recommendLabel', 'Würdest du das Venue empfehlen?')}
+                    {t('rating.recommendLabel')}
                   </label>
                   <div className="flex gap-3">
                     <button
@@ -283,10 +286,10 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
 
                 <div className="space-y-2">
                   <label className="text-sm text-muted-foreground">
-                    {t('rating.commentLabel', 'Kommentar (optional)')}
+                    {t('rating.commentLabel')}
                   </label>
                   <Textarea
-                    placeholder={t('rating.commentPlaceholder', 'Was hat dir besonders gefallen oder was könnte besser sein?')}
+                    placeholder={t('rating.commentPlaceholder')}
                     value={ratingData.feedbackText}
                     onChange={(e) => updateRatingData({ feedbackText: e.target.value })}
                     className="min-h-[70px] resize-none"
@@ -300,9 +303,7 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
                   className="w-full gap-2"
                 >
                   <Star className="h-4 w-4" />
-                  {isSubmitting
-                    ? t('rating.submitting', 'Wird gespeichert...')
-                    : t('rating.submit', 'Bewertung abgeben')}
+                  {isSubmitting ? t('rating.submitting') : t('rating.submit')}
                 </Button>
               </div>
             </motion.div>
