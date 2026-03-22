@@ -327,7 +327,55 @@ const Preferences = () => {
     finally { setIsLocating(false); }
   };
 
-  const clearHomeLocation = () => { setHomeAddress(''); setHomeLatitude(null); setHomeLongitude(null); setLocationError(''); };
+  const clearHomeLocation = () => { setHomeAddress(''); setHomeLatitude(null); setHomeLongitude(null); setLocationError(''); setSuggestions([]); };
+
+  // Autocomplete suggestions
+  const [suggestions, setSuggestions] = useState<{ display_name: string; lat: string; lon: string }[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const fetchSuggestions = useCallback((query: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (query.trim().length < 2) { setSuggestions([]); setShowSuggestions(false); return; }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query.trim())}&format=json&limit=5&addressdetails=1`,
+          { headers: { 'Accept-Language': 'de' } }
+        );
+        const data = await res.json();
+        if (data?.length > 0) {
+          setSuggestions(data.map((d: any) => ({ display_name: d.display_name, lat: d.lat, lon: d.lon })));
+          setShowSuggestions(true);
+        } else {
+          setSuggestions([]);
+          setShowSuggestions(false);
+        }
+      } catch { setSuggestions([]); }
+    }, 350);
+  }, []);
+
+  const selectSuggestion = (suggestion: { display_name: string; lat: string; lon: string }) => {
+    const shortName = suggestion.display_name.split(',').slice(0, 3).join(',').trim();
+    setHomeAddress(shortName);
+    setHomeLatitude(parseFloat(suggestion.lat));
+    setHomeLongitude(parseFloat(suggestion.lon));
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setLocationError('');
+  };
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   const geocodeAddress = async (event?: React.SyntheticEvent) => {
     event?.preventDefault();
