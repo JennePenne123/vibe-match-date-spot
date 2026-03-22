@@ -138,7 +138,15 @@
     "screen2Title": "Explore Your Area",
     "screen2Desc": "Find hidden gems and popular destinations in your neighborhood. Get personalized recommendations based on your location.",
     "screen3Title": "Connect with Friends",
-    "screen3Desc": "Invite friends, share experiences, and plan group dates together. Make every moment memorable with the people you love."
+    "screen3Desc": "Invite friends, share experiences, and plan group dates together. Make every moment memorable with the people you love.",
+    "goalTitle": "What are you looking for?",
+    "goalSubtitle": "We'll tailor recommendations to your goal.",
+    "goalRomantic": "Romantic Date",
+    "goalRomanticDesc": "Experience something special together",
+    "goalFriends": "Friends Date",
+    "goalFriendsDesc": "Have fun together with friends",
+    "goalNetworking": "Networking",
+    "goalNetworkingDesc": "New contacts in a cool location"
   },
   "profile": {
     "title": "Profile",
