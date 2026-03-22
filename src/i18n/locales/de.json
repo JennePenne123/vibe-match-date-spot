@@ -648,5 +648,41 @@
     "meTime": "Brauch Zeit für mich",
     "meTimeDesc": "Etwas Ruhiges und Entspanntes",
     "skip": "Überspringen"
+  },
+  "dateCancel": {
+    "title": "Date absagen?",
+    "description": "Bist du sicher, dass du dein Date bei {{venue}} absagen möchtest?",
+    "partnerNotified": "{{name}} wird über die Absage informiert.",
+    "yourPartnerNotified": "Dein Partner wird über die Absage informiert.",
+    "cannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "keepDate": "Nein, Date behalten",
+    "confirmCancel": "Ja, Date absagen"
+  },
+  "compatibility": {
+    "title": "Kompatibilitäts-Zusammenfassung",
+    "noPreferences": "Keine Vorlieben gesetzt – bitte Vorlieben festlegen, um Kompatibilität zu sehen",
+    "youMissing": "Du hast noch keine Vorlieben gesetzt – Kompatibilität kann nicht berechnet werden",
+    "partnerMissing": "Dein Partner hat noch keine Vorlieben gesetzt – Kompatibilität kann nicht berechnet werden",
+    "cuisineMatches": "Küchen-Matches",
+    "vibeMatches": "Vibe-Matches",
+    "timeMatches": "Zeit-Matches",
+    "priceMatches": "Preis-Matches"
+  },
+  "dateProposal": {
+    "title": "Date vorschlagen",
+    "subtitle": "Sende einen gemeinsamen Date-Vorschlag an {{name}}",
+    "details": "Vorschlags-Details",
+    "dateTitle": "Date-Titel *",
+    "titlePlaceholder": "z.B. Kaffee und Gespräch",
+    "proposedDate": "Vorgeschlagenes Datum *",
+    "proposedTime": "Vorgeschlagene Uhrzeit *",
+    "messageLabel": "Nachricht (Optional)",
+    "messagePlaceholder": "Füge eine persönliche Nachricht hinzu...",
+    "sending": "Wird gesendet...",
+    "sendProposal": "Vorschlag senden",
+    "missingInfo": "Fehlende Informationen",
+    "fillRequired": "Bitte fülle alle Pflichtfelder aus",
+    "proposalSent": "Vorschlag gesendet!",
+    "proposalSentTo": "Dein Date-Vorschlag wurde an {{name}} gesendet"
   }
 }

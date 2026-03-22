@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,6 +22,7 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
   onProposalSent,
   onBack
 }) => {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [proposedDate, setProposedDate] = useState('');
@@ -34,8 +36,8 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
     
     if (!title || !proposedDate || !proposedTime) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
+        title: t('dateProposal.missingInfo'),
+        description: t('dateProposal.fillRequired'),
         variant: "destructive"
       });
       return;
@@ -46,8 +48,8 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
     
     if (proposal) {
       toast({
-        title: "Proposal Sent!",
-        description: `Your date proposal has been sent to ${recipientName}`,
+        title: t('dateProposal.proposalSent'),
+        description: t('dateProposal.proposalSentTo', { name: recipientName }),
         variant: "default"
       });
       onProposalSent();
@@ -57,9 +59,9 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Propose a Date</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('dateProposal.title')}</h2>
         <p className="text-muted-foreground">
-          Send a collaborative date proposal to {recipientName}
+          {t('dateProposal.subtitle', { name: recipientName })}
         </p>
       </div>
 
@@ -67,25 +69,25 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Date Proposal Details
+            {t('dateProposal.details')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="title">Date Title *</Label>
+              <Label htmlFor="title">{t('dateProposal.dateTitle')}</Label>
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., Coffee and conversation"
+                placeholder={t('dateProposal.titlePlaceholder')}
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="date">Proposed Date *</Label>
+                <Label htmlFor="date">{t('dateProposal.proposedDate')}</Label>
                 <Input
                   id="date"
                   type="date"
@@ -96,7 +98,7 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
                 />
               </div>
               <div>
-                <Label htmlFor="time">Proposed Time *</Label>
+                <Label htmlFor="time">{t('dateProposal.proposedTime')}</Label>
                 <Input
                   id="time"
                   type="time"
@@ -108,12 +110,12 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="message">Message (Optional)</Label>
+              <Label htmlFor="message">{t('dateProposal.messageLabel')}</Label>
               <Textarea
                 id="message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Add a personal message..."
+                placeholder={t('dateProposal.messagePlaceholder')}
                 rows={3}
               />
             </div>
@@ -125,7 +127,7 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
                 onClick={onBack}
                 className="flex-1"
               >
-                Back
+                {t('common.back')}
               </Button>
               <Button
                 type="submit"
@@ -133,11 +135,11 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
                 className="flex-1"
               >
                 {loading ? (
-                  "Sending..."
+                  t('dateProposal.sending')
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-2" />
-                    Send Proposal
+                    {t('dateProposal.sendProposal')}
                   </>
                 )}
               </Button>
