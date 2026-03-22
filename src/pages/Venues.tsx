@@ -58,13 +58,16 @@ const Venues = () => {
     if (saved) setLikedVenues(JSON.parse(saved));
   }, []);
 
-  // Get user's home location on mount
+  // Get user's home location on mount and trigger initial venue search
   useEffect(() => {
     const initLocation = async () => {
       if (!user) return;
       const loc = await getLocationFallback(user.id);
-      setSearchCenter({ lat: loc.latitude, lng: loc.longitude });
+      const center = { lat: loc.latitude, lng: loc.longitude };
+      setSearchCenter(center);
       setActiveCity(loc.address || t('venues.nearYou', 'In deiner Nähe'));
+      // Also trigger external venue search on initial load
+      triggerVenueSearchRef.current?.(center);
     };
     initLocation();
   }, [user, t]);
