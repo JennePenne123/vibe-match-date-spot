@@ -1,16 +1,31 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-export const getActiveVenues = async (limit: number = 50) => {
+export const getActiveVenues = async (
+  limit: number = 50,
+  userLocation?: { latitude: number; longitude: number },
+  radiusKm: number = 25
+) => {
   try {
-    const { data: venues, error: venuesError } = await supabase
+    let query = supabase
       .from('venues')
       .select('*')
-      .eq('is_active', true)
-      .limit(limit);
+      .eq('is_active', true);
 
+    // Filter by bounding box if location is provided
+    if (userLocation?.latitude && userLocation?.longitude) {
+      const latDelta = radiusKm / 111; // ~111km per degree latitude
+      const lngDelta = radiusKm / (111 * Math.cos(userLocation.latitude * Math.PI / 180));
+      query = query
+        .gte('latitude', userLocation.latitude - latDelta)
+        .lte('latitude', userLocation.latitude + latDelta)
+        .gte('longitude', userLocation.longitude - lngDelta)
+        .lte('longitude', userLocation.longitude + lngDelta);
+    }
+
+    const { data: venues, error: venuesError } = await query.limit(limit);
     if (venuesError) throw venuesError;
-    return venues;
+    return venues || [];
   } catch (error) {
     console.error('Error fetching venues:', error);
     return [];
