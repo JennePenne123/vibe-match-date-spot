@@ -648,27 +648,46 @@ const Preferences = () => {
                     {isLocating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.gettingLocation')}</> : <><Navigation className="w-4 h-4 mr-2" />{t('preferences.useCurrentLocation')}</>}
                   </Button>
                   <div className="space-y-2">
-                    <div className="relative">
+                    <div className="relative" ref={suggestionsRef}>
                       <Input
                         type="text"
-                        placeholder={t('preferences.enterAddress')}
+                        placeholder={t('preferences.enterAddress', 'Stadt, Adresse oder Ort eingeben...')}
                         value={homeAddress}
-                        onChange={(e) => setHomeAddress(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') { void geocodeAddress(e); } }}
+                        onChange={(e) => { setHomeAddress(e.target.value); fetchSuggestions(e.target.value); }}
+                        onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); setShowSuggestions(false); void geocodeAddress(e); } }}
                         className="w-full h-11 pl-9 text-sm"
                       />
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      {showSuggestions && suggestions.length > 0 && (
+                        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg overflow-hidden max-h-48 overflow-y-auto">
+                          {suggestions.map((s, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              className="w-full text-left px-3 py-2.5 text-xs hover:bg-accent transition-colors flex items-start gap-2 border-b border-border/50 last:border-0"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => selectSuggestion(s)}
+                            >
+                              <MapPin className="w-3.5 h-3.5 mt-0.5 text-muted-foreground shrink-0" />
+                              <span className="text-foreground/80 line-clamp-2">{s.display_name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <Button
-                      type="button"
-                      onClick={(e) => { void geocodeAddress(e); }}
-                      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                      disabled={!homeAddress.trim() || isGeocodingAddress}
-                      size="sm"
-                      className="w-full h-11"
-                    >
-                      {isGeocodingAddress ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />{t('preferences.confirmLocation', 'Bestätigen')}</>}
-                    </Button>
+                    {!homeLatitude && (
+                      <Button
+                        type="button"
+                        onClick={(e) => { setShowSuggestions(false); void geocodeAddress(e); }}
+                        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        disabled={!homeAddress.trim() || isGeocodingAddress}
+                        size="sm"
+                        className="w-full h-11"
+                      >
+                        {isGeocodingAddress ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />{t('preferences.confirmLocation', 'Bestätigen')}</>}
+                      </Button>
+                    )}
                   </div>
                   {homeLatitude && homeLongitude && (
                     <div className="p-2.5 bg-success/10 rounded-lg border border-success/20 flex items-center justify-between">
@@ -682,8 +701,8 @@ const Preferences = () => {
                     </div>
                   )}
                   {locationError && (
-                    <div className="p-2.5 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
-                      <p className="text-xs text-red-600 dark:text-red-400">{locationError}</p>
+                    <div className="p-2.5 bg-destructive/10 rounded-lg border border-destructive/20">
+                      <p className="text-xs text-destructive">{locationError}</p>
                     </div>
                   )}
                 </div>
