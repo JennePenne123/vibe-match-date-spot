@@ -245,6 +245,7 @@ const Preferences = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === 'true';
+  const initialStep = parseInt(searchParams.get('step') || '0', 10);
   const { t } = useTranslation();
   const { updateCuisines, updateVibes } = useApp();
   const { user } = useAuth();
