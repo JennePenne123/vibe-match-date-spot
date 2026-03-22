@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
@@ -13,7 +13,7 @@ import { getInitials } from '@/lib/utils';
 
 const Friends = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { updateInvitedFriends } = useApp();
   const { friends } = useFriends();
   const [searchParams] = useSearchParams();
@@ -22,8 +22,13 @@ const Friends = () => {
   const [invitedIds, setInvitedIds] = useState<string[]>([]);
   const { toast } = useToast();
 
-  if (!isDemoMode && !user) {
-    navigate('/?auth=required', { replace: true });
+  useEffect(() => {
+    if (!authLoading && !isDemoMode && !user) {
+      navigate('/?auth=required', { replace: true });
+    }
+  }, [authLoading, isDemoMode, user, navigate]);
+
+  if (!authLoading && !isDemoMode && !user) {
     return null;
   }
 
