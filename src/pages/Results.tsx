@@ -163,25 +163,6 @@ const Results = () => {
             <div className="w-10" />
           </div>
         </div>
-              <h1 className="text-xl font-semibold text-foreground">
-                {isFromSmartPlanning ? 'Date Venues' : 'AI Recommendations'}
-              </h1>
-              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                {isFromSmartPlanning ? (
-                  <>
-                    <Users className="w-4 h-4 text-blue-500" />
-                    {recommendations.length} collaborative matches
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 text-purple-500" />
-                    {recommendations.length} perfect matches
-                  </>
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* AI-Powered Results */}
         <div className="p-4">
