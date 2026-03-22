@@ -14,7 +14,7 @@ import { getInitials } from '@/lib/utils';
 const Friends = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { updateInvitedFriends } = useApp();
+  const { updateInvitedFriends, generateRecommendations } = useApp();
   const { friends } = useFriends();
   const [searchParams] = useSearchParams();
   const isDemoMode = searchParams.get('demo') === 'true';
@@ -65,14 +65,16 @@ const Friends = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const finalInvitedIds = isDemoMode ? invitedIds : friends.filter(f => f.isInvited).map(f => f.id);
     updateInvitedFriends(finalInvitedIds);
+    await generateRecommendations();
     navigate(isDemoMode ? '/results?demo=true' : '/results');
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
     updateInvitedFriends([]);
+    await generateRecommendations();
     navigate(isDemoMode ? '/results?demo=true' : '/results');
   };
 
