@@ -648,5 +648,41 @@
     "meTime": "Need some me-time",
     "meTimeDesc": "Something calm and relaxing",
     "skip": "Skip for now"
+  },
+  "dateCancel": {
+    "title": "Cancel this date?",
+    "description": "Are you sure you want to cancel your date at {{venue}}?",
+    "partnerNotified": "{{name}} will be notified about the cancellation.",
+    "yourPartnerNotified": "Your partner will be notified about the cancellation.",
+    "cannotUndo": "This action cannot be undone.",
+    "keepDate": "No, keep date",
+    "confirmCancel": "Yes, cancel date"
+  },
+  "compatibility": {
+    "title": "Compatibility Summary",
+    "noPreferences": "No preferences set for either user – please set preferences to see compatibility",
+    "youMissing": "You haven't set preferences yet – compatibility cannot be calculated",
+    "partnerMissing": "Your partner hasn't set preferences yet – compatibility cannot be calculated",
+    "cuisineMatches": "Cuisine Matches",
+    "vibeMatches": "Vibe Matches",
+    "timeMatches": "Time Matches",
+    "priceMatches": "Price Matches"
+  },
+  "dateProposal": {
+    "title": "Propose a Date",
+    "subtitle": "Send a collaborative date proposal to {{name}}",
+    "details": "Date Proposal Details",
+    "dateTitle": "Date Title *",
+    "titlePlaceholder": "e.g., Coffee and conversation",
+    "proposedDate": "Proposed Date *",
+    "proposedTime": "Proposed Time *",
+    "messageLabel": "Message (Optional)",
+    "messagePlaceholder": "Add a personal message...",
+    "sending": "Sending...",
+    "sendProposal": "Send Proposal",
+    "missingInfo": "Missing Information",
+    "fillRequired": "Please fill in all required fields",
+    "proposalSent": "Proposal Sent!",
+    "proposalSentTo": "Your date proposal has been sent to {{name}}"
   }
 }

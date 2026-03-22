@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,24 +28,28 @@ const DateInviteCancelDialog = ({
   direction,
   onConfirmCancel
 }: DateInviteCancelDialogProps) => {
+  const { t } = useTranslation();
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Cancel this date?</AlertDialogTitle>
+          <AlertDialogTitle>{t('dateCancel.title')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to cancel your date at {venueName}? 
-            {direction === 'received' ? ` ${friendName}` : ' Your partner'} will be notified about the cancellation.
-            This action cannot be undone.
+            {t('dateCancel.description', { venue: venueName })}{' '}
+            {direction === 'received'
+              ? t('dateCancel.partnerNotified', { name: friendName })
+              : t('dateCancel.yourPartnerNotified')}{' '}
+            {t('dateCancel.cannotUndo')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>No, keep date</AlertDialogCancel>
+          <AlertDialogCancel>{t('dateCancel.keepDate')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirmCancel}
             className="bg-red-600 hover:bg-red-700"
           >
-            Yes, cancel date
+            {t('dateCancel.confirmCancel')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
