@@ -607,12 +607,13 @@ const Preferences = () => {
                         placeholder={t('preferences.enterAddress')}
                         value={homeAddress}
                         onChange={(e) => setHomeAddress(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && geocodeAddress()}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); geocodeAddress(); } }}
                         className="w-full h-11 pl-9 text-sm"
                       />
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     </div>
                     <Button
+                      type="button"
                       onClick={geocodeAddress}
                       disabled={!homeAddress.trim() || isGeocodingAddress}
                       size="sm"
