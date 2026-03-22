@@ -1,5 +1,5 @@
 {
-  "common": {"loading":"Cargando...","save":"Guardar","cancel":"Cancelar","back":"Atrás","delete":"Eliminar","edit":"Editar","confirm":"Confirmar","error":"Error","success":"Éxito","signOut":"Cerrar sesión","more":"Más","next":"Siguiente","skip":"Omitir","search":"Buscar","email":"Correo","signIn":"Iniciar sesión","getStarted":"Comenzar","returnHome":"Volver al inicio","saved":"Guardado"},
+  "common": {"loading":"Cargando...","save":"Guardar","cancel":"Cancelar","back":"Atrás","delete":"Eliminar","edit":"Editar","confirm":"Confirmar","error":"Error","success":"Éxito","signOut":"Cerrar sesión","more":"Más","next":"Siguiente","skip":"Omitir","search":"Buscar","email":"Correo","signIn":"Iniciar sesión","getStarted":"Comenzar","returnHome":"Volver al inicio","saved":"Guardado","yes":"Sí","no":"No","unlimited":"Ilimitado","creating":"Creando...","noMinimum":"Sin mínimo"},
   "nav": {"home":"Inicio","planDate":"Planear Cita","profile":"Perfil","chats":"Chats","myFriends":"Mis Amigos","invitations":"Invitaciones","myVenues":"Mis Lugares","navigation":"Navegación"},
   "chats": {"empty":"Sin conversaciones aún. ¡Planea una cita y empieza a chatear!","noResults":"No se encontraron chats","you":"Tú"},
   "chat": {"newDate":"Nueva Cita"},
