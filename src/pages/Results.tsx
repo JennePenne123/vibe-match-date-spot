@@ -116,7 +116,7 @@ const Results = () => {
               )}
               <Button 
                 variant="outline" 
-                onClick={() => navigate('/preferences')}
+                onClick={() => navigate('/preferences?step=2')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Andere Area wählen

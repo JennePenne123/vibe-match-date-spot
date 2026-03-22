@@ -477,7 +477,7 @@ const Preferences = () => {
 
   const activityIconMap: Record<string, string> = { cultural: 'cultural_act', nightlife: 'nightlife_act' };
 
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 2));
   const steps = [
     { title: t('home.wizardStep1'), subtitle: t('home.wizardStep1Desc'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
     { title: t('home.wizardStep2'), subtitle: t('home.wizardStep2Desc'), icon: <HeartHandshake className="w-5 h-5 text-rose-500" /> },
