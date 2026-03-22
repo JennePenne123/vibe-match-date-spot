@@ -265,8 +265,8 @@ const Preferences = () => {
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
   const [locationError, setLocationError] = useState<string>('');
-  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const loadExistingPreferences = async () => {
