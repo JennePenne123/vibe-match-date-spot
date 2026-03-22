@@ -151,14 +151,18 @@ export const useAIAnalysis = () => {
         
         // Use configurable fallback location system
         const fallbackResult = await getLocationFallback(user.id);
-        const fallbackLocation = {
+        if (!fallbackResult) {
+          console.error('❌ AI ANALYSIS: No location available — user must set location');
+          setVenueSearchError('Bitte setze deinen Standort in den Einstellungen, um Venues zu finden.');
+          setVenueRecommendations([]);
+          return;
+        }
+        userLocation = {
           latitude: fallbackResult.latitude,
           longitude: fallbackResult.longitude,
           address: fallbackResult.address
         };
-        
-        console.log('📍 AI ANALYSIS: Using fallback location:', fallbackLocation, '(source:', fallbackResult.source, ')');
-        userLocation = fallbackLocation;
+        console.log('📍 AI ANALYSIS: Using fallback location:', userLocation, '(source:', fallbackResult.source, ')');
       } else {
         console.log('📍 AI ANALYSIS: User location validated:', userLocation);
       }
