@@ -183,40 +183,41 @@ const Venues = () => {
         .eq('user_id', user.id)
         .single();
 
-      const searchPayload = {
-        latitude: center.lat,
-        longitude: center.lng,
-        cuisines: userPrefs?.preferred_cuisines || [],
-        radius: searchRadius * 1000,
-        limit: 40,
-        venueTypes: (userPrefs as any)?.preferred_venue_types || [],
-        activities: (userPrefs as any)?.preferred_activities || [],
-      };
+      const cuisines = userPrefs?.preferred_cuisines || [];
+      const radiusMeters = searchRadius * 1000;
 
-      console.log('🔍 Search payload:', searchPayload);
-
-      const [radarResult, overpassResult] = await Promise.allSettled([
-        supabase.functions.invoke('search-venues-radar', { body: searchPayload }),
-        supabase.functions.invoke('search-venues-overpass', { body: searchPayload }),
-      ]);
-
-      if (radarResult.status === 'rejected') {
-        console.error('❌ Radar venue search failed:', radarResult.reason);
-      } else if (radarResult.value.error) {
-        console.error('❌ Radar venue search returned error:', radarResult.value.error);
-      } else {
-        console.log('✅ Radar result:', radarResult.value.data);
+      // Use client-side Overpass API directly (free, no API key needed)
+      try {
+        const result = await searchVenuesOverpass(center.lat, center.lng, radiusMeters, cuisines, 40);
+        console.log('✅ Overpass client result:', result.count, 'venues found');
+      } catch (err) {
+        console.error('❌ Overpass client search failed:', err);
       }
 
-      if (overpassResult.status === 'rejected') {
-        console.error('❌ Overpass venue search failed:', overpassResult.reason);
-      } else if (overpassResult.value.error) {
-        console.error('❌ Overpass venue search returned error:', overpassResult.value.error);
-      } else {
-        console.log('✅ Overpass result:', overpassResult.value.data);
+      // Also try edge functions as fallback (may not be deployed)
+      try {
+        const searchPayload = {
+          latitude: center.lat,
+          longitude: center.lng,
+          cuisines,
+          radius: radiusMeters,
+          limit: 40,
+          venueTypes: (userPrefs as any)?.preferred_venue_types || [],
+          activities: (userPrefs as any)?.preferred_activities || [],
+        };
+
+        const [radarResult] = await Promise.allSettled([
+          supabase.functions.invoke('search-venues-radar', { body: searchPayload }),
+        ]);
+
+        if (radarResult.status === 'fulfilled' && !radarResult.value.error && radarResult.value.data?.venues?.length) {
+          console.log('✅ Radar result:', radarResult.value.data.count, 'venues');
+        }
+      } catch (err) {
+        console.log('ℹ️ Edge function fallback unavailable:', err);
       }
 
-      // Reload venues after edge functions have inserted data
+      // Reload venues after data insertion
       await loadVenues(center);
     } catch (err) {
       console.error('❌ Venue search failed:', err);
