@@ -65,14 +65,16 @@ const Friends = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const finalInvitedIds = isDemoMode ? invitedIds : friends.filter(f => f.isInvited).map(f => f.id);
     updateInvitedFriends(finalInvitedIds);
+    await generateRecommendations();
     navigate(isDemoMode ? '/results?demo=true' : '/results');
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
     updateInvitedFriends([]);
+    await generateRecommendations();
     navigate(isDemoMode ? '/results?demo=true' : '/results');
   };
 
