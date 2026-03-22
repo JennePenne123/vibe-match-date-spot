@@ -557,22 +557,6 @@ const Preferences = () => {
                 <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
               </AccordionSection>
 
-              <AccordionSection title={t('preferences.preferredNeighborhood', 'Bevorzugte Viertel')} icon={<Building2 className="w-5 h-5 text-violet-500" />} selectedCount={selectedNeighborhoods.length}>
-                <SelectionList items={neighborhoods} selected={selectedNeighborhoods} onToggle={(id) => toggleSelection(id, selectedNeighborhoods, setSelectedNeighborhoods)} />
-              </AccordionSection>
-
-              <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
-                <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
-              </AccordionSection>
-
-              <AccordionSection title={t('preferences.howLong') || 'Dauer'} icon={<Timer className="w-5 h-5 text-teal-500" />} selectedCount={selectedDuration ? 1 : 0}>
-                <SingleSelectionList items={durations} selected={selectedDuration} onToggle={(id) => toggleSingleSelection(id, setSelectedDuration)} />
-              </AccordionSection>
-
-              <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
-                <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
-              </AccordionSection>
-
               <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0}>
                 <div className="space-y-3">
                   <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
@@ -604,6 +588,22 @@ const Preferences = () => {
                     </div>
                   )}
                 </div>
+              </AccordionSection>
+
+              <AccordionSection title={t('preferences.preferredNeighborhood', 'Bevorzugte Viertel')} icon={<Building2 className="w-5 h-5 text-violet-500" />} selectedCount={selectedNeighborhoods.length}>
+                <SelectionList items={neighborhoods} selected={selectedNeighborhoods} onToggle={(id) => toggleSelection(id, selectedNeighborhoods, setSelectedNeighborhoods)} />
+              </AccordionSection>
+
+              <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
+                <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
+              </AccordionSection>
+
+              <AccordionSection title={t('preferences.howLong') || 'Dauer'} icon={<Timer className="w-5 h-5 text-teal-500" />} selectedCount={selectedDuration ? 1 : 0}>
+                <SingleSelectionList items={durations} selected={selectedDuration} onToggle={(id) => toggleSingleSelection(id, setSelectedDuration)} />
+              </AccordionSection>
+
+              <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
+                <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
               </AccordionSection>
             </>
           )}
