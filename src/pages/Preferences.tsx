@@ -10,25 +10,19 @@ import { Input } from '@/components/ui/input';
 import { bowlChopsticks } from '@lucide/lab';
 import { Waves as WavesIcon, Palette as PaletteIcon, Landmark as LandmarkIcon, Gem as GemIcon } from 'lucide-react';
 import {
-  ArrowLeft, ArrowRight, Check, Clock, MapPin, Coffee, Heart, Navigation, Loader2, X,
-  Icon, ChevronDown, Save,
+  ArrowLeft, ArrowRight, Check, Clock, MapPin, Heart, Navigation, Loader2, X,
+  Icon, ChevronDown, Save, HeartHandshake,
   Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup,
-  HeartHandshake, Smile, TreePine, Moon, Theater, Compass,
+  Smile, TreePine, Moon, Theater, Compass,
   PiggyBank, CreditCard, Gem, Crown,
   Sunrise, Sun, CloudSun, Sunset, MoonStar, Clock3,
-  Zap, Hourglass, Timer, Shuffle,
-  Wine, Tent, Martini, Palette, Dumbbell, PartyPopper,
-  Guitar, Headphones, MessageCircle, Gamepad2, Music4, Tv,
   Salad, Sprout, WheatOff, MilkOff, CircleDot, Star,
-  Accessibility, ParkingCircle, TrainFront, Dog, CigaretteOff,
-  Sparkles, Ticket,
-  Landmark, Film, Trophy, Waves, Mountain, Drama,
-  Footprints, Target, Lock, Bike, Building2,
+  Accessibility, ParkingCircle, TrainFront, Dog, CigaretteOff, 
   type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Icon + color mapping
+// Icon + color mapping (slimmed down)
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
   italian:        { icon: Pizza,           bg: 'bg-red-500/15', fg: 'text-red-500' },
   japanese:       { icon: Fish,            bg: 'bg-orange-500/15', fg: 'text-orange-500' },
@@ -56,22 +50,6 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
   dinner:         { icon: Sunset,          bg: 'bg-orange-600/15', fg: 'text-orange-600' },
   evening:        { icon: MoonStar,        bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
   flexible:       { icon: Clock3,          bg: 'bg-slate-400/15', fg: 'text-slate-400' },
-  quick:          { icon: Zap,             bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
-  relaxed:        { icon: Hourglass,       bg: 'bg-teal-500/15', fg: 'text-teal-500' },
-  extended:       { icon: Timer,           bg: 'bg-blue-500/15', fg: 'text-blue-500' },
-  spontaneous:    { icon: Shuffle,         bg: 'bg-purple-400/15', fg: 'text-purple-400' },
-  dining:         { icon: Wine,            bg: 'bg-red-500/15', fg: 'text-red-500' },
-  dining_plus:    { icon: Tent,            bg: 'bg-pink-500/15', fg: 'text-pink-500' },
-  cocktails:      { icon: Martini,         bg: 'bg-violet-500/15', fg: 'text-violet-500' },
-  cultural_act:   { icon: Palette,         bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
-  active:         { icon: Dumbbell,        bg: 'bg-rose-500/15', fg: 'text-rose-500' },
-  nightlife_act:  { icon: PartyPopper,     bg: 'bg-fuchsia-500/15', fg: 'text-fuchsia-500' },
-  live_music:          { icon: Guitar,         bg: 'bg-red-500/15', fg: 'text-red-500' },
-  dj_playlist:         { icon: Headphones,     bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
-  quiet_conversation:  { icon: MessageCircle,  bg: 'bg-sky-500/15', fg: 'text-sky-500' },
-  games:               { icon: Gamepad2,       bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
-  dancing:             { icon: Music4,         bg: 'bg-pink-500/15', fg: 'text-pink-500' },
-  sports_viewing:      { icon: Tv,             bg: 'bg-blue-500/15', fg: 'text-blue-500' },
   vegetarian:     { icon: Salad,           bg: 'bg-green-500/15', fg: 'text-green-500' },
   vegan:          { icon: Sprout,          bg: 'bg-lime-500/15', fg: 'text-lime-500' },
   gluten_free:    { icon: WheatOff,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
@@ -83,32 +61,6 @@ const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: 
   public_transport: { icon: TrainFront,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
   pet_friendly:     { icon: Dog,             bg: 'bg-amber-500/15', fg: 'text-amber-500' },
   non_smoking:      { icon: CigaretteOff,    bg: 'bg-red-500/15', fg: 'text-red-500' },
-  museum:           { icon: Landmark,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
-  gallery:          { icon: Palette,         bg: 'bg-fuchsia-500/15', fg: 'text-fuchsia-500' },
-  theater_venue:    { icon: Drama,           bg: 'bg-purple-500/15', fg: 'text-purple-500' },
-  cinema:           { icon: Film,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
-  concert_hall:     { icon: Music4,          bg: 'bg-rose-500/15', fg: 'text-rose-500' },
-  exhibition:       { icon: Ticket,          bg: 'bg-teal-500/15', fg: 'text-teal-500' },
-  mini_golf:        { icon: Target,          bg: 'bg-green-500/15', fg: 'text-green-500' },
-  bowling:          { icon: Trophy,          bg: 'bg-orange-500/15', fg: 'text-orange-500' },
-  escape_room:      { icon: Lock,            bg: 'bg-indigo-500/15', fg: 'text-indigo-500' },
-  climbing:         { icon: Mountain,        bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
-  swimming:         { icon: Waves,           bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
-  hiking:           { icon: Footprints,      bg: 'bg-lime-500/15', fg: 'text-lime-500' },
-  cycling:          { icon: Bike,            bg: 'bg-sky-500/15', fg: 'text-sky-500' },
-  karaoke:          { icon: Headphones,      bg: 'bg-pink-500/15', fg: 'text-pink-500' },
-  comedy_club:      { icon: Smile,           bg: 'bg-yellow-500/15', fg: 'text-yellow-500' },
-  arcade:           { icon: Gamepad2,        bg: 'bg-violet-500/15', fg: 'text-violet-500' },
-  live_event:       { icon: Sparkles,        bg: 'bg-amber-500/15', fg: 'text-amber-500' },
-  spa_wellness:     { icon: Building2,       bg: 'bg-teal-500/15', fg: 'text-teal-500' },
-  template_romantic: { icon: Heart,          bg: 'bg-pink-500/15', fg: 'text-pink-500' },
-  template_casual:   { icon: Coffee,         bg: 'bg-amber-500/15', fg: 'text-amber-500' },
-  template_trendy:   { icon: Sparkles,       bg: 'bg-violet-500/15', fg: 'text-violet-500' },
-  downtown:          { icon: Building2,      bg: 'bg-violet-500/15', fg: 'text-violet-500' },
-  waterfront:        { icon: WavesIcon,      bg: 'bg-cyan-500/15', fg: 'text-cyan-500' },
-  'arts-district':   { icon: PaletteIcon,    bg: 'bg-pink-500/15', fg: 'text-pink-500' },
-  oldtown:           { icon: LandmarkIcon,   bg: 'bg-amber-500/15', fg: 'text-amber-500' },
-  uptown:            { icon: GemIcon,        bg: 'bg-emerald-500/15', fg: 'text-emerald-500' },
 };
 
 function PrefIcon({ id, size = 'md' }: { id: string; size?: 'sm' | 'md' | 'lg' }) {
@@ -251,13 +203,8 @@ const Preferences = () => {
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState<string[]>([]);
   const [selectedTimePreferences, setSelectedTimePreferences] = useState<string[]>([]);
-  const [selectedDuration, setSelectedDuration] = useState<string>('');
-  const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
-  const [selectedEntertainment, setSelectedEntertainment] = useState<string[]>([]);
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
   const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
-  const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
-  const [selectedNeighborhoods, setSelectedNeighborhoods] = useState<string[]>([]);
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
@@ -284,12 +231,7 @@ const Preferences = () => {
           if (data.preferred_price_range) setSelectedPriceRange(data.preferred_price_range);
           if (data.preferred_times) setSelectedTimePreferences(data.preferred_times);
           if (data.dietary_restrictions) setSelectedDietary(data.dietary_restrictions);
-          if ((data as any).preferred_activities) setSelectedActivities((data as any).preferred_activities);
-          if ((data as any).preferred_entertainment) setSelectedEntertainment((data as any).preferred_entertainment);
-          if ((data as any).preferred_duration) setSelectedDuration((data as any).preferred_duration);
           if ((data as any).accessibility_needs) setSelectedAccessibility((data as any).accessibility_needs);
-          if ((data as any).preferred_venue_types) setSelectedVenueTypes((data as any).preferred_venue_types);
-          if ((data as any).lifestyle_data?.preferred_neighborhoods) setSelectedNeighborhoods((data as any).lifestyle_data.preferred_neighborhoods);
         }
       } catch (error) {
         console.log('No existing preferences found');
@@ -300,10 +242,6 @@ const Preferences = () => {
 
   const toggleSelection = (item: string, selectedItems: string[], setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>) => {
     setSelectedItems(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
-  };
-
-  const toggleSingleSelection = (item: string, setSelectedItem: React.Dispatch<React.SetStateAction<string>>) => {
-    setSelectedItem(prev => prev === item ? '' : item);
   };
 
   const useCurrentLocation = async () => {
@@ -421,12 +359,7 @@ const Preferences = () => {
           preferred_price_range: selectedPriceRange.length > 0 ? selectedPriceRange : null,
           preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
           dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
-          preferred_activities: selectedActivities.length > 0 ? selectedActivities : null,
-          preferred_entertainment: selectedEntertainment.length > 0 ? selectedEntertainment : null,
-          preferred_duration: selectedDuration || null,
           accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
-          preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
-          lifestyle_data: { preferred_neighborhoods: selectedNeighborhoods.length > 0 ? selectedNeighborhoods : null },
         };
         const { data: existing, error: existErr } = await supabase.from('user_preferences').select('id').eq('user_id', currentUserId).maybeSingle();
         if (existErr) throw existErr;
@@ -436,7 +369,7 @@ const Preferences = () => {
         if (mutation.error) throw mutation.error;
         try {
           const { initializePreferenceVectors } = await import('@/services/preferenceInitService');
-          await initializePreferenceVectors(user.id, { cuisines: selectedCuisines, vibes: selectedVibes, priceRange: selectedPriceRange, times: selectedTimePreferences, dietary: selectedDietary, activities: selectedActivities, venueTypes: selectedVenueTypes });
+          await initializePreferenceVectors(user.id, { cuisines: selectedCuisines, vibes: selectedVibes, priceRange: selectedPriceRange, times: selectedTimePreferences, dietary: selectedDietary });
         } catch (e) { console.error('Failed to initialize preference vectors:', e); }
         try { const { awardPoints } = await import('@/services/awardPointsService'); await awardPoints('preferences_set'); } catch (e) { console.error('Failed to award preferences points:', e); }
         toast({ title: t('preferences.prefsSaved'), description: t('preferences.prefsSavedDesc') });
@@ -461,6 +394,7 @@ const Preferences = () => {
     { id: 'chinese', name: t('preferences.cuisine_chinese'), emoji: '🥢' },
     { id: 'korean', name: t('preferences.cuisine_korean'), emoji: '🍲' },
   ];
+
   const vibes: Preference[] = [
     { id: 'romantic', name: t('preferences.vibe_romantic'), emoji: '💕', desc: t('preferences.vibe_romanticDesc') },
     { id: 'casual', name: t('preferences.vibe_casual'), emoji: '😊', desc: t('preferences.vibe_casualDesc') },
@@ -469,12 +403,14 @@ const Preferences = () => {
     { id: 'cultural', name: t('preferences.vibe_cultural'), emoji: '🎭', desc: t('preferences.vibe_culturalDesc') },
     { id: 'adventurous', name: t('preferences.vibe_adventurous'), emoji: '🗺️', desc: t('preferences.vibe_adventurousDesc') },
   ];
+
   const priceRanges: Preference[] = [
     { id: 'budget', name: t('preferences.price_budget'), emoji: '💰', desc: t('preferences.price_budgetDesc') },
     { id: 'moderate', name: t('preferences.price_moderate'), emoji: '💳', desc: t('preferences.price_moderateDesc') },
     { id: 'upscale', name: t('preferences.price_upscale'), emoji: '💎', desc: t('preferences.price_upscaleDesc') },
     { id: 'luxury', name: t('preferences.price_luxury'), emoji: '👑', desc: t('preferences.price_luxuryDesc') },
   ];
+
   const timePreferences: Preference[] = [
     { id: 'brunch', name: t('preferences.time_brunch'), emoji: '🌅', desc: t('preferences.time_brunchDesc') },
     { id: 'lunch', name: t('preferences.time_lunch'), emoji: '☀️', desc: t('preferences.time_lunchDesc') },
@@ -483,28 +419,7 @@ const Preferences = () => {
     { id: 'evening', name: t('preferences.time_evening'), emoji: '🌙', desc: t('preferences.time_eveningDesc') },
     { id: 'flexible', name: t('preferences.time_flexible'), emoji: '🕐', desc: t('preferences.time_flexibleDesc') },
   ];
-  const durations: Preference[] = [
-    { id: 'quick', name: t('preferences.duration_quick'), emoji: '⚡', desc: t('preferences.duration_quickDesc') },
-    { id: 'relaxed', name: t('preferences.duration_relaxed'), emoji: '⏰', desc: t('preferences.duration_relaxedDesc') },
-    { id: 'extended', name: t('preferences.duration_extended'), emoji: '🕐', desc: t('preferences.duration_extendedDesc') },
-    { id: 'spontaneous', name: t('preferences.duration_spontaneous'), emoji: '🤷', desc: t('preferences.duration_spontaneousDesc') },
-  ];
-  const activities: Preference[] = [
-    { id: 'dining', name: t('preferences.activity_dining'), emoji: '🍽️', desc: t('preferences.activity_diningDesc') },
-    { id: 'dining_plus', name: t('preferences.activity_dining_plus'), emoji: '🎪', desc: t('preferences.activity_dining_plusDesc') },
-    { id: 'cocktails', name: t('preferences.activity_cocktails'), emoji: '🍸', desc: t('preferences.activity_cocktailsDesc') },
-    { id: 'cultural', name: t('preferences.activity_cultural'), emoji: '🎨', desc: t('preferences.activity_culturalDesc') },
-    { id: 'active', name: t('preferences.activity_active'), emoji: '🎳', desc: t('preferences.activity_activeDesc') },
-    { id: 'nightlife', name: t('preferences.activity_nightlife'), emoji: '🎉', desc: t('preferences.activity_nightlifeDesc') },
-  ];
-  const entertainment: Preference[] = [
-    { id: 'live_music', name: t('preferences.ent_live_music'), emoji: '🎵' },
-    { id: 'dj_playlist', name: t('preferences.ent_dj_playlist'), emoji: '🎧' },
-    { id: 'quiet_conversation', name: t('preferences.ent_quiet_conversation'), emoji: '💬' },
-    { id: 'games', name: t('preferences.ent_games'), emoji: '🎮' },
-    { id: 'dancing', name: t('preferences.ent_dancing'), emoji: '💃' },
-    { id: 'sports_viewing', name: t('preferences.ent_sports_viewing'), emoji: '📺' },
-  ];
+
   const dietaryRequirements: Preference[] = [
     { id: 'vegetarian', name: t('preferences.dietary_vegetarian'), emoji: '🥬' },
     { id: 'vegan', name: t('preferences.dietary_vegan'), emoji: '🌱' },
@@ -513,6 +428,7 @@ const Preferences = () => {
     { id: 'halal', name: t('preferences.dietary_halal'), emoji: '☪️' },
     { id: 'kosher', name: t('preferences.dietary_kosher'), emoji: '✡️' },
   ];
+
   const accessibilityNeeds: Preference[] = [
     { id: 'wheelchair', name: t('preferences.access_wheelchair'), emoji: '♿' },
     { id: 'parking', name: t('preferences.access_parking'), emoji: '🅿️' },
@@ -520,44 +436,14 @@ const Preferences = () => {
     { id: 'pet_friendly', name: t('preferences.access_pet_friendly'), emoji: '🐕' },
     { id: 'non_smoking', name: t('preferences.access_non_smoking'), emoji: '🚭' },
   ];
-  const allVenueTypes: Preference[] = [
-    { id: 'museum', name: t('preferences.venue_museum'), emoji: '🏛️' },
-    { id: 'gallery', name: t('preferences.venue_gallery'), emoji: '🎨' },
-    { id: 'theater_venue', name: t('preferences.venue_theater'), emoji: '🎭' },
-    { id: 'cinema', name: t('preferences.venue_cinema'), emoji: '🎬' },
-    { id: 'concert_hall', name: t('preferences.venue_concert'), emoji: '🎵' },
-    { id: 'exhibition', name: t('preferences.venue_exhibition'), emoji: '🎟️' },
-    { id: 'mini_golf', name: t('preferences.venue_mini_golf'), emoji: '⛳' },
-    { id: 'bowling', name: t('preferences.venue_bowling'), emoji: '🎳' },
-    { id: 'escape_room', name: t('preferences.venue_escape_room'), emoji: '🔐' },
-    { id: 'climbing', name: t('preferences.venue_climbing'), emoji: '🧗' },
-    { id: 'swimming', name: t('preferences.venue_swimming'), emoji: '🏊' },
-    { id: 'hiking', name: t('preferences.venue_hiking'), emoji: '🥾' },
-    { id: 'cycling', name: t('preferences.venue_cycling'), emoji: '🚴' },
-    { id: 'karaoke', name: t('preferences.venue_karaoke'), emoji: '🎤' },
-    { id: 'comedy_club', name: t('preferences.venue_comedy'), emoji: '😂' },
-    { id: 'arcade', name: t('preferences.venue_arcade'), emoji: '🕹️' },
-    { id: 'live_event', name: t('preferences.venue_live_event'), emoji: '✨' },
-    { id: 'spa_wellness', name: t('preferences.venue_spa'), emoji: '🧖' },
-  ];
-  const neighborhoods: Preference[] = [
-    { id: 'downtown', name: t('preferences.neighborhood_downtown', 'Downtown'), emoji: '🏙️', desc: t('preferences.neighborhood_downtownDesc', 'Trendige Restaurants, Rooftop-Bars & urbanes Nightlife') },
-    { id: 'waterfront', name: t('preferences.neighborhood_waterfront', 'Waterfront'), emoji: '🌊', desc: t('preferences.neighborhood_waterfrontDesc', 'Seafood, Sunset-Spots & entspannte Terrassen') },
-    { id: 'arts-district', name: t('preferences.neighborhood_arts', 'Arts District'), emoji: '🎨', desc: t('preferences.neighborhood_artsDesc', 'Galerien, Live-Musik & kreative Atmosphäre') },
-    { id: 'oldtown', name: t('preferences.neighborhood_oldtown', 'Old Town'), emoji: '🏛️', desc: t('preferences.neighborhood_oldtownDesc', 'Gemütliche Cafés, Weinstuben & historischer Charme') },
-    { id: 'uptown', name: t('preferences.neighborhood_uptown', 'Uptown'), emoji: '💎', desc: t('preferences.neighborhood_uptownDesc', 'Fine Dining, Cocktail-Lounges & gehobenes Ambiente') },
-  ];
 
-  const activityIconMap: Record<string, string> = { cultural: 'cultural_act', nightlife: 'nightlife_act' };
-
-  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 2));
+  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 1));
   const steps = [
-    { title: t('home.wizardStep1'), subtitle: t('home.wizardStep1Desc'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
-    { title: t('home.wizardStep2'), subtitle: t('home.wizardStep2Desc'), icon: <HeartHandshake className="w-5 h-5 text-rose-500" /> },
-    { title: t('home.wizardStep3'), subtitle: t('home.wizardStep3Desc'), icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
+    { title: t('preferences.stepTaste', 'Geschmack'), subtitle: t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
+    { title: t('preferences.stepPractical', 'Praktisches'), subtitle: t('preferences.stepPracticalDesc', 'Budget, Timing & Standort'), icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
   ];
 
-  const canGoNext = step < 2;
+  const canGoNext = step < 1;
   const canGoBack = step > 0;
 
   return (
@@ -574,7 +460,7 @@ const Preferences = () => {
               <p className="text-xs text-muted-foreground">{steps[step].subtitle}</p>
             </div>
             <span className="text-xs font-medium text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-              {step + 1}/3
+              {step + 1}/2
             </span>
           </div>
           {/* Progress bar */}
@@ -600,13 +486,16 @@ const Preferences = () => {
         {/* Step content */}
         <div className="px-4 py-5 space-y-3 pb-6">
 
-          {/* Step 1: Geschmack */}
+          {/* Step 1: Geschmack + Vibes */}
           {step === 0 && (
             <>
               <AccordionSection title={t('preferences.whatCraving') || 'Küche'} icon={<Heart className="w-5 h-5 text-pink-500" />} selectedCount={selectedCuisines.length} defaultOpen>
                 <SelectionGrid items={cuisines} selected={selectedCuisines} onToggle={(id) => toggleSelection(id, selectedCuisines, setSelectedCuisines)} />
               </AccordionSection>
 
+              <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
+                <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
+              </AccordionSection>
 
               <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
                 <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
@@ -614,29 +503,8 @@ const Preferences = () => {
             </>
           )}
 
-          {/* Step 2: Stimmung & Stil */}
+          {/* Step 2: Praktisches */}
           {step === 1 && (
-            <>
-              <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
-                <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
-              </AccordionSection>
-
-              <AccordionSection title={t('preferences.whatActivity') || 'Aktivitäten'} icon={<Coffee className="w-5 h-5 text-orange-500" />} selectedCount={selectedActivities.length}>
-                <SelectionList items={activities} selected={selectedActivities} onToggle={(id) => toggleSelection(id, selectedActivities, setSelectedActivities)} iconMap={activityIconMap} />
-              </AccordionSection>
-
-              <AccordionSection title={t('preferences.whatEntertainment') || 'Entertainment'} icon={<Guitar className="w-5 h-5 text-red-500" />} selectedCount={selectedEntertainment.length}>
-                <SelectionGrid items={entertainment} selected={selectedEntertainment} onToggle={(id) => toggleSelection(id, selectedEntertainment, setSelectedEntertainment)} />
-              </AccordionSection>
-
-              <AccordionSection title={t('preferences.experiences') || 'Erlebnisse'} icon={<Ticket className="w-5 h-5 text-purple-500" />} selectedCount={selectedVenueTypes.length}>
-                <SelectionGrid items={allVenueTypes} selected={selectedVenueTypes} onToggle={(id) => toggleSelection(id, selectedVenueTypes, setSelectedVenueTypes)} columns={3} />
-              </AccordionSection>
-            </>
-          )}
-
-          {/* Step 3: Praktisches */}
-          {step === 2 && (
             <>
               <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length} defaultOpen>
                 <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
@@ -708,16 +576,8 @@ const Preferences = () => {
                 </div>
               </AccordionSection>
 
-              <AccordionSection title={t('preferences.preferredNeighborhood', 'Bevorzugte Viertel')} icon={<Building2 className="w-5 h-5 text-violet-500" />} selectedCount={selectedNeighborhoods.length}>
-                <SelectionList items={neighborhoods} selected={selectedNeighborhoods} onToggle={(id) => toggleSelection(id, selectedNeighborhoods, setSelectedNeighborhoods)} />
-              </AccordionSection>
-
               <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
                 <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
-              </AccordionSection>
-
-              <AccordionSection title={t('preferences.howLong') || 'Dauer'} icon={<Timer className="w-5 h-5 text-teal-500" />} selectedCount={selectedDuration ? 1 : 0}>
-                <SingleSelectionList items={durations} selected={selectedDuration} onToggle={(id) => toggleSingleSelection(id, setSelectedDuration)} />
               </AccordionSection>
 
               <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
