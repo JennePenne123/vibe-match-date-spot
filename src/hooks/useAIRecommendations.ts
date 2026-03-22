@@ -28,6 +28,12 @@ export const useAIRecommendations = (partnerId?: string) => {
       // Get venue recommendations
       console.log('📍 AI RECOMMENDATIONS: Calling getAIVenueRecommendations...');
       const locationFallback = await getLocationFallback(user.id);
+      if (!locationFallback) {
+        console.warn('📍 AI RECOMMENDATIONS: No location available — user must set location');
+        setError('Bitte setze deinen Standort in den Einstellungen, um Venues zu finden.');
+        setLoading(false);
+        return;
+      }
       const userLocation = {
         latitude: locationFallback.latitude,
         longitude: locationFallback.longitude,
