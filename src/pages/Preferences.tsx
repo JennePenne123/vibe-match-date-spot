@@ -525,7 +525,7 @@ const Preferences = () => {
         </div>
 
         {/* Step content */}
-        <div className="px-4 py-5 space-y-3 pb-32">
+        <div className="px-4 py-5 space-y-3 pb-6">
 
           {/* Step 1: Geschmack */}
           {step === 0 && (
