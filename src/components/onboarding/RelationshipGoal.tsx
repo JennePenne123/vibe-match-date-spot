@@ -1,12 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Heart, Users, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const goals = [
+const goalConfigs = [
   {
     id: 'romantic',
-    label: 'Romantisches Date',
-    desc: 'Zu zweit etwas Besonderes erleben',
+    labelKey: 'onboarding.goalRomantic',
+    descKey: 'onboarding.goalRomanticDesc',
     icon: Heart,
     color: 'text-pink-400',
     bgActive: 'bg-pink-500/15 border-pink-500/40',
@@ -14,8 +15,8 @@ const goals = [
   },
   {
     id: 'friends',
-    label: 'Freunde-Date',
-    desc: 'Gemeinsam mit Freunden Spaß haben',
+    labelKey: 'onboarding.goalFriends',
+    descKey: 'onboarding.goalFriendsDesc',
     icon: Users,
     color: 'text-sky-400',
     bgActive: 'bg-sky-500/15 border-sky-500/40',
@@ -23,8 +24,8 @@ const goals = [
   },
   {
     id: 'networking',
-    label: 'Networking',
-    desc: 'Neue Kontakte in cooler Location',
+    labelKey: 'onboarding.goalNetworking',
+    descKey: 'onboarding.goalNetworkingDesc',
     icon: Briefcase,
     color: 'text-amber-400',
     bgActive: 'bg-amber-500/15 border-amber-500/40',
@@ -38,19 +39,21 @@ interface RelationshipGoalProps {
 }
 
 const RelationshipGoal: React.FC<RelationshipGoalProps> = ({ selected, onChange }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-4">
       <div className="text-center mb-6">
         <h2 className="text-xl font-bold text-foreground mb-1.5">
-          Was suchst du?
+          {t('onboarding.goalTitle')}
         </h2>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Wir passen die Empfehlungen an dein Ziel an.
+          {t('onboarding.goalSubtitle')}
         </p>
       </div>
 
       <div className="space-y-3">
-        {goals.map((goal) => {
+        {goalConfigs.map((goal) => {
           const Icon = goal.icon;
           const isActive = selected === goal.id;
 
@@ -77,10 +80,10 @@ const RelationshipGoal: React.FC<RelationshipGoalProps> = ({ selected, onChange 
                   'font-semibold text-sm',
                   isActive ? 'text-foreground' : 'text-foreground/80'
                 )}>
-                  {goal.label}
+                  {t(goal.labelKey)}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {goal.desc}
+                  {t(goal.descKey)}
                 </p>
               </div>
               {isActive && (
