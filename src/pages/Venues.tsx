@@ -59,11 +59,13 @@ const Venues = () => {
   }, []);
 
   // Get user's home location on mount
+  const [initialSearchDone, setInitialSearchDone] = useState(false);
   useEffect(() => {
     const initLocation = async () => {
       if (!user) return;
       const loc = await getLocationFallback(user.id);
-      setSearchCenter({ lat: loc.latitude, lng: loc.longitude });
+      const center = { lat: loc.latitude, lng: loc.longitude };
+      setSearchCenter(center);
       setActiveCity(loc.address || t('venues.nearYou', 'In deiner Nähe'));
     };
     initLocation();
@@ -133,7 +135,14 @@ const Venues = () => {
   }, [user, searchRadius]);
 
   useEffect(() => {
-    if (searchCenter) loadVenues(searchCenter);
+    if (searchCenter) {
+      loadVenues(searchCenter);
+      // Trigger external venue search on first load to populate DB
+      if (!initialSearchDone) {
+        setInitialSearchDone(true);
+        triggerVenueSearch(searchCenter);
+      }
+    }
   }, [searchCenter, loadVenues]);
 
   // Geocode a city name via BigDataCloud (free, no key needed)
