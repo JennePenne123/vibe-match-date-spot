@@ -160,6 +160,7 @@ const Results = () => {
                 )}
               </p>
             </div>
+            <div className="w-10" />
           </div>
         </div>
 
