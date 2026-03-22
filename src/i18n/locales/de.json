@@ -18,7 +18,12 @@
     "signIn": "Anmelden",
     "getStarted": "Jetzt starten",
     "returnHome": "Zurück zur Startseite",
-    "saved": "Gespeichert"
+    "saved": "Gespeichert",
+    "yes": "Ja",
+    "no": "Nein",
+    "unlimited": "Unbegrenzt",
+    "creating": "Erstelle...",
+    "noMinimum": "Kein Minimum"
   },
   "nav": {
     "home": "Home",

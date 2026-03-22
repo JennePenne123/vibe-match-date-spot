@@ -18,7 +18,12 @@
     "signIn": "Sign In",
     "getStarted": "Get Started",
     "returnHome": "Return to Home",
-    "saved": "Saved"
+    "saved": "Saved",
+    "yes": "Yes",
+    "no": "No",
+    "unlimited": "Unlimited",
+    "creating": "Creating...",
+    "noMinimum": "No minimum"
   },
   "nav": {
     "home": "Home",
