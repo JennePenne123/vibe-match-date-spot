@@ -332,7 +332,9 @@ const Preferences = () => {
 
   const clearHomeLocation = () => { setHomeAddress(''); setHomeLatitude(null); setHomeLongitude(null); setLocationError(''); };
 
-  const geocodeAddress = async () => {
+  const geocodeAddress = async (event?: React.SyntheticEvent) => {
+    event?.preventDefault();
+    event?.stopPropagation();
     if (!homeAddress.trim()) return;
     setIsGeocodingAddress(true);
     setLocationError('');
