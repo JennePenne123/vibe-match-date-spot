@@ -3,8 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
-// VAPID public key - will be loaded from environment/secrets
-const VAPID_PUBLIC_KEY = ''; // To be configured
+// VAPID public key from environment
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
 
 interface PushSubscriptionState {
   isSupported: boolean;
