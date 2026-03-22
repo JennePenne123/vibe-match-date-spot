@@ -271,7 +271,7 @@ const Friends = () => {
             onClick={handleNext}
             className="w-full h-12 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold"
           >
-            Next: Choose Area
+            Find Perfect Spots
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
