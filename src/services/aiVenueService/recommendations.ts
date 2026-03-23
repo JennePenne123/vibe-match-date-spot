@@ -383,20 +383,21 @@ const getVenuesFromMultipleSources = async (
 async function getVenuesRadarOverpass(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   // Step 1: Query Radar + Overpass IN PARALLEL for maximum speed
   const promises: Promise<any[]>[] = [];
   
   if (API_CONFIG.useRadar && userLocation) {
-    promises.push(getVenuesFromRadar(userId, limit, userLocation).catch((err) => {
+    promises.push(getVenuesFromRadar(userId, limit, userLocation, radiusMultiplier).catch((err) => {
       console.warn('⚠️ Radar failed:', err instanceof Error ? err.message : 'Unknown');
       return [];
     }));
   }
   
   if (API_CONFIG.useOverpass && userLocation) {
-    promises.push(getVenuesFromOverpass(userId, limit, userLocation).catch((err) => {
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch((err) => {
       console.warn('⚠️ Overpass failed:', err instanceof Error ? err.message : 'Unknown');
       return [];
     }));
@@ -469,10 +470,11 @@ async function getVenuesRadarOverpass(
 async function getVenuesOverpassOnly(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   if (API_CONFIG.useOverpass && userLocation) {
-    return await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
+    return await getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch(() => []);
   }
   return [];
 }
@@ -483,16 +485,17 @@ async function getVenuesOverpassOnly(
 async function getVenuesParallel(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   const promises: Promise<any[]>[] = [];
   
   if (API_CONFIG.useRadar && userLocation) {
-    promises.push(getVenuesFromRadar(userId, limit, userLocation).catch(() => []));
+    promises.push(getVenuesFromRadar(userId, limit, userLocation, radiusMultiplier).catch(() => []));
   }
   
   if (API_CONFIG.useOverpass && userLocation) {
-    promises.push(getVenuesFromOverpass(userId, limit, userLocation).catch(() => []));
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch(() => []));
   }
   
   if (API_CONFIG.useGooglePlaces) {
