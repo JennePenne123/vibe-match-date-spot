@@ -112,37 +112,36 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
     // Score all venues - don't filter out, just rank
     const scoredVenues = venues.map(venue => {
       let score = 0;
-      const maxScore = 100;
+      let maxPossible = 0; // Track what's actually evaluable
       const hasCuisinePrefs = (userPrefs.preferred_cuisines?.length || 0) > 0;
       const hasPricePrefs = (userPrefs.preferred_price_range?.length || 0) > 0;
       const hasVibePrefs = (userPrefs.preferred_vibes?.length || 0) > 0;
 
       // Cuisine matching (40% weight) - strongest signal
-      const cuisineScore = cuisineMatchScore(
-        venue.cuisine_type, 
-        userPrefs.preferred_cuisines || []
-      );
-      if (hasCuisinePrefs) {
-        // Full match: +40, partial: +32, related: +20, no match: -8
+      if (hasCuisinePrefs && venue.cuisine_type) {
+        maxPossible += 40;
+        const cuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
         score += cuisineScore > 0 ? cuisineScore * 40 : -8;
       }
 
       // Price range matching (25% weight)
-      if (hasPricePrefs) {
+      if (hasPricePrefs && venue.price_range) {
+        maxPossible += 25;
         if (userPrefs.preferred_price_range?.includes(venue.price_range)) {
           score += 25;
-        } else if (venue.price_range) {
+        } else {
           const priceOrder = ['$', '$$', '$$$', '$$$$'];
           const venueIdx = priceOrder.indexOf(venue.price_range);
           const prefIdxes = (userPrefs.preferred_price_range || []).map((p: string) => priceOrder.indexOf(p));
           const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
           if (minDist === 1) score += 10;
-          else score -= 5; // Penalty for 2+ price tiers away
+          else score -= 5;
         }
       }
 
       // Vibe/tag matching (15% weight) - fuzzy
-      if (venue.tags && hasVibePrefs) {
+      if (hasVibePrefs && venue.tags && venue.tags.length > 0) {
+        maxPossible += 15;
         const venueTags = venue.tags.map((t: string) => t.toLowerCase());
         const prefVibes = userPrefs.preferred_vibes.map((v: string) => v.toLowerCase());
         const vibeMatches = venueTags.filter((tag: string) => 
@@ -151,12 +150,24 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         if (vibeMatches.length > 0) {
           score += Math.min(15, vibeMatches.length * 8);
         } else {
-          score -= 4; // Penalty when no vibe matches at all
+          // Infer vibes from other attributes
+          let inferred = false;
+          if (prefVibes.includes('casual') && (venue.price_range === '$' || venue.price_range === '$$')) {
+            score += 8;
+            inferred = true;
+          }
+          if (prefVibes.includes('romantic') && (venue.price_range === '$$$' || venue.price_range === '$$$$' ||
+              venue.cuisine_type?.toLowerCase().includes('italian') || venue.cuisine_type?.toLowerCase().includes('french'))) {
+            score += 8;
+            inferred = true;
+          }
+          if (!inferred) score -= 4;
         }
       }
 
-      // Activity matching (10% weight) - NEW
+      // Activity matching (10% weight)
       if (userPrefs.preferred_activities?.length && venue.tags) {
+        maxPossible += 10;
         const activityTagMap: Record<string, string[]> = {
           'dining': ['restaurant', 'dining', 'food'],
           'cocktails': ['bar', 'cocktail', 'drinks', 'lounge'],
@@ -173,7 +184,7 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         if (actMatch) score += 10;
       }
 
-      // Venue type matching (10% weight) - NEW
+      // Venue type matching (10% weight)
       if (userPrefs.preferred_venue_types?.length) {
         const venueTypeKeywords: Record<string, string[]> = {
           'museum': ['museum'], 'gallery': ['gallery', 'galerie'],
@@ -190,18 +201,22 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           const keywords = venueTypeKeywords[vt] || [vt.toLowerCase().replace('_', ' ')];
           return keywords.some(kw => searchText.includes(kw));
         });
-        if (typeMatch) score += 10;
+        if (typeMatch) {
+          maxPossible += 10;
+          score += 10;
+        }
       }
 
       // Rating bonus (10% weight)
-      if (venue.rating && venue.rating >= 4.0) {
-        score += 10;
-      } else if (venue.rating && venue.rating >= 3.5) {
-        score += 5;
+      if (venue.rating) {
+        maxPossible += 10;
+        if (venue.rating >= 4.0) score += 10;
+        else if (venue.rating >= 3.5) score += 5;
       }
 
-      // Dietary compatibility bonus (5%) - NEW
+      // Dietary compatibility bonus (5%)
       if (userPrefs.dietary_restrictions?.length && venue.tags) {
+        maxPossible += 5;
         const searchText = [...venue.tags, venue.description || ''].map((s: string) => s.toLowerCase()).join(' ');
         const dietMatch = (userPrefs.dietary_restrictions as string[]).some((diet: string) => 
           searchText.includes(diet.toLowerCase().replace('_', ' '))
@@ -211,35 +226,30 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
 
       // Area/neighborhood vibe matching (10% weight)
       if (selectedArea && AREA_VIBE_MAP[selectedArea]) {
+        maxPossible += 10;
         const areaConfig = AREA_VIBE_MAP[selectedArea];
         const searchText = [
           ...(venue.tags || []), venue.name || '', venue.description || '', venue.address || '', venue.cuisine_type || ''
         ].map((s: string) => s.toLowerCase()).join(' ');
 
-        // Keyword match (main signal)
         const keywordHits = areaConfig.keywords.filter(kw => searchText.includes(kw));
-        if (keywordHits.length > 0) {
-          score += Math.min(7, keywordHits.length * 3);
-        }
+        if (keywordHits.length > 0) score += Math.min(7, keywordHits.length * 3);
 
-        // Vibe match
         const vibeHits = areaConfig.vibes.filter(v => searchText.includes(v));
-        if (vibeHits.length > 0) {
-          score += Math.min(3, vibeHits.length * 2);
-        }
+        if (vibeHits.length > 0) score += Math.min(3, vibeHits.length * 2);
 
-        // Price hint bonus (subtle)
-        if (areaConfig.priceHint?.includes(venue.price_range)) {
-          score += 2;
-        }
+        if (areaConfig.priceHint?.includes(venue.price_range)) score += 2;
       }
 
-      // Floor: venues with zero matches can go as low as 2%
-      score = Math.max(2, score);
+      // --- NORMALIZED SCORING ---
+      // Normalize score to what was actually evaluable, so sparse data doesn't penalize
+      const effectiveMax = Math.max(maxPossible, 20); // Floor at 20 to avoid inflating tiny data
+      const normalizedScore = Math.max(2, Math.min(100, (score / effectiveMax) * 100));
 
       const scoredVenue = {
         ...venue,
-        preferenceScore: (score / maxScore) * 100
+        preferenceScore: normalizedScore,
+        _debugScoring: { rawScore: score, maxPossible, effectiveMax },
       };
 
       if (!scoredVenue.venue_id && (venue.id || venue.placeId)) {
