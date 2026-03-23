@@ -89,6 +89,25 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
   return 0;
 }
 
+// Map user-facing price labels to venue price symbols
+const PRICE_LABEL_TO_SYMBOL: Record<string, string[]> = {
+  'budget': ['$'],
+  'moderate': ['$', '$$'],
+  'upscale': ['$$', '$$$'],
+  'luxury': ['$$$', '$$$$'],
+};
+
+function normalizePricePreferences(pricePrefs: string[] | null): string[] {
+  if (!pricePrefs?.length) return [];
+  const symbols = new Set<string>();
+  for (const p of pricePrefs) {
+    const mapped = PRICE_LABEL_TO_SYMBOL[p.toLowerCase()];
+    if (mapped) mapped.forEach(s => symbols.add(s));
+    else symbols.add(p); // Already a symbol like "$$"
+  }
+  return Array.from(symbols);
+}
+
 // Filter venues by user preferences to improve matching
 export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string) => {
   try {
@@ -105,9 +124,13 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       return venues;
     }
 
+    // Normalize price preferences from labels to symbols
+    const normalizedPricePrefs = normalizePricePreferences(userPrefs.preferred_price_range as string[] | null);
+
     console.log('🎯 PREFERENCE FILTER: User preferences:', {
       cuisines: userPrefs.preferred_cuisines,
       priceRanges: userPrefs.preferred_price_range,
+      priceSymbols: normalizedPricePrefs,
       vibes: userPrefs.preferred_vibes,
     });
 
