@@ -142,7 +142,7 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       }
 
       // Vibe/tag matching (15% weight) - fuzzy
-      if (venue.tags && userPrefs.preferred_vibes?.length) {
+      if (venue.tags && hasVibePrefs) {
         const venueTags = venue.tags.map((t: string) => t.toLowerCase());
         const prefVibes = userPrefs.preferred_vibes.map((v: string) => v.toLowerCase());
         const vibeMatches = venueTags.filter((tag: string) => 
@@ -150,6 +150,8 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         );
         if (vibeMatches.length > 0) {
           score += Math.min(15, vibeMatches.length * 8);
+        } else {
+          score -= 4; // Penalty when no vibe matches at all
         }
       }
 
