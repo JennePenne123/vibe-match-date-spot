@@ -312,12 +312,17 @@ export function PremiumWalletCard() {
       <div className="h-1 bg-gradient-to-r from-primary via-primary/60 to-accent" />
 
       <CardHeader className="pb-2 pt-4">
-        <CardTitle className="text-base font-medium flex items-center gap-2">
-          <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10">
-            <Wallet className="h-4 w-4 text-primary" />
-          </div>
-          Meine Wallet
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10">
+              <Wallet className="h-4 w-4 text-primary" />
+            </div>
+            Meine Wallet
+          </CardTitle>
+          <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={fetchWalletVouchers} disabled={loading}>
+            <RefreshCw className={cn("h-3.5 w-3.5 text-muted-foreground", loading && "animate-spin")} />
+          </Button>
+        </div>
       </CardHeader>
 
       <CardContent className="pt-0">
