@@ -42,7 +42,7 @@ export interface AIVenueRecommendation {
 export const getAIVenueRecommendations = async (
   userId: string,
   partnerId?: string,
-  limit: number = 10,
+  limit: number = 6,
   userLocation?: { latitude: number; longitude: number; address?: string },
   selectedArea?: string
 ): Promise<AIVenueRecommendation[]> => {
