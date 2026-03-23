@@ -196,7 +196,7 @@ const Preferences = () => {
   const isOnboarding = searchParams.get('onboarding') === 'true';
   const initialStep = parseInt(searchParams.get('step') || '0', 10);
   const { t } = useTranslation();
-  const { updateCuisines, updateVibes } = useApp();
+  const { updateCuisines, updateVibes, updateUserLocation } = useApp();
   const { user } = useAuth();
 
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
@@ -372,6 +372,10 @@ const Preferences = () => {
           await initializePreferenceVectors(user.id, { cuisines: selectedCuisines, vibes: selectedVibes, priceRange: selectedPriceRange, times: selectedTimePreferences, dietary: selectedDietary });
         } catch (e) { console.error('Failed to initialize preference vectors:', e); }
         try { const { awardPoints } = await import('@/services/awardPointsService'); await awardPoints('preferences_set'); } catch (e) { console.error('Failed to award preferences points:', e); }
+        // Sync location to global app state so planner/recommendations use the new city
+        if (homeLatitude && homeLongitude) {
+          updateUserLocation({ latitude: homeLatitude, longitude: homeLongitude, address: homeAddress || undefined });
+        }
         toast({ title: t('preferences.prefsSaved'), description: t('preferences.prefsSavedDesc') });
       } catch (error) {
         console.error('Error saving preferences:', error);

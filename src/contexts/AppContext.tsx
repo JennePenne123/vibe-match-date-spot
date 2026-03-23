@@ -49,6 +49,7 @@ interface AppContextType {
   generateRecommendations: () => Promise<void>;
   resetState: () => void;
   requestLocation: () => Promise<void>;
+  updateUserLocation: (location: UserLocation) => void;
 }
 
 const initialState: AppState = {
@@ -347,6 +348,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAppState(initialState);
   };
 
+  const updateUserLocation = (location: UserLocation) => {
+    console.log('📍 APP STATE: User location updated to:', location.address || `${location.latitude}, ${location.longitude}`);
+    // Invalidate venue cache for old location
+    if (appState.userLocation) {
+      import('@/services/venueCacheService').then(({ venueCacheService }) => {
+        venueCacheService.invalidateLocation(appState.userLocation!.latitude, appState.userLocation!.longitude);
+        console.log('🗑️ APP STATE: Old location cache invalidated');
+      });
+    }
+    setAppState(prev => ({ ...prev, userLocation: location, locationError: null }));
+  };
+
   return (
     <AppContext.Provider value={{
       appState,
@@ -357,7 +370,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateVenues,
       generateRecommendations,
       resetState,
-      requestLocation
+      requestLocation,
+      updateUserLocation
     }}>
       {children}
     </AppContext.Provider>
