@@ -119,7 +119,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 8 | **DSGVO-Update Datenschutzerklärung** | 🟡 Offen | Implizites Tracking dokumentieren, Consent/Opt-Out prüfen |
+| 8 | ~~**DSGVO-Update Datenschutzerklärung**~~ | ✅ Erledigt | Implizites Tracking, Sentry, Foursquare/Radar dokumentiert + Opt-Out Toggle in Settings |
 | 9 | ~~**Sentry Integration**~~ | ✅ Erledigt | Konto (vybepulse.sentry.io), DSN konfiguriert, SDK aktiv |
 | 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner |
 | 11 | ~~**Image-Optimierung**~~ | ✅ Erledigt | lazy loading, decoding=async, fetchPriority auf LCP-Elementen |
