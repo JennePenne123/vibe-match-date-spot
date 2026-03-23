@@ -319,6 +319,56 @@ const Settings = () => {
             </CardContent>
           </Card>
 
+          {/* Privacy & Tracking */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base text-foreground">
+                <Shield className="w-4 h-4 text-primary" />
+                {t('settings.privacyTracking', 'Datenschutz & Tracking')}
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {t('settings.privacyTrackingDesc', 'Kontrolliere, welche Daten zur Verbesserung der Empfehlungen erfasst werden')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium text-foreground">
+                    {t('settings.implicitTracking', 'Implizite Signale')}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {trackingOptOut
+                      ? t('settings.trackingDisabled', 'Verweildauer, Scrolltiefe und Klickmuster werden nicht erfasst')
+                      : t('settings.trackingEnabled', 'Nutzungsverhalten wird zur Verbesserung der AI-Empfehlungen analysiert')
+                    }
+                  </p>
+                </div>
+                <Switch
+                  checked={!trackingOptOut}
+                  onCheckedChange={(checked) => {
+                    const optOut = !checked;
+                    setTrackingOptOut(optOut);
+                    localStorage.setItem(TRACKING_OPT_OUT_KEY, String(optOut));
+                    toast({
+                      title: optOut
+                        ? t('settings.trackingDeactivated', 'Tracking deaktiviert')
+                        : t('settings.trackingActivated', 'Tracking aktiviert'),
+                      description: optOut
+                        ? t('settings.trackingDeactivatedDesc', 'Implizite Signale werden nicht mehr erfasst')
+                        : t('settings.trackingActivatedDesc', 'Implizite Signale verbessern deine Empfehlungen'),
+                    });
+                  }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t('settings.trackingInfo', 'Mehr dazu in unserer')}{' '}
+                <button onClick={() => navigate('/datenschutz')} className="text-primary underline underline-offset-2 hover:text-primary/80">
+                  {t('settings.privacyPolicy', 'Datenschutzerklärung')}
+                </button>
+              </p>
+            </CardContent>
+          </Card>
+
           {/* Pause Account */}
           <Card className={`bg-card ${isPaused ? 'border-amber-500/40' : 'border-border'}`}>
             <CardHeader className="pb-3">
