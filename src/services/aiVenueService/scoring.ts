@@ -26,7 +26,8 @@ const calculateUserScore = (
     }
     
     matches.cuisine = cuisineMatch;
-    const cuisineScore = cuisineMatch ? 0.25 : -0.05;
+    // Cuisine is the strongest signal: big reward for match, real penalty for mismatch
+    const cuisineScore = cuisineMatch ? 0.30 : -0.12;
     score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
   }
 
