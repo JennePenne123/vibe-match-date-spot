@@ -143,23 +143,26 @@ const Friends = () => {
             <div className="bg-gradient-primary rounded-full h-2 w-2/3 transition-all duration-300" />
           </div>
           {/* Action Button */}
-          <Button
-            onClick={handleNext}
-            disabled={isGenerating}
-            className="w-full h-10 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold text-sm"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Venues werden gesucht...
-              </>
-            ) : (
-              <>
-                Find Perfect Spots
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </>
-            )}
-          </Button>
+          {isGenerating ? (
+            <div className="w-full h-24 rounded-xl bg-gradient-primary/10 border border-primary/20 flex flex-col items-center justify-center gap-3 animate-fade-in">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0ms]" />
+                <span className="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:150ms]" />
+                <span className="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:300ms]" />
+              </div>
+              <p className="text-sm font-medium text-primary animate-pulse">
+                Perfekte Spots werden gesucht…
+              </p>
+            </div>
+          ) : (
+            <Button
+              onClick={handleNext}
+              className="w-full h-10 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold text-sm"
+            >
+              Find Perfect Spots
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          )}
         </div>
 
         <div className="px-6 pb-8">
