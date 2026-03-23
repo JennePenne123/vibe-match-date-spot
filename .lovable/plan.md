@@ -181,5 +181,5 @@ DSGVO/Legal:        ████████████████████
 | Venues | Foursquare API + Google Places API |
 | i18n | i18next (6 Sprachen) |
 | PWA | Service Worker + Push Notifications |
-| Monitoring | Error Monitoring Service (Sentry geplant) |
+| Monitoring | Error Monitoring Service + Sentry (aktiv) |
 | Payments | Stripe (geplant) |
