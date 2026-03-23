@@ -18,10 +18,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="VybePulse" />
     
-    <!-- Google Fonts for Design System -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts – preconnect + swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="VybePulse – KI-gestützte Date-Planung" />
@@ -50,6 +50,7 @@
       "url": "https://vybepulse.app",
       "applicationCategory": "LifestyleApplication",
       "operatingSystem": "Web",
+      "inLanguage": "de",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -60,10 +61,19 @@
   </head>
 
   <body>
+    <!-- Skip navigation link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-medium">
+      Zum Inhalt springen
+    </a>
     <div id="root"></div>
+    <noscript>
+      <div style="text-align:center;padding:2rem;font-family:sans-serif;">
+        <h1>VybePulse</h1>
+        <p>Diese App benötigt JavaScript. Bitte aktiviere JavaScript in deinem Browser.</p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Register service worker for push notifications
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
           navigator.serviceWorker.register('/sw.js')

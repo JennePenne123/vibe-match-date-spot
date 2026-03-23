@@ -96,12 +96,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </header>
         )}
 
-        <div
+        <main
+          id="main-content"
           style={getContentStyle()}
           className={cn("will-change-transform", isAdminRoute && "overflow-x-hidden")}
         >
           {children}
-        </div>
+        </main>
 
         {isPartnerRoute ? (
           <PartnerMobileBottomNav />
@@ -137,7 +138,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </header>
 
           {/* Main content area */}
-          <main className="flex-1 overflow-auto">
+          <main id="main-content" className="flex-1 overflow-auto">
             <div className={cn(
               "h-full",
               isDesktop ? "p-6" : "p-4"
