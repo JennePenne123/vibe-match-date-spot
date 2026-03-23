@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +41,7 @@ const SystemHealth: React.FC = () => {
         .limit(500);
       return data || [];
     },
-    staleTime: 60_000,
+    staleTime: STALE_TIMES.ADMIN,
   });
 
   // Error logs
@@ -55,7 +56,7 @@ const SystemHealth: React.FC = () => {
         .limit(200);
       return data || [];
     },
-    staleTime: 60_000,
+    staleTime: STALE_TIMES.ADMIN,
   });
 
   // API cost trend
@@ -91,7 +92,7 @@ const SystemHealth: React.FC = () => {
         cacheRate: stats.calls > 0 ? Math.round((stats.cacheHits / stats.calls) * 100) : 0,
       }));
     },
-    staleTime: 120_000,
+    staleTime: STALE_TIMES.ADMIN_ANALYTICS,
   });
 
   // Sessions

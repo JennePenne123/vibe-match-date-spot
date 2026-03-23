@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -63,7 +64,7 @@ const AdminAnalytics: React.FC = () => {
         };
       });
     },
-    staleTime: 120_000,
+    staleTime: STALE_TIMES.ADMIN_ANALYTICS,
   });
 
   // Date activity trend
@@ -96,7 +97,7 @@ const AdminAnalytics: React.FC = () => {
         ...counts,
       }));
     },
-    staleTime: 120_000,
+    staleTime: STALE_TIMES.ADMIN_ANALYTICS,
   });
 
   // API usage by service
@@ -129,7 +130,7 @@ const AdminAnalytics: React.FC = () => {
         avgTime: stats.times.length > 0 ? Math.round(stats.times.reduce((a, b) => a + b, 0) / stats.times.length) : 0,
       }));
     },
-    staleTime: 120_000,
+    staleTime: STALE_TIMES.ADMIN_ANALYTICS,
   });
 
   // Dates by status (pie)
@@ -149,7 +150,7 @@ const AdminAnalytics: React.FC = () => {
 
       return Array.from(statusCount.entries()).map(([name, value]) => ({ name, value }));
     },
-    staleTime: 120_000,
+    staleTime: STALE_TIMES.ADMIN_ANALYTICS,
   });
 
   // Engagement summary stats
