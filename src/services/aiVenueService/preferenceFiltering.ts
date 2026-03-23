@@ -67,21 +67,23 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
   if (preferredCuisines.some(c => c.toLowerCase().trim() === vc)) return 1.0;
   
   // Partial / contains match (e.g. "Italian Restaurant" matches "Italian")
-  if (preferredCuisines.some(c => vc.includes(c.toLowerCase()) || c.toLowerCase().includes(vc))) return 0.8;
+  if (preferredCuisines.some(c => vc.includes(c.toLowerCase()) || c.toLowerCase().includes(vc))) return 0.9;
   
-  // Related cuisine groups
+  // Related cuisine groups - higher score for same family
   const cuisineGroups: Record<string, string[]> = {
-    'asian': ['chinese', 'japanese', 'thai', 'korean', 'vietnamese', 'asian', 'sushi', 'ramen', 'wok'],
-    'european': ['italian', 'french', 'spanish', 'greek', 'mediterranean', 'german', 'portuguese'],
+    'asian': ['chinese', 'japanese', 'thai', 'korean', 'vietnamese', 'asian', 'sushi', 'ramen', 'wok', 'dim sum', 'curry'],
+    'european': ['italian', 'french', 'spanish', 'greek', 'mediterranean', 'german', 'portuguese', 'european'],
     'american': ['american', 'burger', 'bbq', 'steakhouse', 'diner', 'grill'],
-    'cafe': ['café', 'cafe', 'coffee', 'bakery', 'brunch', 'breakfast'],
-    'bar': ['bar', 'pub', 'cocktail', 'wine bar', 'lounge'],
+    'cafe': ['café', 'cafe', 'coffee', 'bakery', 'brunch', 'breakfast', 'patisserie'],
+    'bar': ['bar', 'pub', 'cocktail', 'wine bar', 'lounge', 'biergarten'],
+    'middle_eastern': ['turkish', 'persian', 'lebanese', 'arabic', 'falafel', 'kebab', 'döner'],
+    'latin': ['mexican', 'brazilian', 'peruvian', 'argentinian', 'tapas'],
   };
   
   for (const [, members] of Object.entries(cuisineGroups)) {
     const venueInGroup = members.some(m => vc.includes(m));
     const prefInGroup = preferredCuisines.some(p => members.some(m => p.toLowerCase().includes(m)));
-    if (venueInGroup && prefInGroup) return 0.5;
+    if (venueInGroup && prefInGroup) return 0.7;
   }
   
   return 0;
@@ -109,59 +111,128 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       vibes: userPrefs.preferred_vibes,
     });
 
+    // Infer vibes from cuisine type to enrich sparse venue data
+    const CUISINE_VIBE_INFERENCE: Record<string, string[]> = {
+      'italian': ['romantic', 'casual', 'cozy'],
+      'french': ['romantic', 'elegant', 'upscale'],
+      'thai': ['casual', 'adventurous', 'exotic'],
+      'chinese': ['casual', 'adventurous', 'family-friendly'],
+      'japanese': ['trendy', 'modern', 'casual'],
+      'mediterranean': ['casual', 'outdoor', 'relaxed'],
+      'mexican': ['casual', 'lively', 'fun'],
+      'indian': ['adventurous', 'casual', 'exotic'],
+      'german': ['casual', 'cozy', 'traditional'],
+      'american': ['casual', 'fun', 'lively'],
+      'korean': ['trendy', 'adventurous', 'casual'],
+      'vietnamese': ['casual', 'adventurous', 'trendy'],
+    };
+
+    // Infer price range from cuisine type
+    const CUISINE_PRICE_INFERENCE: Record<string, string[]> = {
+      'italian': ['$$', '$$$'],
+      'french': ['$$$', '$$$$'],
+      'thai': ['$', '$$'],
+      'chinese': ['$', '$$'],
+      'japanese': ['$$', '$$$'],
+      'mediterranean': ['$$', '$$$'],
+      'mexican': ['$', '$$'],
+      'german': ['$$'],
+      'american': ['$$'],
+    };
+
     // Score all venues - don't filter out, just rank
     const scoredVenues = venues.map(venue => {
       let score = 0;
       let maxPossible = 0; // Track what's actually evaluable
+      let primaryMatchFound = false; // Track if main signal matches
       const hasCuisinePrefs = (userPrefs.preferred_cuisines?.length || 0) > 0;
       const hasPricePrefs = (userPrefs.preferred_price_range?.length || 0) > 0;
       const hasVibePrefs = (userPrefs.preferred_vibes?.length || 0) > 0;
+
+      // === PREFERENCE-BASED TAG ENRICHMENT ===
+      // Infer missing venue attributes from what we know
+      const venueCuisine = (venue.cuisine_type || '').toLowerCase();
+      let inferredVibes: string[] = [];
+      let inferredPriceRange: string[] = [];
+
+      for (const [cuisine, vibes] of Object.entries(CUISINE_VIBE_INFERENCE)) {
+        if (venueCuisine.includes(cuisine)) {
+          inferredVibes = vibes;
+          break;
+        }
+      }
+      for (const [cuisine, prices] of Object.entries(CUISINE_PRICE_INFERENCE)) {
+        if (venueCuisine.includes(cuisine)) {
+          inferredPriceRange = prices;
+          break;
+        }
+      }
 
       // Cuisine matching (40% weight) - strongest signal
       if (hasCuisinePrefs && venue.cuisine_type) {
         maxPossible += 40;
         const cuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
-        score += cuisineScore > 0 ? cuisineScore * 40 : -8;
-      }
-
-      // Price range matching (25% weight)
-      if (hasPricePrefs && venue.price_range) {
-        maxPossible += 25;
-        if (userPrefs.preferred_price_range?.includes(venue.price_range)) {
-          score += 25;
+        if (cuisineScore > 0) {
+          score += cuisineScore * 40;
+          primaryMatchFound = true;
         } else {
-          const priceOrder = ['$', '$$', '$$$', '$$$$'];
-          const venueIdx = priceOrder.indexOf(venue.price_range);
-          const prefIdxes = (userPrefs.preferred_price_range || []).map((p: string) => priceOrder.indexOf(p));
-          const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
-          if (minDist === 1) score += 10;
-          else score -= 5;
+          score -= 5; // Reduced penalty (was -8)
         }
       }
 
-      // Vibe/tag matching (15% weight) - fuzzy
-      if (hasVibePrefs && venue.tags && venue.tags.length > 0) {
+      // Price range matching (25% weight) - use inferred price if missing
+      const effectivePrice = venue.price_range || (inferredPriceRange.length > 0 ? inferredPriceRange[0] : null);
+      if (hasPricePrefs && effectivePrice) {
+        maxPossible += 25;
+        if (userPrefs.preferred_price_range?.includes(effectivePrice)) {
+          score += 25;
+        } else {
+          const priceOrder = ['$', '$$', '$$$', '$$$$'];
+          const venueIdx = priceOrder.indexOf(effectivePrice);
+          const prefIdxes = (userPrefs.preferred_price_range || []).map((p: string) => priceOrder.indexOf(p));
+          const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
+          if (minDist === 1) score += 15; // Adjacent price (was 10)
+          else score -= 3; // Reduced penalty (was -5)
+        }
+      }
+
+      // Vibe/tag matching (15% weight) - use inferred vibes for sparse data
+      if (hasVibePrefs) {
         maxPossible += 15;
-        const venueTags = venue.tags.map((t: string) => t.toLowerCase());
+        const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase());
+        const allVibes = [...venueTags, ...inferredVibes]; // Enrich with inferred vibes
         const prefVibes = userPrefs.preferred_vibes.map((v: string) => v.toLowerCase());
-        const vibeMatches = venueTags.filter((tag: string) => 
+        const vibeMatches = allVibes.filter((tag: string) => 
           prefVibes.some((vibe: string) => tag.includes(vibe) || vibe.includes(tag))
         );
         if (vibeMatches.length > 0) {
-          score += Math.min(15, vibeMatches.length * 8);
+          score += Math.min(15, vibeMatches.length * 6);
         } else {
-          // Infer vibes from other attributes
+          // Soft inference from price/cuisine as last resort
           let inferred = false;
-          if (prefVibes.includes('casual') && (venue.price_range === '$' || venue.price_range === '$$')) {
-            score += 8;
+          if (prefVibes.includes('casual') && (effectivePrice === '$' || effectivePrice === '$$')) {
+            score += 10;
             inferred = true;
           }
-          if (prefVibes.includes('romantic') && (venue.price_range === '$$$' || venue.price_range === '$$$$' ||
-              venue.cuisine_type?.toLowerCase().includes('italian') || venue.cuisine_type?.toLowerCase().includes('french'))) {
-            score += 8;
+          if (prefVibes.includes('romantic') && (effectivePrice === '$$$' || effectivePrice === '$$$$' ||
+              venueCuisine.includes('italian') || venueCuisine.includes('french'))) {
+            score += 10;
             inferred = true;
           }
-          if (!inferred) score -= 4;
+          if (prefVibes.includes('adventurous') && (
+            venueCuisine.includes('thai') || venueCuisine.includes('chinese') || 
+            venueCuisine.includes('korean') || venueCuisine.includes('indian') ||
+            venueCuisine.includes('vietnamese') || venueCuisine.includes('japanese'))) {
+            score += 10;
+            inferred = true;
+          }
+          if (prefVibes.includes('outdoor') && venueTags.some((t: string) => 
+            t.includes('outdoor') || t.includes('terrace') || t.includes('garden') || 
+            t.includes('biergarten') || t.includes('terrasse'))) {
+            score += 10;
+            inferred = true;
+          }
+          if (!inferred) score -= 2; // Very mild penalty (was -4)
         }
       }
 
@@ -241,15 +312,38 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         if (areaConfig.priceHint?.includes(venue.price_range)) score += 2;
       }
 
-      // --- NORMALIZED SCORING ---
-      // Normalize score to what was actually evaluable, so sparse data doesn't penalize
-      const effectiveMax = Math.max(maxPossible, 20); // Floor at 20 to avoid inflating tiny data
+      // === PRIMARY MATCH BOOST ===
+      // If the strongest signal (cuisine) matches well, ensure a minimum score floor
+      // This prevents good matches from being dragged down by sparse secondary data
+      if (primaryMatchFound) {
+        const cuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
+        const matchFloor = cuisineScore >= 0.9 ? 65 : cuisineScore >= 0.7 ? 55 : 45;
+        // Normalize, then apply floor
+        const effectiveMax = Math.max(maxPossible, 20);
+        const rawNormalized = Math.max(2, (score / effectiveMax) * 100);
+        const normalizedScore = Math.max(rawNormalized, matchFloor);
+        
+        const scoredVenue = {
+          ...venue,
+          preferenceScore: Math.min(98, normalizedScore),
+          _debugScoring: { rawScore: score, maxPossible, effectiveMax, matchFloor, primaryMatchFound },
+        };
+
+        if (!scoredVenue.venue_id && (venue.id || venue.placeId)) {
+          scoredVenue.venue_id = venue.id || venue.placeId;
+        }
+
+        return scoredVenue;
+      }
+
+      // --- NORMALIZED SCORING (no primary match) ---
+      const effectiveMax = Math.max(maxPossible, 20);
       const normalizedScore = Math.max(2, Math.min(100, (score / effectiveMax) * 100));
 
       const scoredVenue = {
         ...venue,
         preferenceScore: normalizedScore,
-        _debugScoring: { rawScore: score, maxPossible, effectiveMax },
+        _debugScoring: { rawScore: score, maxPossible, effectiveMax, primaryMatchFound },
       };
 
       if (!scoredVenue.venue_id && (venue.id || venue.placeId)) {
