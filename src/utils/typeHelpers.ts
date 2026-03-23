@@ -55,6 +55,6 @@ export const getVenueDistance = (venue: any): string => {
   return venue?.distance ?? '0.5 mi';
 };
 
-export const getVenueMatchScore = (venue: any): number => {
-  return venue?.matchScore ?? Math.floor(Math.random() * 30) + 70;
+export const getVenueMatchScore = (venue: any): number | undefined => {
+  return venue?.matchScore ?? undefined;
 };
