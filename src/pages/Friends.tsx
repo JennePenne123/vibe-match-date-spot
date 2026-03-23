@@ -145,10 +145,20 @@ const Friends = () => {
           {/* Action Button */}
           <Button
             onClick={handleNext}
+            disabled={isGenerating}
             className="w-full h-10 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold text-sm"
           >
-            Find Perfect Spots
-            <ArrowRight className="w-4 h-4 ml-2" />
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Venues werden gesucht...
+              </>
+            ) : (
+              <>
+                Find Perfect Spots
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
         </div>
 
