@@ -437,9 +437,11 @@ export const filterVenuesByCollaborativePreferences = async (
         sharedScore += 50 * Math.min(userCuisineScore, partnerCuisineScore);
       }
 
-      // Price matching
-      const userPriceMatch = userPrefs.preferred_price_range?.includes(venue.price_range);
-      const partnerPriceMatch = partnerPrefs.preferred_price_range?.includes(venue.price_range);
+      // Price matching - normalize labels to symbols
+      const userNormalizedPrices = normalizePricePreferences(userPrefs.preferred_price_range as string[] | null);
+      const partnerNormalizedPrices = normalizePricePreferences(partnerPrefs.preferred_price_range as string[] | null);
+      const userPriceMatch = venue.price_range && userNormalizedPrices.includes(venue.price_range);
+      const partnerPriceMatch = venue.price_range && partnerNormalizedPrices.includes(venue.price_range);
       if (userPriceMatch) userScore += 30;
       if (partnerPriceMatch) partnerScore += 30;
       if (userPriceMatch && partnerPriceMatch) sharedScore += 30;
