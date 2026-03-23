@@ -156,7 +156,7 @@ export const usePipelineVisualization = () => {
       const recommendations = await getAIVenueRecommendations(
         userId, 
         partnerId, 
-        10, 
+        6, 
         resolvedLocation
       );
       
