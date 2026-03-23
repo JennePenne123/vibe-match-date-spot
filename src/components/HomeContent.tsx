@@ -194,6 +194,9 @@ const HomeContent: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Feedback Impact Banner */}
+        <FeedbackImpactBanner />
+
         {/* Pending ratings — compact, above fold */}
         <PendingRatingsCard />
 
