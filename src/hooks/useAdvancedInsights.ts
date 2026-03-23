@@ -14,7 +14,7 @@ export const useAdvancedInsights = () => {
     queryKey: ['ai-insights', user?.id],
     queryFn: () => user ? getAIInsights(user.id) : null,
     enabled: !!user,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: STALE_TIMES.DYNAMIC, // 5 minutes
     refetchOnWindowFocus: false,
   });
 
