@@ -234,8 +234,8 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         }
       }
 
-      // Base score - every venue gets at least 5 points
-      score = Math.max(5, score);
+      // Floor: venues with zero matches can go as low as 2%
+      score = Math.max(2, score);
 
       const scoredVenue = {
         ...venue,

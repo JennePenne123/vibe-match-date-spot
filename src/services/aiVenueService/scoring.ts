@@ -373,7 +373,8 @@ export const calculateVenueAIScore = async (
     
     // Final AI score (0-100 scale)
     const rawScore = (baseScore + weightedContextual + moodModifier + confidenceBoost + implicitBoost) * 100;
-    const finalScore = Math.max(35, Math.min(98, rawScore));
+    // Floor lowered to 10 so poorly matching venues are clearly distinguishable
+    const finalScore = Math.max(10, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
       venue: venue.name,
