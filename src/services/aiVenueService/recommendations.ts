@@ -332,14 +332,34 @@ const getVenuesFromMultipleSources = async (
   }
 
   const strategy = API_CONFIG.venueSearchStrategy;
+  const MIN_VENUES_THRESHOLD = 6;
+  const RADIUS_MULTIPLIERS = [1, 1.5, 2.5]; // Progressive radius expansion
   let venues: any[] = [];
   
-  if (strategy === 'radar-overpass') {
-    venues = await getVenuesRadarOverpass(userId, limit, userLocation);
-  } else if (strategy === 'overpass-only') {
-    venues = await getVenuesOverpassOnly(userId, limit, userLocation);
-  } else {
-    venues = await getVenuesParallel(userId, limit, userLocation);
+  for (const multiplier of RADIUS_MULTIPLIERS) {
+    // Expand search location by increasing the radius via user preferences override
+    const expandedLocation = multiplier > 1 
+      ? { ...userLocation!, _radiusMultiplier: multiplier } 
+      : userLocation;
+    
+    if (strategy === 'radar-overpass') {
+      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier);
+    } else if (strategy === 'overpass-only') {
+      venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier);
+    } else {
+      venues = await getVenuesParallel(userId, limit, expandedLocation, multiplier);
+    }
+    
+    if (venues.length >= MIN_VENUES_THRESHOLD) {
+      if (multiplier > 1) {
+        console.log(`📡 RADIUS FALLBACK: Found ${venues.length} venues at ${multiplier}x radius`);
+      }
+      break;
+    }
+    
+    if (multiplier < RADIUS_MULTIPLIERS[RADIUS_MULTIPLIERS.length - 1]) {
+      console.log(`📡 RADIUS FALLBACK: Only ${venues.length} venues at ${multiplier}x radius, expanding to ${RADIUS_MULTIPLIERS[RADIUS_MULTIPLIERS.indexOf(multiplier) + 1]}x...`);
+    }
   }
   
   // Store in cache after fetching — now includes preferences in key
