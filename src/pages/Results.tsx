@@ -208,14 +208,17 @@ const Results = () => {
           {/* AIVenueCard Components */}
           <div className="space-y-6">
             {recommendations.map((recommendation, index) => {
-              const isTop3 = index < 3;
+              // Only show Top badge if quality-verified by the engine (≥80% score)
+              const isQualityVerified = (recommendation as any).qualityVerified === true;
+              const qualityRank = (recommendation as any).qualityRank as number | undefined;
+              const isTop3 = isQualityVerified && qualityRank !== undefined && qualityRank <= 3;
               const venueVouchers = isTop3 && isPremium 
                 ? (vouchers.get(recommendation.venue_id) || []) 
                 : [];
               
               return (
                 <div key={recommendation.venue_id} className="relative">
-                  {/* Top 3 Premium Badge */}
+                  {/* Top 3 Premium Badge — only for quality-verified venues */}
                   {isTop3 && (
                     <div className="absolute -top-2 -left-1 z-10">
                       <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold shadow-md ${
@@ -226,12 +229,12 @@ const Results = () => {
                         {isPremium ? (
                           <>
                             <Crown className="w-3 h-3" />
-                            Top {index + 1} Match
+                            Top {qualityRank} Match
                           </>
                         ) : (
                           <>
                             <Lock className="w-3 h-3" />
-                            Top {index + 1}
+                            Top {qualityRank}
                           </>
                         )}
                       </div>
