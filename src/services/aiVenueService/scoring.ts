@@ -37,7 +37,7 @@ const calculateUserScore = (
     
     if (priceMatch) {
       matches.price = true;
-      score += applyWeight(0.18, weights.price, 'price');
+      score += applyWeight(0.22, weights.price, 'price');
     } else {
       matches.price = false;
       score += applyWeight(-0.06, weights.price, 'price');
