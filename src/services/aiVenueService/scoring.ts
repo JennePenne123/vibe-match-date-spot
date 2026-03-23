@@ -9,7 +9,7 @@ const calculateUserScore = (
   venue: any,
   weights: { cuisine: number; price: number; vibe: number; rating: number; time: number }
 ): { score: number; matches: { cuisine: boolean; price: boolean; vibes: string[]; activities: string[]; venueType: boolean; dietary: boolean; time: boolean } } => {
-  let score = 0.10; // Very low baseline — venues must EARN their score through preference matches
+  let score = 0.15; // Low baseline — venues must EARN their score through preference matches
   const matches = { cuisine: false, price: false, vibes: [] as string[], activities: [] as string[], venueType: false, dietary: false, time: false };
 
   // Cuisine matching with learned weight (25%)
@@ -27,7 +27,7 @@ const calculateUserScore = (
     
     matches.cuisine = cuisineMatch;
     // Cuisine is the strongest signal: big reward for match, real penalty for mismatch
-    const cuisineScore = cuisineMatch ? 0.30 : -0.12;
+    const cuisineScore = cuisineMatch ? 0.35 : -0.10;
     score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
   }
 
@@ -37,7 +37,7 @@ const calculateUserScore = (
     
     if (priceMatch) {
       matches.price = true;
-      score += applyWeight(0.18, weights.price, 'price');
+      score += applyWeight(0.22, weights.price, 'price');
     } else {
       matches.price = false;
       score += applyWeight(-0.06, weights.price, 'price');
@@ -73,7 +73,7 @@ const calculateUserScore = (
     
     matches.vibes = vibeMatches;
     // More vibe matches = stronger signal; no matches = slight penalty
-    const vibeScore = vibeMatches.length > 0 ? vibeMatches.length * 0.10 : -0.04;
+    const vibeScore = vibeMatches.length > 0 ? vibeMatches.length * 0.12 : -0.04;
     score += applyWeight(vibeScore, weights.vibe, 'vibe');
   }
 
