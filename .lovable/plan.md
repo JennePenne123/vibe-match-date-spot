@@ -137,7 +137,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 18 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
 | 19 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
 | 20 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
-| 21 | **DSGVO Opt-Out für implizite Signale** | Klein | Toggle in Settings zum Deaktivieren von Tracking |
+| 21 | ~~**DSGVO Opt-Out für implizite Signale**~~ | ✅ Erledigt | Toggle in Settings + localStorage-Opt-Out im implicitSignalsService |
 | 22 | **Feedback-Impact-Anzeige** | Klein | Hinweis auf Home wenn sich Empfehlungen durch Feedback verändert haben |
 
 ---
