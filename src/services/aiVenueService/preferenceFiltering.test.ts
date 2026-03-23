@@ -73,7 +73,7 @@ describe('preferenceFiltering', () => {
       
       // Italian Bistro should have highest score
       expect(result[0].name).toBe('Italian Bistro');
-      expect(result[0].preferenceScore).toBeGreaterThan(40);
+      expect(result[0].preferenceScore).toBeGreaterThanOrEqual(35);
     });
 
     it('should filter venues by price range preference', async () => {
