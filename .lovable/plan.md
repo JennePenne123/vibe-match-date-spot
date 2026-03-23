@@ -133,8 +133,11 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 9 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
 | 10 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
 | 11 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
-| 12 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
-| 13 | **Feedback-Impact-Anzeige** | Klein | Hinweis auf Home wenn sich Empfehlungen durch Feedback verändert haben |
+| 12 | ~~**Route Preloading**~~ | ✅ Done | Prefetch nach Login + Hover-Prefetch |
+| 13 | ~~**Feedback-Impact-Anzeige**~~ | ✅ Done | Hinweis auf Home wenn sich Empfehlungen durch Feedback verändert haben |
+| 14 | **Tree-Shaking-Audit** | Klein | Ungenutzten Code und Imports identifizieren und entfernen |
+| 15 | **Bundle-Größe optimieren** | Mittel | Chunk-Splitting analysieren, große Dependencies prüfen |
+| 16 | **React Query Tuning** | Klein | Differenzierte staleTime pro Query-Typ (z.B. 30s für Admin, 10min für Stammdaten) |
 
 ---
 
