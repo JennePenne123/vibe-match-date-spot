@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -63,7 +64,7 @@ const DateFeedbackList: React.FC = () => {
         .limit(50);
       return data || [];
     },
-    staleTime: 60_000,
+    staleTime: STALE_TIMES.ADMIN,
   });
 
   // Stats
@@ -161,7 +162,7 @@ const VenueVerificationList: React.FC = () => {
         .limit(50);
       return data || [];
     },
-    staleTime: 60_000,
+    staleTime: STALE_TIMES.ADMIN,
   });
 
   const unverified = venues?.filter(v => !v.verified) || [];
@@ -228,7 +229,7 @@ const VenueFeedbackList: React.FC = () => {
         .limit(50);
       return data || [];
     },
-    staleTime: 60_000,
+    staleTime: STALE_TIMES.ADMIN,
   });
 
   const likes = feedback?.filter(f => f.feedback_type === 'like').length || 0;

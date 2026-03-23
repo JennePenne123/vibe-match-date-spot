@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
+import { DEFAULT_STALE_TIME, DEFAULT_GC_TIME } from "@/config/queryConfig";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -172,8 +173,8 @@ const queryClient = new QueryClient({
         }
         return failureCount < 3;
       },
-      staleTime: 10 * 60 * 1000, // 10 minutes
-      gcTime: 30 * 60 * 1000, // 30 minutes – keep unused data in cache longer
+      staleTime: DEFAULT_STALE_TIME, // 5 minutes – balanced freshness
+      gcTime: DEFAULT_GC_TIME, // 30 minutes – keep unused data in cache longer
       refetchOnWindowFocus: false, // prevent unnecessary refetches on tab switch
       refetchOnReconnect: true, // auto-refetch after offline recovery
     },

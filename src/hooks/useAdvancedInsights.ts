@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAIInsights, AIInsights } from '@/services/aiLearningService';
+import { STALE_TIMES } from '@/config/queryConfig';
 
 export const useAdvancedInsights = () => {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ export const useAdvancedInsights = () => {
     queryKey: ['ai-insights', user?.id],
     queryFn: () => user ? getAIInsights(user.id) : null,
     enabled: !!user,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: STALE_TIMES.DYNAMIC, // 5 minutes
     refetchOnWindowFocus: false,
   });
 
