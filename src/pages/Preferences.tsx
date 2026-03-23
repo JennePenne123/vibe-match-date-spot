@@ -196,7 +196,7 @@ const Preferences = () => {
   const isOnboarding = searchParams.get('onboarding') === 'true';
   const initialStep = parseInt(searchParams.get('step') || '0', 10);
   const { t } = useTranslation();
-  const { updateCuisines, updateVibes } = useApp();
+  const { updateCuisines, updateVibes, updateUserLocation } = useApp();
   const { user } = useAuth();
 
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
