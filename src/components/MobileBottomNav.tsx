@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Home, Sparkles, User, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { preloadOnHover } from '@/utils/routePreloading'
 
 export function MobileBottomNav() {
   const { t } = useTranslation()
@@ -43,6 +44,7 @@ function NavItem({ icon: Icon, label, path, active, badge, highlight }: NavItemP
   return (
     <NavLink
       to={path}
+      {...preloadOnHover(path)}
       className={cn(
         'relative flex flex-col items-center justify-center gap-0.5',
         'min-w-[56px] py-2 px-2',
