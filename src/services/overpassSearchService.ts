@@ -227,7 +227,7 @@ export async function searchVenuesOverpass(
       latitude: venueLat,
       longitude: venueLon,
       cuisine_type: extractCuisineType(tags),
-      price_range: '$$',
+      price_range: inferPriceRange(tags),
       rating: null,
       description: tags.description || tags.note || '',
       phone: tags.phone || tags['contact:phone'] || '',
