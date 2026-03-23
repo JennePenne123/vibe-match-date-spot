@@ -106,7 +106,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 1 | **Wallet mit echten Daten** | 🔴 Offen | Mock-Vouchers durch Supabase-Queries ersetzen |
+| 1 | ~~**Wallet mit echten Daten**~~ | ✅ Erledigt | reward_redemptions + voucher_redemptions kombiniert, Refresh-Button |
 | 2 | ~~**Venue API konfigurieren**~~ | ✅ Erledigt | Radar + Foursquare Strategie implementiert (Google Places deaktiviert) |
 | 3 | ~~**Route Code Splitting**~~ | ✅ Erledigt | War bereits implementiert (alle Routes nutzen React.lazy) |
 | 4 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons, Favicon finalisieren |
