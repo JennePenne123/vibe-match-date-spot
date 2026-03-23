@@ -44,6 +44,7 @@ function NavItem({ icon: Icon, label, path, active, badge, highlight }: NavItemP
   return (
     <NavLink
       to={path}
+      {...preloadOnHover(path)}
       className={cn(
         'relative flex flex-col items-center justify-center gap-0.5',
         'min-w-[56px] py-2 px-2',
