@@ -70,13 +70,15 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
   if (preferredCuisines.some(c => vc.includes(c.toLowerCase()) || c.toLowerCase().includes(vc))) return 0.9;
   
   // Related cuisine groups - higher score for same family
+  // Tighter cuisine groups - avoid false positives (e.g. german ≠ mediterranean)
   const cuisineGroups: Record<string, string[]> = {
     'asian': ['chinese', 'japanese', 'thai', 'korean', 'vietnamese', 'asian', 'sushi', 'ramen', 'wok', 'dim sum', 'curry'],
-    'european': ['italian', 'french', 'spanish', 'greek', 'mediterranean', 'german', 'portuguese', 'european'],
-    'american': ['american', 'burger', 'bbq', 'steakhouse', 'diner', 'grill'],
+    'mediterranean': ['italian', 'greek', 'mediterranean', 'spanish', 'turkish', 'lebanese', 'moroccan'],
+    'western_european': ['french', 'german', 'portuguese', 'european', 'regional', 'tarte flambee'],
+    'american': ['american', 'burger', 'bbq', 'steakhouse', 'steak house', 'diner', 'grill'],
     'cafe': ['café', 'cafe', 'coffee', 'bakery', 'brunch', 'breakfast', 'patisserie'],
     'bar': ['bar', 'pub', 'cocktail', 'wine bar', 'lounge', 'biergarten'],
-    'middle_eastern': ['turkish', 'persian', 'lebanese', 'arabic', 'falafel', 'kebab', 'döner'],
+    'middle_eastern': ['persian', 'arabic', 'falafel', 'kebab', 'döner'],
     'latin': ['mexican', 'brazilian', 'peruvian', 'argentinian', 'tapas'],
   };
   
@@ -87,6 +89,25 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
   }
   
   return 0;
+}
+
+// Map user-facing price labels to venue price symbols
+const PRICE_LABEL_TO_SYMBOL: Record<string, string[]> = {
+  'budget': ['$'],
+  'moderate': ['$', '$$'],
+  'upscale': ['$$', '$$$'],
+  'luxury': ['$$$', '$$$$'],
+};
+
+function normalizePricePreferences(pricePrefs: string[] | null): string[] {
+  if (!pricePrefs?.length) return [];
+  const symbols = new Set<string>();
+  for (const p of pricePrefs) {
+    const mapped = PRICE_LABEL_TO_SYMBOL[p.toLowerCase()];
+    if (mapped) mapped.forEach(s => symbols.add(s));
+    else symbols.add(p); // Already a symbol like "$$"
+  }
+  return Array.from(symbols);
 }
 
 // Filter venues by user preferences to improve matching
@@ -105,9 +126,13 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       return venues;
     }
 
+    // Normalize price preferences from labels to symbols
+    const normalizedPricePrefs = normalizePricePreferences(userPrefs.preferred_price_range as string[] | null);
+
     console.log('🎯 PREFERENCE FILTER: User preferences:', {
       cuisines: userPrefs.preferred_cuisines,
       priceRanges: userPrefs.preferred_price_range,
+      priceSymbols: normalizedPricePrefs,
       vibes: userPrefs.preferred_vibes,
     });
 
@@ -180,19 +205,19 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         }
       }
 
-      // Price range matching (25% weight) - use inferred price if missing
+      // Price range matching (25% weight) - use normalized price symbols
       const effectivePrice = venue.price_range || (inferredPriceRange.length > 0 ? inferredPriceRange[0] : null);
       if (hasPricePrefs && effectivePrice) {
         maxPossible += 25;
-        if (userPrefs.preferred_price_range?.includes(effectivePrice)) {
+        if (normalizedPricePrefs.includes(effectivePrice)) {
           score += 25;
         } else {
           const priceOrder = ['$', '$$', '$$$', '$$$$'];
           const venueIdx = priceOrder.indexOf(effectivePrice);
-          const prefIdxes = (userPrefs.preferred_price_range || []).map((p: string) => priceOrder.indexOf(p));
+          const prefIdxes = normalizedPricePrefs.map((p: string) => priceOrder.indexOf(p));
           const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
-          if (minDist === 1) score += 15; // Adjacent price (was 10)
-          else score -= 3; // Reduced penalty (was -5)
+          if (minDist === 1) score += 15;
+          else score -= 3;
         }
       }
 
@@ -412,9 +437,11 @@ export const filterVenuesByCollaborativePreferences = async (
         sharedScore += 50 * Math.min(userCuisineScore, partnerCuisineScore);
       }
 
-      // Price matching
-      const userPriceMatch = userPrefs.preferred_price_range?.includes(venue.price_range);
-      const partnerPriceMatch = partnerPrefs.preferred_price_range?.includes(venue.price_range);
+      // Price matching - normalize labels to symbols
+      const userNormalizedPrices = normalizePricePreferences(userPrefs.preferred_price_range as string[] | null);
+      const partnerNormalizedPrices = normalizePricePreferences(partnerPrefs.preferred_price_range as string[] | null);
+      const userPriceMatch = venue.price_range && userNormalizedPrices.includes(venue.price_range);
+      const partnerPriceMatch = venue.price_range && partnerNormalizedPrices.includes(venue.price_range);
       if (userPriceMatch) userScore += 30;
       if (partnerPriceMatch) partnerScore += 30;
       if (userPriceMatch && partnerPriceMatch) sharedScore += 30;
