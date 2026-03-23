@@ -6,12 +6,13 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useFriends } from '@/hooks/useFriends';
 import { getInitials } from '@/lib/utils';
 
 const Friends = () => {
+  const [isGenerating, setIsGenerating] = useState(false);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { updateInvitedFriends, generateRecommendations } = useApp();
@@ -66,16 +67,26 @@ const Friends = () => {
   };
 
   const handleNext = async () => {
-    const finalInvitedIds = isDemoMode ? invitedIds : friends.filter(f => f.isInvited).map(f => f.id);
-    updateInvitedFriends(finalInvitedIds);
-    await generateRecommendations();
-    navigate(isDemoMode ? '/results?demo=true' : '/results');
+    setIsGenerating(true);
+    try {
+      const finalInvitedIds = isDemoMode ? invitedIds : friends.filter(f => f.isInvited).map(f => f.id);
+      updateInvitedFriends(finalInvitedIds);
+      await generateRecommendations();
+      navigate(isDemoMode ? '/results?demo=true' : '/results');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSkip = async () => {
-    updateInvitedFriends([]);
-    await generateRecommendations();
-    navigate(isDemoMode ? '/results?demo=true' : '/results');
+    setIsGenerating(true);
+    try {
+      updateInvitedFriends([]);
+      await generateRecommendations();
+      navigate(isDemoMode ? '/results?demo=true' : '/results');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const generateReferralLink = () => {
@@ -122,6 +133,7 @@ const Friends = () => {
               onClick={handleSkip}
               variant="ghost"
               className="text-muted-foreground hover:bg-muted text-sm"
+              disabled={isGenerating}
             >
               Skip
             </Button>
@@ -133,10 +145,20 @@ const Friends = () => {
           {/* Action Button */}
           <Button
             onClick={handleNext}
+            disabled={isGenerating}
             className="w-full h-10 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold text-sm"
           >
-            Find Perfect Spots
-            <ArrowRight className="w-4 h-4 ml-2" />
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Venues werden gesucht...
+              </>
+            ) : (
+              <>
+                Find Perfect Spots
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
         </div>
 
