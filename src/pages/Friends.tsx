@@ -12,6 +12,7 @@ import { useFriends } from '@/hooks/useFriends';
 import { getInitials } from '@/lib/utils';
 
 const Friends = () => {
+  const [isGenerating, setIsGenerating] = useState(false);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { updateInvitedFriends, generateRecommendations } = useApp();
