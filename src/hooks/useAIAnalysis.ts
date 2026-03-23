@@ -170,7 +170,7 @@ export const useAIAnalysis = () => {
       const venues = await retryAnalysisWithBackoff(async () => {
         console.log('🎯 AI ANALYSIS: Calling getAIVenueRecommendations...');
         setCurrentStep('Finding perfect matches...');
-        return await getAIVenueRecommendations(user.id, partnerId, 10, userLocation);
+        return await getAIVenueRecommendations(user.id, partnerId, 6, userLocation);
       }, 3, 3000); // 3 Retries with 3s, 6s, 12s delays
 
       if (!venues || venues.length === 0) {

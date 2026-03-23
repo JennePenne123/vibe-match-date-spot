@@ -40,7 +40,7 @@ export const useAIRecommendations = (partnerId?: string) => {
         address: locationFallback.address,
       };
       console.log('📍 AI RECOMMENDATIONS: Using location:', userLocation.address, `(${locationFallback.source})`);
-      const venueRecs = await getAIVenueRecommendations(user.id, partnerId, 10, userLocation);
+      const venueRecs = await getAIVenueRecommendations(user.id, partnerId, 6, userLocation);
       console.log('✅ AI RECOMMENDATIONS: Received', venueRecs.length, 'venue recommendations');
       setRecommendations(venueRecs);
 
