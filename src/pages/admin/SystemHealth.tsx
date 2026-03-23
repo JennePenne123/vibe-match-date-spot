@@ -107,7 +107,7 @@ const SystemHealth: React.FC = () => {
         .limit(20);
       return data || [];
     },
-    staleTime: 60_000,
+    staleTime: STALE_TIMES.ADMIN,
   });
 
   // Computed stats
