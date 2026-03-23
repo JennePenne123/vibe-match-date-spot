@@ -13,8 +13,9 @@ const calculateUserScore = (
   let maxPossible = 0;
   const matches = { cuisine: false, price: false, vibes: [] as string[], activities: [] as string[], venueType: false, dietary: false, time: false };
 
-  // Cuisine matching with learned weight (25%)
+  // Cuisine matching with learned weight
   if (userPrefs.preferred_cuisines && venue.cuisine_type) {
+    maxPossible += 0.35;
     const userCuisines = userPrefs.preferred_cuisines.map((c: string) => c.toLowerCase());
     const venueCuisine = venue.cuisine_type.toLowerCase();
     
@@ -27,7 +28,6 @@ const calculateUserScore = (
     }
     
     matches.cuisine = cuisineMatch;
-    // Cuisine is the strongest signal: big reward for match, real penalty for mismatch
     const cuisineScore = cuisineMatch ? 0.35 : -0.10;
     score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
   }
