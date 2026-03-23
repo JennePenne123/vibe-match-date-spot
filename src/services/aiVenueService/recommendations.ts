@@ -332,14 +332,34 @@ const getVenuesFromMultipleSources = async (
   }
 
   const strategy = API_CONFIG.venueSearchStrategy;
+  const MIN_VENUES_THRESHOLD = 6;
+  const RADIUS_MULTIPLIERS = [1, 1.5, 2.5]; // Progressive radius expansion
   let venues: any[] = [];
   
-  if (strategy === 'radar-overpass') {
-    venues = await getVenuesRadarOverpass(userId, limit, userLocation);
-  } else if (strategy === 'overpass-only') {
-    venues = await getVenuesOverpassOnly(userId, limit, userLocation);
-  } else {
-    venues = await getVenuesParallel(userId, limit, userLocation);
+  for (const multiplier of RADIUS_MULTIPLIERS) {
+    // Expand search location by increasing the radius via user preferences override
+    const expandedLocation = multiplier > 1 
+      ? { ...userLocation!, _radiusMultiplier: multiplier } 
+      : userLocation;
+    
+    if (strategy === 'radar-overpass') {
+      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier);
+    } else if (strategy === 'overpass-only') {
+      venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier);
+    } else {
+      venues = await getVenuesParallel(userId, limit, expandedLocation, multiplier);
+    }
+    
+    if (venues.length >= MIN_VENUES_THRESHOLD) {
+      if (multiplier > 1) {
+        console.log(`📡 RADIUS FALLBACK: Found ${venues.length} venues at ${multiplier}x radius`);
+      }
+      break;
+    }
+    
+    if (multiplier < RADIUS_MULTIPLIERS[RADIUS_MULTIPLIERS.length - 1]) {
+      console.log(`📡 RADIUS FALLBACK: Only ${venues.length} venues at ${multiplier}x radius, expanding to ${RADIUS_MULTIPLIERS[RADIUS_MULTIPLIERS.indexOf(multiplier) + 1]}x...`);
+    }
   }
   
   // Store in cache after fetching — now includes preferences in key
@@ -363,20 +383,21 @@ const getVenuesFromMultipleSources = async (
 async function getVenuesRadarOverpass(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   // Step 1: Query Radar + Overpass IN PARALLEL for maximum speed
   const promises: Promise<any[]>[] = [];
   
   if (API_CONFIG.useRadar && userLocation) {
-    promises.push(getVenuesFromRadar(userId, limit, userLocation).catch((err) => {
+    promises.push(getVenuesFromRadar(userId, limit, userLocation, radiusMultiplier).catch((err) => {
       console.warn('⚠️ Radar failed:', err instanceof Error ? err.message : 'Unknown');
       return [];
     }));
   }
   
   if (API_CONFIG.useOverpass && userLocation) {
-    promises.push(getVenuesFromOverpass(userId, limit, userLocation).catch((err) => {
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch((err) => {
       console.warn('⚠️ Overpass failed:', err instanceof Error ? err.message : 'Unknown');
       return [];
     }));
@@ -449,10 +470,11 @@ async function getVenuesRadarOverpass(
 async function getVenuesOverpassOnly(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   if (API_CONFIG.useOverpass && userLocation) {
-    return await getVenuesFromOverpass(userId, limit, userLocation).catch(() => []);
+    return await getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch(() => []);
   }
   return [];
 }
@@ -463,16 +485,17 @@ async function getVenuesOverpassOnly(
 async function getVenuesParallel(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   const promises: Promise<any[]>[] = [];
   
   if (API_CONFIG.useRadar && userLocation) {
-    promises.push(getVenuesFromRadar(userId, limit, userLocation).catch(() => []));
+    promises.push(getVenuesFromRadar(userId, limit, userLocation, radiusMultiplier).catch(() => []));
   }
   
   if (API_CONFIG.useOverpass && userLocation) {
-    promises.push(getVenuesFromOverpass(userId, limit, userLocation).catch(() => []));
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch(() => []));
   }
   
   if (API_CONFIG.useGooglePlaces) {
@@ -641,7 +664,8 @@ function enrichVenueWithSecondary(primaryVenue: any, secondaryVenue: any): void 
 async function getVenuesFromRadar(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   const timer = apiUsageService.createTimer('radar', '/search-venues-radar');
   
@@ -661,12 +685,13 @@ async function getVenuesFromRadar(
       return [];
     }
     
+    const baseRadius = (userPrefs.max_distance || 25) * 1000;
     const { data, error } = await supabase.functions.invoke('search-venues-radar', {
       body: {
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
         cuisines: userPrefs.preferred_cuisines || [],
-        radius: (userPrefs.max_distance || 25) * 1000,
+        radius: Math.round(baseRadius * radiusMultiplier),
         limit,
         venueTypes: (userPrefs as any).preferred_venue_types || [],
         activities: (userPrefs as any).preferred_activities || [],
@@ -714,7 +739,8 @@ async function getVenuesFromRadar(
 async function getVenuesFromOverpass(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   const timer = apiUsageService.createTimer('overpass', '/client-overpass');
   
@@ -735,7 +761,8 @@ async function getVenuesFromOverpass(
     }
     
     const { searchVenuesOverpass } = await import('@/services/overpassSearchService');
-    const radiusMeters = (userPrefs.max_distance || 25) * 1000;
+    const baseRadius = (userPrefs.max_distance || 25) * 1000;
+    const radiusMeters = Math.round(baseRadius * radiusMultiplier);
     const result = await searchVenuesOverpass(
       userLocation.latitude,
       userLocation.longitude,
