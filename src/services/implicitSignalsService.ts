@@ -49,6 +49,7 @@ const venueViewCounts: Map<string, number> = new Map();
  * Record an implicit signal into the buffer
  */
 export const recordSignal = (signal: ImplicitSignal): void => {
+  if (isTrackingOptedOut()) return;
   signalBuffer.push(signal);
   
   if (signalBuffer.length >= MAX_BUFFER_SIZE) {
