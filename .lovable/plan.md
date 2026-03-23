@@ -1,7 +1,7 @@
 
 # VybePulse – Gesamt-Projektübersicht & Roadmap
 
-**Stand: 18. März 2026** | **Geschätzter Fortschritt: ~77%**
+**Stand: 23. März 2026** | **Geschätzter Fortschritt: ~82%**
 
 ---
 
@@ -11,7 +11,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## ✅ Fertiggestellte Features (~77%)
+## ✅ Fertiggestellte Features (~82%)
 
 ### 🏠 User-Frontend
 - **Landing Page** mit Auth-Modal (Google, Apple, E-Mail)
@@ -31,10 +31,12 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Cold-Start-Lösung**: Onboarding-Präferenzen → initiale `feature_weights` + Preference-Vektoren
 - **Mood Check-In** mit Score-Modifier
 - **Implizite Signale**: Dwell Time, Scroll Depth, Repeat Views, Voucher-Klicks → Scoring-Integration
-- **Beschleunigte Gewichtsanpassung**: Stärkere Adjustments bei wenig Datenpunkten für schnelleres Lernen
+- **Beschleunigte Gewichtsanpassung**: Stärkere Adjustments bei wenig Datenpunkten
 - **Contextual Factors**: Tageszeit, Saison (Wetter-Integration geplant)
 - **Compatibility Scores** zwischen User-Paaren
 - **AI Edge Function** für Venue-Reasoning (Top-N Enhancement, optional aktivierbar)
+- **Präziseres Scoring** ✅ Gewichte optimiert → Top-3 Venues erreichen ~80%+ Match-Score
+- **Konsistente Match-Scores** ✅ Keine Mock-Overrides mehr bei Venue-Detail-Ansicht
 
 ### 📅 Date-Planning
 - **Smart Date Planner** (Solo + Collaborative Mode)
@@ -45,7 +47,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Invitation Messenger** (Chat pro Einladung)
 
 ### 🏪 Venue-System
-- **Venue-Suche** (Foursquare + Google Places Integration)
+- **Venue-Suche** (Foursquare + Radar Integration, Google Places deaktiviert)
 - **Venue Detail Pages** mit Fotos, Ratings, Öffnungszeiten, Karte
 - **Venue Feedback** (Like/Dislike/Super Like/Skip)
 - **30-min LRU Venue-Cache**
@@ -53,6 +55,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ### 🎟️ Voucher & Rewards
 - **QR-Code Voucher-System** (Wallet → QR anzeigen → Partner scannt → Edge Function validiert)
+- **Wallet mit echten Supabase-Daten** ✅ (reward_redemptions + voucher_redemptions kombiniert)
 - **Gamification**: Punkte, Badges, Streaks, Leaderboard, Levels
 - **Reward Shop** mit Einlösung (monatliche Limits, Premium-Zugang)
 - **Referral-System** mit Codes + Punkten
@@ -82,10 +85,11 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **RLS-Policies** auf allen Tabellen (inkl. SECURITY DEFINER für Rollen)
 - **Rate Limiting** auf Edge Functions (mit Request-Logging)
 - **Error Monitoring Service** (JS, API, UI, Performance Fehler → DB)
+- **Sentry Integration** ✅ (vybepulse.sentry.io, DSN konfiguriert, SDK aktiv)
 - **Input Sanitization** (DOMPurify)
 - **Session Cleanup** (automatisch)
 - **OSRM Routing** Integration
-- **Auth-Redirect Konsistenz** → alle Seiten → `/?auth=required` ✅
+- **Auth-Redirect Konsistenz** ✅ → alle Seiten → `/?auth=required`
 - **autoComplete-Attribute** auf Auth-Formularen ✅
 
 ### ⚙️ Account & Settings
@@ -97,74 +101,65 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Sprachauswahl**
 - **Support-Bereich** (FAQ-Accordion + E-Mail-Fallback)
 - **Rechtliche Seiten** (Impressum, Datenschutz, AGB)
+- **DSGVO-Opt-Out** für implizite Signale ✅ (Toggle in Settings + localStorage)
+- **Datenschutzerklärung aktualisiert** ✅ (Sentry, Foursquare/Radar, implizites Tracking dokumentiert)
 
 ---
 
-## 🔧 Offene Aufgaben vor Launch (~23%)
+## 🔧 Offene Aufgaben vor Launch (~18%)
 
 ### 🔴 Kritisch (Must-Have für Launch)
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 1 | ~~**Wallet mit echten Daten**~~ | ✅ Erledigt | reward_redemptions + voucher_redemptions kombiniert, Refresh-Button |
-| 2 | ~~**Venue API konfigurieren**~~ | ✅ Erledigt | Radar + Foursquare Strategie implementiert (Google Places deaktiviert) |
-| 3 | ~~**Route Code Splitting**~~ | ✅ Erledigt | War bereits implementiert (alle Routes nutzen React.lazy) |
-| 4 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons, Favicon finalisieren |
-| 5 | ~~**Auth-Redirect Konsistenz**~~ | ✅ Erledigt | Alle Seiten einheitlich → `/?auth=required` |
-| 6 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor |
-| 7 | **Security Hardening** | 📋 Manuell | OTP-Ablauf <10min, **Leaked Password Protection (HIBP Check) aktivieren** (Auth → Email Settings), **Anonymous Sign-Ins deaktivieren** (Auth → Providers) im Supabase Dashboard |
-| 7a | ~~**Sentry DSN als Build Secret**~~ | ✅ Erledigt | DSN bereits in `.env` konfiguriert, Sentry aktiv |
+| 1 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons, Favicon finalisieren |
+| 2 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor |
+| 3 | **Security Hardening** | 📋 Manuell | OTP-Ablauf <10min, **Leaked Password Protection (HIBP Check)**, **Anonymous Sign-Ins deaktivieren** im Supabase Dashboard |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 8 | ~~**DSGVO-Update Datenschutzerklärung**~~ | ✅ Erledigt | Implizites Tracking, Sentry, Foursquare/Radar dokumentiert + Opt-Out Toggle in Settings |
-| 9 | ~~**Sentry Integration**~~ | ✅ Erledigt | Konto (vybepulse.sentry.io), DSN konfiguriert, SDK aktiv |
-| 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner |
-| 11 | ~~**Image-Optimierung**~~ | ✅ Erledigt | lazy loading, decoding=async, fetchPriority auf LCP-Elementen |
-| 12 | **React Query Tuning** | 🟡 Offen | Differenzierte staleTime pro Query-Typ |
-| 13 | **VAPID-Keys einrichten** | 📋 Manuell | `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` als Edge Function Secrets |
-| 14 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
+| 4 | **React Query Tuning** | 🟡 Offen | Differenzierte staleTime pro Query-Typ |
+| 5 | **VAPID-Keys einrichten** | 📋 Manuell | `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` als Edge Function Secrets |
+| 6 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
 
 ### 🟢 Post-Launch / Nice-to-Have
 
 | # | Aufgabe | Aufwand | Beschreibung |
 |---|---------|---------|--------------|
-| 15 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
-| 16 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
-| 17 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
-| 18 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
-| 19 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
-| 20 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
-| 21 | ~~**DSGVO Opt-Out für implizite Signale**~~ | ✅ Erledigt | Toggle in Settings + localStorage-Opt-Out im implicitSignalsService |
-| 22 | **Feedback-Impact-Anzeige** | Klein | Hinweis auf Home wenn sich Empfehlungen durch Feedback verändert haben |
+| 7 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
+| 8 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
+| 9 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
+| 10 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
+| 11 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
+| 12 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
+| 13 | **Feedback-Impact-Anzeige** | Klein | Hinweis auf Home wenn sich Empfehlungen durch Feedback verändert haben |
 
 ---
 
 ## 📊 Fortschritts-Einschätzung
 
 ```
-Gesamt-Fortschritt: ███████████████████████░░░░░░░ ~77%
+Gesamt-Fortschritt: █████████████████████████░░░░░ ~82%
 
 Frontend UI/UX:     ██████████████████████████████ ~98%
-KI-Engine:          █████████████████████████░░░░░ ~85%
+KI-Engine:          ███████████████████████████░░░ ~90%  ↑ Scoring optimiert
 Date-Planning:      █████████████████████████████░ ~95%
-Venue-System:       ██████████████████████░░░░░░░░ ~75% (echte API-Anbindung fehlt)
-Voucher/Rewards:    ██████████████████████░░░░░░░░ ~70% (Wallet noch Mock-Daten)
+Venue-System:       █████████████████████████░░░░░ ~80%  ↑ API-Strategie steht
+Voucher/Rewards:    █████████████████████████░░░░░ ~85%  ↑ Wallet mit echten Daten
 Partner-Portal:     █████████████████████████░░░░░ ~85%
 Admin Dashboard:    █████████████████████████████░ ~95%
-Security/Infra:     ██████████████████████████░░░░ ~85% (VAPID offen)
+Security/Infra:     ███████████████████████████░░░ ~90%  ↑ Sentry aktiv
 Monetarisierung:    ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~10% (Stripe noch nicht)
-Performance:        ██████████████████░░░░░░░░░░░░ ~60% (Code Splitting offen)
-DSGVO/Legal:        ████████████████████░░░░░░░░░░ ~65% (Tracking-Update offen)
+Performance:        ██████████████████████████░░░░ ~85%  ↑ Code Splitting + Image Opt.
+DSGVO/Legal:        ████████████████████████████░░ ~92%  ↑ Datenschutz aktualisiert
 ```
 
 ### Zeitliche Einschätzung bis Launch (Sommer 2026)
-- **Kritische Aufgaben (1-4)**: ~2 Sessions (Code-Änderungen)
-- **Manuelle Aufgaben (6, 7, 13)**: Jederzeit im Dashboard erledigbar
-- **Wichtige Aufgaben (8, 9, 11, 12, 14)**: ~3 Sessions
-- **Gesamt bis MVP-Launch**: ~5 Sessions
+- **Kritische Aufgaben (1-3)**: ~1 Session + manuelle Dashboard-Schritte
+- **Wichtige Aufgaben (4-6)**: ~2 Sessions
+- **Gesamt bis MVP-Launch**: ~3 Sessions
 - **Post-Launch Features**: Laufend nach Priorität
 
 ---
@@ -178,7 +173,7 @@ DSGVO/Legal:        ████████████████████
 | Backend | Supabase (Auth, DB, Realtime, Edge Functions, Storage) |
 | AI/ML | Custom Scoring Engine + Edge Functions (Gemini via Lovable AI Gateway) |
 | Maps | Leaflet + OSRM Routing |
-| Venues | Foursquare API + Google Places API |
+| Venues | Foursquare API + Radar API |
 | i18n | i18next (6 Sprachen) |
 | PWA | Service Worker + Push Notifications |
 | Monitoring | Error Monitoring Service + Sentry (aktiv) |
