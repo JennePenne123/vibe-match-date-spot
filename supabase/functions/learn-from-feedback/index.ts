@@ -12,10 +12,26 @@ const corsHeaders = {
  * Early ratings have MORE impact (exploration), later ratings less (exploitation).
  */
 function getLearningRate(totalRatings: number): number {
-  if (totalRatings <= 3) return 0.25;   // First 3 ratings: aggressive learning
-  if (totalRatings <= 8) return 0.15;   // Next 5: moderate learning
+  if (totalRatings <= 2) return 0.35;   // First 2 ratings: very aggressive learning
+  if (totalRatings <= 5) return 0.25;   // Next 3: aggressive learning
+  if (totalRatings <= 10) return 0.15;  // Building confidence
   if (totalRatings <= 20) return 0.10;  // Settling phase
   return 0.05;                           // Stable: fine-tuning only
+}
+
+/**
+ * Returns a strength multiplier based on how extreme the rating is.
+ * 5-star or 1-star ratings carry more weight than 3-star.
+ */
+function getRatingIntensity(rating: number): number {
+  switch (rating) {
+    case 5: return 1.4;  // Strong positive signal
+    case 4: return 1.0;  // Standard positive
+    case 3: return 0.0;  // Neutral → no learning
+    case 2: return 1.0;  // Standard negative
+    case 1: return 1.4;  // Strong negative signal
+    default: return 0.5;
+  }
 }
 
 /**
@@ -157,27 +173,43 @@ serve(async (req) => {
     };
 
     const lr = getLearningRate(totalRatings);
-    console.log(`🧠 Learning rate: ${lr} (totalRatings: ${totalRatings})`);
+    const intensity = getRatingIntensity(actualRating || 3);
+    console.log(`🧠 Learning rate: ${lr}, intensity: ${intensity} (totalRatings: ${totalRatings}, rating: ${actualRating})`);
 
     const newWeights = { ...oldWeights };
 
-    if (isSuccess) {
+    if (intensity === 0) {
+      // Neutral rating (3 stars) → no weight changes
+      console.log('⚖️ Neutral rating, skipping weight adjustments');
+    } else if (isSuccess) {
       // BOOST factors that matched AND led to a good date
-      newWeights.cuisine = adjustWeight(oldWeights.cuisine || 1.0, hadCuisineMatch ? 'boost' : 'neutral', lr);
-      newWeights.vibe = adjustWeight(oldWeights.vibe || 1.0, hadVibeMatch ? 'boost' : 'neutral', lr);
-      newWeights.price = adjustWeight(oldWeights.price || 1.0, hadPriceMatch ? 'boost' : 'neutral', lr);
+      newWeights.cuisine = adjustWeight(oldWeights.cuisine || 1.0, hadCuisineMatch ? 'boost' : 'neutral', lr, intensity);
+      newWeights.vibe = adjustWeight(oldWeights.vibe || 1.0, hadVibeMatch ? 'boost' : 'neutral', lr, intensity);
+      newWeights.price = adjustWeight(oldWeights.price || 1.0, hadPriceMatch ? 'boost' : 'neutral', lr, intensity);
       // If highly rated, also boost general rating weight
       if (actualRating === 5) {
-        newWeights.rating = adjustWeight(oldWeights.rating || 1.0, 'boost', lr, 0.5);
+        newWeights.rating = adjustWeight(oldWeights.rating || 1.0, 'boost', lr, 0.8);
+      }
+      // wouldRecommend signal: extra boost to all matching factors
+      if (wouldRecommend === true && actualRating >= 4) {
+        const recBoost = lr * 0.3;
+        if (hadCuisineMatch) newWeights.cuisine = Math.min(2.5, newWeights.cuisine + recBoost);
+        if (hadVibeMatch) newWeights.vibe = Math.min(2.5, newWeights.vibe + recBoost);
+        if (hadPriceMatch) newWeights.price = Math.min(2.5, newWeights.price + recBoost);
       }
     } else if (isFailure) {
       // REDUCE factors that matched but STILL led to a bad date (wrong signal)
       // BOOST factors that didn't match (they might be more important than we thought)
-      newWeights.cuisine = adjustWeight(oldWeights.cuisine || 1.0, hadCuisineMatch ? 'reduce' : 'boost', lr, 0.7);
-      newWeights.vibe = adjustWeight(oldWeights.vibe || 1.0, hadVibeMatch ? 'reduce' : 'boost', lr, 0.7);
-      newWeights.price = adjustWeight(oldWeights.price || 1.0, hadPriceMatch ? 'reduce' : 'boost', lr, 0.7);
+      newWeights.cuisine = adjustWeight(oldWeights.cuisine || 1.0, hadCuisineMatch ? 'reduce' : 'boost', lr, intensity);
+      newWeights.vibe = adjustWeight(oldWeights.vibe || 1.0, hadVibeMatch ? 'reduce' : 'boost', lr, intensity);
+      newWeights.price = adjustWeight(oldWeights.price || 1.0, hadPriceMatch ? 'reduce' : 'boost', lr, intensity);
+      // Strong negative + wouldn't recommend: extra penalty
+      if (wouldRecommend === false && actualRating <= 2) {
+        const penalty = lr * 0.3;
+        if (hadCuisineMatch) newWeights.cuisine = Math.max(0.3, newWeights.cuisine - penalty);
+        if (hadVibeMatch) newWeights.vibe = Math.max(0.3, newWeights.vibe - penalty);
+      }
     }
-    // Ratings of 3 (neutral) → no weight changes
 
     // Log weight changes
     const weightChanges: Record<string, string> = {};

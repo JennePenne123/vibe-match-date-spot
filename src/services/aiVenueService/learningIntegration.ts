@@ -106,18 +106,33 @@ export const getConfidenceBoost = (learnedWeights: LearnedWeights): number => {
     return 0;
   }
 
-  // Boost based on AI accuracy (max +10% when accuracy > 70%)
   let boost = 0;
-  if (learnedWeights.aiAccuracy > 70) {
-    boost += (learnedWeights.aiAccuracy - 70) * 0.003; // Up to 9% boost
+  
+  // Accuracy-based boost: scales more aggressively (max +15% when accuracy > 60%)
+  if (learnedWeights.aiAccuracy > 60) {
+    boost += (learnedWeights.aiAccuracy - 60) * 0.004; // Up to 16% boost at 100%
   }
 
-  // Small boost for having rating history (max +3%)
-  boost += Math.min(learnedWeights.totalRatings * 0.005, 0.03);
+  // Rating history boost: more impactful early on (max +8%)
+  // First 5 ratings give bigger per-rating boost to reward engagement
+  const ratingBoost = learnedWeights.totalRatings <= 5
+    ? learnedWeights.totalRatings * 0.012  // 1.2% per rating for first 5
+    : 0.06 + Math.min((learnedWeights.totalRatings - 5) * 0.004, 0.02); // then slower
+  boost += Math.min(ratingBoost, 0.08);
+
+  // Weight divergence bonus: if weights have moved significantly from defaults,
+  // the system has learned meaningful preferences → small extra boost
+  const avgDeviation = Object.values(learnedWeights.weights).reduce(
+    (sum, w) => sum + Math.abs(w - 1.0), 0
+  ) / Object.values(learnedWeights.weights).length;
+  if (avgDeviation > 0.15) {
+    boost += Math.min(avgDeviation * 0.05, 0.04); // Max +4% for strong personalization
+  }
 
   console.log('🎯 LEARNING: Confidence boost calculated:', {
     aiAccuracy: learnedWeights.aiAccuracy,
     totalRatings: learnedWeights.totalRatings,
+    avgWeightDeviation: avgDeviation.toFixed(3),
     boost: `+${Math.round(boost * 100)}%`
   });
 
