@@ -162,7 +162,7 @@ export default function LandingDemo() {
                 <h3 className="text-3xl lg:text-4xl font-semibold text-foreground">{t('landing.step1Title')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{t('landing.step1Desc')}</p>
               </div>
-              <div className="order-1 lg:order-2"><Card variant="elegant" size="xl"><div className="aspect-video bg-gradient-calm rounded-xl flex items-center justify-center"><img src="/icon-512.png" alt="VybePulse" className="w-24 h-24 rounded-2xl shadow-lg" /></div></Card></div>
+              <div className="order-1 lg:order-2"><Card variant="elegant" size="xl"><div className="aspect-video bg-gradient-calm rounded-xl flex items-center justify-center"><img src="/icon-512.png" alt="VybePulse" className="w-24 h-24 rounded-2xl shadow-lg" loading="lazy" /></div></Card></div>
             </div>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center scroll-animate opacity-0">
               <div className="order-2 space-y-6">
