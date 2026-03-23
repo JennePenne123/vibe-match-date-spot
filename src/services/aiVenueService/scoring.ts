@@ -32,8 +32,9 @@ const calculateUserScore = (
     score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
   }
 
-  // Price range matching with learned weight (15%)
+  // Price range matching
   if (userPrefs.preferred_price_range && venue.price_range) {
+    maxPossible += 0.22;
     const priceMatch = userPrefs.preferred_price_range.includes(venue.price_range);
     
     if (priceMatch) {
