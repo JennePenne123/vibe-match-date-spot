@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAIInsights, AIInsights } from '@/services/aiLearningService';
+import { STALE_TIMES } from '@/config/queryConfig';
 
 export const useAdvancedInsights = () => {
   const { user } = useAuth();
