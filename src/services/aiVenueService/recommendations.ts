@@ -187,11 +187,20 @@ export const getAIVenueRecommendations = async (
     const sortedRecommendations = recommendations
       .sort((a, b) => b.ai_score - a.ai_score);
 
-    // Quality gate: Top 3 must have ≥75% match score
+    // Quality gate: Top 3 must have ≥80% match score
     // Venues below threshold are demoted out of the top 3
     const MIN_TOP3_SCORE = 0.80;
     const qualifiedTop3 = sortedRecommendations.filter(r => r.ai_score >= MIN_TOP3_SCORE);
     const belowThreshold = sortedRecommendations.filter(r => r.ai_score < MIN_TOP3_SCORE);
+    
+    // Mark qualified venues so the UI can reliably show Top 3 badges
+    qualifiedTop3.forEach((r, i) => {
+      (r as any).qualityVerified = true;
+      (r as any).qualityRank = i + 1;
+    });
+    belowThreshold.forEach(r => {
+      (r as any).qualityVerified = false;
+    });
     
     // Rebuild: qualified venues first (sorted by score), then the rest
     const qualitySorted = [...qualifiedTop3, ...belowThreshold];
@@ -220,8 +229,11 @@ export const getAIVenueRecommendations = async (
       }
     }
 
-    console.log(`🏆 TOP 3 QUALITY: ${qualifiedTop3.slice(0, 3).length}/3 venues meet ≥75% threshold`, 
+    console.log(`🏆 TOP 3 QUALITY: ${qualifiedTop3.slice(0, 3).length}/3 venues meet ≥80% threshold`, 
       qualifiedTop3.slice(0, 3).map(r => `${r.venue_name}: ${Math.round(r.ai_score * 100)}%`));
+    if (qualifiedTop3.length < 3) {
+      console.warn(`⚠️ QUALITY WARNING: Only ${qualifiedTop3.length}/3 venues passed the 80% quality gate`);
+    }
 
     return validateRecommendations(diverseRecommendations);
   } catch (error) {
