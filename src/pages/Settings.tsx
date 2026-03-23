@@ -25,6 +25,8 @@ import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import LanguageSelector from '@/components/LanguageSelector';
 
+const TRACKING_OPT_OUT_KEY = 'vybepulse_tracking_opt_out';
+
 const Settings = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -45,6 +47,7 @@ const Settings = () => {
   const [exportLoading, setExportLoading] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [trackingOptOut, setTrackingOptOut] = useState(() => localStorage.getItem(TRACKING_OPT_OUT_KEY) === 'true');
 
   useEffect(() => {
     window.scrollTo(0, 0);
