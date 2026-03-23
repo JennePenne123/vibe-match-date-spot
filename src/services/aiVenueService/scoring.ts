@@ -9,7 +9,7 @@ const calculateUserScore = (
   venue: any,
   weights: { cuisine: number; price: number; vibe: number; rating: number; time: number }
 ): { score: number; matches: { cuisine: boolean; price: boolean; vibes: string[]; activities: string[]; venueType: boolean; dietary: boolean; time: boolean } } => {
-  let score = 0.4; // Lower baseline to allow wider spread
+  let score = 0.10; // Very low baseline — venues must EARN their score through preference matches
   const matches = { cuisine: false, price: false, vibes: [] as string[], activities: [] as string[], venueType: false, dietary: false, time: false };
 
   // Cuisine matching with learned weight (25%)
@@ -26,7 +26,8 @@ const calculateUserScore = (
     }
     
     matches.cuisine = cuisineMatch;
-    const cuisineScore = cuisineMatch ? 0.25 : -0.05;
+    // Cuisine is the strongest signal: big reward for match, real penalty for mismatch
+    const cuisineScore = cuisineMatch ? 0.30 : -0.12;
     score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
   }
 
@@ -36,7 +37,10 @@ const calculateUserScore = (
     
     if (priceMatch) {
       matches.price = true;
-      score += applyWeight(0.15, weights.price, 'price');
+      score += applyWeight(0.18, weights.price, 'price');
+    } else {
+      matches.price = false;
+      score += applyWeight(-0.06, weights.price, 'price');
     }
   }
 
@@ -68,7 +72,8 @@ const calculateUserScore = (
     }
     
     matches.vibes = vibeMatches;
-    const vibeScore = vibeMatches.length * 0.08;
+    // More vibe matches = stronger signal; no matches = slight penalty
+    const vibeScore = vibeMatches.length > 0 ? vibeMatches.length * 0.10 : -0.04;
     score += applyWeight(vibeScore, weights.vibe, 'vibe');
   }
 
@@ -367,7 +372,8 @@ export const calculateVenueAIScore = async (
     
     // Final AI score (0-100 scale)
     const rawScore = (baseScore + weightedContextual + moodModifier + confidenceBoost + implicitBoost) * 100;
-    const finalScore = Math.max(35, Math.min(98, rawScore));
+    // Floor lowered to 10 so poorly matching venues are clearly distinguishable
+    const finalScore = Math.max(10, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
       venue: venue.name,
