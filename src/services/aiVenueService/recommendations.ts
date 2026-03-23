@@ -664,7 +664,8 @@ function enrichVenueWithSecondary(primaryVenue: any, secondaryVenue: any): void 
 async function getVenuesFromRadar(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   const timer = apiUsageService.createTimer('radar', '/search-venues-radar');
   
@@ -684,12 +685,13 @@ async function getVenuesFromRadar(
       return [];
     }
     
+    const baseRadius = (userPrefs.max_distance || 25) * 1000;
     const { data, error } = await supabase.functions.invoke('search-venues-radar', {
       body: {
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
         cuisines: userPrefs.preferred_cuisines || [],
-        radius: (userPrefs.max_distance || 25) * 1000,
+        radius: Math.round(baseRadius * radiusMultiplier),
         limit,
         venueTypes: (userPrefs as any).preferred_venue_types || [],
         activities: (userPrefs as any).preferred_activities || [],
@@ -737,7 +739,8 @@ async function getVenuesFromRadar(
 async function getVenuesFromOverpass(
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  radiusMultiplier: number = 1
 ) {
   const timer = apiUsageService.createTimer('overpass', '/client-overpass');
   
@@ -758,7 +761,8 @@ async function getVenuesFromOverpass(
     }
     
     const { searchVenuesOverpass } = await import('@/services/overpassSearchService');
-    const radiusMeters = (userPrefs.max_distance || 25) * 1000;
+    const baseRadius = (userPrefs.max_distance || 25) * 1000;
+    const radiusMeters = Math.round(baseRadius * radiusMultiplier);
     const result = await searchVenuesOverpass(
       userLocation.latitude,
       userLocation.longitude,
