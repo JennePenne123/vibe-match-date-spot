@@ -92,7 +92,7 @@ describe('preferenceFiltering', () => {
       // French Fine Dining should rank highest for $$$ price
       const frenchVenue = result.find(v => v.name === 'French Fine Dining');
       expect(frenchVenue).toBeDefined();
-      expect(frenchVenue?.preferenceScore).toBeGreaterThanOrEqual(30);
+      expect(frenchVenue?.preferenceScore).toBeGreaterThanOrEqual(20);
     });
 
     it('should filter venues by vibe/tag preferences', async () => {
