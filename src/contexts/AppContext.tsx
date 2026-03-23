@@ -49,6 +49,7 @@ interface AppContextType {
   generateRecommendations: () => Promise<void>;
   resetState: () => void;
   requestLocation: () => Promise<void>;
+  updateUserLocation: (location: UserLocation) => void;
 }
 
 const initialState: AppState = {
