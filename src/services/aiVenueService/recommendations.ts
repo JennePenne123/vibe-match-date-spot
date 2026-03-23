@@ -489,6 +489,45 @@ async function getVenuesParallel(
 }
 
 /**
+ * Deduplicate venues within a single recommendation list
+ * Catches same-source duplicates (e.g., Overpass Node + Way for same venue)
+ */
+function deduplicateWithinSource(recommendations: AIVenueRecommendation[]): AIVenueRecommendation[] {
+  const unique: AIVenueRecommendation[] = [];
+  
+  for (const rec of recommendations) {
+    const isDupe = unique.some(existing => {
+      // Same venue_id
+      if (existing.venue_id === rec.venue_id) return true;
+      
+      // Same name (exact)
+      const name1 = existing.venue_name.toLowerCase().trim();
+      const name2 = rec.venue_name.toLowerCase().trim();
+      if (name1 === name2) return true;
+      
+      // Geo proximity + name similarity
+      if (existing.latitude && existing.longitude && rec.latitude && rec.longitude) {
+        const dist = calculateGeoDistance(existing.latitude, existing.longitude, rec.latitude, rec.longitude);
+        if (dist < 30) {
+          const sim = calculateStringSimilarity(name1, name2);
+          if (sim > 0.5) return true;
+        }
+      }
+      
+      return false;
+    });
+    
+    if (!isDupe) {
+      unique.push(rec);
+    } else {
+      console.log(`🔄 DEDUP: Removed duplicate recommendation: "${rec.venue_name}"`);
+    }
+  }
+  
+  return unique;
+}
+
+/**
  * Merge and deduplicate venues from multiple sources
  */
 function mergeAndDeduplicateVenues(primaryVenues: any[], secondaryVenues: any[]): any[] {
