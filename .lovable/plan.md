@@ -112,7 +112,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 4 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons, Favicon finalisieren |
 | 5 | ~~**Auth-Redirect Konsistenz**~~ | ✅ Erledigt | Alle Seiten einheitlich → `/?auth=required` |
 | 6 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor |
-| 7 | **Security Hardening** | 📋 Manuell | OTP-Ablauf <10min, Leaked Password Protection im Supabase Dashboard |
+| 7 | **Security Hardening** | 📋 Manuell | OTP-Ablauf <10min, Leaked Password Protection, **Anonymous Sign-Ins deaktivieren** (Auth → Providers) im Supabase Dashboard |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
