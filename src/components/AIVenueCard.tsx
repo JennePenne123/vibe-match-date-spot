@@ -112,6 +112,26 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   // Calculate display score (handle both 0-1 and 0-100 ranges)
   const displayScore = ai_score <= 1 ? Math.round(ai_score * 100) : Math.round(ai_score);
 
+  // Determine confidence label based on score + data quality
+  const getConfidenceLabel = (): { label: string; icon: React.ReactNode; className: string } | null => {
+    const isQualityVerified = (recommendation as any).qualityVerified === true;
+    const confLevel = confidence_level ?? 0;
+    const hasStrongData = confLevel > 0.7 || (match_factors?.learned_weights_applied === true);
+    
+    if (isQualityVerified && displayScore >= 80 && hasStrongData) {
+      return { label: 'Top Match', icon: <Check className="w-3 h-3" />, className: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' };
+    }
+    if (displayScore >= 60 && (hasStrongData || confLevel > 0.5)) {
+      return { label: 'Guter Match', icon: <ThumbsUp className="w-3 h-3" />, className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' };
+    }
+    if (displayScore >= 50) {
+      return { label: 'Entdeckung', icon: <Eye className="w-3 h-3" />, className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' };
+    }
+    return null;
+  };
+
+  const confidenceLabel = getConfidenceLabel();
+
   // Get AI score color based on score
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-100';
@@ -132,12 +152,18 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
           className="transition-transform duration-300 hover:scale-105"
         />
           
-        {/* AI Match Score Overlay */}
-        <div className="absolute top-3 right-3">
+        {/* AI Match Score + Confidence Label Overlay */}
+        <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
           <Badge className={`${getScoreColor(displayScore)} font-bold border-0 shadow-sm text-sm px-2.5 py-1`}>
             <Sparkles className="w-3.5 h-3.5 mr-1" />
             {displayScore}% Match
           </Badge>
+          {confidenceLabel && (
+            <Badge className={`${confidenceLabel.className} font-medium border-0 shadow-sm text-xs px-2 py-0.5`}>
+              {confidenceLabel.icon}
+              <span className="ml-1">{confidenceLabel.label}</span>
+            </Badge>
+          )}
         </div>
 
         {/* Voucher badges */}
