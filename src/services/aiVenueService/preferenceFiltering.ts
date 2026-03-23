@@ -70,13 +70,15 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
   if (preferredCuisines.some(c => vc.includes(c.toLowerCase()) || c.toLowerCase().includes(vc))) return 0.9;
   
   // Related cuisine groups - higher score for same family
+  // Tighter cuisine groups - avoid false positives (e.g. german ≠ mediterranean)
   const cuisineGroups: Record<string, string[]> = {
     'asian': ['chinese', 'japanese', 'thai', 'korean', 'vietnamese', 'asian', 'sushi', 'ramen', 'wok', 'dim sum', 'curry'],
-    'european': ['italian', 'french', 'spanish', 'greek', 'mediterranean', 'german', 'portuguese', 'european'],
-    'american': ['american', 'burger', 'bbq', 'steakhouse', 'diner', 'grill'],
+    'mediterranean': ['italian', 'greek', 'mediterranean', 'spanish', 'turkish', 'lebanese', 'moroccan'],
+    'western_european': ['french', 'german', 'portuguese', 'european', 'regional', 'tarte flambee'],
+    'american': ['american', 'burger', 'bbq', 'steakhouse', 'steak house', 'diner', 'grill'],
     'cafe': ['café', 'cafe', 'coffee', 'bakery', 'brunch', 'breakfast', 'patisserie'],
     'bar': ['bar', 'pub', 'cocktail', 'wine bar', 'lounge', 'biergarten'],
-    'middle_eastern': ['turkish', 'persian', 'lebanese', 'arabic', 'falafel', 'kebab', 'döner'],
+    'middle_eastern': ['persian', 'arabic', 'falafel', 'kebab', 'döner'],
     'latin': ['mexican', 'brazilian', 'peruvian', 'argentinian', 'tapas'],
   };
   
