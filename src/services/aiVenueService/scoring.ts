@@ -9,7 +9,7 @@ const calculateUserScore = (
   venue: any,
   weights: { cuisine: number; price: number; vibe: number; rating: number; time: number }
 ): { score: number; matches: { cuisine: boolean; price: boolean; vibes: string[]; activities: string[]; venueType: boolean; dietary: boolean; time: boolean } } => {
-  let score = 0.10; // Very low baseline — venues must EARN their score through preference matches
+  let score = 0.15; // Low baseline — venues must EARN their score through preference matches
   const matches = { cuisine: false, price: false, vibes: [] as string[], activities: [] as string[], venueType: false, dietary: false, time: false };
 
   // Cuisine matching with learned weight (25%)
