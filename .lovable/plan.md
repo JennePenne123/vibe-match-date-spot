@@ -113,14 +113,14 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 5 | ~~**Auth-Redirect Konsistenz**~~ | ✅ Erledigt | Alle Seiten einheitlich → `/?auth=required` |
 | 6 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor |
 | 7 | **Security Hardening** | 📋 Manuell | OTP-Ablauf <10min, **Leaked Password Protection (HIBP Check) aktivieren** (Auth → Email Settings), **Anonymous Sign-Ins deaktivieren** (Auth → Providers) im Supabase Dashboard |
-| 7a | **Sentry DSN als Build Secret** | 📋 Manuell | `VITE_SENTRY_DSN` in Workspace Settings → Build Secrets hinterlegen (Code ist fertig) |
+| 7a | ~~**Sentry DSN als Build Secret**~~ | ✅ Erledigt | DSN bereits in `.env` konfiguriert, Sentry aktiv |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
 | 8 | **DSGVO-Update Datenschutzerklärung** | 🟡 Offen | Implizites Tracking dokumentieren, Consent/Opt-Out prüfen |
-| 9 | **Sentry Integration** | 🟡 Offen | Konto erstellen, DSN hinterlegen, SDK einbinden |
+| 9 | ~~**Sentry Integration**~~ | ✅ Erledigt | Konto (vybepulse.sentry.io), DSN konfiguriert, SDK aktiv |
 | 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner |
 | 11 | ~~**Image-Optimierung**~~ | ✅ Erledigt | lazy loading, decoding=async, fetchPriority auf LCP-Elementen |
 | 12 | **React Query Tuning** | 🟡 Offen | Differenzierte staleTime pro Query-Typ |
@@ -181,5 +181,5 @@ DSGVO/Legal:        ████████████████████
 | Venues | Foursquare API + Google Places API |
 | i18n | i18next (6 Sprachen) |
 | PWA | Service Worker + Push Notifications |
-| Monitoring | Error Monitoring Service (Sentry geplant) |
+| Monitoring | Error Monitoring Service + Sentry (aktiv) |
 | Payments | Stripe (geplant) |
