@@ -1,7 +1,7 @@
 
 # VybePulse – Gesamt-Projektübersicht & Roadmap
 
-**Stand: 23. März 2026** | **Geschätzter Fortschritt: ~82%**
+**Stand: 23. März 2026** | **Geschätzter Fortschritt: ~87%**
 
 ---
 
@@ -11,7 +11,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## ✅ Fertiggestellte Features (~82%)
+## ✅ Fertiggestellte Features (~87%)
 
 ### 🏠 User-Frontend
 - **Landing Page** mit Auth-Modal (Google, Apple, E-Mail)
@@ -37,6 +37,8 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **AI Edge Function** für Venue-Reasoning (Top-N Enhancement, optional aktivierbar)
 - **Präziseres Scoring** ✅ Gewichte optimiert → Top-3 Venues erreichen ~80%+ Match-Score
 - **Konsistente Match-Scores** ✅ Keine Mock-Overrides mehr bei Venue-Detail-Ansicht
+- **Cuisine-Mismatch-Penalty** ✅ Stärkere Bestrafung für falsche Küchen-Matches (z.B. Pizza bei Thai-Suche)
+- **Venue-Blocklist** ✅ Lieferservices, Takeaway-only, Supermärkte werden automatisch gefiltert
 
 ### 📅 Date-Planning
 - **Smart Date Planner** (Solo + Collaborative Mode)
@@ -47,11 +49,14 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Invitation Messenger** (Chat pro Einladung)
 
 ### 🏪 Venue-System
-- **Venue-Suche** (Foursquare + Radar Integration, Google Places deaktiviert)
+- **Venue-Suche** (Overpass + Radar + Foursquare, Google Places als Fallback)
 - **Venue Detail Pages** mit Fotos, Ratings, Öffnungszeiten, Karte
 - **Venue Feedback** (Like/Dislike/Super Like/Skip)
-- **30-min LRU Venue-Cache**
+- **30-min LRU Venue-Cache** mit automatischer Invalidierung bei Standortwechsel ✅
 - **Map View** mit Clustered Markers (Leaflet)
+- **Globaler Standort-Sync** ✅ Stadtwechsel in Preferences → Planner übernimmt automatisch
+- **Radar-API Radius-Fix** ✅ Max 10km (API-Limit) statt fehlerhafter 50km
+- **Strikte Geo-Filterung** ✅ Bounding-Box verhindert standortfremde Ergebnisse
 
 ### 🎟️ Voucher & Rewards
 - **QR-Code Voucher-System** (Wallet → QR anzeigen → Partner scannt → Edge Function validiert)
@@ -106,63 +111,68 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## 🔧 Offene Aufgaben vor Launch (~18%)
+## 🔧 Offene Aufgaben vor Launch (~13%)
 
 ### 🔴 Kritisch (Must-Have für Launch)
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 1 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons, Favicon finalisieren |
+| 1 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons (192x192, 512x512), Favicons (16x16, 32x32, 180x180) |
 | 2 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor |
-| 3 | **Security Hardening** | 📋 Manuell | OTP-Ablauf <10min, **Leaked Password Protection (HIBP Check)**, **Anonymous Sign-Ins deaktivieren** im Supabase Dashboard |
+| 3 | **Security Hardening** | 📋 Manuell | OTP-Ablauf <10min, HIBP-Check aktivieren, Anonymous Sign-Ins deaktivieren |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 4 | **React Query Tuning** | 🟡 Offen | Differenzierte staleTime pro Query-Typ |
-| 5 | **VAPID-Keys einrichten** | 📋 Manuell | `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` als Edge Function Secrets |
-| 6 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
+| 4 | **Bundle-Optimierung** | 🟡 Offen | Code-Splitting, Lazy Loading, Tree-Shaking-Audit |
+| 5 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
 
 ### 🟢 Post-Launch / Nice-to-Have
 
 | # | Aufgabe | Aufwand | Beschreibung |
 |---|---------|---------|--------------|
-| 7 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
-| 8 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
-| 9 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
-| 10 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
-| 11 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
-| 12 | ~~**Route Preloading**~~ | ✅ Done | Prefetch nach Login + Hover-Prefetch |
-| 13 | ~~**Feedback-Impact-Anzeige**~~ | ✅ Done | Hinweis auf Home wenn sich Empfehlungen durch Feedback verändert haben |
-| 14 | **Tree-Shaking-Audit** | Klein | Ungenutzten Code und Imports identifizieren und entfernen |
-| 15 | **Bundle-Größe optimieren** | Mittel | Chunk-Splitting analysieren, große Dependencies prüfen |
-| 16 | ~~**React Query Tuning**~~ | ✅ Done | Zentrales `queryConfig.ts` mit differenzierten staleTime-Kategorien (30s–10min) |
+| 6 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
+| 7 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
+| 8 | **Standort-Picker im Planner** | Klein | Schneller Stadtwechsel direkt im Smart Date Planner |
+| 9 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
+| 10 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
+
+### ✅ Heute erledigt (23. März 2026)
+
+| Aufgabe | Beschreibung |
+|---------|--------------|
+| ~~Stadtwechsel-Sync~~ | Location-Update in Preferences → globaler AppState + Cache-Invalidierung |
+| ~~Radar-API Radius-Bug~~ | Max-Radius von 50km auf 10km (API-Limit) korrigiert |
+| ~~Venue-Blocklist~~ | Lieferservices, Takeaway, Supermärkte werden vor Scoring gefiltert |
+| ~~Cuisine-Mismatch-Penalty~~ | Stärkere Bestrafung für falsche Küchen (Pizza ≠ Thai) |
+| ~~React Query Tuning~~ | Zentrales queryConfig.ts mit differenzierten staleTime-Kategorien |
+| ~~VAPID-Keys~~ | Push-Notifications vollständig live mit Web Push API |
 
 ---
 
 ## 📊 Fortschritts-Einschätzung
 
 ```
-Gesamt-Fortschritt: █████████████████████████░░░░░ ~82%
+Gesamt-Fortschritt: ██████████████████████████░░░░ ~87%
 
 Frontend UI/UX:     ██████████████████████████████ ~98%
-KI-Engine:          ███████████████████████████░░░ ~90%  ↑ Scoring optimiert
+KI-Engine:          ████████████████████████████░░ ~93%  ↑ Blocklist + Mismatch-Penalty
 Date-Planning:      █████████████████████████████░ ~95%
-Venue-System:       █████████████████████████░░░░░ ~80%  ↑ API-Strategie steht
-Voucher/Rewards:    █████████████████████████░░░░░ ~85%  ↑ Wallet mit echten Daten
+Venue-System:       ██████████████████████████░░░░ ~88%  ↑ Stadtwechsel + Radar-Fix
+Voucher/Rewards:    █████████████████████████░░░░░ ~85%
 Partner-Portal:     █████████████████████████░░░░░ ~85%
 Admin Dashboard:    █████████████████████████████░ ~95%
-Security/Infra:     ███████████████████████████░░░ ~90%  ↑ Sentry aktiv
+Security/Infra:     ████████████████████████████░░ ~92%  ↑ Push live
 Monetarisierung:    ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~10% (Stripe noch nicht)
-Performance:        ██████████████████████████░░░░ ~85%  ↑ Code Splitting + Image Opt.
-DSGVO/Legal:        ████████████████████████████░░ ~92%  ↑ Datenschutz aktualisiert
+Performance:        ██████████████████████████░░░░ ~85%
+DSGVO/Legal:        ████████████████████████████░░ ~92%
 ```
 
 ### Zeitliche Einschätzung bis Launch (Sommer 2026)
 - **Kritische Aufgaben (1-3)**: ~1 Session + manuelle Dashboard-Schritte
-- **Wichtige Aufgaben (4-6)**: ~2 Sessions
-- **Gesamt bis MVP-Launch**: ~3 Sessions
+- **Wichtige Aufgaben (4-5)**: ~1-2 Sessions
+- **Gesamt bis MVP-Launch**: ~2-3 Sessions
 - **Post-Launch Features**: Laufend nach Priorität
 
 ---
@@ -176,8 +186,8 @@ DSGVO/Legal:        ████████████████████
 | Backend | Supabase (Auth, DB, Realtime, Edge Functions, Storage) |
 | AI/ML | Custom Scoring Engine + Edge Functions (Gemini via Lovable AI Gateway) |
 | Maps | Leaflet + OSRM Routing |
-| Venues | Foursquare API + Radar API |
+| Venues | Overpass API + Radar API + Foursquare API |
 | i18n | i18next (6 Sprachen) |
-| PWA | Service Worker + Push Notifications |
+| PWA | Service Worker + Web Push API (VAPID) |
 | Monitoring | Error Monitoring Service + Sentry (aktiv) |
 | Payments | Stripe (geplant) |
