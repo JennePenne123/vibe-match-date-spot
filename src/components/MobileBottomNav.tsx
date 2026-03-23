@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Home, Sparkles, User, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { preloadOnHover } from '@/utils/routePreloading'
 
 export function MobileBottomNav() {
   const { t } = useTranslation()
