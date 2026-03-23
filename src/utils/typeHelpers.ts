@@ -22,10 +22,10 @@ export const venueToAppVenue = (venue: Venue): AppVenue => {
     // Map database fields to UI fields
     image: venue.image_url,
     location: venue.address,
-    distance: '0.5 mi', // Mock distance
-    matchScore: Math.floor(Math.random() * 30) + 70, // Mock match score 70-100
-    discount: Math.random() > 0.7 ? '15% off appetizers' : undefined, // Random discount
-    isOpen: Math.random() > 0.3, // Random open status
+    distance: (venue as any).distance || '0.5 mi',
+    matchScore: (venue as any).matchScore ?? undefined,
+    discount: (venue as any).discount ?? undefined,
+    isOpen: (venue as any).isOpen ?? undefined,
     openingHours: venue.opening_hours ? 
       (Array.isArray(venue.opening_hours) ? venue.opening_hours as string[] : ['Mon-Sun: 9:00 AM - 10:00 PM']) : 
       ['Mon-Sun: 9:00 AM - 10:00 PM'],
@@ -55,6 +55,6 @@ export const getVenueDistance = (venue: any): string => {
   return venue?.distance ?? '0.5 mi';
 };
 
-export const getVenueMatchScore = (venue: any): number => {
-  return venue?.matchScore ?? Math.floor(Math.random() * 30) + 70;
+export const getVenueMatchScore = (venue: any): number | undefined => {
+  return venue?.matchScore ?? undefined;
 };
