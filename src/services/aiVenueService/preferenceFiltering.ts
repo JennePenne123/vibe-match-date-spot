@@ -110,10 +110,34 @@ function normalizePricePreferences(pricePrefs: string[] | null): string[] {
   return Array.from(symbols);
 }
 
+// Blocklist: filter out non-dine-in venues (delivery, takeaway-only, supermarkets)
+const VENUE_NAME_BLOCKLIST = [
+  'lieferservice', 'lieferdienst', 'delivery', 'lieferando', 'wolt', 'uber eats',
+  'just eat', 'flink', 'gorillas', 'getir', 'foodpanda', 'domino', 'pizza hut delivery',
+  'netto', 'aldi', 'lidl', 'rewe', 'edeka', 'penny', 'kaufland',
+  'takeaway', 'take away', 'zum mitnehmen', 'abhol',
+];
+
+const isBlockedVenue = (venue: any): boolean => {
+  const name = (venue.name || '').toLowerCase();
+  const desc = (venue.description || '').toLowerCase();
+  const tags = (venue.tags || []).map((t: string) => t.toLowerCase());
+  const searchText = [name, desc, ...tags].join(' ');
+  return VENUE_NAME_BLOCKLIST.some(blocked => searchText.includes(blocked));
+};
+
 // Filter venues by user preferences to improve matching
 export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string) => {
   try {
-    console.log('🎯 PREFERENCE FILTER: Filtering', venues.length, 'venues for user:', userId);
+    // Pre-filter: remove delivery services and supermarkets
+    const filteredVenues = venues.filter(v => {
+      if (isBlockedVenue(v)) {
+        console.log(`🚫 PREFERENCE FILTER: Blocked non-venue: ${v.name}`);
+        return false;
+      }
+      return true;
+    });
+    console.log('🎯 PREFERENCE FILTER: Filtering', filteredVenues.length, 'venues (blocked', venues.length - filteredVenues.length, 'non-venues) for user:', userId);
     
     const { data: userPrefs, error: prefsError } = await supabase
       .from('user_preferences')
@@ -166,7 +190,7 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
     };
 
     // Score all venues - don't filter out, just rank
-    const scoredVenues = venues.map(venue => {
+    const scoredVenues = filteredVenues.map(venue => {
       let score = 0;
       let maxPossible = 0; // Track what's actually evaluable
       let primaryMatchFound = false; // Track if main signal matches
@@ -201,7 +225,8 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           score += cuisineScore * 40;
           primaryMatchFound = true;
         } else {
-          score -= 5; // Reduced penalty (was -8)
+          // Strong penalty for wrong cuisine (e.g. Pizza when Thai selected)
+          score -= 15;
         }
       }
 
