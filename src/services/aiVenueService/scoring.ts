@@ -8,12 +8,14 @@ const calculateUserScore = (
   userPrefs: any,
   venue: any,
   weights: { cuisine: number; price: number; vibe: number; rating: number; time: number }
-): { score: number; matches: { cuisine: boolean; price: boolean; vibes: string[]; activities: string[]; venueType: boolean; dietary: boolean; time: boolean } } => {
-  let score = 0.15; // Low baseline — venues must EARN their score through preference matches
+): { score: number; maxPossible: number; matches: { cuisine: boolean; price: boolean; vibes: string[]; activities: string[]; venueType: boolean; dietary: boolean; time: boolean } } => {
+  let score = 0;
+  let maxPossible = 0;
   const matches = { cuisine: false, price: false, vibes: [] as string[], activities: [] as string[], venueType: false, dietary: false, time: false };
 
-  // Cuisine matching with learned weight (25%)
+  // Cuisine matching with learned weight
   if (userPrefs.preferred_cuisines && venue.cuisine_type) {
+    maxPossible += 0.35;
     const userCuisines = userPrefs.preferred_cuisines.map((c: string) => c.toLowerCase());
     const venueCuisine = venue.cuisine_type.toLowerCase();
     
@@ -26,13 +28,13 @@ const calculateUserScore = (
     }
     
     matches.cuisine = cuisineMatch;
-    // Cuisine is the strongest signal: big reward for match, real penalty for mismatch
     const cuisineScore = cuisineMatch ? 0.35 : -0.10;
     score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
   }
 
-  // Price range matching with learned weight (15%)
+  // Price range matching
   if (userPrefs.preferred_price_range && venue.price_range) {
+    maxPossible += 0.22;
     const priceMatch = userPrefs.preferred_price_range.includes(venue.price_range);
     
     if (priceMatch) {
@@ -44,8 +46,9 @@ const calculateUserScore = (
     }
   }
 
-  // Vibe matching with learned weight (15%)
+  // Vibe matching
   if (userPrefs.preferred_vibes && venue.tags && venue.tags.length > 0) {
+    maxPossible += 0.12;
     const vibeMatches = userPrefs.preferred_vibes.filter((vibe: string) => 
       venue.tags.some((tag: string) => 
         tag.toLowerCase().includes(vibe.toLowerCase()) ||
@@ -53,17 +56,14 @@ const calculateUserScore = (
       )
     );
     
-    // Infer vibes if no direct matches
     if (vibeMatches.length === 0) {
       if (userPrefs.preferred_vibes.includes('romantic')) {
         if (venue.price_range === '$$$' || venue.price_range === '$$$$' || 
-            venue.cuisine_type?.toLowerCase().includes('fine') ||
             venue.cuisine_type?.toLowerCase().includes('italian') ||
             venue.cuisine_type?.toLowerCase().includes('french')) {
           vibeMatches.push('romantic (inferred)');
         }
       }
-      
       if (userPrefs.preferred_vibes.includes('casual')) {
         if (venue.price_range === '$' || venue.price_range === '$$') {
           vibeMatches.push('casual (inferred)');
@@ -72,13 +72,13 @@ const calculateUserScore = (
     }
     
     matches.vibes = vibeMatches;
-    // More vibe matches = stronger signal; no matches = slight penalty
     const vibeScore = vibeMatches.length > 0 ? vibeMatches.length * 0.12 : -0.04;
     score += applyWeight(vibeScore, weights.vibe, 'vibe');
   }
 
-  // Activity matching (10%) - NEW
+  // Activity matching (10%)
   if (userPrefs.preferred_activities && venue.tags && venue.tags.length > 0) {
+    maxPossible += 0.10;
     const activityTagMap: Record<string, string[]> = {
       'dining': ['restaurant', 'dining', 'food', 'essen'],
       'dining_plus': ['experience', 'event', 'erlebnis'],
@@ -87,24 +87,21 @@ const calculateUserScore = (
       'active': ['sport', 'bowling', 'climbing', 'fitness', 'aktiv'],
       'nightlife_act': ['club', 'party', 'nightlife', 'disco'],
     };
-    
     const venueTags = venue.tags.map((t: string) => t.toLowerCase());
     const venueCuisine = (venue.cuisine_type || '').toLowerCase();
     const venueDesc = (venue.description || '').toLowerCase();
     const searchText = [...venueTags, venueCuisine, venueDesc].join(' ');
-    
     const activityMatches = (userPrefs.preferred_activities as string[]).filter((act: string) => {
       const keywords = activityTagMap[act] || [act.toLowerCase()];
       return keywords.some(kw => searchText.includes(kw));
     });
-    
     if (activityMatches.length > 0) {
       matches.activities = activityMatches;
       score += 0.10;
     }
   }
 
-  // Venue Type matching (10%) - NEW
+  // Venue Type matching (10%)
   if (userPrefs.preferred_venue_types && userPrefs.preferred_venue_types.length > 0) {
     const venueTypeTagMap: Record<string, string[]> = {
       'museum': ['museum', 'ausstellung', 'exhibition'],
@@ -119,74 +116,70 @@ const calculateUserScore = (
       'climbing': ['climbing', 'klettern', 'bouldering', 'boulderhalle'],
       'swimming': ['swimming', 'pool', 'schwimmbad', 'therme'],
       'hiking': ['hiking', 'wandern', 'trail'],
-      
       'karaoke': ['karaoke'],
       'comedy_club': ['comedy', 'comedy club', 'stand-up'],
       'arcade': ['arcade', 'spielhalle', 'gaming'],
       'live_event': ['event', 'live', 'veranstaltung'],
       'spa_wellness': ['spa', 'wellness', 'sauna', 'massage'],
     };
-    
     const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase());
     const venueCuisine = (venue.cuisine_type || '').toLowerCase();
     const venueName = (venue.name || '').toLowerCase();
     const venueDesc = (venue.description || '').toLowerCase();
     const searchText = [...venueTags, venueCuisine, venueName, venueDesc].join(' ');
-    
     const typeMatch = (userPrefs.preferred_venue_types as string[]).some((vt: string) => {
       const keywords = venueTypeTagMap[vt] || [vt.toLowerCase().replace('_', ' ')];
       return keywords.some(kw => searchText.includes(kw));
     });
-    
     if (typeMatch) {
+      maxPossible += 0.10;
       matches.venueType = true;
       score += 0.10;
     }
   }
 
-  // Time preference matching (5%) - NEW
+  // Time preference matching (5%)
   if (userPrefs.preferred_times && userPrefs.preferred_times.length > 0) {
+    maxPossible += 0.05;
     const currentHour = new Date().getHours();
     const timeSlotMap: Record<string, [number, number]> = {
       'brunch': [8, 11], 'lunch': [11, 14], 'afternoon': [14, 17],
       'dinner': [17, 20], 'evening': [20, 23], 'flexible': [0, 24],
     };
-    
     const isCurrentTimePreferred = (userPrefs.preferred_times as string[]).some((t: string) => {
       const range = timeSlotMap[t];
       if (!range) return false;
       return currentHour >= range[0] && currentHour < range[1];
     });
-    
     if (isCurrentTimePreferred || (userPrefs.preferred_times as string[]).includes('flexible')) {
       matches.time = true;
       score += 0.05;
     }
   }
 
-  // Dietary compatibility (5%) - NEW  
+  // Dietary compatibility (5%)
   if (userPrefs.dietary_restrictions && userPrefs.dietary_restrictions.length > 0 && venue.tags) {
+    maxPossible += 0.05;
     const venueTags = venue.tags.map((t: string) => t.toLowerCase());
     const venueDesc = (venue.description || '').toLowerCase();
     const searchText = [...venueTags, venueDesc].join(' ');
-    
     const dietaryMatch = (userPrefs.dietary_restrictions as string[]).some((diet: string) => 
       searchText.includes(diet.toLowerCase().replace('_', ' '))
     );
-    
     if (dietaryMatch) {
       matches.dietary = true;
       score += 0.05;
     }
   }
 
-  // Rating bonus with learned weight (5%)
+  // Rating bonus (5%)
   if (venue.rating) {
+    maxPossible += 0.10;
     const ratingBonus = Math.min((venue.rating - 3.0) * 0.05, 0.1);
     score += applyWeight(ratingBonus, weights.rating, 'rating');
   }
 
-  return { score, matches };
+  return { score, maxPossible, matches };
 };
 
 // Calculate shared preference bonus for collaborative scoring
@@ -336,6 +329,7 @@ export const calculateVenueAIScore = async (
     // Calculate user score
     const userResult = calculateUserScore(userPrefs, venue, weights);
     let baseScore = userResult.score;
+    let baseMaxPossible = userResult.maxPossible;
     let sharedMatches = null;
 
     // Calculate collaborative score if partner preferences available
@@ -343,8 +337,8 @@ export const calculateVenueAIScore = async (
       const partnerResult = calculateUserScore(partnerPrefs, venue, weights);
       const sharedResult = calculateSharedBonus(userResult.matches, partnerResult.matches);
       
-      // Average scores and add shared bonus
       baseScore = (userResult.score + partnerResult.score) / 2 + sharedResult.bonus;
+      baseMaxPossible = (userResult.maxPossible + partnerResult.maxPossible) / 2 + sharedResult.bonus;
       sharedMatches = sharedResult.sharedMatches;
       
       console.log('🤝 SCORING: Collaborative scoring:', {
@@ -355,6 +349,10 @@ export const calculateVenueAIScore = async (
         sharedMatches: sharedResult.sharedMatches
       });
     }
+
+    // Normalize base score by what was actually evaluable
+    const effectiveMax = Math.max(baseMaxPossible, 0.20);
+    const normalizedBase = baseScore / effectiveMax;
 
     // Calculate contextual factors with time weight
     const contextualScore = await calculateContextualFactors(venueId);
@@ -370,9 +368,8 @@ export const calculateVenueAIScore = async (
     // Apply implicit signal boost
     const implicitBoost = await getImplicitSignalBoost(userId, venueId);
     
-    // Final AI score (0-100 scale)
-    const rawScore = (baseScore + weightedContextual + moodModifier + confidenceBoost + implicitBoost) * 100;
-    // Floor lowered to 10 so poorly matching venues are clearly distinguishable
+    // Final AI score (0-100 scale) — normalized so sparse data doesn't penalize
+    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost) * 100;
     const finalScore = Math.max(10, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
