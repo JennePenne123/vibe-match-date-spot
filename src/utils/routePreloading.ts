@@ -42,7 +42,7 @@ export function preloadRoute(path: string): void {
  */
 export function preloadCoreRoutes(): void {
   // Small delay to avoid competing with initial render
-  requestIdleCallback
+  typeof requestIdleCallback === 'function'
     ? requestIdleCallback(() => POST_LOGIN_ROUTES.forEach(preloadRoute))
     : setTimeout(() => POST_LOGIN_ROUTES.forEach(preloadRoute), 1500);
 }
