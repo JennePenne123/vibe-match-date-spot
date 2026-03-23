@@ -406,7 +406,7 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
     // Sort by preference score, return ALL venues (no filtering threshold)
     const sorted = scoredVenues.sort((a, b) => b.preferenceScore - a.preferenceScore);
 
-    console.log(`🎯 PREFERENCE FILTER: Scored ${venues.length} venues`);
+    console.log(`🎯 PREFERENCE FILTER: Scored ${filteredVenues.length} venues`);
     console.log('🎯 TOP MATCHES:', sorted.slice(0, 5).map(v => 
       `${v.name}: ${Math.round(v.preferenceScore)}%`
     ));

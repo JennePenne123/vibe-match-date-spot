@@ -28,7 +28,7 @@ const calculateUserScore = (
     }
     
     matches.cuisine = cuisineMatch;
-    const cuisineScore = cuisineMatch ? 0.35 : -0.10;
+    const cuisineScore = cuisineMatch ? 0.35 : -0.20; // Strong penalty for wrong cuisine
     score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
   }
 
