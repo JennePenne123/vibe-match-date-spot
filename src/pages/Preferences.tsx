@@ -455,7 +455,7 @@ const Preferences = () => {
             <Button onClick={() => canGoBack ? setStep(s => s - 1) : navigate(-1)} variant="ghost" size="icon" className="text-muted-foreground flex-shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div className="flex-1">
+            <div className="flex-1 text-center">
               <h1 className="text-lg font-semibold text-foreground">{steps[step].title}</h1>
               <p className="text-xs text-muted-foreground">{steps[step].subtitle}</p>
             </div>
