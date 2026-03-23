@@ -183,8 +183,12 @@ export const getAIVenueRecommendations = async (
       }
     }
 
+    // Intra-source deduplication: remove duplicates within the same result set
+    // (e.g., Overpass returning same venue as both Node and Way)
+    const deduped = deduplicateWithinSource(recommendations);
+    
     // Sort by AI score, then apply diversity filter
-    const sortedRecommendations = recommendations
+    const sortedRecommendations = deduped
       .sort((a, b) => b.ai_score - a.ai_score);
 
     // Quality gate: Top 3 must have ≥80% match score
@@ -519,13 +523,30 @@ function areVenuesDuplicates(v1: any, v2: any): boolean {
   const name1 = (v1.name || '').toLowerCase().trim();
   const name2 = (v2.name || '').toLowerCase().trim();
   
-  if (name1 === name2) return true;
+  // Exact name match
+  if (name1 && name2 && name1 === name2) return true;
   
-  if (v1.latitude && v1.longitude && v2.latitude && v2.longitude) {
-    const distance = calculateGeoDistance(v1.latitude, v1.longitude, v2.latitude, v2.longitude);
+  // Same address (normalized)
+  const addr1 = (v1.address || v1.venue_address || '').toLowerCase().replace(/[,.\s]+/g, ' ').trim();
+  const addr2 = (v2.address || v2.venue_address || '').toLowerCase().replace(/[,.\s]+/g, ' ').trim();
+  if (addr1 && addr2 && addr1 === addr2 && name1 && name2) {
+    const similarity = calculateStringSimilarity(name1, name2);
+    if (similarity > 0.5) return true;
+  }
+  
+  // Geo proximity + name similarity
+  const lat1 = v1.latitude ?? v1.lat;
+  const lng1 = v1.longitude ?? v1.lng;
+  const lat2 = v2.latitude ?? v2.lat;
+  const lng2 = v2.longitude ?? v2.lng;
+  
+  if (lat1 && lng1 && lat2 && lng2) {
+    const distance = calculateGeoDistance(lat1, lng1, lat2, lng2);
     if (distance < API_CONFIG.deduplicationThreshold) {
       const similarity = calculateStringSimilarity(name1, name2);
       if (similarity > API_CONFIG.nameSimilarityThreshold) return true;
+      // Very close venues (< 20m) with moderate name similarity are likely dupes
+      if (distance < 20 && similarity > 0.4) return true;
     }
   }
   
