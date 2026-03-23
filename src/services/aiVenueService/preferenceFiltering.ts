@@ -117,14 +117,14 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       const hasPricePrefs = (userPrefs.preferred_price_range?.length || 0) > 0;
       const hasVibePrefs = (userPrefs.preferred_vibes?.length || 0) > 0;
 
-      // Cuisine matching (35% weight) - strongest signal
+      // Cuisine matching (40% weight) - strongest signal
       const cuisineScore = cuisineMatchScore(
         venue.cuisine_type, 
         userPrefs.preferred_cuisines || []
       );
       if (hasCuisinePrefs) {
-        // Full match: +35, partial: +28, related: +17, no match: -8
-        score += cuisineScore > 0 ? cuisineScore * 35 : -8;
+        // Full match: +40, partial: +32, related: +20, no match: -8
+        score += cuisineScore > 0 ? cuisineScore * 40 : -8;
       }
 
       // Price range matching (20% weight)
