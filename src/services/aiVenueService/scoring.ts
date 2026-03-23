@@ -329,6 +329,7 @@ export const calculateVenueAIScore = async (
     // Calculate user score
     const userResult = calculateUserScore(userPrefs, venue, weights);
     let baseScore = userResult.score;
+    let baseMaxPossible = userResult.maxPossible;
     let sharedMatches = null;
 
     // Calculate collaborative score if partner preferences available
@@ -336,8 +337,8 @@ export const calculateVenueAIScore = async (
       const partnerResult = calculateUserScore(partnerPrefs, venue, weights);
       const sharedResult = calculateSharedBonus(userResult.matches, partnerResult.matches);
       
-      // Average scores and add shared bonus
       baseScore = (userResult.score + partnerResult.score) / 2 + sharedResult.bonus;
+      baseMaxPossible = (userResult.maxPossible + partnerResult.maxPossible) / 2 + sharedResult.bonus;
       sharedMatches = sharedResult.sharedMatches;
       
       console.log('🤝 SCORING: Collaborative scoring:', {
@@ -348,6 +349,10 @@ export const calculateVenueAIScore = async (
         sharedMatches: sharedResult.sharedMatches
       });
     }
+
+    // Normalize base score by what was actually evaluable
+    const effectiveMax = Math.max(baseMaxPossible, 0.20);
+    const normalizedBase = baseScore / effectiveMax;
 
     // Calculate contextual factors with time weight
     const contextualScore = await calculateContextualFactors(venueId);
@@ -363,9 +368,8 @@ export const calculateVenueAIScore = async (
     // Apply implicit signal boost
     const implicitBoost = await getImplicitSignalBoost(userId, venueId);
     
-    // Final AI score (0-100 scale)
-    const rawScore = (baseScore + weightedContextual + moodModifier + confidenceBoost + implicitBoost) * 100;
-    // Floor lowered to 10 so poorly matching venues are clearly distinguishable
+    // Final AI score (0-100 scale) — normalized so sparse data doesn't penalize
+    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost) * 100;
     const finalScore = Math.max(10, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
