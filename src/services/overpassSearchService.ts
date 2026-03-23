@@ -80,14 +80,87 @@ function buildAddress(tags: Record<string, string>): string {
 
 function extractTags(tags: Record<string, string>): string[] {
   const result: string[] = [];
+  
+  // Basic type tags
   if (tags.cuisine) result.push(...tags.cuisine.split(';').map(c => c.trim().replace(/_/g, ' ')));
   if (tags.amenity) result.push(tags.amenity.replace(/_/g, ' '));
   if (tags.leisure) result.push(tags.leisure.replace(/_/g, ' '));
   if (tags.tourism) result.push(tags.tourism.replace(/_/g, ' '));
+
+  // Dietary tags — critical for scoring
   if (tags['diet:vegan'] === 'yes' || tags['diet:vegan'] === 'only') result.push('vegan');
   if (tags['diet:vegetarian'] === 'yes' || tags['diet:vegetarian'] === 'only') result.push('vegetarian');
-  if (tags.outdoor_seating === 'yes') result.push('outdoor seating');
+  if (tags['diet:gluten_free'] === 'yes') result.push('gluten free');
+  if (tags['diet:halal'] === 'yes') result.push('halal');
+  if (tags['diet:kosher'] === 'yes') result.push('kosher');
+  if (tags['diet:lactose_free'] === 'yes') result.push('lactose free');
+
+  // Seating & atmosphere — maps to vibes
+  if (tags.outdoor_seating === 'yes') result.push('outdoor seating', 'terrasse');
+  if (tags.indoor_seating === 'yes') result.push('indoor');
+  if (tags.beer_garden === 'yes' || tags.biergarten === 'yes') result.push('biergarten', 'outdoor seating');
+
+  // Vibe inference from amenity type
+  const amenity = tags.amenity || '';
+  const cuisine = (tags.cuisine || '').toLowerCase();
+  if (amenity === 'cafe' || amenity === 'coffee_shop') result.push('casual', 'cozy', 'gemütlich');
+  if (amenity === 'bar') result.push('evening', 'drinks', 'nightlife');
+  if (amenity === 'nightclub') result.push('nightlife', 'party', 'lively');
+  if (amenity === 'restaurant') result.push('dining');
+  if (amenity === 'fast_food') result.push('casual', 'quick');
+  if (amenity === 'theatre') result.push('cultural', 'evening', 'entertainment');
+  if (amenity === 'cinema') result.push('entertainment', 'evening');
+  if (tags.tourism === 'museum') result.push('cultural', 'art', 'daytime');
+  if (tags.leisure === 'bowling_alley') result.push('active', 'fun', 'entertainment');
+
+  // Infer vibes from cuisine type
+  if (cuisine.includes('italian') || cuisine.includes('french')) result.push('romantic');
+  if (cuisine.includes('fine') || cuisine.includes('gourmet')) result.push('upscale', 'elegant');
+  if (cuisine.includes('burger') || cuisine.includes('pizza') || cuisine.includes('kebab')) result.push('casual');
+  if (cuisine.includes('sushi') || cuisine.includes('japanese')) result.push('trendy');
+  if (cuisine.includes('indian') || cuisine.includes('thai') || cuisine.includes('vietnamese')) result.push('exotic');
+
+  // Wheelchair / accessibility
+  if (tags.wheelchair === 'yes') result.push('wheelchair accessible', 'barrierearm');
+  
+  // Opening hours hint for time matching
+  if (tags.opening_hours) {
+    const oh = tags.opening_hours.toLowerCase();
+    if (oh.includes('24') || oh.includes('00:00-24:00')) result.push('late night');
+    if (/\b(sa|su|so)\b/.test(oh) && /\b(10|11):00/.test(oh)) result.push('brunch');
+  }
+
+  // Stars / quality signals
+  if (tags.stars || tags['cuisine:michelin']) result.push('upscale', 'fine dining');
+  
+  // Smoking
+  if (tags.smoking === 'no' || tags.smoking === 'outside') result.push('non-smoking');
+
   return [...new Set(result)];
+}
+
+/**
+ * Infer a more accurate price_range from OSM tags instead of defaulting to '$$'
+ */
+function inferPriceRange(tags: Record<string, string>): string {
+  const cuisine = (tags.cuisine || '').toLowerCase();
+  const amenity = tags.amenity || '';
+  const name = (tags.name || '').toLowerCase();
+  
+  // Expensive signals
+  if (cuisine.includes('fine') || cuisine.includes('gourmet') || tags.stars || 
+      name.includes('sterne') || name.includes('gourmet')) return '$$$';
+  if (cuisine.includes('steak') || cuisine.includes('sushi') || cuisine.includes('french')) return '$$$';
+  
+  // Cheap signals
+  if (amenity === 'fast_food' || cuisine.includes('kebab') || cuisine.includes('döner') ||
+      cuisine.includes('pizza') || amenity === 'ice_cream') return '$';
+  if (cuisine.includes('burger') && !name.includes('gourmet')) return '$';
+  
+  // Mid-range (cafes, most restaurants)
+  if (amenity === 'cafe') return '$$';
+  
+  return '$$';
 }
 
 export interface OverpassSearchResult {
