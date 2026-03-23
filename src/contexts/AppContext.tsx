@@ -308,7 +308,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       if (user && location?.latitude && location?.longitude) {
         try {
-          const recommendations = await getAIVenueRecommendations(user.id, undefined, 20, location, appState.selectedArea);
+          const recommendations = await getAIVenueRecommendations(user.id, undefined, 6, location, appState.selectedArea);
           venues = recommendations.map(recommendationToVenue);
           console.log(`✅ AI venue pipeline returned ${venues.length} venues`);
         } catch (aiError) {

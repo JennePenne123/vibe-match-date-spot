@@ -96,7 +96,7 @@ export const VenueMatchingDebug: React.FC = () => {
       const partnerId = testMode === 'collaborative' ? testPartner : undefined;
       console.log(`🔍 Testing ${testMode} venue matching...`);
       
-      const recs = await getAIVenueRecommendations(user.id, partnerId, 10, testLocation);
+      const recs = await getAIVenueRecommendations(user.id, partnerId, 6, testLocation);
       setRecommendations(recs);
       
       // Convert recommendations to venues and store in app context
