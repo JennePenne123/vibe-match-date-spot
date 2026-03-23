@@ -137,7 +137,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 13 | ~~**Feedback-Impact-Anzeige**~~ | ✅ Done | Hinweis auf Home wenn sich Empfehlungen durch Feedback verändert haben |
 | 14 | **Tree-Shaking-Audit** | Klein | Ungenutzten Code und Imports identifizieren und entfernen |
 | 15 | **Bundle-Größe optimieren** | Mittel | Chunk-Splitting analysieren, große Dependencies prüfen |
-| 16 | **React Query Tuning** | Klein | Differenzierte staleTime pro Query-Typ (z.B. 30s für Admin, 10min für Stammdaten) |
+| 16 | ~~**React Query Tuning**~~ | ✅ Done | Zentrales `queryConfig.ts` mit differenzierten staleTime-Kategorien (30s–10min) |
 
 ---
 
