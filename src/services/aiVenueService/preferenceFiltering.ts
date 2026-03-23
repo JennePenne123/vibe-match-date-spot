@@ -113,23 +113,32 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
     const scoredVenues = venues.map(venue => {
       let score = 0;
       const maxScore = 100;
+      const hasCuisinePrefs = (userPrefs.preferred_cuisines?.length || 0) > 0;
+      const hasPricePrefs = (userPrefs.preferred_price_range?.length || 0) > 0;
+      const hasVibePrefs = (userPrefs.preferred_vibes?.length || 0) > 0;
 
-      // Cuisine matching (30% weight) - fuzzy
+      // Cuisine matching (35% weight) - strongest signal
       const cuisineScore = cuisineMatchScore(
         venue.cuisine_type, 
         userPrefs.preferred_cuisines || []
       );
-      score += cuisineScore * 30;
+      if (hasCuisinePrefs) {
+        // Full match: +35, partial: +28, related: +17, no match: -8
+        score += cuisineScore > 0 ? cuisineScore * 35 : -8;
+      }
 
       // Price range matching (20% weight)
-      if (userPrefs.preferred_price_range?.includes(venue.price_range)) {
-        score += 20;
-      } else if (venue.price_range) {
-        const priceOrder = ['$', '$$', '$$$', '$$$$'];
-        const venueIdx = priceOrder.indexOf(venue.price_range);
-        const prefIdxes = (userPrefs.preferred_price_range || []).map((p: string) => priceOrder.indexOf(p));
-        const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
-        if (minDist === 1) score += 12;
+      if (hasPricePrefs) {
+        if (userPrefs.preferred_price_range?.includes(venue.price_range)) {
+          score += 20;
+        } else if (venue.price_range) {
+          const priceOrder = ['$', '$$', '$$$', '$$$$'];
+          const venueIdx = priceOrder.indexOf(venue.price_range);
+          const prefIdxes = (userPrefs.preferred_price_range || []).map((p: string) => priceOrder.indexOf(p));
+          const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
+          if (minDist === 1) score += 10;
+          else score -= 5; // Penalty for 2+ price tiers away
+        }
       }
 
       // Vibe/tag matching (15% weight) - fuzzy
