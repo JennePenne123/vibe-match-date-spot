@@ -133,6 +133,7 @@ const Friends = () => {
               onClick={handleSkip}
               variant="ghost"
               className="text-muted-foreground hover:bg-muted text-sm"
+              disabled={isGenerating}
             >
               Skip
             </Button>
