@@ -46,8 +46,9 @@ const calculateUserScore = (
     }
   }
 
-  // Vibe matching with learned weight (15%)
+  // Vibe matching
   if (userPrefs.preferred_vibes && venue.tags && venue.tags.length > 0) {
+    maxPossible += 0.12;
     const vibeMatches = userPrefs.preferred_vibes.filter((vibe: string) => 
       venue.tags.some((tag: string) => 
         tag.toLowerCase().includes(vibe.toLowerCase()) ||
@@ -55,17 +56,14 @@ const calculateUserScore = (
       )
     );
     
-    // Infer vibes if no direct matches
     if (vibeMatches.length === 0) {
       if (userPrefs.preferred_vibes.includes('romantic')) {
         if (venue.price_range === '$$$' || venue.price_range === '$$$$' || 
-            venue.cuisine_type?.toLowerCase().includes('fine') ||
             venue.cuisine_type?.toLowerCase().includes('italian') ||
             venue.cuisine_type?.toLowerCase().includes('french')) {
           vibeMatches.push('romantic (inferred)');
         }
       }
-      
       if (userPrefs.preferred_vibes.includes('casual')) {
         if (venue.price_range === '$' || venue.price_range === '$$') {
           vibeMatches.push('casual (inferred)');
@@ -74,7 +72,6 @@ const calculateUserScore = (
     }
     
     matches.vibes = vibeMatches;
-    // More vibe matches = stronger signal; no matches = slight penalty
     const vibeScore = vibeMatches.length > 0 ? vibeMatches.length * 0.12 : -0.04;
     score += applyWeight(vibeScore, weights.vibe, 'vibe');
   }
