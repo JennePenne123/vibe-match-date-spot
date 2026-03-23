@@ -429,7 +429,9 @@ export const filterVenuesByCollaborativePreferences = async (
   venues: any[]
 ) => {
   try {
-    console.log('🤝 COLLABORATIVE FILTER: Filtering for users:', userId, 'and', partnerId);
+    // Pre-filter: remove delivery services and supermarkets
+    const filteredVenues = venues.filter(v => !isBlockedVenue(v));
+    console.log('🤝 COLLABORATIVE FILTER: Filtering', filteredVenues.length, 'venues (blocked', venues.length - filteredVenues.length, ') for users:', userId, 'and', partnerId);
     
     const { data: userPrefs } = await supabase
       .from('user_preferences')
@@ -445,10 +447,10 @@ export const filterVenuesByCollaborativePreferences = async (
 
     if (!userPrefs || !partnerPrefs) {
       console.log('⚠️ COLLABORATIVE FILTER: Missing preferences, using single user filter');
-      return filterVenuesByPreferences(userId, venues);
+      return filterVenuesByPreferences(userId, filteredVenues);
     }
 
-    const collaborativeScoredVenues = venues.map(venue => {
+    const collaborativeScoredVenues = filteredVenues.map(venue => {
       // Fuzzy cuisine scoring for both users
       const userCuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
       const partnerCuisineScore = cuisineMatchScore(venue.cuisine_type, partnerPrefs.preferred_cuisines || []);
