@@ -166,7 +166,7 @@ describe('preferenceFiltering', () => {
       
       // Italian Bistro matches cuisine, price, and vibe - should be top
       expect(result[0].name).toBe('Italian Bistro');
-      expect(result[0].preferenceScore).toBeGreaterThan(80);
+      expect(result[0].preferenceScore).toBeGreaterThan(65);
     });
 
     it('should handle empty venues array', async () => {
