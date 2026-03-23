@@ -23,6 +23,17 @@ export interface ImplicitSignal {
   metadata?: Record<string, any>;
 }
 
+const TRACKING_OPT_OUT_KEY = 'vybepulse_tracking_opt_out';
+
+/** Check if the user has opted out of implicit tracking */
+function isTrackingOptedOut(): boolean {
+  try {
+    return localStorage.getItem(TRACKING_OPT_OUT_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
 // In-memory buffer to batch signals before writing
 const signalBuffer: ImplicitSignal[] = [];
 let flushTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -38,6 +49,7 @@ const venueViewCounts: Map<string, number> = new Map();
  * Record an implicit signal into the buffer
  */
 export const recordSignal = (signal: ImplicitSignal): void => {
+  if (isTrackingOptedOut()) return;
   signalBuffer.push(signal);
   
   if (signalBuffer.length >= MAX_BUFFER_SIZE) {

@@ -119,7 +119,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 8 | **DSGVO-Update Datenschutzerklärung** | 🟡 Offen | Implizites Tracking dokumentieren, Consent/Opt-Out prüfen |
+| 8 | ~~**DSGVO-Update Datenschutzerklärung**~~ | ✅ Erledigt | Implizites Tracking, Sentry, Foursquare/Radar dokumentiert + Opt-Out Toggle in Settings |
 | 9 | ~~**Sentry Integration**~~ | ✅ Erledigt | Konto (vybepulse.sentry.io), DSN konfiguriert, SDK aktiv |
 | 10 | ~~**Redemption Push-Notifications**~~ | ✅ Erledigt | Push bei Voucher-Einlösung an User + Partner |
 | 11 | ~~**Image-Optimierung**~~ | ✅ Erledigt | lazy loading, decoding=async, fetchPriority auf LCP-Elementen |
@@ -137,7 +137,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 18 | **Bundle-Analyse automatisieren** | Klein | vite-plugin-visualizer + Budget-Limits |
 | 19 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
 | 20 | **Route Preloading** | Klein | Prefetch nach Login + Hover-Prefetch |
-| 21 | **DSGVO Opt-Out für implizite Signale** | Klein | Toggle in Settings zum Deaktivieren von Tracking |
+| 21 | ~~**DSGVO Opt-Out für implizite Signale**~~ | ✅ Erledigt | Toggle in Settings + localStorage-Opt-Out im implicitSignalsService |
 | 22 | **Feedback-Impact-Anzeige** | Klein | Hinweis auf Home wenn sich Empfehlungen durch Feedback verändert haben |
 
 ---
