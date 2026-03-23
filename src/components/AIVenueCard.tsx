@@ -153,16 +153,22 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
         />
           
         {/* AI Match Score + Confidence Label Overlay */}
-        <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
-          <Badge className={`${getScoreColor(displayScore)} font-bold border-0 shadow-sm text-sm px-2.5 py-1`}>
-            <Sparkles className="w-3.5 h-3.5 mr-1" />
-            {displayScore}% Match
-          </Badge>
+        <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5">
+          <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md rounded-full px-3 py-1.5 shadow-lg border border-white/10">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            <span className="text-white font-bold text-sm tracking-tight">{displayScore}%</span>
+          </div>
           {confidenceLabel && (
-            <Badge className={`${confidenceLabel.className} font-medium border-0 shadow-sm text-xs px-2 py-0.5`}>
+            <div className={`flex items-center gap-1 backdrop-blur-md rounded-full px-2.5 py-1 shadow-md border ${
+              confidenceLabel.label === 'Top Match' 
+                ? 'bg-emerald-500/80 border-emerald-400/30 text-white' 
+                : confidenceLabel.label === 'Guter Match'
+                ? 'bg-blue-500/80 border-blue-400/30 text-white'
+                : 'bg-amber-500/80 border-amber-400/30 text-white'
+            }`}>
               {confidenceLabel.icon}
-              <span className="ml-1">{confidenceLabel.label}</span>
-            </Badge>
+              <span className="text-xs font-semibold">{confidenceLabel.label}</span>
+            </div>
           )}
         </div>
 
