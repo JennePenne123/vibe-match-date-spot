@@ -35,13 +35,12 @@ const calculateUserScore = (
   if (userPrefs.preferred_price_range && venue.price_range) {
     const priceMatch = userPrefs.preferred_price_range.includes(venue.price_range);
     
-    matches.price = true;
     if (priceMatch) {
+      matches.price = true;
       score += applyWeight(0.18, weights.price, 'price');
     } else {
-      // Penalty for price mismatch — users care about budget
-      score += applyWeight(-0.06, weights.price, 'price');
       matches.price = false;
+      score += applyWeight(-0.06, weights.price, 'price');
     }
   }
 
