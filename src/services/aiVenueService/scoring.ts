@@ -73,7 +73,7 @@ const calculateUserScore = (
     
     matches.vibes = vibeMatches;
     // More vibe matches = stronger signal; no matches = slight penalty
-    const vibeScore = vibeMatches.length > 0 ? vibeMatches.length * 0.10 : -0.04;
+    const vibeScore = vibeMatches.length > 0 ? vibeMatches.length * 0.12 : -0.04;
     score += applyWeight(vibeScore, weights.vibe, 'vibe');
   }
 

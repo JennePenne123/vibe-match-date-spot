@@ -127,10 +127,10 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         score += cuisineScore > 0 ? cuisineScore * 40 : -8;
       }
 
-      // Price range matching (20% weight)
+      // Price range matching (25% weight)
       if (hasPricePrefs) {
         if (userPrefs.preferred_price_range?.includes(venue.price_range)) {
-          score += 20;
+          score += 25;
         } else if (venue.price_range) {
           const priceOrder = ['$', '$$', '$$$', '$$$$'];
           const venueIdx = priceOrder.indexOf(venue.price_range);
