@@ -203,33 +203,60 @@ export function PremiumWalletCard() {
   const { user } = useAuth();
   const tabOrder: WalletTab[] = ['active', 'expiring', 'redeemed', 'expired'];
 
-  useEffect(() => {
-    if (user) fetchWalletVouchers();
-  }, [user?.id]);
-
-  const fetchWalletVouchers = async () => {
+  const fetchWalletVouchers = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
-      // Fetch voucher_redemptions for this user with voucher + venue details
-      const { data: redemptions, error } = await supabase
-        .from('voucher_redemptions')
-        .select('id, redeemed_at, status, voucher_id, vouchers(id, title, code, discount_type, discount_value, venue_id, valid_until, created_at, venues(name))')
+      // 1. Fetch vouchers claimed via Reward Shop (reward_redemptions with voucher_id)
+      const { data: rewardRedemptions } = await (supabase
+        .from('reward_redemptions' as any)
+        .select('id, voucher_id, created_at, reward_type')
         .eq('user_id', user.id)
-        .order('redeemed_at', { ascending: false });
+        .eq('reward_type', 'voucher')
+        .not('voucher_id', 'is', null)
+        .order('created_at', { ascending: false })) as any;
 
-      if (error) {
-        console.error('Error fetching wallet vouchers:', error);
+      // 2. Fetch voucher_redemptions to know which were used at venue
+      const { data: venueRedemptions } = await supabase
+        .from('voucher_redemptions')
+        .select('voucher_id, redeemed_at, status')
+        .eq('user_id', user.id);
+
+      // Build a map of used vouchers
+      const usedMap = new Map<string, { redeemed_at: string; status: string }>();
+      (venueRedemptions || []).forEach((vr: any) => {
+        usedMap.set(vr.voucher_id, { redeemed_at: vr.redeemed_at, status: vr.status });
+      });
+
+      // 3. Get all voucher IDs we need details for
+      const voucherIds: string[] = (rewardRedemptions || [])
+        .map((r: any) => r.voucher_id)
+        .filter(Boolean);
+
+      if (voucherIds.length === 0) {
         setWalletVouchers([]);
+        setLoading(false);
         return;
       }
 
-      const mapped: WalletVoucher[] = (redemptions || [])
-        .filter((r: any) => r.vouchers)
+      // 4. Fetch voucher details with venue names
+      const { data: vouchersData } = await supabase
+        .from('vouchers')
+        .select('id, title, code, discount_type, discount_value, venue_id, valid_until, created_at, status, venues(name)')
+        .in('id', voucherIds);
+
+      const voucherMap = new Map<string, any>();
+      (vouchersData || []).forEach((v: any) => voucherMap.set(v.id, v));
+
+      // 5. Combine data
+      const mapped: WalletVoucher[] = (rewardRedemptions || [])
         .map((r: any) => {
-          const v = r.vouchers;
+          const v = voucherMap.get(r.voucher_id);
+          if (!v) return null;
+
+          const used = usedMap.get(v.id);
           const isExpired = new Date(v.valid_until) < new Date();
-          const isRedeemed = r.status === 'completed';
+          const isRedeemed = used?.status === 'redeemed' || used?.status === 'completed';
 
           return {
             id: v.id,
@@ -237,23 +264,29 @@ export function PremiumWalletCard() {
             code: v.code,
             discount_type: v.discount_type as 'percentage' | 'fixed' | 'free_item',
             discount_value: v.discount_value,
-            venue_name: v.venues?.name || 'Venue',
+            venue_name: (v.venues as any)?.name || 'Venue',
             venue_id: v.venue_id,
             valid_until: v.valid_until,
-            created_at: v.created_at,
-            redeemed_at: r.redeemed_at,
+            created_at: r.created_at,
+            redeemed_at: used?.redeemed_at || null,
             status: isRedeemed ? 'redeemed' as const : isExpired ? 'expired' as const : 'active' as const,
             source: 'reward_shop' as const,
           };
-        });
+        })
+        .filter(Boolean) as WalletVoucher[];
 
       setWalletVouchers(mapped);
     } catch (err) {
       console.error('Wallet fetch error:', err);
+      setWalletVouchers([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) fetchWalletVouchers();
+  }, [user, fetchWalletVouchers]);
 
   const handleTabChange = (newTab: string) => {
     const oldIndex = tabOrder.indexOf(activeTab);
