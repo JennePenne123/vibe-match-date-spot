@@ -205,19 +205,19 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         }
       }
 
-      // Price range matching (25% weight) - use inferred price if missing
+      // Price range matching (25% weight) - use normalized price symbols
       const effectivePrice = venue.price_range || (inferredPriceRange.length > 0 ? inferredPriceRange[0] : null);
       if (hasPricePrefs && effectivePrice) {
         maxPossible += 25;
-        if (userPrefs.preferred_price_range?.includes(effectivePrice)) {
+        if (normalizedPricePrefs.includes(effectivePrice)) {
           score += 25;
         } else {
           const priceOrder = ['$', '$$', '$$$', '$$$$'];
           const venueIdx = priceOrder.indexOf(effectivePrice);
-          const prefIdxes = (userPrefs.preferred_price_range || []).map((p: string) => priceOrder.indexOf(p));
+          const prefIdxes = normalizedPricePrefs.map((p: string) => priceOrder.indexOf(p));
           const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
-          if (minDist === 1) score += 15; // Adjacent price (was 10)
-          else score -= 3; // Reduced penalty (was -5)
+          if (minDist === 1) score += 15;
+          else score -= 3;
         }
       }
 
