@@ -14,14 +14,19 @@ interface FoodVibeQuickPickProps {
 const cuisineOptions = [
   { id: 'italian', label: 'Italienisch', emoji: '🍝', icon: Pizza, color: 'text-red-400' },
   { id: 'japanese', label: 'Japanisch', emoji: '🍣', icon: Fish, color: 'text-orange-400' },
+  { id: 'turkish', label: 'Türkisch', emoji: '🥙', icon: Flame, color: 'text-amber-500' },
   { id: 'mexican', label: 'Mexikanisch', emoji: '🌮', icon: Flame, color: 'text-yellow-500' },
   { id: 'french', label: 'Französisch', emoji: '🥐', icon: Croissant, color: 'text-amber-400' },
   { id: 'indian', label: 'Indisch', emoji: '🍛', icon: Soup, color: 'text-orange-500' },
+  { id: 'greek', label: 'Griechisch', emoji: '🥗', icon: Leaf, color: 'text-blue-400' },
+  { id: 'vietnamese', label: 'Vietnamesisch', emoji: '🍜', icon: CookingPot, color: 'text-lime-400' },
   { id: 'mediterranean', label: 'Mediterran', emoji: '🫒', icon: Leaf, color: 'text-emerald-400' },
   { id: 'american', label: 'Amerikanisch', emoji: '🍔', icon: Beef, color: 'text-sky-400' },
-  { id: 'thai', label: 'Thai', emoji: '🍜', icon: CookingPot, color: 'text-lime-400' },
+  { id: 'thai', label: 'Thai', emoji: '🍜', icon: CookingPot, color: 'text-lime-500' },
   { id: 'chinese', label: 'Chinesisch', emoji: '🥢', icon: null, color: 'text-rose-400' },
   { id: 'korean', label: 'Koreanisch', emoji: '🍲', icon: CookingPot, color: 'text-violet-400' },
+  { id: 'spanish', label: 'Spanisch', emoji: '🥘', icon: CookingPot, color: 'text-orange-400' },
+  { id: 'german', label: 'Deutsch', emoji: '🥨', icon: null, color: 'text-yellow-600' },
 ];
 
 const vibeOptions = [
