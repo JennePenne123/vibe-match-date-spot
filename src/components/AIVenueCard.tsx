@@ -44,6 +44,7 @@ interface AIVenueCardProps {
   onSelect: (venueId: string) => void;
   showAIInsights?: boolean;
   compact?: boolean;
+  isTopMatch?: boolean;
   sessionContext?: {
     sessionId?: string;
     partnerId?: string;
@@ -57,6 +58,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   onSelect,
   showAIInsights = true,
   compact = false,
+  isTopMatch = false,
   sessionContext,
   vouchers = [],
   travelInfo
@@ -114,11 +116,10 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
 
   // Determine confidence label based on score + data quality
   const getConfidenceLabel = (): { label: string; icon: React.ReactNode; className: string } | null => {
-    const isQualityVerified = (recommendation as any).qualityVerified === true;
     const confLevel = confidence_level ?? 0;
     const hasStrongData = confLevel > 0.7 || (match_factors?.learned_weights_applied === true);
     
-    if (isQualityVerified && displayScore >= 80 && hasStrongData) {
+    if (isTopMatch && displayScore >= 80 && hasStrongData) {
       return { label: 'Top Match', icon: <Check className="w-3 h-3" />, className: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' };
     }
     if (displayScore >= 60 && (hasStrongData || confLevel > 0.5)) {

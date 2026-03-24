@@ -309,22 +309,30 @@ const AIRecommendations: React.FC = () => {
 
             {viewMode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sortedRecommendations.map((recommendation) => {
-                  const venueRoute = routeData.get(recommendation.venue_id);
-                  return (
-                    <SafeComponent 
-                      key={recommendation.venue_id}
-                      componentName="AIVenueCard"
-                    >
-                      <AIVenueCard
-                        recommendation={recommendation}
-                        onSelect={handleVenueSelect}
-                        showAIInsights={true}
-                        travelInfo={venueRoute}
-                      />
-                    </SafeComponent>
-                  );
-                })}
+                {(() => {
+                  const topVenueId = sortedRecommendations.reduce((topId, rec) => {
+                    const current = sortedRecommendations.find(r => r.venue_id === topId);
+                    return (!current || rec.ai_score > current.ai_score) ? rec.venue_id : topId;
+                  }, sortedRecommendations[0]?.venue_id);
+                  
+                  return sortedRecommendations.map((recommendation) => {
+                    const venueRoute = routeData.get(recommendation.venue_id);
+                    return (
+                      <SafeComponent 
+                        key={recommendation.venue_id}
+                        componentName="AIVenueCard"
+                      >
+                        <AIVenueCard
+                          recommendation={recommendation}
+                          onSelect={handleVenueSelect}
+                          showAIInsights={true}
+                          isTopMatch={recommendation.venue_id === topVenueId}
+                          travelInfo={venueRoute}
+                        />
+                      </SafeComponent>
+                    );
+                  });
+                })()}
               </div>
             ) : (
               <Suspense fallback={<Skeleton className="h-[500px] rounded-lg" />}>

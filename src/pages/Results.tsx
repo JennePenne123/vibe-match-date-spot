@@ -245,6 +245,7 @@ const Results = () => {
                     onSelect={handleVenueSelect}
                     showAIInsights={true}
                     compact={false}
+                    isTopMatch={index === 0}
                     sessionContext={{
                       sessionId: isFromSmartPlanning ? smartPlanningState.sessionId : 'current-session',
                       partnerId: isFromSmartPlanning ? smartPlanningState.partnerId : 'current-partner'
