@@ -505,9 +505,12 @@ export const filterVenuesByCollaborativePreferences = async (
     }
 
     const collaborativeScoredVenues = filteredVenues.map(venue => {
+      // Infer cuisine if missing
+      const effectiveCuisine = venue.cuisine_type || inferCuisineFromVenue(venue) || '';
+      
       // Fuzzy cuisine scoring for both users
-      const userCuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
-      const partnerCuisineScore = cuisineMatchScore(venue.cuisine_type, partnerPrefs.preferred_cuisines || []);
+      const userCuisineScore = cuisineMatchScore(effectiveCuisine, userPrefs.preferred_cuisines || []);
+      const partnerCuisineScore = cuisineMatchScore(effectiveCuisine, partnerPrefs.preferred_cuisines || []);
       
       let userScore = userCuisineScore * 40;
       let partnerScore = partnerCuisineScore * 40;
