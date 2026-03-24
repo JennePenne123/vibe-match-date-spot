@@ -429,6 +429,78 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         if (areaConfig.priceHint?.includes(venue.price_range)) score += 2;
       }
 
+      // === PERSONALITY-BASED SCORING (8% weight) ===
+      const personalityTraits = userPrefs.personality_traits as { spontaneity?: number; adventure?: number; social_energy?: number } | null;
+      if (personalityTraits) {
+        maxPossible += 8;
+        const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase());
+        const venueText = [...venueTags, (venue.name || '').toLowerCase(), (venue.description || '').toLowerCase(), effectiveCuisine].join(' ');
+        
+        // Adventure score (0-100) → boost exotic/unusual venues
+        const adventure = personalityTraits.adventure ?? 50;
+        if (adventure >= 70) {
+          // Adventurous users: boost exotic cuisines and unique experiences
+          const exoticKeywords = ['exotic', 'fusion', 'unique', 'experience', 'erlebnis', 'unusual', 'hidden', 'secret', 'authentic'];
+          const exoticCuisines = ['thai', 'indian', 'korean', 'vietnamese', 'mexican', 'turkish', 'ethiopian', 'peruvian'];
+          const isExotic = exoticKeywords.some(k => venueText.includes(k)) || exoticCuisines.some(c => effectiveCuisine.includes(c));
+          if (isExotic) score += 5;
+        } else if (adventure <= 30) {
+          // Comfort-seekers: boost familiar, cozy venues
+          const comfortKeywords = ['classic', 'traditional', 'cozy', 'gemütlich', 'home', 'familiar', 'regional'];
+          const comfortCuisines = ['german', 'italian', 'french', 'american'];
+          const isComfort = comfortKeywords.some(k => venueText.includes(k)) || comfortCuisines.some(c => effectiveCuisine.includes(c));
+          if (isComfort) score += 5;
+        }
+        
+        // Social energy (0-100) → intimate vs. lively
+        const socialEnergy = personalityTraits.social_energy ?? 50;
+        if (socialEnergy >= 70) {
+          const livelyKeywords = ['lively', 'buzzing', 'popular', 'group', 'party', 'bar', 'club', 'live music', 'biergarten', 'food hall'];
+          if (livelyKeywords.some(k => venueText.includes(k))) score += 3;
+        } else if (socialEnergy <= 30) {
+          const intimateKeywords = ['intimate', 'quiet', 'small', 'hidden', 'private', 'cozy', 'gemütlich', 'candlelight', 'wine bar'];
+          if (intimateKeywords.some(k => venueText.includes(k))) score += 3;
+        }
+      }
+
+      // === RELATIONSHIP GOAL SCORING (5% weight) ===
+      const relationshipGoal = userPrefs.relationship_goal as string | null;
+      if (relationshipGoal) {
+        maxPossible += 5;
+        const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase());
+        const venueText = [...venueTags, (venue.name || '').toLowerCase(), (venue.description || '').toLowerCase()].join(' ');
+        const venuePrice = venue.price_range || '';
+        
+        const goalSignals: Record<string, { keywords: string[]; priceHint?: string[]; cuisineHint?: string[] }> = {
+          'romantic': {
+            keywords: ['romantic', 'candlelight', 'intimate', 'cozy', 'wine', 'cocktail', 'terrace', 'rooftop', 'fine dining', 'date night'],
+            priceHint: ['$$', '$$$', '$$$$'],
+            cuisineHint: ['italian', 'french', 'japanese', 'mediterranean', 'spanish'],
+          },
+          'friendship': {
+            keywords: ['casual', 'fun', 'group', 'bar', 'pub', 'burger', 'pizza', 'bowling', 'karaoke', 'biergarten', 'street food', 'brunch'],
+            priceHint: ['$', '$$'],
+          },
+          'networking': {
+            keywords: ['upscale', 'business', 'lounge', 'hotel', 'premium', 'wine bar', 'cocktail', 'rooftop', 'conference'],
+            priceHint: ['$$$', '$$$$'],
+          },
+          'selfcare': {
+            keywords: ['spa', 'wellness', 'quiet', 'peaceful', 'café', 'cafe', 'tea', 'reading', 'garden', 'nature'],
+            priceHint: ['$$', '$$$'],
+          },
+        };
+        
+        const signals = goalSignals[relationshipGoal];
+        if (signals) {
+          let goalScore = 0;
+          if (signals.keywords.some(k => venueText.includes(k))) goalScore += 3;
+          if (signals.priceHint?.includes(venuePrice)) goalScore += 1;
+          if (signals.cuisineHint?.some(c => effectiveCuisine.includes(c))) goalScore += 1;
+          score += goalScore;
+        }
+      }
+
       // === PRIMARY MATCH BOOST ===
       // If the strongest signal (cuisine) matches well, ensure a minimum score floor
       // This prevents good matches from being dragged down by sparse secondary data

@@ -1,14 +1,14 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Pizza, Fish, Flame, Croissant, Soup, Leaf, Beef, CookingPot } from 'lucide-react';
-import { Icon } from 'lucide-react';
-import { bowlChopsticks } from '@lucide/lab';
 
 interface FoodVibeQuickPickProps {
   selectedCuisines: string[];
   selectedVibes: string[];
+  selectedDietary: string[];
   onCuisinesChange: (cuisines: string[]) => void;
   onVibesChange: (vibes: string[]) => void;
+  onDietaryChange: (dietary: string[]) => void;
 }
 
 const cuisineOptions = [
@@ -36,10 +36,25 @@ const vibeOptions = [
   { id: 'nightlife', label: 'Nachtleben', emoji: '🌃' },
   { id: 'cultural', label: 'Kultur', emoji: '🎭' },
   { id: 'adventurous', label: 'Abenteuer', emoji: '🗺️' },
+  { id: 'trendy', label: 'Trendy', emoji: '🔥' },
+  { id: 'cozy', label: 'Gemütlich', emoji: '🕯️' },
+  { id: 'elegant', label: 'Elegant', emoji: '✨' },
+  { id: 'lively', label: 'Lebhaft', emoji: '🎉' },
+  { id: 'family', label: 'Familiär', emoji: '👨‍👩‍👧' },
+];
+
+const dietaryOptions = [
+  { id: 'vegetarian', label: 'Vegetarisch', emoji: '🥬' },
+  { id: 'vegan', label: 'Vegan', emoji: '🌱' },
+  { id: 'gluten_free', label: 'Glutenfrei', emoji: '🌾' },
+  { id: 'halal', label: 'Halal', emoji: '☪️' },
+  { id: 'kosher', label: 'Kosher', emoji: '✡️' },
+  { id: 'lactose_free', label: 'Laktosefrei', emoji: '🥛' },
 ];
 
 const FoodVibeQuickPick: React.FC<FoodVibeQuickPickProps> = ({
-  selectedCuisines, selectedVibes, onCuisinesChange, onVibesChange,
+  selectedCuisines, selectedVibes, selectedDietary,
+  onCuisinesChange, onVibesChange, onDietaryChange,
 }) => {
   const toggleCuisine = (id: string) => {
     onCuisinesChange(
@@ -54,6 +69,14 @@ const FoodVibeQuickPick: React.FC<FoodVibeQuickPickProps> = ({
       selectedVibes.includes(id)
         ? selectedVibes.filter((v) => v !== id)
         : [...selectedVibes, id]
+    );
+  };
+
+  const toggleDietary = (id: string) => {
+    onDietaryChange(
+      selectedDietary.includes(id)
+        ? selectedDietary.filter((d) => d !== id)
+        : [...selectedDietary, id]
     );
   };
 
@@ -104,6 +127,32 @@ const FoodVibeQuickPick: React.FC<FoodVibeQuickPickProps> = ({
               <button
                 key={opt.id}
                 onClick={() => toggleVibe(opt.id)}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200 active:scale-[0.96]',
+                  isActive
+                    ? 'bg-primary/10 border-primary/40 text-foreground'
+                    : 'bg-card/40 border-border/30 text-muted-foreground hover:bg-card/60'
+                )}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
+              >
+                <span>{opt.emoji}</span>
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Dietary Restrictions */}
+      <div>
+        <p className="text-sm font-medium text-foreground/80 mb-2.5">🥗 Ernährung <span className="text-muted-foreground font-normal">(optional)</span></p>
+        <div className="flex flex-wrap gap-2">
+          {dietaryOptions.map((opt) => {
+            const isActive = selectedDietary.includes(opt.id);
+            return (
+              <button
+                key={opt.id}
+                onClick={() => toggleDietary(opt.id)}
                 className={cn(
                   'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200 active:scale-[0.96]',
                   isActive
