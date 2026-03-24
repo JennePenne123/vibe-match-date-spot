@@ -29,7 +29,7 @@ const calculateCategoryWeight = (selectedCount: number, totalOptions: number): n
 
 // Derive initial cuisine vector from selections
 const buildCuisineVector = (cuisines: string[]): number[] => {
-  const allCuisines = ['italian', 'japanese', 'mexican', 'french', 'indian', 'mediterranean', 'american', 'thai', 'chinese', 'korean'];
+  const allCuisines = ['italian', 'japanese', 'turkish', 'mexican', 'french', 'indian', 'greek', 'vietnamese', 'mediterranean', 'american', 'thai', 'chinese', 'korean', 'spanish', 'german'];
   return allCuisines.map(c => cuisines.includes(c) ? 1.0 : 0.2);
 };
 
@@ -60,7 +60,7 @@ export const initializePreferenceVectors = async (
 
     // Calculate feature weights based on selection patterns
     const featureWeights = {
-      cuisine: calculateCategoryWeight(preferences.cuisines.length, 10),
+      cuisine: calculateCategoryWeight(preferences.cuisines.length, 15),
       vibe: calculateCategoryWeight(preferences.vibes.length, 6),
       price: calculateCategoryWeight(preferences.priceRange.length, 4),
       time: calculateCategoryWeight(preferences.times.length, 6),
