@@ -192,6 +192,8 @@ const App = () => (
                   <Routes>
                     {/* Public routes without layout */}
                     <Route path="/" element={<Landing />} />
+                    <Route path="/index" element={<Navigate to="/" replace />} />
+                    <Route path="/index.html" element={<Navigate to="/" replace />} />
                     <Route path="/welcome" element={<LazyPageNoLayout><Onboarding /></LazyPageNoLayout>} />
                     <Route path="/mood" element={<LazyPageNoLayout><MoodCheckIn /></LazyPageNoLayout>} />
                     <Route path="/auth" element={<Navigate to="/?auth=required" replace />} />
