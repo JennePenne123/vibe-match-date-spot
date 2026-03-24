@@ -269,15 +269,14 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         }
       }
 
-      // Cuisine matching (40% weight) - strongest signal
-      if (hasCuisinePrefs && venue.cuisine_type) {
+      // Cuisine matching (40% weight) - strongest signal, use effectiveCuisine for inferred data
+      if (hasCuisinePrefs && effectiveCuisine) {
         maxPossible += 40;
-        const cuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
+        const cuisineScore = cuisineMatchScore(effectiveCuisine, userPrefs.preferred_cuisines || []);
         if (cuisineScore > 0) {
           score += cuisineScore * 40;
           primaryMatchFound = true;
         } else {
-          // Strong penalty for wrong cuisine (e.g. Pizza when Thai selected)
           score -= 15;
         }
       }
