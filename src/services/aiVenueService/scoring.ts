@@ -313,11 +313,26 @@ const calculateUserScore = (
     }
   }
 
-  // Rating bonus (5%)
+  // Rating bonus (5%) — weighted by review count confidence (Bayesian approach)
   if (venue.rating) {
     maxPossible += 0.10;
-    const ratingBonus = Math.min((venue.rating - 3.0) * 0.05, 0.1);
+    const rawRatingBonus = Math.min((venue.rating - 3.0) * 0.05, 0.1);
+    
+    // Review count confidence: more reviews = more trustworthy rating
+    // Uses Bayesian-style regression: effective_rating blends toward mean (3.5) with few reviews
+    const reviewCount = venue.review_count || venue.reviewCount || venue.user_ratings_total || 0;
+    const REVIEW_CONFIDENCE_THRESHOLD = 20; // Reviews needed for full confidence
+    const confidence = reviewCount > 0 
+      ? Math.min(reviewCount / REVIEW_CONFIDENCE_THRESHOLD, 1.0) 
+      : 0.5; // No data = 50% confidence (neutral)
+    
+    const ratingBonus = rawRatingBonus * confidence;
     score += applyWeight(ratingBonus, weights.rating, 'rating');
+    
+    // Extra bonus for highly-reviewed venues (social proof)
+    if (reviewCount >= 50 && venue.rating >= 4.0) {
+      score += 0.03; // Small but meaningful "proven quality" bonus
+    }
   }
 
   return { score, maxPossible, matches };

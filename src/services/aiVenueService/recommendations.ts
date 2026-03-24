@@ -97,12 +97,16 @@ export const getAIVenueRecommendations = async (
       if (hour >= 18 && hour <= 21) contextBonus += 5; // Dinner
       else if (hour >= 11 && hour <= 14) contextBonus += 3; // Lunch
 
-      // Rating bonus
-      const ratingBonus = venue.rating ? Math.min((venue.rating - 3.0) * 3, 10) : 0;
+      // Rating bonus — confidence-weighted by review count
+      const reviewCount = venue.review_count || venue.reviewCount || venue.user_ratings_total || 0;
+      const reviewConfidence = reviewCount > 0 ? Math.min(reviewCount / 20, 1.0) : 0.5;
+      const ratingBonus = venue.rating ? Math.min((venue.rating - 3.0) * 3, 10) * reviewConfidence : 0;
+      // Social proof bonus
+      const socialProof = (reviewCount >= 50 && venue.rating >= 4.0) ? 3 : 0;
 
       // Compute final score: preference-driven with small contextual adjustments
       // Floor lowered to 5 so non-matching venues are clearly ranked lower
-      const finalScore = Math.max(5, Math.min(98, prefScore + contextBonus + ratingBonus));
+      const finalScore = Math.max(5, Math.min(98, prefScore + contextBonus + ratingBonus + socialProof));
 
       // Generate reasoning based on actual matches
       const matchReasons: string[] = [];
