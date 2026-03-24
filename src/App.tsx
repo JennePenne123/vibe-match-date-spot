@@ -33,39 +33,16 @@ function AppUsageTracker() {
 
 function ServiceWorkerCacheReset() {
   useEffect(() => {
+    // Skip entirely in Lovable preview – sw.js is not served there
+    if (isLovablePreviewEnvironment()) {
+      return;
+    }
+
     if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('caches' in window)) {
       return;
     }
 
-    const cleanupPreviewServiceWorkers = async () => {
-      try {
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(registrations.map((registration) => registration.unregister()));
-
-        const cacheNames = await caches.keys();
-        await Promise.all(
-          cacheNames
-            .filter((cacheName) => cacheName.startsWith('vybepulse-'))
-            .map((cacheName) => caches.delete(cacheName))
-        );
-      } catch (error) {
-        console.error('Failed to cleanup preview service workers:', error);
-      }
-    };
-
-    if (isLovablePreviewEnvironment()) {
-      void cleanupPreviewServiceWorkers();
-      return;
-    }
-
-    const RESET_KEY = 'vybe-sw-reset-v2';
-    let hasReloaded = false;
-
-    const handleControllerChange = () => {
-      if (hasReloaded) return;
-      hasReloaded = true;
-      window.location.reload();
-    };
+    const RESET_KEY = 'vybe-sw-reset-v3';
 
     const resetCaches = async () => {
       if (sessionStorage.getItem(RESET_KEY) === 'done') return;
@@ -73,7 +50,6 @@ function ServiceWorkerCacheReset() {
 
       try {
         const registrations = await navigator.serviceWorker.getRegistrations();
-
         await Promise.all(
           registrations.map(async (registration) => {
             await registration.update().catch(() => undefined);
@@ -89,22 +65,12 @@ function ServiceWorkerCacheReset() {
             .filter((cacheName) => cacheName.startsWith('vybepulse-'))
             .map((cacheName) => caches.delete(cacheName))
         );
-
-        if (navigator.serviceWorker.controller && !hasReloaded) {
-          hasReloaded = true;
-          window.location.reload();
-        }
       } catch (error) {
         console.error('Failed to reset service worker cache:', error);
       }
     };
 
-    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
     void resetCaches();
-
-    return () => {
-      navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
-    };
   }, []);
 
   return null;
