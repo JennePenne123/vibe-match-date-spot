@@ -119,7 +119,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 |---|---------|--------|--------------|
 | 1 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons (192x192, 512x512), Favicons (16x16, 32x32, 180x180) |
 | 2 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor |
-| 3 | **Security Hardening** | 🟡 Teilweise | ~~OTP-Ablauf <10min~~ ✅, HIBP-Check aktivieren (offen), ~~Anonymous Sign-Ins deaktivieren~~ ✅ |
+| 3 | **Security Hardening** | ✅ Erledigt | ~~OTP-Ablauf <10min~~ ✅, ~~HIBP-Check aktivieren~~ ✅, ~~Anonymous Sign-Ins deaktivieren~~ ✅ |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
