@@ -200,6 +200,7 @@ const Preferences = () => {
   const { user } = useAuth();
 
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+  const [excludedCuisines, setExcludedCuisines] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState<string[]>([]);
   const [selectedTimePreferences, setSelectedTimePreferences] = useState<string[]>([]);
@@ -227,6 +228,7 @@ const Preferences = () => {
           if (data.home_longitude) setHomeLongitude(data.home_longitude);
           if (data.home_address) setHomeAddress(data.home_address);
           if (data.preferred_cuisines) setSelectedCuisines(data.preferred_cuisines);
+          if ((data as any).excluded_cuisines) setExcludedCuisines((data as any).excluded_cuisines);
           if (data.preferred_vibes) setSelectedVibes(data.preferred_vibes);
           if (data.preferred_price_range) setSelectedPriceRange(data.preferred_price_range);
           if (data.preferred_times) setSelectedTimePreferences(data.preferred_times);
@@ -355,6 +357,7 @@ const Preferences = () => {
           user_id: currentUserId,
           home_latitude: homeLatitude, home_longitude: homeLongitude, home_address: homeAddress || null,
           preferred_cuisines: selectedCuisines.length > 0 ? selectedCuisines : null,
+          excluded_cuisines: excludedCuisines.length > 0 ? excludedCuisines : null,
           preferred_vibes: selectedVibes.length > 0 ? selectedVibes : null,
           preferred_price_range: selectedPriceRange.length > 0 ? selectedPriceRange : null,
           preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
