@@ -1,5 +1,5 @@
 import React from 'react';
-import { Brain, Sparkles, TrendingUp } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { useAILearning } from '@/hooks/useAILearning';
 import { cn } from '@/lib/utils';
 
@@ -16,14 +16,13 @@ const AIProgressIndicator: React.FC<AIProgressIndicatorProps> = ({
 
   if (loading || !insights) return null;
 
-  const accuracy = Math.round(insights.aiAccuracy || 0);
-  const totalRatings = insights.totalRatings || 0;
+  const accuracy = Math.round(parseFloat(insights.aiAccuracy) || 0);
+  const totalDates = insights.totalDates || 0;
   const confidence = insights.confidenceLevel || 'low';
 
-  // Determine progress stage
   const getStage = () => {
-    if (totalRatings === 0) return { label: 'Lernphase', emoji: '🌱', color: 'text-amber-600 dark:text-amber-400' };
-    if (totalRatings < 3) return { label: 'Kennenlernen', emoji: '🧠', color: 'text-blue-600 dark:text-blue-400' };
+    if (totalDates === 0) return { label: 'Lernphase', emoji: '🌱', color: 'text-amber-600 dark:text-amber-400' };
+    if (totalDates < 3) return { label: 'Kennenlernen', emoji: '🧠', color: 'text-blue-600 dark:text-blue-400' };
     if (accuracy < 60) return { label: 'Wird besser', emoji: '📈', color: 'text-blue-600 dark:text-blue-400' };
     if (accuracy < 80) return { label: 'Gute Trefferquote', emoji: '🎯', color: 'text-emerald-600 dark:text-emerald-400' };
     return { label: 'Kennt dich gut', emoji: '✨', color: 'text-primary' };
@@ -38,20 +37,14 @@ const AIProgressIndicator: React.FC<AIProgressIndicatorProps> = ({
         className
       )}>
         <Brain className="w-3.5 h-3.5 text-primary" />
-        <span className="text-muted-foreground">KI-Genauigkeit:</span>
+        <span className="text-muted-foreground">KI:</span>
         <span className={cn('font-semibold', stage.color)}>
-          {totalRatings === 0 ? 'Lernphase' : `${accuracy}%`}
+          {totalDates === 0 ? 'Lernphase' : `${accuracy}%`}
         </span>
-        {totalRatings > 0 && (
-          <span className="text-muted-foreground">
-            ({totalRatings} {totalRatings === 1 ? 'Bewertung' : 'Bewertungen'})
-          </span>
-        )}
       </div>
     );
   }
 
-  // Compact variant for profile
   return (
     <div className={cn(
       'flex items-center gap-3 p-3 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50',
@@ -69,16 +62,16 @@ const AIProgressIndicator: React.FC<AIProgressIndicatorProps> = ({
           <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
             <div 
               className="h-full rounded-full bg-gradient-to-r from-primary to-primary/60 transition-all duration-700"
-              style={{ width: `${totalRatings === 0 ? 5 : Math.min(accuracy, 100)}%` }}
+              style={{ width: `${totalDates === 0 ? 5 : Math.min(accuracy, 100)}%` }}
             />
           </div>
           <span className={cn('text-xs font-semibold whitespace-nowrap', stage.color)}>
-            {totalRatings === 0 ? stage.label : `${accuracy}%`}
+            {totalDates === 0 ? stage.label : `${accuracy}%`}
           </span>
         </div>
-        {totalRatings > 0 && (
+        {totalDates > 0 && (
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            Basierend auf {totalRatings} {totalRatings === 1 ? 'Bewertung' : 'Bewertungen'}
+            Basierend auf {totalDates} {totalDates === 1 ? 'Date' : 'Dates'}
           </p>
         )}
       </div>
