@@ -11,7 +11,7 @@ import { bowlChopsticks } from '@lucide/lab';
 import { Waves as WavesIcon, Palette as PaletteIcon, Landmark as LandmarkIcon, Gem as GemIcon } from 'lucide-react';
 import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Heart, Navigation, Loader2, X,
-  Icon, ChevronDown, Save, HeartHandshake,
+  Icon, ChevronDown, Save, HeartHandshake, Ban,
   Pizza, Fish, Flame, Croissant, CookingPot, Leaf, Beef, Soup,
   Smile, TreePine, Moon, Theater, Compass,
   PiggyBank, CreditCard, Gem, Crown,
