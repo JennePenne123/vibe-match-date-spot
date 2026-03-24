@@ -126,7 +126,49 @@ const isBlockedVenue = (venue: any): boolean => {
   return VENUE_NAME_BLOCKLIST.some(blocked => searchText.includes(blocked));
 };
 
-// Filter venues by user preferences to improve matching
+/**
+ * Infer cuisine_type from venue name, address, tags, and description
+ * when the original cuisine_type field is empty/null.
+ * Returns the best-guess cuisine string or null if no inference is possible.
+ */
+const CUISINE_NAME_PATTERNS: Record<string, string[]> = {
+  'italian': ['pizza', 'pasta', 'trattoria', 'ristorante', 'osteria', 'pizzeria', 'gelato', 'italiano'],
+  'japanese': ['sushi', 'ramen', 'izakaya', 'tempura', 'yakitori', 'miso', 'udon', 'sake'],
+  'chinese': ['wok', 'dim sum', 'dumpling', 'noodle', 'peking', 'szechuan', 'sichuan', 'canton'],
+  'thai': ['thai', 'pad thai', 'tom yum', 'satay', 'green curry'],
+  'indian': ['curry', 'tandoori', 'masala', 'naan', 'tikka', 'biryani', 'dal', 'samosa', 'indisch'],
+  'mexican': ['taco', 'burrito', 'enchilada', 'quesadilla', 'guacamole', 'cantina', 'mexicano'],
+  'turkish': ['kebab', 'döner', 'doner', 'kebap', 'pide', 'lahmacun', 'köfte', 'baklava', 'türkisch'],
+  'greek': ['gyros', 'souvlaki', 'tzatziki', 'griechisch', 'greek', 'taverna', 'moussaka'],
+  'vietnamese': ['pho', 'banh mi', 'vietnamesisch', 'vietnamese', 'bún'],
+  'korean': ['bibimbap', 'kimchi', 'korean bbq', 'bulgogi', 'koreanisch'],
+  'french': ['brasserie', 'bistrot', 'crêpe', 'croissant', 'patisserie', 'français', 'französisch'],
+  'german': ['brauhaus', 'gasthof', 'wirtshaus', 'schnitzel', 'bratwurst', 'bierstube', 'ratskeller', 'deutsche küche'],
+  'american': ['burger', 'bbq', 'barbecue', 'steakhouse', 'steak house', 'wings', 'diner', 'smokehouse'],
+  'mediterranean': ['hummus', 'falafel', 'mezze', 'olive', 'mediterran'],
+  'spanish': ['tapas', 'paella', 'churros', 'sangria', 'bodega'],
+};
+
+function inferCuisineFromVenue(venue: any): string | null {
+  const name = (venue.name || '').toLowerCase();
+  const desc = (venue.description || '').toLowerCase();
+  const tags = (venue.tags || []).map((t: string) => t.toLowerCase());
+  const address = (venue.address || '').toLowerCase();
+  const searchText = [name, desc, ...tags, address].join(' ');
+  
+  let bestMatch: { cuisine: string; hits: number } | null = null;
+  
+  for (const [cuisine, patterns] of Object.entries(CUISINE_NAME_PATTERNS)) {
+    const hits = patterns.filter(p => searchText.includes(p)).length;
+    if (hits > 0 && (!bestMatch || hits > bestMatch.hits)) {
+      bestMatch = { cuisine, hits };
+    }
+  }
+  
+  return bestMatch?.cuisine || null;
+}
+
+
 export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string) => {
   try {
     // Pre-filter: remove delivery services and supermarkets
