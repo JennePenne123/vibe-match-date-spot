@@ -379,11 +379,27 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         }
       }
 
-      // Rating bonus (10% weight)
+      // Rating bonus (10% weight) — confidence-weighted by review count
       if (venue.rating) {
         maxPossible += 10;
-        if (venue.rating >= 4.0) score += 10;
-        else if (venue.rating >= 3.5) score += 5;
+        const reviewCount = venue.review_count || venue.reviewCount || venue.user_ratings_total || 0;
+        const REVIEW_CONFIDENCE_THRESHOLD = 20;
+        const confidence = reviewCount > 0 
+          ? Math.min(reviewCount / REVIEW_CONFIDENCE_THRESHOLD, 1.0) 
+          : 0.5; // No review data = neutral confidence
+        
+        // Bayesian effective rating: blend toward mean (3.5) with low review counts
+        const MEAN_RATING = 3.5;
+        const effectiveRating = reviewCount > 0
+          ? (venue.rating * confidence + MEAN_RATING * (1 - confidence))
+          : venue.rating;
+        
+        if (effectiveRating >= 4.0) score += 10 * confidence;
+        else if (effectiveRating >= 3.5) score += 5 * confidence;
+        else if (effectiveRating < 3.0) score -= 3; // Penalty for poor ratings
+        
+        // Social proof bonus for well-reviewed venues
+        if (reviewCount >= 50 && venue.rating >= 4.0) score += 3;
       }
 
       // Dietary compatibility bonus (5%)
