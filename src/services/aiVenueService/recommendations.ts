@@ -50,7 +50,7 @@ export const getAIVenueRecommendations = async (
     // Get venues using hybrid multi-source strategy
     let venues = [];
     if (userLocation?.latitude && userLocation?.longitude) {
-      venues = await getVenuesFromMultipleSources(userId, limit * 5, userLocation);
+      venues = await getVenuesFromMultipleSources(userId, limit * 8, userLocation);
     }
     
     // Fallback to database venues if all sources fail or no location
