@@ -316,14 +316,14 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
             inferred = true;
           }
           if (prefVibes.includes('romantic') && (effectivePrice === '$$$' || effectivePrice === '$$$$' ||
-              venueCuisine.includes('italian') || venueCuisine.includes('french'))) {
+              effectiveCuisine.includes('italian') || effectiveCuisine.includes('french'))) {
             score += 10;
             inferred = true;
           }
           if (prefVibes.includes('adventurous') && (
-            venueCuisine.includes('thai') || venueCuisine.includes('chinese') || 
-            venueCuisine.includes('korean') || venueCuisine.includes('indian') ||
-            venueCuisine.includes('vietnamese') || venueCuisine.includes('japanese'))) {
+            effectiveCuisine.includes('thai') || effectiveCuisine.includes('chinese') || 
+            effectiveCuisine.includes('korean') || effectiveCuisine.includes('indian') ||
+            effectiveCuisine.includes('vietnamese') || effectiveCuisine.includes('japanese'))) {
             score += 10;
             inferred = true;
           }
