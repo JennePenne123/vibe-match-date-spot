@@ -500,6 +500,11 @@ const Preferences = () => {
                 <SelectionGrid items={cuisines} selected={selectedCuisines} onToggle={(id) => toggleSelection(id, selectedCuisines, setSelectedCuisines)} />
               </AccordionSection>
 
+              <AccordionSection title={'Nie wieder vorschlagen'} icon={<Ban className="w-5 h-5 text-destructive" />} selectedCount={excludedCuisines.length}>
+                <p className="text-xs text-muted-foreground mb-3">Küchen, die du <strong>nie</strong> vorgeschlagen bekommen möchtest.</p>
+                <SelectionGrid items={cuisines} selected={excludedCuisines} onToggle={(id) => toggleSelection(id, excludedCuisines, setExcludedCuisines)} />
+              </AccordionSection>
+
               <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
                 <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
               </AccordionSection>
