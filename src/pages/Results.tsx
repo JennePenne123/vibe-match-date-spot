@@ -4,6 +4,7 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Sparkles, Users, Crown, Lock } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
+import RealtimeContextBanner from '@/components/RealtimeContextBanner';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenueVouchers } from '@/hooks/useVenueVouchers';
@@ -166,6 +167,12 @@ const Results = () => {
 
         {/* AI-Powered Results */}
         <div className="p-4">
+          {/* Realtime Context Banner */}
+          <RealtimeContextBanner
+            userLocation={appState.userLocation}
+            className="mb-4"
+          />
+
           <div className="mb-6 text-center bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 p-4 rounded-lg border border-purple-100 dark:border-purple-800">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -174,7 +181,7 @@ const Results = () => {
               </h2>
             </div>
             <p className="text-sm text-purple-700 dark:text-purple-300">
-              Each venue is personally scored based on your preferences and past feedback
+              Jedes Venue wird persönlich für dich bewertet — basierend auf {isFromSmartPlanning ? 'euren gemeinsamen' : 'deinen'} Präferenzen
             </p>
           </div>
 

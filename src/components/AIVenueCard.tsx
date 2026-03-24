@@ -237,149 +237,70 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
       </CardHeader>
 
       <CardContent className="space-y-2">
-        {/* Show Details (Combined AI Reasoning + Match Details) */}
-        {showAIInsights && (ai_reasoning || match_factors) && (
+        {/* "Warum dieses Venue?" — Signal-based explanation */}
+        {showAIInsights && ai_reasoning && (
           <div className="space-y-2">
             <button
               onClick={() => setShowDetails(!showDetails)}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto flex items-center gap-1"
+              className="w-full flex items-center justify-between text-xs py-1.5 px-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
             >
-              {showDetails ? 'Hide details ↑' : 'View details ↓'}
+              <span className="flex items-center gap-1.5 font-medium text-foreground">
+                <Brain className="w-3.5 h-3.5 text-primary" />
+                Warum dieses Venue?
+              </span>
+              {showDetails ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
             </button>
 
             {showDetails && (
-              <div className="space-y-3 border-l-4 border-purple-200 pl-3 py-2">
-                {/* AI Reasoning Section */}
-                {ai_reasoning && (
-                  <>
-                    <div className="bg-purple-50/50 rounded-lg p-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Brain className="w-4 h-4 text-purple-600" />
-                        <Text size="sm" weight="semibold" className="text-purple-800">
-                          AI Reasoning
-                        </Text>
-                      </div>
-                      <Text size="sm" className="text-purple-800 leading-relaxed">
-                        {ai_reasoning}
-                      </Text>
-                    </div>
-                    {match_factors && <div className="border-t my-2" />}
-                  </>
-                )}
+              <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
+                {/* AI Reasoning as signal chips */}
+                <div className="flex flex-wrap gap-1.5">
+                  {ai_reasoning.split(' • ').filter(Boolean).map((reason, i) => {
+                    // Determine chip color based on content
+                    const r = reason.toLowerCase();
+                    let chipColor = 'bg-muted text-foreground border-border/50';
+                    if (r.includes('freund')) chipColor = 'bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/20';
+                    else if (r.includes('wetter') || r.includes('draußen') || r.includes('outdoor') || r.includes('°c')) chipColor = 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20';
+                    else if (r.includes('perfekt für') || r.includes('ideal für')) chipColor = 'bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/20';
+                    else if (r.includes('liebling') || r.includes('favorit') || r.includes('liebst')) chipColor = 'bg-pink-500/10 text-pink-700 dark:text-pink-300 border-pink-500/20';
+                    else if (r.includes('neuentdeckung')) chipColor = 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20';
+                    else if (r.includes('küche') || r.includes('passt')) chipColor = 'bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/20';
+                    else if (r.includes('bewertet') || r.includes('⭐')) chipColor = 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border-yellow-500/20';
+                    else if (r.includes('besucht')) chipColor = 'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/20';
 
-                {/* Match Details Section */}
-                {match_factors && (
-                  <>
-                    {/* Venue Metrics */}
-                    <div className="flex items-center gap-4 text-sm pb-2 border-b">
-                      {(rating || match_factors?.rating) && (
-                        <div className="flex items-center text-yellow-600">
-                          <Star className="w-4 h-4 mr-1 fill-current" />
-                          <span className="font-medium">{rating || match_factors.rating}</span>
-                        </div>
-                      )}
-                      
-                      {(priceRange || match_factors?.price_range) && (
-                        <div className="flex items-center text-green-600">
-                          <DollarSign className="w-4 h-4 mr-1" />
-                          <span className="font-medium">{priceRange || match_factors.price_range}</span>
-                        </div>
-                      )}
+                    return (
+                      <span
+                        key={i}
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium border ${chipColor}`}
+                      >
+                        {reason}
+                      </span>
+                    );
+                  })}
+                </div>
 
-                      {cuisine_type && (
-                        <div className="flex items-center text-purple-600">
-                          <span className="font-medium">{cuisine_type}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Distance and Neighborhood */}
-                    {(distance || venueNeighborhood) && (
-                      <div className="flex items-center gap-3 text-sm">
-                        {distance && (
-                          <div className="flex items-center gap-1 text-muted-foreground">
-                            <MapPin className="w-3 h-3" />
-                            <span>{distance}</span>
-                          </div>
-                        )}
-                        {venueNeighborhood && (
-                          <span className="text-muted-foreground">• {venueNeighborhood}</span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Amenities */}
-                    {amenities && amenities.length > 0 && (
-                      <div className="space-y-1">
-                        <span className="text-sm text-gray-600">Amenities</span>
-                        <div className="flex flex-wrap gap-1">
-                          {amenities.map((amenity, index) => (
-                            <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
-                              {amenity}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Operating Hours */}
-                    {operatingHours && operatingHours.length > 0 && (
-                      <div className="text-sm">
-                        <span className="text-gray-600 font-medium">Hours:</span>{' '}
-                        <span className="text-gray-700">{operatingHours[0]}</span>
-                      </div>
-                    )}
-                    
-                    {match_factors.cuisine_match && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Cuisine Match</span>
-                        <Badge variant="secondary" className="bg-green-100 text-green-700">
-                          ✓ Perfect
-                        </Badge>
-                      </div>
-                    )}
-                    
-                    {match_factors.price_match && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Price Match</span>
-                        <Badge variant="secondary" className="bg-green-100 text-green-700">
-                          ✓ In Budget
-                        </Badge>
-                      </div>
-                    )}
-                    
-                    {match_factors.vibe_matches?.length > 0 && (
-                      <div className="space-y-1">
-                        <span className="text-sm text-gray-600">Vibe Matches</span>
-                        <div className="flex flex-wrap gap-1">
-                          {match_factors.vibe_matches.map((vibe: string, index: number) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {vibe}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {match_factors.rating_bonus > 0 && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Quality Bonus</span>
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                          +{(match_factors.rating_bonus * 100).toFixed(0)}%
-                        </Badge>
-                      </div>
-                    )}
-
-                    {contextual_score > 0 && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Context Score</span>
-                        <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                          +{(contextual_score * 100).toFixed(0)}%
-                        </Badge>
-                      </div>
-                    )}
-                  </>
-                )}
+                {/* Compact venue metrics */}
+                <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1 border-t border-border/30">
+                  {rating && (
+                    <span className="flex items-center gap-0.5">
+                      <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+                      {rating}
+                    </span>
+                  )}
+                  {priceRange && (
+                    <span className="flex items-center gap-0.5">
+                      <DollarSign className="w-3 h-3" />
+                      {priceRange}
+                    </span>
+                  )}
+                  {cuisine_type && <span>{cuisine_type}</span>}
+                  {distance && (
+                    <span className="flex items-center gap-0.5">
+                      <MapPin className="w-3 h-3" />
+                      {distance}
+                    </span>
+                  )}
+                </div>
               </div>
             )}
           </div>
