@@ -1220,6 +1220,7 @@ export type Database = {
           accessibility_needs: string[] | null
           created_at: string
           dietary_restrictions: string[] | null
+          excluded_cuisines: string[] | null
           home_address: string | null
           home_latitude: number | null
           home_longitude: number | null
@@ -1243,6 +1244,7 @@ export type Database = {
           accessibility_needs?: string[] | null
           created_at?: string
           dietary_restrictions?: string[] | null
+          excluded_cuisines?: string[] | null
           home_address?: string | null
           home_latitude?: number | null
           home_longitude?: number | null
@@ -1266,6 +1268,7 @@ export type Database = {
           accessibility_needs?: string[] | null
           created_at?: string
           dietary_restrictions?: string[] | null
+          excluded_cuisines?: string[] | null
           home_address?: string | null
           home_latitude?: number | null
           home_longitude?: number | null
