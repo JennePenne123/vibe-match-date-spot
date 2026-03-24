@@ -24,6 +24,7 @@ import OfflineBanner from "./components/OfflineBanner";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { useAppUsageTracking } from "./hooks/useImplicitSignals";
+import { isLovablePreviewEnvironment } from "./utils/runtimeEnvironment";
 
 function AppUsageTracker() {
   useAppUsageTracking();
@@ -33,6 +34,27 @@ function AppUsageTracker() {
 function ServiceWorkerCacheReset() {
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('caches' in window)) {
+      return;
+    }
+
+    const cleanupPreviewServiceWorkers = async () => {
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames
+            .filter((cacheName) => cacheName.startsWith('vybepulse-'))
+            .map((cacheName) => caches.delete(cacheName))
+        );
+      } catch (error) {
+        console.error('Failed to cleanup preview service workers:', error);
+      }
+    };
+
+    if (isLovablePreviewEnvironment()) {
+      void cleanupPreviewServiceWorkers();
       return;
     }
 

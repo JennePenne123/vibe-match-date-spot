@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { isLovablePreviewEnvironment } from '@/utils/runtimeEnvironment';
 
 // VAPID public key from environment
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
@@ -25,6 +26,10 @@ export function usePushNotifications() {
 
   // Check browser support
   const checkSupport = useCallback(() => {
+    if (isLovablePreviewEnvironment()) {
+      return false;
+    }
+
     const supported = 'serviceWorker' in navigator && 
                       'PushManager' in window && 
                       'Notification' in window;
@@ -74,6 +79,10 @@ export function usePushNotifications() {
 
   // Register service worker
   const registerServiceWorker = useCallback(async () => {
+    if (isLovablePreviewEnvironment()) {
+      throw new Error('Service Worker is disabled in Lovable preview');
+    }
+
     if (!('serviceWorker' in navigator)) {
       throw new Error('Service Worker not supported');
     }
