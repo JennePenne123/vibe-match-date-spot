@@ -133,6 +133,17 @@ const Profile = () => {
           </Collapsible>
 
           <LeaderboardCard />
+
+          {/* Reset Preferences */}
+          <Button
+            variant="outline"
+            className="w-full justify-center gap-2"
+            onClick={() => navigate('/welcome')}
+          >
+            <RotateCcw className="h-4 w-4" />
+            Präferenzen neu setzen
+          </Button>
+
           <ProfileActions onLogout={logout} />
         </div>
       </div>
