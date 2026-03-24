@@ -5,6 +5,9 @@ import { calculateDistanceFromHamburg } from './helperFunctions';
 import { getRealtimeContextScore } from './contextScoring';
 import { getRepeatProtectionModifier } from './repeatProtection';
 import { getHabitBonus } from './habitLearning';
+import { getOccasionScore, type DateOccasion } from './occasionScoring';
+import { getFriendSocialProofBonus } from './friendSocialProof';
+import { getWeatherScore } from './weatherScoring';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
@@ -47,7 +50,8 @@ export const getAIVenueRecommendations = async (
   partnerId?: string,
   limit: number = 6,
   userLocation?: { latitude: number; longitude: number; address?: string },
-  selectedArea?: string
+  selectedArea?: string,
+  occasion?: DateOccasion | null
 ): Promise<AIVenueRecommendation[]> => {
   try {
     // Get venues using hybrid multi-source strategy
@@ -81,6 +85,15 @@ export const getAIVenueRecommendations = async (
       .eq('user_id', userId)
       .single();
 
+    // Apply negative preference filter: hard-exclude cuisines the user blocked
+    const excludedCuisines: string[] = (userPrefs as any)?.excluded_cuisines || [];
+    if (excludedCuisines.length > 0) {
+      venues = venues.filter(v => {
+        const vCuisine = (v.cuisine_type || '').toLowerCase();
+        return !excludedCuisines.some(exc => vCuisine.includes(exc.toLowerCase()));
+      });
+    }
+
     // Build recommendations using the preferenceScore from filtering + local scoring
     for (const venue of venues) {
       if (!venue.id) {
@@ -104,6 +117,15 @@ export const getAIVenueRecommendations = async (
       // ── Repeat-visit protection ──
       const repeatResult = await getRepeatProtectionModifier(userId, cleanVenueId, prefScore);
 
+      // ── Occasion-based scoring ──
+      const occasionResult = getOccasionScore(venue, occasion);
+
+      // ── Friend social proof ──
+      const friendResult = await getFriendSocialProofBonus(userId, cleanVenueId);
+
+      // ── Weather-aware scoring ──
+      const weatherResult = await getWeatherScore(venue, userLocation);
+
       // Rating bonus — confidence-weighted by review count
       const reviewCount = venue.review_count || venue.reviewCount || venue.user_ratings_total || 0;
       const reviewConfidence = reviewCount > 0 ? Math.min(reviewCount / 20, 1.0) : 0.5;
@@ -112,7 +134,11 @@ export const getAIVenueRecommendations = async (
       const socialProof = (reviewCount >= 50 && venue.rating >= 4.0) ? 3 : 0;
 
       // Compute final score: all signals combined
-      const rawScore = prefScore + contextBonus + ratingBonus + socialProof + habitResult.bonus + repeatResult.modifier;
+      const rawScore = prefScore + contextBonus + ratingBonus + socialProof
+        + habitResult.bonus + repeatResult.modifier
+        + occasionResult.bonus + occasionResult.penalty
+        + friendResult.bonus
+        + weatherResult.bonus + weatherResult.penalty;
       const finalScore = Math.max(5, Math.min(98, rawScore));
 
       // Generate reasoning based on actual matches
@@ -149,10 +175,13 @@ export const getAIVenueRecommendations = async (
           matchReasons.push(`Passt zum ${areaNames[selectedArea] || selectedArea}-Vibe`);
         }
       }
-      // Context, habit, and repeat reasons
+      // Context, habit, repeat, occasion, friend, weather reasons
       if (contextResult.reasons.length > 0) matchReasons.push(contextResult.reasons[0]);
       if (habitResult.reason) matchReasons.push(habitResult.reason);
       if (repeatResult.reason && repeatResult.modifier > 0) matchReasons.push(repeatResult.reason);
+      if (occasionResult.reason) matchReasons.push(occasionResult.reason);
+      if (friendResult.reason) matchReasons.push(friendResult.reason);
+      if (weatherResult.reason) matchReasons.push(weatherResult.reason);
       if (repeatResult.visitCount > 0) matchReasons.push(`Bereits ${repeatResult.visitCount}x besucht`);
 
       if (matchReasons.length === 0) {
