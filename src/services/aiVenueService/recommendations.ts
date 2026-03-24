@@ -149,6 +149,12 @@ export const getAIVenueRecommendations = async (
           matchReasons.push(`Passt zum ${areaNames[selectedArea] || selectedArea}-Vibe`);
         }
       }
+      // Context, habit, and repeat reasons
+      if (contextResult.reasons.length > 0) matchReasons.push(contextResult.reasons[0]);
+      if (habitResult.reason) matchReasons.push(habitResult.reason);
+      if (repeatResult.reason && repeatResult.modifier > 0) matchReasons.push(repeatResult.reason);
+      if (repeatResult.visitCount > 0) matchReasons.push(`Bereits ${repeatResult.visitCount}x besucht`);
+
       if (matchReasons.length === 0) {
         matchReasons.push('Entdecke etwas Neues in deiner Nähe');
       }
