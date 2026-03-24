@@ -94,11 +94,15 @@ export const getAIVenueRecommendations = async (
       // This already accounts for cuisine, price, vibe, and rating matching
       const prefScore = venue.preferenceScore || venue.collaborativeScore || 50;
       
-      // Apply contextual bonuses
-      let contextBonus = 0;
-      const hour = new Date().getHours();
-      if (hour >= 18 && hour <= 21) contextBonus += 5; // Dinner
-      else if (hour >= 11 && hour <= 14) contextBonus += 3; // Lunch
+      // ── Real-time context scoring (day, time, season) ──
+      const contextResult = getRealtimeContextScore(venue);
+      const contextBonus = contextResult.bonus;
+
+      // ── Habit pattern bonus ──
+      const habitResult = await getHabitBonus(userId, venue);
+
+      // ── Repeat-visit protection ──
+      const repeatResult = await getRepeatProtectionModifier(userId, cleanVenueId, prefScore);
 
       // Rating bonus — confidence-weighted by review count
       const reviewCount = venue.review_count || venue.reviewCount || venue.user_ratings_total || 0;
@@ -107,9 +111,9 @@ export const getAIVenueRecommendations = async (
       // Social proof bonus
       const socialProof = (reviewCount >= 50 && venue.rating >= 4.0) ? 3 : 0;
 
-      // Compute final score: preference-driven with small contextual adjustments
-      // Floor lowered to 5 so non-matching venues are clearly ranked lower
-      const finalScore = Math.max(5, Math.min(98, prefScore + contextBonus + ratingBonus + socialProof));
+      // Compute final score: all signals combined
+      const rawScore = prefScore + contextBonus + ratingBonus + socialProof + habitResult.bonus + repeatResult.modifier;
+      const finalScore = Math.max(5, Math.min(98, rawScore));
 
       // Generate reasoning based on actual matches
       const matchReasons: string[] = [];
