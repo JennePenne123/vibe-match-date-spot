@@ -95,7 +95,7 @@ serve(async (req) => {
       );
     }
 
-    const validRadius = Math.min(Math.max(parseInt(String(radius)) || 5000, 500), 25000);
+    const validRadius = Math.min(Math.max(parseInt(String(radius)) || 5000, 500), 10000);
     const validLimit = Math.min(Math.max(parseInt(String(limit)) || 20, 1), 100);
 
     console.log('🔍 RADAR: Searching venues', { latitude: validLat, longitude: validLng, cuisines, venueTypes, activities, radius: validRadius, limit: validLimit });
