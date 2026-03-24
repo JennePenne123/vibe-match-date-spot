@@ -106,7 +106,7 @@ export const getAIVenueRecommendations = async (
 
       // Compute final score: preference-driven with small contextual adjustments
       // Floor lowered to 5 so non-matching venues are clearly ranked lower
-      const finalScore = Math.max(5, Math.min(98, prefScore + contextBonus + ratingBonus));
+      const finalScore = Math.max(5, Math.min(98, prefScore + contextBonus + ratingBonus + socialProof));
 
       // Generate reasoning based on actual matches
       const matchReasons: string[] = [];
