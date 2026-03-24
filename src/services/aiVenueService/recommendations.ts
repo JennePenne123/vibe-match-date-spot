@@ -2,6 +2,9 @@ import { calculateVenueAIScore, calculateConfidenceLevel } from './scoring';
 import { getActiveVenues, getStoredAIScore } from './fetching';
 import { filterVenuesByPreferences, filterVenuesByCollaborativePreferences, AREA_VIBE_MAP } from './preferenceFiltering';
 import { calculateDistanceFromHamburg } from './helperFunctions';
+import { getRealtimeContextScore } from './contextScoring';
+import { getRepeatProtectionModifier } from './repeatProtection';
+import { getHabitBonus } from './habitLearning';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
@@ -91,11 +94,15 @@ export const getAIVenueRecommendations = async (
       // This already accounts for cuisine, price, vibe, and rating matching
       const prefScore = venue.preferenceScore || venue.collaborativeScore || 50;
       
-      // Apply contextual bonuses
-      let contextBonus = 0;
-      const hour = new Date().getHours();
-      if (hour >= 18 && hour <= 21) contextBonus += 5; // Dinner
-      else if (hour >= 11 && hour <= 14) contextBonus += 3; // Lunch
+      // ── Real-time context scoring (day, time, season) ──
+      const contextResult = getRealtimeContextScore(venue);
+      const contextBonus = contextResult.bonus;
+
+      // ── Habit pattern bonus ──
+      const habitResult = await getHabitBonus(userId, venue);
+
+      // ── Repeat-visit protection ──
+      const repeatResult = await getRepeatProtectionModifier(userId, cleanVenueId, prefScore);
 
       // Rating bonus — confidence-weighted by review count
       const reviewCount = venue.review_count || venue.reviewCount || venue.user_ratings_total || 0;
@@ -104,9 +111,9 @@ export const getAIVenueRecommendations = async (
       // Social proof bonus
       const socialProof = (reviewCount >= 50 && venue.rating >= 4.0) ? 3 : 0;
 
-      // Compute final score: preference-driven with small contextual adjustments
-      // Floor lowered to 5 so non-matching venues are clearly ranked lower
-      const finalScore = Math.max(5, Math.min(98, prefScore + contextBonus + ratingBonus + socialProof));
+      // Compute final score: all signals combined
+      const rawScore = prefScore + contextBonus + ratingBonus + socialProof + habitResult.bonus + repeatResult.modifier;
+      const finalScore = Math.max(5, Math.min(98, rawScore));
 
       // Generate reasoning based on actual matches
       const matchReasons: string[] = [];
@@ -142,6 +149,12 @@ export const getAIVenueRecommendations = async (
           matchReasons.push(`Passt zum ${areaNames[selectedArea] || selectedArea}-Vibe`);
         }
       }
+      // Context, habit, and repeat reasons
+      if (contextResult.reasons.length > 0) matchReasons.push(contextResult.reasons[0]);
+      if (habitResult.reason) matchReasons.push(habitResult.reason);
+      if (repeatResult.reason && repeatResult.modifier > 0) matchReasons.push(repeatResult.reason);
+      if (repeatResult.visitCount > 0) matchReasons.push(`Bereits ${repeatResult.visitCount}x besucht`);
+
       if (matchReasons.length === 0) {
         matchReasons.push('Entdecke etwas Neues in deiner Nähe');
       }
