@@ -3,6 +3,73 @@ import { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learni
 import { getMoodScoreModifier, getMoodInfluenceLabel } from './moodScoring';
 import { getImplicitSignalBoost } from '@/services/implicitSignalsService';
 
+/**
+ * Cuisine similarity matrix — returns 0..1 similarity between two cuisines.
+ * 1.0 = exact match, 0.85 = same family (e.g. Italian↔Mediterranean),
+ * 0.6 = loosely related (e.g. Greek↔Turkish), 0 = unrelated.
+ */
+const CUISINE_FAMILIES: Record<string, { members: string[]; similarity: number }[]> = {
+  'italian':       [{ members: ['mediterranean', 'greek', 'spanish'], similarity: 0.75 }, { members: ['french'], similarity: 0.6 }],
+  'greek':         [{ members: ['mediterranean', 'turkish', 'lebanese'], similarity: 0.8 }, { members: ['italian', 'spanish'], similarity: 0.65 }],
+  'mediterranean': [{ members: ['italian', 'greek', 'spanish', 'turkish', 'lebanese'], similarity: 0.8 }, { members: ['french', 'moroccan'], similarity: 0.6 }],
+  'spanish':       [{ members: ['mediterranean', 'italian', 'portuguese'], similarity: 0.75 }, { members: ['mexican', 'latin'], similarity: 0.5 }],
+  'turkish':       [{ members: ['mediterranean', 'greek', 'lebanese', 'arabic', 'middle_eastern'], similarity: 0.8 }, { members: ['indian'], similarity: 0.4 }],
+  'japanese':      [{ members: ['korean', 'asian'], similarity: 0.7 }, { members: ['chinese', 'vietnamese', 'thai'], similarity: 0.55 }],
+  'chinese':       [{ members: ['asian', 'vietnamese'], similarity: 0.7 }, { members: ['thai', 'korean', 'japanese'], similarity: 0.55 }],
+  'korean':        [{ members: ['japanese', 'asian'], similarity: 0.7 }, { members: ['chinese'], similarity: 0.55 }],
+  'vietnamese':    [{ members: ['asian', 'thai', 'chinese'], similarity: 0.7 }, { members: ['japanese', 'korean'], similarity: 0.5 }],
+  'thai':          [{ members: ['asian', 'vietnamese'], similarity: 0.7 }, { members: ['indian', 'chinese'], similarity: 0.5 }],
+  'indian':        [{ members: ['curry'], similarity: 0.9 }, { members: ['thai', 'middle_eastern'], similarity: 0.4 }],
+  'mexican':       [{ members: ['latin', 'tex-mex'], similarity: 0.85 }, { members: ['spanish'], similarity: 0.5 }],
+  'french':        [{ members: ['european'], similarity: 0.7 }, { members: ['italian', 'mediterranean'], similarity: 0.6 }],
+  'german':        [{ members: ['european', 'regional'], similarity: 0.7 }, { members: ['french'], similarity: 0.45 }],
+  'american':      [{ members: ['burger', 'bbq', 'steakhouse', 'grill'], similarity: 0.85 }, { members: ['mexican'], similarity: 0.4 }],
+};
+
+function getCuisineSimilarity(userCuisine: string, venueCuisine: string): number {
+  const u = userCuisine.toLowerCase().trim();
+  const v = venueCuisine.toLowerCase().trim();
+  
+  // Exact match
+  if (u === v) return 1.0;
+  
+  // Partial/contains match (e.g. "Italian Restaurant" matches "Italian")
+  if (v.includes(u) || u.includes(v)) return 0.95;
+  
+  // Check family relationships
+  const families = CUISINE_FAMILIES[u];
+  if (families) {
+    for (const family of families) {
+      if (family.members.some(m => v.includes(m) || m.includes(v))) {
+        return family.similarity;
+      }
+    }
+  }
+  
+  // Reverse lookup (venue → user)
+  const reverseFamilies = CUISINE_FAMILIES[v];
+  if (reverseFamilies) {
+    for (const family of reverseFamilies) {
+      if (family.members.some(m => u.includes(m) || m.includes(u))) {
+        return family.similarity;
+      }
+    }
+  }
+  
+  return 0;
+}
+
+function getBestCuisineSimilarity(userCuisines: string[], venueCuisine: string): { similarity: number; matchedCuisine: string } {
+  let best = { similarity: 0, matchedCuisine: '' };
+  for (const uc of userCuisines) {
+    const sim = getCuisineSimilarity(uc, venueCuisine);
+    if (sim > best.similarity) {
+      best = { similarity: sim, matchedCuisine: uc };
+    }
+  }
+  return best;
+}
+
 // Calculate individual user score based on preferences
 const calculateUserScore = (
   userPrefs: any,
@@ -13,23 +80,28 @@ const calculateUserScore = (
   let maxPossible = 0;
   const matches = { cuisine: false, price: false, vibes: [] as string[], activities: [] as string[], venueType: false, dietary: false, time: false };
 
-  // Cuisine matching with learned weight
+  // Cuisine matching with similarity matrix + learned weight
   if (userPrefs.preferred_cuisines && venue.cuisine_type) {
     maxPossible += 0.35;
     const userCuisines = userPrefs.preferred_cuisines.map((c: string) => c.toLowerCase());
     const venueCuisine = venue.cuisine_type.toLowerCase();
     
-    let cuisineMatch = userCuisines.includes(venueCuisine);
+    const { similarity, matchedCuisine } = getBestCuisineSimilarity(userCuisines, venueCuisine);
     
-    if (!cuisineMatch) {
-      cuisineMatch = userCuisines.some((userCuisine: string) => 
-        venueCuisine.includes(userCuisine) || userCuisine.includes(venueCuisine)
-      );
+    if (similarity >= 0.6) {
+      // Proportional score: exact match = full 0.35, similar = scaled down
+      matches.cuisine = true;
+      const cuisineScore = 0.35 * similarity;
+      score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
+    } else if (similarity > 0) {
+      // Weak match — small bonus instead of penalty
+      matches.cuisine = false;
+      score += applyWeight(0.35 * similarity * 0.5, weights.cuisine, 'cuisine');
+    } else {
+      // No relation at all — penalty
+      matches.cuisine = false;
+      score += applyWeight(-0.15, weights.cuisine, 'cuisine');
     }
-    
-    matches.cuisine = cuisineMatch;
-    const cuisineScore = cuisineMatch ? 0.35 : -0.20; // Strong penalty for wrong cuisine
-    score += applyWeight(cuisineScore, weights.cuisine, 'cuisine');
   }
 
   // Price range matching
