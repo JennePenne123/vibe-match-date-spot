@@ -242,18 +242,28 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
 
       // === PREFERENCE-BASED TAG ENRICHMENT ===
       // Infer missing venue attributes from what we know
-      const venueCuisine = (venue.cuisine_type || '').toLowerCase();
+      let effectiveCuisine = (venue.cuisine_type || '').toLowerCase();
+      
+      // If cuisine_type is missing, infer from name/tags/description
+      if (!effectiveCuisine) {
+        const inferred = inferCuisineFromVenue(venue);
+        if (inferred) {
+          effectiveCuisine = inferred;
+          console.log(`🔍 INFERRED CUISINE: "${venue.name}" → ${inferred}`);
+        }
+      }
+      
       let inferredVibes: string[] = [];
       let inferredPriceRange: string[] = [];
 
       for (const [cuisine, vibes] of Object.entries(CUISINE_VIBE_INFERENCE)) {
-        if (venueCuisine.includes(cuisine)) {
+        if (effectiveCuisine.includes(cuisine)) {
           inferredVibes = vibes;
           break;
         }
       }
       for (const [cuisine, prices] of Object.entries(CUISINE_PRICE_INFERENCE)) {
-        if (venueCuisine.includes(cuisine)) {
+        if (effectiveCuisine.includes(cuisine)) {
           inferredPriceRange = prices;
           break;
         }
