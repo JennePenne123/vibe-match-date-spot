@@ -126,7 +126,49 @@ const isBlockedVenue = (venue: any): boolean => {
   return VENUE_NAME_BLOCKLIST.some(blocked => searchText.includes(blocked));
 };
 
-// Filter venues by user preferences to improve matching
+/**
+ * Infer cuisine_type from venue name, address, tags, and description
+ * when the original cuisine_type field is empty/null.
+ * Returns the best-guess cuisine string or null if no inference is possible.
+ */
+const CUISINE_NAME_PATTERNS: Record<string, string[]> = {
+  'italian': ['pizza', 'pasta', 'trattoria', 'ristorante', 'osteria', 'pizzeria', 'gelato', 'italiano'],
+  'japanese': ['sushi', 'ramen', 'izakaya', 'tempura', 'yakitori', 'miso', 'udon', 'sake'],
+  'chinese': ['wok', 'dim sum', 'dumpling', 'noodle', 'peking', 'szechuan', 'sichuan', 'canton'],
+  'thai': ['thai', 'pad thai', 'tom yum', 'satay', 'green curry'],
+  'indian': ['curry', 'tandoori', 'masala', 'naan', 'tikka', 'biryani', 'dal', 'samosa', 'indisch'],
+  'mexican': ['taco', 'burrito', 'enchilada', 'quesadilla', 'guacamole', 'cantina', 'mexicano'],
+  'turkish': ['kebab', 'döner', 'doner', 'kebap', 'pide', 'lahmacun', 'köfte', 'baklava', 'türkisch'],
+  'greek': ['gyros', 'souvlaki', 'tzatziki', 'griechisch', 'greek', 'taverna', 'moussaka'],
+  'vietnamese': ['pho', 'banh mi', 'vietnamesisch', 'vietnamese', 'bún'],
+  'korean': ['bibimbap', 'kimchi', 'korean bbq', 'bulgogi', 'koreanisch'],
+  'french': ['brasserie', 'bistrot', 'crêpe', 'croissant', 'patisserie', 'français', 'französisch'],
+  'german': ['brauhaus', 'gasthof', 'wirtshaus', 'schnitzel', 'bratwurst', 'bierstube', 'ratskeller', 'deutsche küche'],
+  'american': ['burger', 'bbq', 'barbecue', 'steakhouse', 'steak house', 'wings', 'diner', 'smokehouse'],
+  'mediterranean': ['hummus', 'falafel', 'mezze', 'olive', 'mediterran'],
+  'spanish': ['tapas', 'paella', 'churros', 'sangria', 'bodega'],
+};
+
+function inferCuisineFromVenue(venue: any): string | null {
+  const name = (venue.name || '').toLowerCase();
+  const desc = (venue.description || '').toLowerCase();
+  const tags = (venue.tags || []).map((t: string) => t.toLowerCase());
+  const address = (venue.address || '').toLowerCase();
+  const searchText = [name, desc, ...tags, address].join(' ');
+  
+  let bestMatch: { cuisine: string; hits: number } | null = null;
+  
+  for (const [cuisine, patterns] of Object.entries(CUISINE_NAME_PATTERNS)) {
+    const hits = patterns.filter(p => searchText.includes(p)).length;
+    if (hits > 0 && (!bestMatch || hits > bestMatch.hits)) {
+      bestMatch = { cuisine, hits };
+    }
+  }
+  
+  return bestMatch?.cuisine || null;
+}
+
+
 export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string) => {
   try {
     // Pre-filter: remove delivery services and supermarkets
@@ -200,32 +242,41 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
 
       // === PREFERENCE-BASED TAG ENRICHMENT ===
       // Infer missing venue attributes from what we know
-      const venueCuisine = (venue.cuisine_type || '').toLowerCase();
+      let effectiveCuisine = (venue.cuisine_type || '').toLowerCase();
+      
+      // If cuisine_type is missing, infer from name/tags/description
+      if (!effectiveCuisine) {
+        const inferred = inferCuisineFromVenue(venue);
+        if (inferred) {
+          effectiveCuisine = inferred;
+          console.log(`🔍 INFERRED CUISINE: "${venue.name}" → ${inferred}`);
+        }
+      }
+      
       let inferredVibes: string[] = [];
       let inferredPriceRange: string[] = [];
 
       for (const [cuisine, vibes] of Object.entries(CUISINE_VIBE_INFERENCE)) {
-        if (venueCuisine.includes(cuisine)) {
+        if (effectiveCuisine.includes(cuisine)) {
           inferredVibes = vibes;
           break;
         }
       }
       for (const [cuisine, prices] of Object.entries(CUISINE_PRICE_INFERENCE)) {
-        if (venueCuisine.includes(cuisine)) {
+        if (effectiveCuisine.includes(cuisine)) {
           inferredPriceRange = prices;
           break;
         }
       }
 
-      // Cuisine matching (40% weight) - strongest signal
-      if (hasCuisinePrefs && venue.cuisine_type) {
+      // Cuisine matching (40% weight) - strongest signal, use effectiveCuisine for inferred data
+      if (hasCuisinePrefs && effectiveCuisine) {
         maxPossible += 40;
-        const cuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
+        const cuisineScore = cuisineMatchScore(effectiveCuisine, userPrefs.preferred_cuisines || []);
         if (cuisineScore > 0) {
           score += cuisineScore * 40;
           primaryMatchFound = true;
         } else {
-          // Strong penalty for wrong cuisine (e.g. Pizza when Thai selected)
           score -= 15;
         }
       }
@@ -265,14 +316,14 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
             inferred = true;
           }
           if (prefVibes.includes('romantic') && (effectivePrice === '$$$' || effectivePrice === '$$$$' ||
-              venueCuisine.includes('italian') || venueCuisine.includes('french'))) {
+              effectiveCuisine.includes('italian') || effectiveCuisine.includes('french'))) {
             score += 10;
             inferred = true;
           }
           if (prefVibes.includes('adventurous') && (
-            venueCuisine.includes('thai') || venueCuisine.includes('chinese') || 
-            venueCuisine.includes('korean') || venueCuisine.includes('indian') ||
-            venueCuisine.includes('vietnamese') || venueCuisine.includes('japanese'))) {
+            effectiveCuisine.includes('thai') || effectiveCuisine.includes('chinese') || 
+            effectiveCuisine.includes('korean') || effectiveCuisine.includes('indian') ||
+            effectiveCuisine.includes('vietnamese') || effectiveCuisine.includes('japanese'))) {
             score += 10;
             inferred = true;
           }
@@ -366,7 +417,7 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       // If the strongest signal (cuisine) matches well, ensure a minimum score floor
       // This prevents good matches from being dragged down by sparse secondary data
       if (primaryMatchFound) {
-        const cuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
+        const cuisineScore = cuisineMatchScore(effectiveCuisine || venue.cuisine_type, userPrefs.preferred_cuisines || []);
         // Higher floors: exact match should already be in the 80%+ range
         const matchFloor = cuisineScore >= 0.9 ? 82 : cuisineScore >= 0.7 ? 72 : 58;
         // Normalize, then apply floor
@@ -454,9 +505,12 @@ export const filterVenuesByCollaborativePreferences = async (
     }
 
     const collaborativeScoredVenues = filteredVenues.map(venue => {
+      // Infer cuisine if missing
+      const effectiveCuisine = venue.cuisine_type || inferCuisineFromVenue(venue) || '';
+      
       // Fuzzy cuisine scoring for both users
-      const userCuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
-      const partnerCuisineScore = cuisineMatchScore(venue.cuisine_type, partnerPrefs.preferred_cuisines || []);
+      const userCuisineScore = cuisineMatchScore(effectiveCuisine, userPrefs.preferred_cuisines || []);
+      const partnerCuisineScore = cuisineMatchScore(effectiveCuisine, partnerPrefs.preferred_cuisines || []);
       
       let userScore = userCuisineScore * 40;
       let partnerScore = partnerCuisineScore * 40;
