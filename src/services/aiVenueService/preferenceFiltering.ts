@@ -367,11 +367,14 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       // This prevents good matches from being dragged down by sparse secondary data
       if (primaryMatchFound) {
         const cuisineScore = cuisineMatchScore(venue.cuisine_type, userPrefs.preferred_cuisines || []);
-        const matchFloor = cuisineScore >= 0.9 ? 65 : cuisineScore >= 0.7 ? 55 : 45;
+        // Higher floors: exact match should already be in the 80%+ range
+        const matchFloor = cuisineScore >= 0.9 ? 82 : cuisineScore >= 0.7 ? 72 : 58;
         // Normalize, then apply floor
         const effectiveMax = Math.max(maxPossible, 20);
         const rawNormalized = Math.max(2, (score / effectiveMax) * 100);
-        const normalizedScore = Math.max(rawNormalized, matchFloor);
+        // Add secondary signal bonus on top of floor for differentiation
+        const secondaryBonus = Math.max(0, rawNormalized - matchFloor) * 0.5;
+        const normalizedScore = Math.max(rawNormalized, matchFloor + secondaryBonus);
         
         const scoredVenue = {
           ...venue,
