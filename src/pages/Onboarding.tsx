@@ -43,6 +43,7 @@ const Onboarding = () => {
   // Step 5: Food & Vibes
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
+  const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
 
   const animateTransition = useCallback((nextStep: number) => {
     if (isAnimating) return;
@@ -109,6 +110,7 @@ const Onboarding = () => {
           preferred_price_range: derivedPriceRange,
           preferred_times: derivedTimes,
           preferred_activities: mergedActivities.length > 0 ? mergedActivities : null,
+          dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
           personality_traits: personality,
           relationship_goal: relationshipGoal || null,
           lifestyle_data: lifestyle,
@@ -140,7 +142,7 @@ const Onboarding = () => {
             vibes: mergedVibes,
             priceRange: derivedPriceRange,
             times: derivedTimes,
-            dietary: [],
+            dietary: selectedDietary,
             activities: mergedActivities,
           });
         } catch (e) {
@@ -227,8 +229,10 @@ const Onboarding = () => {
             <FoodVibeQuickPick
               selectedCuisines={selectedCuisines}
               selectedVibes={selectedVibes}
+              selectedDietary={selectedDietary}
               onCuisinesChange={setSelectedCuisines}
               onVibesChange={setSelectedVibes}
+              onDietaryChange={setSelectedDietary}
             />
           )}
         </div>
