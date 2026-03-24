@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronDown, Award, Gift, Brain } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Award, Gift, Brain, RotateCcw } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import ProfileHeader from '@/components/ProfileHeader';
 import ProfileStats from '@/components/ProfileStats';
@@ -133,6 +133,17 @@ const Profile = () => {
           </Collapsible>
 
           <LeaderboardCard />
+
+          {/* Reset Preferences */}
+          <Button
+            variant="outline"
+            className="w-full justify-center gap-2"
+            onClick={() => navigate('/welcome')}
+          >
+            <RotateCcw className="h-4 w-4" />
+            Präferenzen neu setzen
+          </Button>
+
           <ProfileActions onLogout={logout} />
         </div>
       </div>
