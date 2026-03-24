@@ -122,7 +122,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
     if (isTopMatch && displayScore >= 80 && hasStrongData) {
       return { label: 'Top Match', icon: <Check className="w-3 h-3" />, className: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' };
     }
-    if (displayScore >= 60 && (hasStrongData || confLevel > 0.5)) {
+    if (displayScore >= 80) {
       return { label: 'Guter Match', icon: <ThumbsUp className="w-3 h-3" />, className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' };
     }
     if (displayScore >= 50) {
