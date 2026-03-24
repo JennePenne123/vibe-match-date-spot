@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Sparkles, Users, Crown, Lock } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
 import RealtimeContextBanner from '@/components/RealtimeContextBanner';
+import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenueVouchers } from '@/hooks/useVenueVouchers';
@@ -167,7 +168,10 @@ const Results = () => {
 
         {/* AI-Powered Results */}
         <div className="p-4">
-          {/* Realtime Context Banner */}
+          {/* AI Progress + Realtime Context */}
+          <div className="flex items-center gap-2 mb-3">
+            <AIProgressIndicator variant="inline" className="flex-shrink-0" />
+          </div>
           <RealtimeContextBanner
             userLocation={appState.userLocation}
             className="mb-4"

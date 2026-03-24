@@ -13,6 +13,7 @@ import { BadgesCard } from '@/components/profile/BadgesCard';
 import { LeaderboardCard } from '@/components/profile/LeaderboardCard';
 import ReferralCard from '@/components/profile/ReferralCard';
 import AILearningCard from '@/components/profile/AILearningCard';
+import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
 import { ThemeSettingsCard } from '@/components/profile/ThemeSettingsCard';
 import { PremiumWalletCard } from '@/components/profile/PremiumWalletCard';
 import ActivityFeed from '@/components/profile/ActivityFeed';
@@ -78,6 +79,9 @@ const Profile = () => {
 
         {/* Content cards */}
         <div className="px-4 pb-6 -mt-4 space-y-4 relative z-10">
+          {/* AI Progress – shows how well AI knows the user */}
+          <AIProgressIndicator variant="compact" />
+          
           {/* Premium Wallet – first for immediate overview */}
           <PremiumWalletCard />
           
