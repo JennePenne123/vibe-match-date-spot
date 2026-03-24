@@ -119,32 +119,101 @@ const calculateUserScore = (
   }
 
   // Vibe matching
-  if (userPrefs.preferred_vibes && venue.tags && venue.tags.length > 0) {
+  if (userPrefs.preferred_vibes && userPrefs.preferred_vibes.length > 0) {
     maxPossible += 0.12;
-    const vibeMatches = userPrefs.preferred_vibes.filter((vibe: string) => 
-      venue.tags.some((tag: string) => 
-        tag.toLowerCase().includes(vibe.toLowerCase()) ||
-        vibe.toLowerCase().includes(tag.toLowerCase())
-      )
-    );
     
-    if (vibeMatches.length === 0) {
-      if (userPrefs.preferred_vibes.includes('romantic')) {
-        if (venue.price_range === '$$$' || venue.price_range === '$$$$' || 
-            venue.cuisine_type?.toLowerCase().includes('italian') ||
-            venue.cuisine_type?.toLowerCase().includes('french')) {
-          vibeMatches.push('romantic (inferred)');
+    // Build a comprehensive search corpus from all venue data
+    const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase());
+    const venueCuisine = (venue.cuisine_type || '').toLowerCase();
+    const venueName = (venue.name || '').toLowerCase();
+    const venueDesc = (venue.description || '').toLowerCase();
+    const venuePrice = (venue.price_range || '');
+    const searchCorpus = [...venueTags, venueCuisine, venueName, venueDesc].join(' ');
+    
+    // Deep vibe keyword map — each vibe maps to multiple signal groups
+    const VIBE_SIGNALS: Record<string, { keywords: string[]; priceHint?: string[]; cuisineHint?: string[] }> = {
+      'romantic': {
+        keywords: ['romantic', 'candlelight', 'intimate', 'cozy', 'gemütlich', 'date night', 'fine dining', 'wine bar', 'cocktail', 'lounge', 'rooftop', 'garden', 'terrace'],
+        priceHint: ['$$$', '$$$$'],
+        cuisineHint: ['italian', 'french', 'mediterranean', 'japanese', 'spanish'],
+      },
+      'casual': {
+        keywords: ['casual', 'relaxed', 'laid-back', 'locker', 'entspannt', 'bistro', 'café', 'cafe', 'burger', 'pizza', 'street food', 'pub', 'biergarten', 'beer garden'],
+        priceHint: ['$', '$$'],
+      },
+      'trendy': {
+        keywords: ['trendy', 'hip', 'modern', 'stylish', 'instagram', 'hotspot', 'new', 'concept', 'fusion', 'craft', 'artisan', 'design', 'szene', 'popup', 'pop-up'],
+      },
+      'cozy': {
+        keywords: ['cozy', 'cosy', 'gemütlich', 'warm', 'intimate', 'small', 'fireplace', 'kamin', 'hygge', 'wohnzimmer', 'snug', 'charming'],
+        priceHint: ['$$', '$$$'],
+      },
+      'lively': {
+        keywords: ['lively', 'lebhaft', 'buzzing', 'energetic', 'party', 'music', 'live', 'dj', 'dance', 'club', 'nightlife', 'bar', 'happy hour', 'karaoke'],
+      },
+      'elegant': {
+        keywords: ['elegant', 'upscale', 'luxury', 'luxus', 'premium', 'fine dining', 'gourmet', 'michelin', 'tasting menu', 'sommelier', 'sophisticated'],
+        priceHint: ['$$$', '$$$$'],
+        cuisineHint: ['french', 'japanese', 'italian'],
+      },
+      'adventurous': {
+        keywords: ['adventure', 'abenteuer', 'exotic', 'exotisch', 'unique', 'unusual', 'experience', 'erlebnis', 'themed', 'immersive', 'surprise', 'hidden', 'secret'],
+      },
+      'cultural': {
+        keywords: ['cultural', 'kultur', 'art', 'kunst', 'gallery', 'museum', 'theater', 'theatre', 'literary', 'historic', 'traditional', 'authentic', 'traditionell'],
+      },
+      'outdoor': {
+        keywords: ['outdoor', 'draußen', 'terrace', 'terrasse', 'rooftop', 'garden', 'garten', 'biergarten', 'beer garden', 'patio', 'park', 'nature', 'waterfront', 'riverside'],
+      },
+      'family': {
+        keywords: ['family', 'familie', 'kid-friendly', 'kinderfreundlich', 'playground', 'spielplatz', 'brunch', 'buffet', 'all-you-can-eat'],
+        priceHint: ['$', '$$'],
+      },
+    };
+    
+    const vibeMatches: string[] = [];
+    
+    for (const vibe of userPrefs.preferred_vibes as string[]) {
+      const vibeLower = vibe.toLowerCase();
+      const signals = VIBE_SIGNALS[vibeLower];
+      
+      if (!signals) {
+        // Fallback: direct tag matching for unknown vibes
+        if (searchCorpus.includes(vibeLower)) {
+          vibeMatches.push(vibe);
+        }
+        continue;
+      }
+      
+      let vibeScore = 0;
+      
+      // 1. Keyword matching against full search corpus (strongest signal)
+      const keywordHits = signals.keywords.filter(kw => searchCorpus.includes(kw));
+      if (keywordHits.length > 0) {
+        vibeScore += Math.min(keywordHits.length * 0.3, 1.0); // Cap at 1.0
+      }
+      
+      // 2. Price hint inference (weaker signal)
+      if (signals.priceHint && venuePrice && signals.priceHint.includes(venuePrice)) {
+        vibeScore += 0.25;
+      }
+      
+      // 3. Cuisine hint inference (weaker signal)
+      if (signals.cuisineHint && venueCuisine) {
+        const cuisineMatch = signals.cuisineHint.some(c => venueCuisine.includes(c));
+        if (cuisineMatch) {
+          vibeScore += 0.2;
         }
       }
-      if (userPrefs.preferred_vibes.includes('casual')) {
-        if (venue.price_range === '$' || venue.price_range === '$$') {
-          vibeMatches.push('casual (inferred)');
-        }
+      
+      // Threshold: vibeScore >= 0.25 counts as a match
+      if (vibeScore >= 0.25) {
+        vibeMatches.push(vibeScore >= 0.5 ? vibe : `${vibe} (inferred)`);
       }
     }
     
     matches.vibes = vibeMatches;
-    const vibeScore = vibeMatches.length > 0 ? vibeMatches.length * 0.12 : -0.04;
+    const vibeScore = vibeMatches.length > 0 ? Math.min(vibeMatches.length * 0.12, 0.24) : -0.04;
     score += applyWeight(vibeScore, weights.vibe, 'vibe');
   }
 
