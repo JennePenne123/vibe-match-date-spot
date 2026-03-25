@@ -57,8 +57,9 @@ const Onboarding = () => {
     liked: [], disliked: [],
   });
 
-  // Step 7: Distance Preference (NEW)
+  // Distance & Location
   const [distanceKm, setDistanceKm] = useState(5);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   // Resolve referral code to referrer ID
   useEffect(() => {
