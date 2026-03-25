@@ -104,6 +104,9 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         {/* Duration */}
         <DurationPicker selectedDuration={selectedDuration} onSelectDuration={selectDuration} />
 
+        {/* Occasion */}
+        <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
+
         {/* Quick Start + Sections — only after duration selected */}
         {selectedDuration && (
           <>
