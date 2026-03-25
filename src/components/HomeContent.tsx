@@ -61,31 +61,8 @@ const HomeContent: React.FC = () => {
   const [invitationSentTrigger, setInvitationSentTrigger] = useState(0);
   const [loadingTipIndex, setLoadingTipIndex] = useState<number | null>(null);
 
-  const handleTipClick = async (tip: typeof CITY_TIPS[0], index: number) => {
-    if (loadingTipIndex !== null) return;
-    setLoadingTipIndex(index);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const { data, error } = await supabase.functions.invoke('ai-quick-tip', {
-        body: {
-          tipTitle: tip.title,
-          tipCategory: tip.label,
-          userId: session?.user?.id || null,
-        },
-      });
-      if (error) throw error;
-      if (data?.venue_id) {
-        toast({ title: t('home.aiTipTitle'), description: data.reason || t('home.aiTipFallback'), duration: 4000 });
-        navigate(`/venue/${data.venue_id}`);
-      } else {
-        toast({ title: t('home.aiTipNoVenues'), description: t('home.aiTipNoVenuesDesc'), variant: 'destructive' });
-      }
-    } catch (err) {
-      console.error('Quick tip error:', err);
-      toast({ title: t('common.error'), description: t('home.aiTipError'), variant: 'destructive' });
-    } finally {
-      setLoadingTipIndex(null);
-    }
+  const handleVenueTipClick = (venueId: string) => {
+    navigate(`/venue/${venueId}`);
   };
 
   const handleSoloPlanning = () => navigate('/preferences');
