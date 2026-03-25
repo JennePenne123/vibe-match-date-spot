@@ -13,12 +13,11 @@ import LifestylePicks, { type LifestyleData } from '@/components/onboarding/Life
 import ExperienceScenarios, { type ScenarioAnswers, scenarios } from '@/components/onboarding/ExperienceScenarios';
 import FoodVibeQuickPick from '@/components/onboarding/FoodVibeQuickPick';
 import VenueSwipeCards, { type VenueSwipeData, deriveSwipePreferences } from '@/components/onboarding/VenueSwipeCards';
-import DistancePreference from '@/components/onboarding/DistancePreference';
 import ReferralInspiration, { type AdoptedPreferences } from '@/components/onboarding/ReferralInspiration';
 
 import onboarding1 from '@/assets/onboarding-1.png';
 
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 6;
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -258,7 +257,6 @@ const Onboarding = () => {
       case 4: return 'Szenarien';
       case 5: return 'Essen & Vibes';
       case 6: return 'Venue-Geschmack';
-      case 7: return 'Entfernung';
       default: return '';
     }
   };
@@ -321,10 +319,7 @@ const Onboarding = () => {
             </>
           )}
           {step === 6 && (
-            <VenueSwipeCards data={venueSwipeData} onChange={setVenueSwipeData} />
-          )}
-          {step === 7 && (
-            <DistancePreference distanceKm={distanceKm} onChange={setDistanceKm} />
+            <VenueSwipeCards data={venueSwipeData} onChange={setVenueSwipeData} distanceKm={distanceKm} onDistanceChange={setDistanceKm} />
           )}
         </div>
 
