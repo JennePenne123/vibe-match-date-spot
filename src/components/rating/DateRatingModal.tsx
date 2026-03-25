@@ -51,6 +51,15 @@ const StarRow = ({
   </div>
 );
 
+const WEIGHT_LABEL_MAP: Record<string, string> = {
+  cuisine: 'Küchen-Vorliebe',
+  vibe: 'Atmosphäre-Gewichtung',
+  price: 'Preis-Sensibilität',
+  rating: 'Bewertungs-Vertrauen',
+  distance: 'Entfernungs-Präferenz',
+  time: 'Zeitfenster-Gewichtung',
+};
+
 const WEIGHT_LABEL_KEYS: Record<string, string> = {
   cuisine: 'rating.weightCuisine',
   vibe: 'rating.weightVibe',
@@ -60,10 +69,46 @@ const WEIGHT_LABEL_KEYS: Record<string, string> = {
   time: 'rating.weightTime',
 };
 
+/** Generate a human-readable summary of what the AI learned */
+const getLearningSummary = (impact: LearningImpact): string => {
+  const changes = Object.entries(impact.weightChanges || {});
+  if (changes.length === 0) return 'Neutrales Feedback – deine Präferenzen bleiben unverändert.';
+
+  const boosts = changes.filter(([, v]) => v.includes('+'));
+  const reduces = changes.filter(([, v]) => v.includes('-') && !v.includes('+'));
+
+  const parts: string[] = [];
+  if (boosts.length > 0) {
+    const labels = boosts.map(([k]) => WEIGHT_LABEL_MAP[k] || k).join(', ');
+    parts.push(`${labels} wurde${boosts.length > 1 ? 'n' : ''} gestärkt`);
+  }
+  if (reduces.length > 0) {
+    const labels = reduces.map(([k]) => WEIGHT_LABEL_MAP[k] || k).join(', ');
+    parts.push(`${labels} wurde${reduces.length > 1 ? 'n' : ''} angepasst`);
+  }
+
+  return parts.join(' und ') + '.';
+};
+
+/** Calculate how many more ratings until the AI "knows" the user well */
+const getRatingsUntilConfident = (totalRatings: number): { remaining: number; phase: string; percent: number } => {
+  const TARGET = 10; // 10 ratings = "kennt dich gut"
+  const remaining = Math.max(0, TARGET - totalRatings);
+  const percent = Math.min(100, Math.round((totalRatings / TARGET) * 100));
+  
+  if (totalRatings === 0) return { remaining, phase: 'Startphase', percent };
+  if (totalRatings < 3) return { remaining, phase: 'Lernphase', percent };
+  if (totalRatings < 5) return { remaining, phase: 'Kennenlernen', percent };
+  if (totalRatings < TARGET) return { remaining, phase: 'Wird besser', percent };
+  return { remaining: 0, phase: 'Kennt dich gut', percent: 100 };
+};
+
 const LearningImpactCard: React.FC<{ impact: LearningImpact }> = ({ impact }) => {
   const { t } = useTranslation();
   const changes = Object.entries(impact.weightChanges || {});
   const hasChanges = changes.length > 0;
+  const totalRatings = typeof impact.totalRatings === 'number' ? impact.totalRatings : parseInt(String(impact.totalRatings)) || 0;
+  const confidence = getRatingsUntilConfident(totalRatings);
 
   return (
     <motion.div
@@ -72,12 +117,19 @@ const LearningImpactCard: React.FC<{ impact: LearningImpact }> = ({ impact }) =>
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3"
     >
-      <div className="flex items-center gap-2">
-        <Brain className="h-5 w-5 text-primary" />
-        <span className="text-sm font-semibold text-primary">{t('rating.aiLearned')}</span>
+      {/* Human-readable summary */}
+      <div className="flex items-start gap-2">
+        <Brain className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+        <div>
+          <span className="text-sm font-semibold text-primary">{t('rating.aiLearned')}</span>
+          <p className="text-xs text-foreground/80 mt-0.5">
+            {getLearningSummary(impact)}
+          </p>
+        </div>
       </div>
 
-      {hasChanges ? (
+      {/* Weight change details */}
+      {hasChanges && (
         <div className="space-y-1.5">
           {changes.map(([key, change]) => (
             <motion.div
@@ -92,22 +144,52 @@ const LearningImpactCard: React.FC<{ impact: LearningImpact }> = ({ impact }) =>
             </motion.div>
           ))}
         </div>
-      ) : (
-        <p className="text-xs text-muted-foreground">
-          {t('rating.neutralRating')}
-        </p>
       )}
 
-      <div className="flex items-center gap-2 pt-1 border-t border-primary/10">
-        <TrendingUp className="h-3.5 w-3.5 text-primary/70" />
-        <span className="text-xs text-muted-foreground">
-          {t('rating.totalRatingsStats', {
-            total: impact.totalRatings,
-            accuracy: impact.aiAccuracy,
-            improvement: impact.improvementPercent,
-          })}
-        </span>
-      </div>
+      {/* Confidence progress for new users */}
+      {confidence.remaining > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="pt-2 border-t border-primary/10 space-y-1.5"
+        >
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground flex items-center gap-1.5">
+              <TrendingUp className="h-3.5 w-3.5 text-primary/70" />
+              KI-Personalisierung: {confidence.phase}
+            </span>
+            <span className="font-semibold text-primary">{confidence.percent}%</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-primary to-primary/60"
+              initial={{ width: 0 }}
+              animate={{ width: `${confidence.percent}%` }}
+              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.5 }}
+            />
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            {confidence.remaining === 1
+              ? 'Noch 1 Bewertung bis die KI dich richtig kennt!'
+              : `Noch ${confidence.remaining} Bewertungen bis die KI dich richtig kennt`}
+          </p>
+        </motion.div>
+      )}
+
+      {/* Stats for experienced users */}
+      {confidence.remaining === 0 && (
+        <div className="flex items-center gap-2 pt-1 border-t border-primary/10">
+          <TrendingUp className="h-3.5 w-3.5 text-primary/70" />
+          <span className="text-xs text-muted-foreground">
+            {t('rating.totalRatingsStats', {
+              total: impact.totalRatings,
+              accuracy: impact.aiAccuracy,
+              improvement: impact.improvementPercent,
+            })}
+          </span>
+        </div>
+      )}
     </motion.div>
   );
 };
