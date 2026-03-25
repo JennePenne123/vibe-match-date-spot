@@ -151,6 +151,15 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 9 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
 | 10 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
 | 11 | **Gemeinsames Planen verbessern** | Mittel | Freunde direkt in die App einladen zum kollaborativen Planning |
+| 12 | **🎉 Event-System** | Groß | Events-Tabelle, AI-Scoring für Events, kombinierte Vorschläge (Event + Venue), Partner können Events erstellen |
+| 13 | **Event-Kategorien** | Mittel | Konzerte, Ausstellungen, Food-Festivals, Workshops, Sport-Events, Open-Air |
+| 14 | **Event + Venue Combos** | Mittel | AI schlägt "Erst Konzert, dann Dinner nebenan" vor |
+| 15 | **Event-Kalender** | Mittel | Kalender-View für anstehende Events in der Nähe |
+| 16 | **A/B Testing Framework** | Mittel | Feature-Flags, Conversion-Tracking für UI-Varianten |
+| 17 | **Multi-User Date Groups** | Groß | Gruppen-Dates planen (3+ Personen, z.B. Doppel-Date) |
+| 18 | **Venue-Reviews von Usern** | Mittel | Eigene Review-Funktion statt nur Feedback-Buttons |
+| 19 | **AI Date-Recap** | Klein | Nach dem Date: AI generiert eine kurze Zusammenfassung + Erinnerungs-Foto-Prompt |
+| 20 | **Partner-Analytics v2** | Mittel | Heatmaps, Conversion Funnels, Zeitraum-Vergleiche im Partner-Portal |
 
 ### ✅ Heute erledigt (25. März 2026)
 
