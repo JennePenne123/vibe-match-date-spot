@@ -243,6 +243,13 @@ const Preferences = () => {
           if (data.preferred_times) setSelectedTimePreferences(data.preferred_times);
           if (data.dietary_restrictions) setSelectedDietary(data.dietary_restrictions);
           if ((data as any).accessibility_needs) setSelectedAccessibility((data as any).accessibility_needs);
+          // Load AI signal preferences from lifestyle_data
+          if (data.lifestyle_data) {
+            const ld = data.lifestyle_data as any;
+            if (ld.occasion) setSelectedOccasion(ld.occasion);
+            if (ld.mood) setSelectedMood(ld.mood);
+            if (ld.priority_weights) setPriorityWeights({ ...DEFAULT_PRIORITY_WEIGHTS, ...ld.priority_weights });
+          }
         }
       } catch (error) {
         console.log('No existing preferences found');
