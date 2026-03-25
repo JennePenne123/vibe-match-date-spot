@@ -8,6 +8,7 @@ export interface UserPoints {
   badges: string[];
   streak_count: number;
   last_review_date: string | null;
+  premium_until: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -17,6 +18,7 @@ export interface LeaderboardEntry {
   total_points: number;
   level: number;
   streak_count: number;
+  premium_until: string | null;
   profile: {
     name: string;
     avatar_url?: string;
