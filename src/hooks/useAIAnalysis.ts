@@ -5,6 +5,7 @@ import { getCompatibilityScore, CompatibilityScore } from '@/services/aiMatching
 import { getAIVenueRecommendations } from '@/services/aiVenueService';
 import { supabase } from '@/integrations/supabase/client';
 import { getLocationFallback } from '@/utils/locationFallback';
+import type { DateOccasion } from '@/services/aiVenueService/occasionScoring';
 
 interface DatePreferences {
   preferred_cuisines?: string[];
@@ -13,6 +14,7 @@ interface DatePreferences {
   preferred_vibes?: string[];
   max_distance?: number;
   dietary_restrictions?: string[];
+  occasion?: DateOccasion | null;
 }
 
 export const useAIAnalysis = () => {
@@ -170,7 +172,7 @@ export const useAIAnalysis = () => {
       const venues = await retryAnalysisWithBackoff(async () => {
         console.log('🎯 AI ANALYSIS: Calling getAIVenueRecommendations...');
         setCurrentStep('Finding perfect matches...');
-        return await getAIVenueRecommendations(user.id, partnerId, 6, userLocation);
+        return await getAIVenueRecommendations(user.id, partnerId, 6, userLocation, undefined, preferences?.occasion);
       }, 3, 3000); // 3 Retries with 3s, 6s, 12s delays
 
       if (!venues || venues.length === 0) {
