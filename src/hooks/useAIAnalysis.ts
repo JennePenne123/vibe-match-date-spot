@@ -15,6 +15,12 @@ interface DatePreferences {
   max_distance?: number;
   dietary_restrictions?: string[];
   occasion?: DateOccasion | null;
+  priority_weights?: {
+    cuisine: number;
+    vibe: number;
+    price: number;
+    location: number;
+  };
 }
 
 export const useAIAnalysis = () => {
