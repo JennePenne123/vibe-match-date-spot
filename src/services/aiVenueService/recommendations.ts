@@ -10,6 +10,7 @@ import { getFriendSocialProofBonus } from './friendSocialProof';
 import { getWeatherScore } from './weatherScoring';
 import { getExplorationBonus, getUserExploredCuisines } from './explorationBonus';
 import { applyImplicitLearning } from './implicitLearning';
+import { getDistanceToleranceScore } from './distanceLearning';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
@@ -138,6 +139,14 @@ export const getAIVenueRecommendations = async (
       // ── Exploration vs. Exploitation ──
       const explorationResult = await getExplorationBonus(userId, venue, exploredCuisines);
 
+      // ── Distance tolerance learning ──
+      const distanceResult = await getDistanceToleranceScore(
+        userId,
+        venue.latitude ?? venue.lat ?? venue.geometry?.location?.lat,
+        venue.longitude ?? venue.lng ?? venue.geometry?.location?.lng,
+        userLocation
+      );
+
       // Rating bonus — confidence-weighted by review count
       const reviewCount = venue.review_count || venue.reviewCount || venue.user_ratings_total || 0;
       const reviewConfidence = reviewCount > 0 ? Math.min(reviewCount / 20, 1.0) : 0.5;
@@ -151,7 +160,8 @@ export const getAIVenueRecommendations = async (
         + occasionResult.bonus + occasionResult.penalty
         + friendResult.bonus
         + weatherResult.bonus + weatherResult.penalty
-        + explorationResult.bonus;
+        + explorationResult.bonus
+        + distanceResult.bonus;
       const finalScore = Math.max(5, Math.min(98, rawScore));
 
       // Generate reasoning based on actual matches
@@ -196,6 +206,7 @@ export const getAIVenueRecommendations = async (
       if (friendResult.reason) matchReasons.push(friendResult.reason);
       if (weatherResult.reason) matchReasons.push(weatherResult.reason);
       if (explorationResult.reason) matchReasons.push(explorationResult.reason);
+      if (distanceResult.reason) matchReasons.push(distanceResult.reason);
       if (repeatResult.visitCount > 0) matchReasons.push(`Bereits ${repeatResult.visitCount}x besucht`);
 
       if (matchReasons.length === 0) {

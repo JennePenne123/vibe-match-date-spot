@@ -13,3 +13,4 @@ export type { DateOccasion } from './occasionScoring';
 export { getExplorationBonus, getUserExploredCuisines } from './explorationBonus';
 export { applyImplicitLearning, analyzeImplicitSignals } from './implicitLearning';
 export { getTemporalDecayFactor, getDecayFromDate, decayWeightedAverage, applyTemporalDecayToWeights } from './temporalDecay';
+export { getDistanceToleranceScore } from './distanceLearning';
