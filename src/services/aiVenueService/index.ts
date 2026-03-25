@@ -3,6 +3,7 @@ export { calculateVenueAIScore, calculateContextualFactors, calculateConfidenceL
 export { getActiveVenues, getStoredAIScore } from './fetching';
 export { getAIVenueRecommendations, generateAIReasoning } from './recommendations';
 export { filterVenuesByPreferences, filterVenuesByCollaborativePreferences } from './preferenceFiltering';
+export type { SessionPriorityWeights } from './preferenceFiltering';
 export { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
 export type { AIVenueRecommendation } from './recommendations';
 export type { DateOccasion } from './occasionScoring';
