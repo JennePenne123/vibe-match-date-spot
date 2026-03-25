@@ -12,12 +12,16 @@ interface ReferralInspirationProps {
 export interface AdoptedPreferences {
   cuisines: string[];
   vibes: string[];
+  personalityTraits?: { spontaneity: number; adventure: number; social_energy: number } | null;
+  maxDistance?: number | null;
 }
 
 interface ReferrerPrefs {
   name: string;
   cuisines: string[];
   vibes: string[];
+  personalityTraits: { spontaneity: number; adventure: number; social_energy: number } | null;
+  maxDistance: number | null;
 }
 
 const ReferralInspiration: React.FC<ReferralInspirationProps> = ({
@@ -39,14 +43,21 @@ const ReferralInspiration: React.FC<ReferralInspirationProps> = ({
         // Fetch referrer's name and preferences
         const [profileRes, prefsRes] = await Promise.all([
           supabase.from('profiles').select('name').eq('id', referrerId).single(),
-          supabase.from('user_preferences').select('preferred_cuisines, preferred_vibes').eq('user_id', referrerId).single(),
+          supabase.from('user_preferences').select('preferred_cuisines, preferred_vibes, personality_traits, max_distance').eq('user_id', referrerId).single(),
         ]);
 
         if (profileRes.data && prefsRes.data) {
+          const pTraits = prefsRes.data.personality_traits as Record<string, number> | null;
           setReferrerPrefs({
             name: profileRes.data.name || 'Dein Freund',
             cuisines: (prefsRes.data.preferred_cuisines || []).slice(0, 4),
             vibes: (prefsRes.data.preferred_vibes || []).slice(0, 3),
+            personalityTraits: pTraits && pTraits.spontaneity != null ? {
+              spontaneity: pTraits.spontaneity,
+              adventure: pTraits.adventure,
+              social_energy: pTraits.social_energy,
+            } : null,
+            maxDistance: prefsRes.data.max_distance || null,
           });
         }
       } catch (err) {
@@ -112,6 +123,8 @@ const ReferralInspiration: React.FC<ReferralInspirationProps> = ({
         onClick={() => onAdoptPreferences({
           cuisines: referrerPrefs.cuisines,
           vibes: referrerPrefs.vibes,
+          personalityTraits: referrerPrefs.personalityTraits,
+          maxDistance: referrerPrefs.maxDistance,
         })}
         disabled={adopted}
         className={cn(
