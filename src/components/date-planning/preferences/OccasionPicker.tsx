@@ -1,10 +1,10 @@
 import React from 'react';
-import { Check, Butterfly, Heart, Coffee, Cake, Users, Sparkles, type LucideIcon } from 'lucide-react';
+import { Check, Bird, Heart, Coffee, Cake, Users, Sparkles, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { occasionOptions, type DateOccasion } from './preferencesData';
 
 const iconMap: Record<string, LucideIcon> = {
-  Butterfly, Heart, Coffee, Cake, Users, Sparkles,
+  Butterfly: Bird, Heart, Coffee, Cake, Users, Sparkles,
 };
 
 interface Props {
