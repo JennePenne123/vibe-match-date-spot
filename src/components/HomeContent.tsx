@@ -5,6 +5,7 @@ import { useFriends } from '@/hooks/useFriends';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
