@@ -143,12 +143,12 @@ export interface OccasionOption {
 }
 
 export const occasionOptions: OccasionOption[] = [
-  { id: 'first_date', label: 'Erstes Date', emoji: '🦋', desc: 'Locker & einladend' },
-  { id: 'anniversary', label: 'Jahrestag', emoji: '💍', desc: 'Romantisch & besonders' },
-  { id: 'casual', label: 'Entspannt', emoji: '😊', desc: 'Ohne Erwartungen' },
-  { id: 'birthday', label: 'Geburtstag', emoji: '🎂', desc: 'Feierlich & spaßig' },
-  { id: 'friends_hangout', label: 'Freunde-Treffen', emoji: '🍻', desc: 'Locker & gesellig' },
-  { id: 'special_celebration', label: 'Besonderer Anlass', emoji: '🥂', desc: 'Exklusiv & elegant' },
+  { id: 'first_date', label: 'Erstes Date', emoji: 'Butterfly', desc: 'Locker & einladend' },
+  { id: 'anniversary', label: 'Jahrestag', emoji: 'Heart', desc: 'Romantisch & besonders' },
+  { id: 'casual', label: 'Entspannt', emoji: 'Coffee', desc: 'Ohne Erwartungen' },
+  { id: 'birthday', label: 'Geburtstag', emoji: 'Cake', desc: 'Feierlich & spaßig' },
+  { id: 'friends_hangout', label: 'Freunde-Treffen', emoji: 'Users', desc: 'Locker & gesellig' },
+  { id: 'special_celebration', label: 'Besonderer Anlass', emoji: 'Sparkles', desc: 'Exklusiv & elegant' },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────

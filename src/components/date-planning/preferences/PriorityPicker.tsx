@@ -1,9 +1,10 @@
 import React from 'react';
+import { UtensilsCrossed, Sparkles, Wallet, MapPin, type LucideIcon } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 
 export interface PriorityWeights {
-  cuisine: number;   // 0.5–2.0 multiplier
+  cuisine: number;
   vibe: number;
   price: number;
   location: number;
@@ -18,17 +19,17 @@ export const DEFAULT_PRIORITY_WEIGHTS: PriorityWeights = {
 
 interface PriorityDimension {
   key: keyof PriorityWeights;
-  emoji: string;
+  icon: LucideIcon;
   label: string;
   low: string;
   high: string;
 }
 
 const dimensions: PriorityDimension[] = [
-  { key: 'cuisine', emoji: '🍽️', label: 'Essen', low: 'Egal', high: 'Sehr wichtig' },
-  { key: 'vibe', emoji: '✨', label: 'Atmosphäre', low: 'Egal', high: 'Sehr wichtig' },
-  { key: 'price', emoji: '💰', label: 'Preis', low: 'Egal', high: 'Sehr wichtig' },
-  { key: 'location', emoji: '📍', label: 'Nähe', low: 'Egal', high: 'Sehr wichtig' },
+  { key: 'cuisine', icon: UtensilsCrossed, label: 'Essen', low: 'Egal', high: 'Sehr wichtig' },
+  { key: 'vibe', icon: Sparkles, label: 'Atmosphäre', low: 'Egal', high: 'Sehr wichtig' },
+  { key: 'price', icon: Wallet, label: 'Preis', low: 'Egal', high: 'Sehr wichtig' },
+  { key: 'location', icon: MapPin, label: 'Nähe', low: 'Egal', high: 'Sehr wichtig' },
 ];
 
 interface Props {
@@ -49,6 +50,7 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights }) => {
         {dimensions.map(d => {
           const val = weights[d.key];
           const isHighlighted = val > 1.2;
+          const Icon = d.icon;
           return (
             <div
               key={d.key}
@@ -58,8 +60,12 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights }) => {
               )}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">
-                  {d.emoji} {d.label}
+                <span className="text-sm font-medium flex items-center gap-1.5">
+                  <Icon className={cn(
+                    'w-4 h-4',
+                    isHighlighted ? 'text-primary' : 'text-muted-foreground'
+                  )} />
+                  {d.label}
                 </span>
                 <span className={cn(
                   'text-xs font-semibold px-2 py-0.5 rounded-full',

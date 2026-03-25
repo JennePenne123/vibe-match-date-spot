@@ -1,19 +1,19 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, Sparkles, ThumbsUp, Leaf, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DailyMood } from '@/pages/MoodCheckIn';
 
 interface MoodOption {
   id: DailyMood;
-  emoji: string;
+  icon: LucideIcon;
   label: string;
   desc: string;
 }
 
 const moodOptions: MoodOption[] = [
-  { id: 'great', emoji: '✨', label: 'Großartig', desc: 'Abenteuer & Neues' },
-  { id: 'okay', emoji: '👍', label: 'Passt schon', desc: 'Gemütlich & vertraut' },
-  { id: 'me-time', emoji: '🧘', label: 'Ruhig', desc: 'Entspannt & ruhig' },
+  { id: 'great', icon: Sparkles, label: 'Großartig', desc: 'Abenteuer & Neues' },
+  { id: 'okay', icon: ThumbsUp, label: 'Passt schon', desc: 'Gemütlich & vertraut' },
+  { id: 'me-time', icon: Leaf, label: 'Ruhig', desc: 'Entspannt & ruhig' },
 ];
 
 const MOOD_STORAGE_KEY = 'vybe-daily-mood';
@@ -47,7 +47,6 @@ const MoodPicker: React.FC<Props> = ({ selectedMood, onSelectMood }) => {
       onSelectMood(null);
     } else {
       onSelectMood(mood);
-      // Persist to localStorage so moodScoring.ts picks it up
       setTodayMoodInStorage(mood);
     }
   };
@@ -59,6 +58,7 @@ const MoodPicker: React.FC<Props> = ({ selectedMood, onSelectMood }) => {
       <div className="grid grid-cols-3 gap-2">
         {moodOptions.map(o => {
           const sel = selectedMood === o.id;
+          const Icon = o.icon;
           return (
             <button
               key={o.id}
@@ -70,7 +70,12 @@ const MoodPicker: React.FC<Props> = ({ selectedMood, onSelectMood }) => {
                 sel ? 'border-primary bg-primary/5' : 'border-border bg-card'
               )}
             >
-              <span className="text-2xl block mb-1">{o.emoji}</span>
+              <div className={cn(
+                'w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1.5',
+                sel ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
+              )}>
+                <Icon className="w-5 h-5" />
+              </div>
               <p className="font-semibold text-xs leading-tight">{o.label}</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{o.desc}</p>
               {sel && (
