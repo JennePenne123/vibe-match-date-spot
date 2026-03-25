@@ -271,14 +271,14 @@ const Onboarding = () => {
         {/* Skip button */}
         {step > 0 && (
           <div className="flex justify-between items-center mb-2">
-            {step > 0 && (
-              <span className="text-xs text-muted-foreground/60 font-medium">
-                {getStepLabel()}
-              </span>
+            <span className="text-xs text-muted-foreground/60 font-medium">
+              {getStepLabel()}
+            </span>
+            {step >= 3 && (
+              <Button onClick={handleSkip} variant="ghost" size="sm" className="text-muted-foreground text-xs ml-auto">
+                Überspringen
+              </Button>
             )}
-            <Button onClick={handleSkip} variant="ghost" size="sm" className="text-muted-foreground text-xs ml-auto">
-              Überspringen
-            </Button>
           </div>
         )}
 
