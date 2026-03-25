@@ -65,6 +65,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 ### 🎟️ Voucher & Rewards
 - **QR-Code Voucher-System** (Wallet → QR anzeigen → Partner scannt → Edge Function validiert)
 - **Wallet mit echten Supabase-Daten** ✅ (reward_redemptions + voucher_redemptions kombiniert)
+- **Top-3 Matches für alle sichtbar** — Vouchers exklusiv für Premium-Mitglieder (Upsell-Anreiz)
 - **Gamification**: Punkte, 18 Badges, Streaks, Leaderboard, Levels
 - **Premium Badge** 👑 ✅ Automatisches goldenes Badge für Premium-Nutzer (Profil + Leaderboard)
 - **Reward Shop** mit Einlösung (monatliche Limits, Premium-Zugang)
