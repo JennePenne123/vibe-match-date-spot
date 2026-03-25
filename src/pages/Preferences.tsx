@@ -21,6 +21,12 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import OccasionPicker from '@/components/date-planning/preferences/OccasionPicker';
+import MoodPicker from '@/components/date-planning/preferences/MoodPicker';
+import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
+import type { DateOccasion } from '@/components/date-planning/preferences/preferencesData';
+import type { DailyMood } from '@/pages/MoodCheckIn';
+import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
 
 // Icon + color mapping (slimmed down)
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
@@ -213,6 +219,9 @@ const Preferences = () => {
   const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
   const [locationError, setLocationError] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
+  const [selectedMood, setSelectedMood] = useState<DailyMood | null>(null);
+  const [priorityWeights, setPriorityWeights] = useState<PriorityWeights>({ ...DEFAULT_PRIORITY_WEIGHTS });
 
   useEffect(() => {
     const loadExistingPreferences = async () => {
@@ -234,6 +243,13 @@ const Preferences = () => {
           if (data.preferred_times) setSelectedTimePreferences(data.preferred_times);
           if (data.dietary_restrictions) setSelectedDietary(data.dietary_restrictions);
           if ((data as any).accessibility_needs) setSelectedAccessibility((data as any).accessibility_needs);
+          // Load AI signal preferences from lifestyle_data
+          if (data.lifestyle_data) {
+            const ld = data.lifestyle_data as any;
+            if (ld.occasion) setSelectedOccasion(ld.occasion);
+            if (ld.mood) setSelectedMood(ld.mood);
+            if (ld.priority_weights) setPriorityWeights({ ...DEFAULT_PRIORITY_WEIGHTS, ...ld.priority_weights });
+          }
         }
       } catch (error) {
         console.log('No existing preferences found');
@@ -363,6 +379,11 @@ const Preferences = () => {
           preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
           dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
           accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
+          lifestyle_data: {
+            occasion: selectedOccasion,
+            mood: selectedMood,
+            priority_weights: priorityWeights,
+          },
         };
         const { data: existing, error: existErr } = await supabase.from('user_preferences').select('id').eq('user_id', currentUserId).maybeSingle();
         if (existErr) throw existErr;
@@ -511,6 +532,18 @@ const Preferences = () => {
 
               <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
                 <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
+              </AccordionSection>
+
+              <AccordionSection title="Anlass" icon={<Sparkles className="w-5 h-5 text-primary" />} selectedCount={selectedOccasion ? 1 : 0}>
+                <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
+              </AccordionSection>
+
+              <AccordionSection title="Stimmung" icon={<SmilePlus className="w-5 h-5 text-primary" />} selectedCount={selectedMood ? 1 : 0}>
+                <MoodPicker selectedMood={selectedMood} onSelectMood={setSelectedMood} />
+              </AccordionSection>
+
+              <AccordionSection title="Prioritäten" icon={<SlidersHorizontal className="w-5 h-5 text-primary" />} selectedCount={Object.values(priorityWeights).filter(v => v !== 1.0).length}>
+                <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
               </AccordionSection>
             </>
           )}
