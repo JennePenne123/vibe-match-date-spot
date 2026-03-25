@@ -465,13 +465,14 @@ const Preferences = () => {
     { id: 'non_smoking', name: t('preferences.access_non_smoking'), emoji: '🚭' },
   ];
 
-  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 1));
+  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 2));
   const steps = [
+    { title: 'Dein Date-Kontext', subtitle: 'Anlass, Stimmung & was dir wichtig ist', icon: <Sparkles className="w-5 h-5 text-primary" /> },
     { title: t('preferences.stepTaste', 'Geschmack'), subtitle: t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
     { title: t('preferences.stepPractical', 'Praktisches'), subtitle: t('preferences.stepPracticalDesc', 'Budget, Timing & Standort'), icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
   ];
 
-  const canGoNext = step < 1;
+  const canGoNext = step < 2;
   const canGoBack = step > 0;
 
   return (
