@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Sparkles, Users, Heart, ArrowRight, Menu, X } from 'lucide-react';
+import { Sparkles, Users, Heart, ArrowRight, Menu, X, Zap, Shield, Star } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthModal } from '@/components/landing/AuthModal';
 import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import AnimatedCounter from '@/components/landing/AnimatedCounter';
+import { motion } from 'framer-motion';
 export default function LandingDemo() {
   const navigate = useNavigate();
   const { t } = useTranslation();
