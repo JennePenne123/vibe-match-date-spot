@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ThumbsUp, ThumbsDown, Sparkles, MapPin } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Sparkles, MapPin, Navigation, Loader2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
 
 export interface VenueSwipeData {
   liked: string[];    // venue style IDs the user liked
@@ -13,6 +14,7 @@ interface VenueSwipeCardsProps {
   onChange: (data: VenueSwipeData) => void;
   distanceKm: number;
   onDistanceChange: (km: number) => void;
+  onLocationCaptured?: (lat: number, lng: number) => void;
 }
 
 // Representative venue "cards" that encode cuisine, vibe, and price signals
@@ -79,9 +81,9 @@ const venueCards = [
   },
 ];
 
-const VenueSwipeCards: React.FC<VenueSwipeCardsProps> = ({ data, onChange, distanceKm, onDistanceChange }) => {
+const VenueSwipeCards: React.FC<VenueSwipeCardsProps> = ({ data, onChange, distanceKm, onDistanceChange, onLocationCaptured }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'granted' | 'denied'>('idle');
   const handleSwipe = (direction: 'like' | 'dislike') => {
     const card = venueCards[currentIndex];
     if (!card) return;
