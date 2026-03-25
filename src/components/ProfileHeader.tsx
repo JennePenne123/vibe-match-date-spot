@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Edit, Save, X, Camera, Loader2, MapPin, Calendar } from 'lucide-react';
+import PremiumBadge from '@/components/PremiumBadge';
 import { getUserAvatar, getFallbackAvatar } from '@/utils/typeHelpers';
 import { uploadAvatar, deleteAvatar } from '@/utils/avatarUpload';
 import { updateUserProfile } from '@/utils/userProfileHelpers';
@@ -26,12 +27,13 @@ interface ProfileHeaderProps {
   onAvatarUpdate?: () => void;
   level?: number;
   totalPoints?: number;
+  premiumUntil?: string | null;
 }
 
 const ProfileHeader = ({
   user, displayName, displayEmail, isEditing, editedName, editedEmail,
   onEditedNameChange, onEditedEmailChange, onEditToggle, onSave, onCancel, onAvatarUpdate,
-  level = 1, totalPoints = 0
+  level = 1, totalPoints = 0, premiumUntil
 }: ProfileHeaderProps) => {
   const { t } = useTranslation();
   const avatarUrl = getUserAvatar(user);
@@ -132,7 +134,10 @@ const ProfileHeader = ({
             </div>
           ) : (
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-3">{displayName}</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-1">{displayName}</h2>
+              <div className="flex justify-center mb-3">
+                <PremiumBadge premiumUntil={premiumUntil} size="md" />
+              </div>
               <div className="flex items-center justify-center gap-2 flex-wrap">
                 <Badge variant="secondary" className="bg-primary/15 text-primary border-primary/20 px-3 py-1 text-xs font-semibold">
                   Level {level}

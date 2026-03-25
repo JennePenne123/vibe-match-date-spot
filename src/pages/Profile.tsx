@@ -72,10 +72,11 @@ const Profile = () => {
           onEditToggle={() => setIsEditing(!isEditing)} 
           onSave={handleSave} 
           onCancel={handleCancel} 
-          onAvatarUpdate={refreshProfile}
-          level={points?.level}
-          totalPoints={points?.total_points}
-        />
+           onAvatarUpdate={refreshProfile}
+           level={points?.level}
+           totalPoints={points?.total_points}
+           premiumUntil={(points as any)?.premium_until}
+         />
 
         {/* Content cards */}
         <div className="px-4 pb-6 -mt-4 space-y-4 relative z-10">
