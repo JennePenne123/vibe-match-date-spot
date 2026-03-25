@@ -276,31 +276,41 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         }
       }
 
-      // Cuisine matching (40% weight) - strongest signal, use effectiveCuisine for inferred data
+      // Priority weight multipliers (default 1.0 if not set)
+      const pw = {
+        cuisine: priorityWeights?.cuisine ?? 1.0,
+        vibe: priorityWeights?.vibe ?? 1.0,
+        price: priorityWeights?.price ?? 1.0,
+        location: priorityWeights?.location ?? 1.0,
+      };
+
+      // Cuisine matching (base 40% × priority weight)
+      const cuisineBase = 40 * pw.cuisine;
       if (hasCuisinePrefs && effectiveCuisine) {
-        maxPossible += 40;
+        maxPossible += cuisineBase;
         const cuisineScore = cuisineMatchScore(effectiveCuisine, userPrefs.preferred_cuisines || []);
         if (cuisineScore > 0) {
-          score += cuisineScore * 40;
+          score += cuisineScore * cuisineBase;
           primaryMatchFound = true;
         } else {
-          score -= 15;
+          score -= 15 * pw.cuisine;
         }
       }
 
-      // Price range matching (25% weight) - use normalized price symbols
+      // Price range matching (base 25% × priority weight)
+      const priceBase = 25 * pw.price;
       const effectivePrice = venue.price_range || (inferredPriceRange.length > 0 ? inferredPriceRange[0] : null);
       if (hasPricePrefs && effectivePrice) {
-        maxPossible += 25;
+        maxPossible += priceBase;
         if (normalizedPricePrefs.includes(effectivePrice)) {
-          score += 25;
+          score += priceBase;
         } else {
           const priceOrder = ['$', '$$', '$$$', '$$$$'];
           const venueIdx = priceOrder.indexOf(effectivePrice);
           const prefIdxes = normalizedPricePrefs.map((p: string) => priceOrder.indexOf(p));
           const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
-          if (minDist === 1) score += 15;
-          else score -= 3;
+          if (minDist === 1) score += priceBase * 0.6;
+          else score -= 3 * pw.price;
         }
       }
 
