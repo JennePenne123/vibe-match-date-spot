@@ -84,7 +84,8 @@ serve(async (req) => {
       userId, partnerId, venueId, invitationId,
       predictedScore, predictedFactors,
       actualRating, venueRating, aiAccuracyRating,
-      wouldRecommend, contextData
+      wouldRecommend, contextData,
+      isExploration  // Flag from exploration bonus system
     } = await req.json();
 
     if (!userId || userId !== user.id) {
@@ -146,7 +147,12 @@ serve(async (req) => {
         prediction_error: predictionError,
         success_factors: successFactors,
         failure_factors: failureFactors,
-        context_data: contextData || {}
+        context_data: {
+          ...(contextData || {}),
+          is_exploration: isExploration || false,
+          exploration_success: isExploration && actualRating >= 4 ? true : 
+                              isExploration && actualRating <= 2 ? false : null,
+        }
       })
       .select()
       .single();
@@ -293,6 +299,32 @@ serve(async (req) => {
     // Calculate improvement stats
     const improvementPercent = Math.min(15, totalRatings * 1.5);
 
+    // --- EXPLORATION A/B TRACKING ---
+    let explorationStats = null;
+    if (isExploration) {
+      const { data: explorationData } = await supabase
+        .from('ai_learning_data')
+        .select('actual_rating, context_data')
+        .eq('user_id', userId);
+
+      const explorationEntries = (explorationData || []).filter(
+        d => (d.context_data as any)?.is_exploration === true && d.actual_rating !== null
+      );
+      const successCount = explorationEntries.filter(d => (d.actual_rating || 0) >= 4).length;
+      const totalExplorations = explorationEntries.length;
+      const explorationSuccessRate = totalExplorations > 0 
+        ? Math.round((successCount / totalExplorations) * 100) 
+        : 0;
+
+      explorationStats = {
+        totalExplorations,
+        successfulExplorations: successCount,
+        explorationSuccessRate,
+        thisWasSuccessful: actualRating >= 4,
+      };
+      console.log('🔍 Exploration tracking:', explorationStats);
+    }
+
     console.log('✅ Learning complete:', { 
       totalRatings, aiAccuracy: aiAccuracy.toFixed(1), 
       weightChanges, improvementPercent 
@@ -308,7 +340,8 @@ serve(async (req) => {
         predictionError: predictionError?.toFixed(1) || null
       },
       weightChanges,
-      newWeights
+      newWeights,
+      explorationStats
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
