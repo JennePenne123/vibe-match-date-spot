@@ -23,9 +23,10 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
-  const [step, setStep] = useState(0); // 0 = welcome, 1-7 = steps
+  const [step, setStep] = useState(0); // 0 = welcome, 1-6 = steps
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [microFeedback, setMicroFeedback] = useState<string | null>(null);
 
   // Referral tracking
   const [referrerId, setReferrerId] = useState<string | null>(null);
@@ -82,9 +83,14 @@ const Onboarding = () => {
   }, [searchParams]);
 
   const handleAdoptPreferences = (prefs: AdoptedPreferences) => {
-    // Merge referrer's preferences with user's current selections
     setSelectedCuisines(prev => Array.from(new Set([...prev, ...prefs.cuisines])));
     setSelectedVibes(prev => Array.from(new Set([...prev, ...prefs.vibes])));
+    if (prefs.personalityTraits) {
+      setPersonality(prefs.personalityTraits);
+    }
+    if (prefs.maxDistance) {
+      setDistanceKm(prefs.maxDistance);
+    }
     setReferralAdopted(true);
   };
 
