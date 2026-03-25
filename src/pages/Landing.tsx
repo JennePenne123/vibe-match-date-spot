@@ -191,27 +191,29 @@ export default function LandingDemo() {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">{t('landing.featuresSubtitle')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-            <Card variant="wellness" className="scroll-animate opacity-0 group cursor-pointer" style={{ animationDelay: '100ms' }}>
-              <div className="p-10 space-y-5">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400"><Sparkles className="w-8 h-8 text-white" /></div>
-                <h3 className="text-2xl font-semibold text-foreground">{t('landing.feature1Title')}</h3>
-                <p className="text-muted-foreground leading-relaxed">{t('landing.feature1Desc')}</p>
-              </div>
-            </Card>
-            <Card variant="wellness" className="scroll-animate opacity-0 group cursor-pointer" style={{ animationDelay: '200ms' }}>
-              <div className="p-10 space-y-5">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-secondary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400"><Users className="w-8 h-8 text-white" /></div>
-                <h3 className="text-2xl font-semibold text-foreground">{t('landing.feature2Title')}</h3>
-                <p className="text-muted-foreground leading-relaxed">{t('landing.feature2Desc')}</p>
-              </div>
-            </Card>
-            <Card variant="wellness" className="scroll-animate opacity-0 group cursor-pointer md:col-span-2 lg:col-span-1" style={{ animationDelay: '300ms' }}>
-              <div className="p-10 space-y-5">
-                <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400"><Heart className="w-8 h-8 text-white" /></div>
-                <h3 className="text-2xl font-semibold text-foreground">{t('landing.feature3Title')}</h3>
-                <p className="text-muted-foreground leading-relaxed">{t('landing.feature3Desc')}</p>
-              </div>
-            </Card>
+            {[
+              { icon: Sparkles, gradient: 'bg-gradient-primary', title: t('landing.feature1Title'), desc: t('landing.feature1Desc'), delay: 0 },
+              { icon: Shield, gradient: 'bg-gradient-secondary', title: t('landing.feature2Title'), desc: t('landing.feature2Desc'), delay: 0.1 },
+              { icon: Heart, gradient: 'from-primary to-accent', title: t('landing.feature3Title'), desc: t('landing.feature3Desc'), delay: 0.2 },
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.5, delay: feature.delay }}
+              >
+                <Card variant="wellness" className="group cursor-pointer h-full">
+                  <div className="p-10 space-y-5">
+                    <div className={`w-16 h-16 rounded-2xl ${feature.gradient} flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg group-hover:scale-110 transition-all duration-400`}>
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-semibold text-foreground">{feature.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
