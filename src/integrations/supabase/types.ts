@@ -1611,12 +1611,11 @@ export type Database = {
       api_usage_daily: {
         Row: {
           api_name: string | null
-          avg_response_time_ms: number | null
+          avg_response_time: number | null
           cache_hits: number | null
           date: string | null
-          error_count: number | null
-          total_calls: number | null
           total_cost: number | null
+          total_requests: number | null
         }
         Relationships: []
       }
