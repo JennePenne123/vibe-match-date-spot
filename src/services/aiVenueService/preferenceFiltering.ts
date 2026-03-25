@@ -314,9 +314,10 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         }
       }
 
-      // Vibe/tag matching (15% weight) - use inferred vibes for sparse data
+      // Vibe/tag matching (base 15% × priority weight)
+      const vibeBase = 15 * pw.vibe;
       if (hasVibePrefs) {
-        maxPossible += 15;
+        maxPossible += vibeBase;
         const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase());
         const allVibes = [...venueTags, ...inferredVibes]; // Enrich with inferred vibes
         const prefVibes = userPrefs.preferred_vibes.map((v: string) => v.toLowerCase());
@@ -324,7 +325,7 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           prefVibes.some((vibe: string) => tag.includes(vibe) || vibe.includes(tag))
         );
         if (vibeMatches.length > 0) {
-          score += Math.min(15, vibeMatches.length * 6);
+          score += Math.min(vibeBase, vibeMatches.length * 6 * pw.vibe);
         } else {
           // Soft inference from price/cuisine as last resort
           let inferred = false;
