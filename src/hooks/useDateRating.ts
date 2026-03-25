@@ -148,14 +148,32 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
           const currentMood = getTodayMood();
           
           let lifestyleContext: Record<string, unknown> = {};
+          let venueDistanceKm: number | null = null;
           try {
             const { data: prefs } = await supabase
               .from('user_preferences')
-              .select('lifestyle_data')
+              .select('lifestyle_data, home_latitude, home_longitude')
               .eq('user_id', user.id)
               .single();
             if (prefs?.lifestyle_data) {
               lifestyleContext = prefs.lifestyle_data as Record<string, unknown>;
+            }
+            // Calculate distance to venue for distance tolerance learning
+            if (prefs?.home_latitude && prefs?.home_longitude && options.venueId) {
+              try {
+                const { data: venueData } = await supabase
+                  .from('venues')
+                  .select('latitude, longitude')
+                  .eq('id', options.venueId)
+                  .single();
+                if (venueData?.latitude && venueData?.longitude) {
+                  const { calculateGeoDistance } = await import('@/utils/stringUtils');
+                  venueDistanceKm = calculateGeoDistance(
+                    prefs.home_latitude, prefs.home_longitude,
+                    venueData.latitude, venueData.longitude
+                  );
+                }
+              } catch { /* non-critical */ }
             }
           } catch { /* non-critical */ }
 
@@ -174,6 +192,7 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
               mood: currentMood,
               occasion: lifestyleContext.occasion || null,
               priority_weights: lifestyleContext.priority_weights || null,
+              venue_distance_km: venueDistanceKm,
             },
           });
           if (result) {
