@@ -8,6 +8,8 @@ import { getHabitBonus } from './habitLearning';
 import { getOccasionScore, type DateOccasion } from './occasionScoring';
 import { getFriendSocialProofBonus } from './friendSocialProof';
 import { getWeatherScore } from './weatherScoring';
+import { getExplorationBonus, getUserExploredCuisines } from './explorationBonus';
+import { applyImplicitLearning } from './implicitLearning';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
@@ -79,6 +81,12 @@ export const getAIVenueRecommendations = async (
 
     const recommendations: AIVenueRecommendation[] = [];
 
+    // Trigger implicit learning in the background (non-blocking)
+    applyImplicitLearning(userId).catch(() => {});
+
+    // Pre-fetch explored cuisines for exploration bonus (avoid N+1)
+    const exploredCuisines = await getUserExploredCuisines(userId);
+
     // Fetch user preferences once (avoid N+1 queries)
     const { data: userPrefs } = await supabase
       .from('user_preferences')
@@ -127,6 +135,9 @@ export const getAIVenueRecommendations = async (
       // ── Weather-aware scoring ──
       const weatherResult = await getWeatherScore(venue, userLocation);
 
+      // ── Exploration vs. Exploitation ──
+      const explorationResult = await getExplorationBonus(userId, venue, exploredCuisines);
+
       // Rating bonus — confidence-weighted by review count
       const reviewCount = venue.review_count || venue.reviewCount || venue.user_ratings_total || 0;
       const reviewConfidence = reviewCount > 0 ? Math.min(reviewCount / 20, 1.0) : 0.5;
@@ -139,7 +150,8 @@ export const getAIVenueRecommendations = async (
         + habitResult.bonus + repeatResult.modifier
         + occasionResult.bonus + occasionResult.penalty
         + friendResult.bonus
-        + weatherResult.bonus + weatherResult.penalty;
+        + weatherResult.bonus + weatherResult.penalty
+        + explorationResult.bonus;
       const finalScore = Math.max(5, Math.min(98, rawScore));
 
       // Generate reasoning based on actual matches
@@ -183,6 +195,7 @@ export const getAIVenueRecommendations = async (
       if (occasionResult.reason) matchReasons.push(occasionResult.reason);
       if (friendResult.reason) matchReasons.push(friendResult.reason);
       if (weatherResult.reason) matchReasons.push(weatherResult.reason);
+      if (explorationResult.reason) matchReasons.push(explorationResult.reason);
       if (repeatResult.visitCount > 0) matchReasons.push(`Bereits ${repeatResult.visitCount}x besucht`);
 
       if (matchReasons.length === 0) {

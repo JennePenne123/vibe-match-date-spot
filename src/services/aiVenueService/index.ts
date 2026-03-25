@@ -10,3 +10,6 @@ export { mergePartnerPreferences } from './collaborativeMerge';
 export type { MergedPreferences } from './collaborativeMerge';
 export type { AIVenueRecommendation } from './recommendations';
 export type { DateOccasion } from './occasionScoring';
+export { getExplorationBonus, getUserExploredCuisines } from './explorationBonus';
+export { applyImplicitLearning, analyzeImplicitSignals } from './implicitLearning';
+export { getTemporalDecayFactor, getDecayFromDate, decayWeightedAverage, applyTemporalDecayToWeights } from './temporalDecay';
