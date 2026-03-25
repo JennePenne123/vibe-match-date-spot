@@ -129,6 +129,22 @@ export const emojiMap: Record<string, string> = {
   romantic: '💕', casual: '😊', outdoor: '🌳', upscale: '✨', lively: '🎉', cozy: '🕯️',
 };
 
+export interface OccasionOption {
+  id: DateOccasion;
+  label: string;
+  emoji: string;
+  desc: string;
+}
+
+export const occasionOptions: OccasionOption[] = [
+  { id: 'first_date', label: 'Erstes Date', emoji: '🦋', desc: 'Locker & einladend' },
+  { id: 'anniversary', label: 'Jahrestag', emoji: '💍', desc: 'Romantisch & besonders' },
+  { id: 'casual', label: 'Entspannt', emoji: '😊', desc: 'Ohne Erwartungen' },
+  { id: 'birthday', label: 'Geburtstag', emoji: '🎂', desc: 'Feierlich & spaßig' },
+  { id: 'friends_hangout', label: 'Freunde-Treffen', emoji: '🍻', desc: 'Locker & gesellig' },
+  { id: 'special_celebration', label: 'Besonderer Anlass', emoji: '🥂', desc: 'Exklusiv & elegant' },
+];
+
 // ── Helpers ──────────────────────────────────────────────────────
 
 export const summaryText = (items: string[], all: Preference[]) => {
