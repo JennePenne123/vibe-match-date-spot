@@ -1,5 +1,6 @@
 
 import React from 'react';
+import VenueQuickReaction from '@/components/VenueQuickReaction';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -325,12 +326,15 @@ const VenueCard = ({
           )}
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
-          {venue.tags?.slice(0, 3).map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap gap-2">
+            {venue.tags?.slice(0, 3).map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          <VenueQuickReaction venueId={venue.id} />
         </div>
 
         {showActions && (

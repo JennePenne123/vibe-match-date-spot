@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2, Lightbulb, Star, Compass } from 'lucide-react';
 import { motion } from 'framer-motion';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
+import AIConfidenceBanner from '@/components/home/AIConfidenceBanner';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
@@ -131,6 +132,9 @@ const HomeContent: React.FC = () => {
   return (
     <main className="px-4 py-5 md:px-6 lg:px-8">
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto space-y-6"}>
+
+        {/* AI Confidence Banner */}
+        <AIConfidenceBanner />
 
         {/* Daily AI Tip — with real venue */}
         <motion.div

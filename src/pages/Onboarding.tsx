@@ -57,8 +57,9 @@ const Onboarding = () => {
     liked: [], disliked: [],
   });
 
-  // Step 7: Distance Preference (NEW)
+  // Distance & Location
   const [distanceKm, setDistanceKm] = useState(5);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   // Resolve referral code to referrer ID
   useEffect(() => {
@@ -165,6 +166,7 @@ const Onboarding = () => {
           lifestyle_data: lifestyle,
           max_distance: distanceKm,
           excluded_cuisines: swipePrefs.dislikedCuisines.length > 0 ? swipePrefs.dislikedCuisines : null,
+          ...(userLocation ? { home_latitude: userLocation.lat, home_longitude: userLocation.lng } : {}),
         };
 
         // Upsert preference
@@ -271,14 +273,14 @@ const Onboarding = () => {
         {/* Skip button */}
         {step > 0 && (
           <div className="flex justify-between items-center mb-2">
-            {step > 0 && (
-              <span className="text-xs text-muted-foreground/60 font-medium">
-                {getStepLabel()}
-              </span>
+            <span className="text-xs text-muted-foreground/60 font-medium">
+              {getStepLabel()}
+            </span>
+            {step >= 3 && (
+              <Button onClick={handleSkip} variant="ghost" size="sm" className="text-muted-foreground text-xs ml-auto">
+                Überspringen
+              </Button>
             )}
-            <Button onClick={handleSkip} variant="ghost" size="sm" className="text-muted-foreground text-xs ml-auto">
-              Überspringen
-            </Button>
           </div>
         )}
 
@@ -319,7 +321,7 @@ const Onboarding = () => {
             </>
           )}
           {step === 6 && (
-            <VenueSwipeCards data={venueSwipeData} onChange={setVenueSwipeData} distanceKm={distanceKm} onDistanceChange={setDistanceKm} />
+            <VenueSwipeCards data={venueSwipeData} onChange={setVenueSwipeData} distanceKm={distanceKm} onDistanceChange={setDistanceKm} onLocationCaptured={(lat, lng) => setUserLocation({ lat, lng })} />
           )}
         </div>
 
