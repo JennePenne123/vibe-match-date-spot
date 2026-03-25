@@ -1,28 +1,75 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Star, MapPin, DollarSign, Clock, Phone, Share, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
 import { venueToAppVenue } from '@/utils/typeHelpers';
 import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
+import { supabase } from '@/integrations/supabase/client';
 
 const VenueDetail = () => {
   const { id } = useParams();
   useVenueImplicitTracking(id);
   const navigate = useNavigate();
   const { appState } = useApp();
+  const [dbVenue, setDbVenue] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   const venue = appState.venues.find(v => v.id === id);
 
-  if (!venue) {
-    navigate('/results');
+  useEffect(() => {
+    if (!venue && id && !dbVenue) {
+      setLoading(true);
+      supabase
+        .from('venues')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setDbVenue(data);
+          } else {
+            setNotFound(true);
+          }
+          setLoading(false);
+        });
+    }
+  }, [id, venue, dbVenue]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background p-4">
+        <div className="max-w-md mx-auto space-y-4">
+          <Skeleton className="w-full h-64 rounded-xl" />
+          <Skeleton className="w-3/4 h-8" />
+          <Skeleton className="w-full h-20" />
+        </div>
+      </div>
+    );
+  }
+
+  const sourceVenue = venue || dbVenue;
+
+  if (!sourceVenue) {
+    if (notFound) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="text-center space-y-4">
+            <p className="text-muted-foreground">Venue nicht gefunden</p>
+            <Button variant="outline" onClick={() => navigate(-1)}>Zurück</Button>
+          </div>
+        </div>
+      );
+    }
     return null;
   }
 
   // Convert to AppVenue format for UI
-  const appVenue = venueToAppVenue(venue);
+  const appVenue = venueToAppVenue(sourceVenue);
 
   const openDirections = () => {
     if (appVenue.google_place_id) {
@@ -65,7 +112,7 @@ const VenueDetail = () => {
           {/* Header Controls */}
           <div className="absolute top-4 left-4 right-4 flex justify-between">
             <Button
-              onClick={() => navigate('/results')}
+              onClick={() => navigate(-1)}
               variant="ghost"
               size="icon"
               className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
@@ -91,12 +138,14 @@ const VenueDetail = () => {
           </div>
 
           {/* Match Score */}
-          <div className="absolute bottom-4 left-4">
-            <Badge className="bg-primary text-primary-foreground font-semibold text-base px-3 py-1">
-              <Sparkles className="w-4 h-4 mr-2" />
-              {appVenue.matchScore}% Perfect Match
-            </Badge>
-          </div>
+          {appVenue.matchScore > 0 && (
+            <div className="absolute bottom-4 left-4">
+              <Badge className="bg-primary text-primary-foreground font-semibold text-base px-3 py-1">
+                <Sparkles className="w-4 h-4 mr-2" />
+                {appVenue.matchScore}% Perfect Match
+              </Badge>
+            </div>
+          )}
 
           {/* Open Status */}
           {appVenue.isOpen !== undefined && (
@@ -125,7 +174,7 @@ const VenueDetail = () => {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4" />
-                {appVenue.distance}
+                {appVenue.distance || appVenue.address}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <DollarSign className="w-4 h-4" />
@@ -144,16 +193,18 @@ const VenueDetail = () => {
           </div>
 
           {/* Tags */}
-          <div className="bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-border/50 mb-4">
-            <h3 className="font-semibold text-foreground mb-3">Perfect For</h3>
-            <div className="flex flex-wrap gap-2">
-              {appVenue.tags?.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
-                </Badge>
-              ))}
+          {appVenue.tags && appVenue.tags.length > 0 && (
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-border/50 mb-4">
+              <h3 className="font-semibold text-foreground mb-3">Perfect For</h3>
+              <div className="flex flex-wrap gap-2">
+                {appVenue.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Contact Info & Hours */}
           <div className="bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-border/50 mb-4">
