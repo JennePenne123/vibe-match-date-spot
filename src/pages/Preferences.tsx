@@ -21,6 +21,12 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import OccasionPicker from '@/components/date-planning/preferences/OccasionPicker';
+import MoodPicker from '@/components/date-planning/preferences/MoodPicker';
+import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
+import type { DateOccasion } from '@/components/date-planning/preferences/preferencesData';
+import type { DailyMood } from '@/pages/MoodCheckIn';
+import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
 
 // Icon + color mapping (slimmed down)
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
