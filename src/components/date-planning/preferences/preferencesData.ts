@@ -1,4 +1,8 @@
+import type { DateOccasion } from '@/services/aiVenueService/occasionScoring';
+
 // ── Types ──────────────────────────────────────────────────────
+
+export type { DateOccasion };
 
 export interface Preference {
   id: string;
@@ -33,6 +37,7 @@ export interface DatePreferences {
   dietary_restrictions: string[];
   preferred_date?: Date;
   preferred_time?: string;
+  occasion?: DateOccasion | null;
 }
 
 export interface DurationModel {
