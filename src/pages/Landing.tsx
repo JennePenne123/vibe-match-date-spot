@@ -113,6 +113,40 @@ export default function LandingDemo() {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </section>
 
+      {/* Social Proof Bar */}
+      <section className="relative py-8 bg-card border-y border-border/30">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-center">
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {['🧑', '👩', '🧔', '👱‍♀️'].map((emoji, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-primary/10 border-2 border-card flex items-center justify-center text-sm">
+                    {emoji}
+                  </div>
+                ))}
+              </div>
+              <span className="text-sm text-muted-foreground">
+                <strong className="text-foreground">500+</strong> Nutzer planen Dates
+              </span>
+            </div>
+            <div className="hidden sm:block w-px h-8 bg-border" />
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⭐</span>
+              <span className="text-sm text-muted-foreground">
+                <strong className="text-foreground">4.8/5</strong> Zufriedenheit
+              </span>
+            </div>
+            <div className="hidden sm:block w-px h-8 bg-border" />
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🎯</span>
+              <span className="text-sm text-muted-foreground">
+                <strong className="text-foreground">92%</strong> Match-Genauigkeit
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section ref={featuresRef} className="relative py-24 lg:py-36 bg-background">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20 scroll-animate opacity-0">

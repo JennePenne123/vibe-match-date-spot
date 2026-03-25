@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, MapPin, Check, X, DollarSign, Calendar, Info, MessageCircle, XCircle } from 'lucide-react';
+import ShareDateButton from '@/components/ShareDateButton';
 import { DateRatingPrompt } from '@/components/DateRatingPrompt';
 import { getInitials } from '@/lib/utils';
 import { DisplayData } from './types';
@@ -164,18 +165,25 @@ const DateInviteCardDetails = ({
                     ✅ Date Confirmed! See you there!
                   </p>
                 </div>
-                <AddToCalendarButton
-                  event={{
-                    title: `Date with ${displayData.friendName} – ${displayData.venueName}`,
-                    description: displayData.message || undefined,
-                    location: displayData.venueAddress || displayData.location || undefined,
-                    startDate: displayData.time ? new Date(displayData.time) : new Date(),
-                    durationMinutes: 120,
-                  }}
-                  variant="outline"
-                  size="default"
-                  className="w-full"
-                />
+                <div className="flex gap-2">
+                  <AddToCalendarButton
+                    event={{
+                      title: `Date with ${displayData.friendName} – ${displayData.venueName}`,
+                      description: displayData.message || undefined,
+                      location: displayData.venueAddress || displayData.location || undefined,
+                      startDate: displayData.time ? new Date(displayData.time) : new Date(),
+                      durationMinutes: 120,
+                    }}
+                    variant="outline"
+                    size="default"
+                    className="flex-1"
+                  />
+                  <ShareDateButton
+                    title={`Date: ${displayData.venueName}`}
+                    venueName={displayData.venueName}
+                    dateTime={displayData.time}
+                  />
+                </div>
               </>
             )}
             
