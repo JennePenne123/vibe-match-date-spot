@@ -5,5 +5,8 @@ export { getAIVenueRecommendations, generateAIReasoning } from './recommendation
 export { filterVenuesByPreferences, filterVenuesByCollaborativePreferences } from './preferenceFiltering';
 export type { SessionPriorityWeights } from './preferenceFiltering';
 export { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
+export { getCombinedContextScore } from './contextCombinationScoring';
+export { mergePartnerPreferences } from './collaborativeMerge';
+export type { MergedPreferences } from './collaborativeMerge';
 export type { AIVenueRecommendation } from './recommendations';
 export type { DateOccasion } from './occasionScoring';

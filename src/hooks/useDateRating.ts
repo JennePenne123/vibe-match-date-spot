@@ -143,6 +143,22 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
       let impact: LearningImpact | null = null;
       if (options?.venueId) {
         try {
+          // Enrich context with mood & priority weights for learning
+          const { getTodayMood } = await import('@/pages/MoodCheckIn');
+          const currentMood = getTodayMood();
+          
+          let lifestyleContext: Record<string, unknown> = {};
+          try {
+            const { data: prefs } = await supabase
+              .from('user_preferences')
+              .select('lifestyle_data')
+              .eq('user_id', user.id)
+              .single();
+            if (prefs?.lifestyle_data) {
+              lifestyleContext = prefs.lifestyle_data as Record<string, unknown>;
+            }
+          } catch { /* non-critical */ }
+
           const result = await learnFromFeedback({
             userId: user.id,
             partnerId: options.partnerId,
@@ -155,6 +171,9 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
             wouldRecommend: ratingData.wouldRecommendVenue ?? undefined,
             contextData: {
               feedbackText: ratingData.feedbackText,
+              mood: currentMood,
+              occasion: lifestyleContext.occasion || null,
+              priority_weights: lifestyleContext.priority_weights || null,
             },
           });
           if (result) {

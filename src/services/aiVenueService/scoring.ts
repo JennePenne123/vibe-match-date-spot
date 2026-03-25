@@ -2,6 +2,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
 import { getMoodScoreModifier, getMoodInfluenceLabel } from './moodScoring';
 import { getImplicitSignalBoost } from '@/services/implicitSignalsService';
+import { getCombinedContextScore } from './contextCombinationScoring';
+import { getTodayMood } from '@/pages/MoodCheckIn';
 
 /**
  * Cuisine similarity matrix — returns 0..1 similarity between two cuisines.
@@ -523,9 +525,16 @@ export const calculateVenueAIScore = async (
 
     // Apply implicit signal boost
     const implicitBoost = await getImplicitSignalBoost(userId, venueId);
+
+    // Apply combined context scoring (synergy + auto time)
+    const currentMood = getTodayMood();
+    const occasionFromPrefs = (userPrefs.lifestyle_data as any)?.occasion || null;
+    const priorityFromPrefs = (userPrefs.lifestyle_data as any)?.priority_weights || null;
+    const combinedCtx = getCombinedContextScore(venue, occasionFromPrefs, currentMood, priorityFromPrefs);
+    const combinedCtxBonus = (combinedCtx.synergyBonus + combinedCtx.autoContextBonus) / 100;
     
     // Final AI score (0-100 scale) — normalized so sparse data doesn't penalize
-    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost) * 100;
+    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost + combinedCtxBonus) * 100;
     const finalScore = Math.max(10, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
@@ -535,6 +544,7 @@ export const calculateVenueAIScore = async (
       moodModifier: moodModifier !== 0 ? `${moodModifier > 0 ? '+' : ''}${Math.round(moodModifier * 100)}% (${moodLabel})` : 'none',
       confidenceBoost: `+${Math.round(confidenceBoost * 100)}%`,
       implicitBoost: implicitBoost !== 0 ? `${implicitBoost > 0 ? '+' : ''}${Math.round(implicitBoost * 100)}%` : 'none',
+      combinedContext: combinedCtxBonus !== 0 ? `+${Math.round(combinedCtxBonus * 100)}% (${combinedCtx.reasons.join(', ')})` : 'none',
       finalScore: `${Math.round(finalScore)}%`,
       learningApplied: learnedWeights.hasLearningData,
       aiAccuracy: learnedWeights.aiAccuracy,
@@ -557,7 +567,11 @@ export const calculateVenueAIScore = async (
       partner_id: partnerPrefs ? partnerId : null,
       shared_matches: sharedMatches,
       mood_modifier: moodModifier !== 0 ? moodModifier : null,
-      mood_label: moodLabel
+      mood_label: moodLabel,
+      combined_context_bonus: combinedCtxBonus !== 0 ? combinedCtxBonus : null,
+      combined_context_reasons: combinedCtx.reasons.length > 0 ? combinedCtx.reasons : null,
+      occasion: occasionFromPrefs,
+      priority_weights: priorityFromPrefs,
     };
 
     const { error: insertError } = await supabase
