@@ -166,6 +166,7 @@ const Onboarding = () => {
           lifestyle_data: lifestyle,
           max_distance: distanceKm,
           excluded_cuisines: swipePrefs.dislikedCuisines.length > 0 ? swipePrefs.dislikedCuisines : null,
+          ...(userLocation ? { home_latitude: userLocation.lat, home_longitude: userLocation.lng } : {}),
         };
 
         // Upsert preference
