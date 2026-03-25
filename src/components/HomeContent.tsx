@@ -229,45 +229,71 @@ const HomeContent: React.FC = () => {
             {t('home.cityTipsTitle')}
           </h3>
           <div className={isDesktop ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-3"}>
-            {[getDailyIndex(0), getDailyIndex(3)].map((idx, i) => {
-              const tip = CITY_TIPS[idx];
-              const isLoading = loadingTipIndex === i;
-              return (
+            {tipsLoading ? (
+              <>
+                <Skeleton className="h-24 w-full rounded-lg" />
+                <Skeleton className="h-24 w-full rounded-lg" />
+              </>
+            ) : cityTipVenues.length > 0 ? (
+              cityTipVenues.map((venue, i) => (
                 <motion.div
-                  key={i}
+                  key={venue.id}
                   initial={{ opacity: 0, x: i === 0 ? -12 : 12 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
                 >
                   <Card
-                    onClick={() => handleTipClick(tip, i)}
+                    onClick={() => handleVenueTipClick(venue.id)}
                     className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
                   >
                     <CardContent className="p-4 flex items-start gap-3">
-                      <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 group-hover:scale-110 transition-all duration-300 shrink-0">
-                        {isLoading ? (
-                          <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                      <div className="shrink-0">
+                        {venue.image_url ? (
+                          <img src={venue.image_url} alt={venue.name} className="w-12 h-12 rounded-xl object-cover" />
                         ) : (
-                          <tip.icon className="w-4 h-4 text-primary" />
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                            {venue.isDiscovery ? (
+                              <Compass className="w-5 h-5 text-primary" />
+                            ) : (
+                              <MapPin className="w-5 h-5 text-primary" />
+                            )}
+                          </div>
                         )}
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                            {tip.label}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {t('home.tipForYou')}
-                          </span>
+                          {venue.isDiscovery ? (
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-accent text-accent-foreground bg-accent/10">
+                              ✨ {t('home.discoveryLabel')}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/30 text-primary bg-primary/10">
+                              💡 {t('home.forYouLabel')}
+                            </Badge>
+                          )}
+                          {venue.rating && (
+                            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                              <Star className="w-2.5 h-2.5 fill-primary text-primary" />
+                              {venue.rating.toFixed(1)}
+                            </span>
+                          )}
                         </div>
-                        <p className="text-sm font-medium text-foreground">{tip.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
+                        <p className="text-sm font-medium text-foreground truncate">{venue.name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed truncate">
+                          {[venue.cuisine_type, venue.price_range].filter(Boolean).join(' · ')}
+                        </p>
                       </div>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-1 group-hover:translate-x-0.5 transition-transform" />
                     </CardContent>
                   </Card>
                 </motion.div>
-              );
-            })}
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground col-span-full text-center py-4">
+                {t('home.noVenueTips')}
+              </p>
+            )}
+          </div>
           </div>
         </motion.div>
 
