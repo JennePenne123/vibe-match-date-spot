@@ -305,6 +305,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         max_distance: maxDistance, dietary_restrictions: selectedDietary,
         preferred_date: selectedDate, preferred_time: selectedTime,
         occasion: selectedOccasion,
+        priority_weights: priorityWeights,
       });
       setHasSubmitted(true);
     } catch (error) {
@@ -313,7 +314,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, selectedCuisines, selectedVibes, selectedPriceRange, selectedTimePreferences, maxDistance, selectedDietary, selectedDate, selectedTime, selectedOccasion, planningMode, sessionId, collaborativeSession, partnerName, onPreferencesComplete]);
+  }, [user?.id, selectedCuisines, selectedVibes, selectedPriceRange, selectedTimePreferences, maxDistance, selectedDietary, selectedDate, selectedTime, selectedOccasion, priorityWeights, planningMode, sessionId, collaborativeSession, partnerName, onPreferencesComplete]);
 
   return {
     // State
@@ -323,6 +324,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     selectedDate, selectedTime, selectedTemplateId,
     selectedOccasion, setSelectedOccasion,
     selectedMood, setSelectedMood,
+    priorityWeights, setPriorityWeights,
     autoNavigating, timeoutTriggered, openSections,
     // Derived
     durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,
