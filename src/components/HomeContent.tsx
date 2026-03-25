@@ -133,6 +133,9 @@ const HomeContent: React.FC = () => {
     <main className="px-4 py-5 md:px-6 lg:px-8">
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto space-y-6"}>
 
+        {/* AI Confidence Banner */}
+        <AIConfidenceBanner />
+
         {/* Daily AI Tip — with real venue */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
