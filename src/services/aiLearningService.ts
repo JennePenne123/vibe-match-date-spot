@@ -71,6 +71,7 @@ export interface LearnFromFeedbackParams {
   aiAccuracyRating?: number;
   wouldRecommend?: boolean;
   contextData?: Record<string, unknown>;
+  isExploration?: boolean;
 }
 
 export const learnFromFeedback = async (params: LearnFromFeedbackParams): Promise<(LearningMetrics & { weightChanges?: Record<string, string>; newWeights?: Record<string, number> }) | null> => {
