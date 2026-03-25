@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useFriends } from '@/hooks/useFriends';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2, Lightbulb } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2, Lightbulb, Star, Compass } from 'lucide-react';
 import { motion } from 'framer-motion';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
@@ -14,6 +16,7 @@ import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import FeedbackImpactBanner from '@/components/home/FeedbackImpactBanner';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { useHomeTipVenues } from '@/hooks/useHomeTipVenues';
 import { supabase } from '@/integrations/supabase/client';
 
 const QUOTES = [
@@ -36,23 +39,10 @@ const DAILY_TIPS = [
   { emoji: '🌿', tip: 'Natur tanken — Parks & Gärten sind unterschätzt', category: 'outdoor' },
 ];
 
-const CITY_TIPS: { title: string; desc: string; icon: typeof MapPin; label: string }[] = [
-  { icon: MapPin, label: 'Heute', title: 'Street-Food-Markt entdecken', desc: 'Probiert euch durch lokale Köstlichkeiten unter freiem Himmel' },
-  { icon: Heart, label: 'Morgen', title: 'Sunset-Spaziergang am Fluss', desc: 'Golden Hour genießen — perfekt für entspannte Gespräche' },
-  { icon: Zap, label: 'Heute', title: 'Pop-up Gallery besuchen', desc: 'Kunst & Kultur als Inspiration für euren Abend' },
-  { icon: MapPin, label: 'Morgen', title: 'Geheimtipp-Café ausprobieren', desc: 'Specialty Coffee in gemütlichem Ambiente — ideal für ein Nachmittags-Date' },
-  { icon: Heart, label: 'Heute', title: 'Rooftop-Bar mit Ausblick', desc: 'Cocktails mit Panoramablick auf die Stadt' },
-  { icon: Zap, label: 'Morgen', title: 'Kochkurs für Zwei', desc: 'Gemeinsam kochen verbindet — und schmeckt!' },
-  { icon: MapPin, label: 'Heute', title: 'Vintage-Markt durchstöbern', desc: 'Schätze finden und dabei Quality-Time genießen' },
-  { icon: Heart, label: 'Morgen', title: 'Botanischer Garten erkunden', desc: 'Ruhe & Natur mitten in der Stadt — unterschätzt romantisch' },
-  { icon: Zap, label: 'Heute', title: 'Live-Musik in der Altstadt', desc: 'Jazz, Indie oder Klassik — lasst euch überraschen' },
-  { icon: MapPin, label: 'Morgen', title: 'Brunch-Spot entdecken', desc: 'Gemütlich in den Tag starten mit Avocado-Toast & Co.' },
-];
-
 const getDailyIndex = (offset: number) => {
   const now = new Date();
   const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-  return (dayOfYear + offset) % CITY_TIPS.length;
+  return dayOfYear + offset;
 };
 
 const HomeContent: React.FC = () => {
@@ -62,6 +52,7 @@ const HomeContent: React.FC = () => {
   const { toast } = useToast();
   const { friends } = useFriends();
   const { isMobile, isDesktop } = useBreakpoint();
+  const { dailyTipVenue, cityTipVenues, loading: tipsLoading } = useHomeTipVenues();
 
   const [showPartnerSelection, setShowPartnerSelection] = useState(false);
   const [showProposalCreation, setShowProposalCreation] = useState(false);
@@ -71,31 +62,8 @@ const HomeContent: React.FC = () => {
   const [invitationSentTrigger, setInvitationSentTrigger] = useState(0);
   const [loadingTipIndex, setLoadingTipIndex] = useState<number | null>(null);
 
-  const handleTipClick = async (tip: typeof CITY_TIPS[0], index: number) => {
-    if (loadingTipIndex !== null) return;
-    setLoadingTipIndex(index);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const { data, error } = await supabase.functions.invoke('ai-quick-tip', {
-        body: {
-          tipTitle: tip.title,
-          tipCategory: tip.label,
-          userId: session?.user?.id || null,
-        },
-      });
-      if (error) throw error;
-      if (data?.venue_id) {
-        toast({ title: t('home.aiTipTitle'), description: data.reason || t('home.aiTipFallback'), duration: 4000 });
-        navigate(`/venue/${data.venue_id}`);
-      } else {
-        toast({ title: t('home.aiTipNoVenues'), description: t('home.aiTipNoVenuesDesc'), variant: 'destructive' });
-      }
-    } catch (err) {
-      console.error('Quick tip error:', err);
-      toast({ title: t('common.error'), description: t('home.aiTipError'), variant: 'destructive' });
-    } finally {
-      setLoadingTipIndex(null);
-    }
+  const handleVenueTipClick = (venueId: string) => {
+    navigate(`/venue/${venueId}`);
   };
 
   const handleSoloPlanning = () => navigate('/preferences');
@@ -164,17 +132,28 @@ const HomeContent: React.FC = () => {
     <main className="px-4 py-5 md:px-6 lg:px-8">
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto space-y-6"}>
 
-        {/* Daily AI Tip */}
+        {/* Daily AI Tip — with real venue */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <Card className="relative overflow-hidden border-border/50 bg-gradient-to-r from-primary/8 via-accent/5 to-transparent">
+          <Card 
+            className="relative overflow-hidden border-border/50 bg-gradient-to-r from-primary/8 via-accent/5 to-transparent cursor-pointer hover:border-primary/30 transition-all duration-300 active:scale-[0.98]"
+            onClick={dailyTipVenue ? () => handleVenueTipClick(dailyTipVenue.id) : undefined}
+          >
             <div className="absolute -top-6 -right-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
             <CardContent className="relative p-4 flex items-center gap-3.5">
               <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg">
-                {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}
+                {dailyTipVenue ? (
+                  dailyTipVenue.image_url ? (
+                    <img src={dailyTipVenue.image_url} alt="" className="w-10 h-10 rounded-xl object-cover" />
+                  ) : (
+                    <span className="text-lg">{DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}</span>
+                  )
+                ) : (
+                  <span className="text-lg">{DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}</span>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
@@ -182,11 +161,27 @@ const HomeContent: React.FC = () => {
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                     {t('home.dailyTipLabel')}
                   </span>
+                  {dailyTipVenue?.rating && (
+                    <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                      <Star className="w-2.5 h-2.5 fill-primary text-primary" />
+                      {dailyTipVenue.rating.toFixed(1)}
+                    </span>
+                  )}
                 </div>
-                <p className="text-sm font-medium text-foreground leading-snug">
-                  {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].tip}
-                </p>
+                {dailyTipVenue ? (
+                  <>
+                    <p className="text-sm font-medium text-foreground leading-snug truncate">{dailyTipVenue.name}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">
+                      {[dailyTipVenue.cuisine_type, dailyTipVenue.price_range].filter(Boolean).join(' · ')}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm font-medium text-foreground leading-snug">
+                    {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].tip}
+                  </p>
+                )}
               </div>
+              {dailyTipVenue && <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />}
             </CardContent>
           </Card>
         </motion.div>
@@ -234,45 +229,70 @@ const HomeContent: React.FC = () => {
             {t('home.cityTipsTitle')}
           </h3>
           <div className={isDesktop ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-3"}>
-            {[getDailyIndex(0), getDailyIndex(3)].map((idx, i) => {
-              const tip = CITY_TIPS[idx];
-              const isLoading = loadingTipIndex === i;
-              return (
+            {tipsLoading ? (
+              <>
+                <Skeleton className="h-24 w-full rounded-lg" />
+                <Skeleton className="h-24 w-full rounded-lg" />
+              </>
+            ) : cityTipVenues.length > 0 ? (
+              cityTipVenues.map((venue, i) => (
                 <motion.div
-                  key={i}
+                  key={venue.id}
                   initial={{ opacity: 0, x: i === 0 ? -12 : 12 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
                 >
                   <Card
-                    onClick={() => handleTipClick(tip, i)}
+                    onClick={() => handleVenueTipClick(venue.id)}
                     className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
                   >
                     <CardContent className="p-4 flex items-start gap-3">
-                      <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 group-hover:scale-110 transition-all duration-300 shrink-0">
-                        {isLoading ? (
-                          <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                      <div className="shrink-0">
+                        {venue.image_url ? (
+                          <img src={venue.image_url} alt={venue.name} className="w-12 h-12 rounded-xl object-cover" />
                         ) : (
-                          <tip.icon className="w-4 h-4 text-primary" />
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                            {venue.isDiscovery ? (
+                              <Compass className="w-5 h-5 text-primary" />
+                            ) : (
+                              <MapPin className="w-5 h-5 text-primary" />
+                            )}
+                          </div>
                         )}
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                            {tip.label}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {t('home.tipForYou')}
-                          </span>
+                          {venue.isDiscovery ? (
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-accent text-accent-foreground bg-accent/10">
+                              ✨ {t('home.discoveryLabel')}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/30 text-primary bg-primary/10">
+                              💡 {t('home.forYouLabel')}
+                            </Badge>
+                          )}
+                          {venue.rating && (
+                            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                              <Star className="w-2.5 h-2.5 fill-primary text-primary" />
+                              {venue.rating.toFixed(1)}
+                            </span>
+                          )}
                         </div>
-                        <p className="text-sm font-medium text-foreground">{tip.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
+                        <p className="text-sm font-medium text-foreground truncate">{venue.name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed truncate">
+                          {[venue.cuisine_type, venue.price_range].filter(Boolean).join(' · ')}
+                        </p>
                       </div>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-1 group-hover:translate-x-0.5 transition-transform" />
                     </CardContent>
                   </Card>
                 </motion.div>
-              );
-            })}
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground col-span-full text-center py-4">
+                {t('home.noVenueTips')}
+              </p>
+            )}
           </div>
         </motion.div>
 
