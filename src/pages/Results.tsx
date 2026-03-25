@@ -196,22 +196,32 @@ const Results = () => {
             className="mb-4"
           />
 
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 }}
-            className="mb-6 text-center bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 p-4 rounded-lg border border-purple-100 dark:border-purple-800"
-          >
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              <h2 className="text-lg font-bold text-purple-900 dark:text-purple-100">
-                AI-Powered Matches
-              </h2>
-            </div>
-            <p className="text-sm text-purple-700 dark:text-purple-300">
-              Jedes Venue wird persönlich für dich bewertet — basierend auf {isFromSmartPlanning ? 'euren gemeinsamen' : 'deinen'} Präferenzen
-            </p>
-          </motion.div>
+          {(() => {
+            const STORAGE_KEY = 'ai_matches_banner_views';
+            const views = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+            if (views < 3) {
+              localStorage.setItem(STORAGE_KEY, String(views + 1));
+              return (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className="mb-6 text-center bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 p-4 rounded-lg border border-purple-100 dark:border-purple-800"
+                >
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    <h2 className="text-lg font-bold text-purple-900 dark:text-purple-100">
+                      AI-Powered Matches
+                    </h2>
+                  </div>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">
+                    Jedes Venue wird persönlich für dich bewertet — basierend auf {isFromSmartPlanning ? 'euren gemeinsamen' : 'deinen'} Präferenzen
+                  </p>
+                </motion.div>
+              );
+            }
+            return null;
+          })()}
 
           {/* Premium Voucher Banner */}
           {!isPremium && (
