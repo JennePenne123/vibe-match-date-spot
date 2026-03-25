@@ -9,6 +9,7 @@ import { Heart, ArrowRight, Calendar } from 'lucide-react';
 import { useInvitations } from '@/hooks/useInvitations';
 import { DateInviteCard } from '@/components/date-invite';
 import { DateInvitation } from '@/types/index';
+import EmptyState from '@/components/EmptyState';
 
 const UpcomingDatesCard: React.FC = () => {
   const navigate = useNavigate();
@@ -111,22 +112,22 @@ const UpcomingDatesCard: React.FC = () => {
   if (upcomingDates.length === 0) {
     return (
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-0">
           <CardTitle className="flex items-center gap-2">
             <Heart className="h-5 w-5 text-primary" />
             {t('home.upcomingDates')}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-center py-6 animate-fade-in">
-            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3 animate-pulse" />
-            <p className="text-sm text-muted-foreground mb-2">
-              {t('home.noUpcomingDates')}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t('home.acceptedDatesHint')}
-            </p>
-          </div>
+        <CardContent>
+          <EmptyState
+            icon={Calendar}
+            title={t('home.noUpcomingDates')}
+            description={t('home.acceptedDatesHint')}
+            actionLabel="Date planen"
+            onAction={() => navigate('/preferences')}
+            variant="minimal"
+            className="py-6"
+          />
         </CardContent>
       </Card>
     );

@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Sparkles, Users, Heart, ArrowRight, Menu, X } from 'lucide-react';
+import { Sparkles, Users, Heart, ArrowRight, Menu, X, Zap, Shield, Star } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthModal } from '@/components/landing/AuthModal';
 import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import AnimatedCounter from '@/components/landing/AnimatedCounter';
+import { motion } from 'framer-motion';
 export default function LandingDemo() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -91,57 +93,90 @@ export default function LandingDemo() {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 lg:pt-20">
         <div className="absolute inset-0 bg-gradient-calm opacity-70" />
         <div className="absolute inset-0 bg-gradient-meadow animate-breathe" />
+        {/* Floating orbs for depth */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/8 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-accent/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-36 text-center">
-          <div className="space-y-10 animate-fade-in">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-semibold leading-tight tracking-tight">
-              <span className="block text-foreground">{t('landing.heroTitle1')}</span>
-              <span className="block text-primary mt-2">{t('landing.heroTitle2')}</span>
-            </h1>
-            <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <div className="space-y-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4" />
+                KI-gestützte Date-Planung
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-semibold leading-tight tracking-tight">
+                <span className="block text-foreground">{t('landing.heroTitle1')}</span>
+                <span className="block bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent mt-2">{t('landing.heroTitle2')}</span>
+              </h1>
+            </motion.div>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-lg sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+            >
               {t('landing.heroSubtitle')}
               <span className="block mt-2">{t('landing.heroSubtitle2')}</span>
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-10">
-              <Button onClick={() => setIsAuthModalOpen(true)} size="xl" className="text-lg px-10 py-7 shadow-gentle-lg hover:shadow-gentle-xl transition-all duration-400 w-full sm:w-auto">
-                {t('landing.beginJourney')} <ArrowRight className="ml-2 w-5 h-5" />
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-10"
+            >
+              <Button onClick={() => setIsAuthModalOpen(true)} size="xl" className="text-lg px-10 py-7 shadow-gentle-lg hover:shadow-gentle-xl transition-all duration-400 w-full sm:w-auto group">
+                {t('landing.beginJourney')} <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
               </Button>
               <Button onClick={() => scrollToSection(featuresRef)} variant="outline" size="xl" className="text-lg px-10 py-7 w-full sm:w-auto">{t('landing.learnMore')}</Button>
-            </div>
-            <p className="text-sm text-muted-foreground pt-4">{t('landing.noCreditCard')}</p>
+            </motion.div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="text-sm text-muted-foreground pt-4"
+            >
+              {t('landing.noCreditCard')}
+            </motion.p>
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </section>
 
-      {/* Social Proof Bar */}
-      <section className="relative py-8 bg-card border-y border-border/30">
+      {/* Social Proof Bar — Animated Counters */}
+      <section className="relative py-10 bg-card/80 backdrop-blur-lg border-y border-border/30">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-center">
-            <div className="flex items-center gap-3">
-              <div className="flex -space-x-2">
-                {['🧑', '👩', '🧔', '👱‍♀️'].map((emoji, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-primary/10 border-2 border-card flex items-center justify-center text-sm">
-                    {emoji}
-                  </div>
-                ))}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-10 text-center">
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary" />
+                <span className="text-2xl sm:text-3xl font-bold text-foreground">
+                  <AnimatedCounter target={500} suffix="+" />
+                </span>
               </div>
-              <span className="text-sm text-muted-foreground">
-                <strong className="text-foreground">500+</strong> Nutzer planen Dates
-              </span>
+              <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">Aktive Nutzer</span>
             </div>
-            <div className="hidden sm:block w-px h-8 bg-border" />
-            <div className="flex items-center gap-2">
-              <span className="text-lg">⭐</span>
-              <span className="text-sm text-muted-foreground">
-                <strong className="text-foreground">4.8/5</strong> Zufriedenheit
-              </span>
+            <div className="hidden sm:block w-px h-12 bg-border/50" />
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-500" />
+                <span className="text-2xl sm:text-3xl font-bold text-foreground">
+                  <AnimatedCounter target={4.8} suffix="/5" decimals={1} />
+                </span>
+              </div>
+              <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">Zufriedenheit</span>
             </div>
-            <div className="hidden sm:block w-px h-8 bg-border" />
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🎯</span>
-              <span className="text-sm text-muted-foreground">
-                <strong className="text-foreground">92%</strong> Match-Genauigkeit
-              </span>
+            <div className="hidden sm:block w-px h-12 bg-border/50" />
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-accent" />
+                <span className="text-2xl sm:text-3xl font-bold text-foreground">
+                  <AnimatedCounter target={92} suffix="%" />
+                </span>
+              </div>
+              <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">Match-Genauigkeit</span>
             </div>
           </div>
         </div>
@@ -156,27 +191,29 @@ export default function LandingDemo() {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">{t('landing.featuresSubtitle')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-            <Card variant="wellness" className="scroll-animate opacity-0 group cursor-pointer" style={{ animationDelay: '100ms' }}>
-              <div className="p-10 space-y-5">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400"><Sparkles className="w-8 h-8 text-white" /></div>
-                <h3 className="text-2xl font-semibold text-foreground">{t('landing.feature1Title')}</h3>
-                <p className="text-muted-foreground leading-relaxed">{t('landing.feature1Desc')}</p>
-              </div>
-            </Card>
-            <Card variant="wellness" className="scroll-animate opacity-0 group cursor-pointer" style={{ animationDelay: '200ms' }}>
-              <div className="p-10 space-y-5">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-secondary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400"><Users className="w-8 h-8 text-white" /></div>
-                <h3 className="text-2xl font-semibold text-foreground">{t('landing.feature2Title')}</h3>
-                <p className="text-muted-foreground leading-relaxed">{t('landing.feature2Desc')}</p>
-              </div>
-            </Card>
-            <Card variant="wellness" className="scroll-animate opacity-0 group cursor-pointer md:col-span-2 lg:col-span-1" style={{ animationDelay: '300ms' }}>
-              <div className="p-10 space-y-5">
-                <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg transition-all duration-400"><Heart className="w-8 h-8 text-white" /></div>
-                <h3 className="text-2xl font-semibold text-foreground">{t('landing.feature3Title')}</h3>
-                <p className="text-muted-foreground leading-relaxed">{t('landing.feature3Desc')}</p>
-              </div>
-            </Card>
+            {[
+              { icon: Sparkles, gradient: 'bg-gradient-primary', title: t('landing.feature1Title'), desc: t('landing.feature1Desc'), delay: 0 },
+              { icon: Shield, gradient: 'bg-gradient-secondary', title: t('landing.feature2Title'), desc: t('landing.feature2Desc'), delay: 0.1 },
+              { icon: Heart, gradient: 'from-primary to-accent', title: t('landing.feature3Title'), desc: t('landing.feature3Desc'), delay: 0.2 },
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.5, delay: feature.delay }}
+              >
+                <Card variant="wellness" className="group cursor-pointer h-full">
+                  <div className="p-10 space-y-5">
+                    <div className={`w-16 h-16 rounded-2xl ${feature.gradient} flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg group-hover:scale-110 transition-all duration-400`}>
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-semibold text-foreground">{feature.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
