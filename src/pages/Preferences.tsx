@@ -465,13 +465,14 @@ const Preferences = () => {
     { id: 'non_smoking', name: t('preferences.access_non_smoking'), emoji: '🚭' },
   ];
 
-  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 1));
+  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 2));
   const steps = [
+    { title: 'Dein Date-Kontext', subtitle: 'Anlass, Stimmung & was dir wichtig ist', icon: <Sparkles className="w-5 h-5 text-primary" /> },
     { title: t('preferences.stepTaste', 'Geschmack'), subtitle: t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
     { title: t('preferences.stepPractical', 'Praktisches'), subtitle: t('preferences.stepPracticalDesc', 'Budget, Timing & Standort'), icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
   ];
 
-  const canGoNext = step < 1;
+  const canGoNext = step < 2;
   const canGoBack = step > 0;
 
   return (
@@ -488,7 +489,7 @@ const Preferences = () => {
               <p className="text-xs text-muted-foreground">{steps[step].subtitle}</p>
             </div>
             <span className="text-xs font-medium text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-              {step + 1}/2
+              {step + 1}/3
             </span>
           </div>
           {/* Progress bar */}
@@ -514,8 +515,25 @@ const Preferences = () => {
         {/* Step content */}
         <div className="px-4 py-5 space-y-3 pb-6">
 
-          {/* Step 1: Geschmack + Vibes */}
+          {/* Step 0: Kontext */}
           {step === 0 && (
+            <>
+              <AccordionSection title="Anlass" icon={<Sparkles className="w-5 h-5 text-primary" />} selectedCount={selectedOccasion ? 1 : 0} defaultOpen>
+                <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
+              </AccordionSection>
+
+              <AccordionSection title="Stimmung" icon={<SmilePlus className="w-5 h-5 text-primary" />} selectedCount={selectedMood ? 1 : 0} defaultOpen>
+                <MoodPicker selectedMood={selectedMood} onSelectMood={setSelectedMood} />
+              </AccordionSection>
+
+              <AccordionSection title="Prioritäten" icon={<SlidersHorizontal className="w-5 h-5 text-primary" />} selectedCount={Object.values(priorityWeights).filter(v => v !== 1.0).length}>
+                <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
+              </AccordionSection>
+            </>
+          )}
+
+          {/* Step 1: Geschmack + Vibes */}
+          {step === 1 && (
             <>
               <AccordionSection title={t('preferences.whatCraving') || 'Küche'} icon={<Heart className="w-5 h-5 text-pink-500" />} selectedCount={selectedCuisines.length} defaultOpen>
                 <SelectionGrid items={cuisines} selected={selectedCuisines} onToggle={(id) => toggleSelection(id, selectedCuisines, setSelectedCuisines)} />
@@ -533,23 +551,11 @@ const Preferences = () => {
               <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
                 <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
               </AccordionSection>
-
-              <AccordionSection title="Anlass" icon={<Sparkles className="w-5 h-5 text-primary" />} selectedCount={selectedOccasion ? 1 : 0}>
-                <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
-              </AccordionSection>
-
-              <AccordionSection title="Stimmung" icon={<SmilePlus className="w-5 h-5 text-primary" />} selectedCount={selectedMood ? 1 : 0}>
-                <MoodPicker selectedMood={selectedMood} onSelectMood={setSelectedMood} />
-              </AccordionSection>
-
-              <AccordionSection title="Prioritäten" icon={<SlidersHorizontal className="w-5 h-5 text-primary" />} selectedCount={Object.values(priorityWeights).filter(v => v !== 1.0).length}>
-                <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
-              </AccordionSection>
             </>
           )}
 
           {/* Step 2: Praktisches */}
-          {step === 1 && (
+          {step === 2 && (
             <>
               <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length} defaultOpen>
                 <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
