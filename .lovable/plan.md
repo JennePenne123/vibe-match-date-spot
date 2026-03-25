@@ -1,7 +1,7 @@
 
 # VybePulse – Gesamt-Projektübersicht & Roadmap
 
-**Stand: 23. März 2026** | **Geschätzter Fortschritt: ~87%**
+**Stand: 25. März 2026** | **Geschätzter Fortschritt: ~89%**
 
 ---
 
@@ -11,11 +11,11 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## ✅ Fertiggestellte Features (~87%)
+## ✅ Fertiggestellte Features (~89%)
 
 ### 🏠 User-Frontend
-- **Landing Page** mit Auth-Modal (Google, Apple, E-Mail)
-- **Onboarding** (3-Step Carousel)
+- **Landing Page** mit Auth-Modal (Google, Apple, E-Mail) + Social Proof Banner
+- **Onboarding** (Gamified, mit Fortschritts-Labels & Motivations-Nachrichten)
 - **Home** mit Quick-Start Templates, AI-Empfehlungen, Upcoming Dates, Pending Ratings
 - **4-Tab Bottom-Nav** (Home, Plan Date, Chats, Profile) mit Slide-Animationen
 - **Modernes Dark-Design** (Slate-900/Indigo Farbschema)
@@ -23,6 +23,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **PWA-Support** (Service Worker, Offline-Banner, Push Notifications)
 - **Responsive Mobile-First** Design (402px optimiert)
 - **SEO-optimiert** (OG-Tags, JSON-LD, Meta-Descriptions, robots.txt)
+- **Framer Motion Animationen** ✅ (gestaffelte Card-Einblendung, Expand/Collapse)
 
 ### 🤖 KI-Engine
 - **AI-Matching-Algorithmus** mit gewichteten Scoring-Faktoren (Küche, Vibe, Preis, Timing, Rating)
@@ -37,8 +38,9 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **AI Edge Function** für Venue-Reasoning (Top-N Enhancement, optional aktivierbar)
 - **Präziseres Scoring** ✅ Gewichte optimiert → Top-3 Venues erreichen ~80%+ Match-Score
 - **Konsistente Match-Scores** ✅ Keine Mock-Overrides mehr bei Venue-Detail-Ansicht
-- **Cuisine-Mismatch-Penalty** ✅ Stärkere Bestrafung für falsche Küchen-Matches (z.B. Pizza bei Thai-Suche)
+- **Cuisine-Mismatch-Penalty** ✅ Stärkere Bestrafung für falsche Küchen-Matches
 - **Venue-Blocklist** ✅ Lieferservices, Takeaway-only, Supermärkte werden automatisch gefiltert
+- **AI-Transparenz** ✅ Confidence-Level, "Warum dieses Venue?"-Chips, Personalisierungs-Indikator
 
 ### 📅 Date-Planning
 - **Smart Date Planner** (Solo + Collaborative Mode)
@@ -47,15 +49,16 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Realtime Collaborative Sessions** (beide Partner setzen Präferenzen)
 - **Date Invitations** mit Status-Tracking (pending → accepted → completed)
 - **Invitation Messenger** (Chat pro Einladung)
+- **Automatische Date-Erinnerungen** ✅ (Cron-Job alle 30min, 24h + 1h vor Date)
 
 ### 🏪 Venue-System
 - **Venue-Suche** (Overpass + Radar + Foursquare, Google Places als Fallback)
 - **Venue Detail Pages** mit Fotos, Ratings, Öffnungszeiten, Karte
 - **Venue Feedback** (Like/Dislike/Super Like/Skip)
-- **30-min LRU Venue-Cache** mit automatischer Invalidierung bei Standortwechsel ✅
+- **30-min LRU Venue-Cache** mit automatischer Invalidierung bei Standortwechsel
 - **Map View** mit Clustered Markers (Leaflet)
 - **Globaler Standort-Sync** ✅ Stadtwechsel in Preferences → Planner übernimmt automatisch
-- **Radar-API Radius-Fix** ✅ Max 10km (API-Limit) statt fehlerhafter 50km
+- **Radar-API Radius-Fix** ✅ Max 10km (API-Limit)
 - **Strikte Geo-Filterung** ✅ Bounding-Box verhindert standortfremde Ergebnisse
 
 ### 🎟️ Voucher & Rewards
@@ -65,6 +68,12 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Reward Shop** mit Einlösung (monatliche Limits, Premium-Zugang)
 - **Referral-System** mit Codes + Punkten
 - **Push-Notifications bei Voucher-Einlösung** (User + Partner + Voucher-Ersteller)
+
+### 📱 Social & Viral Features ✅ NEU
+- **WhatsApp/Telegram Share** für Date-Einladungen (1-Tap Share-Button)
+- **Native Share API** als Fallback
+- **Social Proof Banner** auf der Landing Page (User-Counts, Match-Genauigkeit)
+- **Link-Kopieren** für Date-Einladungen
 
 ### 👔 Partner-Portal
 - **Dashboard** mit KPIs
@@ -94,8 +103,13 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Input Sanitization** (DOMPurify)
 - **Session Cleanup** (automatisch)
 - **OSRM Routing** Integration
-- **Auth-Redirect Konsistenz** ✅ → alle Seiten → `/?auth=required`
-- **autoComplete-Attribute** auf Auth-Formularen ✅
+- **Security Scan: 8/8 Findings gefixt** ✅ NEU
+  - profiles_safe E-Mail-Leak behoben
+  - Venue-Policy Source-Bypass entfernt
+  - Analytics-Views mit security_invoker gesichert
+  - Partner-Update erfordert venue_partner-Rolle
+  - api_usage_logs INSERT auf eigene user_id beschränkt
+- **Verbleibende Warnungen**: Extension in Public (kosmetisch), request_logs true (kein user_id)
 
 ### ⚙️ Account & Settings
 - **E-Mail & Passwort ändern** (mit Re-Auth)
@@ -106,12 +120,11 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Sprachauswahl**
 - **Support-Bereich** (FAQ-Accordion + E-Mail-Fallback)
 - **Rechtliche Seiten** (Impressum, Datenschutz, AGB)
-- **DSGVO-Opt-Out** für implizite Signale ✅ (Toggle in Settings + localStorage)
-- **Datenschutzerklärung aktualisiert** ✅ (Sentry, Foursquare/Radar, implizites Tracking dokumentiert)
+- **DSGVO-Opt-Out** für implizite Signale ✅
 
 ---
 
-## 🔧 Offene Aufgaben vor Launch (~13%)
+## 🔧 Offene Aufgaben vor Launch (~11%)
 
 ### 🔴 Kritisch (Must-Have für Launch)
 
@@ -119,14 +132,14 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 |---|---------|--------|--------------|
 | 1 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons (192x192, 512x512), Favicons (16x16, 32x32, 180x180) |
 | 2 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor |
-| 3 | **Security Hardening** | ✅ Erledigt | ~~OTP-Ablauf <10min~~ ✅, ~~HIBP-Check aktivieren~~ ✅, ~~Anonymous Sign-Ins deaktivieren~~ ✅ |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 4 | **Bundle-Optimierung** | 🟡 Offen | Code-Splitting, Lazy Loading, Tree-Shaking-Audit |
-| 5 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
+| 3 | **Bundle-Optimierung** | 🟡 Offen | Code-Splitting, Lazy Loading für Routes, Tree-Shaking-Audit |
+| 4 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
+| 5 | **E2E Testing** | 🟡 Offen | Kritische Flows testen (Auth, Onboarding, Recommendations, Date-Invite) |
 
 ### 🟢 Post-Launch / Nice-to-Have
 
@@ -137,42 +150,44 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 8 | **Standort-Picker im Planner** | Klein | Schneller Stadtwechsel direkt im Smart Date Planner |
 | 9 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
 | 10 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
+| 11 | **Gemeinsames Planen verbessern** | Mittel | Freunde direkt in die App einladen zum kollaborativen Planning |
 
-### ✅ Heute erledigt (23. März 2026)
+### ✅ Heute erledigt (25. März 2026)
 
 | Aufgabe | Beschreibung |
 |---------|--------------|
-| ~~Stadtwechsel-Sync~~ | Location-Update in Preferences → globaler AppState + Cache-Invalidierung |
-| ~~Radar-API Radius-Bug~~ | Max-Radius von 50km auf 10km (API-Limit) korrigiert |
-| ~~Venue-Blocklist~~ | Lieferservices, Takeaway, Supermärkte werden vor Scoring gefiltert |
-| ~~Cuisine-Mismatch-Penalty~~ | Stärkere Bestrafung für falsche Küchen (Pizza ≠ Thai) |
-| ~~React Query Tuning~~ | Zentrales queryConfig.ts mit differenzierten staleTime-Kategorien |
-| ~~VAPID-Keys~~ | Push-Notifications vollständig live mit Web Push API |
+| ~~Gamified Onboarding~~ | Step-Labels, Motivations-Nachrichten, schnellere Progression |
+| ~~Push Date-Erinnerungen~~ | Cron-Job (30min), 24h + 1h vor Date automatische Benachrichtigung |
+| ~~Social/Viral Features~~ | WhatsApp/Telegram Share, Social Proof Banner auf Landing Page |
+| ~~Security Findings (8/8)~~ | profiles_safe, Venue-Policies, Analytics-Views, Partner-RLS gefixt |
+| ~~Framer Motion Animations~~ | Gestaffelte Card-Einblendung auf Results-Seite |
+| ~~Deutsche UI-Texte~~ | Results-Seite ins Deutsche übersetzt |
 
 ---
 
 ## 📊 Fortschritts-Einschätzung
 
 ```
-Gesamt-Fortschritt: ██████████████████████████░░░░ ~87%
+Gesamt-Fortschritt: ███████████████████████████░░░ ~89%
 
-Frontend UI/UX:     ██████████████████████████████ ~98%
-KI-Engine:          ████████████████████████████░░ ~93%  ↑ Blocklist + Mismatch-Penalty
-Date-Planning:      █████████████████████████████░ ~95%
-Venue-System:       ██████████████████████████░░░░ ~88%  ↑ Stadtwechsel + Radar-Fix
+Frontend UI/UX:     ██████████████████████████████ ~98%  ↑ Framer Motion
+KI-Engine:          █████████████████████████████░ ~95%  ↑ AI-Transparenz
+Date-Planning:      █████████████████████████████░ ~96%  ↑ Auto-Erinnerungen
+Venue-System:       ██████████████████████████░░░░ ~88%
 Voucher/Rewards:    █████████████████████████░░░░░ ~85%
 Partner-Portal:     █████████████████████████░░░░░ ~85%
 Admin Dashboard:    █████████████████████████████░ ~95%
-Security/Infra:     ████████████████████████████░░ ~92%  ↑ Push live
-Monetarisierung:    ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~10% (Stripe noch nicht)
-Performance:        ██████████████████████████░░░░ ~85%
+Security/Infra:     █████████████████████████████░ ~95%  ↑ 8 Findings gefixt
+Social/Viral:       ████████████████████████░░░░░░ ~80%  ✅ NEU
+Monetarisierung:    ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~10% (Stripe geplant)
+Performance:        ███████████████████████████░░░ ~88%  ↑ Animationen
 DSGVO/Legal:        ████████████████████████████░░ ~92%
 ```
 
 ### Zeitliche Einschätzung bis Launch (Sommer 2026)
-- **Kritische Aufgaben (1-3)**: ~1 Session + manuelle Dashboard-Schritte
-- **Wichtige Aufgaben (4-5)**: ~1-2 Sessions
-- **Gesamt bis MVP-Launch**: ~2-3 Sessions
+- **Kritische Aufgaben (1-2)**: ~1 Session + manuelle Dashboard-Schritte
+- **Wichtige Aufgaben (3-5)**: ~2-3 Sessions
+- **Gesamt bis MVP-Launch**: ~3-4 Sessions
 - **Post-Launch Features**: Laufend nach Priorität
 
 ---
