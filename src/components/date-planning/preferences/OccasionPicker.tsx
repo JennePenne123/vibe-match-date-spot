@@ -1,7 +1,11 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, Butterfly, Heart, Coffee, Cake, Users, Sparkles, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { occasionOptions, type DateOccasion } from './preferencesData';
+
+const iconMap: Record<string, LucideIcon> = {
+  Butterfly, Heart, Coffee, Cake, Users, Sparkles,
+};
 
 interface Props {
   selectedOccasion: DateOccasion | null;
@@ -15,6 +19,7 @@ const OccasionPicker: React.FC<Props> = ({ selectedOccasion, onSelectOccasion })
     <div className="grid grid-cols-2 gap-2">
       {occasionOptions.map(o => {
         const sel = selectedOccasion === o.id;
+        const Icon = iconMap[o.emoji];
         return (
           <button
             key={o.id}
@@ -27,7 +32,14 @@ const OccasionPicker: React.FC<Props> = ({ selectedOccasion, onSelectOccasion })
             )}
           >
             <div className="flex items-center gap-2">
-              <span className="text-lg">{o.emoji}</span>
+              {Icon && (
+                <div className={cn(
+                  'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
+                  sel ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
+                )}>
+                  <Icon className="w-4 h-4" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm leading-tight">{o.label}</p>
                 <p className="text-[11px] text-muted-foreground">{o.desc}</p>
