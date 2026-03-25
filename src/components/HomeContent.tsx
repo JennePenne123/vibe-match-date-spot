@@ -155,45 +155,56 @@ const HomeContent: React.FC = () => {
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto space-y-6"}>
 
         {/* Hero CTA — Plan Date */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 shadow-lg">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.12),transparent_60%)]" />
-          <CardContent className="relative p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-2 flex-1">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                  <Sparkles className="w-3 h-3" />
-                  AI-powered
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 shadow-lg">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.12),transparent_60%)]" />
+            <div className="absolute -top-8 -right-8 w-32 h-32 bg-primary/8 rounded-full blur-2xl" />
+            <CardContent className="relative p-5 sm:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-2 flex-1">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                    <Sparkles className="w-3 h-3" />
+                    AI-powered
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
+                    {t('home.heroTitle')}
+                  </h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
+                    {t('home.heroSubtitle')}
+                  </p>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
-                  {t('home.heroTitle')}
-                </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                  {t('home.heroSubtitle')}
-                </p>
+                {!isMobile && (
+                  <motion.div 
+                    className="p-4 rounded-2xl bg-primary/10"
+                    animate={{ rotate: [0, 5, -5, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <Calendar className="w-10 h-10 text-primary" />
+                  </motion.div>
+                )}
               </div>
-              {!isMobile && (
-                <div className="p-4 rounded-2xl bg-primary/10">
-                  <Calendar className="w-10 h-10 text-primary" />
-                </div>
-              )}
-            </div>
-            <Button
-              onClick={handleSoloPlanning}
-              size="lg"
-              className="mt-4 w-full sm:w-auto shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300 gap-2"
-            >
-              <ArrowRight className="w-4 h-4" />
-              {t('home.heroCta')}
-            </Button>
-            <button
-              onClick={handleGroupPlanning}
-              className="mt-2 w-full sm:w-auto text-sm text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1.5"
-            >
-              <Users className="w-3.5 h-3.5" />
-              {t('home.heroGroupCta')}
-            </button>
-          </CardContent>
-        </Card>
+              <Button
+                onClick={handleSoloPlanning}
+                size="lg"
+                className="mt-4 w-full sm:w-auto shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300 gap-2 group"
+              >
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                {t('home.heroCta')}
+              </Button>
+              <button
+                onClick={handleGroupPlanning}
+                className="mt-2 w-full sm:w-auto text-sm text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <Users className="w-3.5 h-3.5" />
+                {t('home.heroGroupCta')}
+              </button>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Feedback Impact Banner */}
         <FeedbackImpactBanner />
