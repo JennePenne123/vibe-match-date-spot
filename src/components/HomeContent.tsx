@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2, Lightbulb, Star, Compass } from 'lucide-react';
 import { motion } from 'framer-motion';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
+import AIConfidenceBanner from '@/components/home/AIConfidenceBanner';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
