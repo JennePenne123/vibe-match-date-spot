@@ -1,7 +1,7 @@
 
 # VybePulse – Gesamt-Projektübersicht & Roadmap
 
-**Stand: 25. März 2026** | **Geschätzter Fortschritt: ~89%**
+**Stand: 25. März 2026 (Abend-Update)** | **Geschätzter Fortschritt: ~90%**
 
 ---
 
@@ -11,7 +11,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## ✅ Fertiggestellte Features (~89%)
+## ✅ Fertiggestellte Features (~90%)
 
 ### 🏠 User-Frontend
 - **Landing Page** mit Auth-Modal (Google, Apple, E-Mail) + Social Proof Banner
@@ -25,8 +25,8 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **SEO-optimiert** (OG-Tags, JSON-LD, Meta-Descriptions, robots.txt)
 - **Framer Motion Animationen** ✅ (gestaffelte Card-Einblendung, Expand/Collapse)
 
-### 🤖 KI-Engine
-- **AI-Matching-Algorithmus** mit gewichteten Scoring-Faktoren (Küche, Vibe, Preis, Timing, Rating)
+### 🤖 KI-Engine (14-Signal-Pipeline)
+- **14-Signal AI-Matching**: User Preferences, Real-time Context, Habit Learning, Repeat-Visit Protection, Occasion Scoring, Social Proof, Weather Scoring, Bayesian Ratings, Implicit Signals, Synergy Bonuses, Time-based Auto-Context, Smarter Partner Merging, Temporal Decay (90d), Distance Tolerance Learning
 - **Collaborative Scoring** für beidseitige Präferenzen mit Shared-Bonus-System
 - **Feedback-Loop**: AI lernt aus Ratings und passt Gewichte an (`user_preference_vectors`)
 - **Cold-Start-Lösung**: Onboarding-Präferenzen → initiale `feature_weights` + Preference-Vektoren
@@ -41,6 +41,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Cuisine-Mismatch-Penalty** ✅ Stärkere Bestrafung für falsche Küchen-Matches
 - **Venue-Blocklist** ✅ Lieferservices, Takeaway-only, Supermärkte werden automatisch gefiltert
 - **AI-Transparenz** ✅ Confidence-Level, "Warum dieses Venue?"-Chips, Personalisierungs-Indikator
+- **AI-Banner Auto-Hide** ✅ "AI-Powered Matches"-Banner blendet nach 3x Ansicht automatisch aus
 
 ### 📅 Date-Planning
 - **Smart Date Planner** (Solo + Collaborative Mode)
@@ -64,7 +65,8 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 ### 🎟️ Voucher & Rewards
 - **QR-Code Voucher-System** (Wallet → QR anzeigen → Partner scannt → Edge Function validiert)
 - **Wallet mit echten Supabase-Daten** ✅ (reward_redemptions + voucher_redemptions kombiniert)
-- **Gamification**: Punkte, Badges, Streaks, Leaderboard, Levels
+- **Gamification**: Punkte, 18 Badges, Streaks, Leaderboard, Levels
+- **Premium Badge** 👑 ✅ Automatisches goldenes Badge für Premium-Nutzer (Profil + Leaderboard)
 - **Reward Shop** mit Einlösung (monatliche Limits, Premium-Zugang)
 - **Referral-System** mit Codes + Punkten
 - **Push-Notifications bei Voucher-Einlösung** (User + Partner + Voucher-Ersteller)
@@ -171,23 +173,26 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | ~~Security Findings (8/8)~~ | profiles_safe, Venue-Policies, Analytics-Views, Partner-RLS gefixt |
 | ~~Framer Motion Animations~~ | Gestaffelte Card-Einblendung auf Results-Seite |
 | ~~Deutsche UI-Texte~~ | Results-Seite ins Deutsche übersetzt |
+| ~~Preferences Toast Position~~ | Push-Benachrichtigung "Gespeichert" nach unten über Bottom-Nav verschoben |
+| ~~AI-Banner Auto-Hide~~ | "AI-Powered Matches"-Banner blendet nach 3x Ansicht automatisch aus |
+| ~~Premium Badge~~ 👑 | Goldenes Badge für Premium-Nutzer im Profil-Header + Leaderboard |
 
 ---
 
 ## 📊 Fortschritts-Einschätzung
 
 ```
-Gesamt-Fortschritt: ███████████████████████████░░░ ~89%
+Gesamt-Fortschritt: ████████████████████████████░░ ~90%
 
 Frontend UI/UX:     ██████████████████████████████ ~98%  ↑ Framer Motion
-KI-Engine:          █████████████████████████████░ ~95%  ↑ AI-Transparenz
+KI-Engine:          █████████████████████████████░ ~96%  ↑ 14-Signal-Pipeline
 Date-Planning:      █████████████████████████████░ ~96%  ↑ Auto-Erinnerungen
 Venue-System:       ██████████████████████████░░░░ ~88%
-Voucher/Rewards:    █████████████████████████░░░░░ ~85%
+Voucher/Rewards:    ██████████████████████████░░░░ ~87%  ↑ Premium Badge
 Partner-Portal:     █████████████████████████░░░░░ ~85%
 Admin Dashboard:    █████████████████████████████░ ~95%
 Security/Infra:     █████████████████████████████░ ~95%  ↑ 8 Findings gefixt
-Social/Viral:       ████████████████████████░░░░░░ ~80%  ✅ NEU
+Social/Viral:       ████████████████████████░░░░░░ ~80%
 Monetarisierung:    ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~10% (Stripe geplant)
 Performance:        ███████████████████████████░░░ ~88%  ↑ Animationen
 DSGVO/Legal:        ████████████████████████████░░ ~92%
