@@ -544,6 +544,7 @@ export const calculateVenueAIScore = async (
       moodModifier: moodModifier !== 0 ? `${moodModifier > 0 ? '+' : ''}${Math.round(moodModifier * 100)}% (${moodLabel})` : 'none',
       confidenceBoost: `+${Math.round(confidenceBoost * 100)}%`,
       implicitBoost: implicitBoost !== 0 ? `${implicitBoost > 0 ? '+' : ''}${Math.round(implicitBoost * 100)}%` : 'none',
+      combinedContext: combinedCtxBonus !== 0 ? `+${Math.round(combinedCtxBonus * 100)}% (${combinedCtx.reasons.join(', ')})` : 'none',
       finalScore: `${Math.round(finalScore)}%`,
       learningApplied: learnedWeights.hasLearningData,
       aiAccuracy: learnedWeights.aiAccuracy,
@@ -566,7 +567,11 @@ export const calculateVenueAIScore = async (
       partner_id: partnerPrefs ? partnerId : null,
       shared_matches: sharedMatches,
       mood_modifier: moodModifier !== 0 ? moodModifier : null,
-      mood_label: moodLabel
+      mood_label: moodLabel,
+      combined_context_bonus: combinedCtxBonus !== 0 ? combinedCtxBonus : null,
+      combined_context_reasons: combinedCtx.reasons.length > 0 ? combinedCtx.reasons : null,
+      occasion: occasionFromPrefs,
+      priority_weights: priorityFromPrefs,
     };
 
     const { error: insertError } = await supabase
