@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,17 +12,25 @@ import RelationshipGoal from '@/components/onboarding/RelationshipGoal';
 import LifestylePicks, { type LifestyleData } from '@/components/onboarding/LifestylePicks';
 import ExperienceScenarios, { type ScenarioAnswers, scenarios } from '@/components/onboarding/ExperienceScenarios';
 import FoodVibeQuickPick from '@/components/onboarding/FoodVibeQuickPick';
+import VenueSwipeCards, { type VenueSwipeData, deriveSwipePreferences } from '@/components/onboarding/VenueSwipeCards';
+import DistancePreference from '@/components/onboarding/DistancePreference';
+import ReferralInspiration, { type AdoptedPreferences } from '@/components/onboarding/ReferralInspiration';
 
 import onboarding1 from '@/assets/onboarding-1.png';
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 7;
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
-  const [step, setStep] = useState(0); // 0 = welcome, 1-5 = steps
+  const [step, setStep] = useState(0); // 0 = welcome, 1-7 = steps
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Referral tracking
+  const [referrerId, setReferrerId] = useState<string | null>(null);
+  const [referralAdopted, setReferralAdopted] = useState(false);
 
   // Step 1: Personality
   const [personality, setPersonality] = useState<PersonalityTraits>({
@@ -44,6 +52,41 @@ const Onboarding = () => {
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
+
+  // Step 6: Venue Swipe (NEW)
+  const [venueSwipeData, setVenueSwipeData] = useState<VenueSwipeData>({
+    liked: [], disliked: [],
+  });
+
+  // Step 7: Distance Preference (NEW)
+  const [distanceKm, setDistanceKm] = useState(5);
+
+  // Resolve referral code to referrer ID
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (!refCode) return;
+
+    const resolveReferrer = async () => {
+      try {
+        const { data } = await supabase
+          .from('user_points')
+          .select('user_id')
+          .eq('referral_code', refCode.toUpperCase())
+          .single();
+        if (data?.user_id) {
+          setReferrerId(data.user_id);
+        }
+      } catch { /* no referrer found */ }
+    };
+    resolveReferrer();
+  }, [searchParams]);
+
+  const handleAdoptPreferences = (prefs: AdoptedPreferences) => {
+    // Merge referrer's preferences with user's current selections
+    setSelectedCuisines(prev => Array.from(new Set([...prev, ...prefs.cuisines])));
+    setSelectedVibes(prev => Array.from(new Set([...prev, ...prefs.vibes])));
+    setReferralAdopted(true);
+  };
 
   const animateTransition = useCallback((nextStep: number) => {
     if (isAnimating) return;
@@ -85,13 +128,20 @@ const Onboarding = () => {
       const mergedVibes = Array.from(new Set([...selectedVibes, ...scenarioVibes]));
       const mergedActivities = Array.from(new Set(scenarioActivities));
 
+      // Enrich from venue swipes
+      const swipePrefs = deriveSwipePreferences(venueSwipeData);
+      const enrichedCuisines = Array.from(new Set([...selectedCuisines, ...swipePrefs.likedCuisines]));
+      const enrichedVibes = Array.from(new Set([...mergedVibes, ...swipePrefs.likedVibes]));
+      const enrichedPrices = swipePrefs.inferredPrices;
+
       // Map lifestyle budget to price range
       const priceRangeMap: Record<string, string[]> = {
         saver: ['budget'],
         balanced: ['budget', 'moderate'],
         spender: ['moderate', 'upscale', 'luxury'],
       };
-      const derivedPriceRange = priceRangeMap[lifestyle.budget_style] || ['moderate'];
+      const basePriceRange = priceRangeMap[lifestyle.budget_style] || ['moderate'];
+      const derivedPriceRange = Array.from(new Set([...basePriceRange, ...enrichedPrices]));
 
       // Map chronotype to preferred times
       const timeMap: Record<string, string[]> = {
@@ -105,8 +155,8 @@ const Onboarding = () => {
 
         const preferencePayload = {
           user_id: currentUserId,
-          preferred_cuisines: selectedCuisines.length > 0 ? selectedCuisines : null,
-          preferred_vibes: mergedVibes.length > 0 ? mergedVibes : null,
+          preferred_cuisines: enrichedCuisines.length > 0 ? enrichedCuisines : null,
+          preferred_vibes: enrichedVibes.length > 0 ? enrichedVibes : null,
           preferred_price_range: derivedPriceRange,
           preferred_times: derivedTimes,
           preferred_activities: mergedActivities.length > 0 ? mergedActivities : null,
@@ -114,9 +164,11 @@ const Onboarding = () => {
           personality_traits: personality,
           relationship_goal: relationshipGoal || null,
           lifestyle_data: lifestyle,
+          max_distance: distanceKm,
+          excluded_cuisines: swipePrefs.dislikedCuisines.length > 0 ? swipePrefs.dislikedCuisines : null,
         };
 
-        // Upsert preference (select → update/insert pattern per memory)
+        // Upsert preference
         const { data: existing } = await supabase
           .from('user_preferences')
           .select('id')
@@ -134,16 +186,18 @@ const Onboarding = () => {
             .insert(preferencePayload);
         }
 
-        // Initialize AI preference vectors
+        // Initialize AI preference vectors (now with swipe + distance data)
         try {
           const { initializePreferenceVectors } = await import('@/services/preferenceInitService');
           await initializePreferenceVectors(currentUserId, {
-            cuisines: selectedCuisines,
-            vibes: mergedVibes,
+            cuisines: enrichedCuisines,
+            vibes: enrichedVibes,
             priceRange: derivedPriceRange,
             times: derivedTimes,
             dietary: selectedDietary,
             activities: mergedActivities,
+            swipeData: venueSwipeData,
+            distanceKm,
           });
         } catch (e) {
           console.error('Failed to init vectors:', e);
@@ -158,7 +212,6 @@ const Onboarding = () => {
         }
       }
 
-      // Show celebration toast
       toast({
         title: '🎉 Profil komplett!',
         description: 'Die KI kennt dich jetzt – deine ersten personalisierten Empfehlungen warten!',
@@ -197,6 +250,19 @@ const Onboarding = () => {
     return 'Weiter';
   };
 
+  const getStepLabel = () => {
+    switch (step) {
+      case 1: return 'Persönlichkeit';
+      case 2: return 'Beziehungsziel';
+      case 3: return 'Lifestyle';
+      case 4: return 'Szenarien';
+      case 5: return 'Essen & Vibes';
+      case 6: return 'Venue-Geschmack';
+      case 7: return 'Entfernung';
+      default: return '';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-between p-4 select-none relative overflow-hidden">
       {/* Subtle background */}
@@ -206,14 +272,19 @@ const Onboarding = () => {
       <div className="w-full max-w-md mx-auto relative z-10 flex flex-col flex-1">
         {/* Skip button */}
         {step > 0 && (
-          <div className="flex justify-end mb-2">
-            <Button onClick={handleSkip} variant="ghost" size="sm" className="text-muted-foreground text-xs">
+          <div className="flex justify-between items-center mb-2">
+            {step > 0 && (
+              <span className="text-xs text-muted-foreground/60 font-medium">
+                {getStepLabel()}
+              </span>
+            )}
+            <Button onClick={handleSkip} variant="ghost" size="sm" className="text-muted-foreground text-xs ml-auto">
               Überspringen
             </Button>
           </div>
         )}
 
-        {/* Progress bar (only on actual steps) */}
+        {/* Progress bar */}
         {step > 0 && (
           <div className="mb-4">
             <OnboardingProgress currentStep={step} totalSteps={TOTAL_STEPS} />
@@ -232,14 +303,28 @@ const Onboarding = () => {
           {step === 3 && <LifestylePicks data={lifestyle} onChange={setLifestyle} />}
           {step === 4 && <ExperienceScenarios answers={scenarioAnswers} onChange={setScenarioAnswers} />}
           {step === 5 && (
-            <FoodVibeQuickPick
-              selectedCuisines={selectedCuisines}
-              selectedVibes={selectedVibes}
-              selectedDietary={selectedDietary}
-              onCuisinesChange={setSelectedCuisines}
-              onVibesChange={setSelectedVibes}
-              onDietaryChange={setSelectedDietary}
-            />
+            <>
+              {/* Referral inspiration banner (if available) */}
+              <ReferralInspiration
+                referrerId={referrerId}
+                onAdoptPreferences={handleAdoptPreferences}
+                adopted={referralAdopted}
+              />
+              <FoodVibeQuickPick
+                selectedCuisines={selectedCuisines}
+                selectedVibes={selectedVibes}
+                selectedDietary={selectedDietary}
+                onCuisinesChange={setSelectedCuisines}
+                onVibesChange={setSelectedVibes}
+                onDietaryChange={setSelectedDietary}
+              />
+            </>
+          )}
+          {step === 6 && (
+            <VenueSwipeCards data={venueSwipeData} onChange={setVenueSwipeData} />
+          )}
+          {step === 7 && (
+            <DistancePreference distanceKm={distanceKm} onChange={setDistanceKm} />
           )}
         </div>
 
@@ -293,7 +378,7 @@ function WelcomeScreen() {
 
       <div className="flex items-center gap-2 mt-6 text-xs text-muted-foreground/60">
         <Sparkles className="w-3.5 h-3.5" />
-        <span>5 kurze Schritte · Kein richtig oder falsch</span>
+        <span>7 kurze Schritte · Kein richtig oder falsch</span>
       </div>
     </div>
   );
