@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useFriends } from '@/hooks/useFriends';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2 } from 'lucide-react';
+import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2, Lightbulb } from 'lucide-react';
 import { motion } from 'framer-motion';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
@@ -24,6 +24,16 @@ const QUOTES = [
   '„Zusammen entdecken, zusammen wachsen." 🌱',
   '„Ein gutes Date beginnt mit Neugier." 💡',
   '„Kleine Abenteuer machen das Leben groß." 🚀',
+];
+
+const DAILY_TIPS = [
+  { emoji: '☕', tip: 'Perfekter Tag für ein gemütliches Café-Date', category: 'relaxed' },
+  { emoji: '🌅', tip: 'Golden Hour genießen — ideal für einen Spaziergang', category: 'outdoor' },
+  { emoji: '🍷', tip: 'Wie wäre es mit einer Weinbar zum Feierabend?', category: 'evening' },
+  { emoji: '🎨', tip: 'Kultur-Tipp: Galerie oder Museum als Date-Spot', category: 'culture' },
+  { emoji: '🍜', tip: 'Lust auf was Neues? Probiert eine unbekannte Küche', category: 'food' },
+  { emoji: '🎵', tip: 'Live-Musik macht jedes Date unvergesslich', category: 'entertainment' },
+  { emoji: '🌿', tip: 'Natur tanken — Parks & Gärten sind unterschätzt', category: 'outdoor' },
 ];
 
 const CITY_TIPS: { title: string; desc: string; icon: typeof MapPin; label: string }[] = [
@@ -154,54 +164,29 @@ const HomeContent: React.FC = () => {
     <main className="px-4 py-5 md:px-6 lg:px-8">
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto space-y-6"}>
 
-        {/* Hero CTA — Plan Date */}
+        {/* Daily AI Tip */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4 }}
         >
-          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 shadow-lg">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.12),transparent_60%)]" />
-            <div className="absolute -top-8 -right-8 w-32 h-32 bg-primary/8 rounded-full blur-2xl" />
-            <CardContent className="relative p-5 sm:p-6">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2 flex-1">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                    <Sparkles className="w-3 h-3" />
-                    AI-powered
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
-                    {t('home.heroTitle')}
-                  </h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                    {t('home.heroSubtitle')}
-                  </p>
-                </div>
-                {!isMobile && (
-                  <motion.div 
-                    className="p-4 rounded-2xl bg-primary/10"
-                    animate={{ rotate: [0, 5, -5, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  >
-                    <Calendar className="w-10 h-10 text-primary" />
-                  </motion.div>
-                )}
+          <Card className="relative overflow-hidden border-border/50 bg-gradient-to-r from-primary/8 via-accent/5 to-transparent">
+            <div className="absolute -top-6 -right-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
+            <CardContent className="relative p-4 flex items-center gap-3.5">
+              <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg">
+                {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}
               </div>
-              <Button
-                onClick={handleSoloPlanning}
-                size="lg"
-                className="mt-4 w-full sm:w-auto shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300 gap-2 group"
-              >
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                {t('home.heroCta')}
-              </Button>
-              <button
-                onClick={handleGroupPlanning}
-                className="mt-2 w-full sm:w-auto text-sm text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Users className="w-3.5 h-3.5" />
-                {t('home.heroGroupCta')}
-              </button>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <Lightbulb className="w-3 h-3 text-primary" />
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                    {t('home.dailyTipLabel')}
+                  </span>
+                </div>
+                <p className="text-sm font-medium text-foreground leading-snug">
+                  {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].tip}
+                </p>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
