@@ -2,6 +2,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
 import { getMoodScoreModifier, getMoodInfluenceLabel } from './moodScoring';
 import { getImplicitSignalBoost } from '@/services/implicitSignalsService';
+import { getCombinedContextScore } from './contextCombinationScoring';
+import { getTodayMood } from '@/pages/MoodCheckIn';
 
 /**
  * Cuisine similarity matrix — returns 0..1 similarity between two cuisines.
