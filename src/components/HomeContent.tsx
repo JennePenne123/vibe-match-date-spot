@@ -229,10 +229,16 @@ const HomeContent: React.FC = () => {
         )}
 
         {/* Daily Inspiration */}
-        <div className="space-y-3">
+        <motion.div 
+          className="space-y-3"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           {/* Quote */}
-          <Card className="border-0 bg-gradient-to-r from-accent/30 via-accent/10 to-transparent">
-            <CardContent className="py-4 px-5">
+          <Card className="border-0 bg-gradient-to-r from-accent/20 via-primary/10 to-transparent overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+            <CardContent className="py-4 px-5 relative">
               <p className="text-sm italic text-muted-foreground leading-relaxed text-center">
                 {QUOTES[getDailyIndex(0) % QUOTES.length]}
               </p>
@@ -247,37 +253,43 @@ const HomeContent: React.FC = () => {
               const tip = CITY_TIPS[idx];
               const isLoading = loadingTipIndex === i;
               return (
-                <Card
+                <motion.div
                   key={i}
-                  onClick={() => handleTipClick(tip, i)}
-                  className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
+                  initial={{ opacity: 0, x: i === 0 ? -12 : 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
                 >
-                  <CardContent className="p-4 flex items-start gap-3">
-                    <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors shrink-0">
-                      {isLoading ? (
-                        <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                      ) : (
-                        <tip.icon className="w-4 h-4 text-primary" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                          {tip.label}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {t('home.tipForYou')}
-                        </span>
+                  <Card
+                    onClick={() => handleTipClick(tip, i)}
+                    className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
+                  >
+                    <CardContent className="p-4 flex items-start gap-3">
+                      <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/15 group-hover:scale-110 transition-all duration-300 shrink-0">
+                        {isLoading ? (
+                          <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                        ) : (
+                          <tip.icon className="w-4 h-4 text-primary" />
+                        )}
                       </div>
-                      <p className="text-sm font-medium text-foreground">{tip.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                            {tip.label}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {t('home.tipForYou')}
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium text-foreground">{tip.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
       </div>
     </main>
