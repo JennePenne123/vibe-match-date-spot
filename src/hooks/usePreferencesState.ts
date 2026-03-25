@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import {
   durationModels, quickStartTemplates, allVibes,
   haveSame, type UserPreferences, type DatePreferences, type QuickStartTemplate,
+  type DateOccasion,
 } from '@/components/date-planning/preferences/preferencesData';
 
 interface UsePreferencesStateProps {
@@ -51,6 +52,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
 
   const [userModifiedDate, setUserModifiedDate] = useState(false);
   const [userModifiedTime, setUserModifiedTime] = useState(false);
@@ -297,6 +299,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         preferred_price_range: selectedPriceRange, preferred_times: selectedTimePreferences,
         max_distance: maxDistance, dietary_restrictions: selectedDietary,
         preferred_date: selectedDate, preferred_time: selectedTime,
+        occasion: selectedOccasion,
       });
       setHasSubmitted(true);
     } catch (error) {
@@ -305,7 +308,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, selectedCuisines, selectedVibes, selectedPriceRange, selectedTimePreferences, maxDistance, selectedDietary, selectedDate, selectedTime, planningMode, sessionId, collaborativeSession, partnerName, onPreferencesComplete]);
+  }, [user?.id, selectedCuisines, selectedVibes, selectedPriceRange, selectedTimePreferences, maxDistance, selectedDietary, selectedDate, selectedTime, selectedOccasion, planningMode, sessionId, collaborativeSession, partnerName, onPreferencesComplete]);
 
   return {
     // State
@@ -313,6 +316,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     selectedDuration, selectedCuisines, selectedVibes, selectedPriceRange,
     selectedTimePreferences, maxDistance, setMaxDistance, selectedDietary,
     selectedDate, selectedTime, selectedTemplateId,
+    selectedOccasion, setSelectedOccasion,
     autoNavigating, timeoutTriggered, openSections,
     // Derived
     durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,
