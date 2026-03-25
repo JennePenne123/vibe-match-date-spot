@@ -217,9 +217,48 @@ const VenueSwipeCards: React.FC<VenueSwipeCardsProps> = ({ data, onChange, dista
               <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
                 <span>1 km</span>
                 <span>20 km</span>
-              </div>
             </div>
           </div>
+
+          {/* Optional GPS location */}
+          <div className="w-full border-t border-border/20 pt-4">
+            {locationStatus === 'granted' ? (
+              <div className="flex items-center justify-center gap-2 text-xs text-primary">
+                <Navigation className="w-3.5 h-3.5" />
+                <span className="font-medium">Standort erfasst ✓</span>
+              </div>
+            ) : locationStatus === 'denied' ? (
+              <p className="text-xs text-muted-foreground/60 text-center">
+                Kein Problem – die KI nutzt dann allgemeine Empfehlungen.
+              </p>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs text-muted-foreground hover:text-foreground"
+                disabled={locationStatus === 'loading'}
+                onClick={() => {
+                  setLocationStatus('loading');
+                  navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                      setLocationStatus('granted');
+                      onLocationCaptured?.(pos.coords.latitude, pos.coords.longitude);
+                    },
+                    () => setLocationStatus('denied'),
+                    { timeout: 10000, enableHighAccuracy: false }
+                  );
+                }}
+              >
+                {locationStatus === 'loading' ? (
+                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                ) : (
+                  <Navigation className="w-3.5 h-3.5 mr-1.5" />
+                )}
+                Standort freigeben (optional)
+              </Button>
+            )}
+          </div>
+        </div>
         </div>
       )}
     </div>
