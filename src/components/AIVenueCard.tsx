@@ -171,15 +171,6 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
             )}
           </div>
 
-          {/* Confidence meter — shows how sure the AI is */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
-            <motion.div 
-              className={`h-full ${confPercent >= 70 ? 'bg-emerald-400' : confPercent >= 40 ? 'bg-amber-400' : 'bg-red-400'}`}
-              initial={{ width: 0 }}
-              animate={{ width: `${confPercent}%` }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            />
-          </div>
 
           {/* Voucher badges */}
           {vouchers.length > 0 && (
