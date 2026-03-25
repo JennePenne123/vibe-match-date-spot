@@ -169,7 +169,14 @@ function inferCuisineFromVenue(venue: any): string | null {
 }
 
 
-export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string) => {
+export interface SessionPriorityWeights {
+  cuisine?: number;
+  vibe?: number;
+  price?: number;
+  location?: number;
+}
+
+export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string, priorityWeights?: SessionPriorityWeights) => {
   try {
     // Pre-filter: remove delivery services and supermarkets
     const filteredVenues = venues.filter(v => {
@@ -269,37 +276,48 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
         }
       }
 
-      // Cuisine matching (40% weight) - strongest signal, use effectiveCuisine for inferred data
+      // Priority weight multipliers (default 1.0 if not set)
+      const pw = {
+        cuisine: priorityWeights?.cuisine ?? 1.0,
+        vibe: priorityWeights?.vibe ?? 1.0,
+        price: priorityWeights?.price ?? 1.0,
+        location: priorityWeights?.location ?? 1.0,
+      };
+
+      // Cuisine matching (base 40% × priority weight)
+      const cuisineBase = 40 * pw.cuisine;
       if (hasCuisinePrefs && effectiveCuisine) {
-        maxPossible += 40;
+        maxPossible += cuisineBase;
         const cuisineScore = cuisineMatchScore(effectiveCuisine, userPrefs.preferred_cuisines || []);
         if (cuisineScore > 0) {
-          score += cuisineScore * 40;
+          score += cuisineScore * cuisineBase;
           primaryMatchFound = true;
         } else {
-          score -= 15;
+          score -= 15 * pw.cuisine;
         }
       }
 
-      // Price range matching (25% weight) - use normalized price symbols
+      // Price range matching (base 25% × priority weight)
+      const priceBase = 25 * pw.price;
       const effectivePrice = venue.price_range || (inferredPriceRange.length > 0 ? inferredPriceRange[0] : null);
       if (hasPricePrefs && effectivePrice) {
-        maxPossible += 25;
+        maxPossible += priceBase;
         if (normalizedPricePrefs.includes(effectivePrice)) {
-          score += 25;
+          score += priceBase;
         } else {
           const priceOrder = ['$', '$$', '$$$', '$$$$'];
           const venueIdx = priceOrder.indexOf(effectivePrice);
           const prefIdxes = normalizedPricePrefs.map((p: string) => priceOrder.indexOf(p));
           const minDist = Math.min(...prefIdxes.map((pi: number) => Math.abs(pi - venueIdx)));
-          if (minDist === 1) score += 15;
-          else score -= 3;
+          if (minDist === 1) score += priceBase * 0.6;
+          else score -= 3 * pw.price;
         }
       }
 
-      // Vibe/tag matching (15% weight) - use inferred vibes for sparse data
+      // Vibe/tag matching (base 15% × priority weight)
+      const vibeBase = 15 * pw.vibe;
       if (hasVibePrefs) {
-        maxPossible += 15;
+        maxPossible += vibeBase;
         const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase());
         const allVibes = [...venueTags, ...inferredVibes]; // Enrich with inferred vibes
         const prefVibes = userPrefs.preferred_vibes.map((v: string) => v.toLowerCase());
@@ -307,7 +325,7 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           prefVibes.some((vibe: string) => tag.includes(vibe) || vibe.includes(tag))
         );
         if (vibeMatches.length > 0) {
-          score += Math.min(15, vibeMatches.length * 6);
+          score += Math.min(vibeBase, vibeMatches.length * 6 * pw.vibe);
         } else {
           // Soft inference from price/cuisine as last resort
           let inferred = false;

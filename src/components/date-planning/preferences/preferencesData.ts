@@ -38,6 +38,12 @@ export interface DatePreferences {
   preferred_date?: Date;
   preferred_time?: string;
   occasion?: DateOccasion | null;
+  priority_weights?: {
+    cuisine: number;
+    vibe: number;
+    price: number;
+    location: number;
+  };
 }
 
 export interface DurationModel {

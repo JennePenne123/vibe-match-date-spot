@@ -10,6 +10,7 @@ import {
 } from '@/components/date-planning/preferences/preferencesData';
 import type { DailyMood } from '@/pages/MoodCheckIn';
 import { getTodayMoodFromStorage } from '@/components/date-planning/preferences/MoodPicker';
+import { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 
 interface UsePreferencesStateProps {
   sessionId: string;
@@ -56,6 +57,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
   const [selectedMood, setSelectedMood] = useState<DailyMood | null>(() => getTodayMoodFromStorage());
+  const [priorityWeights, setPriorityWeights] = useState<PriorityWeights>(DEFAULT_PRIORITY_WEIGHTS);
 
   const [userModifiedDate, setUserModifiedDate] = useState(false);
   const [userModifiedTime, setUserModifiedTime] = useState(false);
@@ -303,6 +305,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         max_distance: maxDistance, dietary_restrictions: selectedDietary,
         preferred_date: selectedDate, preferred_time: selectedTime,
         occasion: selectedOccasion,
+        priority_weights: priorityWeights,
       });
       setHasSubmitted(true);
     } catch (error) {
@@ -311,7 +314,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, selectedCuisines, selectedVibes, selectedPriceRange, selectedTimePreferences, maxDistance, selectedDietary, selectedDate, selectedTime, selectedOccasion, planningMode, sessionId, collaborativeSession, partnerName, onPreferencesComplete]);
+  }, [user?.id, selectedCuisines, selectedVibes, selectedPriceRange, selectedTimePreferences, maxDistance, selectedDietary, selectedDate, selectedTime, selectedOccasion, priorityWeights, planningMode, sessionId, collaborativeSession, partnerName, onPreferencesComplete]);
 
   return {
     // State
@@ -321,6 +324,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     selectedDate, selectedTime, selectedTemplateId,
     selectedOccasion, setSelectedOccasion,
     selectedMood, setSelectedMood,
+    priorityWeights, setPriorityWeights,
     autoNavigating, timeoutTriggered, openSections,
     // Derived
     durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,

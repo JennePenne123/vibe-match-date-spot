@@ -1,6 +1,6 @@
 import { calculateVenueAIScore, calculateConfidenceLevel } from './scoring';
 import { getActiveVenues, getStoredAIScore } from './fetching';
-import { filterVenuesByPreferences, filterVenuesByCollaborativePreferences, AREA_VIBE_MAP } from './preferenceFiltering';
+import { filterVenuesByPreferences, filterVenuesByCollaborativePreferences, AREA_VIBE_MAP, type SessionPriorityWeights } from './preferenceFiltering';
 import { calculateDistanceFromHamburg } from './helperFunctions';
 import { getRealtimeContextScore } from './contextScoring';
 import { getRepeatProtectionModifier } from './repeatProtection';
@@ -51,7 +51,8 @@ export const getAIVenueRecommendations = async (
   limit: number = 6,
   userLocation?: { latitude: number; longitude: number; address?: string },
   selectedArea?: string,
-  occasion?: DateOccasion | null
+  occasion?: DateOccasion | null,
+  priorityWeights?: SessionPriorityWeights
 ): Promise<AIVenueRecommendation[]> => {
   try {
     // Get venues using hybrid multi-source strategy
@@ -73,7 +74,7 @@ export const getAIVenueRecommendations = async (
     if (partnerId) {
       venues = await filterVenuesByCollaborativePreferences(userId, partnerId, venues);
     } else {
-      venues = await filterVenuesByPreferences(userId, venues, selectedArea);
+      venues = await filterVenuesByPreferences(userId, venues, selectedArea, priorityWeights);
     }
 
     const recommendations: AIVenueRecommendation[] = [];
