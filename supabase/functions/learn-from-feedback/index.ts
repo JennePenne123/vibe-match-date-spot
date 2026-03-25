@@ -200,6 +200,14 @@ serve(async (req) => {
       newWeights.cuisine = adjustWeight(oldWeights.cuisine || 1.0, hadCuisineMatch ? 'boost' : 'neutral', lr, intensity);
       newWeights.vibe = adjustWeight(oldWeights.vibe || 1.0, hadVibeMatch ? 'boost' : 'neutral', lr, intensity);
       newWeights.price = adjustWeight(oldWeights.price || 1.0, hadPriceMatch ? 'boost' : 'neutral', lr, intensity);
+      // Distance learning: if venue was close and rated well, boost distance weight
+      const venueDistKm = contextData?.venue_distance_km;
+      if (typeof venueDistKm === 'number' && venueDistKm <= 3) {
+        newWeights.distance = adjustWeight(oldWeights.distance || 1.0, 'boost', lr, intensity * 0.5);
+      } else if (typeof venueDistKm === 'number' && venueDistKm > 8 && actualRating >= 4) {
+        // User is happy with far venues → reduce distance weight (they don't mind traveling)
+        newWeights.distance = adjustWeight(oldWeights.distance || 1.0, 'reduce', lr, intensity * 0.3);
+      }
       // If highly rated, also boost general rating weight
       if (actualRating === 5) {
         newWeights.rating = adjustWeight(oldWeights.rating || 1.0, 'boost', lr, 0.8);
@@ -217,6 +225,11 @@ serve(async (req) => {
       newWeights.cuisine = adjustWeight(oldWeights.cuisine || 1.0, hadCuisineMatch ? 'reduce' : 'boost', lr, intensity);
       newWeights.vibe = adjustWeight(oldWeights.vibe || 1.0, hadVibeMatch ? 'reduce' : 'boost', lr, intensity);
       newWeights.price = adjustWeight(oldWeights.price || 1.0, hadPriceMatch ? 'reduce' : 'boost', lr, intensity);
+      // Distance learning: if far venue was rated badly, boost distance weight (proximity matters more)
+      const venueDistKmFail = contextData?.venue_distance_km;
+      if (typeof venueDistKmFail === 'number' && venueDistKmFail > 5) {
+        newWeights.distance = adjustWeight(oldWeights.distance || 1.0, 'boost', lr, intensity * 0.5);
+      }
       // Strong negative + wouldn't recommend: extra penalty
       if (wouldRecommend === false && actualRating <= 2) {
         const penalty = lr * 0.3;
