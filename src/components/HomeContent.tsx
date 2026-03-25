@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useFriends } from '@/hooks/useFriends';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2, Lightbulb } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Sparkles, Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2, Lightbulb, Star, Compass } from 'lucide-react';
 import { motion } from 'framer-motion';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
@@ -14,6 +16,7 @@ import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import FeedbackImpactBanner from '@/components/home/FeedbackImpactBanner';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { useHomeTipVenues } from '@/hooks/useHomeTipVenues';
 import { supabase } from '@/integrations/supabase/client';
 
 const QUOTES = [
@@ -36,23 +39,10 @@ const DAILY_TIPS = [
   { emoji: '🌿', tip: 'Natur tanken — Parks & Gärten sind unterschätzt', category: 'outdoor' },
 ];
 
-const CITY_TIPS: { title: string; desc: string; icon: typeof MapPin; label: string }[] = [
-  { icon: MapPin, label: 'Heute', title: 'Street-Food-Markt entdecken', desc: 'Probiert euch durch lokale Köstlichkeiten unter freiem Himmel' },
-  { icon: Heart, label: 'Morgen', title: 'Sunset-Spaziergang am Fluss', desc: 'Golden Hour genießen — perfekt für entspannte Gespräche' },
-  { icon: Zap, label: 'Heute', title: 'Pop-up Gallery besuchen', desc: 'Kunst & Kultur als Inspiration für euren Abend' },
-  { icon: MapPin, label: 'Morgen', title: 'Geheimtipp-Café ausprobieren', desc: 'Specialty Coffee in gemütlichem Ambiente — ideal für ein Nachmittags-Date' },
-  { icon: Heart, label: 'Heute', title: 'Rooftop-Bar mit Ausblick', desc: 'Cocktails mit Panoramablick auf die Stadt' },
-  { icon: Zap, label: 'Morgen', title: 'Kochkurs für Zwei', desc: 'Gemeinsam kochen verbindet — und schmeckt!' },
-  { icon: MapPin, label: 'Heute', title: 'Vintage-Markt durchstöbern', desc: 'Schätze finden und dabei Quality-Time genießen' },
-  { icon: Heart, label: 'Morgen', title: 'Botanischer Garten erkunden', desc: 'Ruhe & Natur mitten in der Stadt — unterschätzt romantisch' },
-  { icon: Zap, label: 'Heute', title: 'Live-Musik in der Altstadt', desc: 'Jazz, Indie oder Klassik — lasst euch überraschen' },
-  { icon: MapPin, label: 'Morgen', title: 'Brunch-Spot entdecken', desc: 'Gemütlich in den Tag starten mit Avocado-Toast & Co.' },
-];
-
 const getDailyIndex = (offset: number) => {
   const now = new Date();
   const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-  return (dayOfYear + offset) % CITY_TIPS.length;
+  return dayOfYear + offset;
 };
 
 const HomeContent: React.FC = () => {
