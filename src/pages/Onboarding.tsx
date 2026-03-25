@@ -23,9 +23,10 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
-  const [step, setStep] = useState(0); // 0 = welcome, 1-7 = steps
+  const [step, setStep] = useState(0); // 0 = welcome, 1-6 = steps
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [microFeedback, setMicroFeedback] = useState<string | null>(null);
 
   // Referral tracking
   const [referrerId, setReferrerId] = useState<string | null>(null);
@@ -82,15 +83,39 @@ const Onboarding = () => {
   }, [searchParams]);
 
   const handleAdoptPreferences = (prefs: AdoptedPreferences) => {
-    // Merge referrer's preferences with user's current selections
     setSelectedCuisines(prev => Array.from(new Set([...prev, ...prefs.cuisines])));
     setSelectedVibes(prev => Array.from(new Set([...prev, ...prefs.vibes])));
+    if (prefs.personalityTraits) {
+      setPersonality(prefs.personalityTraits);
+    }
+    if (prefs.maxDistance) {
+      setDistanceKm(prefs.maxDistance);
+    }
     setReferralAdopted(true);
+  };
+
+  const stepFeedback: Record<number, string> = {
+    1: '🧠 Die KI versteht deine Persönlichkeit!',
+    2: '💕 Perfekt – dein Ziel ist gesetzt!',
+    3: '🎯 Lifestyle-Daten erfasst!',
+    4: '✨ Szenarien analysiert – schon 60% genauer!',
+    5: '🍜 Geschmack erkannt – fast fertig!',
+    6: '🎉 Alle Signale erfasst!',
   };
 
   const animateTransition = useCallback((nextStep: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
+
+    // Show micro-feedback for the step we're leaving (only when going forward)
+    if (nextStep > step && step > 0) {
+      const msg = stepFeedback[step];
+      if (msg) {
+        setMicroFeedback(msg);
+        setTimeout(() => setMicroFeedback(null), 1800);
+      }
+    }
+
     setTimeout(() => {
       setStep(nextStep);
       setIsAnimating(false);
@@ -268,6 +293,15 @@ const Onboarding = () => {
       {/* Subtle background */}
       <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 -right-20 w-72 h-72 bg-accent/5 rounded-full blur-3xl" />
+
+      {/* Micro-feedback toast */}
+      {microFeedback && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="bg-card/90 backdrop-blur-md border border-primary/20 rounded-full px-4 py-2 shadow-lg">
+            <span className="text-sm font-medium text-foreground">{microFeedback}</span>
+          </div>
+        </div>
+      )}
 
       <div className="w-full max-w-md mx-auto relative z-10 flex flex-col flex-1">
         {/* Skip button */}
