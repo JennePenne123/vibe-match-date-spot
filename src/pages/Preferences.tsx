@@ -533,6 +533,18 @@ const Preferences = () => {
               <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
                 <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
               </AccordionSection>
+
+              <AccordionSection title="Anlass" icon={<Sparkles className="w-5 h-5 text-primary" />} selectedCount={selectedOccasion ? 1 : 0}>
+                <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
+              </AccordionSection>
+
+              <AccordionSection title="Stimmung" icon={<SmilePlus className="w-5 h-5 text-primary" />} selectedCount={selectedMood ? 1 : 0}>
+                <MoodPicker selectedMood={selectedMood} onSelectMood={setSelectedMood} />
+              </AccordionSection>
+
+              <AccordionSection title="Prioritäten" icon={<SlidersHorizontal className="w-5 h-5 text-primary" />} selectedCount={Object.values(priorityWeights).filter(v => v !== 1.0).length}>
+                <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
+              </AccordionSection>
             </>
           )}
 
