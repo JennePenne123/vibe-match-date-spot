@@ -158,6 +158,12 @@ const Onboarding = () => {
         }
       }
 
+      // Show celebration toast
+      toast({
+        title: '🎉 Profil komplett!',
+        description: 'Die KI kennt dich jetzt – deine ersten personalisierten Empfehlungen warten!',
+      });
+
       navigate('/home', { replace: true });
     } catch (error) {
       console.error('Error saving onboarding data:', error);
@@ -282,7 +288,7 @@ function WelcomeScreen() {
       </h1>
 
       <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-        In 2 Minuten lernen wir dich kennen – damit wir dir von Anfang an die besten Date-Ideen vorschlagen können.
+        In unter 60 Sekunden lernen wir dich kennen – damit die KI dir sofort die besten Date-Ideen vorschlagen kann.
       </p>
 
       <div className="flex items-center gap-2 mt-6 text-xs text-muted-foreground/60">
