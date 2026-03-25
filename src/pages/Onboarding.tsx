@@ -320,7 +320,7 @@ const Onboarding = () => {
             </>
           )}
           {step === 6 && (
-            <VenueSwipeCards data={venueSwipeData} onChange={setVenueSwipeData} distanceKm={distanceKm} onDistanceChange={setDistanceKm} />
+            <VenueSwipeCards data={venueSwipeData} onChange={setVenueSwipeData} distanceKm={distanceKm} onDistanceChange={setDistanceKm} onLocationCaptured={(lat, lng) => setUserLocation({ lat, lng })} />
           )}
         </div>
 
