@@ -198,6 +198,16 @@ export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEnt
     console.error('Error fetching profiles for leaderboard:', profilesError);
   }
 
+  // Fetch premium status for leaderboard users
+  const { data: premiumData } = await supabase
+    .from('user_points')
+    .select('user_id, premium_until')
+    .in('user_id', userIds);
+
+  const premiumMap = new Map(
+    (premiumData || []).map(p => [p.user_id, (p as any).premium_until as string | null])
+  );
+
   // Combine the data
   const profilesMap = new Map(
     (profilesData || []).map(p => [p.id, { name: p.name, avatar_url: p.avatar_url || undefined }])
@@ -208,6 +218,7 @@ export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEnt
     total_points: entry.total_points,
     level: entry.level,
     streak_count: entry.streak_count,
+    premium_until: premiumMap.get(entry.user_id) || null,
     profile: profilesMap.get(entry.user_id) || { name: 'Unknown User', avatar_url: undefined }
   }));
 };
