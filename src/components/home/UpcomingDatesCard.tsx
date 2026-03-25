@@ -123,8 +123,6 @@ const UpcomingDatesCard: React.FC = () => {
             icon={Calendar}
             title={t('home.noUpcomingDates')}
             description={t('home.acceptedDatesHint')}
-            actionLabel="Date planen"
-            onAction={() => navigate('/preferences')}
             variant="minimal"
             className="py-6"
           />
