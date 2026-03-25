@@ -219,6 +219,9 @@ const Preferences = () => {
   const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
   const [locationError, setLocationError] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
+  const [selectedMood, setSelectedMood] = useState<DailyMood | null>(null);
+  const [priorityWeights, setPriorityWeights] = useState<PriorityWeights>({ ...DEFAULT_PRIORITY_WEIGHTS });
 
   useEffect(() => {
     const loadExistingPreferences = async () => {
