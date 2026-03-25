@@ -18,9 +18,6 @@ import QuickStartTemplates from './preferences/QuickStartTemplates';
 import DateTimePicker from './preferences/DateTimePicker';
 import { WaitingForPartner, AIAnalysisOverlay, RedirectingOverlay, SoloAIStatus } from './preferences/CollaborativeOverlays';
 
-// Re-export types for consumers
-export type { PreferencesStepProps } from './preferences/preferencesData';
-
 export interface PreferencesStepProps {
   sessionId: string;
   partnerId: string;
