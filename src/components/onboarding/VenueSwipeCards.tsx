@@ -1,0 +1,226 @@
+import React, { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { ThumbsUp, ThumbsDown, Sparkles } from 'lucide-react';
+
+export interface VenueSwipeData {
+  liked: string[];    // venue style IDs the user liked
+  disliked: string[]; // venue style IDs the user disliked
+}
+
+interface VenueSwipeCardsProps {
+  data: VenueSwipeData;
+  onChange: (data: VenueSwipeData) => void;
+}
+
+// Representative venue "cards" that encode cuisine, vibe, and price signals
+const venueCards = [
+  {
+    id: 'italian-romantic',
+    name: 'La Bella Vita',
+    emoji: '🕯️🍝',
+    vibe: 'Romantisches Candle-Light-Dinner',
+    cuisine: 'italian',
+    price: '$$$',
+    vibes: ['romantic', 'elegant'],
+    tags: ['Italian', 'Fine Dining'],
+  },
+  {
+    id: 'street-food-casual',
+    name: 'Street Bites Market',
+    emoji: '🌮🎉',
+    vibe: 'Lebhafter Street-Food-Markt',
+    cuisine: 'mexican',
+    price: '$',
+    vibes: ['casual', 'lively'],
+    tags: ['Street Food', 'Casual'],
+  },
+  {
+    id: 'sushi-trendy',
+    name: 'Omakase House',
+    emoji: '🍣✨',
+    vibe: 'Trendiges Sushi-Erlebnis',
+    cuisine: 'japanese',
+    price: '$$$$',
+    vibes: ['trendy', 'elegant'],
+    tags: ['Japanese', 'Omakase'],
+  },
+  {
+    id: 'biergarten-outdoor',
+    name: 'Zum Alten Biergarten',
+    emoji: '🍺🌳',
+    vibe: 'Gemütlicher Biergarten im Freien',
+    cuisine: 'german',
+    price: '$$',
+    vibes: ['outdoor', 'casual', 'cozy'],
+    tags: ['German', 'Beer Garden'],
+  },
+  {
+    id: 'cocktail-nightlife',
+    name: 'Noir Speakeasy',
+    emoji: '🍸🌃',
+    vibe: 'Versteckte Cocktailbar mit Live-Jazz',
+    cuisine: 'bar',
+    price: '$$$',
+    vibes: ['nightlife', 'adventurous'],
+    tags: ['Cocktails', 'Live Music'],
+  },
+  {
+    id: 'thai-cozy',
+    name: 'Lotus Garden',
+    emoji: '🍜🕯️',
+    vibe: 'Gemütliches Thai-Restaurant',
+    cuisine: 'thai',
+    price: '$$',
+    vibes: ['cozy', 'casual'],
+    tags: ['Thai', 'Cozy'],
+  },
+];
+
+const VenueSwipeCards: React.FC<VenueSwipeCardsProps> = ({ data, onChange }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleSwipe = (direction: 'like' | 'dislike') => {
+    const card = venueCards[currentIndex];
+    if (!card) return;
+
+    const newData = { ...data };
+    if (direction === 'like') {
+      newData.liked = [...newData.liked.filter(id => id !== card.id), card.id];
+      newData.disliked = newData.disliked.filter(id => id !== card.id);
+    } else {
+      newData.disliked = [...newData.disliked.filter(id => id !== card.id), card.id];
+      newData.liked = newData.liked.filter(id => id !== card.id);
+    }
+
+    onChange(newData);
+    setCurrentIndex(prev => prev + 1);
+  };
+
+  const totalSwiped = data.liked.length + data.disliked.length;
+  const allDone = currentIndex >= venueCards.length;
+
+  return (
+    <div className="space-y-4">
+      <div className="text-center mb-4">
+        <h2 className="text-xl font-bold text-foreground mb-1.5">
+          Was gefällt dir?
+        </h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Swipe durch Venue-Ideen – die KI lernt sofort deinen Geschmack.
+        </p>
+      </div>
+
+      {!allDone ? (
+        <>
+          {/* Progress dots */}
+          <div className="flex justify-center gap-1.5 mb-3">
+            {venueCards.map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  'w-2 h-2 rounded-full transition-all duration-300',
+                  i < currentIndex
+                    ? data.liked.includes(venueCards[i].id)
+                      ? 'bg-green-400'
+                      : 'bg-red-400/60'
+                    : i === currentIndex
+                    ? 'bg-primary w-4'
+                    : 'bg-muted-foreground/20'
+                )}
+              />
+            ))}
+          </div>
+
+          {/* Current card */}
+          <div className="relative flex justify-center">
+            <div className="w-full max-w-[280px] rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 text-center shadow-lg">
+              <div className="text-5xl mb-3">{venueCards[currentIndex].emoji}</div>
+              <h3 className="text-lg font-bold text-foreground mb-1">
+                {venueCards[currentIndex].name}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                {venueCards[currentIndex].vibe}
+              </p>
+              <div className="flex justify-center gap-2 flex-wrap">
+                {venueCards[currentIndex].tags.map(tag => (
+                  <span
+                    key={tag}
+                    className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary/80 font-medium"
+                  >
+                    {tag}
+                  </span>
+                ))}
+                <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                  {venueCards[currentIndex].price}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Swipe buttons */}
+          <div className="flex justify-center gap-6 mt-4">
+            <button
+              onClick={() => handleSwipe('dislike')}
+              className="w-14 h-14 rounded-full border-2 border-red-400/40 bg-red-400/10 flex items-center justify-center transition-all duration-200 active:scale-90 hover:bg-red-400/20"
+            >
+              <ThumbsDown className="w-6 h-6 text-red-400" />
+            </button>
+            <button
+              onClick={() => handleSwipe('like')}
+              className="w-14 h-14 rounded-full border-2 border-green-400/40 bg-green-400/10 flex items-center justify-center transition-all duration-200 active:scale-90 hover:bg-green-400/20"
+            >
+              <ThumbsUp className="w-6 h-6 text-green-400" />
+            </button>
+          </div>
+        </>
+      ) : (
+        /* Completion state */
+        <div className="flex flex-col items-center py-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Sparkles className="w-7 h-7 text-primary" />
+          </div>
+          <h3 className="text-lg font-bold text-foreground mb-1">
+            Super, {totalSwiped} Signale erfasst!
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Die KI versteht deinen Geschmack jetzt deutlich besser.
+          </p>
+          <div className="flex gap-3 mt-4 text-sm">
+            <span className="text-green-400 font-medium">👍 {data.liked.length} gefällt</span>
+            <span className="text-muted-foreground">·</span>
+            <span className="text-red-400/80 font-medium">👎 {data.disliked.length} nicht so</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default VenueSwipeCards;
+
+/**
+ * Derives AI-relevant preferences from swipe data.
+ * Used after onboarding to enrich cold-start signals.
+ */
+export function deriveSwipePreferences(data: VenueSwipeData) {
+  const likedCards = venueCards.filter(c => data.liked.includes(c.id));
+  const dislikedCards = venueCards.filter(c => data.disliked.includes(c.id));
+
+  const likedCuisines = [...new Set(likedCards.map(c => c.cuisine).filter(Boolean))];
+  const dislikedCuisines = [...new Set(dislikedCards.map(c => c.cuisine).filter(Boolean))];
+  const likedVibes = [...new Set(likedCards.flatMap(c => c.vibes))];
+  const likedPrices = [...new Set(likedCards.map(c => c.price))];
+
+  // Infer price preference
+  const priceMap: Record<string, string> = {
+    '$': 'budget', '$$': 'moderate', '$$$': 'upscale', '$$$$': 'luxury'
+  };
+  const inferredPrices = likedPrices.map(p => priceMap[p]).filter(Boolean);
+
+  return {
+    likedCuisines,
+    dislikedCuisines,
+    likedVibes,
+    inferredPrices,
+  };
+}
