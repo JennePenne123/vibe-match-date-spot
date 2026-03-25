@@ -52,6 +52,7 @@ const HomeContent: React.FC = () => {
   const { toast } = useToast();
   const { friends } = useFriends();
   const { isMobile, isDesktop } = useBreakpoint();
+  const { dailyTipVenue, cityTipVenues, loading: tipsLoading } = useHomeTipVenues();
 
   const [showPartnerSelection, setShowPartnerSelection] = useState(false);
   const [showProposalCreation, setShowProposalCreation] = useState(false);
