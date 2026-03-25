@@ -555,7 +555,7 @@ const Preferences = () => {
           )}
 
           {/* Step 2: Praktisches */}
-          {step === 1 && (
+          {step === 2 && (
             <>
               <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length} defaultOpen>
                 <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
