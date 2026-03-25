@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ThumbsUp, ThumbsDown, Sparkles } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Sparkles, MapPin } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 export interface VenueSwipeData {
   liked: string[];    // venue style IDs the user liked
@@ -10,6 +11,8 @@ export interface VenueSwipeData {
 interface VenueSwipeCardsProps {
   data: VenueSwipeData;
   onChange: (data: VenueSwipeData) => void;
+  distanceKm: number;
+  onDistanceChange: (km: number) => void;
 }
 
 // Representative venue "cards" that encode cuisine, vibe, and price signals
