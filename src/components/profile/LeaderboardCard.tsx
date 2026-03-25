@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import PremiumBadge from '@/components/PremiumBadge';
 import { Crown, TrendingUp } from 'lucide-react';
 import { getLeaderboard, type LeaderboardEntry } from '@/services/pointsService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -116,10 +117,11 @@ export const LeaderboardCard: React.FC = () => {
 
                     {/* Name and Level */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate">
+                      <p className="font-semibold text-sm truncate flex items-center gap-1.5">
                         {entry.profile?.name || 'Anonymous'}
+                        <PremiumBadge premiumUntil={entry.premium_until} size="sm" showLabel={false} />
                         {isCurrentUser && (
-                          <Badge variant="secondary" className="ml-2 text-xs">
+                          <Badge variant="secondary" className="ml-1 text-xs">
                             You
                           </Badge>
                         )}
