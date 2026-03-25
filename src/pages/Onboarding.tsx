@@ -294,6 +294,15 @@ const Onboarding = () => {
       <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 -right-20 w-72 h-72 bg-accent/5 rounded-full blur-3xl" />
 
+      {/* Micro-feedback toast */}
+      {microFeedback && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="bg-card/90 backdrop-blur-md border border-primary/20 rounded-full px-4 py-2 shadow-lg">
+            <span className="text-sm font-medium text-foreground">{microFeedback}</span>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-md mx-auto relative z-10 flex flex-col flex-1">
         {/* Skip button */}
         {step > 0 && (
