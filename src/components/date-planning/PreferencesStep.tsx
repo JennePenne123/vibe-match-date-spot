@@ -114,6 +114,9 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         {/* Mood */}
         <MoodPicker selectedMood={selectedMood} onSelectMood={setSelectedMood} />
 
+        {/* Priority Weights */}
+        <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
+
         {/* Quick Start + Sections — only after duration selected */}
         {selectedDuration && (
           <>
