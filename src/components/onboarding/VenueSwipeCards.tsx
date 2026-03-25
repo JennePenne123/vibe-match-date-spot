@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ThumbsUp, ThumbsDown, Sparkles } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Sparkles, MapPin } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 export interface VenueSwipeData {
   liked: string[];    // venue style IDs the user liked
@@ -10,6 +11,8 @@ export interface VenueSwipeData {
 interface VenueSwipeCardsProps {
   data: VenueSwipeData;
   onChange: (data: VenueSwipeData) => void;
+  distanceKm: number;
+  onDistanceChange: (km: number) => void;
 }
 
 // Representative venue "cards" that encode cuisine, vibe, and price signals
@@ -76,7 +79,7 @@ const venueCards = [
   },
 ];
 
-const VenueSwipeCards: React.FC<VenueSwipeCardsProps> = ({ data, onChange }) => {
+const VenueSwipeCards: React.FC<VenueSwipeCardsProps> = ({ data, onChange, distanceKm, onDistanceChange }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleSwipe = (direction: 'like' | 'dislike') => {
@@ -174,21 +177,46 @@ const VenueSwipeCards: React.FC<VenueSwipeCardsProps> = ({ data, onChange }) => 
           </div>
         </>
       ) : (
-        /* Completion state */
-        <div className="flex flex-col items-center py-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <Sparkles className="w-7 h-7 text-primary" />
+        /* Completion state + distance slider */
+        <div className="flex flex-col items-center py-4 text-center space-y-5">
+          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+            <Sparkles className="w-6 h-6 text-primary" />
           </div>
-          <h3 className="text-lg font-bold text-foreground mb-1">
-            Super, {totalSwiped} Signale erfasst!
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Die KI versteht deinen Geschmack jetzt deutlich besser.
-          </p>
-          <div className="flex gap-3 mt-4 text-sm">
-            <span className="text-green-400 font-medium">👍 {data.liked.length} gefällt</span>
-            <span className="text-muted-foreground">·</span>
-            <span className="text-red-400/80 font-medium">👎 {data.disliked.length} nicht so</span>
+          <div>
+            <h3 className="text-lg font-bold text-foreground mb-1">
+              Super, {totalSwiped} Signale erfasst!
+            </h3>
+            <div className="flex gap-3 text-sm justify-center">
+              <span className="text-green-400 font-medium">👍 {data.liked.length} gefällt</span>
+              <span className="text-muted-foreground">·</span>
+              <span className="text-red-400/80 font-medium">👎 {data.disliked.length} nicht so</span>
+            </div>
+          </div>
+
+          {/* Integrated distance preference */}
+          <div className="w-full border-t border-border/20 pt-5">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <MapPin className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-foreground">Wie weit darf's sein?</span>
+            </div>
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <span className="text-2xl font-bold text-foreground">{distanceKm}</span>
+              <span className="text-sm text-muted-foreground">km</span>
+            </div>
+            <div className="w-full max-w-[260px] mx-auto px-2">
+              <Slider
+                value={[distanceKm]}
+                onValueChange={([val]) => onDistanceChange(val)}
+                min={1}
+                max={20}
+                step={1}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
+                <span>1 km</span>
+                <span>20 km</span>
+              </div>
+            </div>
           </div>
         </div>
       )}
