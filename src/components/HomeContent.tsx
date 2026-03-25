@@ -132,17 +132,28 @@ const HomeContent: React.FC = () => {
     <main className="px-4 py-5 md:px-6 lg:px-8">
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto space-y-6"}>
 
-        {/* Daily AI Tip */}
+        {/* Daily AI Tip — with real venue */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <Card className="relative overflow-hidden border-border/50 bg-gradient-to-r from-primary/8 via-accent/5 to-transparent">
+          <Card 
+            className="relative overflow-hidden border-border/50 bg-gradient-to-r from-primary/8 via-accent/5 to-transparent cursor-pointer hover:border-primary/30 transition-all duration-300 active:scale-[0.98]"
+            onClick={dailyTipVenue ? () => handleVenueTipClick(dailyTipVenue.id) : undefined}
+          >
             <div className="absolute -top-6 -right-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
             <CardContent className="relative p-4 flex items-center gap-3.5">
               <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg">
-                {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}
+                {dailyTipVenue ? (
+                  dailyTipVenue.image_url ? (
+                    <img src={dailyTipVenue.image_url} alt="" className="w-10 h-10 rounded-xl object-cover" />
+                  ) : (
+                    <span className="text-lg">{DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}</span>
+                  )
+                ) : (
+                  <span className="text-lg">{DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}</span>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
@@ -150,11 +161,27 @@ const HomeContent: React.FC = () => {
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                     {t('home.dailyTipLabel')}
                   </span>
+                  {dailyTipVenue?.rating && (
+                    <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                      <Star className="w-2.5 h-2.5 fill-primary text-primary" />
+                      {dailyTipVenue.rating.toFixed(1)}
+                    </span>
+                  )}
                 </div>
-                <p className="text-sm font-medium text-foreground leading-snug">
-                  {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].tip}
-                </p>
+                {dailyTipVenue ? (
+                  <>
+                    <p className="text-sm font-medium text-foreground leading-snug truncate">{dailyTipVenue.name}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">
+                      {[dailyTipVenue.cuisine_type, dailyTipVenue.price_range].filter(Boolean).join(' · ')}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm font-medium text-foreground leading-snug">
+                    {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].tip}
+                  </p>
+                )}
               </div>
+              {dailyTipVenue && <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />}
             </CardContent>
           </Card>
         </motion.div>
