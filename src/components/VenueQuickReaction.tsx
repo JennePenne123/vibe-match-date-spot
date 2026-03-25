@@ -19,7 +19,7 @@ const VenueQuickReaction: React.FC<VenueQuickReactionProps> = ({ venueId, classN
     setLoading(true);
 
     try {
-      await recordVenueFeedback(venueId, type, { source: 'quick_reaction' });
+      await recordVenueFeedback(venueId, type, { source: 'quick_feedback' });
       setReaction(type);
       onReaction?.(type);
     } catch {
