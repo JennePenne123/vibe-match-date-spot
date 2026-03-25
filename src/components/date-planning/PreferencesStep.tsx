@@ -17,6 +17,7 @@ import DurationPicker from './preferences/DurationPicker';
 import QuickStartTemplates from './preferences/QuickStartTemplates';
 import DateTimePicker from './preferences/DateTimePicker';
 import OccasionPicker from './preferences/OccasionPicker';
+import MoodPicker from './preferences/MoodPicker';
 import { WaitingForPartner, AIAnalysisOverlay, RedirectingOverlay, SoloAIStatus } from './preferences/CollaborativeOverlays';
 
 export interface PreferencesStepProps {
@@ -53,6 +54,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     selectedTimePreferences, maxDistance, setMaxDistance, selectedDietary,
     selectedDate, selectedTime,
     selectedOccasion, setSelectedOccasion,
+    selectedMood, setSelectedMood,
     autoNavigating, timeoutTriggered, openSections,
     durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,
     toggleCuisine, toggleVibe, togglePrice, toggleTime, toggleDietary,
@@ -106,6 +108,9 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
         {/* Occasion */}
         <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
+
+        {/* Mood */}
+        <MoodPicker selectedMood={selectedMood} onSelectMood={setSelectedMood} />
 
         {/* Quick Start + Sections — only after duration selected */}
         {selectedDuration && (

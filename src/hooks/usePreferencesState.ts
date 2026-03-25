@@ -8,6 +8,8 @@ import {
   haveSame, type UserPreferences, type DatePreferences, type QuickStartTemplate,
   type DateOccasion,
 } from '@/components/date-planning/preferences/preferencesData';
+import type { DailyMood } from '@/pages/MoodCheckIn';
+import { getTodayMoodFromStorage } from '@/components/date-planning/preferences/MoodPicker';
 
 interface UsePreferencesStateProps {
   sessionId: string;
@@ -53,6 +55,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
+  const [selectedMood, setSelectedMood] = useState<DailyMood | null>(() => getTodayMoodFromStorage());
 
   const [userModifiedDate, setUserModifiedDate] = useState(false);
   const [userModifiedTime, setUserModifiedTime] = useState(false);
@@ -317,6 +320,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     selectedTimePreferences, maxDistance, setMaxDistance, selectedDietary,
     selectedDate, selectedTime, selectedTemplateId,
     selectedOccasion, setSelectedOccasion,
+    selectedMood, setSelectedMood,
     autoNavigating, timeoutTriggered, openSections,
     // Derived
     durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,
