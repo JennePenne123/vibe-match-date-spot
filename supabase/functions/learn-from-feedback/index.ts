@@ -156,12 +156,20 @@ serve(async (req) => {
       throw learningError;
     }
 
-    // --- ADAPTIVE WEIGHT UPDATE ---
+    // --- ADAPTIVE WEIGHT UPDATE WITH TEMPORAL DECAY ---
     const { data: existingVector } = await supabase
       .from('user_preference_vectors')
       .select('*')
       .eq('user_id', userId)
       .single();
+
+    // Fetch recent learning data for temporal decay
+    const { data: recentLearning } = await supabase
+      .from('ai_learning_data')
+      .select('actual_rating, created_at, predicted_factors')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(50);
 
     const totalRatings = (existingVector?.total_ratings || 0) + 1;
     const successfulPredictions = (existingVector?.successful_predictions || 0) + 
@@ -212,6 +220,50 @@ serve(async (req) => {
     }
 
     // Log weight changes
+    // --- TEMPORAL DECAY: blend weights with historical trend ---
+    if (recentLearning && recentLearning.length >= 3) {
+      const HALF_LIFE_DAYS = 90;
+      const DECAY_CONST = Math.LN2 / HALF_LIFE_DAYS;
+
+      // Calculate decay-weighted average for each factor
+      for (const key of Object.keys(newWeights)) {
+        let driftSum = 0;
+        let driftWeight = 0;
+
+        for (const entry of recentLearning) {
+          if (!entry.actual_rating || !entry.created_at) continue;
+          const ageMs = Date.now() - new Date(entry.created_at).getTime();
+          const ageDays = ageMs / (1000 * 60 * 60 * 24);
+          const decay = Math.exp(-DECAY_CONST * ageDays);
+          const ratingIntensity = Math.abs((entry.actual_rating || 3) - 3) / 2;
+          const effectiveWeight = decay * (0.5 + ratingIntensity);
+
+          // Check if this factor was relevant in the prediction
+          const factors = entry.predicted_factors as Record<string, any> | null;
+          if (factors) {
+            const hadMatch = key === 'cuisine' ? factors.cuisine_match : 
+                            key === 'vibe' ? (factors.vibe_matches?.length > 0) :
+                            key === 'price' ? factors.price_match : false;
+            if (hadMatch && entry.actual_rating >= 4) {
+              driftSum += 0.1 * effectiveWeight; // Positive drift
+            } else if (hadMatch && entry.actual_rating <= 2) {
+              driftSum -= 0.1 * effectiveWeight; // Negative drift
+            }
+          }
+          driftWeight += effectiveWeight;
+        }
+
+        // Apply drift with 20% influence (subtle)
+        if (driftWeight > 0) {
+          const avgDrift = driftSum / driftWeight;
+          newWeights[key] = Math.max(0.3, Math.min(2.5, 
+            newWeights[key] + avgDrift * 0.2
+          ));
+        }
+      }
+      console.log('⏳ Temporal decay applied to weights');
+    }
+
     const weightChanges: Record<string, string> = {};
     for (const key of Object.keys(newWeights)) {
       const old = (oldWeights[key] || 1.0);
