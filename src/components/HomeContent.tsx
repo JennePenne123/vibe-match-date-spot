@@ -294,7 +294,6 @@ const HomeContent: React.FC = () => {
               </p>
             )}
           </div>
-          </div>
         </motion.div>
 
       </div>
