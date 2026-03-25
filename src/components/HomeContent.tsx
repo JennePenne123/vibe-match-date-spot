@@ -139,20 +139,16 @@ const HomeContent: React.FC = () => {
           transition={{ duration: 0.4 }}
         >
           <Card 
-            className="relative overflow-hidden border-border/50 bg-gradient-to-r from-primary/8 via-accent/5 to-transparent cursor-pointer hover:border-primary/30 transition-all duration-300 active:scale-[0.98]"
+            className="relative overflow-hidden border-border/50 bg-gradient-to-r from-primary/8 via-accent/5 to-transparent cursor-pointer hover:border-primary/30 transition-all duration-300 active:scale-[0.98] group"
             onClick={dailyTipVenue ? () => handleVenueTipClick(dailyTipVenue.id) : undefined}
           >
             <div className="absolute -top-6 -right-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
             <CardContent className="relative p-4 flex items-center gap-3.5">
-              <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg">
-                {dailyTipVenue ? (
-                  dailyTipVenue.image_url ? (
-                    <img src={dailyTipVenue.image_url} alt="" className="w-10 h-10 rounded-xl object-cover" />
-                  ) : (
-                    <span className="text-lg">{DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}</span>
-                  )
+              <div className="shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-lg overflow-hidden">
+                {dailyTipVenue?.image_url ? (
+                  <img src={dailyTipVenue.image_url} alt="" className="w-12 h-12 rounded-xl object-cover" />
                 ) : (
-                  <span className="text-lg">{DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}</span>
+                  <span className="text-xl">{DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].emoji}</span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -180,8 +176,12 @@ const HomeContent: React.FC = () => {
                     {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].tip}
                   </p>
                 )}
+                {dailyTipVenue && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-primary mt-1 group-hover:gap-1.5 transition-all">
+                    {t('home.discoverNow')} <ArrowRight className="w-3 h-3" />
+                  </span>
+                )}
               </div>
-              {dailyTipVenue && <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />}
             </CardContent>
           </Card>
         </motion.div>
@@ -244,46 +244,71 @@ const HomeContent: React.FC = () => {
                 >
                   <Card
                     onClick={() => handleVenueTipClick(venue.id)}
-                    className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
+                    className="border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-300 group cursor-pointer active:scale-[0.98] overflow-hidden"
                   >
-                    <CardContent className="p-4 flex items-start gap-3">
-                      <div className="shrink-0">
-                        {venue.image_url ? (
-                          <img src={venue.image_url} alt={venue.name} className="w-12 h-12 rounded-xl object-cover" />
-                        ) : (
-                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
-                            {venue.isDiscovery ? (
-                              <Compass className="w-5 h-5 text-primary" />
-                            ) : (
-                              <MapPin className="w-5 h-5 text-primary" />
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-0.5">
+                    {/* Venue photo banner */}
+                    {venue.image_url && (
+                      <div className="relative h-24 w-full overflow-hidden">
+                        <img 
+                          src={venue.image_url} 
+                          alt={venue.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
+                        <div className="absolute top-2 left-2">
                           {venue.isDiscovery ? (
-                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-accent text-accent-foreground bg-accent/10">
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-accent/50 text-accent-foreground bg-accent/80 backdrop-blur-sm">
                               ✨ {t('home.discoveryLabel')}
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/30 text-primary bg-primary/10">
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/40 text-primary-foreground bg-primary/80 backdrop-blur-sm">
                               💡 {t('home.forYouLabel')}
                             </Badge>
                           )}
+                        </div>
+                      </div>
+                    )}
+                    <CardContent className={`p-3.5 flex items-center gap-3 ${!venue.image_url ? 'pt-4' : ''}`}>
+                      {/* Fallback icon when no photo */}
+                      {!venue.image_url && (
+                        <div className="shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                          {venue.isDiscovery ? (
+                            <Compass className="w-5 h-5 text-primary" />
+                          ) : (
+                            <MapPin className="w-5 h-5 text-primary" />
+                          )}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        {/* Badge row for no-image cards */}
+                        {!venue.image_url && (
+                          <div className="flex items-center gap-2 mb-0.5">
+                            {venue.isDiscovery ? (
+                              <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-accent text-accent-foreground bg-accent/10">
+                                ✨ {t('home.discoveryLabel')}
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/30 text-primary bg-primary/10">
+                                💡 {t('home.forYouLabel')}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-medium text-foreground truncate">{venue.name}</p>
                           {venue.rating && (
-                            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground shrink-0">
                               <Star className="w-2.5 h-2.5 fill-primary text-primary" />
                               {venue.rating.toFixed(1)}
                             </span>
                           )}
                         </div>
-                        <p className="text-sm font-medium text-foreground truncate">{venue.name}</p>
                         <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed truncate">
                           {[venue.cuisine_type, venue.price_range].filter(Boolean).join(' · ')}
                         </p>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-1 group-hover:translate-x-0.5 transition-transform" />
+                      <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
                     </CardContent>
                   </Card>
                 </motion.div>
