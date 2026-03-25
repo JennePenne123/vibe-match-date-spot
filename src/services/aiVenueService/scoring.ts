@@ -525,9 +525,16 @@ export const calculateVenueAIScore = async (
 
     // Apply implicit signal boost
     const implicitBoost = await getImplicitSignalBoost(userId, venueId);
+
+    // Apply combined context scoring (synergy + auto time)
+    const currentMood = getTodayMood();
+    const occasionFromPrefs = (userPrefs.lifestyle_data as any)?.occasion || null;
+    const priorityFromPrefs = (userPrefs.lifestyle_data as any)?.priority_weights || null;
+    const combinedCtx = getCombinedContextScore(venue, occasionFromPrefs, currentMood, priorityFromPrefs);
+    const combinedCtxBonus = (combinedCtx.synergyBonus + combinedCtx.autoContextBonus) / 100;
     
     // Final AI score (0-100 scale) — normalized so sparse data doesn't penalize
-    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost) * 100;
+    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost + combinedCtxBonus) * 100;
     const finalScore = Math.max(10, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
