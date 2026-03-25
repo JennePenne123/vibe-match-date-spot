@@ -169,7 +169,14 @@ function inferCuisineFromVenue(venue: any): string | null {
 }
 
 
-export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string) => {
+export interface SessionPriorityWeights {
+  cuisine?: number;
+  vibe?: number;
+  price?: number;
+  location?: number;
+}
+
+export const filterVenuesByPreferences = async (userId: string, venues: any[], selectedArea?: string, priorityWeights?: SessionPriorityWeights) => {
   try {
     // Pre-filter: remove delivery services and supermarkets
     const filteredVenues = venues.filter(v => {
