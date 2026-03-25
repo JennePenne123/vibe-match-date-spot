@@ -94,9 +94,28 @@ const Onboarding = () => {
     setReferralAdopted(true);
   };
 
+  const stepFeedback: Record<number, string> = {
+    1: '🧠 Die KI versteht deine Persönlichkeit!',
+    2: '💕 Perfekt – dein Ziel ist gesetzt!',
+    3: '🎯 Lifestyle-Daten erfasst!',
+    4: '✨ Szenarien analysiert – schon 60% genauer!',
+    5: '🍜 Geschmack erkannt – fast fertig!',
+    6: '🎉 Alle Signale erfasst!',
+  };
+
   const animateTransition = useCallback((nextStep: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
+
+    // Show micro-feedback for the step we're leaving (only when going forward)
+    if (nextStep > step && step > 0) {
+      const msg = stepFeedback[step];
+      if (msg) {
+        setMicroFeedback(msg);
+        setTimeout(() => setMicroFeedback(null), 1800);
+      }
+    }
+
     setTimeout(() => {
       setStep(nextStep);
       setIsAnimating(false);
