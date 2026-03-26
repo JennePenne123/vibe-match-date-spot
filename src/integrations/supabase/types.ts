@@ -1400,6 +1400,8 @@ export type Database = {
       venues: {
         Row: {
           address: string
+          best_times: Json | null
+          capacity: number | null
           created_at: string
           created_by: string | null
           cuisine_type: string | null
@@ -1407,6 +1409,7 @@ export type Database = {
           foursquare_data: Json | null
           foursquare_id: string | null
           google_place_id: string | null
+          has_separee: boolean | null
           id: string
           image_url: string | null
           is_active: boolean
@@ -1415,6 +1418,7 @@ export type Database = {
           menu_highlights: string[] | null
           name: string
           opening_hours: Json | null
+          pair_friendly_features: string[] | null
           phone: string | null
           photos: Json | null
           price_range: string | null
@@ -1427,6 +1431,8 @@ export type Database = {
         }
         Insert: {
           address: string
+          best_times?: Json | null
+          capacity?: number | null
           created_at?: string
           created_by?: string | null
           cuisine_type?: string | null
@@ -1434,6 +1440,7 @@ export type Database = {
           foursquare_data?: Json | null
           foursquare_id?: string | null
           google_place_id?: string | null
+          has_separee?: boolean | null
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -1442,6 +1449,7 @@ export type Database = {
           menu_highlights?: string[] | null
           name: string
           opening_hours?: Json | null
+          pair_friendly_features?: string[] | null
           phone?: string | null
           photos?: Json | null
           price_range?: string | null
@@ -1454,6 +1462,8 @@ export type Database = {
         }
         Update: {
           address?: string
+          best_times?: Json | null
+          capacity?: number | null
           created_at?: string
           created_by?: string | null
           cuisine_type?: string | null
@@ -1461,6 +1471,7 @@ export type Database = {
           foursquare_data?: Json | null
           foursquare_id?: string | null
           google_place_id?: string | null
+          has_separee?: boolean | null
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -1469,6 +1480,7 @@ export type Database = {
           menu_highlights?: string[] | null
           name?: string
           opening_hours?: Json | null
+          pair_friendly_features?: string[] | null
           phone?: string | null
           photos?: Json | null
           price_range?: string | null
