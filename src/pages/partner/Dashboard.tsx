@@ -24,6 +24,7 @@ export default function PartnerDashboard() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { stats, loading: statsLoading } = usePartnerDashboardStats(user?.id);
+  const onboarding = usePartnerOnboardingState(user?.id);
 
   const isLoading = roleLoading || authLoading;
 
