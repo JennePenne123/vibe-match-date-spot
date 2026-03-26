@@ -900,9 +900,13 @@ export type Database = {
           network_discount_value: number
           phone: string | null
           postal_code: string | null
+          privacy_accepted_at: string | null
+          privacy_version: string | null
           tax_id: string | null
           tax_id_type: string | null
           tax_id_verified: boolean
+          terms_accepted_at: string | null
+          terms_version: string | null
           updated_at: string
           user_id: string
           verification_deadline: string | null
@@ -931,9 +935,13 @@ export type Database = {
           network_discount_value?: number
           phone?: string | null
           postal_code?: string | null
+          privacy_accepted_at?: string | null
+          privacy_version?: string | null
           tax_id?: string | null
           tax_id_type?: string | null
           tax_id_verified?: boolean
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
           user_id: string
           verification_deadline?: string | null
@@ -962,9 +970,13 @@ export type Database = {
           network_discount_value?: number
           phone?: string | null
           postal_code?: string | null
+          privacy_accepted_at?: string | null
+          privacy_version?: string | null
           tax_id?: string | null
           tax_id_type?: string | null
           tax_id_verified?: boolean
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
           user_id?: string
           verification_deadline?: string | null
