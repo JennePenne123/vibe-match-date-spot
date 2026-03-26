@@ -1,8 +1,8 @@
 # aiVenueService Test Coverage Summary
 
-> **Last Updated:** December 2024  
-> **Total Tests:** ~104  
-> **Function Coverage:** 69% (9/13 exported functions)
+> **Last Updated:** March 2026  
+> **Total Tests:** ~138  
+> **Function Coverage:** 82% (13/16 exported functions)
 
 ---
 

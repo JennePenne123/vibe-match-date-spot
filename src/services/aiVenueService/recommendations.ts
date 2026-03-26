@@ -11,6 +11,9 @@ import { getWeatherScore } from './weatherScoring';
 import { getExplorationBonus, getUserExploredCuisines } from './explorationBonus';
 import { applyImplicitLearning } from './implicitLearning';
 import { getDistanceToleranceScore } from './distanceLearning';
+import { getPhotoVibeScoreModifier, getPhotoVibeLabel } from './photoVibeScoring';
+import { getPairFriendlyScoreModifier, getPairFriendlyLabel } from './pairFriendlyScoring';
+import { getSeasonalScoreModifier, getSeasonalLabel } from './seasonalScoring';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
@@ -147,6 +150,21 @@ export const getAIVenueRecommendations = async (
         userLocation
       );
 
+      // ── Photo Vibe Scoring (Signal #15) ──
+      const photoVibeResult = getPhotoVibeScoreModifier(
+        venue.photos,
+        userPrefs?.preferred_vibes
+      );
+
+      // ── Pair-Friendly Scoring (Signal #16) ──
+      const pairResult = getPairFriendlyScoreModifier(venue, !!partnerId);
+
+      // ── Seasonal Specials (Signal #17) ──
+      const seasonalResult = getSeasonalScoreModifier(
+        venue.seasonal_specials,
+        userPrefs?.preferred_vibes
+      );
+
       // Rating bonus — confidence-weighted by review count
       const reviewCount = venue.review_count || venue.reviewCount || venue.user_ratings_total || 0;
       const reviewConfidence = reviewCount > 0 ? Math.min(reviewCount / 20, 1.0) : 0.5;
@@ -154,14 +172,17 @@ export const getAIVenueRecommendations = async (
       // Social proof bonus
       const socialProof = (reviewCount >= 50 && venue.rating >= 4.0) ? 3 : 0;
 
-      // Compute final score: all signals combined
+      // Compute final score: all signals combined (including new #15-#17)
       const rawScore = prefScore + contextBonus + ratingBonus + socialProof
         + habitResult.bonus + repeatResult.modifier
         + occasionResult.bonus + occasionResult.penalty
         + friendResult.bonus
         + weatherResult.bonus + weatherResult.penalty
         + explorationResult.bonus
-        + distanceResult.bonus;
+        + distanceResult.bonus
+        + (photoVibeResult.modifier * 100)  // Convert 0-0.12 to 0-12 scale
+        + (pairResult.modifier * 100)       // Convert 0-0.15 to 0-15 scale
+        + (seasonalResult.modifier * 100);  // Convert 0-0.08 to 0-8 scale
       const finalScore = Math.max(5, Math.min(98, rawScore));
 
       // Generate reasoning based on actual matches
@@ -208,6 +229,13 @@ export const getAIVenueRecommendations = async (
       if (explorationResult.reason) matchReasons.push(explorationResult.reason);
       if (distanceResult.reason) matchReasons.push(distanceResult.reason);
       if (repeatResult.visitCount > 0) matchReasons.push(`Bereits ${repeatResult.visitCount}x besucht`);
+      // New signal reasons (#15-#17)
+      const photoVibeLabel = getPhotoVibeLabel(photoVibeResult.matchedVibes);
+      if (photoVibeLabel) matchReasons.push(photoVibeLabel);
+      const pairLabel = getPairFriendlyLabel(pairResult.reasons);
+      if (pairLabel) matchReasons.push(pairLabel);
+      const seasonalLabel = getSeasonalLabel(seasonalResult.activeSpecials);
+      if (seasonalLabel) matchReasons.push(seasonalLabel);
 
       if (matchReasons.length === 0) {
         matchReasons.push('Entdecke etwas Neues in deiner Nähe');
