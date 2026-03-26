@@ -28,6 +28,7 @@ import RealtimeRedemptionToast from '@/components/partner/RealtimeRedemptionToas
 import ConversionRateCard from '@/components/partner/ConversionRateCard';
 import MembershipCard from '@/components/partner/MembershipCard';
 import ProFeatureGate from '@/components/partner/ProFeatureGate';
+import BillingOverview from '@/components/partner/BillingOverview';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
