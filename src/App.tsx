@@ -116,6 +116,8 @@ const PartnerProfile = lazy(() => import("./pages/partner/Profile"));
 const PartnerCityRankings = lazy(() => import("./pages/partner/CityRankings"));
 const PartnerNotifications = lazy(() => import("./pages/partner/Notifications"));
 const PartnerVenueComparison = lazy(() => import("./pages/partner/VenueComparison"));
+const PartnerTerms = lazy(() => import("./pages/partner/Terms"));
+const PartnerPrivacy = lazy(() => import("./pages/partner/Privacy"));
 
 // Admin routes – lazy loaded
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
