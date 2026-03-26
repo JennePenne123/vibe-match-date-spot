@@ -14,3 +14,5 @@ export { getExplorationBonus, getUserExploredCuisines } from './explorationBonus
 export { applyImplicitLearning, analyzeImplicitSignals } from './implicitLearning';
 export { getTemporalDecayFactor, getDecayFromDate, decayWeightedAverage, applyTemporalDecayToWeights } from './temporalDecay';
 export { getDistanceToleranceScore } from './distanceLearning';
+export { getPhotoVibeScoreModifier, extractPhotoVibes, getPhotoVibeLabel, AVAILABLE_PHOTO_VIBES, PHOTO_VIBE_LABELS } from './photoVibeScoring';
+export type { PhotoVibe } from './photoVibeScoring';

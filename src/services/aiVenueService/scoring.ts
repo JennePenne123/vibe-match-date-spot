@@ -4,6 +4,7 @@ import { getMoodScoreModifier, getMoodInfluenceLabel } from './moodScoring';
 import { getImplicitSignalBoost } from '@/services/implicitSignalsService';
 import { getCombinedContextScore } from './contextCombinationScoring';
 import { getTodayMood } from '@/pages/MoodCheckIn';
+import { getPhotoVibeScoreModifier, getPhotoVibeLabel } from './photoVibeScoring';
 
 /**
  * Cuisine similarity matrix — returns 0..1 similarity between two cuisines.
