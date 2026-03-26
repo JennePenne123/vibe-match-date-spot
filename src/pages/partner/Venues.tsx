@@ -12,6 +12,8 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
 import { VenueManagementSheet } from '@/components/partner/VenueManagementSheet';
 import VenueRegistrationModal from '@/components/partner/VenueRegistrationModal';
+import { usePartnerVerificationGuard } from '@/hooks/usePartnerVerificationGuard';
+import VerificationLockOverlay from '@/components/partner/VerificationLockOverlay';
 
 interface Partnership {
   id: string;
@@ -39,6 +41,7 @@ export default function PartnerVenues() {
   const [loading, setLoading] = useState(true);
   const [managingVenue, setManagingVenue] = useState<{ id: string; name: string } | null>(null);
   const [showRegistration, setShowRegistration] = useState(false);
+  const { isLocked } = usePartnerVerificationGuard();
 
   useEffect(() => {
     if (!roleLoading && role !== 'venue_partner' && role !== 'admin') {
@@ -94,6 +97,7 @@ export default function PartnerVenues() {
 
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
+      {isLocked && <VerificationLockOverlay feature="Standortverwaltung" />}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl md:text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">

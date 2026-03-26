@@ -62,3 +62,9 @@ verify_jwt = true
 
 [functions.ai-quick-tip]
 verify_jwt = true
+
+[functions.check-verification-reminders]
+verify_jwt = false
+
+[functions.verify-partner]
+verify_jwt = true
