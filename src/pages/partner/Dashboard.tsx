@@ -85,6 +85,15 @@ export default function PartnerDashboard() {
         </div>
       </div>
 
+      {/* Onboarding Banner */}
+      {!onboarding.loading && (
+        <PartnerOnboardingBanner
+          hasProfile={onboarding.hasProfile}
+          hasVenues={onboarding.hasVenues}
+          hasVouchers={onboarding.hasVouchers}
+        />
+      )}
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <Card variant="glass" className="group hover:scale-105 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -133,6 +142,12 @@ export default function PartnerDashboard() {
             </p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Notifications & Performance side by side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+        <PartnerNotificationsCard />
+        <VenuePerformanceCard />
       </div>
 
       {/* Voucher Alerts */}
