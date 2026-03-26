@@ -245,6 +245,8 @@ const App = () => (
                     <Route path="/partner/notifications" element={<LazyPage><PartnerNotifications /></LazyPage>} />
                     <Route path="/partner/venue-comparison" element={<LazyPage><PartnerVenueComparison /></LazyPage>} />
                     <Route path="/partner/onboarding" element={<LazyPage><PartnerOnboarding /></LazyPage>} />
+                    <Route path="/partner/terms" element={<LazyPage><PartnerTerms /></LazyPage>} />
+                    <Route path="/partner/privacy" element={<LazyPage><PartnerPrivacy /></LazyPage>} />
                     
                     {/* Admin Routes – protected by role check */}
                     <Route path="/admin" element={<LazyPage><AdminRouteGuard><AdminDashboard /></AdminRouteGuard></LazyPage>} />
