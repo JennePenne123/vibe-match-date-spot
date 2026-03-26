@@ -226,15 +226,20 @@ export default function VenueBestTimesEditor({
                         : 'hover:bg-muted/30'
                     }`}
                   >
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 400 }}
-                      >
-                        <mood!.icon className="w-3.5 h-3.5" />
-                      </motion.div>
-                    )}
+                  {isSelected && (
+                    (() => {
+                      const MoodIcon = mood!.icon;
+                      return (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: 'spring', stiffness: 400 }}
+                        >
+                          <MoodIcon className="w-3.5 h-3.5" />
+                        </motion.div>
+                      );
+                    })()
+                  )}
                   </button>
                 );
               })}
