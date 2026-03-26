@@ -295,8 +295,43 @@ export default function PartnerOnboarding() {
                   </div>
                 </div>
 
+                {/* Legal Acceptance */}
+                <div className="border-t pt-4 space-y-3">
+                  <h4 className="text-sm font-medium">Rechtliche Zustimmung</h4>
+                  <div className="flex items-start gap-2">
+                    <Checkbox
+                      id="terms"
+                      checked={termsAccepted}
+                      onCheckedChange={(c) => setTermsAccepted(c === true)}
+                      className="mt-0.5"
+                    />
+                    <label htmlFor="terms" className="text-sm text-muted-foreground leading-snug">
+                      Ich akzeptiere die{' '}
+                      <Link to="/partner/terms" className="text-primary underline underline-offset-2" target="_blank">
+                        Allgemeinen Geschäftsbedingungen
+                      </Link>{' '}
+                      für Venue-Partner. *
+                    </label>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Checkbox
+                      id="privacy"
+                      checked={privacyAccepted}
+                      onCheckedChange={(c) => setPrivacyAccepted(c === true)}
+                      className="mt-0.5"
+                    />
+                    <label htmlFor="privacy" className="text-sm text-muted-foreground leading-snug">
+                      Ich habe die{' '}
+                      <Link to="/partner/privacy" className="text-primary underline underline-offset-2" target="_blank">
+                        Datenschutzerklärung
+                      </Link>{' '}
+                      gelesen und stimme der Datenverarbeitung zu. *
+                    </label>
+                  </div>
+                </div>
+
                 <div className="flex justify-end pt-2">
-                  <Button onClick={saveProfile} disabled={saving} className="gap-2">
+                  <Button onClick={saveProfile} disabled={saving || !termsAccepted || !privacyAccepted} className="gap-2">
                     {saving ? <LoadingSpinner size="sm" /> : <ArrowRight className="w-4 h-4" />}
                     Weiter zur Verifizierung
                   </Button>
