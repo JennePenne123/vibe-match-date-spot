@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, Clock, Info, Sparkles, Heart } from 'lucide-react';
+import { Camera, Clock, Info, Sparkles, Heart, Brain } from 'lucide-react';
 import { VenuePhotoUpload } from './VenuePhotoUpload';
 import { VenueDetailsEditor } from './VenueDetailsEditor';
 import { VenueInfoEditor } from './VenueInfoEditor';
 import VenuePersonalityWizard from './VenuePersonalityWizard';
 import VenueBestTimesEditor from './VenueBestTimesEditor';
+import AITagSuggestions from './AITagSuggestions';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface VenueManagementSheetProps {
@@ -63,7 +64,7 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
           </div>
         ) : (
           <Tabs defaultValue="info" className="mt-4">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="info" className="gap-1 text-[10px] sm:text-xs">
                 <Info className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 Info
@@ -71,6 +72,10 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
               <TabsTrigger value="personality" className="gap-1 text-[10px] sm:text-xs">
                 <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 KI-Profil
+              </TabsTrigger>
+              <TabsTrigger value="ai-tags" className="gap-1 text-[10px] sm:text-xs">
+                <Brain className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                Auto-Tags
               </TabsTrigger>
               <TabsTrigger value="besttimes" className="gap-1 text-[10px] sm:text-xs">
                 <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -106,6 +111,14 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
                 existingTags={venueData?.tags || []}
                 existingDescription={venueData?.description}
                 onComplete={handleUpdated}
+              />
+            </TabsContent>
+            <TabsContent value="ai-tags" className="mt-4">
+              <AITagSuggestions
+                venueId={venueId}
+                venueName={venueName}
+                existingTags={venueData?.tags || []}
+                onTagsUpdated={handleUpdated}
               />
             </TabsContent>
             <TabsContent value="besttimes" className="mt-4">
