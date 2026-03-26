@@ -2,12 +2,73 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Crown, Sparkles, Check, Lock, Star } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Crown, Sparkles, Check, Lock, Star, Gift, Heart } from 'lucide-react';
 import { usePartnerMembership } from '@/hooks/usePartnerMembership';
 import { useTranslation } from 'react-i18next';
 
+const LoyaltyBonusSection: React.FC<{
+  isFoundingPartner: boolean;
+  isPro: boolean;
+  loyaltyBonusAwarded: boolean;
+  loyaltyBonusMonths: number;
+  loyaltyBonusProgress: number;
+  paidProSince: string | null;
+}> = ({ isFoundingPartner, isPro, loyaltyBonusAwarded, loyaltyBonusMonths, loyaltyBonusProgress, paidProSince }) => {
+  if (!isFoundingPartner || !isPro) return null;
+
+  if (loyaltyBonusAwarded) {
+    return (
+      <div className="rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <Gift className="w-5 h-5 text-emerald-500" />
+          <span className="font-semibold text-sm">Treue-Bonus erhalten!</span>
+          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[11px]">
+            +{loyaltyBonusMonths} Monate gratis
+          </Badge>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Als Dankeschön für deine Treue haben wir dir {loyaltyBonusMonths} Monate Pro-Mitgliedschaft geschenkt. 💚
+        </p>
+      </div>
+    );
+  }
+
+  if (paidProSince) {
+    const progressPercent = (loyaltyBonusProgress / 12) * 100;
+    return (
+      <div className="rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Heart className="w-5 h-5 text-amber-500" />
+          <span className="font-semibold text-sm">Treue-Bonus Fortschritt</span>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Bleib 12 Monate im Pro-Plan und erhalte 3 Monate Pro gratis als Dankeschön!
+        </p>
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs">
+            <span className="text-muted-foreground">{loyaltyBonusProgress} / 12 Monate</span>
+            <span className="font-medium text-amber-600">{Math.round(progressPercent)}%</span>
+          </div>
+          <Progress value={progressPercent} className="h-2" />
+        </div>
+        {loyaltyBonusProgress >= 10 && (
+          <p className="text-xs text-amber-600 font-medium">
+            🎉 Fast geschafft! Noch {12 - loyaltyBonusProgress} Monat{12 - loyaltyBonusProgress !== 1 ? 'e' : ''}!
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  return null;
+};
+
 const MembershipCard: React.FC = () => {
-  const { tier, isPro, isFoundingPartner, membershipValidUntil, loading } = usePartnerMembership();
+  const {
+    tier, isPro, isFoundingPartner, membershipValidUntil, loading,
+    loyaltyBonusAwarded, loyaltyBonusMonths, loyaltyBonusProgress, paidProSince
+  } = usePartnerMembership();
   const { t } = useTranslation();
 
   if (loading) return null;
@@ -62,6 +123,16 @@ const MembershipCard: React.FC = () => {
         )}
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Loyalty Bonus Section */}
+        <LoyaltyBonusSection
+          isFoundingPartner={isFoundingPartner}
+          isPro={isPro}
+          loyaltyBonusAwarded={loyaltyBonusAwarded}
+          loyaltyBonusMonths={loyaltyBonusMonths}
+          loyaltyBonusProgress={loyaltyBonusProgress}
+          paidProSince={paidProSince}
+        />
+
         {isPro ? (
           <div className="space-y-2">
             {proFeatures.map((feature) => (
