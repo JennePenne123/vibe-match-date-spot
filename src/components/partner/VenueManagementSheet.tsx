@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, Clock, Info, Sparkles } from 'lucide-react';
+import { Camera, Clock, Info, Sparkles, Heart } from 'lucide-react';
 import { VenuePhotoUpload } from './VenuePhotoUpload';
 import { VenueDetailsEditor } from './VenueDetailsEditor';
 import { VenueInfoEditor } from './VenueInfoEditor';
 import VenuePersonalityWizard from './VenuePersonalityWizard';
+import VenueBestTimesEditor from './VenueBestTimesEditor';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface VenueManagementSheetProps {
@@ -31,7 +32,7 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
     setLoading(true);
     const { data } = await supabase
       .from('venues')
-      .select('photos, opening_hours, menu_highlights, description, cuisine_type, price_range, website, phone, address, tags')
+      .select('photos, opening_hours, menu_highlights, description, cuisine_type, price_range, website, phone, address, tags, best_times, capacity, has_separee, pair_friendly_features')
       .eq('id', venueId)
       .maybeSingle();
     setVenueData(data);
@@ -62,22 +63,26 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
           </div>
         ) : (
           <Tabs defaultValue="info" className="mt-4">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="info" className="gap-1.5 text-xs">
-                <Info className="w-3.5 h-3.5" />
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="info" className="gap-1 text-[10px] sm:text-xs">
+                <Info className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 Info
               </TabsTrigger>
-              <TabsTrigger value="personality" className="gap-1.5 text-xs">
-                <Sparkles className="w-3.5 h-3.5" />
+              <TabsTrigger value="personality" className="gap-1 text-[10px] sm:text-xs">
+                <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 KI-Profil
               </TabsTrigger>
-              <TabsTrigger value="photos" className="gap-1.5 text-xs">
-                <Camera className="w-3.5 h-3.5" />
+              <TabsTrigger value="besttimes" className="gap-1 text-[10px] sm:text-xs">
+                <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                Zeiten+
+              </TabsTrigger>
+              <TabsTrigger value="photos" className="gap-1 text-[10px] sm:text-xs">
+                <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 Fotos
               </TabsTrigger>
-              <TabsTrigger value="details" className="gap-1.5 text-xs">
-                <Clock className="w-3.5 h-3.5" />
-                Zeiten
+              <TabsTrigger value="details" className="gap-1 text-[10px] sm:text-xs">
+                <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                Details
               </TabsTrigger>
             </TabsList>
             <TabsContent value="info" className="mt-4">
@@ -101,6 +106,16 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
                 existingTags={venueData?.tags || []}
                 existingDescription={venueData?.description}
                 onComplete={handleUpdated}
+              />
+            </TabsContent>
+            <TabsContent value="besttimes" className="mt-4">
+              <VenueBestTimesEditor
+                venueId={venueId}
+                currentBestTimes={venueData?.best_times}
+                currentCapacity={venueData?.capacity}
+                currentHasSeparee={venueData?.has_separee}
+                currentPairFeatures={venueData?.pair_friendly_features}
+                onUpdated={handleUpdated}
               />
             </TabsContent>
             <TabsContent value="photos" className="mt-4">
