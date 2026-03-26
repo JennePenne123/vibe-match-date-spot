@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePartnerDashboardStats } from '@/hooks/usePartnerDashboardStats';
 import { usePartnerOnboardingState } from '@/hooks/usePartnerOnboardingState';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,8 @@ import PartnerOnboardingBanner from '@/components/partner/PartnerOnboardingBanne
 import PartnerNotificationsCard from '@/components/partner/PartnerNotificationsCard';
 import VenuePerformanceCard from '@/components/partner/VenuePerformanceCard';
 import PartnerMatchFeedback from '@/components/partner/PartnerMatchFeedback';
+import VenueOptimizationNudges from '@/components/partner/VenueOptimizationNudges';
+import { VenueManagementSheet } from '@/components/partner/VenueManagementSheet';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
@@ -26,6 +29,24 @@ export default function PartnerDashboard() {
   const navigate = useNavigate();
   const { stats, loading: statsLoading } = usePartnerDashboardStats(user?.id);
   const onboarding = usePartnerOnboardingState(user?.id);
+  const [partnerVenues, setPartnerVenues] = useState<any[]>([]);
+  const [managingVenue, setManagingVenue] = useState<{ id: string; name: string; tab: string } | null>(null);
+
+  // Fetch partner venues for optimization nudges
+  useEffect(() => {
+    if (!user) return;
+    const fetchVenues = async () => {
+      const { data } = await supabase
+        .from('venue_partnerships')
+        .select('venue_id, venues(id, name, seasonal_specials, best_times, pair_friendly_features, photos, tags, has_separee, capacity)')
+        .eq('partner_id', user.id)
+        .eq('status', 'approved');
+      if (data) {
+        setPartnerVenues(data.map((d: any) => d.venues).filter(Boolean));
+      }
+    };
+    fetchVenues();
+  }, [user]);
 
   const isLoading = roleLoading || authLoading;
 
