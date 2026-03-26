@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, Clock, Info, Sparkles } from 'lucide-react';
+import { Camera, Clock, Info, Sparkles, Heart } from 'lucide-react';
 import { VenuePhotoUpload } from './VenuePhotoUpload';
 import { VenueDetailsEditor } from './VenueDetailsEditor';
 import { VenueInfoEditor } from './VenueInfoEditor';
 import VenuePersonalityWizard from './VenuePersonalityWizard';
+import VenueBestTimesEditor from './VenueBestTimesEditor';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface VenueManagementSheetProps {
