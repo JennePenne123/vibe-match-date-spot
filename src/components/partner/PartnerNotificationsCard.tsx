@@ -1,9 +1,10 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Ticket, Star, Clock, TrendingUp } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Bell, Ticket, Star, Clock, TrendingUp, ArrowRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 
@@ -18,6 +19,7 @@ interface NotificationItem {
 
 export default function PartnerNotificationsCard() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -135,13 +137,19 @@ export default function PartnerNotificationsCard() {
   return (
     <Card variant="glass">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Bell className="w-4 h-4 text-primary" />
-          {t('partner.notifications.title', 'Neuigkeiten')}
-          {notifications.length > 0 && (
-            <Badge variant="secondary" className="text-[10px] px-1.5">{notifications.length}</Badge>
-          )}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Bell className="w-4 h-4 text-primary" />
+            {t('partner.notifications.title', 'Neuigkeiten')}
+            {notifications.length > 0 && (
+              <Badge variant="secondary" className="text-[10px] px-1.5">{notifications.length}</Badge>
+            )}
+          </CardTitle>
+          <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => navigate('/partner/notifications')}>
+            {t('partner.notifications.viewAll', 'Alle')}
+            <ArrowRight className="w-3 h-3" />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         {notifications.length === 0 ? (

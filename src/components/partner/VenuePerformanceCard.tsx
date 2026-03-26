@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, Store, Star, Ticket, TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BarChart3, Store, Star, Ticket, TrendingUp, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface VenuePerformance {
@@ -15,6 +17,7 @@ interface VenuePerformance {
 
 export default function VenuePerformanceCard() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [venues, setVenues] = useState<VenuePerformance[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -132,10 +135,18 @@ export default function VenuePerformanceCard() {
   return (
     <Card variant="glass">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <BarChart3 className="w-4 h-4 text-primary" />
-          {t('partner.performance.title', 'Venue-Performance')}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <BarChart3 className="w-4 h-4 text-primary" />
+            {t('partner.performance.title', 'Venue-Performance')}
+          </CardTitle>
+          {venues.length > 1 && (
+            <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => navigate('/partner/venue-comparison')}>
+              {t('partner.performance.compare', 'Vergleichen')}
+              <ArrowRight className="w-3 h-3" />
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         {venues.map((venue, index) => {
