@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, Clock, Info, Sparkles, Heart, Brain } from 'lucide-react';
+import { Camera, Clock, Info, Sparkles, Heart, Brain, Calendar } from 'lucide-react';
 import { VenuePhotoUpload } from './VenuePhotoUpload';
 import { VenueDetailsEditor } from './VenueDetailsEditor';
 import { VenueInfoEditor } from './VenueInfoEditor';
 import VenuePersonalityWizard from './VenuePersonalityWizard';
 import VenueBestTimesEditor from './VenueBestTimesEditor';
 import AITagSuggestions from './AITagSuggestions';
+import SeasonalSpecialsEditor from './SeasonalSpecialsEditor';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface VenueManagementSheetProps {
@@ -33,7 +34,7 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
     setLoading(true);
     const { data } = await supabase
       .from('venues')
-      .select('photos, opening_hours, menu_highlights, description, cuisine_type, price_range, website, phone, address, tags, best_times, capacity, has_separee, pair_friendly_features')
+      .select('photos, opening_hours, menu_highlights, description, cuisine_type, price_range, website, phone, address, tags, best_times, capacity, has_separee, pair_friendly_features, seasonal_specials')
       .eq('id', venueId)
       .maybeSingle();
     setVenueData(data);
