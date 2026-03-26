@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/sonner';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -43,6 +44,8 @@ export default function PartnerOnboarding() {
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('profile');
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [existingProfile, setExistingProfile] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -115,11 +118,19 @@ export default function PartnerOnboarding() {
       toast.error('Bitte fülle alle Pflichtfelder aus');
       return;
     }
+    if (!termsAccepted || !privacyAccepted) {
+      toast.error('Bitte akzeptiere die AGB und Datenschutzerklärung');
+      return;
+    }
     setSaving(true);
     try {
       const payload = {
         user_id: user.id,
         ...profileData,
+        terms_accepted_at: new Date().toISOString(),
+        terms_version: '1.0',
+        privacy_accepted_at: new Date().toISOString(),
+        privacy_version: '1.0',
         verification_deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       };
 
