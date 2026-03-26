@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,13 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Gift } from 'lucide-react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import { useToast } from '@/hooks/use-toast';
@@ -21,8 +17,10 @@ import VoucherCreationModal from '@/components/partner/VoucherCreationModal';
 import VoucherEditModal from '@/components/partner/VoucherEditModal';
 import VoucherAnalyticsModal from '@/components/partner/VoucherAnalyticsModal';
 import VoucherActionsMenu from '@/components/partner/VoucherActionsMenu';
+import VoucherMobileCard from '@/components/partner/VoucherMobileCard';
 import { format } from 'date-fns';
 import { useRealtimeVouchers } from '@/hooks/useRealtimeVouchers';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Voucher {
   id: string;
@@ -42,17 +40,20 @@ interface Voucher {
   terms_conditions: string;
 }
 
+type VoucherTab = 'active' | 'expired' | 'inactive';
+
 export default function PartnerVouchers() {
   const { role, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [analyticsModalOpen, setAnalyticsModalOpen] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
   const [userId, setUserId] = useState<string>();
+  const [activeTab, setActiveTab] = useState<VoucherTab>('active');
 
-  // Use real-time hook for live voucher updates
   const { vouchers, loading, connected } = useRealtimeVouchers(userId);
 
   useEffect(() => {
@@ -64,34 +65,46 @@ export default function PartnerVouchers() {
   useEffect(() => {
     const getUserId = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-      }
+      if (user) setUserId(user.id);
     };
     getUserId();
   }, []);
 
+  const filteredVouchers = useMemo(() => {
+    const now = new Date();
+    return vouchers.filter((v) => {
+      const isExpired = new Date(v.valid_until) < now;
+      if (activeTab === 'active') return !isExpired && v.status === 'active';
+      if (activeTab === 'expired') return isExpired;
+      return v.status !== 'active' && !isExpired; // inactive
+    });
+  }, [vouchers, activeTab]);
+
+  const tabCounts = useMemo(() => {
+    const now = new Date();
+    return {
+      active: vouchers.filter(v => !new Date(v.valid_until).valueOf() || (new Date(v.valid_until) >= now && v.status === 'active')).length,
+      expired: vouchers.filter(v => new Date(v.valid_until) < now).length,
+      inactive: vouchers.filter(v => v.status !== 'active' && new Date(v.valid_until) >= now).length,
+    };
+  }, [vouchers]);
+
   const getStatusBadge = (voucher: Voucher) => {
     const isExpired = new Date(voucher.valid_until) < new Date();
-    
-    if (isExpired) {
-      return <Badge variant="destructive">Expired</Badge>;
-    }
-    
+    if (isExpired) return <Badge variant="destructive">Abgelaufen</Badge>;
     return voucher.status === 'active' ? (
-      <Badge className="bg-gradient-to-r from-green-500 to-emerald-500">Active</Badge>
+      <Badge className="bg-gradient-to-r from-green-500 to-emerald-500">Aktiv</Badge>
     ) : (
-      <Badge variant="secondary">Inactive</Badge>
+      <Badge variant="secondary">Inaktiv</Badge>
     );
   };
 
   const formatDiscount = (type: string, value: number) => {
     if (type === 'percentage') return `${value}%`;
-    if (type === 'fixed') return `$${value}`;
+    if (type === 'fixed') return `${value}€`;
     return 'Free Item';
   };
 
-  // Only block for role verification (security requirement)
   if (roleLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -100,21 +113,114 @@ export default function PartnerVouchers() {
     );
   }
 
+  const renderVoucherTable = (items: Voucher[]) => (
+    <Card variant="glass" className="overflow-hidden">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Titel / Code</TableHead>
+              <TableHead>Rabatt</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Ablauf</TableHead>
+              <TableHead>Einlösungen</TableHead>
+              <TableHead className="text-right">Aktionen</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.map((voucher, index) => (
+              <TableRow
+                key={voucher.id}
+                className="hover:bg-muted/50 transition-colors opacity-0 animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'forwards' }}
+              >
+                <TableCell>
+                  <div>
+                    <div className="font-medium">{voucher.title}</div>
+                    <code className="text-xs bg-muted px-2 py-1 rounded">{voucher.code}</code>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="font-semibold">{formatDiscount(voucher.discount_type, voucher.discount_value)}</span>
+                </TableCell>
+                <TableCell>{getStatusBadge(voucher)}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {format(new Date(voucher.valid_until), 'dd.MM.yyyy')}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">
+                      {voucher.current_redemptions}
+                      {voucher.max_redemptions ? ` / ${voucher.max_redemptions}` : ' / ∞'}
+                    </span>
+                    {voucher.max_redemptions > 0 && (
+                      <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-primary to-primary/60 transition-all"
+                          style={{
+                            width: `${Math.min((voucher.current_redemptions / voucher.max_redemptions) * 100, 100)}%`,
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  <VoucherActionsMenu
+                    voucherId={voucher.id}
+                    voucherTitle={voucher.title}
+                    currentStatus={voucher.status}
+                    currentRedemptions={voucher.current_redemptions}
+                    validUntil={voucher.valid_until}
+                    onEdit={() => { setSelectedVoucher(voucher); setEditModalOpen(true); }}
+                    onViewAnalytics={() => { setSelectedVoucher(voucher); setAnalyticsModalOpen(true); }}
+                    onSuccess={() => {}}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </Card>
+  );
+
+  const renderMobileCards = (items: Voucher[]) => (
+    <div className="space-y-3">
+      {items.map((voucher) => (
+        <VoucherMobileCard
+          key={voucher.id}
+          voucher={voucher}
+          onEdit={() => { setSelectedVoucher(voucher); setEditModalOpen(true); }}
+          onViewAnalytics={() => { setSelectedVoucher(voucher); setAnalyticsModalOpen(true); }}
+        />
+      ))}
+    </div>
+  );
+
+  const renderEmptyTab = () => (
+    <Card variant="glass" className="text-center py-8">
+      <CardContent>
+        <p className="text-muted-foreground text-sm">Keine Gutscheine in dieser Kategorie</p>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 space-y-6 overflow-x-hidden">
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
-            Manage Vouchers
+            Gutscheine
           </h1>
           <Button size="sm" className="gap-1.5 shrink-0" onClick={() => setCreateModalOpen(true)}>
             <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Create Voucher</span>
-            <span className="sm:hidden">New</span>
+            <span className="hidden sm:inline">Gutschein erstellen</span>
+            <span className="sm:hidden">Neu</span>
           </Button>
         </div>
         <p className="text-muted-foreground text-sm">
-          Create and manage special offers for your venues
+          Erstelle und verwalte Angebote für deine Venues
         </p>
       </div>
 
@@ -126,123 +232,44 @@ export default function PartnerVouchers() {
         <Card variant="elegant" className="text-center py-12">
           <CardContent>
             <Gift className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">No vouchers yet</h3>
+            <h3 className="text-xl font-semibold mb-2">Noch keine Gutscheine</h3>
             <p className="text-muted-foreground mb-6">
-              Create your first voucher to start attracting couples to your venue
+              Erstelle deinen ersten Gutschein, um Paare in dein Venue zu locken
             </p>
             <Button className="gap-2" onClick={() => setCreateModalOpen(true)}>
               <Plus className="w-4 h-4" />
-              Create Your First Voucher
+              Ersten Gutschein erstellen
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <Card variant="glass" className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title / Code</TableHead>
-                  <TableHead>Discount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Expires</TableHead>
-                  <TableHead>Redemptions</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {vouchers.map((voucher, index) => (
-                  <TableRow 
-                    key={voucher.id} 
-                    className="hover:bg-muted/50 transition-colors opacity-0 animate-fade-in"
-                    style={{
-                      animationDelay: `${index * 50}ms`,
-                      animationFillMode: 'forwards'
-                    }}
-                  >
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{voucher.title}</div>
-                        <code className="text-xs bg-muted px-2 py-1 rounded">
-                          {voucher.code}
-                        </code>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-semibold">
-                        {formatDiscount(voucher.discount_type, voucher.discount_value)}
-                      </span>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(voucher)}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {format(new Date(voucher.valid_until), 'MMM dd, yyyy')}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">
-                          {voucher.current_redemptions}
-                          {voucher.max_redemptions ? ` / ${voucher.max_redemptions}` : ' / ∞'}
-                        </span>
-                        {voucher.max_redemptions && (
-                          <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all"
-                              style={{
-                                width: `${Math.min(
-                                  (voucher.current_redemptions / voucher.max_redemptions) * 100,
-                                  100
-                                )}%`,
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <VoucherActionsMenu
-                        voucherId={voucher.id}
-                        voucherTitle={voucher.title}
-                        currentStatus={voucher.status}
-                        currentRedemptions={voucher.current_redemptions}
-                        validUntil={voucher.valid_until}
-                        onEdit={() => {
-                          setSelectedVoucher(voucher);
-                          setEditModalOpen(true);
-                        }}
-                        onViewAnalytics={() => {
-                          setSelectedVoucher(voucher);
-                          setAnalyticsModalOpen(true);
-                        }}
-                        onSuccess={() => {}}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </Card>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as VoucherTab)}>
+          <TabsList className="w-full grid grid-cols-3">
+            <TabsTrigger value="active" className="text-xs sm:text-sm">
+              Aktiv {tabCounts.active > 0 && <Badge variant="secondary" className="ml-1.5 text-[10px] px-1.5">{tabCounts.active}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="expired" className="text-xs sm:text-sm">
+              Abgelaufen {tabCounts.expired > 0 && <Badge variant="secondary" className="ml-1.5 text-[10px] px-1.5">{tabCounts.expired}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="inactive" className="text-xs sm:text-sm">
+              Inaktiv {tabCounts.inactive > 0 && <Badge variant="secondary" className="ml-1.5 text-[10px] px-1.5">{tabCounts.inactive}</Badge>}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value={activeTab}>
+            {filteredVouchers.length === 0
+              ? renderEmptyTab()
+              : isMobile
+                ? renderMobileCards(filteredVouchers)
+                : renderVoucherTable(filteredVouchers)
+            }
+          </TabsContent>
+        </Tabs>
       )}
 
-      <VoucherCreationModal
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-        onSuccess={() => setCreateModalOpen(false)}
-      />
-
-      <VoucherEditModal
-        open={editModalOpen}
-        onOpenChange={setEditModalOpen}
-        voucher={selectedVoucher}
-        onSuccess={() => setEditModalOpen(false)}
-      />
-
-      <VoucherAnalyticsModal
-        open={analyticsModalOpen}
-        onOpenChange={setAnalyticsModalOpen}
-        voucherId={selectedVoucher?.id || null}
-        voucherTitle={selectedVoucher?.title || ''}
-      />
+      <VoucherCreationModal open={createModalOpen} onOpenChange={setCreateModalOpen} onSuccess={() => setCreateModalOpen(false)} />
+      <VoucherEditModal open={editModalOpen} onOpenChange={setEditModalOpen} voucher={selectedVoucher} onSuccess={() => setEditModalOpen(false)} />
+      <VoucherAnalyticsModal open={analyticsModalOpen} onOpenChange={setAnalyticsModalOpen} voucherId={selectedVoucher?.id || null} voucherTitle={selectedVoucher?.title || ''} />
     </div>
   );
 }

@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePartnerDashboardStats } from '@/hooks/usePartnerDashboardStats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode, Map, UserCog, Trophy } from 'lucide-react';
+import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode, Map, UserCog, Trophy, Star } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import LanguageSelector from '@/components/LanguageSelector';
 import RedemptionChart from '@/components/partner/RedemptionChart';
@@ -18,6 +19,7 @@ export default function PartnerDashboard() {
   const { role, loading: roleLoading } = useUserRole();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { stats, loading: statsLoading } = usePartnerDashboardStats(user?.id);
 
   const isLoading = roleLoading || authLoading;
 
@@ -85,7 +87,7 @@ export default function PartnerDashboard() {
             <Gift className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent className="pt-0 md:pt-0">
-            <div className="text-2xl md:text-3xl font-bold">0</div>
+            <div className="text-2xl md:text-3xl font-bold">{statsLoading ? '–' : stats.activeVouchers}</div>
             <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{t('partner.activeVouchersDesc')}</p>
           </CardContent>
         </Card>
@@ -96,7 +98,7 @@ export default function PartnerDashboard() {
             <Users className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent className="pt-0 md:pt-0">
-            <div className="text-2xl md:text-3xl font-bold">0</div>
+            <div className="text-2xl md:text-3xl font-bold">{statsLoading ? '–' : stats.totalRedemptions}</div>
             <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{t('partner.totalRedemptionsDesc')}</p>
           </CardContent>
         </Card>
@@ -107,19 +109,23 @@ export default function PartnerDashboard() {
             <TrendingUp className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent className="pt-0 md:pt-0">
-            <div className="text-2xl md:text-3xl font-bold">0</div>
+            <div className="text-2xl md:text-3xl font-bold">{statsLoading ? '–' : stats.thisMonthRedemptions}</div>
             <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{t('partner.thisMonthDesc')}</p>
           </CardContent>
         </Card>
 
         <Card variant="glass" className="group hover:scale-105 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('partner.managedVenues')}</CardTitle>
-            <Sparkles className="w-4 h-4 text-primary" />
+            <CardTitle className="text-sm font-medium">{stats.avgRating !== null ? t('partner.avgRating', 'Ø Bewertung') : t('partner.managedVenues')}</CardTitle>
+            {stats.avgRating !== null ? <Star className="w-4 h-4 text-primary" /> : <Sparkles className="w-4 h-4 text-primary" />}
           </CardHeader>
           <CardContent className="pt-0 md:pt-0">
-            <div className="text-2xl md:text-3xl font-bold">0</div>
-            <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{t('partner.managedVenuesDesc')}</p>
+            <div className="text-2xl md:text-3xl font-bold">
+              {statsLoading ? '–' : stats.avgRating !== null ? `${stats.avgRating} ★` : stats.managedVenues}
+            </div>
+            <p className="text-[11px] md:text-xs text-muted-foreground mt-1">
+              {stats.avgRating !== null ? t('partner.avgRatingDesc', 'Durchschnittliche Venue-Bewertung') : t('partner.managedVenuesDesc')}
+            </p>
           </CardContent>
         </Card>
       </div>
