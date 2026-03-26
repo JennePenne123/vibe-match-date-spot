@@ -5,11 +5,12 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePartnerDashboardStats } from '@/hooks/usePartnerDashboardStats';
 import { usePartnerOnboardingState } from '@/hooks/usePartnerOnboardingState';
+import { usePartnerMembership } from '@/hooks/usePartnerMembership';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode, Map, UserCog, Trophy, Star } from 'lucide-react';
+import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode, Map, UserCog, Trophy, Star, Lock } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import LanguageSelector from '@/components/LanguageSelector';
 import RedemptionChart from '@/components/partner/RedemptionChart';
@@ -25,6 +26,8 @@ import PartnerVerificationBanner from '@/components/partner/PartnerVerificationB
 import SupportContactCard from '@/components/partner/SupportContactCard';
 import RealtimeRedemptionToast from '@/components/partner/RealtimeRedemptionToast';
 import ConversionRateCard from '@/components/partner/ConversionRateCard';
+import MembershipCard from '@/components/partner/MembershipCard';
+import ProFeatureGate from '@/components/partner/ProFeatureGate';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
