@@ -1,7 +1,7 @@
 
 # VybePulse – Gesamt-Projektübersicht & Roadmap
 
-**Stand: 25. März 2026 (Abend-Update)** | **Geschätzter Fortschritt: ~90%**
+**Stand: 26. März 2026 (Abend-Update)** | **Geschätzter Fortschritt: ~93%**
 
 ---
 
@@ -11,7 +11,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## ✅ Fertiggestellte Features (~90%)
+## ✅ Fertiggestellte Features (~93%)
 
 ### 🏠 User-Frontend
 - **Landing Page** mit Auth-Modal (Google, Apple, E-Mail) + Social Proof Banner
@@ -72,21 +72,26 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Referral-System** mit Codes + Punkten
 - **Push-Notifications bei Voucher-Einlösung** (User + Partner + Voucher-Ersteller)
 
-### 📱 Social & Viral Features ✅ NEU
+### 📱 Social & Viral Features ✅
 - **WhatsApp/Telegram Share** für Date-Einladungen (1-Tap Share-Button)
 - **Native Share API** als Fallback
 - **Social Proof Banner** auf der Landing Page (User-Counts, Match-Genauigkeit)
 - **Link-Kopieren** für Date-Einladungen
 
-### 👔 Partner-Portal
-- **Dashboard** mit KPIs
+### 👔 Partner-Portal ✅ ERWEITERT (26. März)
+- **Dashboard** mit KPIs + Membership-Karte + Billing-Übersicht
 - **Venue Management** (Fotos, Details, Öffnungszeiten)
 - **Voucher-Erstellung & -Verwaltung** (mit Analytics)
 - **QR-Scanner** (User-Voucher einlösen + Partner-Netzwerk)
 - **City Rankings** (Venue-Performance nach Stadt)
 - **Reports** mit PDF-Export
 - **Partner-Netzwerk** (exklusive Vouchers zwischen Partnern)
-- **Guest Feedback Widget**
+- **Guest Feedback** ✅ NEU — Anonymes, unidirektionales Feedback (Kategorien: Essen, Service, Ambiente, Preis-Leistung) mit Trend-Analyse & pro-Venue-Vergleich. Keine Venue-Antwort möglich (Nutzerschutz).
+- **Membership-System** ✅ NEU — Free/Pro-Tiers mit Feature-Gating (ProFeatureGate), Founding Partner Badge, MembershipCard mit Upgrade-CTA
+- **Treue-Bonus** ✅ NEU — Founding Partners erhalten nach 12 bezahlten Pro-Monaten automatisch 3 Monate Pro gratis. Fortschrittsbalken in MembershipCard, täglicher Cron-Check (`check-loyalty-bonus`)
+- **Legal-Framework** ✅ NEU — AGB-/Datenschutz-Akzeptanz im Onboarding mit Versionierung & Timestamps, Platzhalter-Seiten für rechtliche Texte
+- **Billing-Übersicht** ✅ NEU — Aktueller Plan, Preisanzeige, Founding Partner Status, Stripe-vorbereitet
+- **22-Länder-Verifizierung** (USt-IdNr., Tax ID, ABN etc.)
 
 ### 🔐 Admin Dashboard
 - **Dashboard** mit KPIs
@@ -106,7 +111,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - **Input Sanitization** (DOMPurify)
 - **Session Cleanup** (automatisch)
 - **OSRM Routing** Integration
-- **Security Scan: 8/8 Findings gefixt** ✅ NEU
+- **Security Scan: 8/8 Findings gefixt** ✅
   - profiles_safe E-Mail-Leak behoben
   - Venue-Policy Source-Bypass entfernt
   - Analytics-Views mit security_invoker gesichert
@@ -127,7 +132,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## 🔧 Offene Aufgaben vor Launch (~11%)
+## 🔧 Offene Aufgaben vor Launch (~7%)
 
 ### 🔴 Kritisch (Must-Have für Launch)
 
@@ -135,36 +140,47 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 |---|---------|--------|--------------|
 | 1 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons (192x192, 512x512), Favicons (16x16, 32x32, 180x180) |
 | 2 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles (user_id, role) VALUES ('UUID', 'admin')` im SQL Editor |
+| 3 | **Rechtliche Texte finalisieren** | 🔴 Extern | AGB + Datenschutzerklärung durch Anwalt prüfen lassen, Platzhalter befüllen |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 3 | **Bundle-Optimierung** | 🟡 Offen | Code-Splitting, Lazy Loading für Routes, Tree-Shaking-Audit |
-| 4 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
-| 5 | **E2E Testing** | 🟡 Offen | Kritische Flows testen (Auth, Onboarding, Recommendations, Date-Invite) |
+| 4 | **Bundle-Optimierung** | 🟡 Offen | Code-Splitting, Lazy Loading für Routes, Tree-Shaking-Audit |
+| 5 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor, Terrasse) |
+| 6 | **E2E Testing** | 🟡 Offen | Kritische Flows testen (Auth, Onboarding, Recommendations, Date-Invite) |
 
 ### 🟢 Post-Launch / Nice-to-Have
 
 | # | Aufgabe | Aufwand | Beschreibung |
 |---|---------|---------|--------------|
-| 6 | **Stripe-Integration (Partner + User)** | Groß | Partner-Abo (14,90€/Monat), User-Premium, Checkout, Webhooks, `paid_pro_since` automatisch setzen, Founding Partner Gratis-Jahr |
-| 7 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
-| 8 | **Standort-Picker im Planner** | Klein | Schneller Stadtwechsel direkt im Smart Date Planner |
-| 9 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
-| 10 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
-| 11 | **Gemeinsames Planen verbessern** | Mittel | Freunde direkt in die App einladen zum kollaborativen Planning |
-| 12 | **🎉 Event-System** | Groß | Events-Tabelle, AI-Scoring für Events, kombinierte Vorschläge (Event + Venue), Partner können Events erstellen |
-| 13 | **Event-Kategorien** | Mittel | Konzerte, Ausstellungen, Food-Festivals, Workshops, Sport-Events, Open-Air |
-| 14 | **Event + Venue Combos** | Mittel | AI schlägt "Erst Konzert, dann Dinner nebenan" vor |
-| 15 | **Event-Kalender** | Mittel | Kalender-View für anstehende Events in der Nähe |
-| 16 | **A/B Testing Framework** | Mittel | Feature-Flags, Conversion-Tracking für UI-Varianten |
-| 17 | **Multi-User Date Groups** | Groß | Gruppen-Dates planen (3+ Personen, z.B. Doppel-Date) |
-| 18 | **Venue-Reviews von Usern** | Mittel | Eigene Review-Funktion statt nur Feedback-Buttons |
-| 19 | **AI Date-Recap** | Klein | Nach dem Date: AI generiert eine kurze Zusammenfassung + Erinnerungs-Foto-Prompt |
-| 20 | **Partner-Analytics v2** | Mittel | Heatmaps, Conversion Funnels, Zeitraum-Vergleiche im Partner-Portal |
+| 7 | **Stripe-Integration (Partner + User)** | Groß | Partner-Abo (14,90€/Monat), User-Premium, Checkout, Webhooks, `paid_pro_since` automatisch setzen, Founding Partner Gratis-Jahr, Treue-Bonus-Trigger |
+| 8 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
+| 9 | **Standort-Picker im Planner** | Klein | Schneller Stadtwechsel direkt im Smart Date Planner |
+| 10 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
+| 11 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
+| 12 | **Gemeinsames Planen verbessern** | Mittel | Freunde direkt in die App einladen zum kollaborativen Planning |
+| 13 | **🎉 Event-System** | Groß | Events-Tabelle, AI-Scoring für Events, kombinierte Vorschläge (Event + Venue), Partner können Events erstellen |
+| 14 | **Event-Kategorien** | Mittel | Konzerte, Ausstellungen, Food-Festivals, Workshops, Sport-Events, Open-Air |
+| 15 | **Event + Venue Combos** | Mittel | AI schlägt "Erst Konzert, dann Dinner nebenan" vor |
+| 16 | **Event-Kalender** | Mittel | Kalender-View für anstehende Events in der Nähe |
+| 17 | **A/B Testing Framework** | Mittel | Feature-Flags, Conversion-Tracking für UI-Varianten |
+| 18 | **Multi-User Date Groups** | Groß | Gruppen-Dates planen (3+ Personen, z.B. Doppel-Date) |
+| 19 | **Venue-Reviews von Usern** | Mittel | Eigene Review-Funktion statt nur Feedback-Buttons |
+| 20 | **AI Date-Recap** | Klein | Nach dem Date: AI generiert eine kurze Zusammenfassung + Erinnerungs-Foto-Prompt |
+| 21 | **Partner-Analytics v2** | Mittel | Heatmaps, Conversion Funnels, Zeitraum-Vergleiche im Partner-Portal |
 
-### ✅ Heute erledigt (25. März 2026)
+### ✅ Heute erledigt (26. März 2026)
+
+| Aufgabe | Beschreibung |
+|---------|--------------|
+| ~~Guest Feedback Loop~~ | Anonymes, kategorisiertes Feedback (Essen/Service/Ambiente/Preis) mit Trend-Charts, unidirektional |
+| ~~Membership-System~~ | Free/Pro-Tiers, ProFeatureGate, MembershipCard mit Feature-Liste & Upgrade-CTA |
+| ~~Treue-Bonus-System~~ | 12 Monate bezahltes Pro → 3 Monate gratis, Fortschrittsbalken, täglicher Cron-Check |
+| ~~Legal-Framework~~ | AGB-/Datenschutz-Akzeptanz im Partner-Onboarding mit Versionierung + Platzhalter-Seiten |
+| ~~Billing-Übersicht~~ | Plan-Anzeige, Pricing, Founding Partner Status im Partner-Dashboard |
+
+### ✅ Zuvor erledigt (25. März 2026)
 
 | Aufgabe | Beschreibung |
 |---------|--------------|
@@ -183,26 +199,27 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 ## 📊 Fortschritts-Einschätzung
 
 ```
-Gesamt-Fortschritt: ████████████████████████████░░ ~90%
+Gesamt-Fortschritt: █████████████████████████████░ ~93%
 
-Frontend UI/UX:     ██████████████████████████████ ~98%  ↑ Framer Motion
-KI-Engine:          █████████████████████████████░ ~96%  ↑ 14-Signal-Pipeline
-Date-Planning:      █████████████████████████████░ ~96%  ↑ Auto-Erinnerungen
+Frontend UI/UX:     ██████████████████████████████ ~98%
+KI-Engine:          █████████████████████████████░ ~96%
+Date-Planning:      █████████████████████████████░ ~96%
 Venue-System:       ██████████████████████████░░░░ ~88%
-Voucher/Rewards:    ██████████████████████████░░░░ ~87%  ↑ Premium Badge
-Partner-Portal:     █████████████████████████░░░░░ ~85%
+Voucher/Rewards:    ██████████████████████████░░░░ ~87%
+Partner-Portal:     ████████████████████████████░░ ~92%  ↑ Feedback, Membership, Legal, Billing, Treue-Bonus
 Admin Dashboard:    █████████████████████████████░ ~95%
-Security/Infra:     █████████████████████████████░ ~95%  ↑ 8 Findings gefixt
+Security/Infra:     █████████████████████████████░ ~95%
 Social/Viral:       ████████████████████████░░░░░░ ~80%
-Monetarisierung:    ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~10% (Stripe geplant)
-Performance:        ███████████████████████████░░░ ~88%  ↑ Animationen
-DSGVO/Legal:        ████████████████████████████░░ ~92%
+Monetarisierung:    █████░░░░░░░░░░░░░░░░░░░░░░░░░ ~18% ↑ Tiers & Billing UI (Stripe ausstehend)
+Performance:        ███████████████████████████░░░ ~88%
+DSGVO/Legal:        █████████████████████████████░ ~95%  ↑ Legal-Framework
 ```
 
 ### Zeitliche Einschätzung bis Launch (Sommer 2026)
-- **Kritische Aufgaben (1-2)**: ~1 Session + manuelle Dashboard-Schritte
-- **Wichtige Aufgaben (3-5)**: ~2-3 Sessions
-- **Gesamt bis MVP-Launch**: ~3-4 Sessions
+- **Kritische Aufgaben (1-3)**: ~1 Session + externe Anwaltsprüfung
+- **Wichtige Aufgaben (4-6)**: ~2-3 Sessions
+- **Gesamt bis MVP-Launch**: ~3 Sessions
+- **Stripe-Integration**: ~1-2 Sessions (wenn bereit)
 - **Post-Launch Features**: Laufend nach Priorität
 
 ---
