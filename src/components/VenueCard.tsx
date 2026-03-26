@@ -10,6 +10,7 @@ import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
 import { useBreakpoint } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import VerifiedBadge from '@/components/partner/VerifiedBadge';
 
 interface VenueCardProps {
   venue: Venue;
@@ -18,6 +19,7 @@ interface VenueCardProps {
   showActions?: boolean;
   isLiked?: boolean;
   onToggleLike?: (venueId: string) => void;
+  isVerifiedPartner?: boolean;
 }
 
 const VenueCard = ({ 
@@ -26,7 +28,8 @@ const VenueCard = ({
   showMatchScore = true,
   showActions = true,
   isLiked = false,
-  onToggleLike 
+  onToggleLike,
+  isVerifiedPartner = false,
 }: VenueCardProps) => {
   const navigate = useNavigate();
   const { isDesktop } = useBreakpoint();
@@ -110,9 +113,12 @@ const VenueCard = ({
           <div className="space-y-2">
             {/* Title and Rating */}
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-semibold text-lg text-foreground leading-tight line-clamp-2">
-                {venue.name}
-              </h3>
+              <div className="flex items-center gap-1.5">
+                <h3 className="font-semibold text-lg text-foreground leading-tight line-clamp-2">
+                  {venue.name}
+                </h3>
+                {isVerifiedPartner && <VerifiedBadge size="sm" />}
+              </div>
               {venue.rating && (
                 <div className="flex items-center gap-1 text-sm text-muted-foreground flex-shrink-0">
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -285,7 +291,10 @@ const VenueCard = ({
 
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <h3 className="font-bold text-lg text-foreground">{venue.name}</h3>
+          <div className="flex items-center gap-1.5">
+            <h3 className="font-bold text-lg text-foreground">{venue.name}</h3>
+            {isVerifiedPartner && <VerifiedBadge />}
+          </div>
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-yellow-400 fill-current" />
             <span className="text-sm font-medium">{venue.rating}</span>

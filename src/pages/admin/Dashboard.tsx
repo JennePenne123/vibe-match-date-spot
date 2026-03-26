@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity } from 'lucide-react';
+import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface PlatformStats {
@@ -16,6 +16,8 @@ interface PlatformStats {
   totalRedemptions: number;
   totalApiCalls: number;
   estimatedApiCost: number;
+  verifiedPartners: number;
+  pendingPartners: number;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -32,6 +34,8 @@ const AdminDashboard: React.FC = () => {
         vouchersRes,
         redemptionsRes,
         apiLogsRes,
+        verifiedPartnersRes,
+        pendingPartnersRes,
       ] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('date_invitations').select('id', { count: 'exact', head: true }),
@@ -40,6 +44,8 @@ const AdminDashboard: React.FC = () => {
         supabase.from('vouchers').select('id', { count: 'exact', head: true }),
         supabase.from('voucher_redemptions').select('id', { count: 'exact', head: true }),
         supabase.from('api_usage_logs').select('estimated_cost'),
+        supabase.from('partner_profiles').select('id', { count: 'exact', head: true }).eq('verification_status', 'verified'),
+        supabase.from('partner_profiles').select('id', { count: 'exact', head: true }).in('verification_status', ['pending_review', 'unverified']),
       ]);
 
       const totalApiCost = (apiLogsRes.data || []).reduce((sum, r) => sum + (Number(r.estimated_cost) || 0), 0);
@@ -53,6 +59,8 @@ const AdminDashboard: React.FC = () => {
         totalRedemptions: redemptionsRes.count || 0,
         totalApiCalls: (apiLogsRes.data || []).length,
         estimatedApiCost: Math.round(totalApiCost * 100) / 100,
+        verifiedPartners: verifiedPartnersRes.count || 0,
+        pendingPartners: pendingPartnersRes.count || 0,
       };
     },
     staleTime: STALE_TIMES.ADMIN,
@@ -67,6 +75,8 @@ const AdminDashboard: React.FC = () => {
     { label: t('admin.voucherRedemptions', 'Einlösungen'), value: stats?.totalRedemptions ?? 0, icon: Ticket, color: 'text-orange-400' },
     { label: t('admin.apiCalls', 'API Calls'), value: stats?.totalApiCalls ?? 0, icon: Activity, color: 'text-cyan-400' },
     { label: t('admin.apiCost', 'API Kosten (€)'), value: `€${stats?.estimatedApiCost ?? 0}`, icon: DollarSign, color: 'text-red-400' },
+    { label: t('admin.verifiedPartners', 'Verifizierte Partner'), value: stats?.verifiedPartners ?? 0, icon: ShieldCheck, color: 'text-emerald-400' },
+    { label: t('admin.pendingPartners', 'Offene Verifizierungen'), value: stats?.pendingPartners ?? 0, icon: ShieldAlert, color: 'text-yellow-400' },
   ];
 
   return (

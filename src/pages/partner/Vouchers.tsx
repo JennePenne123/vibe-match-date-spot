@@ -21,6 +21,8 @@ import VoucherMobileCard from '@/components/partner/VoucherMobileCard';
 import { format } from 'date-fns';
 import { useRealtimeVouchers } from '@/hooks/useRealtimeVouchers';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { usePartnerVerificationGuard } from '@/hooks/usePartnerVerificationGuard';
+import VerificationLockOverlay from '@/components/partner/VerificationLockOverlay';
 
 interface Voucher {
   id: string;
@@ -55,6 +57,7 @@ export default function PartnerVouchers() {
   const [activeTab, setActiveTab] = useState<VoucherTab>('active');
 
   const { vouchers, loading, connected } = useRealtimeVouchers(userId);
+  const { isLocked } = usePartnerVerificationGuard();
 
   useEffect(() => {
     if (!roleLoading && role !== 'venue_partner' && role !== 'admin') {
@@ -208,6 +211,7 @@ export default function PartnerVouchers() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 space-y-6 overflow-x-hidden">
+      {isLocked && <VerificationLockOverlay feature="Gutscheine" />}
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-romantic bg-clip-text text-transparent">

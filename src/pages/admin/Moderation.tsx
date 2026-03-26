@@ -8,9 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Star, AlertTriangle, CheckCircle2, MapPin, ThumbsUp, ThumbsDown, Shield } from 'lucide-react';
+import { MessageCircle, Star, AlertTriangle, CheckCircle2, MapPin, ThumbsUp, ThumbsDown, Shield, ShieldCheck } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import PartnerVerificationReview from '@/components/admin/PartnerVerificationReview';
 
 const AdminModeration: React.FC = () => {
   const { t } = useTranslation();
@@ -36,6 +37,10 @@ const AdminModeration: React.FC = () => {
             <ThumbsUp className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">Venue-Feedback</span>
           </TabsTrigger>
+          <TabsTrigger value="partner-review" className="gap-1.5 flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">
+            <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Partner</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="feedback" className="mt-4">
@@ -46,6 +51,9 @@ const AdminModeration: React.FC = () => {
         </TabsContent>
         <TabsContent value="venue-feedback" className="mt-4">
           <VenueFeedbackList />
+        </TabsContent>
+        <TabsContent value="partner-review" className="mt-4">
+          <PartnerVerificationReview />
         </TabsContent>
       </Tabs>
     </div>
