@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePartnerDashboardStats } from '@/hooks/usePartnerDashboardStats';
+import { usePartnerOnboardingState } from '@/hooks/usePartnerOnboardingState';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,9 @@ import LanguageSelector from '@/components/LanguageSelector';
 import RedemptionChart from '@/components/partner/RedemptionChart';
 import VoucherAlerts from '@/components/partner/VoucherAlerts';
 import GuestFeedbackCard from '@/components/partner/GuestFeedbackCard';
+import PartnerOnboardingBanner from '@/components/partner/PartnerOnboardingBanner';
+import PartnerNotificationsCard from '@/components/partner/PartnerNotificationsCard';
+import VenuePerformanceCard from '@/components/partner/VenuePerformanceCard';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
@@ -20,6 +24,7 @@ export default function PartnerDashboard() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { stats, loading: statsLoading } = usePartnerDashboardStats(user?.id);
+  const onboarding = usePartnerOnboardingState(user?.id);
 
   const isLoading = roleLoading || authLoading;
 
@@ -80,6 +85,15 @@ export default function PartnerDashboard() {
         </div>
       </div>
 
+      {/* Onboarding Banner */}
+      {!onboarding.loading && (
+        <PartnerOnboardingBanner
+          hasProfile={onboarding.hasProfile}
+          hasVenues={onboarding.hasVenues}
+          hasVouchers={onboarding.hasVouchers}
+        />
+      )}
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <Card variant="glass" className="group hover:scale-105 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -128,6 +142,12 @@ export default function PartnerDashboard() {
             </p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Notifications & Performance side by side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+        <PartnerNotificationsCard />
+        <VenuePerformanceCard />
       </div>
 
       {/* Voucher Alerts */}
