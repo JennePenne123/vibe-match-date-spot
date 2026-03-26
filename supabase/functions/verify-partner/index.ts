@@ -8,32 +8,78 @@ const corsHeaders = {
 
 interface VerifyRequest {
   tax_id: string;
-  tax_id_type: 'ust_id' | 'steuernummer';
-  country_code?: string;
+  tax_id_type: 'vat_id' | 'local_tax_number';
+  country_code: string;
   business_name?: string;
   address?: string;
   city?: string;
 }
 
+// EU member state VAT ID prefixes and basic format validation
+const EU_VAT_FORMATS: Record<string, { prefix: string; pattern: RegExp; label: string }> = {
+  AT: { prefix: 'ATU', pattern: /^ATU\d{8}$/, label: 'UID-Nummer' },
+  BE: { prefix: 'BE', pattern: /^BE[01]\d{9}$/, label: 'BTW-nummer' },
+  BG: { prefix: 'BG', pattern: /^BG\d{9,10}$/, label: 'ДДС номер' },
+  HR: { prefix: 'HR', pattern: /^HR\d{11}$/, label: 'OIB' },
+  CY: { prefix: 'CY', pattern: /^CY\d{8}[A-Z]$/, label: 'ΦΠΑ' },
+  CZ: { prefix: 'CZ', pattern: /^CZ\d{8,10}$/, label: 'DIČ' },
+  DK: { prefix: 'DK', pattern: /^DK\d{8}$/, label: 'CVR/SE-nr' },
+  EE: { prefix: 'EE', pattern: /^EE\d{9}$/, label: 'KMKR-number' },
+  FI: { prefix: 'FI', pattern: /^FI\d{8}$/, label: 'ALV-numero' },
+  FR: { prefix: 'FR', pattern: /^FR[A-Z0-9]{2}\d{9}$/, label: 'TVA' },
+  DE: { prefix: 'DE', pattern: /^DE\d{9}$/, label: 'USt-IdNr.' },
+  GR: { prefix: 'EL', pattern: /^EL\d{9}$/, label: 'ΑΦΜ' },
+  HU: { prefix: 'HU', pattern: /^HU\d{8}$/, label: 'Adószám' },
+  IE: { prefix: 'IE', pattern: /^IE\d{7}[A-Z]{1,2}$/, label: 'VAT number' },
+  IT: { prefix: 'IT', pattern: /^IT\d{11}$/, label: 'Partita IVA' },
+  LV: { prefix: 'LV', pattern: /^LV\d{11}$/, label: 'PVN' },
+  LT: { prefix: 'LT', pattern: /^LT(\d{9}|\d{12})$/, label: 'PVM' },
+  LU: { prefix: 'LU', pattern: /^LU\d{8}$/, label: 'TVA' },
+  MT: { prefix: 'MT', pattern: /^MT\d{8}$/, label: 'VAT number' },
+  NL: { prefix: 'NL', pattern: /^NL\d{9}B\d{2}$/, label: 'BTW-nummer' },
+  PL: { prefix: 'PL', pattern: /^PL\d{10}$/, label: 'NIP' },
+  PT: { prefix: 'PT', pattern: /^PT\d{9}$/, label: 'NIF' },
+  RO: { prefix: 'RO', pattern: /^RO\d{2,10}$/, label: 'CIF' },
+  SK: { prefix: 'SK', pattern: /^SK\d{10}$/, label: 'IČ DPH' },
+  SI: { prefix: 'SI', pattern: /^SI\d{8}$/, label: 'DDV' },
+  ES: { prefix: 'ES', pattern: /^ES[A-Z0-9]\d{7}[A-Z0-9]$/, label: 'NIF/CIF' },
+  SE: { prefix: 'SE', pattern: /^SE\d{12}$/, label: 'Momsnummer' },
+};
+
+// Non-EU countries with local tax ID formats
+const NON_EU_TAX_FORMATS: Record<string, { pattern: RegExp; label: string }> = {
+  CH: { pattern: /^CHE[\-\.]?\d{3}[\-\.]?\d{3}[\-\.]?\d{3}$/, label: 'UID/MWST-Nr.' },
+  GB: { pattern: /^\d{9,12}$/, label: 'VAT Registration Number' },
+  US: { pattern: /^\d{2}[\-]?\d{7}$/, label: 'EIN (Tax ID)' },
+  NO: { pattern: /^\d{9}MVA$/, label: 'MVA-nummer' },
+};
+
+const isEuCountry = (cc: string) => cc in EU_VAT_FORMATS;
+
 // Validate EU VAT ID via VIES SOAP API
 async function validateViesVatId(vatId: string, countryCode: string): Promise<{ valid: boolean; name?: string; address?: string; error?: string }> {
-  // Clean the VAT ID - remove spaces, dashes
   const cleanVatId = vatId.replace(/[\s\-\.]/g, '');
   
-  // Extract country code from VAT ID if present
   let cc = countryCode.toUpperCase();
   let vatNumber = cleanVatId;
   
+  // Use EL prefix for Greece
+  const viesCountryCode = cc === 'GR' ? 'EL' : cc;
+  
   if (/^[A-Z]{2}/.test(cleanVatId)) {
-    cc = cleanVatId.substring(0, 2);
+    const extractedCC = cleanVatId.substring(0, 2);
+    // Map EL back to GR for country matching
+    cc = extractedCC === 'EL' ? 'GR' : extractedCC;
     vatNumber = cleanVatId.substring(2);
   }
+
+  const soapCC = cc === 'GR' ? 'EL' : cc;
 
   const soapBody = `<?xml version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:ec.europa.eu:taxud:vies:services:checkVat:types">
   <soapenv:Body>
     <urn:checkVat>
-      <urn:countryCode>${cc}</urn:countryCode>
+      <urn:countryCode>${soapCC}</urn:countryCode>
       <urn:vatNumber>${vatNumber}</urn:vatNumber>
     </urn:checkVat>
   </soapenv:Body>
@@ -42,26 +88,18 @@ async function validateViesVatId(vatId: string, countryCode: string): Promise<{ 
   try {
     const response = await fetch('https://ec.europa.eu/taxation_customs/vies/services/checkVatService', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'text/xml;charset=UTF-8',
-        'SOAPAction': '',
-      },
+      headers: { 'Content-Type': 'text/xml;charset=UTF-8', 'SOAPAction': '' },
       body: soapBody,
     });
 
     const text = await response.text();
-    
     const validMatch = text.match(/<ns2:valid>(true|false)<\/ns2:valid>/);
     const nameMatch = text.match(/<ns2:name>([^<]*)<\/ns2:name>/);
     const addressMatch = text.match(/<ns2:address>([^<]*)<\/ns2:address>/);
     
     if (!validMatch) {
-      // Check for fault
       const faultMatch = text.match(/<faultstring>([^<]*)<\/faultstring>/);
-      return { 
-        valid: false, 
-        error: faultMatch ? faultMatch[1] : 'VIES API response could not be parsed' 
-      };
+      return { valid: false, error: faultMatch ? faultMatch[1] : 'VIES API response could not be parsed' };
     }
 
     return {
@@ -75,19 +113,28 @@ async function validateViesVatId(vatId: string, countryCode: string): Promise<{ 
   }
 }
 
-// Validate German Steuernummer format (basic format check)
-function validateSteuernummer(steuernummer: string): { valid: boolean; error?: string } {
-  const clean = steuernummer.replace(/[\s\-\/]/g, '');
+// Validate local tax number format by country
+function validateLocalTaxNumber(taxNumber: string, countryCode: string): { valid: boolean; error?: string } {
+  const clean = taxNumber.replace(/[\s]/g, '');
   
-  // German tax numbers are 10-11 digits (unified) or 13 digits (with Bundesland prefix)
-  if (!/^\d{10,13}$/.test(clean)) {
-    return { valid: false, error: 'Steuernummer muss 10-13 Ziffern haben' };
+  // Check non-EU formats
+  const nonEuFormat = NON_EU_TAX_FORMATS[countryCode];
+  if (nonEuFormat) {
+    if (!nonEuFormat.pattern.test(clean)) {
+      return { valid: false, error: `Invalid ${nonEuFormat.label} format` };
+    }
+    return { valid: true };
+  }
+
+  // For EU countries, local tax numbers vary widely - do basic digit check
+  if (clean.replace(/[\-\/\.]/g, '').length < 5) {
+    return { valid: false, error: 'Tax number too short' };
   }
   
   return { valid: true };
 }
 
-// Simple address verification using Google Places text search
+// Address verification using Google Places
 async function verifyAddress(businessName: string, address: string, city: string): Promise<{ verified: boolean; confidence: number; matchedName?: string }> {
   const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
   if (!apiKey) {
@@ -98,9 +145,8 @@ async function verifyAddress(businessName: string, address: string, city: string
   try {
     const query = encodeURIComponent(`${businessName} ${address} ${city}`);
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${apiKey}&language=de`
+      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${apiKey}`
     );
-    
     const data = await response.json();
     
     if (data.status !== 'OK' || !data.results?.length) {
@@ -115,11 +161,7 @@ async function verifyAddress(businessName: string, address: string, city: string
     if (nameMatch) confidence += 50;
     if (addressMatch) confidence += 50;
 
-    return {
-      verified: confidence >= 50,
-      confidence,
-      matchedName: topResult.name,
-    };
+    return { verified: confidence >= 50, confidence, matchedName: topResult.name };
   } catch (error) {
     console.error('Google Places verification error:', error);
     return { verified: false, confidence: 0 };
@@ -132,7 +174,6 @@ serve(async (req) => {
   }
 
   try {
-    // Auth check
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Missing authorization' }), {
@@ -162,43 +203,62 @@ serve(async (req) => {
       });
     }
 
+    const cc = country_code.toUpperCase();
     let taxVerification: { valid: boolean; error?: string; name?: string; address?: string };
-    
-    if (tax_id_type === 'ust_id') {
-      taxVerification = await validateViesVatId(tax_id, country_code);
+
+    if (tax_id_type === 'vat_id') {
+      if (isEuCountry(cc)) {
+        taxVerification = await validateViesVatId(tax_id, cc);
+      } else if (cc === 'CH') {
+        // Swiss UID - format check only (no VIES)
+        const clean = tax_id.replace(/[\s\-\.]/g, '');
+        taxVerification = /^CHE\d{9}$/.test(clean)
+          ? { valid: true }
+          : { valid: false, error: 'Invalid Swiss UID format (CHE + 9 digits)' };
+      } else {
+        taxVerification = validateLocalTaxNumber(tax_id, cc);
+      }
     } else {
-      taxVerification = validateSteuernummer(tax_id);
+      taxVerification = validateLocalTaxNumber(tax_id, cc);
     }
 
-    // Address verification (runs in parallel for USt-IdNr, sequential for Steuernummer)
+    // Address verification
     let addressResult = { verified: false, confidence: 0, matchedName: undefined as string | undefined };
     if (business_name && (address || city)) {
       addressResult = await verifyAddress(business_name, address, city);
     }
 
-    // Determine overall verification status
+    // Determine verification status
     let verificationStatus: string;
     let verificationNotes: string;
 
-    if (tax_id_type === 'ust_id' && taxVerification.valid) {
-      // USt-IdNr valid via VIES = fully verified
+    if (tax_id_type === 'vat_id' && isEuCountry(cc) && taxVerification.valid) {
+      // EU VAT ID valid via VIES = fully verified
       verificationStatus = 'verified';
-      verificationNotes = `USt-IdNr. via VIES bestätigt. ${addressResult.verified ? 'Adresse verifiziert.' : 'Adresse konnte nicht automatisch verifiziert werden.'}`;
-    } else if (tax_id_type === 'steuernummer' && taxVerification.valid && addressResult.verified) {
-      // Valid Steuernummer format + address match = verified
+      const vatLabel = EU_VAT_FORMATS[cc]?.label || 'VAT ID';
+      verificationNotes = `${vatLabel} via VIES verified. ${addressResult.verified ? 'Address verified.' : 'Address could not be automatically verified.'}`;
+    } else if (tax_id_type === 'vat_id' && !isEuCountry(cc) && taxVerification.valid && addressResult.verified) {
+      // Non-EU VAT + address match = verified
       verificationStatus = 'verified';
-      verificationNotes = `Steuernummer-Format gültig. Adresse über Google Places verifiziert (Konfidenz: ${addressResult.confidence}%).`;
-    } else if (tax_id_type === 'steuernummer' && taxVerification.valid) {
-      // Valid Steuernummer format but no address match = pending admin review
+      verificationNotes = `Tax ID format valid. Address verified via Google Places (confidence: ${addressResult.confidence}%).`;
+    } else if (tax_id_type === 'vat_id' && !isEuCountry(cc) && taxVerification.valid) {
+      // Non-EU VAT format valid but no address match = pending review
       verificationStatus = 'pending_review';
-      verificationNotes = `Steuernummer-Format gültig, aber Adressabgleich nicht erfolgreich. Admin-Prüfung erforderlich.`;
+      verificationNotes = `Tax ID format valid, but address could not be matched. Admin review required.`;
+    } else if (tax_id_type === 'local_tax_number' && taxVerification.valid && addressResult.verified) {
+      // Local tax number + address = verified
+      verificationStatus = 'verified';
+      verificationNotes = `Local tax number format valid. Address verified via Google Places (confidence: ${addressResult.confidence}%).`;
+    } else if (tax_id_type === 'local_tax_number' && taxVerification.valid) {
+      // Local tax number only = pending review
+      verificationStatus = 'pending_review';
+      verificationNotes = `Local tax number format valid, but address could not be matched. Admin review required.`;
     } else {
-      // Invalid tax ID
       verificationStatus = 'failed';
-      verificationNotes = taxVerification.error || 'Verifizierung fehlgeschlagen.';
+      verificationNotes = taxVerification.error || 'Verification failed.';
     }
 
-    // Update partner profile with service role
+    // Update with service role
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
 
@@ -207,20 +267,18 @@ serve(async (req) => {
       .update({
         verification_status: verificationStatus,
         verification_method: tax_id_type,
-        tax_id: tax_id,
-        tax_id_type: tax_id_type,
-        tax_id_verified: tax_id_type === 'ust_id' ? taxVerification.valid : false,
+        tax_id,
+        tax_id_type,
+        tax_id_verified: tax_id_type === 'vat_id' && isEuCountry(cc) ? taxVerification.valid : false,
         address_verified: addressResult.verified,
         verification_notes: verificationNotes,
         verified_at: verificationStatus === 'verified' ? new Date().toISOString() : null,
+        country: cc,
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', user.id);
 
-    if (updateError) {
-      console.error('Update error:', updateError);
-      throw new Error(`Failed to update profile: ${updateError.message}`);
-    }
+    if (updateError) throw new Error(`Failed to update profile: ${updateError.message}`);
 
     return new Response(JSON.stringify({
       status: verificationStatus,
@@ -238,8 +296,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Verification error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });

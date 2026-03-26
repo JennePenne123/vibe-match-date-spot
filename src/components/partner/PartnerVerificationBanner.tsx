@@ -6,19 +6,24 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ShieldCheck, ShieldAlert, Clock, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { usePartnerVerification } from '@/hooks/usePartnerVerification';
+import { usePartnerVerification, COUNTRY_TAX_CONFIG } from '@/hooks/usePartnerVerification';
 import { toast } from '@/hooks/use-toast';
 
 export default function PartnerVerificationBanner() {
   const { t } = useTranslation();
   const { verification, loading, submitVerification, daysRemaining, isExpired } = usePartnerVerification();
   const [taxId, setTaxId] = useState('');
-  const [taxIdType, setTaxIdType] = useState<'ust_id' | 'steuernummer'>('ust_id');
+  const [taxIdType, setTaxIdType] = useState<'vat_id' | 'local_tax_number'>('vat_id');
+  const [selectedCountry, setSelectedCountry] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
   if (loading || !verification) return null;
+
+  const country = selectedCountry || verification.country || 'DE';
+  const countryConfig = COUNTRY_TAX_CONFIG[country] || COUNTRY_TAX_CONFIG['DE'];
 
   // Already verified
   if (verification.verification_status === 'verified') {
@@ -30,7 +35,7 @@ export default function PartnerVerificationBanner() {
             {t('partner.verification.verified', 'Verifiziert')}
           </span>
           <Badge variant="outline" className="border-green-500/50 text-green-700 text-xs">
-            {verification.verification_method === 'ust_id' ? 'USt-IdNr.' : 'Steuernummer'}
+            {verification.verification_method === 'vat_id' ? countryConfig.vatLabel : countryConfig.localLabel}
           </Badge>
         </AlertDescription>
       </Alert>
@@ -53,7 +58,7 @@ export default function PartnerVerificationBanner() {
     if (!taxId.trim()) return;
     setVerifying(true);
     try {
-      const result = await submitVerification(taxId.trim(), taxIdType);
+      const result = await submitVerification(taxId.trim(), taxIdType, country);
       if (result?.status === 'verified') {
         toast({
           title: t('partner.verification.success', 'Verifizierung erfolgreich! ✅'),
@@ -73,17 +78,12 @@ export default function PartnerVerificationBanner() {
       }
       setShowForm(false);
     } catch (err: any) {
-      toast({
-        title: t('partner.verification.error', 'Fehler'),
-        description: err.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
     } finally {
       setVerifying(false);
     }
   };
 
-  // Unverified or failed - show banner
   const urgencyColor = isExpired ? 'destructive' : daysRemaining !== null && daysRemaining <= 3 ? 'destructive' : 'secondary';
 
   return (
@@ -129,40 +129,61 @@ export default function PartnerVerificationBanner() {
           </Button>
         ) : (
           <div className="space-y-3 pt-1">
+            {/* Country Selection */}
+            <div className="space-y-1.5">
+              <Label className="text-xs">{t('partner.verification.country', 'Land')}</Label>
+              <Select value={country} onValueChange={setSelectedCountry}>
+                <SelectTrigger className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  {Object.entries(COUNTRY_TAX_CONFIG)
+                    .sort((a, b) => a[1].name.localeCompare(b[1].name))
+                    .map(([code, config]) => (
+                      <SelectItem key={code} value={code} className="text-sm">
+                        {config.flag} {config.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Tax ID Type Selection */}
             <div className="grid grid-cols-2 gap-2">
               <Button
-                variant={taxIdType === 'ust_id' ? 'default' : 'outline'}
+                variant={taxIdType === 'vat_id' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setTaxIdType('ust_id')}
+                onClick={() => setTaxIdType('vat_id')}
                 className="text-xs"
               >
-                USt-IdNr.
+                {countryConfig.vatLabel}
               </Button>
               <Button
-                variant={taxIdType === 'steuernummer' ? 'default' : 'outline'}
+                variant={taxIdType === 'local_tax_number' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setTaxIdType('steuernummer')}
+                onClick={() => setTaxIdType('local_tax_number')}
                 className="text-xs"
               >
-                Steuernummer
+                {countryConfig.localLabel}
               </Button>
             </div>
 
             <p className="text-xs text-muted-foreground">
-              {taxIdType === 'ust_id'
-                ? t('partner.verification.ustHint', 'Wird automatisch über die EU VIES-Datenbank geprüft.')
-                : t('partner.verification.stHint', 'Wird mit Adressabgleich verifiziert. Bei Bedarf kurze Admin-Prüfung.')}
+              {taxIdType === 'vat_id' && countryConfig.isEu
+                ? t('partner.verification.vatEuHint', 'Wird automatisch über die EU VIES-Datenbank geprüft.')
+                : taxIdType === 'vat_id'
+                  ? t('partner.verification.vatNonEuHint', 'Format-Prüfung + Adressabgleich via Google Places.')
+                  : t('partner.verification.localHint', 'Wird mit Adressabgleich verifiziert. Bei Bedarf kurze Admin-Prüfung.')}
             </p>
 
             <div className="space-y-1.5">
               <Label className="text-xs">
-                {taxIdType === 'ust_id' ? 'USt-IdNr. (z.B. DE123456789)' : 'Steuernummer (z.B. 12/345/67890)'}
+                {taxIdType === 'vat_id' ? countryConfig.vatLabel : countryConfig.localLabel}
               </Label>
               <Input
                 value={taxId}
                 onChange={(e) => setTaxId(e.target.value)}
-                placeholder={taxIdType === 'ust_id' ? 'DE123456789' : '12/345/67890'}
+                placeholder={taxIdType === 'vat_id' ? countryConfig.vatPlaceholder : countryConfig.localPlaceholder}
                 className="text-sm"
               />
             </div>
