@@ -245,7 +245,7 @@ export default function PartnerDashboard() {
 
       {/* Quick Links */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-        <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/reports')}>
+        <Card variant="glass" className={`group hover:scale-[1.02] transition-all duration-300 cursor-pointer ${!membership.canUseFeature.reports ? 'opacity-60' : ''}`} onClick={() => membership.canUseFeature.reports ? navigate('/partner/reports') : null}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <FileText className="w-6 h-6 text-primary" />
@@ -254,7 +254,11 @@ export default function PartnerDashboard() {
               <h3 className="font-semibold">{t('partner.reports.title')}</h3>
               <p className="text-sm text-muted-foreground">{t('partner.reports.subtitle')}</p>
             </div>
-            <Badge variant="outline">{t('partner.reports.taxReady')}</Badge>
+            {membership.canUseFeature.reports ? (
+              <Badge variant="outline">{t('partner.reports.taxReady')}</Badge>
+            ) : (
+              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 gap-1"><Lock className="w-3 h-3" />Pro</Badge>
+            )}
           </CardContent>
         </Card>
 
@@ -270,7 +274,7 @@ export default function PartnerDashboard() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/network-map')}>
+        <Card variant="glass" className={`group hover:scale-[1.02] transition-all duration-300 cursor-pointer ${!membership.canUseFeature.partnerNetwork ? 'opacity-60' : ''}`} onClick={() => membership.canUseFeature.partnerNetwork ? navigate('/partner/network-map') : null}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Map className="w-6 h-6 text-primary" />
@@ -279,11 +283,15 @@ export default function PartnerDashboard() {
               <h3 className="font-semibold">{t('partner.network.findPartners')}</h3>
               <p className="text-sm text-muted-foreground">{t('partner.network.findPartnersDesc')}</p>
             </div>
-            <Badge variant="outline">{t('partner.network.mapBadge')}</Badge>
+            {membership.canUseFeature.partnerNetwork ? (
+              <Badge variant="outline">{t('partner.network.mapBadge')}</Badge>
+            ) : (
+              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 gap-1"><Lock className="w-3 h-3" />Pro</Badge>
+            )}
           </CardContent>
         </Card>
 
-        <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/city-rankings')}>
+        <Card variant="glass" className={`group hover:scale-[1.02] transition-all duration-300 cursor-pointer ${!membership.canUseFeature.cityRankings ? 'opacity-60' : ''}`} onClick={() => membership.canUseFeature.cityRankings ? navigate('/partner/city-rankings') : null}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Trophy className="w-6 h-6 text-primary" />
@@ -292,7 +300,11 @@ export default function PartnerDashboard() {
               <h3 className="font-semibold">{t('partner.cityRankings.title', 'City Rankings')}</h3>
               <p className="text-sm text-muted-foreground">{t('partner.cityRankings.dashboardDesc', 'Sieh, wie dein Venue in deiner Stadt abschneidet')}</p>
             </div>
-            <Badge variant="outline">{t('partner.cityRankings.rankingBadge', 'Ranking')}</Badge>
+            {membership.canUseFeature.cityRankings ? (
+              <Badge variant="outline">{t('partner.cityRankings.rankingBadge', 'Ranking')}</Badge>
+            ) : (
+              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 gap-1"><Lock className="w-3 h-3" />Pro</Badge>
+            )}
           </CardContent>
         </Card>
       </div>
