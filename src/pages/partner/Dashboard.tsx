@@ -117,6 +117,9 @@ export default function PartnerDashboard() {
         />
       )}
 
+      {/* Verification Banner */}
+      <PartnerVerificationBanner />
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <Card variant="glass" className="group hover:scale-105 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
