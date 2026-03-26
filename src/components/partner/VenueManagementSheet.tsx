@@ -128,6 +128,13 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
                 onTagsUpdated={handleUpdated}
               />
             </TabsContent>
+            <TabsContent value="seasonal" className="mt-4">
+              <SeasonalSpecialsEditor
+                venueId={venueId}
+                currentSpecials={venueData?.seasonal_specials}
+                onUpdated={handleUpdated}
+              />
+            </TabsContent>
             <TabsContent value="besttimes" className="mt-4">
               <VenueBestTimesEditor
                 venueId={venueId}
