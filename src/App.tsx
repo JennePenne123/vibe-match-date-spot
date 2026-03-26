@@ -113,6 +113,8 @@ const PartnerQRCode = lazy(() => import("./pages/partner/QRCode"));
 const PartnerNetworkMap = lazy(() => import("./pages/partner/NetworkMap"));
 const PartnerProfile = lazy(() => import("./pages/partner/Profile"));
 const PartnerCityRankings = lazy(() => import("./pages/partner/CityRankings"));
+const PartnerNotifications = lazy(() => import("./pages/partner/Notifications"));
+const PartnerVenueComparison = lazy(() => import("./pages/partner/VenueComparison"));
 
 // Admin routes – lazy loaded
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -237,6 +239,8 @@ const App = () => (
                     <Route path="/partner/network" element={<LazyPage><PartnerNetworkMap /></LazyPage>} />
                     <Route path="/partner/profile" element={<LazyPage><PartnerProfile /></LazyPage>} />
                     <Route path="/partner/city-rankings" element={<LazyPage><PartnerCityRankings /></LazyPage>} />
+                    <Route path="/partner/notifications" element={<LazyPage><PartnerNotifications /></LazyPage>} />
+                    <Route path="/partner/venue-comparison" element={<LazyPage><PartnerVenueComparison /></LazyPage>} />
                     
                     {/* Admin Routes – protected by role check */}
                     <Route path="/admin" element={<LazyPage><AdminRouteGuard><AdminDashboard /></AdminRouteGuard></LazyPage>} />
