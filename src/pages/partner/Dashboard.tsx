@@ -244,6 +244,9 @@ export default function PartnerDashboard() {
       {/* Support Contact */}
       <SupportContactCard />
 
+      {/* Billing Overview */}
+      <BillingOverview />
+
       {/* Quick Links */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         <Card variant="glass" className={`group hover:scale-[1.02] transition-all duration-300 cursor-pointer ${!membership.canUseFeature.reports ? 'opacity-60' : ''}`} onClick={() => membership.canUseFeature.reports ? navigate('/partner/reports') : null}>
