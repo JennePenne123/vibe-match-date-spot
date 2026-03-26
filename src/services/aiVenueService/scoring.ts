@@ -5,6 +5,8 @@ import { getImplicitSignalBoost } from '@/services/implicitSignalsService';
 import { getCombinedContextScore } from './contextCombinationScoring';
 import { getTodayMood } from '@/pages/MoodCheckIn';
 import { getPhotoVibeScoreModifier, getPhotoVibeLabel } from './photoVibeScoring';
+import { getPairFriendlyScoreModifier, getPairFriendlyLabel } from './pairFriendlyScoring';
+import { getSeasonalScoreModifier, getSeasonalLabel } from './seasonalScoring';
 
 /**
  * Cuisine similarity matrix — returns 0..1 similarity between two cuisines.
@@ -539,9 +541,19 @@ export const calculateVenueAIScore = async (
     const photoVibeResult = getPhotoVibeScoreModifier(venuePhotos, userPrefs.preferred_vibes);
     const photoVibeModifier = photoVibeResult.modifier;
     const photoVibeLabel = getPhotoVibeLabel(photoVibeResult.matchedVibes);
+
+    // Apply pair-friendly scoring (Signal #16)
+    const pairResult = getPairFriendlyScoreModifier(venue, !!partnerPrefs);
+    const pairModifier = pairResult.modifier;
+    const pairLabel = getPairFriendlyLabel(pairResult.reasons);
+
+    // Apply seasonal specials scoring (Signal #17)
+    const seasonalResult = getSeasonalScoreModifier(venue.seasonal_specials, userPrefs.preferred_vibes);
+    const seasonalModifier = seasonalResult.modifier;
+    const seasonalLabel = getSeasonalLabel(seasonalResult.activeSpecials);
     
     // Final AI score (0-100 scale) — normalized so sparse data doesn't penalize
-    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost + combinedCtxBonus + photoVibeModifier) * 100;
+    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost + combinedCtxBonus + photoVibeModifier + pairModifier + seasonalModifier) * 100;
     const finalScore = Math.max(10, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
@@ -553,6 +565,8 @@ export const calculateVenueAIScore = async (
       implicitBoost: implicitBoost !== 0 ? `${implicitBoost > 0 ? '+' : ''}${Math.round(implicitBoost * 100)}%` : 'none',
       combinedContext: combinedCtxBonus !== 0 ? `+${Math.round(combinedCtxBonus * 100)}% (${combinedCtx.reasons.join(', ')})` : 'none',
       photoVibe: photoVibeModifier !== 0 ? `+${Math.round(photoVibeModifier * 100)}% (${photoVibeLabel})` : 'none',
+      pairFriendly: pairModifier !== 0 ? `+${Math.round(pairModifier * 100)}% (${pairLabel})` : 'none',
+      seasonal: seasonalModifier !== 0 ? `+${Math.round(seasonalModifier * 100)}% (${seasonalLabel})` : 'none',
       finalScore: `${Math.round(finalScore)}%`,
       learningApplied: learnedWeights.hasLearningData,
       aiAccuracy: learnedWeights.aiAccuracy,
@@ -583,6 +597,10 @@ export const calculateVenueAIScore = async (
       photo_vibe_modifier: photoVibeModifier !== 0 ? photoVibeModifier : null,
       photo_vibe_matches: photoVibeResult.matchedVibes.length > 0 ? photoVibeResult.matchedVibes : null,
       photo_vibe_signals: photoVibeResult.photoVibeSignals.length > 0 ? photoVibeResult.photoVibeSignals : null,
+      pair_friendly_modifier: pairModifier !== 0 ? pairModifier : null,
+      pair_friendly_reasons: pairResult.reasons.length > 0 ? pairResult.reasons : null,
+      seasonal_modifier: seasonalModifier !== 0 ? seasonalModifier : null,
+      seasonal_specials_active: seasonalResult.activeSpecials.length > 0 ? seasonalResult.activeSpecials.map(s => s.title) : null,
     };
 
     const { error: insertError } = await supabase

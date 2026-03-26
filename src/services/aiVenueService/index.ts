@@ -16,3 +16,6 @@ export { getTemporalDecayFactor, getDecayFromDate, decayWeightedAverage, applyTe
 export { getDistanceToleranceScore } from './distanceLearning';
 export { getPhotoVibeScoreModifier, extractPhotoVibes, getPhotoVibeLabel, AVAILABLE_PHOTO_VIBES, PHOTO_VIBE_LABELS } from './photoVibeScoring';
 export type { PhotoVibe } from './photoVibeScoring';
+export { getPairFriendlyScoreModifier, getPairFriendlyLabel } from './pairFriendlyScoring';
+export { getSeasonalScoreModifier, getSeasonalLabel, getActiveSpecials, SEASONAL_TEMPLATES } from './seasonalScoring';
+export type { SeasonalSpecial } from './seasonalScoring';

@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, Clock, Info, Sparkles, Heart, Brain } from 'lucide-react';
+import { Camera, Clock, Info, Sparkles, Heart, Brain, Calendar } from 'lucide-react';
 import { VenuePhotoUpload } from './VenuePhotoUpload';
 import { VenueDetailsEditor } from './VenueDetailsEditor';
 import { VenueInfoEditor } from './VenueInfoEditor';
 import VenuePersonalityWizard from './VenuePersonalityWizard';
 import VenueBestTimesEditor from './VenueBestTimesEditor';
 import AITagSuggestions from './AITagSuggestions';
+import SeasonalSpecialsEditor from './SeasonalSpecialsEditor';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface VenueManagementSheetProps {
@@ -33,7 +34,7 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
     setLoading(true);
     const { data } = await supabase
       .from('venues')
-      .select('photos, opening_hours, menu_highlights, description, cuisine_type, price_range, website, phone, address, tags, best_times, capacity, has_separee, pair_friendly_features')
+      .select('photos, opening_hours, menu_highlights, description, cuisine_type, price_range, website, phone, address, tags, best_times, capacity, has_separee, pair_friendly_features, seasonal_specials')
       .eq('id', venueId)
       .maybeSingle();
     setVenueData(data);
@@ -64,32 +65,38 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
           </div>
         ) : (
           <Tabs defaultValue="info" className="mt-4">
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="info" className="gap-1 text-[10px] sm:text-xs">
-                <Info className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                Info
-              </TabsTrigger>
-              <TabsTrigger value="personality" className="gap-1 text-[10px] sm:text-xs">
-                <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                KI-Profil
-              </TabsTrigger>
-              <TabsTrigger value="ai-tags" className="gap-1 text-[10px] sm:text-xs">
-                <Brain className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                Auto-Tags
-              </TabsTrigger>
-              <TabsTrigger value="besttimes" className="gap-1 text-[10px] sm:text-xs">
-                <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                Zeiten+
-              </TabsTrigger>
-              <TabsTrigger value="photos" className="gap-1 text-[10px] sm:text-xs">
-                <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                Fotos
-              </TabsTrigger>
-              <TabsTrigger value="details" className="gap-1 text-[10px] sm:text-xs">
-                <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                Details
-              </TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-1 px-1">
+              <TabsList className="inline-flex w-auto min-w-full">
+                <TabsTrigger value="info" className="gap-1 text-[10px] sm:text-xs">
+                  <Info className="w-3 h-3" />
+                  Info
+                </TabsTrigger>
+                <TabsTrigger value="personality" className="gap-1 text-[10px] sm:text-xs">
+                  <Sparkles className="w-3 h-3" />
+                  KI
+                </TabsTrigger>
+                <TabsTrigger value="ai-tags" className="gap-1 text-[10px] sm:text-xs">
+                  <Brain className="w-3 h-3" />
+                  Tags
+                </TabsTrigger>
+                <TabsTrigger value="seasonal" className="gap-1 text-[10px] sm:text-xs">
+                  <Calendar className="w-3 h-3" />
+                  Saison
+                </TabsTrigger>
+                <TabsTrigger value="besttimes" className="gap-1 text-[10px] sm:text-xs">
+                  <Heart className="w-3 h-3" />
+                  Zeiten
+                </TabsTrigger>
+                <TabsTrigger value="photos" className="gap-1 text-[10px] sm:text-xs">
+                  <Camera className="w-3 h-3" />
+                  Fotos
+                </TabsTrigger>
+                <TabsTrigger value="details" className="gap-1 text-[10px] sm:text-xs">
+                  <Clock className="w-3 h-3" />
+                  Details
+                </TabsTrigger>
+              </TabsList>
+            </div>
             <TabsContent value="info" className="mt-4">
               <VenueInfoEditor
                 venueId={venueId}
@@ -119,6 +126,13 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
                 venueName={venueName}
                 existingTags={venueData?.tags || []}
                 onTagsUpdated={handleUpdated}
+              />
+            </TabsContent>
+            <TabsContent value="seasonal" className="mt-4">
+              <SeasonalSpecialsEditor
+                venueId={venueId}
+                currentSpecials={venueData?.seasonal_specials}
+                onUpdated={handleUpdated}
               />
             </TabsContent>
             <TabsContent value="besttimes" className="mt-4">
