@@ -36,6 +36,7 @@ export default function PartnerDashboard() {
   const navigate = useNavigate();
   const { stats, loading: statsLoading } = usePartnerDashboardStats(user?.id);
   const onboarding = usePartnerOnboardingState(user?.id);
+  const membership = usePartnerMembership();
   const [partnerVenues, setPartnerVenues] = useState<any[]>([]);
   const [managingVenue, setManagingVenue] = useState<{ id: string; name: string; tab: string } | null>(null);
 
