@@ -1423,6 +1423,7 @@ export type Database = {
           photos: Json | null
           price_range: string | null
           rating: number | null
+          seasonal_specials: Json | null
           source: string | null
           tags: string[] | null
           updated_at: string
@@ -1454,6 +1455,7 @@ export type Database = {
           photos?: Json | null
           price_range?: string | null
           rating?: number | null
+          seasonal_specials?: Json | null
           source?: string | null
           tags?: string[] | null
           updated_at?: string
@@ -1485,6 +1487,7 @@ export type Database = {
           photos?: Json | null
           price_range?: string | null
           rating?: number | null
+          seasonal_specials?: Json | null
           source?: string | null
           tags?: string[] | null
           updated_at?: string
