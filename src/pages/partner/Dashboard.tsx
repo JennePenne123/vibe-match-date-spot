@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePartnerDashboardStats } from '@/hooks/usePartnerDashboardStats';
+import { usePartnerOnboardingState } from '@/hooks/usePartnerOnboardingState';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,9 @@ import LanguageSelector from '@/components/LanguageSelector';
 import RedemptionChart from '@/components/partner/RedemptionChart';
 import VoucherAlerts from '@/components/partner/VoucherAlerts';
 import GuestFeedbackCard from '@/components/partner/GuestFeedbackCard';
+import PartnerOnboardingBanner from '@/components/partner/PartnerOnboardingBanner';
+import PartnerNotificationsCard from '@/components/partner/PartnerNotificationsCard';
+import VenuePerformanceCard from '@/components/partner/VenuePerformanceCard';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
