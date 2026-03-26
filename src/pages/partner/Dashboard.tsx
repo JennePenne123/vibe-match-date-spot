@@ -22,6 +22,9 @@ import PartnerMatchFeedback from '@/components/partner/PartnerMatchFeedback';
 import VenueOptimizationNudges from '@/components/partner/VenueOptimizationNudges';
 import { VenueManagementSheet } from '@/components/partner/VenueManagementSheet';
 import PartnerVerificationBanner from '@/components/partner/PartnerVerificationBanner';
+import SupportContactCard from '@/components/partner/SupportContactCard';
+import RealtimeRedemptionToast from '@/components/partner/RealtimeRedemptionToast';
+import ConversionRateCard from '@/components/partner/ConversionRateCard';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
@@ -119,6 +122,9 @@ export default function PartnerDashboard() {
 
       {/* Verification Banner */}
       <PartnerVerificationBanner />
+
+      {/* Realtime toast for redemptions */}
+      <RealtimeRedemptionToast />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <Card variant="glass" className="group hover:scale-105 transition-all duration-300">
@@ -219,8 +225,14 @@ export default function PartnerDashboard() {
       {/* AI Match Insights */}
       {user && <PartnerMatchFeedback partnerId={user.id} />}
 
+      {/* Conversion & Trends */}
+      <ConversionRateCard />
+
       {/* Analytics Chart */}
       <RedemptionChart />
+
+      {/* Support Contact */}
+      <SupportContactCard />
 
       {/* Quick Links */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
