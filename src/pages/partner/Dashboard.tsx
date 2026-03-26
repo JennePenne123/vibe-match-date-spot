@@ -21,6 +21,7 @@ import VenuePerformanceCard from '@/components/partner/VenuePerformanceCard';
 import PartnerMatchFeedback from '@/components/partner/PartnerMatchFeedback';
 import VenueOptimizationNudges from '@/components/partner/VenueOptimizationNudges';
 import { VenueManagementSheet } from '@/components/partner/VenueManagementSheet';
+import PartnerVerificationBanner from '@/components/partner/PartnerVerificationBanner';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
