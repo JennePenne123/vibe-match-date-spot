@@ -4,6 +4,7 @@ import { getMoodScoreModifier, getMoodInfluenceLabel } from './moodScoring';
 import { getImplicitSignalBoost } from '@/services/implicitSignalsService';
 import { getCombinedContextScore } from './contextCombinationScoring';
 import { getTodayMood } from '@/pages/MoodCheckIn';
+import { getPhotoVibeScoreModifier, getPhotoVibeLabel } from './photoVibeScoring';
 
 /**
  * Cuisine similarity matrix — returns 0..1 similarity between two cuisines.
@@ -532,9 +533,15 @@ export const calculateVenueAIScore = async (
     const priorityFromPrefs = (userPrefs.lifestyle_data as any)?.priority_weights || null;
     const combinedCtx = getCombinedContextScore(venue, occasionFromPrefs, currentMood, priorityFromPrefs);
     const combinedCtxBonus = (combinedCtx.synergyBonus + combinedCtx.autoContextBonus) / 100;
+
+    // Apply photo-based vibe scoring (Signal #15)
+    const venuePhotos = Array.isArray(venue.photos) ? venue.photos : [];
+    const photoVibeResult = getPhotoVibeScoreModifier(venuePhotos, userPrefs.preferred_vibes);
+    const photoVibeModifier = photoVibeResult.modifier;
+    const photoVibeLabel = getPhotoVibeLabel(photoVibeResult.matchedVibes);
     
     // Final AI score (0-100 scale) — normalized so sparse data doesn't penalize
-    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost + combinedCtxBonus) * 100;
+    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost + combinedCtxBonus + photoVibeModifier) * 100;
     const finalScore = Math.max(10, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
@@ -545,6 +552,7 @@ export const calculateVenueAIScore = async (
       confidenceBoost: `+${Math.round(confidenceBoost * 100)}%`,
       implicitBoost: implicitBoost !== 0 ? `${implicitBoost > 0 ? '+' : ''}${Math.round(implicitBoost * 100)}%` : 'none',
       combinedContext: combinedCtxBonus !== 0 ? `+${Math.round(combinedCtxBonus * 100)}% (${combinedCtx.reasons.join(', ')})` : 'none',
+      photoVibe: photoVibeModifier !== 0 ? `+${Math.round(photoVibeModifier * 100)}% (${photoVibeLabel})` : 'none',
       finalScore: `${Math.round(finalScore)}%`,
       learningApplied: learnedWeights.hasLearningData,
       aiAccuracy: learnedWeights.aiAccuracy,
@@ -572,6 +580,9 @@ export const calculateVenueAIScore = async (
       combined_context_reasons: combinedCtx.reasons.length > 0 ? combinedCtx.reasons : null,
       occasion: occasionFromPrefs,
       priority_weights: priorityFromPrefs,
+      photo_vibe_modifier: photoVibeModifier !== 0 ? photoVibeModifier : null,
+      photo_vibe_matches: photoVibeResult.matchedVibes.length > 0 ? photoVibeResult.matchedVibes : null,
+      photo_vibe_signals: photoVibeResult.photoVibeSignals.length > 0 ? photoVibeResult.photoVibeSignals : null,
     };
 
     const { error: insertError } = await supabase
