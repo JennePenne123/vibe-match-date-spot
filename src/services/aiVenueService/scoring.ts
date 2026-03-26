@@ -580,6 +580,9 @@ export const calculateVenueAIScore = async (
       combined_context_reasons: combinedCtx.reasons.length > 0 ? combinedCtx.reasons : null,
       occasion: occasionFromPrefs,
       priority_weights: priorityFromPrefs,
+      photo_vibe_modifier: photoVibeModifier !== 0 ? photoVibeModifier : null,
+      photo_vibe_matches: photoVibeResult.matchedVibes.length > 0 ? photoVibeResult.matchedVibes : null,
+      photo_vibe_signals: photoVibeResult.photoVibeSignals.length > 0 ? photoVibeResult.photoVibeSignals : null,
     };
 
     const { error: insertError } = await supabase
