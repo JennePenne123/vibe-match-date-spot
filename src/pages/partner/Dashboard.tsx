@@ -127,6 +127,9 @@ export default function PartnerDashboard() {
       {/* Verification Banner */}
       <PartnerVerificationBanner />
 
+      {/* Membership Card */}
+      <MembershipCard />
+
       {/* Realtime toast for redemptions */}
       <RealtimeRedemptionToast />
 
@@ -229,8 +232,10 @@ export default function PartnerDashboard() {
       {/* AI Match Insights */}
       {user && <PartnerMatchFeedback partnerId={user.id} />}
 
-      {/* Conversion & Trends */}
-      <ConversionRateCard />
+      {/* Conversion & Trends (Pro) */}
+      <ProFeatureGate featureName="Erweiterte Analytics" description="Detaillierte Conversion-Raten und Trend-Analysen sind Pro-Mitgliedern vorbehalten." hasAccess={membership.canUseFeature.advancedAnalytics}>
+        <ConversionRateCard />
+      </ProFeatureGate>
 
       {/* Analytics Chart */}
       <RedemptionChart />
