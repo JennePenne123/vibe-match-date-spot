@@ -883,6 +883,7 @@ export type Database = {
       partner_profiles: {
         Row: {
           address: string | null
+          address_verified: boolean
           business_email: string
           business_name: string
           city: string | null
@@ -896,12 +897,20 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           tax_id: string | null
+          tax_id_type: string | null
+          tax_id_verified: boolean
           updated_at: string
           user_id: string
+          verification_deadline: string | null
+          verification_method: string | null
+          verification_notes: string | null
+          verification_status: string
+          verified_at: string | null
           website: string | null
         }
         Insert: {
           address?: string | null
+          address_verified?: boolean
           business_email?: string
           business_name?: string
           city?: string | null
@@ -915,12 +924,20 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           tax_id?: string | null
+          tax_id_type?: string | null
+          tax_id_verified?: boolean
           updated_at?: string
           user_id: string
+          verification_deadline?: string | null
+          verification_method?: string | null
+          verification_notes?: string | null
+          verification_status?: string
+          verified_at?: string | null
           website?: string | null
         }
         Update: {
           address?: string | null
+          address_verified?: boolean
           business_email?: string
           business_name?: string
           city?: string | null
@@ -934,8 +951,15 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           tax_id?: string | null
+          tax_id_type?: string | null
+          tax_id_verified?: boolean
           updated_at?: string
           user_id?: string
+          verification_deadline?: string | null
+          verification_method?: string | null
+          verification_notes?: string | null
+          verification_status?: string
+          verified_at?: string | null
           website?: string | null
         }
         Relationships: []
