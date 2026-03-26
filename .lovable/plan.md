@@ -148,7 +148,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 | # | Aufgabe | Aufwand | Beschreibung |
 |---|---------|---------|--------------|
-| 6 | **Stripe Premium-Subscription** | Groß | Free/Premium Tiers, Paywall, Checkout, Webhooks |
+| 6 | **Stripe-Integration (Partner + User)** | Groß | Partner-Abo (14,90€/Monat), User-Premium, Checkout, Webhooks, `paid_pro_since` automatisch setzen, Founding Partner Gratis-Jahr |
 | 7 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
 | 8 | **Standort-Picker im Planner** | Klein | Schneller Stadtwechsel direkt im Smart Date Planner |
 | 9 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
