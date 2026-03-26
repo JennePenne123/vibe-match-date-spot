@@ -32,7 +32,7 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
     setLoading(true);
     const { data } = await supabase
       .from('venues')
-      .select('photos, opening_hours, menu_highlights, description, cuisine_type, price_range, website, phone, address, tags')
+      .select('photos, opening_hours, menu_highlights, description, cuisine_type, price_range, website, phone, address, tags, best_times, capacity, has_separee, pair_friendly_features')
       .eq('id', venueId)
       .maybeSingle();
     setVenueData(data);
