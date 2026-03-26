@@ -895,9 +895,13 @@ export type Database = {
           id: string
           is_founding_partner: boolean
           logo_url: string | null
+          loyalty_bonus_awarded: boolean
+          loyalty_bonus_awarded_at: string | null
+          loyalty_bonus_months: number | null
           membership_tier: string
           membership_valid_until: string | null
           network_discount_value: number
+          paid_pro_since: string | null
           phone: string | null
           postal_code: string | null
           privacy_accepted_at: string | null
@@ -930,9 +934,13 @@ export type Database = {
           id?: string
           is_founding_partner?: boolean
           logo_url?: string | null
+          loyalty_bonus_awarded?: boolean
+          loyalty_bonus_awarded_at?: string | null
+          loyalty_bonus_months?: number | null
           membership_tier?: string
           membership_valid_until?: string | null
           network_discount_value?: number
+          paid_pro_since?: string | null
           phone?: string | null
           postal_code?: string | null
           privacy_accepted_at?: string | null
@@ -965,9 +973,13 @@ export type Database = {
           id?: string
           is_founding_partner?: boolean
           logo_url?: string | null
+          loyalty_bonus_awarded?: boolean
+          loyalty_bonus_awarded_at?: string | null
+          loyalty_bonus_months?: number | null
           membership_tier?: string
           membership_valid_until?: string | null
           network_discount_value?: number
+          paid_pro_since?: string | null
           phone?: string | null
           postal_code?: string | null
           privacy_accepted_at?: string | null
