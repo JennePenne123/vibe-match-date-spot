@@ -172,6 +172,40 @@ export default function PartnerDashboard() {
         <VenuePerformanceCard />
       </div>
 
+      {/* Optimization Nudges */}
+      {partnerVenues.length > 0 && (
+        <VenueOptimizationNudges
+          venues={partnerVenues}
+          onOpenVenue={(venueId, tab) => {
+            const venue = partnerVenues.find(v => v.id === venueId);
+            if (venue) setManagingVenue({ id: venueId, name: venue.name, tab });
+          }}
+        />
+      )}
+
+      {/* Venue Management Sheet */}
+      {managingVenue && (
+        <VenueManagementSheet
+          open={!!managingVenue}
+          onOpenChange={(open) => !open && setManagingVenue(null)}
+          venueId={managingVenue.id}
+          venueName={managingVenue.name}
+          onUpdated={() => {
+            // Refresh venues
+            if (user) {
+              supabase
+                .from('venue_partnerships')
+                .select('venue_id, venues(id, name, seasonal_specials, best_times, pair_friendly_features, photos, tags, has_separee, capacity)')
+                .eq('partner_id', user.id)
+                .eq('status', 'approved')
+                .then(({ data }) => {
+                  if (data) setPartnerVenues(data.map((d: any) => d.venues).filter(Boolean));
+                });
+            }
+          }}
+        />
+      )}
+
       {/* Voucher Alerts */}
       <VoucherAlerts />
 
