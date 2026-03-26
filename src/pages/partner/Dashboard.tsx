@@ -17,6 +17,7 @@ import GuestFeedbackCard from '@/components/partner/GuestFeedbackCard';
 import PartnerOnboardingBanner from '@/components/partner/PartnerOnboardingBanner';
 import PartnerNotificationsCard from '@/components/partner/PartnerNotificationsCard';
 import VenuePerformanceCard from '@/components/partner/VenuePerformanceCard';
+import PartnerMatchFeedback from '@/components/partner/PartnerMatchFeedback';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
@@ -155,6 +156,9 @@ export default function PartnerDashboard() {
 
       {/* Guest Feedback */}
       <GuestFeedbackCard />
+
+      {/* AI Match Insights */}
+      {user && <PartnerMatchFeedback partnerId={user.id} />}
 
       {/* Analytics Chart */}
       <RedemptionChart />
