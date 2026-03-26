@@ -541,9 +541,19 @@ export const calculateVenueAIScore = async (
     const photoVibeResult = getPhotoVibeScoreModifier(venuePhotos, userPrefs.preferred_vibes);
     const photoVibeModifier = photoVibeResult.modifier;
     const photoVibeLabel = getPhotoVibeLabel(photoVibeResult.matchedVibes);
+
+    // Apply pair-friendly scoring (Signal #16)
+    const pairResult = getPairFriendlyScoreModifier(venue, !!partnerPrefs);
+    const pairModifier = pairResult.modifier;
+    const pairLabel = getPairFriendlyLabel(pairResult.reasons);
+
+    // Apply seasonal specials scoring (Signal #17)
+    const seasonalResult = getSeasonalScoreModifier(venue.seasonal_specials, userPrefs.preferred_vibes);
+    const seasonalModifier = seasonalResult.modifier;
+    const seasonalLabel = getSeasonalLabel(seasonalResult.activeSpecials);
     
     // Final AI score (0-100 scale) — normalized so sparse data doesn't penalize
-    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost + combinedCtxBonus + photoVibeModifier) * 100;
+    const rawScore = (normalizedBase + weightedContextual + moodModifier + confidenceBoost + implicitBoost + combinedCtxBonus + photoVibeModifier + pairModifier + seasonalModifier) * 100;
     const finalScore = Math.max(10, Math.min(98, rawScore));
     
     console.log('🎯 SCORING: Final scoring details:', {
@@ -555,6 +565,8 @@ export const calculateVenueAIScore = async (
       implicitBoost: implicitBoost !== 0 ? `${implicitBoost > 0 ? '+' : ''}${Math.round(implicitBoost * 100)}%` : 'none',
       combinedContext: combinedCtxBonus !== 0 ? `+${Math.round(combinedCtxBonus * 100)}% (${combinedCtx.reasons.join(', ')})` : 'none',
       photoVibe: photoVibeModifier !== 0 ? `+${Math.round(photoVibeModifier * 100)}% (${photoVibeLabel})` : 'none',
+      pairFriendly: pairModifier !== 0 ? `+${Math.round(pairModifier * 100)}% (${pairLabel})` : 'none',
+      seasonal: seasonalModifier !== 0 ? `+${Math.round(seasonalModifier * 100)}% (${seasonalLabel})` : 'none',
       finalScore: `${Math.round(finalScore)}%`,
       learningApplied: learnedWeights.hasLearningData,
       aiAccuracy: learnedWeights.aiAccuracy,
