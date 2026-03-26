@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePartnerDashboardStats } from '@/hooks/usePartnerDashboardStats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode, Map, UserCog, Trophy } from 'lucide-react';
+import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode, Map, UserCog, Trophy, Star } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import LanguageSelector from '@/components/LanguageSelector';
 import RedemptionChart from '@/components/partner/RedemptionChart';
@@ -18,6 +19,7 @@ export default function PartnerDashboard() {
   const { role, loading: roleLoading } = useUserRole();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { stats, loading: statsLoading } = usePartnerDashboardStats(user?.id);
 
   const isLoading = roleLoading || authLoading;
 
