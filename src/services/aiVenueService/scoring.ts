@@ -5,6 +5,8 @@ import { getImplicitSignalBoost } from '@/services/implicitSignalsService';
 import { getCombinedContextScore } from './contextCombinationScoring';
 import { getTodayMood } from '@/pages/MoodCheckIn';
 import { getPhotoVibeScoreModifier, getPhotoVibeLabel } from './photoVibeScoring';
+import { getPairFriendlyScoreModifier, getPairFriendlyLabel } from './pairFriendlyScoring';
+import { getSeasonalScoreModifier, getSeasonalLabel } from './seasonalScoring';
 
 /**
  * Cuisine similarity matrix — returns 0..1 similarity between two cuisines.
