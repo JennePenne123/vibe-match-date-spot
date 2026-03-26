@@ -28,6 +28,7 @@ import RealtimeRedemptionToast from '@/components/partner/RealtimeRedemptionToas
 import ConversionRateCard from '@/components/partner/ConversionRateCard';
 import MembershipCard from '@/components/partner/MembershipCard';
 import ProFeatureGate from '@/components/partner/ProFeatureGate';
+import BillingOverview from '@/components/partner/BillingOverview';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
@@ -242,6 +243,9 @@ export default function PartnerDashboard() {
 
       {/* Support Contact */}
       <SupportContactCard />
+
+      {/* Billing Overview */}
+      <BillingOverview />
 
       {/* Quick Links */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
