@@ -106,6 +106,7 @@ const AGB = lazy(() => import("./pages/AGB"));
 
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
+const PartnerOnboarding = lazy(() => import("./pages/partner/Onboarding"));
 const PartnerVouchers = lazy(() => import("./pages/partner/Vouchers"));
 const PartnerVenues = lazy(() => import("./pages/partner/Venues"));
 const PartnerReports = lazy(() => import("./pages/partner/Reports"));
@@ -241,6 +242,7 @@ const App = () => (
                     <Route path="/partner/city-rankings" element={<LazyPage><PartnerCityRankings /></LazyPage>} />
                     <Route path="/partner/notifications" element={<LazyPage><PartnerNotifications /></LazyPage>} />
                     <Route path="/partner/venue-comparison" element={<LazyPage><PartnerVenueComparison /></LazyPage>} />
+                    <Route path="/partner/onboarding" element={<LazyPage><PartnerOnboarding /></LazyPage>} />
                     
                     {/* Admin Routes – protected by role check */}
                     <Route path="/admin" element={<LazyPage><AdminRouteGuard><AdminDashboard /></AdminRouteGuard></LazyPage>} />
