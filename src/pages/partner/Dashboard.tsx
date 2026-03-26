@@ -5,11 +5,12 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePartnerDashboardStats } from '@/hooks/usePartnerDashboardStats';
 import { usePartnerOnboardingState } from '@/hooks/usePartnerOnboardingState';
+import { usePartnerMembership } from '@/hooks/usePartnerMembership';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode, Map, UserCog, Trophy, Star } from 'lucide-react';
+import { Sparkles, TrendingUp, Users, Gift, LogIn, FileText, QrCode, Map, UserCog, Trophy, Star, Lock } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import LanguageSelector from '@/components/LanguageSelector';
 import RedemptionChart from '@/components/partner/RedemptionChart';
@@ -25,6 +26,8 @@ import PartnerVerificationBanner from '@/components/partner/PartnerVerificationB
 import SupportContactCard from '@/components/partner/SupportContactCard';
 import RealtimeRedemptionToast from '@/components/partner/RealtimeRedemptionToast';
 import ConversionRateCard from '@/components/partner/ConversionRateCard';
+import MembershipCard from '@/components/partner/MembershipCard';
+import ProFeatureGate from '@/components/partner/ProFeatureGate';
 
 export default function PartnerDashboard() {
   const { t } = useTranslation();
@@ -33,6 +36,7 @@ export default function PartnerDashboard() {
   const navigate = useNavigate();
   const { stats, loading: statsLoading } = usePartnerDashboardStats(user?.id);
   const onboarding = usePartnerOnboardingState(user?.id);
+  const membership = usePartnerMembership();
   const [partnerVenues, setPartnerVenues] = useState<any[]>([]);
   const [managingVenue, setManagingVenue] = useState<{ id: string; name: string; tab: string } | null>(null);
 
@@ -122,6 +126,9 @@ export default function PartnerDashboard() {
 
       {/* Verification Banner */}
       <PartnerVerificationBanner />
+
+      {/* Membership Card */}
+      <MembershipCard />
 
       {/* Realtime toast for redemptions */}
       <RealtimeRedemptionToast />
@@ -225,8 +232,10 @@ export default function PartnerDashboard() {
       {/* AI Match Insights */}
       {user && <PartnerMatchFeedback partnerId={user.id} />}
 
-      {/* Conversion & Trends */}
-      <ConversionRateCard />
+      {/* Conversion & Trends (Pro) */}
+      <ProFeatureGate featureName="Erweiterte Analytics" description="Detaillierte Conversion-Raten und Trend-Analysen sind Pro-Mitgliedern vorbehalten." hasAccess={membership.canUseFeature.advancedAnalytics}>
+        <ConversionRateCard />
+      </ProFeatureGate>
 
       {/* Analytics Chart */}
       <RedemptionChart />
@@ -236,7 +245,7 @@ export default function PartnerDashboard() {
 
       {/* Quick Links */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-        <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/reports')}>
+        <Card variant="glass" className={`group hover:scale-[1.02] transition-all duration-300 cursor-pointer ${!membership.canUseFeature.reports ? 'opacity-60' : ''}`} onClick={() => membership.canUseFeature.reports ? navigate('/partner/reports') : null}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <FileText className="w-6 h-6 text-primary" />
@@ -245,7 +254,11 @@ export default function PartnerDashboard() {
               <h3 className="font-semibold">{t('partner.reports.title')}</h3>
               <p className="text-sm text-muted-foreground">{t('partner.reports.subtitle')}</p>
             </div>
-            <Badge variant="outline">{t('partner.reports.taxReady')}</Badge>
+            {membership.canUseFeature.reports ? (
+              <Badge variant="outline">{t('partner.reports.taxReady')}</Badge>
+            ) : (
+              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 gap-1"><Lock className="w-3 h-3" />Pro</Badge>
+            )}
           </CardContent>
         </Card>
 
@@ -261,7 +274,7 @@ export default function PartnerDashboard() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/network-map')}>
+        <Card variant="glass" className={`group hover:scale-[1.02] transition-all duration-300 cursor-pointer ${!membership.canUseFeature.partnerNetwork ? 'opacity-60' : ''}`} onClick={() => membership.canUseFeature.partnerNetwork ? navigate('/partner/network-map') : null}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Map className="w-6 h-6 text-primary" />
@@ -270,11 +283,15 @@ export default function PartnerDashboard() {
               <h3 className="font-semibold">{t('partner.network.findPartners')}</h3>
               <p className="text-sm text-muted-foreground">{t('partner.network.findPartnersDesc')}</p>
             </div>
-            <Badge variant="outline">{t('partner.network.mapBadge')}</Badge>
+            {membership.canUseFeature.partnerNetwork ? (
+              <Badge variant="outline">{t('partner.network.mapBadge')}</Badge>
+            ) : (
+              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 gap-1"><Lock className="w-3 h-3" />Pro</Badge>
+            )}
           </CardContent>
         </Card>
 
-        <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/city-rankings')}>
+        <Card variant="glass" className={`group hover:scale-[1.02] transition-all duration-300 cursor-pointer ${!membership.canUseFeature.cityRankings ? 'opacity-60' : ''}`} onClick={() => membership.canUseFeature.cityRankings ? navigate('/partner/city-rankings') : null}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Trophy className="w-6 h-6 text-primary" />
@@ -283,7 +300,11 @@ export default function PartnerDashboard() {
               <h3 className="font-semibold">{t('partner.cityRankings.title', 'City Rankings')}</h3>
               <p className="text-sm text-muted-foreground">{t('partner.cityRankings.dashboardDesc', 'Sieh, wie dein Venue in deiner Stadt abschneidet')}</p>
             </div>
-            <Badge variant="outline">{t('partner.cityRankings.rankingBadge', 'Ranking')}</Badge>
+            {membership.canUseFeature.cityRankings ? (
+              <Badge variant="outline">{t('partner.cityRankings.rankingBadge', 'Ranking')}</Badge>
+            ) : (
+              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 gap-1"><Lock className="w-3 h-3" />Pro</Badge>
+            )}
           </CardContent>
         </Card>
       </div>

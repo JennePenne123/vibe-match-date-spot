@@ -891,8 +891,12 @@ export type Database = {
           country: string | null
           created_at: string
           description: string | null
+          founding_partner_claimed_at: string | null
           id: string
+          is_founding_partner: boolean
           logo_url: string | null
+          membership_tier: string
+          membership_valid_until: string | null
           network_discount_value: number
           phone: string | null
           postal_code: string | null
@@ -918,8 +922,12 @@ export type Database = {
           country?: string | null
           created_at?: string
           description?: string | null
+          founding_partner_claimed_at?: string | null
           id?: string
+          is_founding_partner?: boolean
           logo_url?: string | null
+          membership_tier?: string
+          membership_valid_until?: string | null
           network_discount_value?: number
           phone?: string | null
           postal_code?: string | null
@@ -945,8 +953,12 @@ export type Database = {
           country?: string | null
           created_at?: string
           description?: string | null
+          founding_partner_claimed_at?: string | null
           id?: string
+          is_founding_partner?: boolean
           logo_url?: string | null
+          membership_tier?: string
+          membership_valid_until?: string | null
           network_discount_value?: number
           phone?: string | null
           postal_code?: string | null
