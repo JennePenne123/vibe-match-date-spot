@@ -42,6 +42,10 @@ interface PartnerMembershipState {
   limits: TierLimits;
   isPro: boolean;
   loading: boolean;
+  loyaltyBonusAwarded: boolean;
+  loyaltyBonusMonths: number;
+  paidProSince: string | null;
+  loyaltyBonusProgress: number; // 0-12 months progress
 }
 
 export const usePartnerMembership = () => {
@@ -53,6 +57,10 @@ export const usePartnerMembership = () => {
     limits: TIER_LIMITS.free,
     isPro: false,
     loading: true,
+    loyaltyBonusAwarded: false,
+    loyaltyBonusMonths: 0,
+    paidProSince: null,
+    loyaltyBonusProgress: 0,
   });
 
   useEffect(() => {
@@ -64,7 +72,7 @@ export const usePartnerMembership = () => {
     const fetch = async () => {
       const { data } = await supabase
         .from('partner_profiles')
-        .select('membership_tier, membership_valid_until, is_founding_partner')
+        .select('membership_tier, membership_valid_until, is_founding_partner, loyalty_bonus_awarded, loyalty_bonus_months, paid_pro_since')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -72,10 +80,24 @@ export const usePartnerMembership = () => {
         const tier = (data as any).membership_tier as PartnerTier || 'free';
         const validUntil = (data as any).membership_valid_until as string | null;
         const isFounding = (data as any).is_founding_partner as boolean || false;
+        const bonusAwarded = (data as any).loyalty_bonus_awarded as boolean || false;
+        const bonusMonths = (data as any).loyalty_bonus_months as number || 0;
+        const paidSince = (data as any).paid_pro_since as string | null;
 
         // Check if pro is still valid
         const isProActive = tier === 'pro' && (!validUntil || new Date(validUntil) > new Date());
         const effectiveTier: PartnerTier = isProActive ? 'pro' : 'free';
+
+        // Calculate loyalty progress (months paid out of 12)
+        let loyaltyProgress = 0;
+        if (paidSince && isFounding && !bonusAwarded) {
+          const now = new Date();
+          const paid = new Date(paidSince);
+          const months = (now.getFullYear() - paid.getFullYear()) * 12 + (now.getMonth() - paid.getMonth());
+          loyaltyProgress = Math.min(months, 12);
+        } else if (bonusAwarded) {
+          loyaltyProgress = 12;
+        }
 
         setState({
           tier: effectiveTier,
@@ -84,6 +106,10 @@ export const usePartnerMembership = () => {
           limits: TIER_LIMITS[effectiveTier],
           isPro: isProActive,
           loading: false,
+          loyaltyBonusAwarded: bonusAwarded,
+          loyaltyBonusMonths: bonusMonths,
+          paidProSince: paidSince,
+          loyaltyBonusProgress: loyaltyProgress,
         });
       } else {
         setState(s => ({ ...s, loading: false }));
