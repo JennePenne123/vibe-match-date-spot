@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, Clock, Info } from 'lucide-react';
+import { Camera, Clock, Info, Sparkles } from 'lucide-react';
 import { VenuePhotoUpload } from './VenuePhotoUpload';
 import { VenueDetailsEditor } from './VenueDetailsEditor';
 import { VenueInfoEditor } from './VenueInfoEditor';
+import VenuePersonalityWizard from './VenuePersonalityWizard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface VenueManagementSheetProps {
@@ -61,10 +62,14 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
           </div>
         ) : (
           <Tabs defaultValue="info" className="mt-4">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="info" className="gap-1.5 text-xs">
                 <Info className="w-3.5 h-3.5" />
                 Info
+              </TabsTrigger>
+              <TabsTrigger value="personality" className="gap-1.5 text-xs">
+                <Sparkles className="w-3.5 h-3.5" />
+                KI-Profil
               </TabsTrigger>
               <TabsTrigger value="photos" className="gap-1.5 text-xs">
                 <Camera className="w-3.5 h-3.5" />
@@ -88,6 +93,14 @@ export const VenueManagementSheet: React.FC<VenueManagementSheetProps> = ({
                   tags: venueData?.tags,
                 }}
                 onUpdated={handleUpdated}
+              />
+            </TabsContent>
+            <TabsContent value="personality" className="mt-4">
+              <VenuePersonalityWizard
+                venueId={venueId}
+                existingTags={venueData?.tags || []}
+                existingDescription={venueData?.description}
+                onComplete={handleUpdated}
               />
             </TabsContent>
             <TabsContent value="photos" className="mt-4">
