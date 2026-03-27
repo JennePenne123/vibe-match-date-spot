@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -365,6 +366,19 @@ const Venues = () => {
 
           {/* Filters */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <Badge
+              variant={openNowFilter ? 'default' : 'secondary'}
+              className={cn(
+                'cursor-pointer transition-colors whitespace-nowrap gap-1',
+                openNowFilter
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              )}
+              onClick={() => setOpenNowFilter(prev => !prev)}
+            >
+              <Clock className="w-3 h-3" />
+              {t('venues.openNow', 'Geöffnet')}
+            </Badge>
             <SlidersHorizontal className="w-4 h-4 text-muted-foreground shrink-0" />
             {FILTERS.map((filter) => (
               <Badge
