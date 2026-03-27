@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Search, SlidersHorizontal, MapPin, Star, Sparkles, Heart, Navigation, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, SlidersHorizontal, MapPin, Star, Sparkles, Heart, Navigation, Loader2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getLocationFallback } from '@/utils/locationFallback';
 import { searchVenuesOverpass } from '@/services/overpassSearchService';
