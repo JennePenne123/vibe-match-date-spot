@@ -22,19 +22,51 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Heavy UI/charting libs
-          'vendor-charts': ['recharts'],
-          'vendor-maps': ['leaflet', 'react-leaflet', 'react-leaflet-cluster'],
-          'vendor-motion': ['framer-motion'],
-          // Supabase SDK
-          'vendor-supabase': ['@supabase/supabase-js'],
-          // React core (shared across all chunks)
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          // PDF / QR utilities
-          'vendor-pdf': ['jspdf', 'html2canvas', 'qrcode.react'],
+        manualChunks(id) {
+          // React core
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/') || id.includes('node_modules/react-router')) {
+            return 'vendor-react';
+          }
+          // Radix UI primitives
+          if (id.includes('node_modules/@radix-ui/')) {
+            return 'vendor-radix';
+          }
+          // Charting
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3-')) {
+            return 'vendor-charts';
+          }
+          // Maps
+          if (id.includes('node_modules/leaflet') || id.includes('node_modules/react-leaflet')) {
+            return 'vendor-maps';
+          }
+          // Animation
+          if (id.includes('node_modules/framer-motion')) {
+            return 'vendor-motion';
+          }
+          // Supabase
+          if (id.includes('node_modules/@supabase/')) {
+            return 'vendor-supabase';
+          }
+          // PDF / QR
+          if (id.includes('node_modules/jspdf') || id.includes('node_modules/html2canvas') || id.includes('node_modules/qrcode')) {
+            return 'vendor-pdf';
+          }
           // i18n
-          'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+          if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
+            return 'vendor-i18n';
+          }
+          // QR scanner
+          if (id.includes('node_modules/html5-qrcode')) {
+            return 'vendor-qr-scanner';
+          }
+          // Sentry
+          if (id.includes('node_modules/@sentry/')) {
+            return 'vendor-sentry';
+          }
+          // Tanstack query
+          if (id.includes('node_modules/@tanstack/')) {
+            return 'vendor-query';
+          }
         },
       },
     },
