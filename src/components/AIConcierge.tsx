@@ -223,7 +223,9 @@ export default function AIConcierge() {
                     {['Date-Idee für heute?', 'Restaurant-Tipps', 'Erstes Date Tipps'].map(q => (
                       <button
                         key={q}
-                        onClick={() => { setInput(q); setTimeout(send, 50); }}
+                        onClick={() => {
+                          setInput(q);
+                        }}
                         className="text-[11px] px-3 py-1.5 rounded-full border border-primary/20 text-primary hover:bg-primary/5 transition-colors"
                       >
                         {q}
