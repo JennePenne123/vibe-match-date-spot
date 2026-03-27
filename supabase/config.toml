@@ -68,3 +68,6 @@ verify_jwt = false
 
 [functions.verify-partner]
 verify_jwt = true
+
+[functions.ai-concierge]
+verify_jwt = false
