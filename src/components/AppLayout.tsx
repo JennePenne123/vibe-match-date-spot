@@ -110,7 +110,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
         ) : isAdminRoute ? (
           <AdminMobileBottomNav />
         ) : (
-          <MobileBottomNav />
+          <>
+            <MobileBottomNav />
+            <AIConcierge />
+          </>
         )}
       </div>
     )
@@ -148,6 +151,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </div>
           </main>
         </div>
+        {!isPartnerRoute && !isAdminRoute && <AIConcierge />}
       </div>
     </SidebarProvider>
   )
