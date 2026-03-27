@@ -155,20 +155,21 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | # | Aufgabe | Aufwand | Beschreibung |
 |---|---------|---------|--------------|
 | 7 | **Stripe-Integration (Partner + User)** | Groß | Partner-Abo (14,90€/Monat), User-Premium, Checkout, Webhooks, `paid_pro_since` automatisch setzen, Founding Partner Gratis-Jahr, Treue-Bonus-Trigger |
-| 8 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
-| 9 | **Standort-Picker im Planner** | Klein | Schneller Stadtwechsel direkt im Smart Date Planner |
-| 10 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
-| 11 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
-| 12 | **Gemeinsames Planen verbessern** | Mittel | Freunde direkt in die App einladen zum kollaborativen Planning |
-| 13 | **🎉 Event-System** | Groß | Events-Tabelle, AI-Scoring für Events, kombinierte Vorschläge (Event + Venue), Partner können Events erstellen |
-| 14 | **Event-Kategorien** | Mittel | Konzerte, Ausstellungen, Food-Festivals, Workshops, Sport-Events, Open-Air |
-| 15 | **Event + Venue Combos** | Mittel | AI schlägt "Erst Konzert, dann Dinner nebenan" vor |
-| 16 | **Event-Kalender** | Mittel | Kalender-View für anstehende Events in der Nähe |
-| 17 | **A/B Testing Framework** | Mittel | Feature-Flags, Conversion-Tracking für UI-Varianten |
-| 18 | **Multi-User Date Groups** | Groß | Gruppen-Dates planen (3+ Personen, z.B. Doppel-Date) |
-| 19 | **Venue-Reviews von Usern** | Mittel | Eigene Review-Funktion statt nur Feedback-Buttons |
-| 20 | **AI Date-Recap** | Klein | Nach dem Date: AI generiert eine kurze Zusammenfassung + Erinnerungs-Foto-Prompt |
-| 21 | **Partner-Analytics v2** | Mittel | Heatmaps, Conversion Funnels, Zeitraum-Vergleiche im Partner-Portal |
+| 8 | **Favoriten-System → Supabase** | Mittel | localStorage → DB-Migration, Favoriten als AI-Trainingsignal nutzen, Social Proof ("3 Freunde mögen das auch"), geräteübergreifende Sync |
+| 9 | **KI-Support-Agent** | Groß | AI-Chat als First-Line-Support (ersetzt FAQ) |
+| 10 | **Standort-Picker im Planner** | Klein | Schneller Stadtwechsel direkt im Smart Date Planner |
+| 11 | **Supabase Realtime konsolidieren** | Mittel | Gemeinsamer Channel statt separate Subscriptions |
+| 12 | **Partner Redemption-Übersicht** | Mittel | Eingelöste Vouchers detailliert im Partner-Dashboard |
+| 13 | **Gemeinsames Planen verbessern** | Mittel | Freunde direkt in die App einladen zum kollaborativen Planning |
+| 14 | **🎉 Event-System** | Groß | Events-Tabelle, AI-Scoring für Events, kombinierte Vorschläge (Event + Venue), Partner können Events erstellen |
+| 15 | **Event-Kategorien** | Mittel | Konzerte, Ausstellungen, Food-Festivals, Workshops, Sport-Events, Open-Air |
+| 16 | **Event + Venue Combos** | Mittel | AI schlägt "Erst Konzert, dann Dinner nebenan" vor |
+| 17 | **Event-Kalender** | Mittel | Kalender-View für anstehende Events in der Nähe |
+| 18 | **A/B Testing Framework** | Mittel | Feature-Flags, Conversion-Tracking für UI-Varianten |
+| 19 | **Multi-User Date Groups** | Groß | Gruppen-Dates planen (3+ Personen, z.B. Doppel-Date) |
+| 20 | **Venue-Reviews von Usern** | Mittel | Eigene Review-Funktion statt nur Feedback-Buttons |
+| 21 | **AI Date-Recap** | Klein | Nach dem Date: AI generiert eine kurze Zusammenfassung + Erinnerungs-Foto-Prompt |
+| 22 | **Partner-Analytics v2** | Mittel | Heatmaps, Conversion Funnels, Zeitraum-Vergleiche im Partner-Portal |
 
 ### ✅ Heute erledigt (26. März 2026)
 
