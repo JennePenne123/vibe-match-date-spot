@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import SmartDatePlanner from '@/components/SmartDatePlanner';
+import { FirstUseNudge } from '@/components/FirstUseNudge';
+import { useFirstUseNudge } from '@/hooks/useFirstUseNudge';
 import { useCollaborativeSession } from '@/hooks/useCollaborativeSession';
 import { useSessionManagement } from '@/hooks/useSessionManagement';
 import HomeHeader from '@/components/HomeHeader';
@@ -171,6 +173,7 @@ const SmartDatePlanning: React.FC = () => {
             />
           )}
           
+          <DatePlanningNudge />
           <ErrorBoundary level="component" silent={true}>
             <SmartDatePlanner
               sessionId={sessionId ?? ''}
@@ -181,6 +184,17 @@ const SmartDatePlanning: React.FC = () => {
         </div>
       </div>
     </ErrorBoundary>
+  );
+};
+
+const DatePlanningNudge = () => {
+  const { visible, dismiss } = useFirstUseNudge('planning-concierge');
+  return (
+    <div className="px-4">
+      <FirstUseNudge visible={visible} onDismiss={dismiss}>
+        <strong>Wusstest du?</strong> Der ✨ Concierge hilft dir mit Date-Ideen basierend auf euren gemeinsamen Vorlieben!
+      </FirstUseNudge>
+    </div>
   );
 };
 
