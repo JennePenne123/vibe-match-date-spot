@@ -15,6 +15,8 @@ import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import FeedbackImpactBanner from '@/components/home/FeedbackImpactBanner';
+import { FirstUseNudge } from '@/components/FirstUseNudge';
+import { useFirstUseNudge } from '@/hooks/useFirstUseNudge';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
 import { useHomeTipVenues } from '@/hooks/useHomeTipVenues';
@@ -132,6 +134,9 @@ const HomeContent: React.FC = () => {
   return (
     <main className="px-4 py-5 md:px-6 lg:px-8">
       <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto space-y-6"}>
+
+        {/* First-Use Nudge for Home */}
+        <HomeNudge />
 
         {/* AI Confidence Banner */}
         <AIConfidenceBanner />
@@ -327,6 +332,15 @@ const HomeContent: React.FC = () => {
 
       </div>
     </main>
+  );
+};
+
+const HomeNudge = () => {
+  const { visible, dismiss } = useFirstUseNudge('home-concierge');
+  return (
+    <FirstUseNudge visible={visible} onDismiss={dismiss}>
+      <strong>Tipp:</strong> Tippe unten rechts auf ✨ für deinen KI-Concierge — er kennt deine Vorlieben!
+    </FirstUseNudge>
   );
 };
 

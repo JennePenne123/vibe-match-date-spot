@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FirstUseNudge } from '@/components/FirstUseNudge';
+import { useFirstUseNudge } from '@/hooks/useFirstUseNudge';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -78,6 +80,8 @@ const Profile = () => {
            premiumUntil={(points as any)?.premium_until}
          />
 
+        <ProfileNudge />
+
         {/* Content cards */}
         <div className="px-4 pb-6 -mt-4 space-y-4 relative z-10">
           {/* AI Progress – shows how well AI knows the user */}
@@ -142,6 +146,17 @@ const Profile = () => {
           <ProfileActions onLogout={logout} />
         </div>
       </div>
+    </div>
+  );
+};
+
+const ProfileNudge = () => {
+  const { visible, dismiss } = useFirstUseNudge('profile-points');
+  return (
+    <div className="px-4">
+      <FirstUseNudge visible={visible} onDismiss={dismiss}>
+        <strong>Tipp:</strong> Sammle Punkte durch Bewertungen und schalte Premium-Features frei!
+      </FirstUseNudge>
     </div>
   );
 };
