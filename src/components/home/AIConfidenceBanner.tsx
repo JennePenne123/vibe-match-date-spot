@@ -1,42 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Progress } from '@/components/ui/progress';
 import { Brain, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface ConfidenceFactors {
-  hasCuisines: boolean;
-  hasVibes: boolean;
-  hasPriceRange: boolean;
-  hasTimes: boolean;
-  hasDietary: boolean;
-  hasPersonality: boolean;
-  hasRelationshipGoal: boolean;
-  hasDistance: boolean;
-  hasLocation: boolean;
-  hasActivities: boolean;
-}
-
-function calculateConfidence(factors: ConfidenceFactors): number {
-  const weights: Record<keyof ConfidenceFactors, number> = {
-    hasCuisines: 15,
-    hasVibes: 15,
-    hasPriceRange: 10,
-    hasTimes: 10,
-    hasDietary: 5,
-    hasPersonality: 15,
-    hasRelationshipGoal: 5,
-    hasDistance: 10,
-    hasLocation: 10,
-    hasActivities: 5,
-  };
-
+function calculateConfidence(data: Record<string, unknown> | null): number {
+  if (!data) return 0;
+  const checks: [string, number][] = [
+    ['preferred_cuisines', 15],
+    ['preferred_vibes', 15],
+    ['preferred_price_range', 10],
+    ['preferred_times', 10],
+    ['dietary_restrictions', 5],
+    ['personality_traits', 15],
+    ['relationship_goal', 5],
+    ['max_distance', 10],
+    ['home_latitude', 10],
+    ['preferred_activities', 5],
+  ];
   let score = 0;
-  for (const [key, weight] of Object.entries(weights)) {
-    if (factors[key as keyof ConfidenceFactors]) score += weight;
+  for (const [key, weight] of checks) {
+    const val = data[key];
+    if (Array.isArray(val) ? val.length > 0 : !!val) score += weight;
   }
   return score;
 }
@@ -49,46 +36,14 @@ function getConfidenceMessage(score: number): string {
 }
 
 const AIConfidenceBanner: React.FC = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [confidence, setConfidence] = useState<number | null>(null);
+  const { data: prefs, isLoading } = useUserPreferences();
   const [dismissed, setDismissed] = useState(false);
 
-  useEffect(() => {
-    if (!user) return;
+  if (isLoading || dismissed) return null;
 
-    const fetchConfidence = async () => {
-      const { data } = await supabase
-        .from('user_preferences')
-        .select('preferred_cuisines, preferred_vibes, preferred_price_range, preferred_times, dietary_restrictions, personality_traits, relationship_goal, max_distance, home_latitude, preferred_activities')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (!data) {
-        setConfidence(0);
-        return;
-      }
-
-      const factors: ConfidenceFactors = {
-        hasCuisines: !!data.preferred_cuisines?.length,
-        hasVibes: !!data.preferred_vibes?.length,
-        hasPriceRange: !!data.preferred_price_range?.length,
-        hasTimes: !!data.preferred_times?.length,
-        hasDietary: !!data.dietary_restrictions?.length,
-        hasPersonality: !!data.personality_traits,
-        hasRelationshipGoal: !!data.relationship_goal,
-        hasDistance: !!data.max_distance,
-        hasLocation: !!data.home_latitude,
-        hasActivities: !!data.preferred_activities?.length,
-      };
-
-      setConfidence(calculateConfidence(factors));
-    };
-
-    fetchConfidence();
-  }, [user]);
-
-  if (confidence === null || confidence >= 100 || dismissed) return null;
+  const confidence = calculateConfidence(prefs as unknown as Record<string, unknown>);
+  if (confidence >= 100) return null;
 
   return (
     <AnimatePresence>
