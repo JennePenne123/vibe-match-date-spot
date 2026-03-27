@@ -148,4 +148,15 @@ const Profile = () => {
   );
 };
 
+const ProfileNudge = () => {
+  const { visible, dismiss } = useFirstUseNudge('profile-points');
+  return (
+    <div className="px-4">
+      <FirstUseNudge visible={visible} onDismiss={dismiss}>
+        <strong>Tipp:</strong> Sammle Punkte durch Bewertungen und schalte Premium-Features frei!
+      </FirstUseNudge>
+    </div>
+  );
+};
+
 export default Profile;
