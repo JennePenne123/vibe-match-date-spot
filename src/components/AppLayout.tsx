@@ -11,6 +11,7 @@ import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { Menu, Sparkles } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import AIConcierge from '@/components/AIConcierge'
 
 // Tab order for directional slide
 const NAV_ORDER = ['/home', '/preferences', '/chats', '/profile']
