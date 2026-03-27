@@ -35,7 +35,7 @@ const Home: React.FC = () => {
       return;
     }
 
-    if (!hasCompletedPreferenceSetup(preferences)) {
+    if (!hasCompletedPreferenceSetup(preferences as any)) {
       navigate('/preferences?onboarding=true', { replace: true });
     }
   }, [user, authLoading, prefsLoading, preferences, navigate]);
