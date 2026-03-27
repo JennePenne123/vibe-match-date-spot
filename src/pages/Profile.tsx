@@ -80,6 +80,8 @@ const Profile = () => {
            premiumUntil={(points as any)?.premium_until}
          />
 
+        <ProfileNudge />
+
         {/* Content cards */}
         <div className="px-4 pb-6 -mt-4 space-y-4 relative z-10">
           {/* AI Progress – shows how well AI knows the user */}
