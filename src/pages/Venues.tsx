@@ -12,6 +12,7 @@ import { ArrowLeft, Search, SlidersHorizontal, MapPin, Star, Sparkles, Heart, Na
 import { cn } from '@/lib/utils';
 import { getLocationFallback } from '@/utils/locationFallback';
 import { searchVenuesOverpass } from '@/services/overpassSearchService';
+import { isVenueOpenNow } from '@/utils/openingHoursParser';
 
 interface DBVenue {
   id: string;
@@ -25,6 +26,7 @@ interface DBVenue {
   image_url: string | null;
   latitude: number | null;
   longitude: number | null;
+  opening_hours: any | null;
 }
 
 interface VenueWithScore extends DBVenue {
@@ -49,6 +51,7 @@ const Venues = () => {
   const [activeCity, setActiveCity] = useState<string | null>(null);
   const [searchRadius, setSearchRadius] = useState(25);
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [openNowFilter, setOpenNowFilter] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/?auth=required', { replace: true });
@@ -79,7 +82,7 @@ const Venues = () => {
     try {
       let venueQuery = supabase
         .from('venues')
-        .select('id, name, address, cuisine_type, price_range, rating, tags, description, image_url, latitude, longitude')
+        .select('id, name, address, cuisine_type, price_range, rating, tags, description, image_url, latitude, longitude, opening_hours')
         .eq('is_active', true);
 
       if (center) {
@@ -254,7 +257,8 @@ const Venues = () => {
         venue.cuisine_type?.toLowerCase().includes(f.toLowerCase()) ||
         venue.tags?.some(tag => tag.toLowerCase().includes(f.toLowerCase()))
       );
-    return matchesSearch && matchesFilters;
+    const matchesOpenNow = !openNowFilter || isVenueOpenNow(venue.opening_hours) === true;
+    return matchesSearch && matchesFilters && matchesOpenNow;
   });
 
   const getScoreColor = (score: number) => {
