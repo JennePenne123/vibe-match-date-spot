@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { STALE_TIME_TIERS } from '@/config/queryConfig';
+import { STALE_TIMES } from '@/config/queryConfig';
 
 export interface UserPreferencesData {
   preferred_cuisines: string[] | null;
@@ -44,6 +44,6 @@ export function useUserPreferences() {
       return data as UserPreferencesData | null;
     },
     enabled: !!user,
-    staleTime: STALE_TIME_TIERS.DYNAMIC,
+    staleTime: STALE_TIMES.DYNAMIC,
   });
 }
