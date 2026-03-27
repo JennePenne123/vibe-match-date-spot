@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FirstUseNudge } from '@/components/FirstUseNudge';
+import { useFirstUseNudge } from '@/hooks/useFirstUseNudge';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';

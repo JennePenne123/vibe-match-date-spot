@@ -335,4 +335,13 @@ const HomeContent: React.FC = () => {
   );
 };
 
+const HomeNudge = () => {
+  const { visible, dismiss } = useFirstUseNudge('home-concierge');
+  return (
+    <FirstUseNudge visible={visible} onDismiss={dismiss}>
+      <strong>Tipp:</strong> Tippe unten rechts auf ✨ für deinen KI-Concierge — er kennt deine Vorlieben!
+    </FirstUseNudge>
+  );
+};
+
 export default HomeContent;
