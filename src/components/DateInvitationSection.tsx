@@ -148,9 +148,9 @@ const DateInvitationSection: React.FC = () => {
     return (
       <div className="space-y-4 mb-6">
         <div className="text-center p-6 bg-muted/30 rounded-lg border-2 border-dashed border-muted">
-          <h3 className="text-lg font-medium text-muted-foreground mb-2">No Date Invitations</h3>
+          <h3 className="text-lg font-medium text-muted-foreground mb-2">{t('invitationsSection.emptyTitle')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            You don't have any date invitations yet. Use the Smart Date Planner below to create and send invitations to your friends!
+            {t('invitationsSection.emptyDesc')}
           </p>
           <Button 
             onClick={handleRefresh}
@@ -159,7 +159,7 @@ const DateInvitationSection: React.FC = () => {
             disabled={isRefreshing}
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('invitationsSection.refresh')}
           </Button>
         </div>
       </div>
@@ -170,7 +170,7 @@ const DateInvitationSection: React.FC = () => {
     if (inviteList.length === 0) {
       return (
         <div className="text-center py-8 text-muted-foreground">
-          <p>No {direction} invitations in this category</p>
+          <p>{t('invitationsSection.noInCategory', { direction: t(direction === 'received' ? 'invitationsSection.directionReceived' : 'invitationsSection.directionSent') })}</p>
         </div>
       );
     }
@@ -190,10 +190,10 @@ const DateInvitationSection: React.FC = () => {
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Date Invitations</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t('invitationsSection.title')}</h2>
         <div className="flex items-center gap-2">
           <Badge variant="secondary" className="text-xs">
-            {invitations.length} total
+            {t('invitationsSection.total', { count: invitations.length })}
           </Badge>
           <Button 
             onClick={handleRefresh}
@@ -209,7 +209,7 @@ const DateInvitationSection: React.FC = () => {
       <Tabs defaultValue="received" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="received" className="flex items-center gap-2">
-            Received
+            {t('invitationsSection.received')}
             {receivedInvitations.length > 0 && (
               <Badge variant="secondary" className="text-xs">
                 {receivedInvitations.length}
@@ -217,7 +217,7 @@ const DateInvitationSection: React.FC = () => {
             )}
           </TabsTrigger>
           <TabsTrigger value="sent" className="flex items-center gap-2">
-            Sent
+            {t('invitationsSection.sent')}
             {sentInvitations.length > 0 && (
               <Badge variant="secondary" className="text-xs">
                 {sentInvitations.length}
