@@ -92,7 +92,7 @@ export default function LandingDemo() {
 
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 lg:pt-20">
         <div className="absolute inset-0 bg-gradient-calm opacity-70" />
-        <div className="absolute inset-0 bg-gradient-meadow animate-breathe" />
+        <div className="absolute inset-0 bg-gradient-meadow" />
         {/* Floating orbs for depth */}
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/8 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-accent/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
