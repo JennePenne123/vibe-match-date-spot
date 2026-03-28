@@ -45,8 +45,8 @@ const DateInvitationSection: React.FC = () => {
     if (invitation) {
       await acceptInvitation(invitation.id);
       toast({
-        title: "Date Accepted! 🎉",
-        description: `You've accepted the date invitation from ${invitation.sender?.name || 'your friend'}. Time to get excited! ✨`,
+        title: t('invitationsSection.dateAcceptedTitle'),
+        description: t('invitationsSection.dateAcceptedDesc', { name: invitation.sender?.name || 'your friend' }),
         duration: 5000,
       });
     } else {
@@ -60,8 +60,8 @@ const DateInvitationSection: React.FC = () => {
     if (invitation) {
       await declineInvitation(invitation.id);
       toast({
-        title: "Date Declined",
-        description: `You've respectfully declined the invitation from ${invitation.sender?.name || 'your friend'}. No worries! 💙`,
+        title: t('invitationsSection.dateDeclinedTitle'),
+        description: t('invitationsSection.dateDeclinedDesc', { name: invitation.sender?.name || 'your friend' }),
         duration: 4000,
       });
     } else {
@@ -78,8 +78,8 @@ const DateInvitationSection: React.FC = () => {
         ? invitation.sender?.name 
         : invitation.recipient?.name;
       toast({
-        title: "Date Cancelled",
-        description: `Your date has been cancelled. ${partnerName || 'Your partner'} has been notified.`,
+        title: t('invitationsSection.dateCancelledTitle'),
+        description: t('invitationsSection.dateCancelledDesc', { name: partnerName || 'Your partner' }),
         duration: 4000,
         variant: "destructive"
       });
