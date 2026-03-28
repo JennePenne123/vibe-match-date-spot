@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useInvitations } from '@/hooks/useInvitations';
 import { DateInviteCard } from '@/components/date-invite';
 import { useToast } from '@/hooks/use-toast';
@@ -11,6 +12,7 @@ import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const DateInvitationSection: React.FC = () => {
+  const { t } = useTranslation();
   const { invitations, loading, acceptInvitation, declineInvitation, cancelInvitation, fetchInvitations } = useInvitations();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('pending');
