@@ -1,7 +1,7 @@
 
 # VybePulse – Gesamt-Projektübersicht & Roadmap
 
-**Stand: 27. März 2026** | **Geschätzter Fortschritt: ~94%**
+**Stand: 28. März 2026** | **Geschätzter Fortschritt: ~94%**
 
 ---
 
@@ -112,33 +112,42 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 1 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons (192x192, 512x512), Favicons (16x16, 32x32, 180x180) |
 | 2 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles` im SQL Editor |
 | 3 | **Rechtliche Texte finalisieren** | 🔴 Extern | AGB + Datenschutzerklärung durch Anwalt prüfen lassen |
+| 4 | **Google Sign-In konfigurieren** | 🔴 Extern | Google Cloud Projekt → OAuth 2.0 Client ID + Secret → Supabase Auth Providers |
+| 5 | **Apple Sign-In konfigurieren** | 🔴 Extern | Apple Developer Account (99$/Jahr) → Services ID → Supabase Auth Providers |
+| 6 | **Supabase Site URL setzen** | 🔴 Manuell | Live-Domain als Site URL unter Auth → URL Configuration eintragen |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 4 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor) |
-| 5 | **E2E Testing** | 🟡 Offen | Kritische Flows testen (Auth, Onboarding, Recommendations, Date-Invite) |
+| 7 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor) |
+| 8 | **E2E Testing** | 🟡 Offen | Kritische Flows testen (Auth, Onboarding, Recommendations, Date-Invite) |
 
 ### 🟢 Post-Launch / Nice-to-Have
 
 | # | Aufgabe | Aufwand |
 |---|---------|---------|
-| 6 | Stripe-Integration (Partner + User) | Groß |
-| 7 | Favoriten-System → Supabase | Mittel |
-| 8 | KI-Support-Agent | Groß |
-| 9 | Standort-Picker im Planner | Klein |
-| 10 | Supabase Realtime konsolidieren | Mittel |
-| 11 | Event-System (Events + Venue Combos + Kalender) | Groß |
-| 12 | A/B Testing Framework | Mittel |
-| 13 | Multi-User Date Groups | Groß |
-| 14 | Venue-Reviews von Usern | Mittel |
-| 15 | AI Date-Recap | Klein |
-| 16 | Partner-Analytics v2 | Mittel |
+| 9 | Stripe-Integration (Partner + User) | Groß |
+| 10 | Favoriten-System → Supabase | Mittel |
+| 11 | KI-Support-Agent | Groß |
+| 12 | Standort-Picker im Planner | Klein |
+| 13 | Supabase Realtime konsolidieren | Mittel |
+| 14 | Event-System (Events + Venue Combos + Kalender) | Groß |
+| 15 | A/B Testing Framework | Mittel |
+| 16 | Multi-User Date Groups | Groß |
+| 17 | Venue-Reviews von Usern | Mittel |
+| 18 | AI Date-Recap | Klein |
+| 19 | Partner-Analytics v2 | Mittel |
 
 ---
 
 ## ✅ Zuletzt erledigt
+
+### 28. März 2026
+| Aufgabe | Beschreibung |
+|---------|--------------|
+| ~~Quality & Polish Sprint~~ | Mobile-Responsivität, i18n Error/Empty States, Design-Token-Konsolidierung |
+| ~~Social Login To-Dos dokumentiert~~ | Google + Apple Sign-In Konfigurationsanleitung erstellt |
 
 ### 27. März 2026
 | Aufgabe | Beschreibung |
@@ -188,8 +197,8 @@ DSGVO/Legal:        ████████████████████
 ```
 
 ### Zeitliche Einschätzung bis Launch
-- **Kritische Aufgaben (1-3)**: ~1 Session + externe Anwaltsprüfung
-- **Wichtige Aufgaben (4-5)**: ~1-2 Sessions
+- **Kritische Aufgaben (1-6)**: ~1-2 Sessions + externe Accounts/Anwaltsprüfung
+- **Wichtige Aufgaben (7-8)**: ~1-2 Sessions
 - **Gesamt bis MVP-Launch**: ~2-3 Sessions
 - **Stripe-Integration**: ~1-2 Sessions (Post-Launch)
 
