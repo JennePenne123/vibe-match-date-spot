@@ -174,8 +174,18 @@
 
     /* Light mode gradients */
     --gradient-primary: linear-gradient(135deg, hsl(239, 84%, 57%) 0%, hsl(263, 70%, 56%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(263, 70%, 56%) 0%, hsl(330, 81%, 50%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(330, 81%, 50%) 0%, hsl(350, 80%, 45%) 100%);
     --gradient-calm: linear-gradient(135deg, hsl(210, 40%, 98%) 0%, hsl(210, 35%, 96%) 100%);
+    --gradient-earth: linear-gradient(135deg, hsl(210, 40%, 96%) 0%, hsl(210, 35%, 94%) 100%);
+    --gradient-meadow: linear-gradient(135deg, hsl(239, 84%, 57% / 0.08) 0%, hsl(263, 70%, 56% / 0.05) 100%);
+    --gradient-sunrise: linear-gradient(135deg, hsl(330, 81%, 50% / 0.08) 0%, hsl(263, 70%, 56% / 0.05) 100%);
     --gradient-surface-subtle: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(210, 40%, 98%) 100%);
+    --gradient-surface-warm: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(210, 35%, 97%) 100%);
+    --gradient-surface-soft: linear-gradient(135deg, hsl(239, 84%, 57% / 0.04) 0%, hsl(263, 70%, 56% / 0.04) 100%);
+    --gradient-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.80) 0%, rgba(255, 255, 255, 0.60) 100%);
+    --gradient-card-elegant: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(210, 40%, 98%) 100%);
+    --gradient-card-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.70) 100%);
 
     /* Light shadows */
     --shadow-gentle-sm: 0 2px 8px hsl(215 16% 50% / 0.08);

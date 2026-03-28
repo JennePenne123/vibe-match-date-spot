@@ -105,7 +105,7 @@ export default function LandingDemo() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 backdrop-blur-sm">
                 <Sparkles className="w-4 h-4" />
-                KI-gestützte Date-Planung
+                {t('landing.aiBadge', 'KI-gestützte Date-Planung')}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-semibold leading-tight tracking-tight">
                 <span className="block text-foreground">{t('landing.heroTitle1')}</span>
@@ -204,7 +204,7 @@ export default function LandingDemo() {
                 transition={{ duration: 0.5, delay: feature.delay }}
               >
                 <Card variant="wellness" className="group cursor-pointer h-full">
-                  <div className="p-10 space-y-5">
+                  <div className="p-6 md:p-10 space-y-5">
                     <div className={`w-16 h-16 rounded-2xl ${feature.gradient} flex items-center justify-center shadow-gentle-md group-hover:shadow-gentle-lg group-hover:scale-110 transition-all duration-400`}>
                       <feature.icon className="w-8 h-8 text-white" />
                     </div>
@@ -233,7 +233,7 @@ export default function LandingDemo() {
                 <h3 className="text-3xl lg:text-4xl font-semibold text-foreground">{t('landing.step1Title')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{t('landing.step1Desc')}</p>
               </div>
-              <div className="order-1 lg:order-2"><Card variant="elegant" size="xl"><div className="aspect-video bg-gradient-calm rounded-xl flex items-center justify-center"><img src="/icon-512.png" alt="VybePulse" className="w-24 h-24 rounded-2xl shadow-lg" loading="lazy" /></div></Card></div>
+              <div className="order-1 lg:order-2"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-calm rounded-xl flex items-center justify-center"><img src="/icon-512.png" alt="VybePulse" className="w-24 h-24 rounded-2xl shadow-lg" loading="lazy" /></div></Card></div>
             </div>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center scroll-animate opacity-0">
               <div className="order-2 space-y-6">
@@ -241,7 +241,7 @@ export default function LandingDemo() {
                 <h3 className="text-3xl lg:text-4xl font-semibold text-foreground">{t('landing.step2Title')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{t('landing.step2Desc')}</p>
               </div>
-              <div className="order-1"><Card variant="elegant" size="xl"><div className="aspect-video bg-gradient-secondary rounded-xl flex items-center justify-center"><Sparkles className="w-20 h-20 text-white/70" /></div></Card></div>
+              <div className="order-1"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-secondary rounded-xl flex items-center justify-center"><Sparkles className="w-20 h-20 text-white/70" /></div></Card></div>
             </div>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center scroll-animate opacity-0">
               <div className="order-2 lg:order-1 space-y-6">
@@ -249,7 +249,7 @@ export default function LandingDemo() {
                 <h3 className="text-3xl lg:text-4xl font-semibold text-foreground">{t('landing.step3Title')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{t('landing.step3Desc')}</p>
               </div>
-              <div className="order-1 lg:order-2"><Card variant="elegant" size="xl"><div className="aspect-video bg-gradient-primary rounded-xl flex items-center justify-center"><Users className="w-20 h-20 text-white/70" /></div></Card></div>
+              <div className="order-1 lg:order-2"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-primary rounded-xl flex items-center justify-center"><Users className="w-20 h-20 text-white/70" /></div></Card></div>
             </div>
           </div>
         </div>

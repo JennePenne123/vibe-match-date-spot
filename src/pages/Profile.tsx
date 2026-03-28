@@ -50,7 +50,7 @@ const Profile = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Back button - floating over header */}
-        <div className="absolute top-3 left-3 z-20">
+        <div className="sticky top-3 left-3 z-20 w-fit ml-3 pt-3">
           <Button 
             onClick={() => navigate(-1)} 
             variant="ghost" 
@@ -101,7 +101,7 @@ const Profile = () => {
               <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
                 <span className="flex items-center gap-2 font-semibold">
                   <Award className="h-5 w-5 text-primary" />
-                  Achievements
+                  {t('profile.achievements', 'Achievements')}
                 </span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
               </Button>
@@ -116,7 +116,7 @@ const Profile = () => {
               <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
                 <span className="flex items-center gap-2 font-semibold">
                   <Brain className="h-5 w-5 text-primary" />
-                  AI Learning
+                  {t('profile.aiLearning', 'AI Learning')}
                 </span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
               </Button>
@@ -131,7 +131,7 @@ const Profile = () => {
               <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
                 <span className="flex items-center gap-2 font-semibold">
                   <Gift className="h-5 w-5 text-primary" />
-                  Referral Program
+                  {t('profile.referralProgram', 'Referral Program')}
                 </span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
               </Button>
