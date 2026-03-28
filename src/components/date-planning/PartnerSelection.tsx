@@ -43,9 +43,11 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
     }
   };
 
+  const maxGroupSize = 5; // max 5 friends + user = 6 total
+  
   const isValidSelection = dateMode === 'single' 
     ? selectedPartnerId 
-    : selectedPartnerIds.length > 0;
+    : selectedPartnerIds.length > 0 && selectedPartnerIds.length <= maxGroupSize;
 
   const selectedCount = selectedPartnerIds.length;
 
@@ -84,7 +86,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
         <div className="text-sm text-muted-foreground mb-3">
           {dateMode === 'single' 
             ? 'Select a friend to plan a date with' 
-            : `Select friends for your group date (${selectedCount} selected)`}
+            : `Select friends for your group date (${selectedCount}/5 selected, max 6 inkl. dir)`}
         </div>
         {dateMode === 'single' ? (
           <Select value={selectedPartnerId} onValueChange={onPartnerChange}>
@@ -107,6 +109,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
                   <Checkbox
                     id={friend.id}
                     checked={selectedPartnerIds.includes(friend.id)}
+                    disabled={!selectedPartnerIds.includes(friend.id) && selectedPartnerIds.length >= maxGroupSize}
                     onCheckedChange={(checked) => handlePartnerToggle(friend.id, checked as boolean)}
                     className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
