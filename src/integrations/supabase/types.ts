@@ -412,6 +412,141 @@ export type Database = {
           },
         ]
       }
+      date_group_members: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          invitation_status: string
+          joined_at: string | null
+          preferences_data: Json | null
+          preferences_submitted: boolean
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          invitation_status?: string
+          joined_at?: string | null
+          preferences_data?: Json | null
+          preferences_submitted?: boolean
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          invitation_status?: string
+          joined_at?: string | null
+          preferences_data?: Json | null
+          preferences_submitted?: boolean
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "date_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "date_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      date_group_messages: {
+        Row: {
+          created_at: string | null
+          group_id: string
+          id: string
+          message: string
+          read_by: string[] | null
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          group_id: string
+          id?: string
+          message: string
+          read_by?: string[] | null
+          sender_id: string
+        }
+        Update: {
+          created_at?: string | null
+          group_id?: string
+          id?: string
+          message?: string
+          read_by?: string[] | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "date_group_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "date_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      date_groups: {
+        Row: {
+          created_at: string
+          creator_id: string
+          group_compatibility_score: number | null
+          id: string
+          max_members: number
+          merged_preferences: Json | null
+          name: string
+          planning_session_id: string | null
+          proposed_date: string | null
+          status: string
+          updated_at: string
+          venue_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          group_compatibility_score?: number | null
+          id?: string
+          max_members?: number
+          merged_preferences?: Json | null
+          name: string
+          planning_session_id?: string | null
+          proposed_date?: string | null
+          status?: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          group_compatibility_score?: number | null
+          id?: string
+          max_members?: number
+          merged_preferences?: Json | null
+          name?: string
+          planning_session_id?: string | null
+          proposed_date?: string | null
+          status?: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "date_groups_planning_session_id_fkey"
+            columns: ["planning_session_id"]
+            isOneToOne: false
+            referencedRelation: "date_planning_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       date_invitations: {
         Row: {
           actual_date_time: string | null
