@@ -1,5 +1,6 @@
 import React, { useMemo, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Sparkles, Users, Crown, Lock } from 'lucide-react';
