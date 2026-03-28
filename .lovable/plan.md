@@ -11,7 +11,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## ✅ Fertiggestellte Features (~94%)
+## ✅ Fertiggestellte Features (~95%)
 
 ### 🏠 User-Frontend
 - Landing Page mit Auth-Modal (Google, Apple, E-Mail) + Social Proof Banner
