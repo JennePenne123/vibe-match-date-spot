@@ -78,7 +78,7 @@ export function useHomeTipVenues(): UseHomeTipVenuesResult {
 
       // Apply geographic bounding box (~200km) to keep venues in the user's region/country
       if (lat !== null && lng !== null) {
-        const radiusKm = 200;
+        const radiusKm = 25;
         const latDelta = radiusKm / 111;
         const lngDelta = radiusKm / (111 * Math.cos(lat * Math.PI / 180));
         query = query
