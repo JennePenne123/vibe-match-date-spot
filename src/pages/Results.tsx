@@ -33,6 +33,7 @@ const VenueCardSkeleton = () => (
 const Results = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { appState } = useApp();
   const { user } = useAuth();
   const { points } = useUserPoints();
