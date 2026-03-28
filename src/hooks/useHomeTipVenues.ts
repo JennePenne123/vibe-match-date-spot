@@ -54,13 +54,41 @@ export function useHomeTipVenues(): UseHomeTipVenuesResult {
   const { data: prefs } = useUserPreferences();
 
   const { data: rawVenues = [], isLoading } = useQuery({
-    queryKey: ['home-tip-venues'],
+    queryKey: ['home-tip-venues', user?.id],
     queryFn: async () => {
-      const { data } = await supabase
+      // Load user's home location for geographic filtering
+      let lat: number | null = null;
+      let lng: number | null = null;
+
+      if (user) {
+        const { data: userPrefs } = await supabase
+          .from('user_preferences')
+          .select('home_latitude, home_longitude')
+          .eq('user_id', user.id)
+          .single();
+        lat = userPrefs?.home_latitude ?? null;
+        lng = userPrefs?.home_longitude ?? null;
+      }
+
+      let query = supabase
         .from('venues')
         .select('id, name, cuisine_type, price_range, rating, address, image_url, tags')
         .eq('is_active', true)
-        .not('name', 'is', null)
+        .not('name', 'is', null);
+
+      // Apply geographic bounding box (~200km) to keep venues in the user's region/country
+      if (lat !== null && lng !== null) {
+        const radiusKm = 200;
+        const latDelta = radiusKm / 111;
+        const lngDelta = radiusKm / (111 * Math.cos(lat * Math.PI / 180));
+        query = query
+          .gte('latitude', lat - latDelta)
+          .lte('latitude', lat + latDelta)
+          .gte('longitude', lng - lngDelta)
+          .lte('longitude', lng + lngDelta);
+      }
+
+      const { data } = await query
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(100);
       return data || [];
