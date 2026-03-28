@@ -177,7 +177,7 @@ const HomeContent: React.FC = () => {
                   <>
                     <p className="text-sm font-medium text-foreground leading-snug truncate">{dailyTipVenue.name}</p>
                     <p className="text-[11px] text-muted-foreground truncate">
-                      {[dailyTipVenue.cuisine_type, dailyTipVenue.price_range].filter(Boolean).join(' · ')}
+                      {[dailyTipVenue.cuisine_type, dailyTipVenue.price_range, dailyTipVenue.distance].filter(Boolean).join(' · ')}
                     </p>
                   </>
                 ) : (
@@ -314,7 +314,7 @@ const HomeContent: React.FC = () => {
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed truncate">
-                          {[venue.cuisine_type, venue.price_range].filter(Boolean).join(' · ')}
+                          {[venue.cuisine_type, venue.price_range, venue.distance].filter(Boolean).join(' · ')}
                         </p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
