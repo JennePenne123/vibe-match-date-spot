@@ -167,18 +167,18 @@ const Results = () => {
             </Button>
             <div className="text-center">
               <h1 className="text-xl font-semibold text-foreground">
-                {isFromSmartPlanning ? 'Date Venues' : 'AI Recommendations'}
+                {isFromSmartPlanning ? t('results.dateVenues') : t('results.title')}
               </h1>
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 {isFromSmartPlanning ? (
                   <>
-                    <Users className="w-4 h-4 text-blue-500" />
-                    {recommendations.length} collaborative matches
+                    <Users className="w-4 h-4 text-secondary" />
+                    {t('results.collaborativeMatches', { count: recommendations.length })}
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 text-purple-500" />
-                    {recommendations.length} perfect matches
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    {t('results.perfectMatches', { count: recommendations.length })}
                   </>
                 )}
               </p>
@@ -208,16 +208,16 @@ const Results = () => {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.1 }}
-                  className="mb-6 text-center bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 p-4 rounded-lg border border-purple-100 dark:border-purple-800"
+                  className="mb-6 text-center bg-gradient-to-r from-primary/5 to-secondary/5 p-4 rounded-lg border border-primary/20"
                 >
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                    <h2 className="text-lg font-bold text-purple-900 dark:text-purple-100">
-                      AI-Powered Matches
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    <h2 className="text-lg font-bold text-foreground">
+                      {t('results.aiMatchesTitle')}
                     </h2>
                   </div>
-                  <p className="text-sm text-purple-700 dark:text-purple-300">
-                    Jedes Venue wird persönlich für dich bewertet — basierend auf {isFromSmartPlanning ? 'euren gemeinsamen' : 'deinen'} Präferenzen
+                  <p className="text-sm text-muted-foreground">
+                    {t('results.aiMatchesDesc', { type: isFromSmartPlanning ? t('results.aiMatchesDescShared') : t('results.aiMatchesDescYour') })}
                   </p>
                 </motion.div>
               );
@@ -231,27 +231,27 @@ const Results = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 p-4 rounded-lg border border-amber-200 dark:border-amber-800"
+              className="mb-6 bg-gradient-to-r from-warning/10 to-accent/5 p-4 rounded-lg border border-warning/20"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
-                  <Crown className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                <div className="p-2 rounded-full bg-warning/15">
+                  <Crown className="w-5 h-5 text-warning" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-amber-900 dark:text-amber-100 text-sm">
-                    Premium: Exklusive Voucher für deine Top 3 Matches
+                  <h3 className="font-semibold text-foreground text-sm">
+                    {t('results.premiumVoucherTitle')}
                   </h3>
-                  <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
-                    Als Premium-Mitglied erhältst du Rabatt-Voucher für die 3 bestbewerteten Venues.
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t('results.premiumVoucherDesc')}
                   </p>
                 </div>
                 <Button
                   size="sm"
                   onClick={() => navigate('/rewards')}
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 shrink-0"
+                  className="bg-gradient-primary text-primary-foreground hover:opacity-90 shrink-0"
                 >
                   <Crown className="w-3 h-3 mr-1" />
-                  Upgrade
+                  {t('results.upgrade')}
                 </Button>
               </div>
             </motion.div>
