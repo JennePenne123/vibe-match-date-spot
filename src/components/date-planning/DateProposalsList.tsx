@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, User, CheckCircle, XCircle, Play } from 'lucide-react';
+import EmptyState from '@/components/EmptyState';
 import { useDateProposals, DateProposal } from '@/hooks/useDateProposals';
 import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
@@ -82,10 +83,13 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({ onProposalAccepte
 
   if (visibleProposals.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground animate-fade-in">
-        <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50 animate-pulse" />
-        <p>{t('proposals.noProposals')}</p>
-      </div>
+      <EmptyState
+        icon={Calendar}
+        title={t('proposals.noProposals')}
+        description={t('proposals.noProposalsDesc', 'Sende oder empfange Date-Vorschläge um loszulegen.')}
+        variant="minimal"
+        className="py-6"
+      />
     );
   }
 
