@@ -12,10 +12,12 @@ export default function RealtimeRedemptionToast() {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
+
+    const channelName = `partner-redemptions-${user.id}-${Date.now()}`;
 
     const channel = supabase
-      .channel('partner-redemptions')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -45,7 +47,7 @@ export default function RealtimeRedemptionToast() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id]);
 
   return null;
 }

@@ -56,7 +56,12 @@ export const useRealtimeVouchers = (partnerId: string | undefined): UseRealtimeV
 
   // Initial fetch
   useEffect(() => {
-    if (!partnerId) return;
+    if (!partnerId) {
+      setVouchers([]);
+      setLastRedemption(null);
+      setLoading(false);
+      return;
+    }
 
     const fetchVouchers = async () => {
       setLoading(true);
@@ -82,10 +87,15 @@ export const useRealtimeVouchers = (partnerId: string | undefined): UseRealtimeV
 
   // Real-time subscriptions
   useEffect(() => {
-    if (!partnerId) return;
+    if (!partnerId) {
+      setConnected(false);
+      return;
+    }
+
+    const channelName = `partner-vouchers-realtime-${partnerId}-${Date.now()}`;
 
     const channel = supabase
-      .channel('partner-vouchers-realtime')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {

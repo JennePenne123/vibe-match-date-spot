@@ -81,8 +81,10 @@ export default function GuestFeedbackCard() {
 
       if (!partnerships?.length) return;
 
+      const channelName = `partner-feedback-notifications-${user.id}-${Date.now()}`;
+
       channel = supabase
-        .channel('partner-feedback-notifications')
+        .channel(channelName)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'date_feedback' }, async (payload) => {
           const { data: invitation } = await supabase
             .from('date_invitations')

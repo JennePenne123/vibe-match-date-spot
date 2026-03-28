@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,7 @@ interface Partnership {
 export default function PartnerVenues() {
   const { t } = useTranslation();
   const { role, loading: roleLoading } = useUserRole();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
@@ -42,24 +44,36 @@ export default function PartnerVenues() {
   const [managingVenue, setManagingVenue] = useState<{ id: string; name: string } | null>(null);
   const [showRegistration, setShowRegistration] = useState(false);
   const { isLocked } = usePartnerVerificationGuard();
+  const isPageLoading = roleLoading || authLoading;
 
   useEffect(() => {
-    if (!roleLoading && role !== 'venue_partner' && role !== 'admin') {
+    if (!isPageLoading && !user) {
+      navigate('/?auth=partner', { replace: true });
+      return;
+    }
+
+    if (!isPageLoading && user && role !== 'venue_partner' && role !== 'admin') {
       navigate('/home');
     }
-  }, [role, roleLoading, navigate]);
+  }, [role, isPageLoading, user, navigate]);
 
-  useEffect(() => { fetchPartnerships(); }, []);
+  useEffect(() => {
+    if (!user?.id) {
+      if (!authLoading) {
+        setLoading(false);
+      }
+      return;
+    }
 
-  const fetchPartnerships = async () => {
+    void fetchPartnerships(user.id);
+  }, [user?.id, authLoading]);
+
+  const fetchPartnerships = async (userId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
       const { data, error } = await supabase
         .from('venue_partnerships')
         .select('*, venues(name, address, cuisine_type, phone, website, rating, latitude, longitude)')
-        .eq('partner_id', user.id)
+        .eq('partner_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -72,7 +86,7 @@ export default function PartnerVenues() {
     }
   };
 
-  if (roleLoading || loading) {
+  if (isPageLoading || loading) {
     return <div className="flex items-center justify-center min-h-[50vh]"><LoadingSpinner /></div>;
   }
 
@@ -230,14 +244,22 @@ export default function PartnerVenues() {
           onOpenChange={(open) => !open && setManagingVenue(null)}
           venueId={managingVenue.id}
           venueName={managingVenue.name}
-          onUpdated={fetchPartnerships}
+          onUpdated={() => {
+            if (user?.id) {
+              void fetchPartnerships(user.id);
+            }
+          }}
         />
       )}
 
       <VenueRegistrationModal
         open={showRegistration}
         onOpenChange={setShowRegistration}
-        onSuccess={fetchPartnerships}
+        onSuccess={() => {
+          if (user?.id) {
+            void fetchPartnerships(user.id);
+          }
+        }}
       />
     </div>
   );

@@ -17,9 +17,11 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
   useEffect(() => {
     if (!user) return;
 
+    const channelSuffix = Date.now();
+
     // Listen for invitation responses (for senders)
     const senderChannel = supabase
-      .channel(`invitation-responses-${user.id}`)
+      .channel(`invitation-responses-${user.id}-${channelSuffix}`)
       .on(
         'postgres_changes',
         {
@@ -72,7 +74,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
 
     // Listen for new invitations (for recipients)
     const recipientChannel = supabase
-      .channel(`new-invitations-${user.id}`)
+      .channel(`new-invitations-${user.id}-${channelSuffix}`)
       .on(
         'postgres_changes',
         {
@@ -112,7 +114,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
       supabase.removeChannel(senderChannel);
       supabase.removeChannel(recipientChannel);
     };
-  }, [user?.id, toast]);
+  }, [user?.id, toast, navigate]);
 
   return <>{children}</>;
 };
