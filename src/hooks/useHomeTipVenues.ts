@@ -92,14 +92,9 @@ const isBlockedHomeVenue = (venue: { name: string; tags: string[] | null; cuisin
   // 1. Explicit blocklist match → block
   if (VENUE_BLOCKLIST.some(blocked => searchText.includes(blocked))) return true;
 
-  // 2. If venue has a recognized cuisine_type, it's likely gastro → allow
-  if (cuisine && GASTRO_INDICATORS.some(g => cuisine.includes(g))) return false;
-
-  // 3. If name or tags contain gastro indicators → allow
-  if (GASTRO_INDICATORS.some(g => searchText.includes(g))) return false;
-
-  // 4. If no gastro signal at all and no cuisine_type, likely not a restaurant → block
-  if (!cuisine && tags.length === 0) return true;
+  // 2. Venue MUST have at least one gastro indicator (in name, cuisine_type, or tags) to pass
+  const hasGastroSignal = GASTRO_INDICATORS.some(g => searchText.includes(g));
+  if (!hasGastroSignal) return true;
 
   return false;
 };
