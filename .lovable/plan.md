@@ -1,7 +1,7 @@
 
 # VybePulse – Gesamt-Projektübersicht & Roadmap
 
-**Stand: 27. März 2026** | **Geschätzter Fortschritt: ~94%**
+**Stand: 28. März 2026** | **Geschätzter Fortschritt: ~94%**
 
 ---
 
@@ -127,17 +127,17 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 | # | Aufgabe | Aufwand |
 |---|---------|---------|
-| 6 | Stripe-Integration (Partner + User) | Groß |
-| 7 | Favoriten-System → Supabase | Mittel |
-| 8 | KI-Support-Agent | Groß |
-| 9 | Standort-Picker im Planner | Klein |
-| 10 | Supabase Realtime konsolidieren | Mittel |
-| 11 | Event-System (Events + Venue Combos + Kalender) | Groß |
-| 12 | A/B Testing Framework | Mittel |
-| 13 | Multi-User Date Groups | Groß |
-| 14 | Venue-Reviews von Usern | Mittel |
-| 15 | AI Date-Recap | Klein |
-| 16 | Partner-Analytics v2 | Mittel |
+| 9 | Stripe-Integration (Partner + User) | Groß |
+| 10 | Favoriten-System → Supabase | Mittel |
+| 11 | KI-Support-Agent | Groß |
+| 12 | Standort-Picker im Planner | Klein |
+| 13 | Supabase Realtime konsolidieren | Mittel |
+| 14 | Event-System (Events + Venue Combos + Kalender) | Groß |
+| 15 | A/B Testing Framework | Mittel |
+| 16 | Multi-User Date Groups | Groß |
+| 17 | Venue-Reviews von Usern | Mittel |
+| 18 | AI Date-Recap | Klein |
+| 19 | Partner-Analytics v2 | Mittel |
 
 ---
 
