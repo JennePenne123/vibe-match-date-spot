@@ -95,6 +95,7 @@ const MyFriends = lazy(() => import("./pages/MyFriends"));
 const MyVenues = lazy(() => import("./pages/MyVenues"));
 const Invitations = lazy(() => import("./pages/Invitations"));
 const Chats = lazy(() => import("./pages/Chats"));
+const GroupDates = lazy(() => import("./pages/GroupDates"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AIRecommendations = lazy(() => import("./pages/AIRecommendations"));
 const SmartDatePlanning = lazy(() => import("./pages/SmartDatePlanning"));
@@ -218,6 +219,7 @@ const App = () => (
                     <Route path="/my-venues" element={<LazyPage><MyVenues /></LazyPage>} />
                     <Route path="/invitations" element={<LazyPage><Invitations /></LazyPage>} />
                     <Route path="/chats" element={<LazyPage><Chats /></LazyPage>} />
+                    <Route path="/group-dates" element={<LazyPage><GroupDates /></LazyPage>} />
                     <Route path="/ai-recommendations" element={<LazyPage><AIRecommendations /></LazyPage>} />
                     <Route path="/ai-insights" element={<LazyPage><AIInsights /></LazyPage>} />
                     <Route path="/plan-date" element={<LazyPage><SmartDatePlanning /></LazyPage>} />
