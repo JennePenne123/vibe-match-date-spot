@@ -112,13 +112,16 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 | 1 | **Produktions-Assets** | 🔴 Offen | OG-Images, App-Icons (192x192, 512x512), Favicons (16x16, 32x32, 180x180) |
 | 2 | **Admin-Zugänge konfigurieren** | 📋 Manuell | `INSERT INTO user_roles` im SQL Editor |
 | 3 | **Rechtliche Texte finalisieren** | 🔴 Extern | AGB + Datenschutzerklärung durch Anwalt prüfen lassen |
+| 4 | **Google Sign-In konfigurieren** | 🔴 Extern | Google Cloud Projekt → OAuth 2.0 Client ID + Secret → Supabase Auth Providers |
+| 5 | **Apple Sign-In konfigurieren** | 🔴 Extern | Apple Developer Account (99$/Jahr) → Services ID → Supabase Auth Providers |
+| 6 | **Supabase Site URL setzen** | 🔴 Manuell | Live-Domain als Site URL unter Auth → URL Configuration eintragen |
 
 ### 🟡 Wichtig (Sollte vor Launch)
 
 | # | Aufgabe | Status | Beschreibung |
 |---|---------|--------|--------------|
-| 4 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor) |
-| 5 | **E2E Testing** | 🟡 Offen | Kritische Flows testen (Auth, Onboarding, Recommendations, Date-Invite) |
+| 7 | **Wetter-Integration** | 🟡 Geplant | OpenWeatherMap API → Kontext-Aware Scoring (Indoor/Outdoor) |
+| 8 | **E2E Testing** | 🟡 Offen | Kritische Flows testen (Auth, Onboarding, Recommendations, Date-Invite) |
 
 ### 🟢 Post-Launch / Nice-to-Have
 
