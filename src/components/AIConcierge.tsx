@@ -229,7 +229,13 @@ export default function AIConcierge() {
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-1.5 justify-center pt-2">
-                    {['Date-Idee für heute?', 'Restaurant-Tipps', 'Erstes Date Tipps'].map(q => (
+                    {[
+                      '💡 Date-Idee für heute?',
+                      '🍽️ Restaurant-Tipps',
+                      '❓ Wie plane ich ein Date?',
+                      '🎫 Wie löse ich Gutscheine ein?',
+                      '⚙️ App-Hilfe',
+                    ].map(q => (
                       <button
                         key={q}
                         onClick={() => {
