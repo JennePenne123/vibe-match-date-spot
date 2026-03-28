@@ -23,24 +23,85 @@ interface UseHomeTipVenuesResult {
   loading: boolean;
 }
 
-// Blocklist: supermarkets, delivery services, and non-venue businesses
+// Blocklist: non-gastronomy businesses
 const VENUE_BLOCKLIST = [
+  // Supermärkte & Discounter
   'netto', 'aldi', 'lidl', 'rewe', 'edeka', 'penny', 'kaufland',
+  'norma', 'nahkauf', 'real', 'globus', 'famila', 'combi', 'hit markt',
+  'bio company', 'bio markt', 'reformhaus', 'trinkgut', 'getränkemarkt',
+  'supermarkt', 'supermarket', 'grocery', 'lebensmittel', 'discounter',
+  // Lieferdienste
   'lieferservice', 'lieferdienst', 'delivery', 'lieferando', 'wolt', 'uber eats',
   'flink', 'gorillas', 'getir', 'foodpanda', 'domino', 'pizza hut delivery',
   'takeaway', 'take away', 'zum mitnehmen', 'abhol',
-  'supermarkt', 'supermarket', 'grocery', 'lebensmittel', 'discounter',
+  // Drogerien & Apotheken
   'drogerie', 'rossmann', 'dm-drogerie', 'müller drogerie',
-  'tankstelle', 'fuel', 'gas station', 'waschanlage',
-  'norma', 'nahkauf', 'real', 'globus', 'famila', 'combi', 'hit markt',
-  'bio company', 'bio markt', 'reformhaus', 'trinkgut', 'getränkemarkt',
+  'apotheke', 'pharmacy', 'pharma',
+  // Tankstellen & Autowäsche
+  'tankstelle', 'fuel', 'gas station', 'waschanlage', 'aral', 'shell', 'jet tankstelle',
+  // Einzelhandel & Geschäfte
+  'baumarkt', 'obi', 'hornbach', 'bauhaus', 'toom',
+  'möbelhaus', 'ikea', 'roller', 'poco', 'xxxlutz',
+  'elektro', 'mediamarkt', 'media markt', 'saturn',
+  'textil', 'kik', 'primark', 'h&m', 'zara', 'c&a',
+  'friseur', 'frisör', 'barber', 'hair salon', 'nagelstudio', 'nail salon',
+  'fitnessstudio', 'fitness', 'gym', 'mcfit', 'fitx',
+  'waschsalon', 'laundry', 'reinigung', 'dry cleaning',
+  'autohaus', 'autovermietung', 'car rental', 'werkstatt', 'kfz',
+  'tierarzt', 'tierhandlung', 'tierbedarf', 'fressnapf', 'zoohandlung',
+  'bestattung', 'funeral',
+  'versicherung', 'insurance', 'steuerberater', 'rechtsanwalt', 'notar',
+  'zahnarzt', 'arztpraxis', 'praxis', 'klinik', 'krankenhaus', 'hospital',
+  'schule', 'kindergarten', 'kita', 'schul',
+  'kirche', 'church', 'moschee', 'mosque', 'synagoge',
+  'bibliothek', 'library', 'bücherei',
+  'postfiliale', 'post office', 'paketshop',
+  'copy shop', 'druckerei', 'print shop',
+  'sonnenstudio', 'solarium', 'tanning',
+  'schlüsseldienst', 'locksmith',
+  // Kioske & Automaten
+  'kiosk', 'trinkhalle', 'späti', 'spätverkauf', 'automat', 'vending',
+];
+
+// Gastro-relevante cuisine_types und tags
+const GASTRO_INDICATORS = [
+  'restaurant', 'café', 'cafe', 'bistro', 'bar', 'pub', 'lounge',
+  'imbiss', 'grill', 'pizzeria', 'trattoria', 'osteria', 'brasserie',
+  'brauhaus', 'biergarten', 'beer garden', 'wine bar', 'weinbar',
+  'sushi', 'ramen', 'noodle', 'burger', 'steakhouse', 'steak',
+  'tapas', 'taqueria', 'cantina', 'diner', 'eatery',
+  'bakery', 'bäckerei', 'konditorei', 'patisserie',
+  'eisdiele', 'ice cream', 'gelateria', 'frozen yogurt',
+  'food court', 'food hall', 'street food',
+  'italian', 'japanese', 'turkish', 'mexican', 'french', 'indian',
+  'greek', 'vietnamese', 'mediterranean', 'american', 'thai',
+  'chinese', 'korean', 'spanish', 'german', 'deutsch',
+  'italienisch', 'japanisch', 'türkisch', 'mexikanisch', 'französisch',
+  'indisch', 'griechisch', 'vietnamesisch', 'mediterran', 'amerikanisch',
+  'koreanisch', 'spanisch', 'chinesisch',
+  'brunch', 'breakfast', 'frühstück', 'lunch', 'dinner',
+  'cocktail', 'cocktails', 'drinks', 'speisekarte', 'küche',
 ];
 
 const isBlockedHomeVenue = (venue: { name: string; tags: string[] | null; cuisine_type: string | null }): boolean => {
   const name = (venue.name || '').toLowerCase();
+  const cuisine = (venue.cuisine_type || '').toLowerCase();
   const tags = (venue.tags || []).map(t => t.toLowerCase());
-  const searchText = [name, ...tags].join(' ');
-  return VENUE_BLOCKLIST.some(blocked => searchText.includes(blocked));
+  const searchText = [name, cuisine, ...tags].join(' ');
+
+  // 1. Explicit blocklist match → block
+  if (VENUE_BLOCKLIST.some(blocked => searchText.includes(blocked))) return true;
+
+  // 2. If venue has a recognized cuisine_type, it's likely gastro → allow
+  if (cuisine && GASTRO_INDICATORS.some(g => cuisine.includes(g))) return false;
+
+  // 3. If name or tags contain gastro indicators → allow
+  if (GASTRO_INDICATORS.some(g => searchText.includes(g))) return false;
+
+  // 4. If no gastro signal at all and no cuisine_type, likely not a restaurant → block
+  if (!cuisine && tags.length === 0) return true;
+
+  return false;
 };
 
 const getDailyIndex = (offset: number, arrayLength: number) => {
