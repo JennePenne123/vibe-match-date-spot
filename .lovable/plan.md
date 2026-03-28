@@ -11,7 +11,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ---
 
-## ✅ Fertiggestellte Features (~94%)
+## ✅ Fertiggestellte Features (~95%)
 
 ### 🏠 User-Frontend
 - Landing Page mit Auth-Modal (Google, Apple, E-Mail) + Social Proof Banner
@@ -180,9 +180,9 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 ## 📊 Fortschritts-Einschätzung
 
 ```
-Gesamt-Fortschritt: ██████████████████████████████ ~94%
+Gesamt-Fortschritt: ██████████████████████████████ ~95%
 
-Frontend UI/UX:     ██████████████████████████████ ~98%
+Frontend UI/UX:     ██████████████████████████████ ~99% ↑ Quality Sprint
 KI-Engine:          █████████████████████████████░ ~96%
 Date-Planning:      █████████████████████████████░ ~96%
 Venue-System:       ██████████████████████████░░░░ ~88%
@@ -191,8 +191,9 @@ Partner-Portal:     ████████████████████
 Admin Dashboard:    █████████████████████████████░ ~95%
 Security/Infra:     █████████████████████████████░ ~95%
 Social/Viral:       ████████████████████████░░░░░░ ~80%
-Performance:        █████████████████████████████░ ~93% ↑ Chunks + Caching
+Performance:        █████████████████████████████░ ~93%
 Monetarisierung:    █████░░░░░░░░░░░░░░░░░░░░░░░░░ ~18%
+Auth/Social Login:  ██████████████████████████░░░░ ~85% (Code fertig, Config extern)
 DSGVO/Legal:        █████████████████████████████░ ~95%
 ```
 
