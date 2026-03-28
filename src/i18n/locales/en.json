@@ -761,5 +761,50 @@
     "fillRequired": "Please fill in all required fields",
     "proposalSent": "Proposal Sent!",
     "proposalSentTo": "Your date proposal has been sent to {{name}}"
+  },
+  "results": {
+    "title": "AI Recommendations",
+    "dateVenues": "Date Venues",
+    "collaborativeMatches": "{{count}} collaborative matches",
+    "perfectMatches": "{{count}} perfect matches",
+    "noVenuesTitle": "No venues found",
+    "noVenuesDescAuth": "No matching venues were found in this area. Try a different area or adjust your preferences.",
+    "noVenuesDescAnon": "Please sign in so the AI can find personalized recommendations for you.",
+    "signIn": "Sign In",
+    "changeLocation": "Change location",
+    "aiMatchesTitle": "AI-Powered Matches",
+    "aiMatchesDesc": "Each venue is personally rated for you — based on {{type}} preferences",
+    "aiMatchesDescYour": "your",
+    "aiMatchesDescShared": "your shared",
+    "premiumVoucherTitle": "Premium: Exclusive vouchers for your Top 3 matches",
+    "premiumVoucherDesc": "As a Premium member, get discount vouchers for the 3 highest-rated venues.",
+    "upgrade": "Upgrade"
+  },
+  "invitationsSection": {
+    "title": "Date Invitations",
+    "total": "{{count}} total",
+    "emptyTitle": "No Invitations",
+    "emptyDesc": "You don't have any date invitations yet. Use the Date Planner to send invitations to your friends!",
+    "refresh": "Refresh",
+    "received": "Received",
+    "sent": "Sent",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "declined": "Declined",
+    "cancelled": "Cancelled",
+    "noInCategory": "No {{direction}} invitations in this category",
+    "directionReceived": "received",
+    "directionSent": "sent",
+    "dateAcceptedTitle": "Date Accepted! 🎉",
+    "dateAcceptedDesc": "You've accepted the date invitation from {{name}}. Time to get excited! ✨",
+    "dateDeclinedTitle": "Date Declined",
+    "dateDeclinedDesc": "You've respectfully declined the invitation from {{name}}. No worries! 💙",
+    "dateCancelledTitle": "Date Cancelled",
+    "dateCancelledDesc": "Your date has been cancelled. {{name}} has been notified."
+  },
+  "profile": {
+    "achievements": "Achievements",
+    "aiLearning": "AI Learning",
+    "referralProgram": "Referral Program"
   }
 }

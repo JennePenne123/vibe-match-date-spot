@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useInvitations } from '@/hooks/useInvitations';
 import { DateInviteCard } from '@/components/date-invite';
 import { useToast } from '@/hooks/use-toast';
@@ -11,6 +12,7 @@ import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const DateInvitationSection: React.FC = () => {
+  const { t } = useTranslation();
   const { invitations, loading, acceptInvitation, declineInvitation, cancelInvitation, fetchInvitations } = useInvitations();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('pending');
@@ -43,8 +45,8 @@ const DateInvitationSection: React.FC = () => {
     if (invitation) {
       await acceptInvitation(invitation.id);
       toast({
-        title: "Date Accepted! 🎉",
-        description: `You've accepted the date invitation from ${invitation.sender?.name || 'your friend'}. Time to get excited! ✨`,
+        title: t('invitationsSection.dateAcceptedTitle'),
+        description: t('invitationsSection.dateAcceptedDesc', { name: invitation.sender?.name || 'your friend' }),
         duration: 5000,
       });
     } else {
@@ -58,8 +60,8 @@ const DateInvitationSection: React.FC = () => {
     if (invitation) {
       await declineInvitation(invitation.id);
       toast({
-        title: "Date Declined",
-        description: `You've respectfully declined the invitation from ${invitation.sender?.name || 'your friend'}. No worries! 💙`,
+        title: t('invitationsSection.dateDeclinedTitle'),
+        description: t('invitationsSection.dateDeclinedDesc', { name: invitation.sender?.name || 'your friend' }),
         duration: 4000,
       });
     } else {
@@ -76,8 +78,8 @@ const DateInvitationSection: React.FC = () => {
         ? invitation.sender?.name 
         : invitation.recipient?.name;
       toast({
-        title: "Date Cancelled",
-        description: `Your date has been cancelled. ${partnerName || 'Your partner'} has been notified.`,
+        title: t('invitationsSection.dateCancelledTitle'),
+        description: t('invitationsSection.dateCancelledDesc', { name: partnerName || 'Your partner' }),
         duration: 4000,
         variant: "destructive"
       });
@@ -146,9 +148,9 @@ const DateInvitationSection: React.FC = () => {
     return (
       <div className="space-y-4 mb-6">
         <div className="text-center p-6 bg-muted/30 rounded-lg border-2 border-dashed border-muted">
-          <h3 className="text-lg font-medium text-muted-foreground mb-2">No Date Invitations</h3>
+          <h3 className="text-lg font-medium text-muted-foreground mb-2">{t('invitationsSection.emptyTitle')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            You don't have any date invitations yet. Use the Smart Date Planner below to create and send invitations to your friends!
+            {t('invitationsSection.emptyDesc')}
           </p>
           <Button 
             onClick={handleRefresh}
@@ -157,7 +159,7 @@ const DateInvitationSection: React.FC = () => {
             disabled={isRefreshing}
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('invitationsSection.refresh')}
           </Button>
         </div>
       </div>
@@ -168,7 +170,7 @@ const DateInvitationSection: React.FC = () => {
     if (inviteList.length === 0) {
       return (
         <div className="text-center py-8 text-muted-foreground">
-          <p>No {direction} invitations in this category</p>
+          <p>{t('invitationsSection.noInCategory', { direction: t(direction === 'received' ? 'invitationsSection.directionReceived' : 'invitationsSection.directionSent') })}</p>
         </div>
       );
     }
@@ -188,10 +190,10 @@ const DateInvitationSection: React.FC = () => {
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Date Invitations</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t('invitationsSection.title')}</h2>
         <div className="flex items-center gap-2">
           <Badge variant="secondary" className="text-xs">
-            {invitations.length} total
+            {t('invitationsSection.total', { count: invitations.length })}
           </Badge>
           <Button 
             onClick={handleRefresh}
@@ -207,7 +209,7 @@ const DateInvitationSection: React.FC = () => {
       <Tabs defaultValue="received" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="received" className="flex items-center gap-2">
-            Received
+            {t('invitationsSection.received')}
             {receivedInvitations.length > 0 && (
               <Badge variant="secondary" className="text-xs">
                 {receivedInvitations.length}
@@ -215,7 +217,7 @@ const DateInvitationSection: React.FC = () => {
             )}
           </TabsTrigger>
           <TabsTrigger value="sent" className="flex items-center gap-2">
-            Sent
+            {t('invitationsSection.sent')}
             {sentInvitations.length > 0 && (
               <Badge variant="secondary" className="text-xs">
                 {sentInvitations.length}
@@ -228,16 +230,16 @@ const DateInvitationSection: React.FC = () => {
           <Tabs defaultValue="pending" className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
               <TabsTrigger value="pending" className="text-xs md:text-sm">
-                Pending ({receivedPending.length})
+                {t('invitationsSection.pending')} ({receivedPending.length})
               </TabsTrigger>
               <TabsTrigger value="accepted" className="text-xs md:text-sm">
-                Accepted ({receivedAccepted.length})
+                {t('invitationsSection.accepted')} ({receivedAccepted.length})
               </TabsTrigger>
               <TabsTrigger value="declined" className="text-xs md:text-sm">
-                Declined ({receivedDeclined.length})
+                {t('invitationsSection.declined')} ({receivedDeclined.length})
               </TabsTrigger>
               <TabsTrigger value="cancelled" className="text-xs md:text-sm">
-                Cancelled ({receivedCancelled.length})
+                {t('invitationsSection.cancelled')} ({receivedCancelled.length})
               </TabsTrigger>
             </TabsList>
             
@@ -260,16 +262,16 @@ const DateInvitationSection: React.FC = () => {
           <Tabs defaultValue="pending" className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
               <TabsTrigger value="pending" className="text-xs md:text-sm">
-                Pending ({sentPending.length})
+                {t('invitationsSection.pending')} ({sentPending.length})
               </TabsTrigger>
               <TabsTrigger value="accepted" className="text-xs md:text-sm">
-                Accepted ({sentAccepted.length})
+                {t('invitationsSection.accepted')} ({sentAccepted.length})
               </TabsTrigger>
               <TabsTrigger value="declined" className="text-xs md:text-sm">
-                Declined ({sentDeclined.length})
+                {t('invitationsSection.declined')} ({sentDeclined.length})
               </TabsTrigger>
               <TabsTrigger value="cancelled" className="text-xs md:text-sm">
-                Cancelled ({sentCancelled.length})
+                {t('invitationsSection.cancelled')} ({sentCancelled.length})
               </TabsTrigger>
             </TabsList>
             

@@ -761,5 +761,50 @@
     "fillRequired": "Bitte fülle alle Pflichtfelder aus",
     "proposalSent": "Vorschlag gesendet!",
     "proposalSentTo": "Dein Date-Vorschlag wurde an {{name}} gesendet"
+  },
+  "results": {
+    "title": "KI-Empfehlungen",
+    "dateVenues": "Date Venues",
+    "collaborativeMatches": "{{count}} gemeinsame Matches",
+    "perfectMatches": "{{count}} perfekte Matches",
+    "noVenuesTitle": "Keine Venues gefunden",
+    "noVenuesDescAuth": "In dieser Gegend wurden leider keine passenden Venues gefunden. Versuche eine andere Gegend oder passe deine Präferenzen an.",
+    "noVenuesDescAnon": "Bitte melde dich an, damit die KI personalisierte Empfehlungen für dich finden kann.",
+    "signIn": "Anmelden",
+    "changeLocation": "Standort ändern",
+    "aiMatchesTitle": "KI-basierte Matches",
+    "aiMatchesDesc": "Jedes Venue wird persönlich für dich bewertet — basierend auf {{type}} Präferenzen",
+    "aiMatchesDescYour": "deinen",
+    "aiMatchesDescShared": "euren gemeinsamen",
+    "premiumVoucherTitle": "Premium: Exklusive Voucher für deine Top 3 Matches",
+    "premiumVoucherDesc": "Als Premium-Mitglied erhältst du Rabatt-Voucher für die 3 bestbewerteten Venues.",
+    "upgrade": "Upgrade"
+  },
+  "invitationsSection": {
+    "title": "Date-Einladungen",
+    "total": "{{count}} gesamt",
+    "emptyTitle": "Keine Einladungen",
+    "emptyDesc": "Du hast noch keine Date-Einladungen. Nutze den Date Planner um Einladungen an Freunde zu senden!",
+    "refresh": "Aktualisieren",
+    "received": "Empfangen",
+    "sent": "Gesendet",
+    "pending": "Ausstehend",
+    "accepted": "Angenommen",
+    "declined": "Abgelehnt",
+    "cancelled": "Abgesagt",
+    "noInCategory": "Keine {{direction}} Einladungen in dieser Kategorie",
+    "directionReceived": "empfangenen",
+    "directionSent": "gesendeten",
+    "dateAcceptedTitle": "Date angenommen! 🎉",
+    "dateAcceptedDesc": "Du hast die Date-Einladung von {{name}} angenommen. Freut euch drauf! ✨",
+    "dateDeclinedTitle": "Date abgelehnt",
+    "dateDeclinedDesc": "Du hast die Einladung von {{name}} freundlich abgelehnt. Kein Problem! 💙",
+    "dateCancelledTitle": "Date abgesagt",
+    "dateCancelledDesc": "Dein Date wurde abgesagt. {{name}} wurde benachrichtigt."
+  },
+  "profile": {
+    "achievements": "Erfolge",
+    "aiLearning": "KI-Lernfortschritt",
+    "referralProgram": "Empfehlungsprogramm"
   }
 }
