@@ -102,20 +102,30 @@ const isBlockedHomeVenue = (venue: { name: string; tags: string[] | null; cuisin
   return false;
 };
 
-const getDailyIndex = (offset: number, arrayLength: number) => {
-  const now = new Date();
-  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-  return (dayOfYear + offset) % Math.max(arrayLength, 1);
+const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+const formatDistance = (km: number): string => {
+  if (km < 0.1) return `${Math.round(km * 1000)}m`;
+  if (km < 1) return `${(km * 1000).toFixed(0)}m`;
+  if (km < 10) return `${km.toFixed(1)}km`;
+  return `${Math.round(km)}km`;
 };
 
 export function useHomeTipVenues(): UseHomeTipVenuesResult {
   const { user } = useAuth();
   const { data: prefs } = useUserPreferences();
 
-  const { data: rawVenues = [], isLoading } = useQuery({
+  const { data: queryResult, isLoading } = useQuery({
     queryKey: ['home-tip-venues', user?.id],
     queryFn: async () => {
-      // Load user's home location for geographic filtering
       let lat: number | null = null;
       let lng: number | null = null;
 
@@ -135,7 +145,6 @@ export function useHomeTipVenues(): UseHomeTipVenuesResult {
         .eq('is_active', true)
         .not('name', 'is', null);
 
-      // Apply geographic bounding box (~200km) to keep venues in the user's region/country
       if (lat !== null && lng !== null) {
         const radiusKm = 25;
         const latDelta = radiusKm / 111;
@@ -156,28 +165,36 @@ export function useHomeTipVenues(): UseHomeTipVenuesResult {
     staleTime: STALE_TIMES.STATIC,
   });
 
-  const userLat = rawVenues?.userLat ?? null;
-  const userLng = rawVenues?.userLng ?? null;
-  const venueRows = rawVenues?.venues ?? [];
+  const venueRows = queryResult?.venues ?? [];
+  const userLat = queryResult?.userLat ?? null;
+  const userLng = queryResult?.userLng ?? null;
 
   const venues = useMemo(() => {
-    if (rawVenues.length === 0) return [];
+    if (venueRows.length === 0) return [];
 
-    // Filter out supermarkets, delivery services, etc.
-    const cleanVenues = rawVenues.filter(v => !isBlockedHomeVenue(v));
+    const cleanVenues = venueRows.filter(v => !isBlockedHomeVenue(v));
     
     const cuisineLower = (prefs?.preferred_cuisines || []).map(c => c.toLowerCase());
 
+    const addDistance = (v: typeof venueRows[0]) => {
+      let distance: string | null = null;
+      if (userLat !== null && userLng !== null && v.latitude && v.longitude) {
+        const km = haversineDistance(userLat, userLng, Number(v.latitude), Number(v.longitude));
+        distance = formatDistance(km);
+      }
+      return { ...v, distance };
+    };
+
     const matching = cleanVenues
       .filter(v => v.cuisine_type && cuisineLower.some(c => v.cuisine_type!.toLowerCase().includes(c)))
-      .map(v => ({ ...v, isDiscovery: false }));
+      .map(v => ({ ...addDistance(v), isDiscovery: false }));
 
     const discovery = cleanVenues
       .filter(v => !v.cuisine_type || !cuisineLower.some(c => v.cuisine_type!.toLowerCase().includes(c)))
-      .map(v => ({ ...v, isDiscovery: true }));
+      .map(v => ({ ...addDistance(v), isDiscovery: true }));
 
     return [...matching, ...discovery];
-  }, [rawVenues, prefs?.preferred_cuisines]);
+  }, [venueRows, prefs?.preferred_cuisines, userLat, userLng]);
 
   const result = useMemo(() => {
     if (venues.length === 0) return { dailyTipVenue: null, cityTipVenues: [] as TipVenue[] };
