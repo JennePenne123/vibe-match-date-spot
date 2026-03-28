@@ -18,6 +18,7 @@ import SmartDatePlannerAuth from '@/components/smart-date-planner/SmartDatePlann
 import LocationDisplay from '@/components/smart-date-planner/LocationDisplay';
 import { useCollaborativeSession } from '@/hooks/useCollaborativeSession';
 import { useFriends } from '@/hooks/useFriends';
+import { useGroupDatePlanning } from '@/hooks/useGroupDatePlanning';
 import { supabase } from '@/integrations/supabase/client';
 
 interface SmartDatePlannerProps {
@@ -29,6 +30,7 @@ interface SmartDatePlannerProps {
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal, preselectedFriend = null }) => {
   const { isMobile, isDesktop } = useBreakpoint();
   const { friends: allFriends } = useFriends();
+  const groupPlanning = useGroupDatePlanning();
 
   const {
     session: collaborativeSession,
@@ -84,9 +86,22 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     dateMode, setDateMode, selectedPartnerIds, setSelectedPartnerIds,
   } = state;
 
-  const handlePartnerContinue = () => {
-    if (selectedPartnerId) {
-      // TODO: create collaborative session for the selected partner if needed
+  const handlePartnerContinue = async () => {
+    if (dateMode === 'group' && selectedPartnerIds.length > 0) {
+      // Create a group date
+      const friendNames = selectedPartnerIds.map(id => {
+        const f = friends.find(fr => fr.id === id);
+        return f?.name || 'Freund';
+      });
+      const groupName = `Date mit ${friendNames.slice(0, 2).join(', ')}${friendNames.length > 2 ? ` +${friendNames.length - 2}` : ''}`;
+      
+      const group = await groupPlanning.createGroup(groupName, selectedPartnerIds);
+      if (group) {
+        // Set first partner as main partner for the preferences step
+        setSelectedPartnerId(selectedPartnerIds[0]);
+        setCurrentStep('set-preferences');
+      }
+    } else if (selectedPartnerId) {
       setCurrentStep('set-preferences');
     }
   };
