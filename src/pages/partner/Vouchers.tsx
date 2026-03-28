@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserRole } from '@/hooks/useUserRole';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +46,7 @@ type VoucherTab = 'active' | 'expired' | 'inactive';
 
 export default function PartnerVouchers() {
   const { role, loading: roleLoading } = useUserRole();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -53,25 +54,22 @@ export default function PartnerVouchers() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [analyticsModalOpen, setAnalyticsModalOpen] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
-  const [userId, setUserId] = useState<string>();
   const [activeTab, setActiveTab] = useState<VoucherTab>('active');
 
-  const { vouchers, loading, connected } = useRealtimeVouchers(userId);
+  const { vouchers, loading, connected } = useRealtimeVouchers(user?.id);
   const { isLocked } = usePartnerVerificationGuard();
+  const isPageLoading = roleLoading || authLoading;
 
   useEffect(() => {
-    if (!roleLoading && role !== 'venue_partner' && role !== 'admin') {
+    if (!isPageLoading && !user) {
+      navigate('/?auth=partner', { replace: true });
+      return;
+    }
+
+    if (!isPageLoading && user && role !== 'venue_partner' && role !== 'admin') {
       navigate('/home');
     }
-  }, [role, roleLoading, navigate]);
-
-  useEffect(() => {
-    const getUserId = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) setUserId(user.id);
-    };
-    getUserId();
-  }, []);
+  }, [role, isPageLoading, user, navigate]);
 
   const filteredVouchers = useMemo(() => {
     const now = new Date();
@@ -108,7 +106,7 @@ export default function PartnerVouchers() {
     return 'Free Item';
   };
 
-  if (roleLoading) {
+  if (isPageLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner />
