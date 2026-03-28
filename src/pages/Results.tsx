@@ -111,7 +111,7 @@ const Results = () => {
               >
                 <ArrowLeft className="w-6 h-6" />
               </Button>
-              <h1 className="text-xl font-semibold text-foreground">AI Recommendations</h1>
+              <h1 className="text-xl font-semibold text-foreground">{t('results.title')}</h1>
               <div className="w-10" />
             </div>
           </div>
@@ -119,16 +119,16 @@ const Results = () => {
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
               <Sparkles className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-bold text-foreground">Keine Venues gefunden</h2>
+            <h2 className="text-xl font-bold text-foreground">{t('results.noVenuesTitle')}</h2>
             <p className="text-muted-foreground text-sm max-w-xs mx-auto">
               {!user 
-                ? 'Bitte melde dich an, damit die KI personalisierte Empfehlungen für dich finden kann.'
-                : 'In dieser Area wurden leider keine passenden Venues gefunden. Versuche eine andere Area oder passe deine Präferenzen an.'}
+                ? t('results.noVenuesDescAnon')
+                : t('results.noVenuesDescAuth')}
             </p>
             <div className="flex flex-col gap-3 pt-4">
               {!user && (
                 <Button onClick={() => navigate('/')} className="bg-gradient-primary text-primary-foreground hover:opacity-90">
-                  Anmelden
+                  {t('results.signIn')}
                 </Button>
               )}
               <Button 
@@ -136,7 +136,7 @@ const Results = () => {
                 onClick={() => navigate('/preferences?step=1')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Standort ändern
+                {t('results.changeLocation')}
               </Button>
             </div>
           </div>
