@@ -14,7 +14,10 @@ interface TipVenue {
   address: string;
   image_url: string | null;
   tags: string[] | null;
+  latitude: number | null;
+  longitude: number | null;
   isDiscovery: boolean;
+  distance: string | null;
 }
 
 interface UseHomeTipVenuesResult {
@@ -128,7 +131,7 @@ export function useHomeTipVenues(): UseHomeTipVenuesResult {
 
       let query = supabase
         .from('venues')
-        .select('id, name, cuisine_type, price_range, rating, address, image_url, tags')
+        .select('id, name, cuisine_type, price_range, rating, address, image_url, tags, latitude, longitude')
         .eq('is_active', true)
         .not('name', 'is', null);
 
@@ -147,11 +150,15 @@ export function useHomeTipVenues(): UseHomeTipVenuesResult {
       const { data } = await query
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(100);
-      return data || [];
+      return { venues: data || [], userLat: lat, userLng: lng };
     },
     enabled: !!user,
     staleTime: STALE_TIMES.STATIC,
   });
+
+  const userLat = rawVenues?.userLat ?? null;
+  const userLng = rawVenues?.userLng ?? null;
+  const venueRows = rawVenues?.venues ?? [];
 
   const venues = useMemo(() => {
     if (rawVenues.length === 0) return [];
