@@ -237,7 +237,23 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             {/* Desktop sidebar */}
             {isDesktop && (
               <div className="space-y-4">
-                {effectivePreselectedFriend && (
+                {dateMode === 'group' && groupPlanning.currentGroup && (
+                  <div className="p-4 rounded-lg bg-muted/50">
+                    <h3 className="font-semibold text-foreground mb-2">Gruppe</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{groupPlanning.currentGroup.name}</p>
+                    <div className="space-y-1.5">
+                      {groupPlanning.groupMembers.map(m => (
+                        <div key={m.id} className="flex items-center justify-between text-xs">
+                          <span className="text-foreground">{m.profile?.name || 'Unbekannt'}</span>
+                          <span className={m.invitation_status === 'accepted' ? 'text-green-500' : m.invitation_status === 'declined' ? 'text-red-500' : 'text-muted-foreground'}>
+                            {m.invitation_status === 'accepted' ? '✓' : m.invitation_status === 'declined' ? '✗' : '⏳'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {effectivePreselectedFriend && dateMode !== 'group' && (
                   <div className="p-4 rounded-lg bg-muted/50">
                     <h3 className="font-semibold text-foreground mb-2">Planning with</h3>
                     <p className="text-muted-foreground">{effectivePreselectedFriend.name}</p>
