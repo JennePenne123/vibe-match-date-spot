@@ -244,14 +244,22 @@ export default function PartnerVenues() {
           onOpenChange={(open) => !open && setManagingVenue(null)}
           venueId={managingVenue.id}
           venueName={managingVenue.name}
-          onUpdated={fetchPartnerships}
+          onUpdated={() => {
+            if (user?.id) {
+              void fetchPartnerships(user.id);
+            }
+          }}
         />
       )}
 
       <VenueRegistrationModal
         open={showRegistration}
         onOpenChange={setShowRegistration}
-        onSuccess={fetchPartnerships}
+        onSuccess={() => {
+          if (user?.id) {
+            void fetchPartnerships(user.id);
+          }
+        }}
       />
     </div>
   );
