@@ -102,6 +102,12 @@ const isBlockedHomeVenue = (venue: { name: string; tags: string[] | null; cuisin
   return false;
 };
 
+const getDailyIndex = (offset: number, arrayLength: number) => {
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  return (dayOfYear + offset) % Math.max(arrayLength, 1);
+};
+
 const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
