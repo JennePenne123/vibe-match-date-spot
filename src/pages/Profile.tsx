@@ -50,7 +50,7 @@ const Profile = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
         {/* Back button - floating over header */}
-        <div className="absolute top-3 left-3 z-20">
+        <div className="sticky top-3 left-3 z-20 w-fit ml-3 pt-3">
           <Button 
             onClick={() => navigate(-1)} 
             variant="ghost" 
