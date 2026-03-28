@@ -23,6 +23,26 @@ interface UseHomeTipVenuesResult {
   loading: boolean;
 }
 
+// Blocklist: supermarkets, delivery services, and non-venue businesses
+const VENUE_BLOCKLIST = [
+  'netto', 'aldi', 'lidl', 'rewe', 'edeka', 'penny', 'kaufland',
+  'lieferservice', 'lieferdienst', 'delivery', 'lieferando', 'wolt', 'uber eats',
+  'flink', 'gorillas', 'getir', 'foodpanda', 'domino', 'pizza hut delivery',
+  'takeaway', 'take away', 'zum mitnehmen', 'abhol',
+  'supermarkt', 'supermarket', 'grocery', 'lebensmittel', 'discounter',
+  'drogerie', 'rossmann', 'dm-drogerie', 'müller drogerie',
+  'tankstelle', 'fuel', 'gas station', 'waschanlage',
+  'norma', 'nahkauf', 'real', 'globus', 'famila', 'combi', 'hit markt',
+  'bio company', 'bio markt', 'reformhaus', 'trinkgut', 'getränkemarkt',
+];
+
+const isBlockedHomeVenue = (venue: { name: string; tags: string[] | null; cuisine_type: string | null }): boolean => {
+  const name = (venue.name || '').toLowerCase();
+  const tags = (venue.tags || []).map(t => t.toLowerCase());
+  const searchText = [name, ...tags].join(' ');
+  return VENUE_BLOCKLIST.some(blocked => searchText.includes(blocked));
+};
+
 const getDailyIndex = (offset: number, arrayLength: number) => {
   const now = new Date();
   const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
@@ -51,13 +71,17 @@ export function useHomeTipVenues(): UseHomeTipVenuesResult {
 
   const venues = useMemo(() => {
     if (rawVenues.length === 0) return [];
+
+    // Filter out supermarkets, delivery services, etc.
+    const cleanVenues = rawVenues.filter(v => !isBlockedHomeVenue(v));
+    
     const cuisineLower = (prefs?.preferred_cuisines || []).map(c => c.toLowerCase());
 
-    const matching = rawVenues
+    const matching = cleanVenues
       .filter(v => v.cuisine_type && cuisineLower.some(c => v.cuisine_type!.toLowerCase().includes(c)))
       .map(v => ({ ...v, isDiscovery: false }));
 
-    const discovery = rawVenues
+    const discovery = cleanVenues
       .filter(v => !v.cuisine_type || !cuisineLower.some(c => v.cuisine_type!.toLowerCase().includes(c)))
       .map(v => ({ ...v, isDiscovery: true }));
 
