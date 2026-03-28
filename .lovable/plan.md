@@ -143,6 +143,12 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 
 ## ✅ Zuletzt erledigt
 
+### 28. März 2026
+| Aufgabe | Beschreibung |
+|---------|--------------|
+| ~~Quality & Polish Sprint~~ | Mobile-Responsivität, i18n Error/Empty States, Design-Token-Konsolidierung |
+| ~~Social Login To-Dos dokumentiert~~ | Google + Apple Sign-In Konfigurationsanleitung erstellt |
+
 ### 27. März 2026
 | Aufgabe | Beschreibung |
 |---------|--------------|
@@ -191,8 +197,8 @@ DSGVO/Legal:        ████████████████████
 ```
 
 ### Zeitliche Einschätzung bis Launch
-- **Kritische Aufgaben (1-3)**: ~1 Session + externe Anwaltsprüfung
-- **Wichtige Aufgaben (4-5)**: ~1-2 Sessions
+- **Kritische Aufgaben (1-6)**: ~1-2 Sessions + externe Accounts/Anwaltsprüfung
+- **Wichtige Aufgaben (7-8)**: ~1-2 Sessions
 - **Gesamt bis MVP-Launch**: ~2-3 Sessions
 - **Stripe-Integration**: ~1-2 Sessions (Post-Launch)
 
