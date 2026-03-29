@@ -162,8 +162,9 @@
     "achievements": "Erfolge",
     "aiLearning": "KI-Lernfortschritt",
     "referralProgram": "Empfehlungsprogramm",
-    "friendsList": "Freundesliste",
-    "accountSettings": "Einstellungen"
+    "friendsList": "Meine Freunde",
+    "accountSettings": "Einstellungen",
+    "addFriends": "Freunde finden"
   },
   "invitations": {
     "title": "Date-Einladungen"

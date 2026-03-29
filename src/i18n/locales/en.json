@@ -162,8 +162,9 @@
     "achievements": "Achievements",
     "aiLearning": "AI Learning",
     "referralProgram": "Referral Program",
-    "friendsList": "Friends",
-    "accountSettings": "Settings"
+    "friendsList": "My Friends",
+    "accountSettings": "Settings",
+    "addFriends": "Find Friends"
   },
   "invitations": {
     "title": "Date Invitations"
