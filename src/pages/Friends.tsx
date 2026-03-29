@@ -281,21 +281,21 @@ const Friends = () => {
 
                   {/* Share Options */}
                   <div className="grid grid-cols-2 gap-3">
-                    <Button
-                      onClick={copyReferralLink}
-                      variant="outline"
-                      className="w-full"
-                    >
+                    <Button onClick={copyReferralLink} variant="outline" className="w-full">
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Link
                     </Button>
-                    <Button
-                      onClick={shareViaEmail}
-                      variant="outline"
-                      className="w-full"
-                    >
+                    <Button onClick={shareViaEmail} variant="outline" className="w-full">
                       <Mail className="w-4 h-4 mr-2" />
                       Email
+                    </Button>
+                    <Button onClick={shareViaWhatsApp} variant="outline" className="w-full text-green-600 border-green-200 hover:bg-green-50 dark:text-green-400 dark:border-green-800 dark:hover:bg-green-900/20">
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      WhatsApp
+                    </Button>
+                    <Button onClick={shareViaTelegram} variant="outline" className="w-full text-blue-500 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/20">
+                      <Send className="w-4 h-4 mr-2" />
+                      Telegram
                     </Button>
                   </div>
                 </div>
