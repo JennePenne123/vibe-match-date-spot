@@ -26,7 +26,7 @@ VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Paaren personalisi
 - Framer Motion Animationen (gestaffelte Card-Einblendung, Expand/Collapse)
 
 ### 🤖 KI-Engine (14-Signal-Pipeline)
-- 14-Signal AI-Matching: User Preferences, Real-time Context, Habit Learning, Repeat-Visit Protection, Occasion Scoring, Social Proof, Weather Scoring, Bayesian Ratings, Implicit Signals, Synergy Bonuses, Time-based Auto-Context, Smarter Partner Merging, Temporal Decay (90d), Distance Tolerance Learning
+- 27-Signal AI-Matching: 17 User-Signale (Preferences, Real-time Context, Habit Learning, Repeat-Visit Protection, Occasion Scoring, Social Proof, Weather Scoring, Bayesian Ratings, Implicit Signals, Synergy Bonuses, Time-based Auto-Context, Smarter Partner Merging, Temporal Decay (90d), Distance Tolerance Learning, Photo-Vibe-Scoring, Pair-Friendly-Scoring, Mood Scoring) + 4 Learning-Loops (Implicit Tracking, Feedback-Gewichtungen, Collaborative Matching, Exploration Bonus) + 6 Partner-Signale (Personality Wizard, Best-Times-Grid, Foto-Vibe-Tags, Saisonale Specials, Pair-friendly Flags, Voucher-Einlösungsraten)
 - Collaborative Scoring für beidseitige Präferenzen mit Shared-Bonus-System
 - Feedback-Loop: AI lernt aus Ratings und passt Gewichte an
 - Cold-Start-Lösung: Onboarding-Präferenzen → initiale feature_weights
