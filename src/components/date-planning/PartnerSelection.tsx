@@ -97,7 +97,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
               <Users className="h-5 w-5 text-sage-600 dark:text-sage-400" />
             </div>
             <CardTitle className="text-xl font-semibold">
-              {dateMode === 'single' ? 'Choose Your Date Partner' : 'Choose Your Group'}
+              {dateMode === 'single' ? t('datePlanning.choosePartner') : t('datePlanning.chooseGroup')}
             </CardTitle>
           </div>
           <Toggle 
@@ -108,12 +108,12 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
             {dateMode === 'single' ? (
               <>
                 <User className="h-3.5 w-3.5 mr-1.5" />
-                Single
+                {t('datePlanning.single')}
               </>
             ) : (
               <>
                 <UsersIcon className="h-3.5 w-3.5 mr-1.5" />
-                Group
+                {t('datePlanning.group')}
               </>
             )}
           </Toggle>
@@ -122,13 +122,13 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
       <CardContent className="space-y-4 pt-2">
         <div className="text-sm text-muted-foreground mb-3">
           {dateMode === 'single' 
-            ? 'Select a friend to plan a date with' 
-            : `Select friends for your group date (${selectedCount}/5 selected, max 6 inkl. dir)`}
+            ? t('datePlanning.selectFriend') 
+            : t('datePlanning.selectGroupFriends', { count: selectedCount })}
         </div>
         {dateMode === 'single' ? (
           <Select value={selectedPartnerId} onValueChange={onPartnerChange}>
             <SelectTrigger className="h-11">
-              <SelectValue placeholder="Choose a friend..." />
+              <SelectValue placeholder={t('datePlanning.chooseFriend')} />
             </SelectTrigger>
             <SelectContent>
               {friends.map((friend) => (
@@ -197,11 +197,11 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
           {loading ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Creating Planning Session...
+              {t('datePlanning.creatingSession')}
             </>
           ) : (
             <>
-              {dateMode === 'single' ? 'Continue' : `Plan Group Date (${selectedCount})`}
+              {dateMode === 'single' ? t('datePlanning.continue') : t('datePlanning.planGroupDate', { count: selectedCount })}
               <ArrowRight className="h-4 w-4 ml-2" />
             </>
           )}
