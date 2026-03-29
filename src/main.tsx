@@ -3,8 +3,13 @@ import App from './App.tsx'
 import './i18n'
 import './index.css'
 
+// Polyfill requestIdleCallback for Safari
+const ric = typeof requestIdleCallback === 'function'
+  ? requestIdleCallback
+  : (cb: () => void) => setTimeout(cb, 1);
+
 // Defer heavy monitoring init so React can mount first
-requestIdleCallback(
+ric(
   () => {
     import('./services/sentryService').then(m => m.initSentry());
     import('./services/errorMonitoringService').then(m => m.initErrorMonitoring());
