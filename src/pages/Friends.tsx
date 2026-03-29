@@ -6,7 +6,7 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail, Loader2, MessageCircle, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useFriends } from '@/hooks/useFriends';
 import { getInitials } from '@/lib/utils';
@@ -109,6 +109,18 @@ const Friends = () => {
     const subject = "Join me on Dzeng - Find Amazing Date Ideas!";
     const body = `Hey! I've been using Dzeng to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+  };
+
+  const shareViaWhatsApp = () => {
+    const link = generateReferralLink();
+    const text = `Hey! Ich nutze Dzeng um tolle Date-Spots zu finden. Komm dazu: ${link}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const shareViaTelegram = () => {
+    const link = generateReferralLink();
+    const text = `Hey! Ich nutze Dzeng um tolle Date-Spots zu finden. Komm dazu!`;
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`, '_blank');
   };
 
   return (
@@ -269,21 +281,21 @@ const Friends = () => {
 
                   {/* Share Options */}
                   <div className="grid grid-cols-2 gap-3">
-                    <Button
-                      onClick={copyReferralLink}
-                      variant="outline"
-                      className="w-full"
-                    >
+                    <Button onClick={copyReferralLink} variant="outline" className="w-full">
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Link
                     </Button>
-                    <Button
-                      onClick={shareViaEmail}
-                      variant="outline"
-                      className="w-full"
-                    >
+                    <Button onClick={shareViaEmail} variant="outline" className="w-full">
                       <Mail className="w-4 h-4 mr-2" />
                       Email
+                    </Button>
+                    <Button onClick={shareViaWhatsApp} variant="outline" className="w-full text-green-600 border-green-200 hover:bg-green-50 dark:text-green-400 dark:border-green-800 dark:hover:bg-green-900/20">
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      WhatsApp
+                    </Button>
+                    <Button onClick={shareViaTelegram} variant="outline" className="w-full text-blue-500 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/20">
+                      <Send className="w-4 h-4 mr-2" />
+                      Telegram
                     </Button>
                   </div>
                 </div>
