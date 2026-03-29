@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, MapPin, Check, X, DollarSign, Calendar, Info, MessageCircle, XCircle } from 'lucide-react';
 import ShareDateButton from '@/components/ShareDateButton';
+import type { ShareCardData } from '@/components/share/ShareCardGenerator';
 import { DateRatingPrompt } from '@/components/DateRatingPrompt';
 import { getInitials } from '@/lib/utils';
 import { DisplayData } from './types';
@@ -182,6 +183,14 @@ const DateInviteCardDetails = ({
                     title={`Date: ${displayData.venueName}`}
                     venueName={displayData.venueName}
                     dateTime={displayData.time}
+                    shareCardData={{
+                      type: 'date-experience',
+                      venueName: displayData.venueName,
+                      venueImage: displayData.venueImage,
+                      address: displayData.venueAddress || displayData.location,
+                      dateTitle: `Date mit ${displayData.friendName}`,
+                      dateMessage: displayData.message,
+                    }}
                   />
                 </div>
               </>

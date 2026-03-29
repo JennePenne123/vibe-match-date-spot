@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, MessageCircle, Link as LinkIcon, Copy, Check } from 'lucide-react';
-import { useState } from 'react';
+import { Share2, MessageCircle, Copy, Check, Image, Download } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -9,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import ShareCard, { useShareCardCapture, type ShareCardData } from '@/components/share/ShareCardGenerator';
 
 interface ShareDateButtonProps {
   title: string;
@@ -18,6 +18,7 @@ interface ShareDateButtonProps {
   dateTime?: string;
   className?: string;
   variant?: 'default' | 'compact';
+  shareCardData?: ShareCardData;
 }
 
 const ShareDateButton: React.FC<ShareDateButtonProps> = ({
@@ -27,9 +28,12 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
   venueName,
   dateTime,
   className,
-  variant = 'default'
+  variant = 'default',
+  shareCardData
 }) => {
   const [copied, setCopied] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const { cardRef, generateImage } = useShareCardCapture();
 
   const shareUrl = url || window.location.origin;
   
@@ -53,15 +57,49 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
   };
 
   const handleNativeShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, text: shareText, url: shareUrl });
-      } catch (e) {
-        // User cancelled
-      }
-    } else {
+    if (!navigator.share) {
       handleCopyLink();
+      return;
     }
+
+    try {
+      // Try sharing with image if share card data is available
+      if (shareCardData) {
+        setGenerating(true);
+        const blob = await generateImage();
+        setGenerating(false);
+
+        if (blob && navigator.canShare?.({ files: [new File([blob], 'vybepulse-share.png', { type: 'image/png' })] })) {
+          const file = new File([blob], 'vybepulse-share.png', { type: 'image/png' });
+          await navigator.share({ title, text: shareText, url: shareUrl, files: [file] });
+          return;
+        }
+      }
+
+      await navigator.share({ title, text: shareText, url: shareUrl });
+    } catch (e) {
+      // User cancelled or share failed
+    }
+  };
+
+  const handleDownloadCard = async () => {
+    if (!shareCardData) return;
+    setGenerating(true);
+    const blob = await generateImage();
+    setGenerating(false);
+
+    if (!blob) {
+      toast({ variant: 'destructive', title: 'Bild konnte nicht erstellt werden' });
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vybepulse-${Date.now()}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: 'Share-Card heruntergeladen! 🎨' });
   };
 
   const handleCopyLink = async () => {
@@ -75,61 +113,64 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
     }
   };
 
-  if (variant === 'compact') {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon-sm" className={className}>
-            <Share2 className="w-4 h-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={handleWhatsAppShare} className="gap-2">
-            <MessageCircle className="w-4 h-4 text-green-600" />
-            WhatsApp
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleTelegramShare} className="gap-2">
-            <Share2 className="w-4 h-4 text-blue-500" />
-            Telegram
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleCopyLink} className="gap-2">
-            {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
-            {copied ? 'Kopiert!' : 'Link kopieren'}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
+  const shareMenuItems = (
+    <>
+      {typeof navigator !== 'undefined' && 'share' in navigator && (
+        <DropdownMenuItem onClick={handleNativeShare} className="gap-2" disabled={generating}>
+          <Share2 className="w-4 h-4" />
+          {generating ? 'Wird erstellt...' : 'Teilen'}
+        </DropdownMenuItem>
+      )}
+      <DropdownMenuItem onClick={handleWhatsAppShare} className="gap-2">
+        <MessageCircle className="w-4 h-4 text-green-600" />
+        WhatsApp
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={handleTelegramShare} className="gap-2">
+        <Share2 className="w-4 h-4 text-blue-500" />
+        Telegram
+      </DropdownMenuItem>
+      {shareCardData && (
+        <DropdownMenuItem onClick={handleDownloadCard} className="gap-2" disabled={generating}>
+          <Download className="w-4 h-4" />
+          {generating ? 'Wird erstellt...' : 'Share-Card speichern'}
+        </DropdownMenuItem>
+      )}
+      <DropdownMenuItem onClick={handleCopyLink} className="gap-2">
+        {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
+        {copied ? 'Kopiert!' : 'Link kopieren'}
+      </DropdownMenuItem>
+    </>
+  );
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className={className}>
-          <Share2 className="w-4 h-4 mr-1.5" />
-          Teilen
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuItem onClick={handleWhatsAppShare} className="gap-2">
-          <MessageCircle className="w-4 h-4 text-green-600" />
-          Via WhatsApp teilen
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleTelegramShare} className="gap-2">
-          <Share2 className="w-4 h-4 text-blue-500" />
-          Via Telegram teilen
-        </DropdownMenuItem>
-        {typeof navigator !== 'undefined' && 'share' in navigator && (
-          <DropdownMenuItem onClick={handleNativeShare} className="gap-2">
-            <Share2 className="w-4 h-4" />
-            Mehr Optionen...
-          </DropdownMenuItem>
-        )}
-        <DropdownMenuItem onClick={handleCopyLink} className="gap-2">
-          {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
-          {copied ? 'Kopiert!' : 'Link kopieren'}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      {/* Hidden share card for capture */}
+      {shareCardData && (
+        <div className="fixed -left-[9999px] -top-[9999px]" aria-hidden="true">
+          <div ref={cardRef}>
+            <ShareCard data={shareCardData} />
+          </div>
+        </div>
+      )}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          {variant === 'compact' ? (
+            <Button variant="ghost" size="icon-sm" className={className}>
+              <Share2 className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" className={className}>
+              <Share2 className="w-4 h-4 mr-1.5" />
+              Teilen
+            </Button>
+          )}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52">
+          {shareMenuItems}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 };
 

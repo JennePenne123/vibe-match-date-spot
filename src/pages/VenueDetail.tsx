@@ -5,10 +5,12 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Star, MapPin, DollarSign, Clock, Phone, Share, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, DollarSign, Clock, Phone, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
 import { venueToAppVenue } from '@/utils/typeHelpers';
 import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
 import { supabase } from '@/integrations/supabase/client';
+import ShareDateButton from '@/components/ShareDateButton';
+import type { ShareCardData } from '@/components/share/ShareCardGenerator';
 
 const VenueDetail = () => {
   const { id } = useParams();
@@ -71,6 +73,16 @@ const VenueDetail = () => {
   // Convert to AppVenue format for UI
   const appVenue = venueToAppVenue(sourceVenue);
 
+  const shareCardData: ShareCardData = {
+    type: 'venue',
+    venueName: appVenue.name,
+    venueImage: appVenue.image_url || appVenue.image,
+    rating: appVenue.rating,
+    address: appVenue.address,
+    tags: appVenue.tags,
+    matchScore: appVenue.matchScore,
+  };
+
   const openDirections = () => {
     if (appVenue.google_place_id) {
       window.open(`https://www.google.com/maps/place/?q=place_id:${appVenue.google_place_id}`, '_blank');
@@ -120,13 +132,14 @@ const VenueDetail = () => {
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
+              <ShareDateButton
+                title={appVenue.name}
+                venueName={appVenue.name}
+                url={`${window.location.origin}/venue/${appVenue.id}`}
+                shareCardData={shareCardData}
+                variant="compact"
                 className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
-              >
-                <Share className="w-6 h-6" />
-              </Button>
+              />
               <Button
                 variant="ghost"
                 size="icon"
