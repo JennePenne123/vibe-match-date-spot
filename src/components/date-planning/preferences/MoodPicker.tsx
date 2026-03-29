@@ -75,5 +75,4 @@ const MoodPicker: React.FC<Props> = ({ selectedMood, onSelectMood }) => {
   );
 };
 
-export { getTodayMoodFromStorage };
 export default MoodPicker;
