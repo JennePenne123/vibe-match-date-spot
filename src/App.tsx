@@ -76,10 +76,8 @@ function ServiceWorkerCacheReset() {
   return null;
 }
 
-// Only Landing is eagerly loaded (first screen users see)
-import Landing from "./pages/Landing";
-
-// All protected routes – lazy loaded
+// All routes – lazy loaded to keep preview boot fast
+const Landing = lazy(() => import("./pages/Landing"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const MoodCheckIn = lazy(() => import("./pages/MoodCheckIn"));
 const Home = lazy(() => import("./pages/Home"));
@@ -197,7 +195,7 @@ const App = () => (
                 <ErrorBoundary level="page">
                   <Routes>
                     {/* Public routes without layout */}
-                    <Route path="/" element={<Landing />} />
+                    <Route path="/" element={<LazyPageNoLayout><Landing /></LazyPageNoLayout>} />
                     <Route path="/index" element={<Navigate to="/" replace />} />
                     <Route path="/index.html" element={<Navigate to="/" replace />} />
                     <Route path="/welcome" element={<LazyPageNoLayout><Onboarding /></LazyPageNoLayout>} />

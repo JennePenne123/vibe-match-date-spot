@@ -6,10 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Sun, Coffee, Moon } from 'lucide-react';
 import { hasCompletedPreferenceSetup } from '@/utils/preferenceCompletion';
-
-const MOOD_STORAGE_KEY = 'vybe-daily-mood';
-
-export type DailyMood = 'great' | 'okay' | 'me-time';
+import { type DailyMood, hasMoodToday, storeMoodForToday } from '@/utils/moodStorage';
 
 interface MoodOption {
   id: DailyMood;
@@ -51,31 +48,6 @@ const moodOptions: MoodOption[] = [
   },
 ];
 
-/** Check if mood was already set today */
-export const hasMoodToday = (): boolean => {
-  try {
-    const stored = localStorage.getItem(MOOD_STORAGE_KEY);
-    if (!stored) return false;
-    const { date } = JSON.parse(stored);
-    return date === new Date().toISOString().split('T')[0];
-  } catch {
-    return false;
-  }
-};
-
-/** Get today's mood if set */
-export const getTodayMood = (): DailyMood | null => {
-  try {
-    const stored = localStorage.getItem(MOOD_STORAGE_KEY);
-    if (!stored) return null;
-    const { date, mood } = JSON.parse(stored);
-    if (date === new Date().toISOString().split('T')[0]) return mood;
-    return null;
-  } catch {
-    return null;
-  }
-};
-
 const MoodCheckIn: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -97,10 +69,7 @@ const MoodCheckIn: React.FC = () => {
 
   const saveMoodAndContinue = async (mood: DailyMood | null) => {
     if (mood) {
-      localStorage.setItem(
-        MOOD_STORAGE_KEY,
-        JSON.stringify({ mood, date: new Date().toISOString().split('T')[0] })
-      );
+      storeMoodForToday(mood);
       try {
         const { awardPoints } = await import('@/services/awardPointsService');
         await awardPoints('mood_checkin');
@@ -108,10 +77,7 @@ const MoodCheckIn: React.FC = () => {
         console.error('Failed to award mood check-in points:', e);
       }
     } else {
-      localStorage.setItem(
-        MOOD_STORAGE_KEY,
-        JSON.stringify({ mood: 'skipped', date: new Date().toISOString().split('T')[0] })
-      );
+      storeMoodForToday('skipped');
     }
 
     setAnimateOut(true);
