@@ -164,7 +164,19 @@
     "referralProgram": "Empfehlungsprogramm",
     "friendsList": "Meine Freunde",
     "accountSettings": "Einstellungen",
-    "addFriends": "Freunde finden"
+    "addFriends": "Freunde finden",
+    "activity": {
+      "title": "Meine Aktivitäten",
+      "dateSent": "Date-Einladung gesendet",
+      "dateReceived": "Date-Einladung erhalten",
+      "youInvited": "Du hast jemanden eingeladen",
+      "youWereInvited": "Du wurdest eingeladen",
+      "ratedDate": "Date bewertet",
+      "newFriend": "Neue Verbindung",
+      "connectionMade": "Du hast einen neuen Freund gefunden",
+      "noActivity": "Noch keine Aktivitäten",
+      "startExploring": "Plane Dates, um hier deine Aktivitäten zu sehen!"
+    }
   },
   "invitations": {
     "title": "Date-Einladungen"
