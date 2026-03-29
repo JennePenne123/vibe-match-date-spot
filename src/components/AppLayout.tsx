@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { lazy, Suspense, useRef, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
@@ -11,7 +11,7 @@ import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { Menu, Sparkles } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import AIConcierge from '@/components/AIConcierge'
+const AIConcierge = lazy(() => import('@/components/AIConcierge'))
 
 // Tab order for directional slide
 const NAV_ORDER = ['/home', '/preferences', '/chats', '/profile']
@@ -37,6 +37,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const prevPath = useRef(location.pathname)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
+
+  const concierge = (
+    <Suspense fallback={null}>
+      <AIConcierge />
+    </Suspense>
+  )
 
 
   // Determine slide direction on route change
@@ -112,7 +118,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         ) : (
           <>
             <MobileBottomNav />
-            <AIConcierge />
+            {concierge}
           </>
         )}
       </div>
@@ -151,7 +157,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </div>
           </main>
         </div>
-        {!isPartnerRoute && !isAdminRoute && <AIConcierge />}
+        {!isPartnerRoute && !isAdminRoute && concierge}
       </div>
     </SidebarProvider>
   )

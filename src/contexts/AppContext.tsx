@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { getAIVenueRecommendations, type AIVenueRecommendation } from '@/services/aiVenueService';
+import type { AIVenueRecommendation } from '@/services/aiVenueService';
 
 interface UserLocation {
   latitude: number;
@@ -309,6 +309,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       if (user && location?.latitude && location?.longitude) {
         try {
+          const { getAIVenueRecommendations } = await import('@/services/aiVenueService');
           const recommendations = await getAIVenueRecommendations(user.id, undefined, 6, location, appState.selectedArea);
           venues = recommendations.map(recommendationToVenue);
           console.log(`✅ AI venue pipeline returned ${venues.length} venues`);
