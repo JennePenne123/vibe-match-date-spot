@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { AppUser } from '@/types/app';
 import { useAuthState } from '@/hooks/useAuthState';
@@ -8,7 +8,6 @@ import { updateUserProfile, fetchUserProfile } from '@/utils/userProfileHelpers'
 import { inviteFriendById } from '@/services/friendshipService';
 import { clearUserPreferenceFields } from '@/services/sessionCleanupService';
 import { supabase } from '@/integrations/supabase/client';
-import { setSentryUser, clearSentryUser } from '@/services/sentryService';
 
 interface AuthContextType {
   user: AppUser | null;
@@ -29,16 +28,38 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, setUser, session, loading } = useAuthState();
+  const previousUserIdRef = useRef<string | null>(null);
 
   // Sync Sentry user context + preload core routes after login
   useEffect(() => {
+    let isActive = true;
+
     if (user) {
-      setSentryUser(user.id, user.email);
+      void import('@/services/sentryService')
+        .then(({ setSentryUser }) => {
+          if (isActive) {
+            setSentryUser(user.id, user.email);
+          }
+        })
+        .catch(() => undefined);
+
       import('@/utils/routePreloading').then(m => m.preloadCoreRoutes());
-    } else {
-      clearSentryUser();
+    } else if (previousUserIdRef.current) {
+      void import('@/services/sentryService')
+        .then(({ clearSentryUser }) => {
+          if (isActive) {
+            clearSentryUser();
+          }
+        })
+        .catch(() => undefined);
     }
-  }, [user]);
+
+    previousUserIdRef.current = user?.id ?? null;
+
+    return () => {
+      isActive = false;
+    };
+  }, [user?.id, user?.email]);
 
   const signUp = async (email: string, password: string, userData?: any) => {
     return await signUpUser(email, password, userData);
