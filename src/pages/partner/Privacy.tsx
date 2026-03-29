@@ -16,7 +16,7 @@ export default function PartnerPrivacy() {
   const sections = [
     {
       title: '1. Verantwortlicher',
-      content: '[VybePulse GmbH, Adresse, Kontaktdaten des Datenschutzbeauftragten einfügen.]',
+      content: '[Dzeng GmbH, Adresse, Kontaktdaten des Datenschutzbeauftragten einfügen.]',
     },
     {
       title: '2. Erhobene Daten',
@@ -81,7 +81,7 @@ export default function PartnerPrivacy() {
             Datenschutzerklärung für Venue-Partner
           </CardTitle>
           <p className="text-xs text-muted-foreground">
-            Version 1.0 · Stand: [Datum einfügen] · VybePulse GmbH
+            Version 1.0 · Stand: [Datum einfügen] · Dzeng GmbH
           </p>
         </CardHeader>
         <CardContent>

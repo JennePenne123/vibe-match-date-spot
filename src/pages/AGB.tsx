@@ -23,12 +23,12 @@ export default function AGB() {
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <h2>§ 1 Geltungsbereich</h2>
           <p className="text-muted-foreground">
-            Diese Allgemeinen Geschäftsbedingungen gelten für die Nutzung der Plattform VybePulse, betrieben von [Firmenname].
+            Diese Allgemeinen Geschäftsbedingungen gelten für die Nutzung der Plattform Dzeng, betrieben von [Firmenname].
           </p>
 
           <h2>§ 2 Leistungsbeschreibung</h2>
           <p className="text-muted-foreground">
-            VybePulse ist eine KI-gestützte Date-Planning-Plattform, die Nutzern personalisierte Venue-Empfehlungen und Planungsfunktionen bietet.
+            Dzeng ist eine KI-gestützte Date-Planning-Plattform, die Nutzern personalisierte Venue-Empfehlungen und Planungsfunktionen bietet.
           </p>
 
           <h2>§ 3 Registrierung und Nutzerkonto</h2>
@@ -38,7 +38,7 @@ export default function AGB() {
 
           <h2>§ 4 Kostenlose und Premium-Nutzung</h2>
           <p className="text-muted-foreground">
-            VybePulse bietet eine kostenlose Basisversion sowie eine kostenpflichtige Premium-Mitgliedschaft mit erweiterten Funktionen. Details zu den Leistungsunterschieden finden sich in der aktuellen Preisübersicht.
+            Dzeng bietet eine kostenlose Basisversion sowie eine kostenpflichtige Premium-Mitgliedschaft mit erweiterten Funktionen. Details zu den Leistungsunterschieden finden sich in der aktuellen Preisübersicht.
           </p>
 
           <h2>§ 5 Punkte und Rewards</h2>
@@ -48,7 +48,7 @@ export default function AGB() {
 
           <h2>§ 6 Voucher</h2>
           <p className="text-muted-foreground">
-            Voucher werden von Partner-Venues bereitgestellt und unterliegen den jeweiligen Bedingungen des Partners. VybePulse übernimmt keine Haftung für die Einlösung bei Partner-Venues.
+            Voucher werden von Partner-Venues bereitgestellt und unterliegen den jeweiligen Bedingungen des Partners. Dzeng übernimmt keine Haftung für die Einlösung bei Partner-Venues.
           </p>
 
           <h2>§ 7 Haftung</h2>

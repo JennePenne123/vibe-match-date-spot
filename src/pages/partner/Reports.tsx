@@ -240,7 +240,7 @@ export default function PartnerReports() {
       // Header
       pdf.setFontSize(20);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('VybePulse', 14, y);
+      pdf.text('Dzeng', 14, y);
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.text(t('partner.reports.partnerReport'), 14, y + 7);
@@ -330,7 +330,7 @@ export default function PartnerReports() {
       pdf.setFontSize(8);
       pdf.setTextColor(150);
       pdf.text(`${t('partner.reports.generatedOn')} ${format(new Date(), 'dd.MM.yyyy HH:mm')}`, 14, 285);
-      pdf.text('VybePulse Partner Report', pageWidth - 60, 285);
+      pdf.text('Dzeng Partner Report', pageWidth - 60, 285);
 
       pdf.save(`report-${monthlyReport.month}.pdf`);
       toast.success(t('partner.reports.exportSuccess'));
