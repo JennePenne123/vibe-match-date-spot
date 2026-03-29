@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { hasMoodToday } from '@/pages/MoodCheckIn';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,7 @@ import {
 import { Loader2, Gift, Store } from 'lucide-react';
 import { validateReferralCode, processReferralSignup } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
+import { hasMoodToday } from '@/utils/moodStorage';
 
 // Google icon SVG component
 const GoogleIcon = () => (

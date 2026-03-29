@@ -1,4 +1,4 @@
-import { getTodayMood, DailyMood } from '@/pages/MoodCheckIn';
+import { getTodayMood, type DailyMood } from '@/utils/moodStorage';
 
 /**
  * Mood-based scoring modifiers

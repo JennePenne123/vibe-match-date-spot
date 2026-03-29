@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { learnFromFeedback } from '@/services/aiLearningService';
 import { calculateLevel } from '@/services/pointsService';
 import { checkAndAwardBadges } from '@/services/badgeService';
+import { getTodayMood } from '@/utils/moodStorage';
 
 export interface DateRatingData {
   overallRating: number;
@@ -144,7 +145,6 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
       if (options?.venueId) {
         try {
           // Enrich context with mood & priority weights for learning
-          const { getTodayMood } = await import('@/pages/MoodCheckIn');
           const currentMood = getTodayMood();
           
           let lifestyleContext: Record<string, unknown> = {};

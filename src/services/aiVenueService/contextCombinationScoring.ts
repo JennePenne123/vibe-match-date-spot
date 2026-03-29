@@ -9,8 +9,8 @@
  */
 
 import type { DateOccasion } from './occasionScoring';
-import type { DailyMood } from '@/pages/MoodCheckIn';
 import type { SessionPriorityWeights } from './preferenceFiltering';
+import type { DailyMood } from '@/utils/moodStorage';
 
 interface VenueContext {
   cuisine_type?: string | null;
