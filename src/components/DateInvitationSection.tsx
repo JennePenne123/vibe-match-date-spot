@@ -355,6 +355,7 @@ const DateInvitationSection: React.FC = () => {
           </Tabs>
         </TabsContent>
       </Tabs>
+      <InviteFriendsSection />
     </div>
   );
 };
