@@ -111,6 +111,18 @@ const Friends = () => {
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 
+  const shareViaWhatsApp = () => {
+    const link = generateReferralLink();
+    const text = `Hey! Ich nutze Dzeng um tolle Date-Spots zu finden. Komm dazu: ${link}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const shareViaTelegram = () => {
+    const link = generateReferralLink();
+    const text = `Hey! Ich nutze Dzeng um tolle Date-Spots zu finden. Komm dazu!`;
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto">
