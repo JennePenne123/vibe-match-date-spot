@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriends } from '@/hooks/useFriends';
+import { useReferral } from '@/hooks/useReferral';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Search, UserPlus, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, Search, UserPlus, Mail, MessageCircle, Send, Share2, Copy, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import FriendCard from '@/components/FriendCard';
 
@@ -15,7 +16,9 @@ const MyFriends = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { friends } = useFriends();
+  const { referralLink, copyReferralLink } = useReferral();
   const [searchTerm, setSearchTerm] = useState('');
+  const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
   const filteredFriends = friends.filter(friend => friend.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -26,6 +29,56 @@ const MyFriends = () => {
 
   const handleInviteDate = (friendId: string, friendName: string) => {
     navigate('/plan-date', { state: { preselectedFriend: { id: friendId, name: friendName } } });
+  };
+
+  const inviteText = t('myFriends.inviteMessage', { link: referralLink || window.location.origin });
+
+  const handleInviteEmail = () => {
+    const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu Dzeng!'));
+    const body = encodeURIComponent(inviteText);
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+  };
+
+  const handleInviteWhatsApp = () => {
+    const text = encodeURIComponent(inviteText);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
+  const handleInviteTelegram = () => {
+    const text = encodeURIComponent(inviteText);
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink || window.location.origin)}&text=${text}`, '_blank');
+  };
+
+  const handleCopyLink = async () => {
+    const success = referralLink ? await copyReferralLink() : false;
+    if (success) {
+      setCopied(true);
+      toast({ title: t('myFriends.linkCopied') });
+      setTimeout(() => setCopied(false), 2000);
+    } else {
+      try {
+        await navigator.clipboard.writeText(referralLink || window.location.origin);
+        setCopied(true);
+        toast({ title: t('myFriends.linkCopied') });
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        toast({ title: t('common.error'), variant: 'destructive' });
+      }
+    }
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Dzeng',
+          text: inviteText,
+          url: referralLink || window.location.origin,
+        });
+      } catch {
+        // User cancelled
+      }
+    }
   };
 
   return (
@@ -62,15 +115,70 @@ const MyFriends = () => {
             <h2 className="text-lg font-semibold text-foreground">{t('myFriends.yourFriends')}</h2>
             {filteredFriends.map((friend) => <FriendCard key={friend.id} friend={friend} onMessage={handleMessage} onInvite={handleInviteDate} />)}
           </div>
-          <Card className="bg-muted/50 border-dashed border-2 border-border">
-            <CardContent className="p-6 text-center">
-              <div className="text-muted-foreground mb-2"><UserPlus className="w-8 h-8 mx-auto" /></div>
-              <h3 className="font-medium text-foreground mb-1">{t('myFriends.inviteMore')}</h3>
-              <p className="text-sm text-muted-foreground mb-4">{t('myFriends.inviteMoreDesc')}</p>
-              <div className="flex gap-2 justify-center">
-                <Button variant="outline" size="sm"><Mail className="w-4 h-4 mr-2" />{t('common.email')}</Button>
-                <Button variant="outline" size="sm"><Phone className="w-4 h-4 mr-2" />{t('myFriends.contacts')}</Button>
+
+          {/* Invite Section */}
+          <Card className="bg-muted/50 border-dashed border-2 border-border overflow-hidden">
+            <CardContent className="p-6 text-center space-y-4">
+              <div className="text-muted-foreground mb-1">
+                <UserPlus className="w-8 h-8 mx-auto" />
               </div>
+              <div>
+                <h3 className="font-medium text-foreground mb-1">{t('myFriends.inviteMore')}</h3>
+                <p className="text-sm text-muted-foreground">{t('myFriends.inviteMoreDesc')}</p>
+              </div>
+
+              {/* Share buttons */}
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleInviteEmail}
+                  className="gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  E-Mail
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleInviteWhatsApp}
+                  className="gap-2 text-green-600 border-green-200 hover:bg-green-50 dark:text-green-400 dark:border-green-800 dark:hover:bg-green-900/20"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  WhatsApp
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleInviteTelegram}
+                  className="gap-2 text-blue-500 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/20"
+                >
+                  <Send className="w-4 h-4" />
+                  Telegram
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyLink}
+                  className="gap-2"
+                >
+                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  {copied ? t('myFriends.copied') : t('myFriends.copyLink')}
+                </Button>
+              </div>
+
+              {/* Native share (mobile) */}
+              {typeof navigator !== 'undefined' && 'share' in navigator && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleNativeShare}
+                  className="w-full gap-2 bg-gradient-primary text-primary-foreground"
+                >
+                  <Share2 className="w-4 h-4" />
+                  {t('myFriends.shareInvite')}
+                </Button>
+              )}
             </CardContent>
           </Card>
         </div>
