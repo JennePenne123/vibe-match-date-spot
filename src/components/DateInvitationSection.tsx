@@ -211,7 +211,7 @@ const DateInvitationSection: React.FC = () => {
   if (invitations.length === 0) {
     return (
       <div className="space-y-4 mb-6">
-        <div className="text-center p-6 bg-muted/30 rounded-lg border-2 border-dashed border-muted">
+      <div className="text-center p-6 bg-muted/30 rounded-lg border-2 border-dashed border-muted">
           <h3 className="text-lg font-medium text-muted-foreground mb-2">{t('invitationsSection.emptyTitle')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
             {t('invitationsSection.emptyDesc')}
@@ -226,6 +226,7 @@ const DateInvitationSection: React.FC = () => {
             {t('invitationsSection.refresh')}
           </Button>
         </div>
+        <InviteFriendsSection />
       </div>
     );
   }
