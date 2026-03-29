@@ -1,8 +1,18 @@
 import { calculateGeoDistance } from '@/utils/stringUtils';
 
 /**
+ * Format distance consistently across the app
+ * <100m → "XXm", <1km → "XXXm", <10km → "X.Xkm", ≥10km → "XXkm"
+ */
+const formatDistance = (km: number): string => {
+  if (km < 0.1) return `${Math.round(km * 1000)}m`;
+  if (km < 1) return `${Math.round(km * 1000)}m`;
+  if (km < 10) return `${km.toFixed(1)}km`;
+  return `${Math.round(km)}km`;
+};
+
+/**
  * Calculate distance from a reference location
- * Uses configurable fallback location instead of hardcoded Hamburg
  */
 export const calculateDistanceFromLocation = (
   venue: any, 
@@ -11,21 +21,18 @@ export const calculateDistanceFromLocation = (
   if (!referenceLocation?.latitude || !referenceLocation?.longitude) {
     return 'Distance unavailable';
   }
-  const refLat = referenceLocation.latitude;
-  const refLng = referenceLocation.longitude;
   
-  if (!venue.latitude || !venue.longitude) return 'Distance unavailable';
+  const venueLat = venue.latitude ?? venue.lat ?? venue.geometry?.location?.lat;
+  const venueLng = venue.longitude ?? venue.lng ?? venue.geometry?.location?.lng;
   
-  const distance = calculateGeoDistance(refLat, refLng, venue.latitude, venue.longitude);
-  if (distance < 1) {
-    return `${Math.round(distance * 1000)}m`;
-  }
-  return `${distance.toFixed(1)}km`;
+  if (!venueLat || !venueLng) return 'Distance unavailable';
+  
+  const distance = calculateGeoDistance(referenceLocation.latitude, referenceLocation.longitude, venueLat, venueLng);
+  return formatDistance(distance);
 };
 
 /**
  * @deprecated Use calculateDistanceFromLocation instead
- * Kept for backward compatibility - now uses configurable fallback
  */
 export const calculateDistanceFromHamburg = (venue: any): string => {
   return calculateDistanceFromLocation(venue);

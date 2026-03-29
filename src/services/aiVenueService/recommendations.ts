@@ -1,7 +1,7 @@
 import { calculateVenueAIScore, calculateConfidenceLevel } from './scoring';
 import { getActiveVenues, getStoredAIScore } from './fetching';
 import { filterVenuesByPreferences, filterVenuesByCollaborativePreferences, AREA_VIBE_MAP, type SessionPriorityWeights } from './preferenceFiltering';
-import { calculateDistanceFromHamburg } from './helperFunctions';
+import { calculateDistanceFromLocation } from './helperFunctions';
 import { getRealtimeContextScore } from './contextScoring';
 import { getRepeatProtectionModifier } from './repeatProtection';
 import { getHabitBonus } from './habitLearning';
@@ -265,7 +265,7 @@ export const getAIVenueRecommendations = async (
         contextual_score: contextBonus / 100,
         ai_reasoning: matchReasons.join(' • '),
         confidence_level: calculateConfidenceLevel(finalScore, {}),
-        distance: calculateDistanceFromHamburg(venue),
+        distance: calculateDistanceFromLocation(venue, userLocation),
         neighborhood: extractNeighborhood(venue.address || venue.location || venue.vicinity),
         isOpen: determineOpenStatus(venue.opening_hours || venue.openNow),
         operatingHours: formatOperatingHours(venue.opening_hours),
