@@ -10,8 +10,10 @@ import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail, Loa
 import { useToast } from '@/hooks/use-toast';
 import { useFriends } from '@/hooks/useFriends';
 import { getInitials } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const Friends = () => {
+  const { t } = useTranslation();
   const [isGenerating, setIsGenerating] = useState(false);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -171,7 +173,7 @@ const Friends = () => {
               onClick={handleNext}
               className="w-full h-10 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold text-sm"
             >
-              Find Perfect Spots
+              {t('datePlanning.findPerfectSpots')}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           )}
@@ -180,8 +182,8 @@ const Friends = () => {
         <div className="px-6 pb-8">
           {/* Header Text */}
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-2">Who's joining you?</h2>
-            <p className="text-muted-foreground">Invite friends to join your date adventure</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">{t('datePlanning.whosJoining')}</h2>
+            <p className="text-muted-foreground">{t('datePlanning.inviteFriendsAdventure')}</p>
           </div>
 
           {/* Search */}
@@ -256,8 +258,8 @@ const Friends = () => {
                     <div className="bg-primary/10 rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                       <Share2 className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">Invite Friends to Dzeng</h3>
-                    <p className="text-sm text-muted-foreground">Share your referral link and discover amazing dates together</p>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">{t('datePlanning.inviteFriendsToDzeng')}</h3>
+                    <p className="text-sm text-muted-foreground">{t('datePlanning.shareReferralDesc')}</p>
                   </div>
 
                   {/* Referral Link Display */}

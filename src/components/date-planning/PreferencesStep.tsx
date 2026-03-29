@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Heart, Loader2, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import SafeComponent from '@/components/SafeComponent';
 
 import { usePreferencesState } from '@/hooks/usePreferencesState';
@@ -48,6 +49,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   } = props;
 
   const state = usePreferencesState(props);
+  const { t } = useTranslation();
 
   const {
     flowState, loading, hasSubmitted, onboardingPrefs, onboardingLoaded,
@@ -95,7 +97,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-foreground">Dein Date planen</h2>
+            <h2 className="text-lg font-bold text-foreground">{t('datePlanning.planYourDate')}</h2>
           </div>
           {planningMode === 'collaborative' && (
             <div className="flex items-center gap-1">
@@ -130,39 +132,39 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
             {/* Accordion Sections */}
             <div className="space-y-2">
-              <Section id="cuisine" icon={<span className="text-sm">🍽️</span>} title="Küche"
-                summary={summaryText(selectedCuisines, cuisines)} count={selectedCuisines.length}
+              <Section id="cuisine" icon={<span className="text-sm">🍽️</span>} title={t('datePlanning.cuisine')}
+                summary={summaryText(selectedCuisines, cuisines, t)} count={selectedCuisines.length}
                 open={openSections.includes('cuisine')} onToggle={() => toggleSection('cuisine')}>
                 <ChipGrid items={cuisines} selected={selectedCuisines} onToggle={toggleCuisine} />
               </Section>
 
-              <Section id="vibes" icon={<span className="text-sm">✨</span>} title="Vibe"
-                summary={summaryText(selectedVibes, allVibes)} count={selectedVibes.length}
+              <Section id="vibes" icon={<span className="text-sm">✨</span>} title={t('datePlanning.vibe')}
+                summary={summaryText(selectedVibes, allVibes, t)} count={selectedVibes.length}
                 open={openSections.includes('vibes')} onToggle={() => toggleSection('vibes')}>
                 {durationModel?.excludeVibes.length ? (
-                  <p className="text-xs text-muted-foreground mb-2 italic">Einige Vibes basierend auf Zeitmodell ausgeblendet</p>
+                  <p className="text-xs text-muted-foreground mb-2 italic">{t('datePlanning.vibesFilteredHint')}</p>
                 ) : null}
                 <ChipGrid items={filteredVibes} selected={selectedVibes} onToggle={toggleVibe} />
               </Section>
 
-              <Section id="budget" icon={<span className="text-sm">💰</span>} title="Budget"
-                summary={summaryText(selectedPriceRange, priceRanges)} count={selectedPriceRange.length}
+              <Section id="budget" icon={<span className="text-sm">💰</span>} title={t('datePlanning.budget')}
+                summary={summaryText(selectedPriceRange, priceRanges, t)} count={selectedPriceRange.length}
                 open={openSections.includes('budget')} onToggle={() => toggleSection('budget')}>
                 <ChipGrid items={priceRanges} selected={selectedPriceRange} onToggle={togglePrice} />
               </Section>
 
-              <Section id="time" icon={<span className="text-sm">🕐</span>} title="Tageszeit"
-                summary={summaryText(selectedTimePreferences, timePreferences)} count={selectedTimePreferences.length}
+              <Section id="time" icon={<span className="text-sm">🕐</span>} title={t('datePlanning.timeOfDay')}
+                summary={summaryText(selectedTimePreferences, timePreferences, t)} count={selectedTimePreferences.length}
                 open={openSections.includes('time')} onToggle={() => toggleSection('time')}>
                 <ChipGrid items={timePreferences} selected={selectedTimePreferences} onToggle={toggleTime} />
               </Section>
 
-              <Section id="advanced" icon={<Settings className="w-4 h-4 text-muted-foreground" />} title="Erweitert"
-                summary={`${maxDistance} km${selectedDietary.length > 0 ? ` · ${selectedDietary.length} Diät` : ''}`} count={selectedDietary.length}
+              <Section id="advanced" icon={<Settings className="w-4 h-4 text-muted-foreground" />} title={t('datePlanning.advanced')}
+                summary={`${maxDistance} km${selectedDietary.length > 0 ? ` · ${selectedDietary.length} ${t('datePlanning.diet')}` : ''}`} count={selectedDietary.length}
                 open={openSections.includes('advanced')} onToggle={() => toggleSection('advanced')}>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium mb-2">Entfernung</p>
+                    <p className="text-sm font-medium mb-2">{t('datePlanning.distance')}</p>
                     <Slider value={[maxDistance]} onValueChange={v => setMaxDistance(v[0])} max={50} min={1} step={1} className="w-full" />
                     <div className="flex justify-between text-xs text-muted-foreground mt-2">
                       <span>1 km</span>
@@ -171,7 +173,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium mb-2">Diät / Unverträglichkeiten</p>
+                    <p className="text-sm font-medium mb-2">{t('datePlanning.dietaryRestrictions')}</p>
                     <ChipGrid items={dietaryRequirements} selected={selectedDietary} onToggle={toggleDietary} />
                   </div>
                 </div>
@@ -192,16 +194,16 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         {/* Selection summary */}
         {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
           <div className="bg-muted/50 rounded-lg p-3 space-y-2 border border-border">
-            <p className="text-xs font-medium text-muted-foreground">Deine Auswahl</p>
+            <p className="text-xs font-medium text-muted-foreground">{t('datePlanning.yourSelection')}</p>
             <div className="flex flex-wrap gap-1.5">
               {selectedDuration && (
                 <Badge variant="outline" className="text-xs">
-                  {durationModels.find(d => d.id === selectedDuration)?.emoji} {durationModels.find(d => d.id === selectedDuration)?.title}
+                  {durationModels.find(d => d.id === selectedDuration)?.emoji} {t(durationModels.find(d => d.id === selectedDuration)?.title || '')}
                 </Badge>
               )}
-              {selectedCuisines.slice(0, 3).map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {c}</Badge>)}
+              {selectedCuisines.slice(0, 3).map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {t(cuisines.find(x => x.id === c)?.name || c)}</Badge>)}
               {selectedCuisines.length > 3 && <Badge variant="outline" className="text-xs">+{selectedCuisines.length - 3}</Badge>}
-              {selectedVibes.slice(0, 3).map(v => <Badge key={v} variant="outline" className="text-xs">{allVibes.find(x => x.id === v)?.emoji} {v}</Badge>)}
+              {selectedVibes.slice(0, 3).map(v => <Badge key={v} variant="outline" className="text-xs">{allVibes.find(x => x.id === v)?.emoji} {t(allVibes.find(x => x.id === v)?.name || v)}</Badge>)}
               {selectedVibes.length > 3 && <Badge variant="outline" className="text-xs">+{selectedVibes.length - 3}</Badge>}
             </div>
           </div>
@@ -215,11 +217,11 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
       <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/50 p-3 -mx-1 flex items-center gap-3 z-10">
         {onboardingPrefs && (
           <Button onClick={() => state.setFlowState('confirm')} variant="outline" className="active:scale-[0.97] transition-transform">
-            Zurück
+            {t('datePlanning.back')}
           </Button>
         )}
         <Button onClick={submitPreferences} disabled={loading || !selectedDuration} className="flex-1 h-12 text-base font-semibold active:scale-[0.97] transition-transform">
-          {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</> : '🚀 Los geht\'s'}
+          {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('datePlanning.saving')}</> : t('datePlanning.letsGo')}
         </Button>
       </div>
 

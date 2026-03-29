@@ -2,6 +2,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import type { Preference } from './preferencesData';
 
 interface ChipProps {
@@ -10,20 +11,23 @@ interface ChipProps {
   onPress: () => void;
 }
 
-export const Chip: React.FC<ChipProps> = ({ item, selected, onPress }) => (
-  <button
-    type="button" onClick={onPress}
-    style={{ WebkitTapHighlightColor: 'transparent' }}
-    className={cn(
-      'inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm transition-colors select-none active:scale-[0.97]',
-      selected ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-card text-muted-foreground hover:border-primary/30'
-    )}
-  >
-    <span>{item.emoji}</span>
-    <span className="font-medium">{item.name}</span>
-    {selected && <Check className="w-3 h-3 ml-0.5 text-primary" />}
-  </button>
-);
+export const Chip: React.FC<ChipProps> = ({ item, selected, onPress }) => {
+  const { t } = useTranslation();
+  return (
+    <button
+      type="button" onClick={onPress}
+      style={{ WebkitTapHighlightColor: 'transparent' }}
+      className={cn(
+        'inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm transition-colors select-none active:scale-[0.97]',
+        selected ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-card text-muted-foreground hover:border-primary/30'
+      )}
+    >
+      <span>{item.emoji}</span>
+      <span className="font-medium">{t(item.name)}</span>
+      {selected && <Check className="w-3 h-3 ml-0.5 text-primary" />}
+    </button>
+  );
+};
 
 interface ChipGridProps {
   items: Preference[];

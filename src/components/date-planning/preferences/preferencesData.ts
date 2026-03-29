@@ -83,50 +83,50 @@ export const cuisines: Preference[] = [
 ];
 
 export const durationModels: DurationModel[] = [
-  { id: 'quick', title: 'Quick & Sweet', emoji: '⚡', desc: '1–2 h', excludeVibes: ['lively'], suggestTimes: ['morning', 'lunch', 'afternoon'], suggestPrice: ['$', '$$'] },
-  { id: 'relaxed', title: 'Relaxed', emoji: '☀️', desc: '2–4 h', excludeVibes: [], suggestTimes: ['lunch', 'afternoon'], suggestPrice: ['$$', '$$$'] },
-  { id: 'evening', title: 'Full Evening', emoji: '🌆', desc: '4+ h', excludeVibes: [], suggestTimes: ['evening', 'night'], suggestPrice: ['$$', '$$$', '$$$$'] },
-  { id: 'adventure', title: 'All-Day', emoji: '🗺️', desc: 'Ganzer Tag', excludeVibes: [], suggestTimes: ['morning', 'lunch', 'afternoon', 'evening'], suggestPrice: ['$', '$$', '$$$'] },
+  { id: 'quick', title: 'datePlanning.durationQuick', emoji: '⚡', desc: 'datePlanning.durationQuickDesc', excludeVibes: ['lively'], suggestTimes: ['morning', 'lunch', 'afternoon'], suggestPrice: ['$', '$$'] },
+  { id: 'relaxed', title: 'datePlanning.durationRelaxed', emoji: '☀️', desc: 'datePlanning.durationRelaxedDesc', excludeVibes: [], suggestTimes: ['lunch', 'afternoon'], suggestPrice: ['$$', '$$$'] },
+  { id: 'evening', title: 'datePlanning.durationEvening', emoji: '🌆', desc: 'datePlanning.durationEveningDesc', excludeVibes: [], suggestTimes: ['evening', 'night'], suggestPrice: ['$$', '$$$', '$$$$'] },
+  { id: 'adventure', title: 'datePlanning.durationAdventure', emoji: '🗺️', desc: 'datePlanning.durationAdventureDesc', excludeVibes: [], suggestTimes: ['morning', 'lunch', 'afternoon', 'evening'], suggestPrice: ['$', '$$', '$$$'] },
 ];
 
 export const allVibes: Preference[] = [
-  { id: 'romantic', name: 'Romantisch', emoji: '💕' },
-  { id: 'casual', name: 'Casual', emoji: '😊' },
-  { id: 'outdoor', name: 'Outdoor', emoji: '🌳' },
-  { id: 'upscale', name: 'Upscale', emoji: '✨' },
-  { id: 'lively', name: 'Lively', emoji: '🎉' },
-  { id: 'cozy', name: 'Gemütlich', emoji: '🕯️' },
+  { id: 'romantic', name: 'datePlanning.vibeRomantic', emoji: '💕' },
+  { id: 'casual', name: 'datePlanning.vibeCasual', emoji: '😊' },
+  { id: 'outdoor', name: 'datePlanning.vibeOutdoor', emoji: '🌳' },
+  { id: 'upscale', name: 'datePlanning.vibeUpscale', emoji: '✨' },
+  { id: 'lively', name: 'datePlanning.vibeLively', emoji: '🎉' },
+  { id: 'cozy', name: 'datePlanning.vibeCozy', emoji: '🕯️' },
 ];
 
 export const priceRanges: Preference[] = [
-  { id: '$', name: 'Budget', emoji: '💰' },
-  { id: '$$', name: 'Moderate', emoji: '💳' },
-  { id: '$$$', name: 'Gehoben', emoji: '💎' },
-  { id: '$$$$', name: 'Luxus', emoji: '👑' },
+  { id: '$', name: 'datePlanning.priceBudget', emoji: '💰' },
+  { id: '$$', name: 'datePlanning.priceModerate', emoji: '💳' },
+  { id: '$$$', name: 'datePlanning.priceUpscale', emoji: '💎' },
+  { id: '$$$$', name: 'datePlanning.priceLuxury', emoji: '👑' },
 ];
 
 export const timePreferences: Preference[] = [
-  { id: 'morning', name: 'Morgens', emoji: '🌅' },
-  { id: 'lunch', name: 'Mittag', emoji: '☀️' },
-  { id: 'afternoon', name: 'Nachmittag', emoji: '🌤️' },
-  { id: 'evening', name: 'Abend', emoji: '🌆' },
-  { id: 'night', name: 'Nacht', emoji: '🌙' },
+  { id: 'morning', name: 'datePlanning.timeMorning', emoji: '🌅' },
+  { id: 'lunch', name: 'datePlanning.timeLunch', emoji: '☀️' },
+  { id: 'afternoon', name: 'datePlanning.timeAfternoon', emoji: '🌤️' },
+  { id: 'evening', name: 'datePlanning.timeEvening', emoji: '🌆' },
+  { id: 'night', name: 'datePlanning.timeNight', emoji: '🌙' },
 ];
 
 export const dietaryRequirements: Preference[] = [
-  { id: 'vegetarian', name: 'Vegetarisch', emoji: '🥬' },
-  { id: 'vegan', name: 'Vegan', emoji: '🌱' },
-  { id: 'gluten-free', name: 'Glutenfrei', emoji: '🚫' },
-  { id: 'dairy-free', name: 'Laktosefrei', emoji: '🥛' },
-  { id: 'halal', name: 'Halal', emoji: '☪️' },
-  { id: 'kosher', name: 'Koscher', emoji: '✡️' },
+  { id: 'vegetarian', name: 'preferences.dietary_vegetarian', emoji: '🥬' },
+  { id: 'vegan', name: 'preferences.dietary_vegan', emoji: '🌱' },
+  { id: 'gluten-free', name: 'preferences.dietary_gluten_free', emoji: '🚫' },
+  { id: 'dairy-free', name: 'preferences.dietary_dairy_free', emoji: '🥛' },
+  { id: 'halal', name: 'preferences.dietary_halal', emoji: '☪️' },
+  { id: 'kosher', name: 'preferences.dietary_kosher', emoji: '✡️' },
 ];
 
 export const quickStartTemplates: QuickStartTemplate[] = [
-  { id: 'romantic-dinner', title: 'Romantic Dinner', emoji: '💕', cuisines: ['Italian', 'French'], vibes: ['romantic', 'upscale'], priceRange: ['$$$', '$$$$'], timePreferences: ['evening'], fitsDuration: ['evening', 'adventure'] },
-  { id: 'casual-brunch', title: 'Casual Brunch', emoji: '☕', cuisines: ['American', 'Mediterranean'], vibes: ['casual', 'cozy'], priceRange: ['$', '$$'], timePreferences: ['morning', 'lunch'], fitsDuration: ['quick', 'relaxed', 'adventure'] },
-  { id: 'trendy-cocktail', title: 'Cocktail Bar', emoji: '🍸', cuisines: ['American'], vibes: ['lively', 'upscale'], priceRange: ['$$', '$$$'], timePreferences: ['evening', 'night'], fitsDuration: ['evening'] },
-  { id: 'coffee-walk', title: 'Coffee & Walk', emoji: '☕🚶', cuisines: ['American', 'Italian'], vibes: ['casual', 'outdoor'], priceRange: ['$'], timePreferences: ['morning', 'afternoon'], fitsDuration: ['quick'] },
+  { id: 'romantic-dinner', title: 'datePlanning.templateRomanticDinner', emoji: '💕', cuisines: ['Italian', 'French'], vibes: ['romantic', 'upscale'], priceRange: ['$$$', '$$$$'], timePreferences: ['evening'], fitsDuration: ['evening', 'adventure'] },
+  { id: 'casual-brunch', title: 'datePlanning.templateCasualBrunch', emoji: '☕', cuisines: ['American', 'Mediterranean'], vibes: ['casual', 'cozy'], priceRange: ['$', '$$'], timePreferences: ['morning', 'lunch'], fitsDuration: ['quick', 'relaxed', 'adventure'] },
+  { id: 'trendy-cocktail', title: 'datePlanning.templateCocktailBar', emoji: '🍸', cuisines: ['American'], vibes: ['lively', 'upscale'], priceRange: ['$$', '$$$'], timePreferences: ['evening', 'night'], fitsDuration: ['evening'] },
+  { id: 'coffee-walk', title: 'datePlanning.templateCoffeeWalk', emoji: '☕🚶', cuisines: ['American', 'Italian'], vibes: ['casual', 'outdoor'], priceRange: ['$'], timePreferences: ['morning', 'afternoon'], fitsDuration: ['quick'] },
 ];
 
 export const emojiMap: Record<string, string> = {
@@ -153,9 +153,10 @@ export const occasionOptions: OccasionOption[] = [
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-export const summaryText = (items: string[], all: Preference[]) => {
-  if (!items.length) return 'Keine Auswahl';
-  const mapped = items.map(id => all.find(x => x.id === id)).filter(Boolean).map(x => `${x!.emoji} ${x!.name}`);
+export const summaryText = (items: string[], all: Preference[], tFn?: (key: string) => string) => {
+  const translate = tFn || ((k: string) => k);
+  if (!items.length) return translate('datePlanning.noSelection');
+  const mapped = items.map(id => all.find(x => x.id === id)).filter(Boolean).map(x => `${x!.emoji} ${translate(x!.name)}`);
   return mapped.length <= 2 ? mapped.join(', ') : `${mapped.slice(0, 2).join(', ')} +${mapped.length - 2}`;
 };
 
