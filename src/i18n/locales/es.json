@@ -242,7 +242,13 @@
     "startConversation": "Iniciando conversación con {{name}}",
     "message": "Mensaje",
     "mutualFriends": "{{count}} amigos en común",
-    "availableForDates": "Disponible para citas"
+    "availableForDates": "Disponible para citas",
+    "inviteMessage": "¡Hey! Uso Dzeng para ideas geniales de citas. Pruébalo: {{link}}",
+    "inviteEmailSubject": "¡Únete a Dzeng!",
+    "linkCopied": "¡Enlace copiado!",
+    "copyLink": "Copiar enlace",
+    "copied": "¡Copiado!",
+    "shareInvite": "Compartir invitación"
   },
   "friends": {
     "inviteFriends": "Invitar Amigos",

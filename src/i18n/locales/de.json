@@ -229,7 +229,13 @@
     "startConversation": "Gespräch mit {{name}} starten",
     "message": "Nachricht",
     "mutualFriends": "{{count}} gemeinsame Freunde",
-    "availableForDates": "Verfügbar für Dates"
+    "availableForDates": "Verfügbar für Dates",
+    "inviteMessage": "Hey! Ich nutze Dzeng für coole Date-Ideen. Probier es aus: {{link}}",
+    "inviteEmailSubject": "Komm zu Dzeng!",
+    "linkCopied": "Link kopiert!",
+    "copyLink": "Link kopieren",
+    "copied": "Kopiert!",
+    "shareInvite": "Einladung teilen"
   },
   "friends": {
     "inviteFriends": "Freunde einladen",
