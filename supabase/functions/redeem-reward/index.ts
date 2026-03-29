@@ -160,17 +160,12 @@ serve(async (req) => {
         );
       }
 
-      // Deduct points
+      // Deduct points but keep level (level reflects highest achievement, not current balance)
       const newTotal = userPoints.total_points - pointsCost;
-      const thresholds = [0, 150, 500, 1000, 2000, 3500, 5500];
-      let newLevel = 1;
-      for (let i = thresholds.length - 1; i >= 0; i--) {
-        if (newTotal >= thresholds[i]) { newLevel = i + 1; break; }
-      }
 
       await adminClient
         .from("user_points")
-        .update({ total_points: newTotal, level: newLevel })
+        .update({ total_points: newTotal })
         .eq("user_id", user.id);
 
       // Create voucher redemption
@@ -231,18 +226,13 @@ serve(async (req) => {
       const baseDate = currentPremiumEnd > now ? currentPremiumEnd : now;
       const newPremiumUntil = new Date(baseDate.getTime() + 7 * 24 * 60 * 60 * 1000);
 
+      // Deduct points but keep level (level reflects highest achievement, not current balance)
       const newTotal = userPoints.total_points - PREMIUM_7_DAY_COST;
-      const thresholds = [0, 150, 500, 1000, 2000, 3500, 5500];
-      let newLevel = 1;
-      for (let i = thresholds.length - 1; i >= 0; i--) {
-        if (newTotal >= thresholds[i]) { newLevel = i + 1; break; }
-      }
 
       await adminClient
         .from("user_points")
         .update({
           total_points: newTotal,
-          level: newLevel,
           premium_until: newPremiumUntil.toISOString(),
         })
         .eq("user_id", user.id);
