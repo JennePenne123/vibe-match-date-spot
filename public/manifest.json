@@ -1,6 +1,6 @@
 {
-  "name": "VybePulse",
-  "short_name": "VybePulse",
+  "name": "Dzeng",
+  "short_name": "Dzeng",
   "description": "AI-powered date spot recommendations that learn your preferences",
   "start_url": "/",
   "display": "standalone",
