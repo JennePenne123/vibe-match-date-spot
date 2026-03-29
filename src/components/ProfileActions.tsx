@@ -65,7 +65,7 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
           <RotateCcw className="h-4 w-4" />
           Präferenzen neu setzen
         </Button>
-        <Button onClick={() => navigate('/home')} className="w-full bg-gradient-primary text-primary-foreground hover:opacity-90">{t('profile.findNewSpots')}</Button>
+        
         <Button onClick={onLogout} variant="outline" className="w-full text-destructive border-destructive/30 hover:bg-destructive/10">{t('common.signOut')}</Button>
       </div>
     </>
