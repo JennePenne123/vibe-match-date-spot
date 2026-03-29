@@ -10,8 +10,10 @@ import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail, Loa
 import { useToast } from '@/hooks/use-toast';
 import { useFriends } from '@/hooks/useFriends';
 import { getInitials } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const Friends = () => {
+  const { t } = useTranslation();
   const [isGenerating, setIsGenerating] = useState(false);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
