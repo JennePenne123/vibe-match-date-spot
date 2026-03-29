@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check, Sparkles, ThumbsUp, Leaf, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { DailyMood } from '@/pages/MoodCheckIn';
+import { type DailyMood, getTodayMood, storeMoodForToday } from '@/utils/moodStorage';
 
 interface MoodOption {
   id: DailyMood;
@@ -16,24 +16,8 @@ const moodOptions: MoodOption[] = [
   { id: 'me-time', icon: Leaf, label: 'Ruhig', desc: 'Entspannt & ruhig' },
 ];
 
-const MOOD_STORAGE_KEY = 'vybe-daily-mood';
-
-function getTodayMoodFromStorage(): DailyMood | null {
-  try {
-    const stored = localStorage.getItem(MOOD_STORAGE_KEY);
-    if (!stored) return null;
-    const parsed = JSON.parse(stored);
-    const today = new Date().toISOString().split('T')[0];
-    if (parsed.date === today) return parsed.mood as DailyMood;
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-function setTodayMoodInStorage(mood: DailyMood) {
-  const today = new Date().toISOString().split('T')[0];
-  localStorage.setItem(MOOD_STORAGE_KEY, JSON.stringify({ mood, date: today }));
+export function getTodayMoodFromStorage(): DailyMood | null {
+  return getTodayMood();
 }
 
 interface Props {
@@ -47,7 +31,7 @@ const MoodPicker: React.FC<Props> = ({ selectedMood, onSelectMood }) => {
       onSelectMood(null);
     } else {
       onSelectMood(mood);
-      setTodayMoodInStorage(mood);
+      storeMoodForToday(mood);
     }
   };
 

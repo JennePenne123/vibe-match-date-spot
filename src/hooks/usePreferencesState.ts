@@ -8,9 +8,9 @@ import {
   haveSame, type UserPreferences, type DatePreferences, type QuickStartTemplate,
   type DateOccasion,
 } from '@/components/date-planning/preferences/preferencesData';
-import type { DailyMood } from '@/pages/MoodCheckIn';
 import { getTodayMoodFromStorage } from '@/components/date-planning/preferences/MoodPicker';
 import { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
+import type { DailyMood } from '@/utils/moodStorage';
 
 interface UsePreferencesStateProps {
   sessionId: string;
