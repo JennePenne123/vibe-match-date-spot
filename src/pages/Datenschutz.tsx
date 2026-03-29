@@ -37,7 +37,7 @@ export default function Datenschutz() {
           <h2>3. Datenerfassung in dieser App</h2>
           <h3>Welche Daten werden erfasst?</h3>
           <p className="text-muted-foreground">
-            Bei der Nutzung von VybePulse werden folgende Daten verarbeitet:
+            Bei der Nutzung von Dzeng werden folgende Daten verarbeitet:
           </p>
           <ul className="text-muted-foreground">
             <li><strong>Account-Daten:</strong> E-Mail-Adresse, Name, Profilbild</li>
@@ -93,7 +93,7 @@ export default function Datenschutz() {
 
           <h2>6. KI-gestützte Verarbeitung</h2>
           <p className="text-muted-foreground">
-            VybePulse nutzt KI-Algorithmen zur Berechnung von Kompatibilitätswerten und Venue-Empfehlungen. Diese Verarbeitung erfolgt auf Basis Ihrer Präferenzen, Bewertungen und – sofern nicht deaktiviert – Ihrer impliziten Nutzungssignale. Die Berechnung erfolgt serverseitig in unserer eigenen Infrastruktur. Es werden keine personenbezogenen Daten an externe KI-Dienste übermittelt.
+            Dzeng nutzt KI-Algorithmen zur Berechnung von Kompatibilitätswerten und Venue-Empfehlungen. Diese Verarbeitung erfolgt auf Basis Ihrer Präferenzen, Bewertungen und – sofern nicht deaktiviert – Ihrer impliziten Nutzungssignale. Die Berechnung erfolgt serverseitig in unserer eigenen Infrastruktur. Es werden keine personenbezogenen Daten an externe KI-Dienste übermittelt.
           </p>
           <p className="text-muted-foreground">
             Die KI passt ihre Empfehlungen kontinuierlich auf Basis Ihres Feedbacks an (adaptive Gewichtung). Sie können die Lernhistorie in Ihrem Profil einsehen.
