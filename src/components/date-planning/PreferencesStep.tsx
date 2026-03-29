@@ -207,17 +207,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           </div>
         )}
 
-        {/* Submit */}
-        <div className="flex items-center gap-3 pt-2">
-          {onboardingPrefs && (
-            <Button onClick={() => state.setFlowState('confirm')} variant="outline" className="active:scale-[0.97] transition-transform">
-              Zurück
-            </Button>
-          )}
-          <Button onClick={submitPreferences} disabled={loading || !selectedDuration} className="flex-1 h-12 text-base font-semibold active:scale-[0.97] transition-transform">
-            {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</> : '🚀 Los geht\'s'}
-          </Button>
-        </div>
+        {/* Spacer for sticky button */}
+        <div className="h-16" />
       </div>
 
       {/* Collaborative: Waiting for partner */}
