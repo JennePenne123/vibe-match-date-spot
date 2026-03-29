@@ -207,17 +207,20 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           </div>
         )}
 
-        {/* Submit */}
-        <div className="flex items-center gap-3 pt-2">
-          {onboardingPrefs && (
-            <Button onClick={() => state.setFlowState('confirm')} variant="outline" className="active:scale-[0.97] transition-transform">
-              Zurück
-            </Button>
-          )}
-          <Button onClick={submitPreferences} disabled={loading || !selectedDuration} className="flex-1 h-12 text-base font-semibold active:scale-[0.97] transition-transform">
-            {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</> : '🚀 Los geht\'s'}
+        {/* Spacer for sticky button */}
+        <div className="h-16" />
+      </div>
+
+      {/* Sticky bottom button */}
+      <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/50 p-3 -mx-1 flex items-center gap-3 z-10">
+        {onboardingPrefs && (
+          <Button onClick={() => state.setFlowState('confirm')} variant="outline" className="active:scale-[0.97] transition-transform">
+            Zurück
           </Button>
-        </div>
+        )}
+        <Button onClick={submitPreferences} disabled={loading || !selectedDuration} className="flex-1 h-12 text-base font-semibold active:scale-[0.97] transition-transform">
+          {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Speichern...</> : '🚀 Los geht\'s'}
+        </Button>
       </div>
 
       {/* Collaborative: Waiting for partner */}
