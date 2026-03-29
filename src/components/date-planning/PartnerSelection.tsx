@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Toggle } from '@/components/ui/toggle';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Users, ArrowRight, Loader2, User, UsersIcon } from 'lucide-react';
+import { Users, ArrowRight, Loader2, User, UsersIcon, Mail, MessageCircle, Send, Copy, Check, UserPlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useReferral } from '@/hooks/useReferral';
+import { useToast } from '@/hooks/use-toast';
 
 interface Friend {
   id: string;
@@ -35,6 +38,11 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
   onDateModeChange,
   onContinue
 }) => {
+  const { t } = useTranslation();
+  const { referralLink, copyReferralLink } = useReferral();
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
+
   const handlePartnerToggle = (friendId: string, checked: boolean) => {
     if (checked) {
       onPartnerIdsChange([...selectedPartnerIds, friendId]);
@@ -43,13 +51,42 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
     }
   };
 
-  const maxGroupSize = 5; // max 5 friends + user = 6 total
+  const maxGroupSize = 5;
   
   const isValidSelection = dateMode === 'single' 
     ? selectedPartnerId 
     : selectedPartnerIds.length > 0 && selectedPartnerIds.length <= maxGroupSize;
 
   const selectedCount = selectedPartnerIds.length;
+
+  const inviteLink = referralLink || window.location.origin;
+  const inviteText = t('myFriends.inviteMessage', { link: inviteLink });
+
+  const handleInviteEmail = () => {
+    const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu Dzeng!'));
+    const body = encodeURIComponent(inviteText);
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+  };
+
+  const handleInviteWhatsApp = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(inviteText)}`, '_blank');
+  };
+
+  const handleInviteTelegram = () => {
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(inviteText)}`, '_blank');
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      const success = referralLink ? await copyReferralLink() : false;
+      if (!success) await navigator.clipboard.writeText(inviteLink);
+      setCopied(true);
+      toast({ title: t('myFriends.linkCopied') });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    }
+  };
 
   return (
     <Card variant="elegant" className="border-sage-200/40 dark:border-sage-800/30">
@@ -124,6 +161,32 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
             </div>
           </div>
         )}
+
+        {/* Invite friends section */}
+        <div className="border-t border-border/50 pt-4">
+          <div className="flex items-center gap-2 mb-3">
+            <UserPlus className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">{t('myFriends.inviteMore')}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="outline" size="sm" onClick={handleInviteEmail} className="gap-1.5 text-xs">
+              <Mail className="w-3.5 h-3.5" />
+              E-Mail
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleInviteWhatsApp} className="gap-1.5 text-xs text-green-600 border-green-200 hover:bg-green-50 dark:text-green-400 dark:border-green-800 dark:hover:bg-green-900/20">
+              <MessageCircle className="w-3.5 h-3.5" />
+              WhatsApp
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleInviteTelegram} className="gap-1.5 text-xs text-blue-500 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/20">
+              <Send className="w-3.5 h-3.5" />
+              Telegram
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleCopyLink} className="gap-1.5 text-xs">
+              {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? t('myFriends.copied') : t('myFriends.copyLink')}
+            </Button>
+          </div>
+        </div>
         
         <Button 
           onClick={onContinue}
