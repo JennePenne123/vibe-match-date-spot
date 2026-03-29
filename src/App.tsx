@@ -194,7 +194,7 @@ const App = () => (
                 <OfflineBanner />
                 <PushNotificationPrompt />
                 <AppUsageTracker />
-                <ErrorBoundary level="page" silent={true}>
+                <ErrorBoundary level="page">
                   <Routes>
                     {/* Public routes without layout */}
                     <Route path="/" element={<Landing />} />
