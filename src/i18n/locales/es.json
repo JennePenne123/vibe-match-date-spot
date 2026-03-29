@@ -100,7 +100,7 @@
     "neighborhood_oldtown":"Casco antiguo","neighborhood_oldtownDesc":"Cafés acogedores, bares de vino y encanto histórico",
     "neighborhood_uptown":"Zona alta","neighborhood_uptownDesc":"Alta cocina, lounges de cócteles y ambiente elegante",
     "accessibilityFeatures":"¿Qué funciones de accesibilidad necesitas?",
-    "saving":"Guardando...","findDates":"¡Invitar ahora!","skipStep":"Omitir este paso",
+    "saving":"Guardando...","findDates":"Invitar ahora","skipStep":"Omitir este paso",
     "prefsSaved":"¡Preferencias guardadas!","prefsSavedDesc":"Tus preferencias se han guardado correctamente.",
     "prefsError":"Error al guardar","prefsErrorDesc":"Por favor inténtalo más tarde.",
     "cuisine_italian":"Italiano","cuisine_japanese":"Japonés","cuisine_mexican":"Mexicano","cuisine_french":"Francés","cuisine_indian":"Indio","cuisine_mediterranean":"Mediterráneo","cuisine_american":"Americano","cuisine_thai":"Tailandés","cuisine_chinese":"Chino","cuisine_korean":"Coreano",
