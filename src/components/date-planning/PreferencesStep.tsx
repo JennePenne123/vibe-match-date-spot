@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Heart, Loader2, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import SafeComponent from '@/components/SafeComponent';
 
 import { usePreferencesState } from '@/hooks/usePreferencesState';
@@ -48,6 +49,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   } = props;
 
   const state = usePreferencesState(props);
+  const { t } = useTranslation();
 
   const {
     flowState, loading, hasSubmitted, onboardingPrefs, onboardingLoaded,
