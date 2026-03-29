@@ -106,8 +106,8 @@ const Friends = () => {
 
   const shareViaEmail = () => {
     const link = generateReferralLink();
-    const subject = "Join me on VybePulse - Find Amazing Date Ideas!";
-    const body = `Hey! I've been using VybePulse to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
+    const subject = "Join me on Dzeng - Find Amazing Date Ideas!";
+    const body = `Hey! I've been using Dzeng to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 
@@ -235,7 +235,7 @@ const Friends = () => {
                 <div className="text-center py-8">
                   <div className="text-4xl mb-4">👥</div>
                   <h3 className="text-foreground font-semibold mb-2">No friends found</h3>
-                  <p className="text-muted-foreground">Invite your friends to join VybePulse!</p>
+                  <p className="text-muted-foreground">Invite your friends to join Dzeng!</p>
                 </div>
 
                 {/* Referral Link Section */}
@@ -244,7 +244,7 @@ const Friends = () => {
                     <div className="bg-primary/10 rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                       <Share2 className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">Invite Friends to VybePulse</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Invite Friends to Dzeng</h3>
                     <p className="text-sm text-muted-foreground">Share your referral link and discover amazing dates together</p>
                   </div>
 
