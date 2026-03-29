@@ -153,9 +153,10 @@ export const occasionOptions: OccasionOption[] = [
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-export const summaryText = (items: string[], all: Preference[]) => {
-  if (!items.length) return 'Keine Auswahl';
-  const mapped = items.map(id => all.find(x => x.id === id)).filter(Boolean).map(x => `${x!.emoji} ${x!.name}`);
+export const summaryText = (items: string[], all: Preference[], tFn?: (key: string) => string) => {
+  const translate = tFn || ((k: string) => k);
+  if (!items.length) return translate('datePlanning.noSelection');
+  const mapped = items.map(id => all.find(x => x.id === id)).filter(Boolean).map(x => `${x!.emoji} ${translate(x!.name)}`);
   return mapped.length <= 2 ? mapped.join(', ') : `${mapped.slice(0, 2).join(', ')} +${mapped.length - 2}`;
 };
 
