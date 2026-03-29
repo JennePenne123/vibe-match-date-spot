@@ -6,7 +6,7 @@ import './index.css'
 // Polyfill requestIdleCallback for Safari
 const ric = typeof requestIdleCallback === 'function'
   ? requestIdleCallback
-  : (cb: () => void) => setTimeout(cb, 1);
+  : (cb: () => void, _opts?: any) => setTimeout(cb, 1);
 
 // Defer heavy monitoring init so React can mount first
 ric(
