@@ -164,7 +164,19 @@
     "referralProgram": "Referral Program",
     "friendsList": "My Friends",
     "accountSettings": "Settings",
-    "addFriends": "Find Friends"
+    "addFriends": "Find Friends",
+    "activity": {
+      "title": "My Activity",
+      "dateSent": "Date invitation sent",
+      "dateReceived": "Date invitation received",
+      "youInvited": "You invited someone",
+      "youWereInvited": "You were invited",
+      "ratedDate": "Date rated",
+      "newFriend": "New connection",
+      "connectionMade": "You found a new friend",
+      "noActivity": "No activity yet",
+      "startExploring": "Plan dates to see your activity here!"
+    }
   },
   "invitations": {
     "title": "Date Invitations"
