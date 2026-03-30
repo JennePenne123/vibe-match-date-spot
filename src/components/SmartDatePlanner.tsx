@@ -3,6 +3,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
 import { ErrorBoundaryWrapper } from '@/components/ErrorBoundary';
 
 import PlanTogether from '@/components/date-planning/PlanTogether';
