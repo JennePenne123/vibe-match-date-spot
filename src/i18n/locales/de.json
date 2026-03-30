@@ -940,6 +940,20 @@
     "whosJoining": "Wer kommt mit?",
     "inviteFriendsAdventure": "Lade Freunde zu deinem Date-Abenteuer ein",
     "inviteFriendsToDzeng": "Freunde zu Dzeng einladen",
-    "shareReferralDesc": "Teile deinen Empfehlungslink und entdeckt gemeinsam tolle Dates"
+    "shareReferralDesc": "Teile deinen Empfehlungslink und entdeckt gemeinsam tolle Dates",
+    "cuisineItalian": "Italienisch",
+    "cuisineJapanese": "Japanisch",
+    "cuisineMexican": "Mexikanisch",
+    "cuisineFrench": "Französisch",
+    "cuisineIndian": "Indisch",
+    "cuisineMediterranean": "Mediterran",
+    "cuisineAmerican": "Amerikanisch",
+    "cuisineThai": "Thai",
+    "cuisineChinese": "Chinesisch",
+    "cuisineKorean": "Koreanisch",
+    "confirmTitle": "Deine Vorlieben",
+    "confirmSubtitle": "Aus deinem Onboarding — übernehmen oder anpassen?",
+    "confirmKeep": "So übernehmen",
+    "confirmCustomize": "Heute anders"
   }
 }

@@ -70,16 +70,16 @@ export interface QuickStartTemplate {
 // ── Data ──────────────────────────────────────────────────────
 
 export const cuisines: Preference[] = [
-  { id: 'Italian', name: 'Italienisch', emoji: '🍝' },
-  { id: 'Japanese', name: 'Japanisch', emoji: '🍣' },
-  { id: 'Mexican', name: 'Mexikanisch', emoji: '🌮' },
-  { id: 'French', name: 'Französisch', emoji: '🥐' },
-  { id: 'Indian', name: 'Indisch', emoji: '🍛' },
-  { id: 'Mediterranean', name: 'Mediterran', emoji: '🫒' },
-  { id: 'American', name: 'Amerikanisch', emoji: '🍔' },
-  { id: 'Thai', name: 'Thai', emoji: '🍜' },
-  { id: 'Chinese', name: 'Chinesisch', emoji: '🥢' },
-  { id: 'Korean', name: 'Koreanisch', emoji: '🍲' },
+  { id: 'Italian', name: 'datePlanning.cuisineItalian', emoji: '🍝' },
+  { id: 'Japanese', name: 'datePlanning.cuisineJapanese', emoji: '🍣' },
+  { id: 'Mexican', name: 'datePlanning.cuisineMexican', emoji: '🌮' },
+  { id: 'French', name: 'datePlanning.cuisineFrench', emoji: '🥐' },
+  { id: 'Indian', name: 'datePlanning.cuisineIndian', emoji: '🍛' },
+  { id: 'Mediterranean', name: 'datePlanning.cuisineMediterranean', emoji: '🫒' },
+  { id: 'American', name: 'datePlanning.cuisineAmerican', emoji: '🍔' },
+  { id: 'Thai', name: 'datePlanning.cuisineThai', emoji: '🍜' },
+  { id: 'Chinese', name: 'datePlanning.cuisineChinese', emoji: '🥢' },
+  { id: 'Korean', name: 'datePlanning.cuisineKorean', emoji: '🍲' },
 ];
 
 export const durationModels: DurationModel[] = [
