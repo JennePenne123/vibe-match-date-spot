@@ -42,7 +42,7 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
     venueName && `📍 ${venueName}`,
     dateTime && `📅 ${dateTime}`,
     '',
-    'Geplant mit Dzeng – der smartesten Date-App! 💜',
+    'Geplant mit HiOutz – der smartesten Date-App! 💜',
     shareUrl
   ].filter(Boolean).join('\n');
 

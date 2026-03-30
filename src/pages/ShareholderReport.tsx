@@ -79,7 +79,7 @@ const techStack = ["React 18", "TypeScript", "Supabase", "Edge Functions", "Tail
 const ShareholderReport = () => {
   const handleDownloadPDF = async () => {
     toast.loading("Generating PDF...");
-    await exportToPDF("shareholder-report", "Dzeng-December-2024.pdf");
+    await exportToPDF("shareholder-report", "HiOutz-December-2024.pdf");
     toast.dismiss();
     toast.success("PDF downloaded successfully!");
   };
@@ -117,7 +117,7 @@ const ShareholderReport = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
-                  Dzeng
+                  HiOutz
                 </h1>
                 <p className="text-white/80 text-sm">AI-Powered Date Planning Platform</p>
               </div>

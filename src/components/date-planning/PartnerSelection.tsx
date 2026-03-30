@@ -63,7 +63,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
   const inviteText = t('myFriends.inviteMessage', { link: inviteLink });
 
   const handleInviteEmail = () => {
-    const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu Dzeng!'));
+    const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu HiOutz!'));
     const body = encodeURIComponent(inviteText);
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
   };

@@ -72,12 +72,12 @@ export default function ShareCard({ data }: ShareCardGeneratorProps) {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
 
-      {/* Dzeng branding top */}
+      {/* HiOutz branding top */}
       <div className="absolute top-5 left-5 flex items-center gap-2">
         <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
           <Sparkles className="w-4 h-4 text-white" />
         </div>
-        <span className="text-white/90 font-semibold text-sm tracking-wide">Dzeng</span>
+        <span className="text-white/90 font-semibold text-sm tracking-wide">HiOutz</span>
       </div>
 
       {/* Match score badge */}

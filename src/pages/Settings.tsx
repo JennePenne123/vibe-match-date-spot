@@ -409,7 +409,7 @@ const Settings = () => {
                     {t('settings.faq1Question', 'Wie funktioniert das AI-Matching?')}
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-muted-foreground">
-                    {t('settings.faq1Answer', 'Dzeng analysiert deine Präferenzen (Küche, Vibe, Preis, Zeiten) und vergleicht sie mit deinem Date-Partner. Je mehr ihr übereinstimmt, desto höher der Match-Score. Die AI lernt auch aus deinem Feedback und wird immer besser.')}
+                    {t('settings.faq1Answer', 'HiOutz analysiert deine Präferenzen (Küche, Vibe, Preis, Zeiten) und vergleicht sie mit deinem Date-Partner. Je mehr ihr übereinstimmt, desto höher der Match-Score. Die AI lernt auch aus deinem Feedback und wird immer besser.')}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="faq-2" className="border-border/50">
@@ -448,8 +448,8 @@ const Settings = () => {
                   variant="outline"
                   className="w-full border-border text-foreground hover:bg-accent/50"
                   onClick={() => {
-                    const subject = encodeURIComponent('Dzeng Support');
-                    const body = encodeURIComponent(`Hallo Dzeng-Team,\n\n[Beschreibe dein Anliegen hier]\n\n---\nUser-ID: ${user.id}\nApp-Version: 1.0\n`);
+                    const subject = encodeURIComponent('HiOutz Support');
+                    const body = encodeURIComponent(`Hallo HiOutz-Team,\n\n[Beschreibe dein Anliegen hier]\n\n---\nUser-ID: ${user.id}\nApp-Version: 1.0\n`);
                     window.open(`mailto:support@vybepulse.de?subject=${subject}&body=${body}`, '_blank');
                   }}
                 >

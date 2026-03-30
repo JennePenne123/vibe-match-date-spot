@@ -143,7 +143,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <div className="w-8 h-8 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow-primary/30">
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <h1 className="font-semibold text-foreground text-lg">Dzeng</h1>
+                <h1 className="font-semibold text-foreground text-lg">HiOutz</h1>
               </div>
             </div>
             <ThemeToggle />

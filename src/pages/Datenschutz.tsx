@@ -26,7 +26,7 @@ export default function Datenschutz() {
           <h2>1. Datenschutz auf einen Blick</h2>
           <p className="text-muted-foreground">
             Die folgenden Hinweise geben einen Überblick darüber, was mit Ihren personenbezogenen Daten passiert,
-            wenn Sie die App „Dzeng" (nachfolgend „App" oder „Dienst") nutzen. Verantwortlicher im Sinne der
+            wenn Sie die App „HiOutz" (nachfolgend „App" oder „Dienst") nutzen. Verantwortlicher im Sinne der
             Datenschutz-Grundverordnung (DSGVO) ist:
           </p>
           <p className="text-muted-foreground">
@@ -168,7 +168,7 @@ export default function Datenschutz() {
 
           <h2>6. KI-gestützte Verarbeitung und automatisierte Entscheidungsfindung</h2>
           <p className="text-muted-foreground">
-            Dzeng verwendet KI-Algorithmen zur Berechnung von:
+            HiOutz verwendet KI-Algorithmen zur Berechnung von:
           </p>
           <ul className="text-muted-foreground">
             <li>Venue-Matching-Scores und personalisierten Empfehlungen</li>
@@ -323,7 +323,7 @@ export default function Datenschutz() {
 
           <h2>13. Minderjährige</h2>
           <p className="text-muted-foreground">
-            Die Nutzung von Dzeng ist ab 16 Jahren gestattet (Art.&nbsp;8 DSGVO i.&nbsp;V.&nbsp;m. § 25 TDDDG).
+            Die Nutzung von HiOutz ist ab 16 Jahren gestattet (Art.&nbsp;8 DSGVO i.&nbsp;V.&nbsp;m. § 25 TDDDG).
             Personen unter 16 Jahren dürfen die App nur mit Einwilligung eines Erziehungsberechtigten nutzen.
           </p>
 
