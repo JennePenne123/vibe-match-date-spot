@@ -41,7 +41,7 @@ const MyFriends = () => {
 
   const handleInviteWhatsApp = () => {
     const text = encodeURIComponent(inviteText);
-    window.open(`https://wa.me/?text=${text}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleInviteTelegram = () => {
