@@ -266,9 +266,6 @@ const VenueDetail = () => {
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            <Button className="w-full h-12 bg-gradient-primary text-primary-foreground hover:opacity-90 font-semibold">
-              Make Reservation
-            </Button>
             <div className="grid grid-cols-2 gap-3">
               <Button 
                 variant="outline" 
