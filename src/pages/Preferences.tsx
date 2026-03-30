@@ -237,6 +237,7 @@ const Preferences = () => {
           if (data.home_latitude) setHomeLatitude(data.home_latitude);
           if (data.home_longitude) setHomeLongitude(data.home_longitude);
           if (data.home_address) setHomeAddress(data.home_address);
+          if ((data as any).max_distance) setMaxDistance((data as any).max_distance);
           if (data.preferred_cuisines) setSelectedCuisines(data.preferred_cuisines);
           if ((data as any).excluded_cuisines) setExcludedCuisines((data as any).excluded_cuisines);
           if (data.preferred_vibes) setSelectedVibes(data.preferred_vibes);
