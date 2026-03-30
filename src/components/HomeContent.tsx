@@ -75,7 +75,9 @@ const HomeContent: React.FC = () => {
     if (selectedPartnerId) { setShowPartnerSelection(false); setShowProposalCreation(true); }
   };
   const handleProposalSent = () => {
-    setShowProposalCreation(false); setSelectedPartnerId('');
+    console.log('[HomeContent] handleProposalSent called, resetting state');
+    setShowProposalCreation(false);
+    setSelectedPartnerId('');
     toast({ title: t('home.proposalSentTitle'), description: t('home.proposalSentDesc'), duration: 3000 });
   };
   const handleProposalAccepted = (sessionId: string) => {
