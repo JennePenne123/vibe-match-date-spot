@@ -21,6 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
 import { useHomeTipVenues } from '@/hooks/useHomeTipVenues';
 import { supabase } from '@/integrations/supabase/client';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 const QUOTES = [
   '„Das Leben ist zu kurz für schlechte Dates." ✨',
@@ -72,7 +73,10 @@ const HomeContent: React.FC = () => {
   const handleSoloPlanning = () => navigate('/preferences');
   const handleGroupPlanning = () => setShowPartnerSelection(true);
   const handlePartnerSelectionContinue = () => {
-    if (selectedPartnerId) { setShowPartnerSelection(false); setShowProposalCreation(true); }
+    if (selectedPartnerId) {
+      setShowPartnerSelection(false);
+      setShowProposalCreation(true);
+    }
   };
   const handleProposalSent = () => {
     setShowProposalCreation(false);
@@ -89,7 +93,9 @@ const HomeContent: React.FC = () => {
     setInvitationSentTrigger(prev => prev + 1);
   }, []);
   const handleBackToModeSelection = () => {
-    setShowPartnerSelection(false); setShowProposalCreation(false); setSelectedPartnerId('');
+    setShowPartnerSelection(false);
+    setShowProposalCreation(false);
+    setSelectedPartnerId('');
   };
 
   useEffect(() => {
@@ -107,12 +113,25 @@ const HomeContent: React.FC = () => {
     }
   }, [location.state, toast, navigate, handleInvitationSent]);
 
+  const proposalsSection = (
+    <ErrorBoundary
+      level="component"
+      fallback={
+        <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+          {t('proposals.noProposalsDesc', 'Date-Vorschläge konnten gerade nicht geladen werden.')}
+        </div>
+      }
+    >
+      <DateProposalsList onProposalAccepted={handleProposalAccepted} onInvitationSent={handleInvitationSent} key={invitationSentTrigger} />
+    </ErrorBoundary>
+  );
+
   // Sub-views for partner selection / proposal creation
   if (showProposalCreation && selectedPartnerId) {
     const selectedFriend = friends.find(f => f.id === selectedPartnerId);
     return (
       <main className="p-6">
-        <div className={isMobile ? "max-w-md mx-auto space-y-6" : "max-w-4xl mx-auto space-y-6"}>
+        <div className={isMobile ? 'max-w-md mx-auto space-y-6' : 'max-w-4xl mx-auto space-y-6'}>
           <DateProposalCreation recipientId={selectedPartnerId} recipientName={selectedFriend?.name || 'Friend'} onProposalSent={handleProposalSent} onBack={handleBackToModeSelection} />
         </div>
       </main>
@@ -122,7 +141,7 @@ const HomeContent: React.FC = () => {
   if (showPartnerSelection) {
     return (
       <main className="p-6">
-        <div className={isMobile ? "max-w-md mx-auto space-y-6" : "max-w-4xl mx-auto space-y-6"}>
+        <div className={isMobile ? 'max-w-md mx-auto space-y-6' : 'max-w-4xl mx-auto space-y-6'}>
           <div className="flex justify-start mb-4">
             <Button variant="outline" onClick={handleBackToModeSelection}>{t('home.backToStart')}</Button>
           </div>
@@ -134,7 +153,7 @@ const HomeContent: React.FC = () => {
 
   return (
     <main className="px-4 py-5 md:px-6 lg:px-8">
-      <div className={isMobile ? "max-w-md mx-auto space-y-5" : "max-w-7xl mx-auto space-y-6"}>
+      <div className={isMobile ? 'max-w-md mx-auto space-y-5' : 'max-w-7xl mx-auto space-y-6'}>
 
         {/* First-Use Nudge for Home */}
         <HomeNudge />
@@ -207,14 +226,14 @@ const HomeContent: React.FC = () => {
             {/* Upcoming Dates */}
             <UpcomingDatesCard key="upcoming-dates-v2" />
             {/* Proposals */}
-            <DateProposalsList onProposalAccepted={handleProposalAccepted} onInvitationSent={handleInvitationSent} key={invitationSentTrigger} />
+            {proposalsSection}
           </div>
         ) : (
           <>
             {/* Upcoming Dates — prominent */}
             <UpcomingDatesCard key="upcoming-dates-v2" />
             {/* Proposals */}
-            <DateProposalsList onProposalAccepted={handleProposalAccepted} onInvitationSent={handleInvitationSent} key={invitationSentTrigger} />
+            {proposalsSection}
           </>
         )}
 

@@ -10,7 +10,7 @@ import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useSessionManagement } from '@/hooks/useSessionManagement';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { useBreakpoint } from '@/hooks/use-mobile';
 
 interface DateProposalsListProps {
@@ -30,12 +30,29 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({ onProposalAccepte
 
   const refreshProposals = useCallback(async () => {
     if (!user?.id) return;
-    try { await getMyProposals(); } catch (error) { console.error('Failed to refresh proposals:', error); }
-  }, [user?.id]);
+    try {
+      await getMyProposals();
+    } catch (error) {
+      console.error('Failed to refresh proposals:', error);
+    }
+  }, [user?.id, getMyProposals]);
 
-  useEffect(() => { if (user?.id) { void refreshProposals(); } }, [user?.id]);
+  useEffect(() => {
+    if (user?.id) {
+      void refreshProposals();
+    }
+  }, [user?.id, refreshProposals]);
 
   const getFriendName = (userId: string) => friends.find(f => f.id === userId)?.name || 'Unknown User';
+
+  const formatProposalDate = (rawDate: string, pattern: string) => {
+    const parsedDate = new Date(rawDate);
+    if (!isValid(parsedDate)) {
+      console.warn('[DateProposalsList] Invalid proposal date:', rawDate);
+      return t('common.notAvailable', 'Nicht verfügbar');
+    }
+    return format(parsedDate, pattern);
+  };
 
   const handleAcceptProposal = async (proposal: DateProposal) => {
     const sessionId = await acceptProposal(proposal.id);
@@ -95,8 +112,8 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({ onProposalAccepte
           {proposal.proposer_id === user?.id ? `${t('proposals.to')} ${getFriendName(proposal.recipient_id)}` : `${t('proposals.from')} ${getFriendName(proposal.proposer_id)}`}
         </span>
       </div>
-      <div className="flex items-center gap-1.5"><Calendar className="h-4 w-4 flex-shrink-0" /><span>{format(new Date(proposal.proposed_date), 'MMM dd, yyyy')}</span></div>
-      <div className="flex items-center gap-1.5"><Clock className="h-4 w-4 flex-shrink-0" /><span>{format(new Date(proposal.proposed_date), 'HH:mm')}</span></div>
+      <div className="flex items-center gap-1.5"><Calendar className="h-4 w-4 flex-shrink-0" /><span>{formatProposalDate(proposal.proposed_date, 'MMM dd, yyyy')}</span></div>
+      <div className="flex items-center gap-1.5"><Clock className="h-4 w-4 flex-shrink-0" /><span>{formatProposalDate(proposal.proposed_date, 'HH:mm')}</span></div>
     </div>
   );
 
@@ -182,7 +199,7 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({ onProposalAccepte
                 <CardContent className="pt-0">
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1"><User className="h-4 w-4" />{proposal.proposer_id === user?.id ? `${t('proposals.to')} ${getFriendName(proposal.recipient_id)}` : `${t('proposals.from')} ${getFriendName(proposal.proposer_id)}`}</div>
-                    <div className="flex items-center gap-1"><Calendar className="h-4 w-4" />{format(new Date(proposal.proposed_date), 'MMM dd, yyyy')}</div>
+                    <div className="flex items-center gap-1"><Calendar className="h-4 w-4" />{formatProposalDate(proposal.proposed_date, 'MMM dd, yyyy')}</div>
                   </div>
                 </CardContent>
               </Card>

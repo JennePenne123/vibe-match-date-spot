@@ -3,6 +3,8 @@ import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
+const isDevelopment = import.meta.env.DEV;
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -91,7 +93,7 @@ class ErrorBoundary extends Component<Props, State> {
                   Go Home
                 </Button>
               </div>
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {isDevelopment && this.state.error && (
                 <details className="text-left mt-4 p-4 bg-destructive/10 rounded-md">
                   <summary className="cursor-pointer text-destructive font-medium">
                     Error Details (Development)
