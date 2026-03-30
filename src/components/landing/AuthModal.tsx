@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Loader2, Gift, Store } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { validateReferralCode, processReferralSignup } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
 import { hasMoodToday } from '@/utils/moodStorage';
@@ -53,6 +54,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
   const [error, setError] = useState('');
+  const [agbAccepted, setAgbAccepted] = useState(false);
+  const [datenschutzAccepted, setDatenschutzAccepted] = useState(false);
   
   const { signIn, signUp, signInWithGoogle, signInWithApple, user } = useAuth();
   const navigate = useNavigate();
@@ -206,6 +209,11 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
       return;
     }
 
+    if (!isLogin && (!agbAccepted || !datenschutzAccepted)) {
+      setError('Bitte akzeptiere die AGB und Datenschutzerklärung.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -281,6 +289,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     setReferralCode('');
     setReferralValid(null);
     setError('');
+    setAgbAccepted(false);
+    setDatenschutzAccepted(false);
     clearErrors();
   };
 
@@ -441,6 +451,44 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     {referralValid === false && referralCode.length >= 8 && (
                       <p className="text-sm text-destructive">Invalid referral code</p>
                     )}
+                  </div>
+                )}
+
+                {/* AGB & Datenschutz Checkboxes - Only for Signup */}
+                {!isLogin && (
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2">
+                      <Checkbox
+                        id="agb"
+                        checked={agbAccepted}
+                        onCheckedChange={(checked) => setAgbAccepted(checked === true)}
+                        disabled={loading || isOAuthLoading}
+                        className="mt-0.5"
+                      />
+                      <label htmlFor="agb" className="text-sm text-muted-foreground leading-tight cursor-pointer">
+                        Ich akzeptiere die{' '}
+                        <a href="/agb" target="_blank" className="text-primary underline hover:text-primary/80">
+                          Allgemeinen Geschäftsbedingungen
+                        </a>
+                        . *
+                      </label>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Checkbox
+                        id="datenschutz"
+                        checked={datenschutzAccepted}
+                        onCheckedChange={(checked) => setDatenschutzAccepted(checked === true)}
+                        disabled={loading || isOAuthLoading}
+                        className="mt-0.5"
+                      />
+                      <label htmlFor="datenschutz" className="text-sm text-muted-foreground leading-tight cursor-pointer">
+                        Ich habe die{' '}
+                        <a href="/datenschutz" target="_blank" className="text-primary underline hover:text-primary/80">
+                          Datenschutzerklärung
+                        </a>
+                        {' '}gelesen und akzeptiert. *
+                      </label>
+                    </div>
                   </div>
                 )}
 
