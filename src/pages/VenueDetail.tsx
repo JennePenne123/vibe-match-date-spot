@@ -71,7 +71,7 @@ const VenueDetail = () => {
   }
 
   // Convert to AppVenue format for UI
-  const appVenue = venueToAppVenue(sourceVenue);
+  const appVenue = venueToAppVenue(sourceVenue, appState.userLocation?.latitude, appState.userLocation?.longitude);
 
   const shareCardData: ShareCardData = {
     type: 'venue',

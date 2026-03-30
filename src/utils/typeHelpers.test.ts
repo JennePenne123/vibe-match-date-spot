@@ -108,20 +108,25 @@ describe('venueToAppVenue', () => {
     expect(result.openingHours).toEqual(['Mon-Sun: 9:00 AM - 10:00 PM']);
   });
 
-  it('adds distance property', () => {
+  it('returns undefined distance without user location', () => {
     const result = venueToAppVenue(mockVenue);
-    expect(result.distance).toBe('0.5 mi');
+    expect(result.distance).toBeUndefined();
   });
 
-  it('adds matchScore between 70-100', () => {
-    const result = venueToAppVenue(mockVenue);
-    expect(result.matchScore).toBeGreaterThanOrEqual(70);
-    expect(result.matchScore).toBeLessThanOrEqual(100);
+  it('calculates distance with user location', () => {
+    const venueWithCoords = { ...mockVenue, latitude: 52.52, longitude: 13.405 };
+    const result = venueToAppVenue(venueWithCoords, 52.51, 13.40);
+    expect(result.distance).toMatch(/\d+.*(?:m|km)/);
   });
 
-  it('adds isOpen boolean', () => {
+  it('returns undefined matchScore when not set', () => {
     const result = venueToAppVenue(mockVenue);
-    expect(typeof result.isOpen).toBe('boolean');
+    expect(result.matchScore).toBeUndefined();
+  });
+
+  it('returns undefined isOpen when not set', () => {
+    const result = venueToAppVenue(mockVenue);
+    expect(result.isOpen).toBeUndefined();
   });
 });
 
@@ -210,19 +215,19 @@ describe('getFallbackAvatar', () => {
 
 describe('getVenueDistance', () => {
   it('returns distance when present', () => {
-    expect(getVenueDistance({ distance: '1.5 mi' })).toBe('1.5 mi');
+    expect(getVenueDistance({ distance: '1.5 km' })).toBe('1.5 km');
   });
 
-  it('returns default for missing distance', () => {
-    expect(getVenueDistance({})).toBe('0.5 mi');
+  it('returns undefined for missing distance', () => {
+    expect(getVenueDistance({})).toBeUndefined();
   });
 
-  it('returns default for null venue', () => {
-    expect(getVenueDistance(null)).toBe('0.5 mi');
+  it('returns undefined for null venue', () => {
+    expect(getVenueDistance(null)).toBeUndefined();
   });
 
-  it('returns default for undefined venue', () => {
-    expect(getVenueDistance(undefined)).toBe('0.5 mi');
+  it('returns undefined for undefined venue', () => {
+    expect(getVenueDistance(undefined)).toBeUndefined();
   });
 });
 
@@ -231,21 +236,15 @@ describe('getVenueMatchScore', () => {
     expect(getVenueMatchScore({ matchScore: 85 })).toBe(85);
   });
 
-  it('returns random score 70-100 for missing matchScore', () => {
-    const result = getVenueMatchScore({});
-    expect(result).toBeGreaterThanOrEqual(70);
-    expect(result).toBeLessThanOrEqual(100);
+  it('returns undefined for missing matchScore', () => {
+    expect(getVenueMatchScore({})).toBeUndefined();
   });
 
-  it('returns random score 70-100 for null venue', () => {
-    const result = getVenueMatchScore(null);
-    expect(result).toBeGreaterThanOrEqual(70);
-    expect(result).toBeLessThanOrEqual(100);
+  it('returns undefined for null venue', () => {
+    expect(getVenueMatchScore(null)).toBeUndefined();
   });
 
-  it('returns random score 70-100 for undefined venue', () => {
-    const result = getVenueMatchScore(undefined);
-    expect(result).toBeGreaterThanOrEqual(70);
-    expect(result).toBeLessThanOrEqual(100);
+  it('returns undefined for undefined venue', () => {
+    expect(getVenueMatchScore(undefined)).toBeUndefined();
   });
 });
