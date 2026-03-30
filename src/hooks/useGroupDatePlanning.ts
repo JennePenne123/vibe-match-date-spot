@@ -286,37 +286,20 @@ export const useGroupDatePlanning = () => {
   };
 };
 
-/** Merge preferences from all group members by finding common ground */
+/** 
+ * Merge preferences from all group members using consensus + veto logic.
+ * - Dietary restrictions: union (ALL must be respected)
+ * - Excluded cuisines: union (ANY member's veto applies)
+ * - Cuisines/vibes: frequency-ranked, shared first
+ * - Numeric values: averaged
+ */
 function mergeGroupPreferences(allPrefs: any[]): any {
   if (!allPrefs.length) return {};
 
   const merged: any = {};
+  const n = allPrefs.length;
 
-  // Merge arrays by counting frequency and picking most popular
-  const arrayFields = ['cuisines', 'vibes', 'activities', 'price_range', 'times'];
-  for (const field of arrayFields) {
-    const counts: Record<string, number> = {};
-    for (const pref of allPrefs) {
-      const arr = pref?.[field] || [];
-      for (const item of arr) {
-        counts[item] = (counts[item] || 0) + 1;
-      }
-    }
-    // Sort by frequency, take top items
-    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    merged[field] = sorted.slice(0, 5).map(([item]) => item);
-  }
-
-  // Average numeric fields
-  const numericFields = ['budget', 'max_distance', 'duration'];
-  for (const field of numericFields) {
-    const values = allPrefs.map(p => p?.[field]).filter(v => v != null);
-    if (values.length) {
-      merged[field] = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
-    }
-  }
-
-  // Combine dietary restrictions (union)
+  // ── Dietary: union (respect ALL restrictions — hard veto) ──
   const dietary = new Set<string>();
   for (const pref of allPrefs) {
     for (const d of pref?.dietary_restrictions || []) {
@@ -325,16 +308,75 @@ function mergeGroupPreferences(allPrefs: any[]): any {
   }
   merged.dietary_restrictions = [...dietary];
 
-  // Mood: pick most common
+  // ── Excluded cuisines: union (ANY member's exclusion = group veto) ──
+  const excluded = new Set<string>();
+  for (const pref of allPrefs) {
+    for (const c of pref?.excluded_cuisines || []) {
+      excluded.add(c.toLowerCase());
+    }
+  }
+  merged.excluded_cuisines = [...excluded];
+
+  // ── Array fields: frequency-ranked with consensus priority ──
+  const arrayFields = ['cuisines', 'vibes', 'activities', 'price_range', 'times'];
+  for (const field of arrayFields) {
+    const counts: Record<string, number> = {};
+    for (const pref of allPrefs) {
+      const arr = pref?.[field] || [];
+      for (const item of arr) {
+        const key = item.toLowerCase();
+        counts[key] = (counts[key] || 0) + 1;
+      }
+    }
+    // Sort by frequency (shared items first)
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    
+    // For cuisines: filter out vetoed ones
+    if (field === 'cuisines') {
+      merged[field] = sorted
+        .filter(([item]) => !excluded.has(item))
+        .slice(0, 6)
+        .map(([item]) => item);
+    } else {
+      merged[field] = sorted.slice(0, 5).map(([item]) => item);
+    }
+  }
+
+  // ── Numeric fields: averaged ──
+  const numericFields = ['budget', 'max_distance', 'duration'];
+  for (const field of numericFields) {
+    const values = allPrefs.map(p => p?.[field]).filter(v => v != null);
+    if (values.length) {
+      merged[field] = Math.round(values.reduce((a: number, b: number) => a + b, 0) / values.length);
+    }
+  }
+
+  // ── Mood: most common ──
   const moods: Record<string, number> = {};
   for (const pref of allPrefs) {
     if (pref?.mood) moods[pref.mood] = (moods[pref.mood] || 0) + 1;
   }
   merged.mood = Object.entries(moods).sort((a, b) => b[1] - a[1])[0]?.[0] || 'chill';
 
-  // Date/time: use first one set (creator's preference)
+  // ── Date/time: creator's preference (first set) ──
   merged.date = allPrefs.find(p => p?.date)?.date;
   merged.time = allPrefs.find(p => p?.time)?.time;
+
+  // ── Merge quality metadata ──
+  const sharedCuisines = Object.entries(
+    allPrefs.reduce((acc: Record<string, number>, p) => {
+      for (const c of p?.cuisines || []) { acc[c] = (acc[c] || 0) + 1; }
+      return acc;
+    }, {})
+  ).filter(([, count]) => (count as number) >= Math.ceil(n / 2)).map(([item]) => item);
+
+  merged._consensusMetadata = {
+    memberCount: n,
+    sharedCuisines,
+    vetoedCuisines: [...excluded],
+    dietaryUnion: [...dietary],
+    scoringStrategy: 'consensus_with_veto',
+  };
 
   return merged;
 }
