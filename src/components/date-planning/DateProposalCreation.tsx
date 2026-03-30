@@ -31,8 +31,7 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
   const { createProposal, loading } = useDateProposals();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     
     if (!title || !proposedDate || !proposedTime) {
       toast({
@@ -82,7 +81,15 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            className="space-y-4"
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              void handleSubmit();
+            }}
+          >
             <div>
               <Label htmlFor="title">{t('dateProposal.dateTitle')}</Label>
               <Input
@@ -139,9 +146,12 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
                 {t('common.back')}
               </Button>
               <Button
-                type="submit"
+                type="button"
                 disabled={loading}
                 className="flex-1"
+                onClick={() => {
+                  void handleSubmit();
+                }}
               >
                 {loading ? (
                   t('dateProposal.sending')
