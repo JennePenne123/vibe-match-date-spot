@@ -31,15 +31,9 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({ onProposalAccepte
   const refreshProposals = useCallback(async () => {
     if (!user?.id) return;
     try { await getMyProposals(); } catch (error) { console.error('Failed to refresh proposals:', error); }
-  }, [getMyProposals, user?.id]);
+  }, [user?.id]);
 
-  useEffect(() => { if (user?.id) refreshProposals(); }, [user?.id]);
-  useEffect(() => {
-    if (onInvitationSent) {
-      const timeoutId = setTimeout(() => { if (user?.id) refreshProposals(); }, 1000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [onInvitationSent, user?.id]);
+  useEffect(() => { if (user?.id) { void refreshProposals(); } }, [user?.id]);
 
   const getFriendName = (userId: string) => friends.find(f => f.id === userId)?.name || 'Unknown User';
 
