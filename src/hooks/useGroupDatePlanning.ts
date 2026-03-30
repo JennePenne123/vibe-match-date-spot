@@ -368,7 +368,7 @@ function mergeGroupPreferences(allPrefs: any[]): any {
       for (const c of p?.cuisines || []) { acc[c] = (acc[c] || 0) + 1; }
       return acc;
     }, {})
-  ).filter(([, count]) => count >= Math.ceil(n / 2)).map(([item]) => item);
+  ).filter(([, count]) => (count as number) >= Math.ceil(n / 2)).map(([item]) => item);
 
   merged._consensusMetadata = {
     memberCount: n,
