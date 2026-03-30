@@ -110,7 +110,7 @@ const Friends = () => {
     const link = generateReferralLink();
     const subject = "Join me on HiOutz - Find Amazing Date Ideas!";
     const body = `Hey! I've been using HiOutz to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
-    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const shareViaWhatsApp = () => {
@@ -122,7 +122,7 @@ const Friends = () => {
   const shareViaTelegram = () => {
     const link = generateReferralLink();
     const text = `Hey! Ich nutze HiOutz um tolle Date-Spots zu finden. Komm dazu!`;
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
   return (

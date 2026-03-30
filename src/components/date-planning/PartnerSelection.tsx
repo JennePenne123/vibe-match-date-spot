@@ -65,7 +65,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
   const handleInviteEmail = () => {
     const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu HiOutz!'));
     const body = encodeURIComponent(inviteText);
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 
   const handleInviteWhatsApp = () => {
@@ -73,7 +73,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
   };
 
   const handleInviteTelegram = () => {
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(inviteText)}`, '_blank');
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(inviteText)}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleCopyLink = async () => {

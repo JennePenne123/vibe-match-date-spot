@@ -53,7 +53,7 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
 
   const handleTelegramShare = () => {
     const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-    window.open(tgUrl, '_blank');
+    window.open(tgUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleNativeShare = async () => {
