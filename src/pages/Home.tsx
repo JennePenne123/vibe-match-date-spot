@@ -70,7 +70,9 @@ const Home: React.FC = () => {
             firstName={firstName} 
           />
         )}
-        <HomeContent />
+        <ErrorBoundary level="page">
+          <HomeContent />
+        </ErrorBoundary>
       </div>
     </div>
   );
