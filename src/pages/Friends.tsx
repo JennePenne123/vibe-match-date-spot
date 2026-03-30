@@ -116,7 +116,7 @@ const Friends = () => {
   const shareViaWhatsApp = () => {
     const link = generateReferralLink();
     const text = `Hey! Ich nutze HiOutz um tolle Date-Spots zu finden. Komm dazu: ${link}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
   const shareViaTelegram = () => {
