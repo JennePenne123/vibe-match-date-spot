@@ -932,6 +932,20 @@
     "whosJoining": "¿Quién se une?",
     "inviteFriendsAdventure": "Invita amigos a tu aventura",
     "inviteFriendsToDzeng": "Invitar Amigos a Dzeng",
-    "shareReferralDesc": "Comparte tu enlace de referencia y descubran citas juntos"
+    "shareReferralDesc": "Comparte tu enlace de referencia y descubran citas juntos",
+    "cuisineItalian": "Italiana",
+    "cuisineJapanese": "Japonesa",
+    "cuisineMexican": "Mexicana",
+    "cuisineFrench": "Francesa",
+    "cuisineIndian": "India",
+    "cuisineMediterranean": "Mediterránea",
+    "cuisineAmerican": "Americana",
+    "cuisineThai": "Tailandesa",
+    "cuisineChinese": "China",
+    "cuisineKorean": "Coreana",
+    "confirmTitle": "Tus preferencias",
+    "confirmSubtitle": "De tu registro — ¿mantener o personalizar?",
+    "confirmKeep": "Mantener así",
+    "confirmCustomize": "Personalizar hoy"
   }
 }

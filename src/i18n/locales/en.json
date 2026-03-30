@@ -940,6 +940,20 @@
     "whosJoining": "Who's joining you?",
     "inviteFriendsAdventure": "Invite friends to join your date adventure",
     "inviteFriendsToDzeng": "Invite Friends to Dzeng",
-    "shareReferralDesc": "Share your referral link and discover amazing dates together"
+    "shareReferralDesc": "Share your referral link and discover amazing dates together",
+    "cuisineItalian": "Italian",
+    "cuisineJapanese": "Japanese",
+    "cuisineMexican": "Mexican",
+    "cuisineFrench": "French",
+    "cuisineIndian": "Indian",
+    "cuisineMediterranean": "Mediterranean",
+    "cuisineAmerican": "American",
+    "cuisineThai": "Thai",
+    "cuisineChinese": "Chinese",
+    "cuisineKorean": "Korean",
+    "confirmTitle": "Your Preferences",
+    "confirmSubtitle": "From your onboarding — keep or customize?",
+    "confirmKeep": "Keep these",
+    "confirmCustomize": "Customize today"
   }
 }
