@@ -257,7 +257,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                 )}
                 {effectivePreselectedFriend && dateMode !== 'group' && (
                   <div className="p-4 rounded-lg bg-muted/50">
-                    <h3 className="font-semibold text-foreground mb-2">Planning with</h3>
+                    <h3 className="font-semibold text-foreground mb-2">{t('datePlanning.planningWith')}</h3>
                     <p className="text-muted-foreground">{effectivePreselectedFriend.name}</p>
                   </div>
                 )}
