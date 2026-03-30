@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Slider } from '@/components/ui/slider';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -215,6 +216,7 @@ const Preferences = () => {
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
+  const [maxDistance, setMaxDistance] = useState<number>(10);
   const [isLocating, setIsLocating] = useState(false);
   const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
   const [locationError, setLocationError] = useState<string>('');
@@ -236,6 +238,7 @@ const Preferences = () => {
           if (data.home_latitude) setHomeLatitude(data.home_latitude);
           if (data.home_longitude) setHomeLongitude(data.home_longitude);
           if (data.home_address) setHomeAddress(data.home_address);
+          if ((data as any).max_distance) setMaxDistance((data as any).max_distance);
           if (data.preferred_cuisines) setSelectedCuisines(data.preferred_cuisines);
           if ((data as any).excluded_cuisines) setExcludedCuisines((data as any).excluded_cuisines);
           if (data.preferred_vibes) setSelectedVibes(data.preferred_vibes);
@@ -371,7 +374,7 @@ const Preferences = () => {
         const currentUserId = authData.user.id;
         const preferencePayload = {
           user_id: currentUserId,
-          home_latitude: homeLatitude, home_longitude: homeLongitude, home_address: homeAddress || null,
+          home_latitude: homeLatitude, home_longitude: homeLongitude, home_address: homeAddress || null, max_distance: maxDistance,
           preferred_cuisines: selectedCuisines.length > 0 ? selectedCuisines : null,
           excluded_cuisines: excludedCuisines.length > 0 ? excludedCuisines : null,
           preferred_vibes: selectedVibes.length > 0 ? selectedVibes : null,
@@ -624,6 +627,17 @@ const Preferences = () => {
                       <p className="text-xs text-destructive">{locationError}</p>
                     </div>
                   )}
+
+                  {/* Max distance slider */}
+                  <div className="pt-2 space-y-2">
+                    <p className="text-sm font-medium text-foreground">{t('preferences.maxDistance', 'Max. Entfernung')}</p>
+                    <Slider value={[maxDistance]} onValueChange={v => setMaxDistance(v[0])} min={1} max={20} step={1} className="w-full" />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>1 km</span>
+                      <span className="font-medium text-foreground">{maxDistance} km</span>
+                      <span>20 km</span>
+                    </div>
+                  </div>
                 </div>
               </AccordionSection>
 
