@@ -124,9 +124,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     if (!venue) {
       return (
         <div className="text-center p-6 text-destructive bg-destructive/10 rounded-lg">
-          <h3 className="font-semibold mb-2">Kein Venue ausgewählt</h3>
-          <p className="mb-4">Bitte geh zurück und wähle ein Venue.</p>
-          <Button onClick={() => setCurrentStep('plan-together')} variant="outline">Zurück zur Venue-Auswahl</Button>
+          <h3 className="font-semibold mb-2">{t('datePlanning.noVenueSelected')}</h3>
+          <p className="mb-4">{t('datePlanning.noVenueHint')}</p>
+          <Button onClick={() => setCurrentStep('plan-together')} variant="outline">{t('datePlanning.backToVenues')}</Button>
         </div>
       );
     }
