@@ -23,7 +23,7 @@ export const useDateProposals = () => {
   const [loading, setLoading] = useState(false);
   const [proposals, setProposals] = useState<DateProposal[]>([]);
 
-  const createProposal = async (
+  const createProposal = useCallback(async (
     recipientId: string,
     proposedDate: Date,
     title: string,
@@ -56,7 +56,7 @@ export const useDateProposals = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, handleError]);
 
   const updateProposalStatus = async (
     proposalId: string,
