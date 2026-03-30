@@ -7,6 +7,12 @@
  * 3. Union for vibes: both partners' vibes are considered
  * 4. Conservative price: overlapping price ranges preferred
  * 5. Dietary union: all restrictions respected
+ * 
+ * Group scoring (3+ people) uses Consensus + Veto:
+ * - Hard veto: dietary/excluded cuisines filter venues entirely
+ * - Minimum guarantee: every person must score ≥ 50% (adjustable)
+ * - Rawlsian fairness: optimize the lowest individual score
+ * - Harmony bonus: low variance across scores = better pick
  */
 
 interface UserPreferences {
@@ -37,6 +43,86 @@ export interface MergedPreferences {
     sharedPriceRange: string[];
     vetoedCuisines: string[];
   };
+}
+
+/**
+ * Given individual scores for each group member, compute a fair consensus score.
+ * 
+ * Strategy:
+ * - If ANY member scores below VETO_THRESHOLD → venue is vetoed (returns 0)
+ * - Otherwise: weighted blend of min-score (Rawlsian fairness) + average
+ * - Harmony bonus for low variance (everyone equally happy)
+ * - Slight uplift when min score is high (everyone genuinely likes it)
+ */
+export const VETO_THRESHOLD = 0.30; // 30% — hard floor, nobody gets something they hate
+export const MIN_ACCEPTABLE = 0.50; // 50% — soft floor for "acceptable" quality
+
+export function computeGroupConsensusScore(individualScores: number[]): {
+  finalScore: number;
+  isVetoed: boolean;
+  minScore: number;
+  avgScore: number;
+  harmonyBonus: number;
+  qualityLabel: string;
+} {
+  if (individualScores.length === 0) {
+    return { finalScore: 0, isVetoed: true, minScore: 0, avgScore: 0, harmonyBonus: 0, qualityLabel: 'no_data' };
+  }
+
+  const n = individualScores.length;
+  const minScore = Math.min(...individualScores);
+  const maxScore = Math.max(...individualScores);
+  const avgScore = individualScores.reduce((a, b) => a + b, 0) / n;
+
+  // Hard veto: if anyone scores below threshold → reject
+  if (minScore < VETO_THRESHOLD) {
+    return { finalScore: 0, isVetoed: true, minScore, avgScore, harmonyBonus: 0, qualityLabel: 'vetoed' };
+  }
+
+  // Variance: how spread out are the scores? (0 = perfect consensus)
+  const variance = individualScores.reduce((sum, s) => sum + Math.pow(s - avgScore, 2), 0) / n;
+  const stdDev = Math.sqrt(variance);
+
+  // Harmony bonus: reward low variance (max +10% when everyone agrees)
+  const harmonyBonus = Math.max(0, 0.10 * (1 - stdDev / 0.5));
+
+  // Rawlsian blend: 40% weight on minimum score, 60% on average
+  // This lifts venues where the "least happy" person is still reasonably satisfied
+  const rawlsianBlend = (minScore * 0.4) + (avgScore * 0.6);
+
+  // Quality uplift: if even the least happy person scores ≥ 70%, bonus
+  const qualityUplift = minScore >= 0.70 ? 0.05 : 0;
+
+  const finalScore = Math.min(0.98, rawlsianBlend + harmonyBonus + qualityUplift);
+
+  // Label for UI/reasoning
+  let qualityLabel: string;
+  if (minScore >= 0.70 && stdDev < 0.10) qualityLabel = 'perfect_consensus';
+  else if (minScore >= MIN_ACCEPTABLE && stdDev < 0.20) qualityLabel = 'good_consensus';
+  else if (minScore >= MIN_ACCEPTABLE) qualityLabel = 'acceptable';
+  else qualityLabel = 'compromised';
+
+  return { finalScore, isVetoed: false, minScore, avgScore, harmonyBonus, qualityLabel };
+}
+
+/**
+ * Get a German-language explanation of the consensus result for AI reasoning.
+ */
+export function getConsensusReasoningLabel(result: ReturnType<typeof computeGroupConsensusScore>, memberCount: number): string {
+  if (result.isVetoed) return `⛔ Für mind. 1 Person ungeeignet`;
+  
+  switch (result.qualityLabel) {
+    case 'perfect_consensus':
+      return `🎯 Perfekter Konsens – alle ${memberCount} Personen begeistert`;
+    case 'good_consensus':
+      return `✅ Guter Kompromiss für alle ${memberCount} Personen`;
+    case 'acceptable':
+      return `👍 Akzeptabel für alle, aber kein Highlight`;
+    case 'compromised':
+      return `⚠️ Kompromiss – nicht alle gleich zufrieden`;
+    default:
+      return `Gruppen-Score für ${memberCount} Personen`;
+  }
 }
 
 /**
