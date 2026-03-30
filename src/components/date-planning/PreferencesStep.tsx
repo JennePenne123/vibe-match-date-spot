@@ -120,6 +120,12 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
 
         {/* Quick Start + Sections — only after duration selected */}
+        {!selectedDuration && (
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-muted/50 border border-border/50">
+            <span className="text-sm">⏱️</span>
+            <p className="text-xs text-muted-foreground">{t('datePlanning.durationHint')}</p>
+          </div>
+        )}
         {selectedDuration && (
           <>
             <QuickStartTemplates
