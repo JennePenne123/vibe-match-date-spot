@@ -6,7 +6,7 @@ export { filterVenuesByPreferences, filterVenuesByCollaborativePreferences } fro
 export type { SessionPriorityWeights } from './preferenceFiltering';
 export { getUserLearnedWeights, getConfidenceBoost, applyWeight } from './learningIntegration';
 export { getCombinedContextScore } from './contextCombinationScoring';
-export { mergePartnerPreferences } from './collaborativeMerge';
+export { mergePartnerPreferences, mergeMultiplePreferences, computeGroupConsensusScore, getConsensusReasoningLabel, VETO_THRESHOLD, MIN_ACCEPTABLE } from './collaborativeMerge';
 export type { MergedPreferences } from './collaborativeMerge';
 export type { AIVenueRecommendation } from './recommendations';
 export type { DateOccasion } from './occasionScoring';
