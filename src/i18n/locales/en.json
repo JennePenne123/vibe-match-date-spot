@@ -954,6 +954,21 @@
     "confirmTitle": "Your Preferences",
     "confirmSubtitle": "From your onboarding — keep or customize?",
     "confirmKeep": "Keep these",
-    "confirmCustomize": "Customize today"
+    "confirmCustomize": "Customize today",
+    "stepPartner": "Partner",
+    "stepPreferences": "Preferences",
+    "stepVenues": "Venues",
+    "stepInvite": "Invite",
+    "stepOf": "Step {{current}} of {{total}}",
+    "headerTitle": "Plan Date",
+    "headerSubtitle": "AI-powered planning with shared preferences",
+    "startFromScratch": "Start over",
+    "planningWith": "Planning with",
+    "compatibility": "Compatibility",
+    "groupLabel": "Group",
+    "durationHint": "Choose a duration first to see all options",
+    "noVenueSelected": "No venue selected",
+    "noVenueHint": "Please go back and select a venue.",
+    "backToVenues": "Back to venue selection"
   }
 }

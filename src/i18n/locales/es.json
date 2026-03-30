@@ -946,6 +946,21 @@
     "confirmTitle": "Tus preferencias",
     "confirmSubtitle": "De tu registro — ¿mantener o personalizar?",
     "confirmKeep": "Mantener así",
-    "confirmCustomize": "Personalizar hoy"
+    "confirmCustomize": "Personalizar hoy",
+    "stepPartner": "Pareja",
+    "stepPreferences": "Preferencias",
+    "stepVenues": "Lugares",
+    "stepInvite": "Invitación",
+    "stepOf": "Paso {{current}} de {{total}}",
+    "headerTitle": "Planear cita",
+    "headerSubtitle": "Planificación con IA y preferencias compartidas",
+    "startFromScratch": "Empezar de nuevo",
+    "planningWith": "Planeando con",
+    "compatibility": "Compatibilidad",
+    "groupLabel": "Grupo",
+    "durationHint": "Elige primero la duración para ver todas las opciones",
+    "noVenueSelected": "Ningún lugar seleccionado",
+    "noVenueHint": "Por favor vuelve y selecciona un lugar.",
+    "backToVenues": "Volver a selección de lugares"
   }
 }
