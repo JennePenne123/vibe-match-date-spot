@@ -36,7 +36,7 @@ const MyFriends = () => {
   const handleInviteEmail = () => {
     const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu HiOutz!'));
     const body = encodeURIComponent(inviteText);
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 
   const handleInviteWhatsApp = () => {
@@ -46,7 +46,7 @@ const MyFriends = () => {
 
   const handleInviteTelegram = () => {
     const text = encodeURIComponent(inviteText);
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink || window.location.origin)}&text=${text}`, '_blank');
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink || window.location.origin)}&text=${text}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleCopyLink = async () => {
