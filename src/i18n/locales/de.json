@@ -954,6 +954,21 @@
     "confirmTitle": "Deine Vorlieben",
     "confirmSubtitle": "Aus deinem Onboarding — übernehmen oder anpassen?",
     "confirmKeep": "So übernehmen",
-    "confirmCustomize": "Heute anders"
+    "confirmCustomize": "Heute anders",
+    "stepPartner": "Partner",
+    "stepPreferences": "Vorlieben",
+    "stepVenues": "Venues",
+    "stepInvite": "Einladung",
+    "stepOf": "Schritt {{current}} von {{total}}",
+    "headerTitle": "Date planen",
+    "headerSubtitle": "KI-gestützte Planung mit gemeinsamen Vorlieben",
+    "startFromScratch": "Neu starten",
+    "planningWith": "Planung mit",
+    "compatibility": "Kompatibilität",
+    "groupLabel": "Gruppe",
+    "durationHint": "Wähle zuerst die Dauer, um alle Optionen zu sehen",
+    "noVenueSelected": "Kein Venue ausgewählt",
+    "noVenueHint": "Bitte geh zurück und wähle ein Venue.",
+    "backToVenues": "Zurück zur Venue-Auswahl"
   }
 }

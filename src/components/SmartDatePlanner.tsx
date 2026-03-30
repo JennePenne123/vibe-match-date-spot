@@ -3,6 +3,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
 import { ErrorBoundaryWrapper } from '@/components/ErrorBoundary';
 
 import PlanTogether from '@/components/date-planning/PlanTogether';
@@ -29,6 +30,7 @@ interface SmartDatePlannerProps {
 
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal, preselectedFriend = null }) => {
   const { isMobile, isDesktop } = useBreakpoint();
+  const { t } = useTranslation();
   const { friends: allFriends } = useFriends();
   const groupPlanning = useGroupDatePlanning();
 
@@ -122,9 +124,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     if (!venue) {
       return (
         <div className="text-center p-6 text-destructive bg-destructive/10 rounded-lg">
-          <h3 className="font-semibold mb-2">Kein Venue ausgewählt</h3>
-          <p className="mb-4">Bitte geh zurück und wähle ein Venue.</p>
-          <Button onClick={() => setCurrentStep('plan-together')} variant="outline">Zurück zur Venue-Auswahl</Button>
+          <h3 className="font-semibold mb-2">{t('datePlanning.noVenueSelected')}</h3>
+          <p className="mb-4">{t('datePlanning.noVenueHint')}</p>
+          <Button onClick={() => setCurrentStep('plan-together')} variant="outline">{t('datePlanning.backToVenues')}</Button>
         </div>
       );
     }
@@ -205,9 +207,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             <div className="space-y-6">
               {/* Back button */}
               <div className="flex justify-start">
-                <Button onClick={() => goBack(effectivePreselectedFriend, navigate)} variant="outline" size="sm" className="flex items-center gap-2">
+              <Button onClick={() => goBack(effectivePreselectedFriend, navigate)} variant="outline" size="sm" className="flex items-center gap-2">
                   <ArrowLeft className="w-4 h-4" />
-                  Zurück
+                  {t('common.back')}
                 </Button>
               </div>
 
@@ -255,13 +257,13 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                 )}
                 {effectivePreselectedFriend && dateMode !== 'group' && (
                   <div className="p-4 rounded-lg bg-muted/50">
-                    <h3 className="font-semibold text-foreground mb-2">Planning with</h3>
+                    <h3 className="font-semibold text-foreground mb-2">{t('datePlanning.planningWith')}</h3>
                     <p className="text-muted-foreground">{effectivePreselectedFriend.name}</p>
                   </div>
                 )}
                 {compatibilityScore && (
                   <div className="p-4 rounded-lg bg-muted/50">
-                    <h3 className="font-semibold text-foreground mb-2">Compatibility</h3>
+                    <h3 className="font-semibold text-foreground mb-2">{t('datePlanning.compatibility')}</h3>
                     <p className="text-2xl font-bold text-primary">
                       {typeof compatibilityScore === 'object' ? compatibilityScore?.overall_score : compatibilityScore}%
                     </p>
