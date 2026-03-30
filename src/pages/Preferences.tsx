@@ -626,6 +626,17 @@ const Preferences = () => {
                       <p className="text-xs text-destructive">{locationError}</p>
                     </div>
                   )}
+
+                  {/* Max distance slider */}
+                  <div className="pt-2 space-y-2">
+                    <p className="text-sm font-medium text-foreground">{t('preferences.maxDistance', 'Max. Entfernung')}</p>
+                    <Slider value={[maxDistance]} onValueChange={v => setMaxDistance(v[0])} min={1} max={20} step={1} className="w-full" />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>1 km</span>
+                      <span className="font-medium text-foreground">{maxDistance} km</span>
+                      <span>20 km</span>
+                    </div>
+                  </div>
                 </div>
               </AccordionSection>
 
