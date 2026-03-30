@@ -30,6 +30,7 @@ interface SmartDatePlannerProps {
 
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal, preselectedFriend = null }) => {
   const { isMobile, isDesktop } = useBreakpoint();
+  const { t } = useTranslation();
   const { friends: allFriends } = useFriends();
   const groupPlanning = useGroupDatePlanning();
 
