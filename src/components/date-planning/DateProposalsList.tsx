@@ -28,20 +28,14 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({ onProposalAccepte
   const [hiddenProposals, setHiddenProposals] = useState(new Set<string>());
   const { isMobile } = useBreakpoint();
 
-  const refreshProposals = useCallback(async () => {
-    if (!user?.id) return;
-    try {
-      await getMyProposals();
-    } catch (error) {
-      console.error('Failed to refresh proposals:', error);
-    }
-  }, [user?.id, getMyProposals]);
+  // Fetch proposals once on mount and when user changes — no unstable deps
+  const hasFetchedRef = React.useRef(false);
 
   useEffect(() => {
-    if (user?.id) {
-      void refreshProposals();
-    }
-  }, [user?.id, refreshProposals]);
+    if (!user?.id || hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+    getMyProposals().catch((err) => console.error('Failed to fetch proposals:', err));
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getFriendName = (userId: string) => friends.find(f => f.id === userId)?.name || 'Unknown User';
 
