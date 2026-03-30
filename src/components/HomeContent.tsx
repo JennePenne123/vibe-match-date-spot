@@ -111,6 +111,7 @@ const HomeContent: React.FC = () => {
   // Sub-views for partner selection / proposal creation
   if (showProposalCreation && selectedPartnerId) {
     const selectedFriend = friends.find(f => f.id === selectedPartnerId);
+    console.log('[HomeContent] Rendering DateProposalCreation for:', selectedPartnerId);
     return (
       <main className="p-6">
         <div className={isMobile ? "max-w-md mx-auto space-y-6" : "max-w-4xl mx-auto space-y-6"}>
