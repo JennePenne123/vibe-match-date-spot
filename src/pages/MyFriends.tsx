@@ -34,7 +34,7 @@ const MyFriends = () => {
   const inviteText = t('myFriends.inviteMessage', { link: referralLink || window.location.origin });
 
   const handleInviteEmail = () => {
-    const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu Dzeng!'));
+    const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu HiOutz!'));
     const body = encodeURIComponent(inviteText);
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
   };
@@ -71,7 +71,7 @@ const MyFriends = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Dzeng',
+          title: 'HiOutz',
           text: inviteText,
           url: referralLink || window.location.origin,
         });

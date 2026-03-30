@@ -25,7 +25,7 @@ export default function AGB() {
 
           <h2>§ 1 Geltungsbereich</h2>
           <p className="text-muted-foreground">
-            (1) Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der mobilen Anwendung „Dzeng"
+            (1) Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der mobilen Anwendung „HiOutz"
             (nachfolgend „App"), betrieben von VybePulse GmbH (i.&nbsp;Gr.), [Adresse] (nachfolgend „Anbieter").
           </p>
           <p className="text-muted-foreground">
@@ -38,7 +38,7 @@ export default function AGB() {
 
           <h2>§ 2 Leistungsbeschreibung</h2>
           <p className="text-muted-foreground">
-            (1) Dzeng ist eine KI-gestützte Date-Planning-Plattform, die Nutzern personalisierte Venue-Empfehlungen
+            (1) HiOutz ist eine KI-gestützte Date-Planning-Plattform, die Nutzern personalisierte Venue-Empfehlungen
             und gemeinsame Planungsfunktionen bietet.
           </p>
           <p className="text-muted-foreground">
@@ -75,7 +75,7 @@ export default function AGB() {
 
           <h2>§ 4 Kostenlose und Premium-Nutzung</h2>
           <p className="text-muted-foreground">
-            (1) Dzeng bietet eine kostenlose Basisversion sowie eine kostenpflichtige Premium-Mitgliedschaft
+            (1) HiOutz bietet eine kostenlose Basisversion sowie eine kostenpflichtige Premium-Mitgliedschaft
             mit erweiterten Funktionen.
           </p>
           <p className="text-muted-foreground">
@@ -111,7 +111,7 @@ export default function AGB() {
           <h2>§ 6 Voucher</h2>
           <p className="text-muted-foreground">
             (1) Voucher werden von Partner-Venues bereitgestellt und unterliegen den jeweiligen Bedingungen
-            des Partners. Dzeng agiert lediglich als Vermittler.
+            des Partners. HiOutz agiert lediglich als Vermittler.
           </p>
           <p className="text-muted-foreground">
             (2) Der Anbieter übernimmt keine Haftung für die Einlösung, Qualität oder Verfügbarkeit der

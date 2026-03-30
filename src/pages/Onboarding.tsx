@@ -400,7 +400,7 @@ function WelcomeScreen() {
       </div>
 
       <h1 className="text-2xl font-bold text-foreground mb-3">
-        Willkommen bei Dzeng
+        Willkommen bei HiOutz
       </h1>
 
       <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
