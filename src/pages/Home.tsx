@@ -3,6 +3,7 @@ import React from 'react';
 import HomeHeader from '@/components/HomeHeader';
 import HomeContent from '@/components/HomeContent';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { getUserName } from '@/utils/typeHelpers';
 import { safeFirstWord } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -69,7 +70,9 @@ const Home: React.FC = () => {
             firstName={firstName} 
           />
         )}
-        <HomeContent />
+        <ErrorBoundary level="page">
+          <HomeContent />
+        </ErrorBoundary>
       </div>
     </div>
   );

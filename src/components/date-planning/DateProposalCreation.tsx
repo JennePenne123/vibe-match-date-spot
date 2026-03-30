@@ -43,16 +43,25 @@ const DateProposalCreation: React.FC<DateProposalCreationProps> = ({
       return;
     }
 
-    const dateTime = new Date(`${proposedDate}T${proposedTime}`);
-    const proposal = await createProposal(recipientId, dateTime, title, message);
-    
-    if (proposal) {
+    try {
+      const dateTime = new Date(`${proposedDate}T${proposedTime}`);
+      const proposal = await createProposal(recipientId, dateTime, title, message);
+      
+      if (proposal) {
+        toast({
+          title: t('dateProposal.proposalSent'),
+          description: t('dateProposal.proposalSentTo', { name: recipientName }),
+          variant: "default"
+        });
+        onProposalSent();
+      }
+    } catch (error) {
+      console.error('[DateProposalCreation] Error sending proposal:', error);
       toast({
-        title: t('dateProposal.proposalSent'),
-        description: t('dateProposal.proposalSentTo', { name: recipientName }),
-        variant: "default"
+        title: 'Fehler',
+        description: 'Proposal konnte nicht gesendet werden. Bitte versuche es erneut.',
+        variant: "destructive"
       });
-      onProposalSent();
     }
   };
 

@@ -75,8 +75,9 @@ const HomeContent: React.FC = () => {
     if (selectedPartnerId) { setShowPartnerSelection(false); setShowProposalCreation(true); }
   };
   const handleProposalSent = () => {
-    setShowProposalCreation(false); setSelectedPartnerId('');
-    toast({ title: t('home.proposalSentTitle'), description: t('home.proposalSentDesc'), duration: 3000 });
+    setShowProposalCreation(false);
+    setSelectedPartnerId('');
+    toast({ title: t('home.proposalSentTitle', 'Vorschlag gesendet!'), description: t('home.proposalSentDesc', 'Dein Date-Vorschlag wurde erfolgreich gesendet.'), duration: 3000 });
   };
   const handleProposalAccepted = (sessionId: string) => {
     const params = new URLSearchParams({ sessionId, planningMode: 'collaborative', fromProposal: 'true' });
