@@ -119,15 +119,14 @@ describe('venueToAppVenue', () => {
     expect(result.distance).toMatch(/\d+.*(?:m|km)/);
   });
 
-  it('adds matchScore between 70-100', () => {
+  it('returns undefined matchScore when not set', () => {
     const result = venueToAppVenue(mockVenue);
-    expect(result.matchScore).toBeGreaterThanOrEqual(70);
-    expect(result.matchScore).toBeLessThanOrEqual(100);
+    expect(result.matchScore).toBeUndefined();
   });
 
-  it('adds isOpen boolean', () => {
+  it('returns undefined isOpen when not set', () => {
     const result = venueToAppVenue(mockVenue);
-    expect(typeof result.isOpen).toBe('boolean');
+    expect(result.isOpen).toBeUndefined();
   });
 });
 
@@ -237,21 +236,15 @@ describe('getVenueMatchScore', () => {
     expect(getVenueMatchScore({ matchScore: 85 })).toBe(85);
   });
 
-  it('returns random score 70-100 for missing matchScore', () => {
-    const result = getVenueMatchScore({});
-    expect(result).toBeGreaterThanOrEqual(70);
-    expect(result).toBeLessThanOrEqual(100);
+  it('returns undefined for missing matchScore', () => {
+    expect(getVenueMatchScore({})).toBeUndefined();
   });
 
-  it('returns random score 70-100 for null venue', () => {
-    const result = getVenueMatchScore(null);
-    expect(result).toBeGreaterThanOrEqual(70);
-    expect(result).toBeLessThanOrEqual(100);
+  it('returns undefined for null venue', () => {
+    expect(getVenueMatchScore(null)).toBeUndefined();
   });
 
-  it('returns random score 70-100 for undefined venue', () => {
-    const result = getVenueMatchScore(undefined);
-    expect(result).toBeGreaterThanOrEqual(70);
-    expect(result).toBeLessThanOrEqual(100);
+  it('returns undefined for undefined venue', () => {
+    expect(getVenueMatchScore(undefined)).toBeUndefined();
   });
 });
