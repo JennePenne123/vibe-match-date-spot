@@ -215,6 +215,7 @@ const Preferences = () => {
   const [homeAddress, setHomeAddress] = useState<string>('');
   const [homeLatitude, setHomeLatitude] = useState<number | null>(null);
   const [homeLongitude, setHomeLongitude] = useState<number | null>(null);
+  const [maxDistance, setMaxDistance] = useState<number>(10);
   const [isLocating, setIsLocating] = useState(false);
   const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
   const [locationError, setLocationError] = useState<string>('');
