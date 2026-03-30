@@ -9,8 +9,35 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { useAuth } from '@/contexts/AuthContext';
 import { useGroupDatePlanning, DateGroup } from '@/hooks/useGroupDatePlanning';
 import GroupChatPanel from '@/components/GroupChatPanel';
+import FairnessBadge from '@/components/group-date/FairnessBadge';
+import VetoFeedbackBanner from '@/components/group-date/VetoFeedbackBanner';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import type { FairnessLevel } from '@/components/group-date/FairnessBadge';
+
+/** Derive a fairness label from merged_preferences metadata */
+function getGroupFairnessLabel(group: DateGroup): FairnessLevel | null {
+  const meta = group.merged_preferences?._consensusMetadata;
+  if (!meta) return null;
+
+  const memberCount = meta.memberCount || group.max_members;
+  const sharedCuisines = meta.sharedCuisines?.length || 0;
+
+  // Simple heuristic based on available metadata
+  if (sharedCuisines >= 3) return 'perfect_consensus';
+  if (sharedCuisines >= 1) return 'good_consensus';
+  if (meta.vetoedCuisines?.length > 0) return 'acceptable';
+  return 'compromised';
+}
+
+function getVetoData(group: DateGroup) {
+  const meta = group.merged_preferences?._consensusMetadata;
+  if (!meta) return null;
+  return {
+    vetoedCuisines: meta.vetoedCuisines || [],
+    dietaryRestrictions: meta.dietaryUnion || [],
+  };
+}
 
 const GroupDates: React.FC = () => {
   const { t } = useTranslation();
@@ -36,6 +63,21 @@ const GroupDates: React.FC = () => {
     }
   };
 
+  // Aggregate veto info across all groups for a summary banner
+  const vetoData = groups.reduce(
+    (acc, g) => {
+      const vd = getVetoData(g);
+      if (vd) {
+        vd.vetoedCuisines.forEach((c: string) => acc.cuisines.add(c));
+        vd.dietaryRestrictions.forEach((d: string) => acc.dietary.add(d));
+      }
+      return acc;
+    },
+    { cuisines: new Set<string>(), dietary: new Set<string>() }
+  );
+  const totalVetoCuisines = vetoData.cuisines.size;
+  const totalDietary = vetoData.dietary.size;
+
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 pb-2">
@@ -48,6 +90,16 @@ const GroupDates: React.FC = () => {
             Neu
           </Button>
         </div>
+
+        {/* Veto Feedback Banner – shows when groups have active veto filters */}
+        {groups.length > 0 && (totalVetoCuisines > 0 || totalDietary > 0) && (
+          <VetoFeedbackBanner
+            vetoedCount={totalVetoCuisines}
+            vetoedCuisines={[...vetoData.cuisines]}
+            dietaryRestrictions={[...vetoData.dietary]}
+            className="mb-3"
+          />
+        )}
       </div>
 
       <ScrollArea className="flex-1">
@@ -74,6 +126,7 @@ const GroupDates: React.FC = () => {
           <div className="p-4 space-y-3">
             {groups.map(group => {
               const status = statusLabel(group.status);
+              const fairness = getGroupFairnessLabel(group);
               return (
                 <Card
                   key={group.id}
@@ -102,11 +155,15 @@ const GroupDates: React.FC = () => {
                           )}
                           <span>{formatDistanceToNow(new Date(group.created_at), { addSuffix: true })}</span>
                         </div>
-                        {group.group_compatibility_score > 0 && (
-                          <p className="text-xs text-primary mt-1">
-                            Gruppen-Kompatibilität: {Math.round(group.group_compatibility_score)}%
-                          </p>
-                        )}
+                        {/* Fairness Badge + Compatibility */}
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          {fairness && <FairnessBadge qualityLabel={fairness} />}
+                          {group.group_compatibility_score > 0 && (
+                            <span className="text-[10px] font-medium text-primary">
+                              {Math.round(group.group_compatibility_score)}% Kompatibilität
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex flex-col items-end gap-1.5 shrink-0">
                         <Badge variant={status.variant}>{status.label}</Badge>
