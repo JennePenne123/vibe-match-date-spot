@@ -38,11 +38,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
 
-  const concierge = (
+  const isHomePage = location.pathname === '/' || location.pathname === '/index' || location.pathname === '/home'
+
+  const concierge = isHomePage ? (
     <Suspense fallback={null}>
       <AIConcierge />
     </Suspense>
-  )
+  ) : null
 
 
   // Determine slide direction on route change
