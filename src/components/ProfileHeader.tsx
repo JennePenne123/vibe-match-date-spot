@@ -80,8 +80,7 @@ const ProfileHeader = ({
 
       <div className="relative z-10 px-4 pt-6 pb-8">
         {/* Top bar */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-xl font-bold text-foreground">{t('profile.title')}</h1>
+        <div className="flex items-center justify-end mb-8">
           <Button 
             onClick={onEditToggle} 
             variant="ghost" 
