@@ -58,7 +58,7 @@ export const useDateProposals = () => {
     }
   }, [user, handleError]);
 
-  const updateProposalStatus = async (
+  const updateProposalStatus = useCallback(async (
     proposalId: string,
     status: 'accepted' | 'declined'
   ): Promise<boolean> => {
@@ -82,13 +82,17 @@ export const useDateProposals = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, handleError]);
 
-  const getMyProposals = async (): Promise<DateProposal[]> => {
-    if (!user?.id) {
+  // Use a ref to prevent concurrent fetches
+  const fetchingRef = useRef(false);
+
+  const getMyProposals = useCallback(async (): Promise<DateProposal[]> => {
+    if (!user?.id || fetchingRef.current) {
       return [];
     }
 
+    fetchingRef.current = true;
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -106,8 +110,9 @@ export const useDateProposals = () => {
       return [];
     } finally {
       setLoading(false);
+      fetchingRef.current = false;
     }
-  };
+  }, [user?.id]);
 
   const cancelProposal = async (proposalId: string): Promise<boolean> => {
     const success = await updateProposalStatus(proposalId, 'declined');
