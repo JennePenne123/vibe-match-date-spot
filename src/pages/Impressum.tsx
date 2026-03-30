@@ -23,10 +23,10 @@ export default function Impressum() {
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <h2>Angaben gemäß § 5 DDG</h2>
           <p className="text-muted-foreground">
-            [Firmenname]<br />
+            VybePulse GmbH (i.&nbsp;Gr.)<br />
             [Straße und Hausnummer]<br />
-            [PLZ und Ort]<br />
-            [Land]
+            [PLZ] [Ort]<br />
+            Deutschland
           </p>
 
           <h3>Vertreten durch</h3>
@@ -35,7 +35,7 @@ export default function Impressum() {
           <h3>Kontakt</h3>
           <p className="text-muted-foreground">
             Telefon: [Telefonnummer]<br />
-            E-Mail: [E-Mail-Adresse]
+            E-Mail: kontakt@dzeng.app
           </p>
 
           <h3>Handelsregister</h3>
@@ -56,9 +56,42 @@ export default function Impressum() {
             [Adresse]
           </p>
 
+          <h3>EU-Streitschlichtung</h3>
+          <p className="text-muted-foreground">
+            Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{' '}
+            <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary">
+              ec.europa.eu/consumers/odr
+            </a>.<br />
+            Wir sind weder bereit noch verpflichtet, an Streitbeilegungsverfahren vor einer
+            Verbraucherschlichtungsstelle teilzunehmen.
+          </p>
+
+          <h3>Haftung für Inhalte</h3>
+          <p className="text-muted-foreground">
+            Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den
+            allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht
+            verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen
+            zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
+          </p>
+
+          <h3>Haftung für Links</h3>
+          <p className="text-muted-foreground">
+            Unsere App enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben.
+            Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der
+            verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.
+          </p>
+
+          <h3>Urheberrecht</h3>
+          <p className="text-muted-foreground">
+            Die durch den Anbieter erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen
+            Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb
+            der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors
+            bzw. Erstellers.
+          </p>
+
           <div className="mt-8 p-4 rounded-lg bg-muted/30 border border-border/50">
             <p className="text-xs text-muted-foreground italic">
-              Diese Seite enthält Platzhalter. Bitte ersetze die Angaben in eckigen Klammern durch die tatsächlichen Unternehmensdaten.
+              ⚠️ Platzhalter in eckigen Klammern müssen durch die tatsächlichen Unternehmensdaten ersetzt werden.
             </p>
           </div>
         </div>

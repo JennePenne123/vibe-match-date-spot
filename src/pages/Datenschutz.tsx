@@ -21,97 +21,325 @@ export default function Datenschutz() {
         </div>
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
+          <p className="text-muted-foreground text-xs">Stand: März 2026</p>
+
           <h2>1. Datenschutz auf einen Blick</h2>
-          <h3>Allgemeine Hinweise</h3>
           <p className="text-muted-foreground">
-            Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Anwendung nutzen.
+            Die folgenden Hinweise geben einen Überblick darüber, was mit Ihren personenbezogenen Daten passiert,
+            wenn Sie die App „Dzeng" (nachfolgend „App" oder „Dienst") nutzen. Verantwortlicher im Sinne der
+            Datenschutz-Grundverordnung (DSGVO) ist:
+          </p>
+          <p className="text-muted-foreground">
+            VybePulse GmbH (i.&nbsp;Gr.)<br />
+            [Straße und Hausnummer]<br />
+            [PLZ] [Ort], Deutschland<br />
+            E-Mail: datenschutz@dzeng.app
           </p>
 
-          <h2>2. Verantwortlicher</h2>
+          <h2>2. Rechtsgrundlagen der Verarbeitung</h2>
           <p className="text-muted-foreground">
-            [Firmenname]<br />
-            [Adresse]<br />
-            E-Mail: [E-Mail-Adresse]
-          </p>
-
-          <h2>3. Datenerfassung in dieser App</h2>
-          <h3>Welche Daten werden erfasst?</h3>
-          <p className="text-muted-foreground">
-            Bei der Nutzung von Dzeng werden folgende Daten verarbeitet:
+            Wir verarbeiten personenbezogene Daten nur auf Grundlage einer gültigen Rechtsgrundlage gemäß Art.&nbsp;6 Abs.&nbsp;1 DSGVO:
           </p>
           <ul className="text-muted-foreground">
-            <li><strong>Account-Daten:</strong> E-Mail-Adresse, Name, Profilbild</li>
-            <li><strong>Präferenzen:</strong> Bevorzugte Küchen, Vibes, Zeiten, Preisklassen, Ernährungseinschränkungen</li>
-            <li><strong>Standortdaten:</strong> Heimadresse (optional), Geolocation für Venue-Suche</li>
-            <li><strong>Nutzungsdaten:</strong> Date-Bewertungen, AI-Kompatibilitätswerte, Feedback</li>
-            <li><strong>Gamification:</strong> Punkte, Level, Badges, Streaks</li>
+            <li><strong>Einwilligung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO):</strong> z.&nbsp;B. Push-Benachrichtigungen, Standortzugriff.</li>
+            <li><strong>Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO):</strong> Bereitstellung des Dienstes, Verwaltung des Nutzerkontos, Abwicklung von Premium-Mitgliedschaften.</li>
+            <li><strong>Berechtigtes Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO):</strong> Fehlerbehebung, Sicherheit, Betrugsprävention, Verbesserung der KI-Empfehlungen.</li>
+            <li><strong>Rechtliche Verpflichtung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;c DSGVO):</strong> steuerliche und handelsrechtliche Aufbewahrungspflichten.</li>
           </ul>
 
-          <h3>Wie werden die Daten erfasst?</h3>
+          <h2>3. Datenerfassung beim Besuch und bei der Registrierung</h2>
+          <h3>3.1 Account-Daten</h3>
           <p className="text-muted-foreground">
-            Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen (z.B. bei der Registrierung oder beim Setzen von Präferenzen). Andere Daten werden automatisch beim Nutzen der App durch unsere IT-Systeme erfasst (z.B. technische Daten wie Browser, Betriebssystem).
-          </p>
-
-          <h2>4. Implizite Nutzungssignale</h2>
-          <p className="text-muted-foreground">
-            Um unsere KI-Empfehlungen zu verbessern, erfassen wir folgende implizite Verhaltensdaten:
+            Bei der Registrierung per E-Mail und Passwort erfassen wir:
           </p>
           <ul className="text-muted-foreground">
-            <li><strong>Verweildauer:</strong> Wie lange Sie sich eine Venue-Detailseite ansehen</li>
-            <li><strong>Scrolltiefe:</strong> Wie weit Sie auf einer Venue-Seite scrollen</li>
-            <li><strong>Wiederholte Besuche:</strong> Ob Sie dieselbe Venue mehrfach aufrufen</li>
-            <li><strong>Voucher-Interaktion:</strong> Ob Sie auf einen Voucher klicken (als Signal für Preissensitivität)</li>
-            <li><strong>Nutzungszeiten:</strong> Zu welcher Tageszeit Sie die App verwenden</li>
+            <li>E-Mail-Adresse</li>
+            <li>Selbstgewählter Anzeigename</li>
+            <li>Profilbild (optional)</li>
           </ul>
           <p className="text-muted-foreground">
-            Diese Signale werden pseudonymisiert Ihrem Benutzerkonto zugeordnet und ausschließlich zur Verbesserung der personalisierten Empfehlungen verwendet. Die Daten werden nicht an Dritte weitergegeben. Die Verarbeitung erfolgt auf Grundlage unseres berechtigten Interesses (Art. 6 Abs. 1 lit. f DSGVO).
-          </p>
-          <p className="text-muted-foreground">
-            <strong>Widerspruchsrecht:</strong> Sie können die Erfassung impliziter Signale jederzeit in den App-Einstellungen unter „Datenschutz & Tracking" deaktivieren. Bereits erfasste Daten werden bei Deaktivierung nicht gelöscht, aber nicht mehr für zukünftige Empfehlungen herangezogen.
+            Die Verarbeitung erfolgt zur Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).
           </p>
 
-          <h2>5. Externe Dienste</h2>
-          <h3>Supabase</h3>
+          <h3>3.2 Anmeldung über Google</h3>
           <p className="text-muted-foreground">
-            Wir nutzen Supabase für Authentifizierung, Datenbank und serverseitige Funktionen. Supabase verarbeitet Daten auf Servern in der EU.
+            Sie können sich mit Ihrem Google-Konto anmelden. Dabei wird ein OAuth-2.0-Verfahren durchgeführt.
+            Wir erhalten von Google folgende Daten:
+          </p>
+          <ul className="text-muted-foreground">
+            <li>Google-Benutzer-ID (Sub-Claim)</li>
+            <li>E-Mail-Adresse</li>
+            <li>Name und Profilbild</li>
+          </ul>
+          <p className="text-muted-foreground">
+            Rechtsgrundlage ist Ihre Einwilligung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO), die Sie durch Klick auf
+            „Mit Google anmelden" erteilen. Die Einwilligung kann jederzeit in den Google-Kontoeinstellungen
+            (
+            <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer" className="text-primary">
+              myaccount.google.com/permissions
+            </a>
+            ) widerrufen werden. Anbieter: Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland.
+            Datenschutzerklärung:{' '}
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary">
+              policies.google.com/privacy
+            </a>.
           </p>
 
-          <h3>OpenStreetMap / Overpass API</h3>
+          <h3>3.3 Anmeldung über Apple</h3>
           <p className="text-muted-foreground">
-            Für die Venue-Suche werden Standortdaten an die OpenStreetMap Overpass API übermittelt.
+            Sie können sich mit Ihrem Apple-Konto anmelden („Sign in with Apple"). Dabei wird ein OAuth-2.0-Verfahren
+            durchgeführt. Wir erhalten von Apple:
+          </p>
+          <ul className="text-muted-foreground">
+            <li>Apple-Benutzer-ID</li>
+            <li>E-Mail-Adresse (optional von Apple anonymisiert als Relay-Adresse bereitgestellt)</li>
+            <li>Name (nur beim erstmaligen Login übertragen)</li>
+          </ul>
+          <p className="text-muted-foreground">
+            Rechtsgrundlage ist Ihre Einwilligung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO). Apple ermöglicht es,
+            die eigene E-Mail-Adresse zu verbergen. In diesem Fall wird eine private Relay-Adresse
+            von Apple verwendet. Die Einwilligung kann jederzeit in den Apple-ID-Einstellungen unter
+            „Mit Apple anmelden" widerrufen werden. Anbieter: Apple Distribution International Ltd.,
+            Hollyhill Industrial Estate, Cork, Irland.
+            Datenschutzerklärung:{' '}
+            <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer" className="text-primary">
+              apple.com/legal/privacy
+            </a>.
           </p>
 
-          <h3>Foursquare / Radar</h3>
+          <h3>3.4 Passwort-Sicherheit</h3>
           <p className="text-muted-foreground">
-            Zur Anreicherung von Venue-Informationen (Fotos, Bewertungen, Kategorien) werden Suchanfragen an die Foursquare Places API und/oder Radar API weitergeleitet. Dabei wird Ihre ungefähre Suchposition übermittelt. Die Verarbeitung erfolgt auf Grundlage unseres berechtigten Interesses an der Bereitstellung relevanter Venue-Informationen.
+            Bei der Registrierung per E-Mail prüfen wir Ihr Passwort gegen die „Have I Been Pwned"-Datenbank
+            (HIBP-Check), um zu erkennen, ob es in bekannten Datenlecks vorkommt. Dabei wird ein partieller
+            SHA-1-Hash (k-Anonymity-Verfahren) an den HIBP-Dienst übermittelt – Ihr Klartext-Passwort wird
+            niemals übertragen.
           </p>
 
-          <h3>Sentry</h3>
+          <h2>4. Präferenzen und Nutzungsdaten</h2>
+          <h3>4.1 Explizite Präferenzen</h3>
           <p className="text-muted-foreground">
-            Zur Fehlererkennung und Leistungsüberwachung nutzen wir Sentry (Functional Software Inc.). Bei Fehlern werden technische Daten (Fehlermeldung, Stack-Trace, Browser, Betriebssystem) sowie eine anonymisierte Session-Aufzeichnung an Sentry-Server übermittelt. Texteingaben werden dabei maskiert und Medieninhalte blockiert. Die Verarbeitung erfolgt auf Grundlage unseres berechtigten Interesses an der Stabilität der Anwendung (Art. 6 Abs. 1 lit. f DSGVO).
+            Sie geben freiwillig Präferenzen an, um personalisierte Empfehlungen zu erhalten:
+          </p>
+          <ul className="text-muted-foreground">
+            <li>Bevorzugte Küchen, Vibes, Zeiten, Preisklassen</li>
+            <li>Ernährungseinschränkungen und Barrierefreiheitsbedürfnisse</li>
+            <li>Beziehungsziel und Persönlichkeitsdaten</li>
+            <li>Heimadresse / maximaler Suchradius</li>
+          </ul>
+          <p className="text-muted-foreground">
+            Rechtsgrundlage: Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).
           </p>
 
-          <h2>6. KI-gestützte Verarbeitung</h2>
+          <h3>4.2 Implizite Nutzungssignale</h3>
           <p className="text-muted-foreground">
-            Dzeng nutzt KI-Algorithmen zur Berechnung von Kompatibilitätswerten und Venue-Empfehlungen. Diese Verarbeitung erfolgt auf Basis Ihrer Präferenzen, Bewertungen und – sofern nicht deaktiviert – Ihrer impliziten Nutzungssignale. Die Berechnung erfolgt serverseitig in unserer eigenen Infrastruktur. Es werden keine personenbezogenen Daten an externe KI-Dienste übermittelt.
+            Zur Verbesserung der KI-Empfehlungen erfassen wir pseudonymisiert folgende Verhaltensdaten:
+          </p>
+          <ul className="text-muted-foreground">
+            <li>Verweildauer auf Venue-Detailseiten</li>
+            <li>Scrolltiefe</li>
+            <li>Wiederholte Besuche derselben Venue</li>
+            <li>Voucher-Interaktionen (Klick als Preissensitivitäts-Signal)</li>
+            <li>Nutzungszeiten (Tageszeit-Muster)</li>
+          </ul>
+          <p className="text-muted-foreground">
+            Rechtsgrundlage: Berechtigtes Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO) an der Verbesserung
+            der Empfehlungsqualität.
           </p>
           <p className="text-muted-foreground">
-            Die KI passt ihre Empfehlungen kontinuierlich auf Basis Ihres Feedbacks an (adaptive Gewichtung). Sie können die Lernhistorie in Ihrem Profil einsehen.
+            <strong>Widerspruchsrecht (Art.&nbsp;21 DSGVO):</strong> Sie können die Erfassung impliziter Signale
+            jederzeit in den App-Einstellungen unter „Datenschutz & Tracking" deaktivieren. Bereits erfasste Daten
+            werden nach Deaktivierung nicht mehr für zukünftige Empfehlungen herangezogen.
           </p>
 
-          <h2>7. Ihre Rechte</h2>
+          <h3>4.3 Gamification-Daten</h3>
           <p className="text-muted-foreground">
-            Sie haben jederzeit das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer Daten sowie das Recht auf Datenübertragbarkeit. Nutzen Sie dafür die Datenexport-Funktion in den App-Einstellungen oder kontaktieren Sie uns per E-Mail.
+            Punkte, Level, Badges, Streaks und Reward-Einlösungen werden gespeichert, um das Gamification-System
+            bereitzustellen (Rechtsgrundlage: Vertragserfüllung).
           </p>
 
-          <h2>8. Datenlöschung</h2>
+          <h2>5. Standortdaten</h2>
           <p className="text-muted-foreground">
-            Sie können Ihr Konto und alle damit verbundenen Daten jederzeit über die Einstellungen löschen. Eine GDPR-konforme Datenexport-Funktion steht ebenfalls zur Verfügung.
+            Die App kann Ihren aktuellen Standort per Geolocation-API Ihres Browsers/Geräts ermitteln, um nahegelegene
+            Venues anzuzeigen und Entfernungen zu berechnen. Die Standortfreigabe erfolgt ausschließlich nach Ihrer
+            ausdrücklichen Einwilligung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO) über den systemeigenen
+            Berechtigungsdialog. Sie können die Berechtigung jederzeit in Ihren Geräte- oder Browsereinstellungen
+            widerrufen.
+          </p>
+
+          <h2>6. KI-gestützte Verarbeitung und automatisierte Entscheidungsfindung</h2>
+          <p className="text-muted-foreground">
+            Dzeng verwendet KI-Algorithmen zur Berechnung von:
+          </p>
+          <ul className="text-muted-foreground">
+            <li>Venue-Matching-Scores und personalisierten Empfehlungen</li>
+            <li>Kompatibilitätswerten zwischen zwei Nutzern</li>
+            <li>Adaptiven Gewichtungen basierend auf Ihrem Feedback</li>
+          </ul>
+          <p className="text-muted-foreground">
+            Die Verarbeitung erfolgt serverseitig in unserer eigenen Infrastruktur (Supabase Edge Functions).
+            Es werden <strong>keine personenbezogenen Daten an externe KI-Dienste</strong> (z.&nbsp;B. OpenAI, Google AI)
+            übermittelt. Rechtsgrundlage: Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).
+          </p>
+          <p className="text-muted-foreground">
+            <strong>Kein Profiling im Sinne des Art.&nbsp;22 DSGVO:</strong> Die KI-Ergebnisse dienen ausschließlich
+            als Vorschläge und erzeugen keine rechtliche oder ähnlich erhebliche Wirkung. Sie treffen die finale
+            Entscheidung über Venue-Auswahl und Date-Planung stets selbst.
+          </p>
+          <p className="text-muted-foreground">
+            Sie können die Lernhistorie der KI jederzeit in Ihrem Profil einsehen und in den Einstellungen
+            zurücksetzen.
+          </p>
+
+          <h2>7. Externe Dienste und Auftragsverarbeiter</h2>
+          <table className="text-muted-foreground text-xs">
+            <thead>
+              <tr>
+                <th className="text-left pr-3">Dienst</th>
+                <th className="text-left pr-3">Anbieter</th>
+                <th className="text-left pr-3">Zweck</th>
+                <th className="text-left">Serverstandort</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="pr-3 py-1">Supabase</td>
+                <td className="pr-3 py-1">Supabase Inc., USA</td>
+                <td className="pr-3 py-1">Authentifizierung, Datenbank, Edge Functions</td>
+                <td className="py-1">EU (Frankfurt)</td>
+              </tr>
+              <tr>
+                <td className="pr-3 py-1">Sentry</td>
+                <td className="pr-3 py-1">Functional Software Inc., USA</td>
+                <td className="pr-3 py-1">Fehlererkennung, Performance-Monitoring</td>
+                <td className="py-1">EU</td>
+              </tr>
+              <tr>
+                <td className="pr-3 py-1">Google OAuth</td>
+                <td className="pr-3 py-1">Google Ireland Ltd., Irland</td>
+                <td className="pr-3 py-1">Social Login</td>
+                <td className="py-1">EU/USA</td>
+              </tr>
+              <tr>
+                <td className="pr-3 py-1">Apple Sign-In</td>
+                <td className="pr-3 py-1">Apple Distribution Intl. Ltd., Irland</td>
+                <td className="pr-3 py-1">Social Login</td>
+                <td className="py-1">EU/USA</td>
+              </tr>
+              <tr>
+                <td className="pr-3 py-1">OpenStreetMap / Overpass API</td>
+                <td className="pr-3 py-1">OpenStreetMap Foundation, UK</td>
+                <td className="pr-3 py-1">Venue-Suche, Kartendaten</td>
+                <td className="py-1">EU</td>
+              </tr>
+              <tr>
+                <td className="pr-3 py-1">Foursquare Places API</td>
+                <td className="pr-3 py-1">Foursquare Labs Inc., USA</td>
+                <td className="pr-3 py-1">Venue-Fotos, Bewertungen, Kategorien</td>
+                <td className="py-1">USA</td>
+              </tr>
+              <tr>
+                <td className="pr-3 py-1">Radar</td>
+                <td className="pr-3 py-1">Radar Labs Inc., USA</td>
+                <td className="pr-3 py-1">Venue-Daten</td>
+                <td className="py-1">USA</td>
+              </tr>
+              <tr>
+                <td className="pr-3 py-1">Open-Meteo</td>
+                <td className="pr-3 py-1">Open-Meteo, Schweiz</td>
+                <td className="pr-3 py-1">Wetterdaten für Empfehlungen</td>
+                <td className="py-1">EU</td>
+              </tr>
+            </tbody>
+          </table>
+          <p className="text-muted-foreground mt-3">
+            Soweit Daten an Empfänger in den USA übermittelt werden, erfolgt dies auf Grundlage des EU-US
+            Data Privacy Frameworks (Angemessenheitsbeschluss der EU-Kommission, Art.&nbsp;45 DSGVO) oder
+            auf Basis von Standardvertragsklauseln (Art.&nbsp;46 Abs.&nbsp;2 lit.&nbsp;c DSGVO).
+          </p>
+
+          <h3>7.1 Sentry (Fehlermonitoring)</h3>
+          <p className="text-muted-foreground">
+            Bei Fehlern werden technische Daten (Fehlermeldung, Stack-Trace, Browser, Betriebssystem) sowie eine
+            anonymisierte Session-Aufzeichnung übermittelt. Texteingaben werden dabei maskiert, Medieninhalte
+            blockiert. Rechtsgrundlage: berechtigtes Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO).
+          </p>
+
+          <h2>8. Push-Benachrichtigungen</h2>
+          <p className="text-muted-foreground">
+            Sie können Push-Benachrichtigungen aktivieren (z.&nbsp;B. Date-Erinnerungen, Einladungsstatus).
+            Die Aktivierung erfolgt ausschließlich auf Ihre ausdrückliche Einwilligung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO).
+            Die Einwilligung kann jederzeit in den App-Einstellungen oder über die Browsereinstellungen
+            widerrufen werden. Wir speichern dazu Push-Subscription-Daten (Endpoint, Keys) auf unseren Servern.
+          </p>
+
+          <h2>9. Speicherdauer</h2>
+          <ul className="text-muted-foreground">
+            <li><strong>Account-Daten:</strong> Bis zur Kontolöschung durch den Nutzer.</li>
+            <li><strong>Nutzungsdaten und Präferenzen:</strong> Bis zur Kontolöschung oder Widerruf.</li>
+            <li><strong>Implizite Signale:</strong> Max. 12 Monate, danach automatische Löschung.</li>
+            <li><strong>Fehlerprotokolle (Sentry):</strong> 90 Tage.</li>
+            <li><strong>Abrechnungsdaten:</strong> 10 Jahre (gesetzliche Aufbewahrungspflicht).</li>
+          </ul>
+
+          <h2>10. Ihre Rechte nach der DSGVO</h2>
+          <p className="text-muted-foreground">
+            Sie haben gegenüber uns folgende Rechte hinsichtlich Ihrer personenbezogenen Daten:
+          </p>
+          <ul className="text-muted-foreground">
+            <li><strong>Recht auf Auskunft</strong> (Art.&nbsp;15 DSGVO)</li>
+            <li><strong>Recht auf Berichtigung</strong> (Art.&nbsp;16 DSGVO)</li>
+            <li><strong>Recht auf Löschung</strong> (Art.&nbsp;17 DSGVO)</li>
+            <li><strong>Recht auf Einschränkung der Verarbeitung</strong> (Art.&nbsp;18 DSGVO)</li>
+            <li><strong>Recht auf Datenübertragbarkeit</strong> (Art.&nbsp;20 DSGVO)</li>
+            <li><strong>Widerspruchsrecht</strong> (Art.&nbsp;21 DSGVO)</li>
+            <li><strong>Recht auf Widerruf erteilter Einwilligungen</strong> (Art.&nbsp;7 Abs.&nbsp;3 DSGVO) – ohne Auswirkung auf die Rechtmäßigkeit der bisherigen Verarbeitung.</li>
+            <li><strong>Recht auf Beschwerde</strong> bei einer Aufsichtsbehörde (Art.&nbsp;77 DSGVO)</li>
+          </ul>
+          <p className="text-muted-foreground">
+            Die zuständige Aufsichtsbehörde ist der Landesbeauftragte für Datenschutz und Informationsfreiheit
+            des jeweiligen Bundeslandes. Sie erreichen uns unter:{' '}
+            <a href="mailto:datenschutz@dzeng.app" className="text-primary">datenschutz@dzeng.app</a>.
+          </p>
+
+          <h2>11. Datenlöschung und Datenexport</h2>
+          <p className="text-muted-foreground">
+            Sie können Ihr Konto und alle damit verbundenen Daten jederzeit in den Einstellungen löschen.
+            Eine Datenexport-Funktion (Art.&nbsp;20 DSGVO) steht ebenfalls in den Einstellungen zur Verfügung.
+            Bei der Kontolöschung werden sämtliche personenbezogenen Daten innerhalb von 30 Tagen
+            unwiderruflich gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
+          </p>
+
+          <h2>12. Datensicherheit</h2>
+          <p className="text-muted-foreground">
+            Wir setzen technische und organisatorische Maßnahmen (TOM) ein, um Ihre Daten zu schützen:
+          </p>
+          <ul className="text-muted-foreground">
+            <li>TLS-Verschlüsselung für alle Datenübertragungen</li>
+            <li>Row-Level Security (RLS) auf Datenbankebene</li>
+            <li>Passwort-Hashing (bcrypt via Supabase Auth)</li>
+            <li>Rate Limiting und Abuse-Erkennung</li>
+            <li>Regelmäßige Sicherheitsaudits</li>
+          </ul>
+
+          <h2>13. Minderjährige</h2>
+          <p className="text-muted-foreground">
+            Die Nutzung von Dzeng ist ab 16 Jahren gestattet (Art.&nbsp;8 DSGVO i.&nbsp;V.&nbsp;m. § 25 TDDDG).
+            Personen unter 16 Jahren dürfen die App nur mit Einwilligung eines Erziehungsberechtigten nutzen.
+          </p>
+
+          <h2>14. Änderungen dieser Datenschutzerklärung</h2>
+          <p className="text-muted-foreground">
+            Wir behalten uns vor, diese Datenschutzerklärung anzupassen, um sie stets den aktuellen rechtlichen
+            Anforderungen anzupassen. Die jeweils aktuelle Fassung gilt bei Ihrem nächsten Besuch.
+            Bei wesentlichen Änderungen informieren wir Sie per In-App-Benachrichtigung.
           </p>
 
           <div className="mt-8 p-4 rounded-lg bg-muted/30 border border-border/50">
             <p className="text-xs text-muted-foreground italic">
-              Diese Datenschutzerklärung enthält Platzhalter. Bitte lasse sie von einem Rechtsanwalt prüfen und ergänzen, bevor du die App veröffentlichst.
+              ⚠️ Hinweis: Diese Datenschutzerklärung wurde mit größter Sorgfalt erstellt, ersetzt aber keine
+              individuelle Rechtsberatung. Bitte lasse sie vor Veröffentlichung von einem spezialisierten
+              Datenschutz-Anwalt prüfen. Platzhalter in eckigen Klammern müssen durch die tatsächlichen
+              Unternehmensdaten ersetzt werden.
             </p>
           </div>
         </div>
