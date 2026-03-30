@@ -373,7 +373,7 @@ const Preferences = () => {
         const currentUserId = authData.user.id;
         const preferencePayload = {
           user_id: currentUserId,
-          home_latitude: homeLatitude, home_longitude: homeLongitude, home_address: homeAddress || null,
+          home_latitude: homeLatitude, home_longitude: homeLongitude, home_address: homeAddress || null, max_distance: maxDistance,
           preferred_cuisines: selectedCuisines.length > 0 ? selectedCuisines : null,
           excluded_cuisines: excludedCuisines.length > 0 ? excludedCuisines : null,
           preferred_vibes: selectedVibes.length > 0 ? selectedVibes : null,
