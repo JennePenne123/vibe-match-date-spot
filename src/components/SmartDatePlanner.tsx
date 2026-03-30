@@ -207,9 +207,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             <div className="space-y-6">
               {/* Back button */}
               <div className="flex justify-start">
-                <Button onClick={() => goBack(effectivePreselectedFriend, navigate)} variant="outline" size="sm" className="flex items-center gap-2">
+              <Button onClick={() => goBack(effectivePreselectedFriend, navigate)} variant="outline" size="sm" className="flex items-center gap-2">
                   <ArrowLeft className="w-4 h-4" />
-                  Zurück
+                  {t('common.back')}
                 </Button>
               </div>
 
