@@ -263,7 +263,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                 )}
                 {compatibilityScore && (
                   <div className="p-4 rounded-lg bg-muted/50">
-                    <h3 className="font-semibold text-foreground mb-2">Compatibility</h3>
+                    <h3 className="font-semibold text-foreground mb-2">{t('datePlanning.compatibility')}</h3>
                     <p className="text-2xl font-bold text-primary">
                       {typeof compatibilityScore === 'object' ? compatibilityScore?.overall_score : compatibilityScore}%
                     </p>
