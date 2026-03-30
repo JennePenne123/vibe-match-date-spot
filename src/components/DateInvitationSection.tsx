@@ -28,7 +28,7 @@ const InviteFriendsSection: React.FC = () => {
   };
 
   const handleInviteWhatsApp = () => {
-    window.open(`https://wa.me/?text=${encodeURIComponent(inviteText)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(inviteText)}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleInviteTelegram = () => {

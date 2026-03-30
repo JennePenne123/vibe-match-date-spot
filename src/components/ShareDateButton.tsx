@@ -47,8 +47,8 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
   ].filter(Boolean).join('\n');
 
   const handleWhatsAppShare = () => {
-    const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-    window.open(waUrl, '_blank');
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleTelegramShare = () => {
