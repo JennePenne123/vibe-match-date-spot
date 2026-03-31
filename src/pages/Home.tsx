@@ -22,7 +22,6 @@ const Home: React.FC = () => {
   const { data: preferences, isLoading: prefsLoading } = useUserPreferences();
   const { showTutorial, completeTutorial } = useTutorial();
   const hasCheckedOnboarding = React.useRef(false);
-  const hasCheckedOnboarding = React.useRef(false);
 
   React.useEffect(() => {
     if (authLoading || prefsLoading) return;
