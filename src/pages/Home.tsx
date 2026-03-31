@@ -64,20 +64,23 @@ const Home: React.FC = () => {
   const { displayName, firstName } = userInfo;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className={isMobile ? "max-w-md mx-auto" : "max-w-none"}>
-        {isMobile && (
-          <HomeHeader 
-            user={user} 
-            displayName={displayName} 
-            firstName={firstName} 
-          />
-        )}
-        <ErrorBoundary level="page">
-          <HomeContent />
-        </ErrorBoundary>
+    <>
+      {showTutorial && <TutorialSlides onComplete={completeTutorial} />}
+      <div className="min-h-screen bg-background">
+        <div className={isMobile ? "max-w-md mx-auto" : "max-w-none"}>
+          {isMobile && (
+            <HomeHeader 
+              user={user} 
+              displayName={displayName} 
+              firstName={firstName} 
+            />
+          )}
+          <ErrorBoundary level="page">
+            <HomeContent />
+          </ErrorBoundary>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
