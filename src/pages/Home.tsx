@@ -4,6 +4,7 @@ import HomeHeader from '@/components/HomeHeader';
 import HomeContent from '@/components/HomeContent';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import TutorialSlides from '@/components/tutorial/TutorialSlides';
 import { getUserName } from '@/utils/typeHelpers';
 import { safeFirstWord } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +13,7 @@ import { useBreakpoint } from '@/hooks/use-mobile';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { hasCompletedPreferenceSetup } from '@/utils/preferenceCompletion';
 import { hasMoodToday } from '@/utils/moodStorage';
+import { useTutorial } from '@/hooks/useTutorial';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
