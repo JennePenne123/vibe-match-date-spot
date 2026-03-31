@@ -970,5 +970,26 @@
     "noVenueSelected": "Kein Venue ausgewählt",
     "noVenueHint": "Bitte geh zurück und wähle ein Venue.",
     "backToVenues": "Zurück zur Venue-Auswahl"
+  },
+  "tutorial": {
+    "skip": "Überspringen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "start": "Los geht's! 🚀",
+    "slide1Title": "Willkommen bei VybePulse",
+    "slide1Subtitle": "Dein KI-Date-Planer",
+    "slide1Desc": "Entdecke perfekte Date-Spots, die zu euch passen — powered by KI, die mit jedem Date dazulernt.",
+    "slide2Title": "Sag uns, was du magst",
+    "slide2Subtitle": "Präferenzen & Stimmung",
+    "slide2Desc": "Wähle Küche, Vibe und Budget — oder check einfach deine Tagesstimmung ein. Je mehr du teilst, desto besser die Vorschläge.",
+    "slide3Title": "KI-Empfehlungen",
+    "slide3Subtitle": "Perfekt gematcht",
+    "slide3Desc": "Unsere KI findet Venues die zu eurer Stimmung, eurem Geschmack und eurer Location passen — mit Echtzeit-Kontext.",
+    "slide4Title": "Date planen & einladen",
+    "slide4Subtitle": "Gemeinsam entscheiden",
+    "slide4Desc": "Plane solo oder zusammen mit deinem Date-Partner. Sende Vorschläge per Link — ganz easy über WhatsApp, Telegram oder E-Mail.",
+    "slide5Title": "Sammle Punkte & Rewards",
+    "slide5Subtitle": "Bewerte & profitiere",
+    "slide5Desc": "Bewerte deine Dates, sammle Punkte und löse Gutscheine bei Partner-Venues ein. Dein Feedback macht die KI schlauer!"
   }
 }

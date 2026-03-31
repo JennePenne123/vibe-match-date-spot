@@ -970,5 +970,26 @@
     "noVenueSelected": "No venue selected",
     "noVenueHint": "Please go back and select a venue.",
     "backToVenues": "Back to venue selection"
+  },
+  "tutorial": {
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "start": "Let's go! 🚀",
+    "slide1Title": "Welcome to VybePulse",
+    "slide1Subtitle": "Your AI Date Planner",
+    "slide1Desc": "Discover perfect date spots that match your vibe — powered by AI that learns with every date.",
+    "slide2Title": "Tell us what you like",
+    "slide2Subtitle": "Preferences & Mood",
+    "slide2Desc": "Pick cuisine, vibe and budget — or just check in your daily mood. The more you share, the better the suggestions.",
+    "slide3Title": "AI Recommendations",
+    "slide3Subtitle": "Perfectly matched",
+    "slide3Desc": "Our AI finds venues that match your mood, taste and location — with real-time context.",
+    "slide4Title": "Plan & invite",
+    "slide4Subtitle": "Decide together",
+    "slide4Desc": "Plan solo or together with your date partner. Send proposals via link — easily through WhatsApp, Telegram or email.",
+    "slide5Title": "Earn Points & Rewards",
+    "slide5Subtitle": "Rate & benefit",
+    "slide5Desc": "Rate your dates, earn points and redeem vouchers at partner venues. Your feedback makes the AI smarter!"
   }
 }

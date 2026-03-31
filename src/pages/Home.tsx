@@ -4,6 +4,7 @@ import HomeHeader from '@/components/HomeHeader';
 import HomeContent from '@/components/HomeContent';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import TutorialSlides from '@/components/tutorial/TutorialSlides';
 import { getUserName } from '@/utils/typeHelpers';
 import { safeFirstWord } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -12,12 +13,14 @@ import { useBreakpoint } from '@/hooks/use-mobile';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { hasCompletedPreferenceSetup } from '@/utils/preferenceCompletion';
 import { hasMoodToday } from '@/utils/moodStorage';
+import { useTutorial } from '@/hooks/useTutorial';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isMobile } = useBreakpoint();
   const { data: preferences, isLoading: prefsLoading } = useUserPreferences();
+  const { showTutorial, completeTutorial } = useTutorial();
   const hasCheckedOnboarding = React.useRef(false);
 
   React.useEffect(() => {
@@ -61,20 +64,23 @@ const Home: React.FC = () => {
   const { displayName, firstName } = userInfo;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className={isMobile ? "max-w-md mx-auto" : "max-w-none"}>
-        {isMobile && (
-          <HomeHeader 
-            user={user} 
-            displayName={displayName} 
-            firstName={firstName} 
-          />
-        )}
-        <ErrorBoundary level="page">
-          <HomeContent />
-        </ErrorBoundary>
+    <>
+      {showTutorial && <TutorialSlides onComplete={completeTutorial} />}
+      <div className="min-h-screen bg-background">
+        <div className={isMobile ? "max-w-md mx-auto" : "max-w-none"}>
+          {isMobile && (
+            <HomeHeader 
+              user={user} 
+              displayName={displayName} 
+              firstName={firstName} 
+            />
+          )}
+          <ErrorBoundary level="page">
+            <HomeContent />
+          </ErrorBoundary>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
