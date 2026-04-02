@@ -74,6 +74,22 @@
       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     </div>
     <script>
+      // Pre-React service worker cleanup – runs even if React never mounts
+      (function(){
+        if(!('serviceWorker' in navigator) || !('caches' in window)) return;
+        var RESET_KEY = 'vybe-html-sw-reset-v1';
+        if(sessionStorage.getItem(RESET_KEY) === 'done') return;
+        sessionStorage.setItem(RESET_KEY, 'done');
+        caches.keys().then(function(names){
+          names.filter(function(n){return n.startsWith('vybepulse-');}).forEach(function(n){caches.delete(n);});
+        });
+        navigator.serviceWorker.getRegistrations().then(function(regs){
+          regs.forEach(function(r){
+            if(r.active) r.active.postMessage({type:'CLEAR_CACHE'});
+            if(r.waiting){r.waiting.postMessage({type:'SKIP_WAITING'});r.waiting.postMessage({type:'CLEAR_CACHE'});}
+          });
+        });
+      })();
       // Remove loading screen once React mounts
       const _ro = new MutationObserver(function(m){
         if(document.getElementById('root') && document.getElementById('root').children.length > 0){
