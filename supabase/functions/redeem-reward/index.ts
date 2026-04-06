@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 const FREE_MONTHLY_LIMIT = 2;
-const PREMIUM_7_DAY_COST = 750;
+const PREMIUM_7_DAY_COST = 1000;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
