@@ -1927,6 +1927,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      insert_request_log: {
+        Args: {
+          p_abuse_score?: number
+          p_client_ip_hash?: string
+          p_function_name: string
+          p_identifier_hash: string
+          p_limit_threshold?: number
+          p_metadata?: Json
+          p_request_count?: number
+          p_user_agent?: string
+          p_was_rate_limited?: boolean
+        }
+        Returns: undefined
+      }
       reset_user_preferences_to_default: {
         Args: { target_user_id: string }
         Returns: boolean
