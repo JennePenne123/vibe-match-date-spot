@@ -225,37 +225,7 @@ const Results = () => {
             return null;
           })()}
 
-          {/* Premium Voucher Banner */}
-          {!isPremium && (
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-6 bg-gradient-to-r from-warning/10 to-accent/5 p-4 rounded-lg border border-warning/20"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-warning/15">
-                  <Crown className="w-5 h-5 text-warning" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground text-sm">
-                    {t('results.premiumVoucherTitle')}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {t('results.premiumVoucherDesc')}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  onClick={() => navigate('/rewards')}
-                  className="bg-gradient-primary text-primary-foreground hover:opacity-90 shrink-0"
-                >
-                  <Crown className="w-3 h-3 mr-1" />
-                  {t('results.upgrade')}
-                </Button>
-              </div>
-            </motion.div>
-          )}
+          {/* Premium Voucher Banner – hidden until premium launches */}
 
           {/* AIVenueCard Components with staggered animation */}
           <div className="space-y-6">
@@ -263,9 +233,7 @@ const Results = () => {
               const isQualityVerified = (recommendation as any).qualityVerified === true;
               const qualityRank = (recommendation as any).qualityRank as number | undefined;
               const isTop3 = isQualityVerified && qualityRank !== undefined && qualityRank <= 3;
-              const venueVouchers = isTop3 && isPremium 
-                ? (vouchers.get(recommendation.venue_id) || []) 
-                : [];
+              const venueVouchers: any[] = [];
               
               return (
                 <motion.div 
@@ -278,16 +246,10 @@ const Results = () => {
                   {/* Top 3 Premium Badge */}
                   {isTop3 && (
                     <div className="absolute -top-2 -left-1 z-10">
-                      <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold shadow-md ${
-                        isPremium 
-                          ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white' 
-                          : 'bg-muted text-muted-foreground'
-                      }`}>
-                        {isPremium ? (
-                          <>
-                            <Crown className="w-3 h-3" />
-                            Top {qualityRank} Match
-                          </>
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold shadow-md bg-gradient-to-r from-primary/80 to-accent/80 text-white">
+                        <Star className="w-3 h-3" />
+                        Top {qualityRank} Match
+                      </div>
                         ) : (
                           <>
                             <Lock className="w-3 h-3" />
