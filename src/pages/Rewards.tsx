@@ -6,9 +6,9 @@ import { useRewardShop } from '@/hooks/useRewardShop';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Gift, Ticket, Crown, Star, Lock, Loader2, Sparkles, History, Clock } from 'lucide-react';
+import { ArrowLeft, Gift, Ticket, Crown, Star, Sparkles, History, Clock } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { toast } from '@/hooks/use-toast';
+
 
 
 
@@ -18,11 +18,8 @@ export default function Rewards() {
   const { user, loading: authLoading } = useAuth();
   const { points, loading: pointsLoading } = useUserPoints();
   const {
-    vouchers,
     history,
     loading: shopLoading,
-    redeeming,
-    redeemReward,
   } = useRewardShop();
 
   if (authLoading || pointsLoading || shopLoading) {
@@ -39,32 +36,6 @@ export default function Rewards() {
   }
 
   const totalPoints = points?.total_points ?? 0;
-  const handleRedeemVoucher = async (voucherId: string, pointsCost: number) => {
-    if (totalPoints < pointsCost) {
-      toast({
-        title: 'Nicht genug Punkte',
-        description: `Dir fehlen ${pointsCost - totalPoints} Punkte.`,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const result = await redeemReward('voucher', voucherId);
-    if (result.success) {
-      toast({
-        title: '🎉 Voucher eingelöst!',
-        description: `Code: ${result.data?.voucher?.code}. Du findest ihn in deinem Profil.`,
-      });
-    } else {
-      toast({ title: 'Fehler', description: result.error, variant: 'destructive' });
-    }
-  };
-
-  const formatDiscount = (type: string, value: number) => {
-    if (type === 'percentage') return `${value}%`;
-    if (type === 'fixed') return `${value}€`;
-    return 'Gratis-Item';
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,70 +73,31 @@ export default function Rewards() {
 
           {/* Points hint */}
           <div className="text-xs text-muted-foreground px-1">
-            Löse deine Punkte gegen Venue-Gutscheine ein
+            Sammle Punkte durch Dates, Bewertungen & Empfehlungen
           </div>
         </div>
 
-        {/* Venue Vouchers */}
+        {/* Venue Vouchers – Coming Soon */}
         <div className="px-4 pb-2 mt-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
             {t('rewards.vouchers', 'Venue-Gutscheine')}
           </h2>
-
-          {vouchers.length === 0 ? (
-            <Card className="bg-card/50 border-border/50">
-              <CardContent className="p-6 text-center">
-                <Ticket className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  Aktuell keine Voucher verfügbar. Schau bald wieder vorbei!
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {vouchers.map((voucher) => {
-                const canAfford = totalPoints >= voucher.points_cost;
-                const disabled = !canAfford;
-
-                return (
-                  <Card
-                    key={voucher.id}
-                    className={`bg-card/50 backdrop-blur-sm border-border/50 transition-all ${disabled ? 'opacity-60' : ''}`}
-                  >
-                    <CardContent className="p-4 flex items-center gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10">
-                        <Ticket className="w-5 h-5 text-emerald-500" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">
-                          {formatDiscount(voucher.discount_type, voucher.discount_value)} Rabatt
-                        </p>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
-                          {voucher.venue_name} · {voucher.title}
-                        </p>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant={canAfford ? 'default' : 'outline'}
-                        disabled={disabled || redeeming}
-                        onClick={() => handleRedeemVoucher(voucher.id, voucher.points_cost)}
-                        className={canAfford ? 'bg-primary text-primary-foreground' : ''}
-                      >
-                        {redeeming ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <>
-                            {!canAfford && <Lock className="w-3 h-3 mr-1" />}
-                            {voucher.points_cost.toLocaleString()}
-                          </>
-                        )}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50 overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-emerald-500/40 via-teal-400/40 to-emerald-500/40" />
+            <CardContent className="p-5 text-center">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 mx-auto mb-3">
+                <Ticket className="w-6 h-6 text-emerald-500/60" />
+              </div>
+              <h3 className="text-base font-semibold text-foreground mb-1">Bald verfügbar</h3>
+              <p className="text-xs text-muted-foreground max-w-[260px] mx-auto">
+                Löse deine Punkte bald gegen exklusive Venue-Gutscheine ein. Wir arbeiten daran!
+              </p>
+              <Badge variant="outline" className="mt-3 text-xs text-emerald-600 border-emerald-500/30">
+                <Sparkles className="w-3 h-3 mr-1" />
+                Coming Soon
+              </Badge>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Premium Section – Coming Soon */}
