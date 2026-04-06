@@ -33,6 +33,18 @@ const MyFriends = () => {
 
   const inviteText = t('myFriends.inviteMessage', { link: referralLink || window.location.origin });
 
+  const safeOpen = (url: string, label: string) => {
+    const win = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!win) {
+      toast({
+        title: `${label} konnte nicht geöffnet werden`,
+        description: 'Dein Browser blockiert Pop-ups. Kopiere den Link und öffne ihn manuell.',
+        variant: 'destructive',
+      });
+      navigator.clipboard.writeText(url).catch(() => {});
+    }
+  };
+
   const handleInviteEmail = () => {
     const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu HiOutz!'));
     const body = encodeURIComponent(inviteText);
@@ -41,12 +53,12 @@ const MyFriends = () => {
 
   const handleInviteWhatsApp = () => {
     const text = encodeURIComponent(inviteText);
-    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank', 'noopener,noreferrer');
+    safeOpen(`https://api.whatsapp.com/send?text=${text}`, 'WhatsApp');
   };
 
   const handleInviteTelegram = () => {
     const text = encodeURIComponent(inviteText);
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink || window.location.origin)}&text=${text}`, '_blank', 'noopener,noreferrer');
+    safeOpen(`https://t.me/share/url?url=${encodeURIComponent(referralLink || window.location.origin)}&text=${text}`, 'Telegram');
   };
 
   const handleCopyLink = async () => {
