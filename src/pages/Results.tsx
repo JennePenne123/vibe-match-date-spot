@@ -1,16 +1,16 @@
-import React, { useMemo, Suspense } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, Users, Crown, Lock } from 'lucide-react';
+import { ArrowLeft, Sparkles, Users, Star } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
 import RealtimeContextBanner from '@/components/RealtimeContextBanner';
 import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenueVouchers } from '@/hooks/useVenueVouchers';
-import { useUserPoints } from '@/hooks/useUserPoints';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
 
@@ -36,11 +36,6 @@ const Results = () => {
   const { t } = useTranslation();
   const { appState } = useApp();
   const { user } = useAuth();
-  const { points } = useUserPoints();
-  
-  const isPremium = (points as any)?.premium_until 
-    ? new Date((points as any).premium_until) > new Date() 
-    : false;
 
   const smartPlanningState = location.state as {
     fromSmartDatePlanning?: boolean;
@@ -79,7 +74,7 @@ const Results = () => {
     recommendations.slice(0, 3).map(r => r.venue_id).filter(Boolean),
     [recommendations]
   );
-  const { vouchers } = useVenueVouchers(top3VenueIds);
+  useVenueVouchers(top3VenueIds);
 
   const handleVenueSelect = (venueId: string) => {
     if (isFromSmartPlanning) {
@@ -225,37 +220,7 @@ const Results = () => {
             return null;
           })()}
 
-          {/* Premium Voucher Banner */}
-          {!isPremium && (
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-6 bg-gradient-to-r from-warning/10 to-accent/5 p-4 rounded-lg border border-warning/20"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-warning/15">
-                  <Crown className="w-5 h-5 text-warning" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground text-sm">
-                    {t('results.premiumVoucherTitle')}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {t('results.premiumVoucherDesc')}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  onClick={() => navigate('/rewards')}
-                  className="bg-gradient-primary text-primary-foreground hover:opacity-90 shrink-0"
-                >
-                  <Crown className="w-3 h-3 mr-1" />
-                  {t('results.upgrade')}
-                </Button>
-              </div>
-            </motion.div>
-          )}
+          {/* Premium Voucher Banner – hidden until premium launches */}
 
           {/* AIVenueCard Components with staggered animation */}
           <div className="space-y-6">
@@ -263,9 +228,7 @@ const Results = () => {
               const isQualityVerified = (recommendation as any).qualityVerified === true;
               const qualityRank = (recommendation as any).qualityRank as number | undefined;
               const isTop3 = isQualityVerified && qualityRank !== undefined && qualityRank <= 3;
-              const venueVouchers = isTop3 && isPremium 
-                ? (vouchers.get(recommendation.venue_id) || []) 
-                : [];
+              const venueVouchers: any[] = [];
               
               return (
                 <motion.div 
@@ -278,22 +241,9 @@ const Results = () => {
                   {/* Top 3 Premium Badge */}
                   {isTop3 && (
                     <div className="absolute -top-2 -left-1 z-10">
-                      <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold shadow-md ${
-                        isPremium 
-                          ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white' 
-                          : 'bg-muted text-muted-foreground'
-                      }`}>
-                        {isPremium ? (
-                          <>
-                            <Crown className="w-3 h-3" />
-                            Top {qualityRank} Match
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="w-3 h-3" />
-                            Top {qualityRank}
-                          </>
-                        )}
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold shadow-md bg-gradient-to-r from-primary/80 to-accent/80 text-white">
+                        <Star className="w-3 h-3" />
+                        Top {qualityRank} Match
                       </div>
                     </div>
                   )}
