@@ -46,14 +46,23 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
     shareUrl
   ].filter(Boolean).join('\n');
 
+  const safeOpen = (url: string, label: string) => {
+    const win = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!win) {
+      toast({
+        title: `${label} konnte nicht geöffnet werden`,
+        description: 'Pop-up blockiert – Link wurde kopiert.',
+      });
+      navigator.clipboard.writeText(url).catch(() => {});
+    }
+  };
+
   const handleWhatsAppShare = () => {
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-    window.open(waUrl, '_blank', 'noopener,noreferrer');
+    safeOpen(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, 'WhatsApp');
   };
 
   const handleTelegramShare = () => {
-    const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-    window.open(tgUrl, '_blank', 'noopener,noreferrer');
+    safeOpen(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, 'Telegram');
   };
 
   const handleNativeShare = async () => {
