@@ -6,7 +6,7 @@ import { useRewardShop } from '@/hooks/useRewardShop';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Gift, Ticket, Crown, Star, Lock, Loader2, Sparkles, History, Clock } from 'lucide-react';
+import { ArrowLeft, Gift, Ticket, Crown, Star, Sparkles, History, Clock } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { toast } from '@/hooks/use-toast';
 
@@ -18,11 +18,8 @@ export default function Rewards() {
   const { user, loading: authLoading } = useAuth();
   const { points, loading: pointsLoading } = useUserPoints();
   const {
-    vouchers,
     history,
     loading: shopLoading,
-    redeeming,
-    redeemReward,
   } = useRewardShop();
 
   if (authLoading || pointsLoading || shopLoading) {
@@ -39,32 +36,6 @@ export default function Rewards() {
   }
 
   const totalPoints = points?.total_points ?? 0;
-  const handleRedeemVoucher = async (voucherId: string, pointsCost: number) => {
-    if (totalPoints < pointsCost) {
-      toast({
-        title: 'Nicht genug Punkte',
-        description: `Dir fehlen ${pointsCost - totalPoints} Punkte.`,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const result = await redeemReward('voucher', voucherId);
-    if (result.success) {
-      toast({
-        title: '🎉 Voucher eingelöst!',
-        description: `Code: ${result.data?.voucher?.code}. Du findest ihn in deinem Profil.`,
-      });
-    } else {
-      toast({ title: 'Fehler', description: result.error, variant: 'destructive' });
-    }
-  };
-
-  const formatDiscount = (type: string, value: number) => {
-    if (type === 'percentage') return `${value}%`;
-    if (type === 'fixed') return `${value}€`;
-    return 'Gratis-Item';
-  };
 
   return (
     <div className="min-h-screen bg-background">
