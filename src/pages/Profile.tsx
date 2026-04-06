@@ -95,7 +95,7 @@ const Profile = () => {
           {/* Activity Feed */}
           <ActivityFeed />
 
-          {!pointsLoading && points && <PointsCard totalPoints={points.total_points} level={points.level} streakCount={points.streak_count} />}
+          {!pointsLoading && points && <PointsCard totalPoints={points.total_points} lifetimeXp={points.lifetime_xp ?? points.total_points} level={points.level} streakCount={points.streak_count} />}
           <Collapsible>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">

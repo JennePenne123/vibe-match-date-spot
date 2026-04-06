@@ -11,7 +11,7 @@ type PointSourceKey = keyof typeof POINT_SOURCES;
  */
 export const awardPoints = async (
   source: PointSourceKey,
-  options?: { skipDuplicateCheck?: boolean }
+  _options?: { skipDuplicateCheck?: boolean }
 ): Promise<{ success: boolean; newTotal?: number; newXp?: number; levelUp?: boolean; newBadges?: string[] }> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
