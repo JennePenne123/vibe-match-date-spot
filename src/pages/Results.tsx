@@ -36,11 +36,6 @@ const Results = () => {
   const { t } = useTranslation();
   const { appState } = useApp();
   const { user } = useAuth();
-  const { points } = useUserPoints();
-  
-  const isPremium = (points as any)?.premium_until 
-    ? new Date((points as any).premium_until) > new Date() 
-    : false;
 
   const smartPlanningState = location.state as {
     fromSmartDatePlanning?: boolean;
@@ -79,7 +74,7 @@ const Results = () => {
     recommendations.slice(0, 3).map(r => r.venue_id).filter(Boolean),
     [recommendations]
   );
-  const { vouchers } = useVenueVouchers(top3VenueIds);
+  useVenueVouchers(top3VenueIds);
 
   const handleVenueSelect = (venueId: string) => {
     if (isFromSmartPlanning) {
