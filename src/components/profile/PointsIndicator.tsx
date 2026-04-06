@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, TrendingUp } from 'lucide-react';
+import { Trophy, TrendingUp, Coins } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useUserPoints } from '@/hooks/useUserPoints';
 import { Skeleton } from '@/components/ui/skeleton';

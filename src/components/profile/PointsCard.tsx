@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, TrendingUp, Zap, Gift, icons } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, Gift, Coins, icons } from 'lucide-react';
 import { getLevelProgress, getPointsForNextLevel, getLevelInfo, LEVEL_THRESHOLDS } from '@/services/pointsService';
 
 interface PointsCardProps {
   totalPoints: number;
+  lifetimeXp: number;
   level: number;
   streakCount: number;
 }
@@ -29,13 +30,14 @@ const LevelIcon = ({ iconName, color, bg }: { iconName: string; color: string; b
 
 export const PointsCard: React.FC<PointsCardProps> = ({
   totalPoints,
+  lifetimeXp,
   level,
   streakCount
 }) => {
   const navigate = useNavigate();
-  const progress = getLevelProgress(totalPoints, level);
+  const progress = getLevelProgress(lifetimeXp, level);
   const nextLevelPoints = getPointsForNextLevel(level);
-  const pointsNeeded = nextLevelPoints - totalPoints;
+  const xpNeeded = nextLevelPoints - lifetimeXp;
   const levelInfo = getLevelInfo(level);
   const isMaxLevel = level >= LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1].level;
 
@@ -48,11 +50,13 @@ export const PointsCard: React.FC<PointsCardProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Points and Level */}
+        {/* XP and Level */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-3xl font-bold text-primary">{totalPoints}</p>
-            <p className="text-sm text-muted-foreground">Punkte gesamt</p>
+            <p className="text-3xl font-bold text-primary">{lifetimeXp.toLocaleString('de-DE')}</p>
+            <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <TrendingUp className="h-3 w-3" /> XP gesamt
+            </p>
           </div>
           <div className="text-right">
             <Badge variant="secondary" className="text-sm px-3 py-1 gap-1.5">
@@ -61,7 +65,7 @@ export const PointsCard: React.FC<PointsCardProps> = ({
             </Badge>
             {!isMaxLevel && (
               <p className="text-xs text-muted-foreground mt-1">
-                {pointsNeeded} bis zum nächsten Level
+                {xpNeeded.toLocaleString('de-DE')} XP bis zum nächsten Level
               </p>
             )}
           </div>
@@ -70,13 +74,23 @@ export const PointsCard: React.FC<PointsCardProps> = ({
         {/* Progress Bar */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
+            <span className="text-muted-foreground">
               {isMaxLevel ? 'Max Level erreicht!' : 'Level-Fortschritt'}
             </span>
             <span className="font-medium">{Math.round(progress)}%</span>
           </div>
           <Progress value={progress} className="h-2" />
+        </div>
+
+        {/* Coins balance */}
+        <div className="flex items-center gap-3 p-3 bg-accent/30 rounded-lg border border-border/50">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center">
+            <Coins className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <p className="font-semibold text-sm">{totalPoints.toLocaleString('de-DE')} Coins</p>
+            <p className="text-xs text-muted-foreground">Einlösbar im Reward Shop</p>
+          </div>
         </div>
 
         {/* Streak */}
@@ -99,18 +113,18 @@ export const PointsCard: React.FC<PointsCardProps> = ({
         {/* Motivational Message */}
         {level < 3 && (
           <p className="text-xs text-center text-muted-foreground italic">
-            Bewerte Dates, plane Abende und löse Vouchers ein, um aufzusteigen!
+            Bewerte Dates, plane Abende und löse Vouchers ein, um XP & Coins zu sammeln!
           </p>
         )}
 
-        {/* Redeem Points CTA */}
+        {/* Redeem Coins CTA */}
         <Button
           onClick={() => navigate('/rewards')}
           variant="outline"
           className="w-full border-primary/30 text-primary hover:bg-primary/10 gap-2"
         >
           <Gift className="w-4 h-4" />
-          Punkte einlösen
+          Coins einlösen
         </Button>
       </CardContent>
     </Card>

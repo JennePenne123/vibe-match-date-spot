@@ -5,15 +5,14 @@ import { checkAndAwardBadges } from './badgeService';
 type PointSourceKey = keyof typeof POINT_SOURCES;
 
 /**
- * Award points to the current user for a specific action.
- * Handles duplicate-safe awarding for one-time actions (profile_complete, preferences_set).
- * Updates level automatically based on new total.
- * After awarding points, automatically checks and awards any new badges.
+ * Award XP and Coins to the current user for a specific action.
+ * XP = experience for levels (never spent)
+ * Coins (total_points) = shop currency (can be spent)
  */
 export const awardPoints = async (
   source: PointSourceKey,
-  options?: { skipDuplicateCheck?: boolean }
-): Promise<{ success: boolean; newTotal?: number; levelUp?: boolean; newBadges?: string[] }> => {
+  _options?: { skipDuplicateCheck?: boolean }
+): Promise<{ success: boolean; newTotal?: number; newXp?: number; levelUp?: boolean; newBadges?: string[] }> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { success: false };
@@ -24,10 +23,13 @@ export const awardPoints = async (
       return { success: false };
     }
 
+    const coins = pointDef.points;
+    const xp = pointDef.xp;
+
     // Fetch current points
     const { data: currentPoints, error: fetchError } = await supabase
       .from('user_points')
-      .select('total_points, level, badges')
+      .select('total_points, lifetime_xp, level, badges')
       .eq('user_id', user.id)
       .maybeSingle();
 
@@ -36,33 +38,31 @@ export const awardPoints = async (
       return { success: false };
     }
 
-    const oldTotal = currentPoints?.total_points ?? 0;
+    const oldXp = (currentPoints as any)?.lifetime_xp ?? currentPoints?.total_points ?? 0;
     const oldLevel = currentPoints?.level ?? 1;
-    const newTotal = oldTotal + pointDef.points;
-    const newLevel = calculateLevel(newTotal);
+    const newXp = oldXp + xp;
+    const newLevel = calculateLevel(newXp);
     const levelUp = newLevel > oldLevel;
+    const newTotal = (currentPoints?.total_points ?? 0) + coins;
 
-    // Upsert points
-    const { error: updateError } = await supabase
-      .from('user_points')
-      .upsert({
-        user_id: user.id,
-        total_points: newTotal,
-        level: newLevel,
-        badges: currentPoints?.badges ?? [],
-      }, { onConflict: 'user_id' });
+    // Use the secure DB function to award points
+    const { error: rpcError } = await supabase.rpc('award_user_points', {
+      target_user_id: user.id,
+      points_to_add: coins,
+      xp_to_add: xp,
+    });
 
-    if (updateError) {
-      console.error('Error awarding points:', updateError);
+    if (rpcError) {
+      console.error('Error awarding points:', rpcError);
       return { success: false };
     }
 
-    console.log(`Awarded ${pointDef.points} points for "${source}". Total: ${newTotal}, Level: ${newLevel}${levelUp ? ' (LEVEL UP!)' : ''}`);
+    console.log(`Awarded ${coins} coins + ${xp} XP for "${source}". Coins: ${newTotal}, XP: ${newXp}, Level: ${newLevel}${levelUp ? ' (LEVEL UP!)' : ''}`);
 
-    // Check and award badges asynchronously (non-blocking)
+    // Check and award badges asynchronously
     const newBadges = await checkAndAwardBadges(user.id);
 
-    return { success: true, newTotal, levelUp, newBadges };
+    return { success: true, newTotal, newXp, levelUp, newBadges };
   } catch (err) {
     console.error('awardPoints error:', err);
     return { success: false };

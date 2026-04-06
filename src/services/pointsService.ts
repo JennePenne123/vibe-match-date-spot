@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 export interface UserPoints {
   id: string;
   user_id: string;
-  total_points: number;
+  total_points: number;  // Coins (spendable in shop)
+  lifetime_xp: number;   // XP (for levels, never spent)
   level: number;
   badges: string[];
   streak_count: number;
@@ -16,6 +17,7 @@ export interface UserPoints {
 export interface LeaderboardEntry {
   user_id: string;
   total_points: number;
+  lifetime_xp: number;
   level: number;
   streak_count: number;
   premium_until: string | null;
@@ -47,6 +49,14 @@ export const getUserPoints = async (): Promise<UserPoints | null> => {
     return null;
   }
 
+  // Ensure lifetime_xp has a fallback for existing records
+  if (data) {
+    return {
+      ...data,
+      lifetime_xp: (data as any).lifetime_xp ?? data.total_points,
+    };
+  }
+
   return data;
 };
 
@@ -69,7 +79,6 @@ export const initializeUserPoints = async (): Promise<boolean> => {
     });
 
   if (error) {
-    // Already exists or other error
     console.log('Points initialization:', error.message);
     return false;
   }
@@ -78,25 +87,25 @@ export const initializeUserPoints = async (): Promise<boolean> => {
 };
 
 /**
- * Level thresholds – fixed values for full control & transparency
+ * Level thresholds – based on lifetime XP (significantly higher for slower progression)
  */
 export const LEVEL_THRESHOLDS = [
   { level: 1, points: 0, name: 'Newbie', lucideIcon: 'sprout' as const, color: 'text-green-500', bg: 'bg-green-500/15' },
-  { level: 2, points: 500, name: 'Explorer', lucideIcon: 'compass' as const, color: 'text-blue-500', bg: 'bg-blue-500/15' },
-  { level: 3, points: 2000, name: 'Regular', lucideIcon: 'star' as const, color: 'text-yellow-500', bg: 'bg-yellow-500/15' },
-  { level: 4, points: 5000, name: 'Expert', lucideIcon: 'gem' as const, color: 'text-purple-500', bg: 'bg-purple-500/15' },
-  { level: 5, points: 10000, name: 'Master', lucideIcon: 'medal' as const, color: 'text-amber-500', bg: 'bg-amber-500/15' },
-  { level: 6, points: 18000, name: 'Legend', lucideIcon: 'crown' as const, color: 'text-orange-500', bg: 'bg-orange-500/15' },
-  { level: 7, points: 30000, name: 'VIP', lucideIcon: 'flame' as const, color: 'text-red-500', bg: 'bg-red-500/15' },
+  { level: 2, points: 1500, name: 'Explorer', lucideIcon: 'compass' as const, color: 'text-blue-500', bg: 'bg-blue-500/15' },
+  { level: 3, points: 6000, name: 'Regular', lucideIcon: 'star' as const, color: 'text-yellow-500', bg: 'bg-yellow-500/15' },
+  { level: 4, points: 15000, name: 'Expert', lucideIcon: 'gem' as const, color: 'text-purple-500', bg: 'bg-purple-500/15' },
+  { level: 5, points: 35000, name: 'Master', lucideIcon: 'medal' as const, color: 'text-amber-500', bg: 'bg-amber-500/15' },
+  { level: 6, points: 65000, name: 'Legend', lucideIcon: 'crown' as const, color: 'text-orange-500', bg: 'bg-orange-500/15' },
+  { level: 7, points: 120000, name: 'VIP', lucideIcon: 'flame' as const, color: 'text-red-500', bg: 'bg-red-500/15' },
 ] as const;
 
 /**
- * Calculate level from total points using fixed thresholds
+ * Calculate level from lifetime XP using fixed thresholds
  */
-export const calculateLevel = (totalPoints: number): number => {
+export const calculateLevel = (lifetimeXp: number): number => {
   let level = 1;
   for (const threshold of LEVEL_THRESHOLDS) {
-    if (totalPoints >= threshold.points) {
+    if (lifetimeXp >= threshold.points) {
       level = threshold.level;
     } else {
       break;
@@ -114,65 +123,65 @@ export const getLevelInfo = (level: number) => {
 };
 
 /**
- * Calculate points needed for next level
+ * Calculate XP needed for next level
  */
 export const getPointsForNextLevel = (currentLevel: number): number => {
   const next = LEVEL_THRESHOLDS.find(t => t.level === currentLevel + 1);
-  if (!next) return LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1].points; // max level
+  if (!next) return LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1].points;
   return next.points;
 };
 
 /**
- * Get progress percentage to next level
+ * Get progress percentage to next level (based on lifetime XP)
  */
-export const getLevelProgress = (totalPoints: number, currentLevel: number): number => {
+export const getLevelProgress = (lifetimeXp: number, currentLevel: number): number => {
   const currentThreshold = LEVEL_THRESHOLDS.find(t => t.level === currentLevel);
   const nextThreshold = LEVEL_THRESHOLDS.find(t => t.level === currentLevel + 1);
 
-  if (!nextThreshold) return 100; // max level reached
+  if (!nextThreshold) return 100;
 
   const currentLevelPoints = currentThreshold?.points ?? 0;
   const nextLevelPoints = nextThreshold.points;
-  const progressPoints = totalPoints - currentLevelPoints;
+  const progressPoints = lifetimeXp - currentLevelPoints;
   const pointsNeeded = nextLevelPoints - currentLevelPoints;
 
   return Math.min(100, Math.max(0, (progressPoints / pointsNeeded) * 100));
 };
 
 /**
- * Point sources with their values
+ * Point sources with XP and Coin values
+ * XP = experience for levels (never spent)
+ * Coins = currency for reward shop (can be spent)
  */
 export const POINT_SOURCES = {
-  // Date ratings (existing)
-  rating_base: { points: 10, label: 'Date bewertet' },
-  rating_venue: { points: 5, label: 'Venue bewertet' },
-  rating_recommend: { points: 5, label: 'Empfehlung abgegeben' },
-  rating_text: { points: 10, label: 'Kommentar geschrieben' },
-  rating_speed_bonus: { points: 10, label: 'Speed-Bonus (< 24h)' },
+  // Date ratings
+  rating_base: { points: 5, xp: 10, label: 'Date bewertet' },
+  rating_venue: { points: 3, xp: 5, label: 'Venue bewertet' },
+  rating_recommend: { points: 3, xp: 5, label: 'Empfehlung abgegeben' },
+  rating_text: { points: 5, xp: 10, label: 'Kommentar geschrieben' },
+  rating_speed_bonus: { points: 5, xp: 10, label: 'Speed-Bonus (< 24h)' },
   // Profile & setup
-  profile_complete: { points: 20, label: 'Profil vervollständigt' },
-  preferences_set: { points: 15, label: 'Präferenzen gesetzt' },
+  profile_complete: { points: 10, xp: 20, label: 'Profil vervollständigt' },
+  preferences_set: { points: 8, xp: 15, label: 'Präferenzen gesetzt' },
   // Dating actions
-  date_planned: { points: 10, label: 'Date geplant' },
-  date_accepted: { points: 5, label: 'Date angenommen' },
+  date_planned: { points: 5, xp: 10, label: 'Date geplant' },
+  date_accepted: { points: 3, xp: 5, label: 'Date angenommen' },
   // Daily engagement
-  mood_checkin: { points: 5, label: 'Mood Check-In' },
-  weekly_streak_bonus: { points: 25, label: '7-Tage Streak Bonus' },
+  mood_checkin: { points: 2, xp: 5, label: 'Mood Check-In' },
+  weekly_streak_bonus: { points: 10, xp: 25, label: '7-Tage Streak Bonus' },
   // Vouchers
-  voucher_redeemed: { points: 15, label: 'Voucher eingelöst' },
-  // Referrals (existing)
-  referral_signup: { points: 25, label: 'Freund eingeladen (Signup)' },
-  referral_completed: { points: 50, label: 'Freund eingeladen (erstes Date)' },
-  referee_signup: { points: 10, label: 'Einladung angenommen' },
-  referee_completed: { points: 25, label: 'Erstes Date abgeschlossen' },
+  voucher_redeemed: { points: 8, xp: 15, label: 'Voucher eingelöst' },
+  // Referrals
+  referral_signup: { points: 15, xp: 25, label: 'Freund eingeladen (Signup)' },
+  referral_completed: { points: 30, xp: 50, label: 'Freund eingeladen (erstes Date)' },
+  referee_signup: { points: 5, xp: 10, label: 'Einladung angenommen' },
+  referee_completed: { points: 15, xp: 25, label: 'Erstes Date abgeschlossen' },
 } as const;
 
 /**
  * Fetch leaderboard data using secure leaderboard_view
  */
 export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEntry[]> => {
-  // Use secure leaderboard_view that only exposes necessary public data
-  // Cast to 'any' since leaderboard_view is not in generated types yet
   const { data: pointsData, error: pointsError } = await (supabase
     .from('leaderboard_view' as any)
     .select('user_id, total_points, level, streak_count')
@@ -187,7 +196,6 @@ export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEnt
     return [];
   }
 
-  // Fetch profiles using profiles_safe view (excludes email for non-owners)
   const userIds = pointsData.map(p => p.user_id);
   const { data: profilesData, error: profilesError } = await (supabase
     .from('profiles_safe' as any)
@@ -198,7 +206,6 @@ export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEnt
     console.error('Error fetching profiles for leaderboard:', profilesError);
   }
 
-  // Fetch premium status for leaderboard users
   const { data: premiumData } = await supabase
     .from('user_points')
     .select('user_id, premium_until')
@@ -208,7 +215,6 @@ export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEnt
     (premiumData || []).map(p => [p.user_id, (p as any).premium_until as string | null])
   );
 
-  // Combine the data
   const profilesMap = new Map(
     (profilesData || []).map(p => [p.id, { name: p.name, avatar_url: p.avatar_url || undefined }])
   );
@@ -216,6 +222,7 @@ export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardEnt
   return pointsData.map(entry => ({
     user_id: entry.user_id,
     total_points: entry.total_points,
+    lifetime_xp: 0, // leaderboard_view doesn't expose this yet
     level: entry.level,
     streak_count: entry.streak_count,
     premium_until: premiumMap.get(entry.user_id) || null,
@@ -235,7 +242,6 @@ export const BADGE_DEFINITIONS: Record<string, {
   requirement: string;
   category: 'rating' | 'social' | 'engagement' | 'exploration' | 'referral';
 }> = {
-  // Rating badges
   'first_reviewer': {
     name: 'First Steps',
     description: 'Deine erste Date-Bewertung abgegeben',
@@ -308,7 +314,6 @@ export const BADGE_DEFINITIONS: Record<string, {
     requirement: '5× gemeinsam bewertet',
     category: 'rating',
   },
-  // Exploration badges
   'explorer': {
     name: 'Explorer',
     description: '5 verschiedene Venues besucht',
@@ -327,7 +332,6 @@ export const BADGE_DEFINITIONS: Record<string, {
     requirement: '3 Küchen-Typen',
     category: 'exploration',
   },
-  // Engagement badges
   'planner': {
     name: 'Planner',
     description: '10 Dates geplant',
@@ -364,7 +368,6 @@ export const BADGE_DEFINITIONS: Record<string, {
     requirement: '50 Nachrichten',
     category: 'social',
   },
-  // Referral badges
   'first_referral': {
     name: 'Ambassador',
     description: 'Ersten Freund eingeladen',
