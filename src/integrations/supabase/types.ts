@@ -1888,6 +1888,14 @@ export type Database = {
       }
     }
     Functions: {
+      award_user_points: {
+        Args: {
+          new_badges?: Json
+          points_to_add: number
+          target_user_id: string
+        }
+        Returns: boolean
+      }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
       cleanup_stale_sessions: {
         Args: never
@@ -1932,6 +1940,14 @@ export type Database = {
           target_user_id: string
           times?: string[]
           vibes?: string[]
+        }
+        Returns: boolean
+      }
+      update_user_streak: {
+        Args: {
+          new_streak: number
+          review_date?: string
+          target_user_id: string
         }
         Returns: boolean
       }
