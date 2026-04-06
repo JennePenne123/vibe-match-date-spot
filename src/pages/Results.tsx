@@ -10,7 +10,7 @@ import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenueVouchers } from '@/hooks/useVenueVouchers';
-import { useUserPoints } from '@/hooks/useUserPoints';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
 
