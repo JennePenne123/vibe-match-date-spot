@@ -1321,6 +1321,7 @@ export type Database = {
           id: string
           last_review_date: string | null
           level: number
+          lifetime_xp: number
           premium_until: string | null
           referral_code: string | null
           referral_count: number
@@ -1336,6 +1337,7 @@ export type Database = {
           id?: string
           last_review_date?: string | null
           level?: number
+          lifetime_xp?: number
           premium_until?: string | null
           referral_code?: string | null
           referral_count?: number
@@ -1351,6 +1353,7 @@ export type Database = {
           id?: string
           last_review_date?: string | null
           level?: number
+          lifetime_xp?: number
           premium_until?: string | null
           referral_code?: string | null
           referral_count?: number
@@ -1888,14 +1891,24 @@ export type Database = {
       }
     }
     Functions: {
-      award_user_points: {
-        Args: {
-          new_badges?: Json
-          points_to_add: number
-          target_user_id: string
-        }
-        Returns: boolean
-      }
+      award_user_points:
+        | {
+            Args: {
+              new_badges?: Json
+              points_to_add: number
+              target_user_id: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              new_badges?: Json
+              points_to_add: number
+              target_user_id: string
+              xp_to_add?: number
+            }
+            Returns: boolean
+          }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
       cleanup_stale_sessions: {
         Args: never
