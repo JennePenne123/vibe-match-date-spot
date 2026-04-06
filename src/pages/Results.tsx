@@ -250,13 +250,6 @@ const Results = () => {
                         <Star className="w-3 h-3" />
                         Top {qualityRank} Match
                       </div>
-                        ) : (
-                          <>
-                            <Lock className="w-3 h-3" />
-                            Top {qualityRank}
-                          </>
-                        )}
-                      </div>
                     </div>
                   )}
                   <AIVenueCard

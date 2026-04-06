@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserPoints } from '@/hooks/useUserPoints';
-import { useRewardShop, type RedemptionHistoryItem } from '@/hooks/useRewardShop';
+import { useRewardShop } from '@/hooks/useRewardShop';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
