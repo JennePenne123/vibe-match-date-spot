@@ -1,9 +1,9 @@
-import React, { useMemo, Suspense } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, Users, Crown, Lock } from 'lucide-react';
+import { ArrowLeft, Sparkles, Users, Star } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
 import RealtimeContextBanner from '@/components/RealtimeContextBanner';
 import AIProgressIndicator from '@/components/profile/AIProgressIndicator';

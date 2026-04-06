@@ -10,7 +10,7 @@ import { ArrowLeft, Gift, Ticket, Crown, Star, Lock, Loader2, Sparkles, History,
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { toast } from '@/hooks/use-toast';
 
-const PREMIUM_7_DAY_COST = 750;
+
 
 export default function Rewards() {
   const navigate = useNavigate();
@@ -20,10 +20,6 @@ export default function Rewards() {
   const {
     vouchers,
     history,
-    monthlyUsed,
-    monthlyLimit,
-    isPremium,
-    premiumUntil,
     loading: shopLoading,
     redeeming,
     redeemReward,
