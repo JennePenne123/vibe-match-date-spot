@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Gift, Ticket, Crown, Star, Sparkles, History, Clock } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { toast } from '@/hooks/use-toast';
+
 
 
 
