@@ -35,7 +35,7 @@ export default function Rewards() {
     return null;
   }
 
-  const totalPoints = points?.total_points ?? 0;
+  const totalCoins = points?.total_points ?? 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -54,27 +54,22 @@ export default function Rewards() {
             </div>
             <Badge variant="secondary" className="text-sm font-semibold gap-1">
               <Star className="w-3.5 h-3.5 text-amber-500" />
-              {totalPoints.toLocaleString()}
+              {totalCoins.toLocaleString()} Coins
             </Badge>
           </div>
         </div>
 
-        {/* Points & Status Banner */}
+        {/* Coins Balance Banner */}
         <div className="px-4 pt-4 space-y-3">
           <Card className="bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 border-primary/20">
             <CardContent className="p-4 text-center">
-              <p className="text-sm text-muted-foreground">{t('rewards.yourPoints', 'Dein Guthaben')}</p>
-              <p className="text-3xl font-bold text-foreground mt-1">{totalPoints.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">{t('rewards.yourCoins', 'Dein Coin-Guthaben')}</p>
+              <p className="text-3xl font-bold text-foreground mt-1">{totalCoins.toLocaleString()} <span className="text-lg text-muted-foreground">Coins</span></p>
               <p className="text-xs text-muted-foreground mt-1">
-                {t('rewards.pointsHint', 'Sammle Punkte durch Dates, Bewertungen & Empfehlungen')}
+                Coins sammelst du durch Dates, Bewertungen & Empfehlungen
               </p>
             </CardContent>
           </Card>
-
-          {/* Points hint */}
-          <div className="text-xs text-muted-foreground px-1">
-            Sammle Punkte durch Dates, Bewertungen & Empfehlungen
-          </div>
         </div>
 
         {/* Venue Vouchers – Coming Soon */}
@@ -90,7 +85,7 @@ export default function Rewards() {
               </div>
               <h3 className="text-base font-semibold text-foreground mb-1">Bald verfügbar</h3>
               <p className="text-xs text-muted-foreground max-w-[260px] mx-auto">
-                Löse deine Punkte bald gegen exklusive Venue-Gutscheine ein. Wir arbeiten daran!
+                Löse deine Coins bald gegen exklusive Venue-Gutscheine ein. Wir arbeiten daran!
               </p>
               <Badge variant="outline" className="mt-3 text-xs text-emerald-600 border-emerald-500/30">
                 <Sparkles className="w-3 h-3 mr-1" />
@@ -113,7 +108,7 @@ export default function Rewards() {
               </div>
               <h3 className="text-base font-semibold text-foreground mb-1">Bald verfügbar</h3>
               <p className="text-xs text-muted-foreground max-w-[260px] mx-auto">
-                Premium-Mitgliedschaft mit exklusiven Gutscheinen und unbegrenzten Vorteilen kommt bald. Wir informieren dich!
+                Tausche deine Coins gegen Premium-Zugang mit exklusiven Vorteilen. Kommt bald!
               </p>
               <Badge variant="outline" className="mt-3 text-xs text-amber-600 border-amber-500/30">
                 <Sparkles className="w-3 h-3 mr-1" />
