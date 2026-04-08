@@ -29,7 +29,7 @@ const GroupChatPanel: React.FC<GroupChatPanelProps> = ({ groupId }) => {
   // Realtime subscription for new messages
   useEffect(() => {
     const channel = supabase
-      .channel(`group-chat-${groupId}-${Date.now()}`)
+      .channel(`${user?.id}:group-chat-${groupId}-${Date.now()}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',

@@ -268,7 +268,7 @@ const SessionStatusDebug: React.FC<{ sessionId?: string; expectedPartnerId?: str
     console.log('🔄 SESSION DEBUG: Setting up real-time updates for session:', sessionId);
     
     const channel = supabase
-      .channel(`session-debug-${sessionId}-${Date.now()}`)
+      .channel(`${user.id}:session-debug-${sessionId}-${Date.now()}`)
       .on(
         'postgres_changes',
         {
