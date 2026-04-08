@@ -1889,6 +1889,87 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences_safe: {
+        Row: {
+          accessibility_needs: string[] | null
+          created_at: string | null
+          dietary_restrictions: string[] | null
+          excluded_cuisines: string[] | null
+          id: string | null
+          lifestyle_data: Json | null
+          max_distance: number | null
+          personality_traits: Json | null
+          preferred_activities: string[] | null
+          preferred_cuisines: string[] | null
+          preferred_duration: string | null
+          preferred_entertainment: string[] | null
+          preferred_price_range: string[] | null
+          preferred_times: string[] | null
+          preferred_venue_types: string[] | null
+          preferred_vibes: string[] | null
+          relationship_goal: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          accessibility_needs?: string[] | null
+          created_at?: string | null
+          dietary_restrictions?: string[] | null
+          excluded_cuisines?: string[] | null
+          id?: string | null
+          lifestyle_data?: Json | null
+          max_distance?: number | null
+          personality_traits?: Json | null
+          preferred_activities?: string[] | null
+          preferred_cuisines?: string[] | null
+          preferred_duration?: string | null
+          preferred_entertainment?: string[] | null
+          preferred_price_range?: string[] | null
+          preferred_times?: string[] | null
+          preferred_venue_types?: string[] | null
+          preferred_vibes?: string[] | null
+          relationship_goal?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          accessibility_needs?: string[] | null
+          created_at?: string | null
+          dietary_restrictions?: string[] | null
+          excluded_cuisines?: string[] | null
+          id?: string | null
+          lifestyle_data?: Json | null
+          max_distance?: number | null
+          personality_traits?: Json | null
+          preferred_activities?: string[] | null
+          preferred_cuisines?: string[] | null
+          preferred_duration?: string | null
+          preferred_entertainment?: string[] | null
+          preferred_price_range?: string[] | null
+          preferred_times?: string[] | null
+          preferred_venue_types?: string[] | null
+          preferred_vibes?: string[] | null
+          relationship_goal?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       award_user_points:
@@ -1933,6 +2014,7 @@ export type Database = {
           visit_count: number
         }[]
       }
+      get_friend_preferences: { Args: { _friend_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
