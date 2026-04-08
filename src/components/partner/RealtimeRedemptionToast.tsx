@@ -14,7 +14,7 @@ export default function RealtimeRedemptionToast() {
   useEffect(() => {
     if (!user?.id) return;
 
-    const channelName = `partner-redemptions-${user.id}-${Date.now()}`;
+    const channelName = `${user.id}:redemptions-${Date.now()}`;
 
     const channel = supabase
       .channel(channelName)
