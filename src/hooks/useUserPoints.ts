@@ -34,7 +34,7 @@ export const useUserPoints = () => {
       loadPoints();
       
       const channel = supabase
-        .channel(`user-points-${user.id}-${Date.now()}`)
+        .channel(`${user.id}:user-points-${Date.now()}`)
         .on(
           'postgres_changes',
           {

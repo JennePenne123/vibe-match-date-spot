@@ -42,7 +42,7 @@ export const useReferral = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel(`referrals-${user.id}-${Date.now()}`)
+      .channel(`${user.id}:referrals-${Date.now()}`)
       .on(
         'postgres_changes',
         {

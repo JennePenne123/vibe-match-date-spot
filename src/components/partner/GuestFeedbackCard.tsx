@@ -81,7 +81,7 @@ export default function GuestFeedbackCard() {
 
       if (!partnerships?.length) return;
 
-      const channelName = `partner-feedback-notifications-${user.id}-${Date.now()}`;
+      const channelName = `${user.id}:partner-feedback-${Date.now()}`;
 
       channel = supabase
         .channel(channelName)

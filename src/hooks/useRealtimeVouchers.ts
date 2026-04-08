@@ -92,7 +92,7 @@ export const useRealtimeVouchers = (partnerId: string | undefined): UseRealtimeV
       return;
     }
 
-    const channelName = `partner-vouchers-realtime-${partnerId}-${Date.now()}`;
+    const channelName = `${partnerId}:vouchers-realtime-${Date.now()}`;
 
     const channel = supabase
       .channel(channelName)

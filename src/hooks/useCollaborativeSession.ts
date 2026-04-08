@@ -243,7 +243,7 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     if (!sessionId || !session) return;
     
     // Create unique channel name to avoid conflicts
-    const channelName = `collab-session-${sessionId}-${user?.id}`;
+    const channelName = `${user?.id}:collab-session-${sessionId}`;
     console.log('🔄 COLLAB SESSION: Setting up real-time subscription:', channelName);
     
     let isActive = true;
