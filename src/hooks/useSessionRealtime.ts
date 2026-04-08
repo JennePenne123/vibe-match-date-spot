@@ -30,7 +30,7 @@ export const useSessionRealtime = (
     if (!currentSession) return;
 
     // Create unique channel name to prevent conflicts with collaborative session
-    const channelName = `${userId}:session-realtime-${currentSession.id}`;
+    const channelName = `${currentSession.initiator_id}:session-realtime-${currentSession.id}`;
     console.log('Setting up session realtime subscription for session:', currentSession.id, 'with channel:', channelName);
     
     let isSubscribed = true; // Flag to prevent updates after unmount
