@@ -23,8 +23,8 @@ export const useFriends = () => {
           status,
           user_id,
           friend_id,
-          user:profiles!user_id(id, name, avatar_url),
-          friend:profiles!friend_id(id, name, avatar_url)
+          user:profiles_safe!user_id(id, name, avatar_url),
+          friend:profiles_safe!friend_id(id, name, avatar_url)
         `)
         .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
         .eq('status', 'accepted');
