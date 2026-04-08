@@ -2,7 +2,7 @@ import { type ReactNode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './i18n'
-import './index.css'
+import './index.css' // boot
 
 const normalizeInitialPath = () => {
   if (typeof window === 'undefined') {
