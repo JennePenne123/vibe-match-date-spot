@@ -280,6 +280,40 @@ serve(async (req) => {
 
     if (updateError) throw new Error(`Failed to update profile: ${updateError.message}`);
 
+    // Send push notification to partner about verification result
+    try {
+      const notifTitle = verificationStatus === 'verified'
+        ? '✅ Verifizierung erfolgreich!'
+        : verificationStatus === 'failed'
+          ? '❌ Verifizierung fehlgeschlagen'
+          : '🔍 Verifizierung wird geprüft';
+
+      const notifBody = verificationStatus === 'verified'
+        ? 'Dein Venue-Partner-Account wurde erfolgreich verifiziert. Du kannst jetzt alle Funktionen nutzen.'
+        : verificationStatus === 'failed'
+          ? `Verifizierung fehlgeschlagen: ${verificationNotes}. Bitte überprüfe deine Angaben.`
+          : 'Deine Verifizierung wird von einem Admin überprüft. Wir melden uns in Kürze.';
+
+      await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${serviceRoleKey}`,
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          title: notifTitle,
+          body: notifBody,
+          url: '/partner',
+          type: 'verification_update',
+        }),
+      });
+      console.log(`📬 Push notification sent for verification status: ${verificationStatus}`);
+    } catch (pushError) {
+      // Don't fail the whole verification if push fails
+      console.error('Push notification error (non-critical):', pushError);
+    }
+
     return new Response(JSON.stringify({
       status: verificationStatus,
       tax_id_valid: taxVerification.valid,

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 export interface PartnerVerification {
   verification_status: string;
@@ -90,6 +91,25 @@ export function usePartnerVerification() {
 
     if (error) throw error;
     await fetchVerification();
+
+    // Show in-app toast based on result
+    if (data?.status === 'verified') {
+      toast.success('Verifizierung erfolgreich!', {
+        description: 'Dein Account wurde automatisch verifiziert. Alle Funktionen sind jetzt freigeschaltet.',
+        duration: 8000,
+      });
+    } else if (data?.status === 'failed') {
+      toast.error('Verifizierung fehlgeschlagen', {
+        description: data.notes || 'Bitte überprüfe deine Angaben und versuche es erneut.',
+        duration: 8000,
+      });
+    } else if (data?.status === 'pending_review') {
+      toast.info('Wird geprüft', {
+        description: 'Deine Angaben werden von einem Admin überprüft. Du wirst benachrichtigt.',
+        duration: 6000,
+      });
+    }
+
     return data;
   };
 
