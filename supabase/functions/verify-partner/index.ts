@@ -245,14 +245,12 @@ serve(async (req) => {
       // Non-EU VAT format valid but no address match = pending review
       verificationStatus = 'pending_review';
       verificationNotes = `Tax ID format valid, but address could not be matched. Admin review required.`;
-    } else if (tax_id_type === 'local_tax_number' && taxVerification.valid && addressResult.verified) {
-      // Local tax number + address = verified
-      verificationStatus = 'verified';
-      verificationNotes = `Local tax number format valid. Address verified via Google Places (confidence: ${addressResult.confidence}%).`;
     } else if (tax_id_type === 'local_tax_number' && taxVerification.valid) {
-      // Local tax number only = pending review
-      verificationStatus = 'pending_review';
-      verificationNotes = `Local tax number format valid, but address could not be matched. Admin review required.`;
+      // Local tax number (e.g. Kleinunternehmer without VAT ID) = auto-verified
+      verificationStatus = 'verified';
+      verificationNotes = addressResult.verified
+        ? `Local tax number format valid. Address verified via Google Places (confidence: ${addressResult.confidence}%).`
+        : `Local tax number format valid. Auto-verified (Kleinunternehmer/small business).${addressResult.confidence > 0 ? ` Address partial match (${addressResult.confidence}%).` : ''}`;
     } else {
       verificationStatus = 'failed';
       verificationNotes = taxVerification.error || 'Verification failed.';
