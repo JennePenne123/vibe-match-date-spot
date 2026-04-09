@@ -141,10 +141,7 @@ User 2 Preferences:
   } catch (error) {
     console.error('❌ ANALYZE-COMPATIBILITY: Error:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Internal server error',
-        details: error instanceof Error ? error.stack : undefined
-      }),
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
