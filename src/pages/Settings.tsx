@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -563,10 +564,21 @@ const Settings = () => {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <Input value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} placeholder={t('settings.deleteConfirmInput', { word: deleteWord })} className="bg-background/50 border-border/50" />
+                  <div className="flex items-start gap-2 mt-2">
+                    <Checkbox 
+                      id="delete-confirm-checkbox" 
+                      checked={deleteConfirmChecked} 
+                      onCheckedChange={(checked) => setDeleteConfirmChecked(checked === true)} 
+                    />
+                    <Label htmlFor="delete-confirm-checkbox" className="text-sm text-muted-foreground leading-snug cursor-pointer">
+                      {t('settings.deleteCheckboxLabel', 'Ich verstehe, dass alle meine Daten (Profil, Einladungen, Bewertungen, Freundschaften, Punkte) unwiderruflich gelöscht werden.')}
+                    </Label>
+                  </div>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="border-border text-foreground">{t('common.cancel')}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteAccount} disabled={deleteConfirmText !== deleteWord || deleteLoading} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    <AlertDialogCancel className="border-border text-foreground" onClick={() => { setDeleteConfirmChecked(false); setDeleteConfirmText(''); }}>{t('common.cancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteAccount} disabled={deleteConfirmText !== deleteWord || !deleteConfirmChecked || deleteLoading} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                       {deleteLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                      {t('settings.deleteForever')}
                       {t('settings.deleteForever')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
