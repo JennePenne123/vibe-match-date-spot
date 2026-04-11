@@ -47,6 +47,7 @@ const Settings = () => {
   const [exportLoading, setExportLoading] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteConfirmChecked, setDeleteConfirmChecked] = useState(false);
   const [trackingOptOut, setTrackingOptOut] = useState(() => localStorage.getItem(TRACKING_OPT_OUT_KEY) === 'true');
 
   useEffect(() => {
