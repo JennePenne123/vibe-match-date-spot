@@ -1987,6 +1987,7 @@ export type Database = {
             }
             Returns: boolean
           }
+      cleanup_old_implicit_signals: { Args: never; Returns: number }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
       cleanup_stale_sessions: {
         Args: never
@@ -1998,6 +1999,7 @@ export type Database = {
       }
       count_perfect_pairs: { Args: { target_user_id: string }; Returns: number }
       create_test_venues: { Args: { venues_data: Json }; Returns: boolean }
+      delete_user_data: { Args: { target_user_id: string }; Returns: boolean }
       get_city_venue_rankings: {
         Args: { _city: string }
         Returns: {
