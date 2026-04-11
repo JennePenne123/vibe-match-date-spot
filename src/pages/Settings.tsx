@@ -518,29 +518,6 @@ const Settings = () => {
 
           <Separator className="bg-border/50" />
 
-          {/* Legal Links */}
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Scale className="w-4 h-4 text-primary" />
-                {t('settings.legal', 'Rechtliches')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              <Button variant="ghost" className="w-full justify-between text-sm h-9" onClick={() => navigate('/impressum')}>
-                Impressum <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
-              </Button>
-              <Button variant="ghost" className="w-full justify-between text-sm h-9" onClick={() => navigate('/datenschutz')}>
-                Datenschutzerklärung <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
-              </Button>
-              <Button variant="ghost" className="w-full justify-between text-sm h-9" onClick={() => navigate('/agb')}>
-                AGB <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Separator className="bg-border/50" />
-
           {/* Danger Zone */}
           <Card className="bg-card border-destructive/30">
             <CardHeader className="pb-3">
