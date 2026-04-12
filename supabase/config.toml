@@ -71,3 +71,6 @@ verify_jwt = true
 
 [functions.ai-concierge]
 verify_jwt = false
+
+[functions.validate-venue-data]
+verify_jwt = false
