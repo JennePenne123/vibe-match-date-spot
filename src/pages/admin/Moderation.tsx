@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Star, AlertTriangle, CheckCircle2, MapPin, ThumbsUp, ThumbsDown, Shield, ShieldCheck } from 'lucide-react';
+import { MessageCircle, Star, AlertTriangle, CheckCircle2, MapPin, ThumbsUp, ThumbsDown, Shield, ShieldCheck, XCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import PartnerVerificationReview from '@/components/admin/PartnerVerificationReview';
@@ -165,12 +165,27 @@ const VenueVerificationList: React.FC = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from('venues')
-        .select('id, name, address, cuisine_type, price_range, rating, source, verified, created_at')
+        .select('id, name, address, cuisine_type, price_range, rating, source, verified, is_active, created_at')
         .order('created_at', { ascending: false })
         .limit(50);
       return data || [];
     },
     staleTime: STALE_TIMES.ADMIN,
+  });
+
+  const verifyMutation = useMutation({
+    mutationFn: async ({ venueId, verified, active }: { venueId: string; verified: boolean; active: boolean }) => {
+      const { error } = await supabase
+        .from('venues')
+        .update({ verified, is_active: active, updated_at: new Date().toISOString() })
+        .eq('id', venueId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-unverified-venues'] });
+      toast.success('Venue-Status aktualisiert');
+    },
+    onError: (err: Error) => toast.error(err.message),
   });
 
   const unverified = venues?.filter(v => !v.verified) || [];
@@ -200,8 +215,8 @@ const VenueVerificationList: React.FC = () => {
           <div className="space-y-3">
             {unverified.map(venue => (
               <Card key={venue.id} className="bg-card/80 border-border/40">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between gap-3">
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-foreground truncate">{venue.name}</p>
                       <p className="text-xs text-muted-foreground truncate">{venue.address}</p>
@@ -209,11 +224,33 @@ const VenueVerificationList: React.FC = () => {
                         {venue.cuisine_type && <Badge variant="outline" className="text-xs">{venue.cuisine_type}</Badge>}
                         {venue.price_range && <Badge variant="outline" className="text-xs">{venue.price_range}</Badge>}
                         {venue.source && <Badge variant="secondary" className="text-xs">{venue.source}</Badge>}
+                        {venue.rating && <Badge variant="outline" className="text-xs gap-1"><Star className="w-3 h-3 text-amber-400" />{venue.rating}</Badge>}
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground whitespace-nowrap">
                       {new Date(venue.created_at).toLocaleDateString('de-DE')}
                     </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="gap-1.5 flex-1"
+                      onClick={() => verifyMutation.mutate({ venueId: venue.id, verified: true, active: true })}
+                      disabled={verifyMutation.isPending}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Verifizieren
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="gap-1.5 flex-1"
+                      onClick={() => verifyMutation.mutate({ venueId: venue.id, verified: false, active: false })}
+                      disabled={verifyMutation.isPending}
+                    >
+                      <XCircle className="w-3.5 h-3.5" />
+                      Ablehnen
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
