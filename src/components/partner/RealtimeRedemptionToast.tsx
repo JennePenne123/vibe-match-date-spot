@@ -24,6 +24,7 @@ export default function RealtimeRedemptionToast() {
           event: 'INSERT',
           schema: 'public',
           table: 'voucher_redemptions',
+          filter: `user_id=eq.${user.id}`,
         },
         async (payload) => {
           const redemption = payload.new as any;
