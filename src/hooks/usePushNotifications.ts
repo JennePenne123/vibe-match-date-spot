@@ -77,8 +77,8 @@ export function usePushNotifications() {
     init();
   }, [user, checkSupport]);
 
-  // Register service worker
-  const registerServiceWorker = useCallback(async () => {
+  // Get service worker registration (managed by vite-plugin-pwa)
+  const getServiceWorkerRegistration = useCallback(async () => {
     if (isLovablePreviewEnvironment()) {
       throw new Error('Service Worker is disabled in Lovable preview');
     }
@@ -87,31 +87,9 @@ export function usePushNotifications() {
       throw new Error('Service Worker not supported');
     }
 
-    try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      await registration.update();
-
-      if (registration.waiting) {
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-      }
-
-      registration.addEventListener('updatefound', () => {
-        const installingWorker = registration.installing;
-        if (!installingWorker) return;
-
-        installingWorker.addEventListener('statechange', () => {
-          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            installingWorker.postMessage({ type: 'SKIP_WAITING' });
-          }
-        });
-      });
-
-      console.log('Service Worker registered:', registration);
-      return registration;
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
-      throw error;
-    }
+    const registration = await navigator.serviceWorker.ready;
+    console.log('Service Worker ready:', registration);
+    return registration;
   }, []);
 
   // Request notification permission
