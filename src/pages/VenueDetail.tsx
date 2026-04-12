@@ -5,7 +5,7 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Star, MapPin, DollarSign, Clock, Phone, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Clock, Phone, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
 import { venueToAppVenue } from '@/utils/typeHelpers';
 import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
 import { supabase } from '@/integrations/supabase/client';

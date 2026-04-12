@@ -4,7 +4,7 @@ import VenueQuickReaction from '@/components/VenueQuickReaction';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Star, MapPin, DollarSign, Sparkles, Navigation, Clock } from 'lucide-react';
+import { Heart, Star, MapPin, Sparkles, Navigation, Clock } from 'lucide-react';
 import { Venue } from '@/types';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
