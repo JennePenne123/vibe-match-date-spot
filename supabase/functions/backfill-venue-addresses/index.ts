@@ -88,7 +88,7 @@ serve(async (req) => {
 
   return new Response(
     JSON.stringify({
-      total: venues?.length || 0,
+      total: emptyAddressVenues.length,
       updated: updatedCount,
       results,
     }),
