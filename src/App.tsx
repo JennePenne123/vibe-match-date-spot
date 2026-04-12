@@ -15,6 +15,7 @@ function ScrollToTop() {
 }
 import { ThemeProvider } from "next-themes";
 import AdminRouteGuard from "./components/AdminRouteGuard";
+import { AdminPermissionGuard } from "./components/admin/AdminPermissionGuard";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppProvider } from "./contexts/AppContext";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -260,12 +261,12 @@ const App = () => (
                     {/* Admin Routes – protected by role check */}
                     <Route path="/admin" element={<LazyPage><AdminRouteGuard><AdminDashboard /></AdminRouteGuard></LazyPage>} />
                     <Route path="/admin/analytics" element={<LazyPage><AdminRouteGuard><AdminAnalytics /></AdminRouteGuard></LazyPage>} />
-                    <Route path="/admin/users" element={<LazyPage><AdminRouteGuard><AdminUsers /></AdminRouteGuard></LazyPage>} />
-                    <Route path="/admin/moderation" element={<LazyPage><AdminRouteGuard><AdminModeration /></AdminRouteGuard></LazyPage>} />
-                    <Route path="/admin/health" element={<LazyPage><AdminRouteGuard><AdminSystemHealth /></AdminRouteGuard></LazyPage>} />
-                    <Route path="/admin/reports" element={<LazyPage><AdminRouteGuard><AdminModeration /></AdminRouteGuard></LazyPage>} />
-                    <Route path="/admin/errors" element={<LazyPage><AdminRouteGuard><AdminErrors /></AdminRouteGuard></LazyPage>} />
-                    <Route path="/admin/team" element={<LazyPage><AdminRouteGuard><AdminTeam /></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/users" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canViewUsers"><AdminUsers /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/moderation" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canModerate"><AdminModeration /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/health" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canViewSystemHealth"><AdminSystemHealth /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/reports" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canModerate"><AdminModeration /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/errors" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canViewErrors"><AdminErrors /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/team" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canManageTeam"><AdminTeam /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
                     
                     {/* Demo routes */}
                     <Route path="/demo/ai-venue-card" element={<LazyPageNoLayout><AIVenueCardDemo /></LazyPageNoLayout>} />
