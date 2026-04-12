@@ -11,6 +11,7 @@ import InvitationCreation from '@/components/date-planning/InvitationCreation';
 import PlanningHeader from '@/components/date-planning/PlanningHeader';
 import PreferencesStep from '@/components/date-planning/PreferencesStep';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
+import DateModeSelection from '@/components/date-planning/DateModeSelection';
 
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
 import { createSmartDatePlannerHandlers } from '@/components/smart-date-planner/SmartDatePlannerHandlers';
@@ -85,7 +86,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     selectedVenueId, invitationMessage, setInvitationMessage, aiAnalyzing,
     selectedPartner, selectedVenue, navigate, userLocation, locationError,
     locationRequested, requestLocation,
-    dateMode, setDateMode, selectedPartnerIds, setSelectedPartnerIds,
+    dateMode, setDateMode, handleModeSelect, selectedPartnerIds, setSelectedPartnerIds,
   } = state;
 
   const handlePartnerContinue = async () => {
@@ -150,34 +151,36 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     return <SmartDatePlannerAuth onSignIn={() => navigate('/?auth=required')} />;
   }
 
+  const isSoloMode = dateMode === 'solo';
+
   const preferencesStepContent = (
     <PreferencesStep
       sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
-      partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
-      partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
-      compatibilityScore={compatibilityScore}
+      partnerId={isSoloMode ? '' : (effectivePreselectedFriend?.id || selectedPartnerId)}
+      partnerName={isSoloMode ? '' : (effectivePreselectedFriend?.name || selectedPartner?.name || '')}
+      compatibilityScore={isSoloMode ? null : compatibilityScore}
       aiAnalyzing={aiAnalyzing}
       onPreferencesComplete={(prefs) => handlePreferencesComplete(prefs, collaborativeSession?.id || sessionId)}
       initialProposedDate={proposalDateISO}
-      planningMode="collaborative"
-      collaborativeSession={collaborativeSession ? { hasUserSetPreferences, hasPartnerSetPreferences, canShowResults } : undefined}
+      planningMode={isSoloMode ? 'collaborative' : 'collaborative'}
+      collaborativeSession={!isSoloMode && collaborativeSession ? { hasUserSetPreferences, hasPartnerSetPreferences, canShowResults } : undefined}
       onManualContinue={handleManualContinue}
       onDisplayVenues={state.navigateToResults}
       venueRecommendations={venueRecommendations}
     />
   );
 
-  const venueStepContent = selectedPartner && (
+  const venueStepContent = (isSoloMode || selectedPartner) && (
     <PlanTogether
-      partnerName={selectedPartner.name}
-      partnerId={selectedPartnerId}
+      partnerName={isSoloMode ? '' : (selectedPartner?.name || '')}
+      partnerId={isSoloMode ? '' : selectedPartnerId}
       venueRecommendations={venueRecommendations || []}
       onVenueSelect={handleVenueSelection}
       error={datePlanningError || undefined}
       onRetrySearch={() => console.log('Retrying venue search...')}
       sessionId={collaborativeSession?.id || currentSession?.id}
-      isCollaborative
-      compatibilityScore={compatibilityScore}
+      isCollaborative={!isSoloMode}
+      compatibilityScore={isSoloMode ? null : compatibilityScore}
     />
   );
 
@@ -216,16 +219,19 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
               {/* Steps */}
               <ErrorBoundaryWrapper silent>
                 <div className="animate-fade-in">
+                  {currentStep === 'select-mode' && (
+                    <DateModeSelection onSelectMode={handleModeSelect} />
+                  )}
                   {currentStep === 'select-partner' && (
                     <PartnerSelection
                       friends={friends}
                       selectedPartnerId={selectedPartnerId}
                       selectedPartnerIds={selectedPartnerIds}
-                      dateMode={dateMode}
+                      dateMode={dateMode === 'group' ? 'group' : 'single'}
                       loading={loading}
                       onPartnerChange={(id) => setSelectedPartnerId(id)}
                       onPartnerIdsChange={setSelectedPartnerIds}
-                      onDateModeChange={setDateMode}
+                      onDateModeChange={(m) => setDateMode(m)}
                       onContinue={handlePartnerContinue}
                     />
                   )}

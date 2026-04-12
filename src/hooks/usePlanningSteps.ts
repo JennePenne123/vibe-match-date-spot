@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-export type PlanningStep = 'select-partner' | 'set-preferences' | 'plan-together' | 'create-invitation';
+export type PlanningStep = 'select-mode' | 'select-partner' | 'set-preferences' | 'plan-together' | 'create-invitation';
+export type DateModeType = 'solo' | 'single' | 'group';
 
 interface UsePlanningStepsProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -8,9 +9,10 @@ interface UsePlanningStepsProps {
 }
 
 export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborative' }: UsePlanningStepsProps) => {
-  const initialStep: PlanningStep = preselectedFriend ? 'set-preferences' : 'select-partner';
+  const initialStep: PlanningStep = preselectedFriend ? 'set-preferences' : 'select-mode';
   const [currentStep, setCurrentStepInternal] = useState<PlanningStep>(initialStep);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
+  const [dateMode, setDateMode] = useState<DateModeType>('single');
 
   const setCurrentStep = (step: PlanningStep) => {
     setCurrentStepInternal(step);
@@ -19,7 +21,8 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
 
   const getStepProgress = () => {
     switch (currentStep) {
-      case 'select-partner': return 10;
+      case 'select-mode': return 5;
+      case 'select-partner': return 15;
       case 'set-preferences': return 33;
       case 'plan-together': return 66;
       case 'create-invitation': return 100;
@@ -27,14 +30,28 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     }
   };
 
+  const handleModeSelect = (mode: DateModeType) => {
+    setDateMode(mode);
+    if (mode === 'solo') {
+      setCurrentStep('set-preferences');
+    } else {
+      setCurrentStep('select-partner');
+    }
+  };
+
   const goBack = (preselectedFriend?: { id: string; name: string } | null, navigate?: (path: string) => void) => {
     switch (currentStep) {
-      case 'select-partner':
+      case 'select-mode':
         if (navigate) navigate('/home');
+        break;
+      case 'select-partner':
+        setCurrentStepInternal('select-mode');
         break;
       case 'set-preferences':
         if (preselectedFriend) {
           if (navigate) navigate('/home');
+        } else if (dateMode === 'solo') {
+          setCurrentStepInternal('select-mode');
         } else {
           setCurrentStepInternal('select-partner');
         }
@@ -54,6 +71,9 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     selectedPartnerId,
     setSelectedPartnerId,
     getStepProgress,
-    goBack
+    goBack,
+    dateMode,
+    setDateMode,
+    handleModeSelect,
   };
 };
