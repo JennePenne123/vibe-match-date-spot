@@ -22,7 +22,7 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
   const getStepProgress = () => {
     switch (currentStep) {
       case 'select-mode': return 5;
-      case 'select-partner': return 15;
+      case 'select-partner': return 10;
       case 'set-preferences': return 33;
       case 'plan-together': return 66;
       case 'create-invitation': return 100;
