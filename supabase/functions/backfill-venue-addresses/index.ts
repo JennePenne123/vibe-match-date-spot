@@ -57,7 +57,9 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: corsHeaders });
   }
 
-  console.log(`📍 Backfill: Found ${venues?.length || 0} venues with empty addresses`);
+  // Filter in code: only venues with empty/null addresses
+  const emptyAddressVenues = (venues || []).filter(v => !v.address || v.address.trim() === '' || v.address.trim() === ',' || v.address.trim() === ', ');
+  console.log(`📍 Backfill: Found ${emptyAddressVenues.length} venues with empty addresses (of ${venues?.length || 0} total)`);
 
   const results: { id: string; name: string; address: string }[] = [];
   let updatedCount = 0;
