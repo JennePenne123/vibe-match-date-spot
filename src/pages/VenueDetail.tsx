@@ -255,7 +255,7 @@ const VenueDetail = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-muted-foreground" />
-                <span className="text-muted-foreground">{appVenue.address}</span>
+                <span className="text-muted-foreground">{displayAddress}</span>
               </div>
               {appVenue.phone && (
                 <div className="flex items-center gap-3">
