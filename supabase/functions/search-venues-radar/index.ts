@@ -60,6 +60,70 @@ const ACTIVITY_TO_RADAR: Record<string, string[]> = {
   'nightlife_act': ['nightclub', 'bar', 'lounge'],
 };
 
+// Build a proper address from Radar's location object with multiple fallbacks
+function buildRadarAddress(location: any): string {
+  if (!location) return '';
+
+  // Best: formattedAddress
+  if (location.formattedAddress && location.formattedAddress.trim()) {
+    return location.formattedAddress.trim();
+  }
+
+  // Build from parts: street + number, postalCode city
+  const streetParts = [
+    location.street || location.addressLabel || '',
+    location.number || location.addressNumber || '',
+  ].filter(Boolean);
+
+  const cityParts = [
+    location.postalCode || location.zip || '',
+    location.city || location.locality || '',
+  ].filter(Boolean);
+
+  const countryPart = location.country || '';
+
+  if (streetParts.length > 0 && cityParts.length > 0) {
+    return `${streetParts.join(' ')}, ${cityParts.join(' ')}`;
+  }
+  if (streetParts.length > 0) return streetParts.join(' ');
+  if (cityParts.length > 0) return cityParts.join(' ');
+
+  // Fallback: neighborhood or region
+  if (location.neighborhood) return `${location.neighborhood}, ${location.city || location.country || ''}`;
+  if (location.region) return `${location.region}, ${countryPart}`;
+
+  return '';
+}
+
+// Reverse-geocode via Nominatim (free, no API key)
+async function reverseGeocode(lat: number, lon: number): Promise<string> {
+  try {
+    const resp = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1&zoom=18`,
+      { headers: { 'User-Agent': 'HiOutz/1.0 (contact@hioutz.de)' } }
+    );
+    if (!resp.ok) return '';
+    const data = await resp.json();
+    
+    const addr = data.address || {};
+    const street = addr.road || addr.pedestrian || addr.footway || '';
+    const number = addr.house_number || '';
+    const postcode = addr.postcode || '';
+    const city = addr.city || addr.town || addr.village || addr.municipality || '';
+    
+    const streetLine = [street, number].filter(Boolean).join(' ');
+    const cityLine = [postcode, city].filter(Boolean).join(' ');
+    
+    if (streetLine && cityLine) return `${streetLine}, ${cityLine}`;
+    if (streetLine) return streetLine;
+    if (cityLine) return cityLine;
+    return data.display_name?.split(',').slice(0, 3).join(',') || '';
+  } catch (e) {
+    console.warn('⚠️ Nominatim reverse-geocode failed:', e);
+    return '';
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -214,14 +278,16 @@ serve(async (req) => {
         const cuisineType = determineCuisineType(place, sanitizedCuisines);
         const isChain = !!place.chain;
         const chainName = place.chain?.name || null;
+        const lat = place.location?.coordinates?.[1] || place.location?.latitude;
+        const lon = place.location?.coordinates?.[0] || place.location?.longitude;
 
         return {
           venue_id: place._id,
           radar_id: place._id,
           name: place.name,
-          address: place.location?.formattedAddress || `${place.location?.addressLabel || ''}, ${place.location?.city || ''}`,
-          latitude: place.location?.coordinates?.[1] || place.location?.latitude,
-          longitude: place.location?.coordinates?.[0] || place.location?.longitude,
+          address: buildRadarAddress(place.location),
+          latitude: lat,
+          longitude: lon,
           cuisine_type: cuisineType,
           price_range: '$$',
           rating: 0,
@@ -236,6 +302,23 @@ serve(async (req) => {
           source: 'radar',
         };
       });
+
+    // Reverse-geocode venues with missing addresses (batch with delay to respect Nominatim rate limit)
+    let geocodedCount = 0;
+    for (const venue of venues) {
+      if ((!venue.address || venue.address.trim() === '' || venue.address.trim() === ',') && venue.latitude && venue.longitude) {
+        const addr = await reverseGeocode(venue.latitude, venue.longitude);
+        if (addr) {
+          venue.address = addr;
+          geocodedCount++;
+        }
+        // Nominatim asks for max 1 req/sec
+        await new Promise(r => setTimeout(r, 1100));
+      }
+    }
+    if (geocodedCount > 0) {
+      console.log(`📍 RADAR: Reverse-geocoded ${geocodedCount} missing addresses via Nominatim`);
+    }
 
     // Save to database
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
