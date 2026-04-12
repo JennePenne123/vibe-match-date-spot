@@ -208,15 +208,25 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       console.error('🔧 PREFERENCES COMPLETE - Missing required data for AI analysis:', {
         hasSession: !!effectiveSessionId,
         hasPartnerId: !!selectedPartnerId,
-        hasLocation: !!state.userLocation,
+        hasLocation: !!locationToUse,
+        hasStateLocation: !!state.userLocation,
+        hasFreshLocation: !!freshLocation,
         effectiveSessionId,
         selectedPartnerId,
-        locationData: state.userLocation
+        locationData: locationToUse
       });
+      
+      const missingItems = [];
+      if (!effectiveSessionId) missingItems.push('Session');
+      if (!selectedPartnerId) missingItems.push('Partner');
+      if (!locationToUse) missingItems.push('Standort');
+      
       toast({
         variant: 'destructive',
-        title: 'Missing Information',
-        description: 'Please ensure location is enabled and try again.'
+        title: 'Fehlende Informationen',
+        description: missingItems.includes('Standort')
+          ? 'Bitte aktiviere deinen Standort oder gib eine Adresse ein.'
+          : `Fehlende Daten: ${missingItems.join(', ')}. Bitte versuche es erneut.`
       });
     }
   }
