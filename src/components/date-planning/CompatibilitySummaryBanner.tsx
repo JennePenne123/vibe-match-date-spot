@@ -11,7 +11,7 @@ interface CompatibilityScore {
 }
 
 interface CompatibilitySummaryBannerProps {
-  compatibilityScore: number | CompatibilityScore;
+  compatibilityScore: number | CompatibilityScore | null;
   partnerName: string;
   venueCount: number;
   compact?: boolean;
@@ -26,6 +26,8 @@ const CompatibilitySummaryBanner: React.FC<CompatibilitySummaryBannerProps> = ({
   collapsible = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  if (!compatibilityScore) return null;
 
   // Extract score percentage
   const scoreValue = typeof compatibilityScore === 'object' && compatibilityScore?.overall_score
