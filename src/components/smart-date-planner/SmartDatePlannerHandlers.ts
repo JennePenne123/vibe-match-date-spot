@@ -483,35 +483,49 @@ export const createSmartDatePlannerHandlers = (state: any) => {
   async function handleManualContinue(freshLocation?: { latitude: number; longitude: number; address?: string }) {
     console.log('🔄 MANUAL TRIGGER - Manual continue triggered');
     
+    const isSoloMode = state.dateMode === 'solo';
     const effectiveSessionId = collaborativeSession?.id || currentSession?.id || sessionId;
     const locationToUse = freshLocation || state.userLocation;
+    const userId = state.user?.id;
     
-    console.log('🔄 MANUAL TRIGGER - Session resolution:', {
-      collaborativeSessionId: collaborativeSession?.id,
-      currentSessionId: currentSession?.id,
-      urlSessionId: sessionId,
-      effectiveSessionId,
-      hasPartnerId: !!selectedPartnerId,
-      hasLocation: !!locationToUse
-    });
-    
-    if (!effectiveSessionId || !selectedPartnerId || !locationToUse) {
-      console.error('❌ MANUAL TRIGGER - Missing required data:', {
-        hasSession: !!effectiveSessionId,
-        hasPartnerId: !!selectedPartnerId,
-        hasLocation: !!locationToUse
-      });
+    if (!locationToUse) {
       toast({
         variant: 'destructive',
         title: 'Fehlende Informationen',
-        description: !locationToUse ? 'Bitte aktiviere deinen Standort oder gib eine Adresse ein.' : 'Session-Daten fehlen. Bitte lade die Seite neu.'
+        description: 'Bitte aktiviere deinen Standort oder gib eine Adresse ein.'
+      });
+      return;
+    }
+
+    // Solo mode: no partner or session needed
+    if (isSoloMode && userId) {
+      try {
+        console.log('🎯 SOLO MANUAL TRIGGER - Starting venue search');
+        await state.analyzeCompatibilityAndVenues(
+          effectiveSessionId || `solo-${userId}`,
+          userId,
+          currentPreferences,
+          locationToUse
+        );
+        setCurrentStep('plan-together');
+        toast({ title: 'Venues gefunden!', description: 'Passende Locations basierend auf deinen Vorlieben.' });
+      } catch (error: any) {
+        console.error('❌ SOLO MANUAL TRIGGER - Error:', error);
+        toast({ variant: 'destructive', title: 'Suche fehlgeschlagen', description: error.message || 'Bitte versuche es erneut.' });
+      }
+      return;
+    }
+    
+    if (!effectiveSessionId || !selectedPartnerId) {
+      toast({
+        variant: 'destructive',
+        title: 'Fehlende Informationen',
+        description: 'Session-Daten fehlen. Bitte lade die Seite neu.'
       });
       return;
     }
 
     try {
-      console.log('🚀 MANUAL TRIGGER - Starting AI analysis with session:', effectiveSessionId);
-      
       await state.analyzeCompatibilityAndVenues(
         effectiveSessionId,
         selectedPartnerId,
@@ -519,24 +533,11 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         locationToUse
       );
       
-      console.log('✅ MANUAL TRIGGER - AI analysis completed successfully');
-      console.log('✅ MANUAL TRIGGER - Venue recommendations:', state.venueRecommendations?.length || 0);
-      
-      // Ensure step transition happens
-      console.log('🎯 MANUAL TRIGGER - FORCING step transition to plan-together');
       setCurrentStep('plan-together');
-      
-      toast({
-        title: 'Analysis Complete!',
-        description: 'Found perfect venues based on your preferences.'
-      });
-    } catch (error) {
+      toast({ title: 'Analysis Complete!', description: 'Found perfect venues based on your preferences.' });
+    } catch (error: any) {
       console.error('❌ MANUAL TRIGGER - AI analysis error:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Analysis Failed',
-        description: `Unable to analyze compatibility: ${error.message || 'Unknown error'}`
-      });
+      toast({ variant: 'destructive', title: 'Analysis Failed', description: error.message || 'Unknown error' });
     }
   }
 
