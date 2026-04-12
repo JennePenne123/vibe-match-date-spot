@@ -264,7 +264,32 @@ export default function Datenschutz() {
             blockiert. Rechtsgrundlage: berechtigtes Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO).
           </p>
 
-          <h2>8. Push-Benachrichtigungen</h2>
+          <h2>8. Mitarbeiterverwaltung für Venue-Partner</h2>
+          <p className="text-muted-foreground">
+            Venue-Partner können Mitarbeiter über die App einladen und verwalten. Im Rahmen der Mitarbeiterverwaltung
+            werden folgende Daten verarbeitet:
+          </p>
+          <ul className="text-muted-foreground">
+            <li><strong>E-Mail-Adresse</strong> des eingeladenen Mitarbeiters (zur Einladung und Kontozuordnung)</li>
+            <li><strong>Name</strong> des Mitarbeiters</li>
+            <li><strong>Rolle</strong> innerhalb des Betriebs (z.&nbsp;B. Manager oder Mitarbeiter)</li>
+            <li><strong>Individueller QR-Code-Token</strong> – ein pseudonymisierter, zufällig generierter Identifikator
+              zur eindeutigen Zuordnung bei der Voucher-Einlösung</li>
+            <li><strong>Zeitstempel des letzten Scans</strong> zur betrieblichen Nachvollziehbarkeit</li>
+          </ul>
+          <p className="text-muted-foreground">
+            <strong>Onboarding per QR-Code:</strong> Mitarbeiter können alternativ zur E-Mail-Einladung auch einen
+            vom Partner bereitgestellten QR-Code scannen, um sich dem Betrieb zuzuordnen. Dabei wird lediglich
+            ein tokenisierter Link verarbeitet – es werden keine zusätzlichen personenbezogenen Daten erhoben.
+          </p>
+          <p className="text-muted-foreground">
+            Rechtsgrundlage: Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO) zwischen dem Partner
+            und seinem Mitarbeiter bzw. berechtigtes Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO) an der
+            betrieblichen Organisation der Voucher-Einlösung. Mitarbeiter können ihre Zuordnung jederzeit
+            über den Partner oder durch Kontolöschung aufheben.
+          </p>
+
+          <h2>9. Push-Benachrichtigungen</h2>
           <p className="text-muted-foreground">
             Sie können Push-Benachrichtigungen aktivieren (z.&nbsp;B. Date-Erinnerungen, Einladungsstatus).
             Die Aktivierung erfolgt ausschließlich auf Ihre ausdrückliche Einwilligung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO).
@@ -272,7 +297,7 @@ export default function Datenschutz() {
             widerrufen werden. Wir speichern dazu Push-Subscription-Daten (Endpoint, Keys) auf unseren Servern.
           </p>
 
-          <h2>9. Speicherdauer</h2>
+          <h2>10. Speicherdauer</h2>
           <ul className="text-muted-foreground">
             <li><strong>Account-Daten:</strong> Bis zur Kontolöschung durch den Nutzer.</li>
             <li><strong>Nutzungsdaten und Präferenzen:</strong> Bis zur Kontolöschung oder Widerruf.</li>
@@ -281,7 +306,7 @@ export default function Datenschutz() {
             <li><strong>Abrechnungsdaten:</strong> 10 Jahre (gesetzliche Aufbewahrungspflicht).</li>
           </ul>
 
-          <h2>10. Ihre Rechte nach der DSGVO</h2>
+          <h2>11. Ihre Rechte nach der DSGVO</h2>
           <p className="text-muted-foreground">
             Sie haben gegenüber uns folgende Rechte hinsichtlich Ihrer personenbezogenen Daten:
           </p>
@@ -301,7 +326,7 @@ export default function Datenschutz() {
             <a href="mailto:datenschutz@dzeng.app" className="text-primary">datenschutz@dzeng.app</a>.
           </p>
 
-          <h2>11. Datenlöschung und Datenexport</h2>
+          <h2>12. Datenlöschung und Datenexport</h2>
           <p className="text-muted-foreground">
             Sie können Ihr Konto und alle damit verbundenen Daten jederzeit in den Einstellungen löschen.
             Eine Datenexport-Funktion (Art.&nbsp;20 DSGVO) steht ebenfalls in den Einstellungen zur Verfügung.
@@ -309,7 +334,7 @@ export default function Datenschutz() {
             unwiderruflich gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
           </p>
 
-          <h2>12. Datensicherheit</h2>
+          <h2>13. Datensicherheit</h2>
           <p className="text-muted-foreground">
             Wir setzen technische und organisatorische Maßnahmen (TOM) ein, um Ihre Daten zu schützen:
           </p>
@@ -321,13 +346,13 @@ export default function Datenschutz() {
             <li>Regelmäßige Sicherheitsaudits</li>
           </ul>
 
-          <h2>13. Minderjährige</h2>
+          <h2>14. Minderjährige</h2>
           <p className="text-muted-foreground">
             Die Nutzung von HiOutz ist ab 16 Jahren gestattet (Art.&nbsp;8 DSGVO i.&nbsp;V.&nbsp;m. § 25 TDDDG).
             Personen unter 16 Jahren dürfen die App nur mit Einwilligung eines Erziehungsberechtigten nutzen.
           </p>
 
-          <h2>14. Änderungen dieser Datenschutzerklärung</h2>
+          <h2>15. Änderungen dieser Datenschutzerklärung</h2>
           <p className="text-muted-foreground">
             Wir behalten uns vor, diese Datenschutzerklärung anzupassen, um sie stets den aktuellen rechtlichen
             Anforderungen anzupassen. Die jeweils aktuelle Fassung gilt bei Ihrem nächsten Besuch.
