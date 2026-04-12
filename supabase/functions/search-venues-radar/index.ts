@@ -278,14 +278,16 @@ serve(async (req) => {
         const cuisineType = determineCuisineType(place, sanitizedCuisines);
         const isChain = !!place.chain;
         const chainName = place.chain?.name || null;
+        const lat = place.location?.coordinates?.[1] || place.location?.latitude;
+        const lon = place.location?.coordinates?.[0] || place.location?.longitude;
 
         return {
           venue_id: place._id,
           radar_id: place._id,
           name: place.name,
-          address: place.location?.formattedAddress || `${place.location?.addressLabel || ''}, ${place.location?.city || ''}`,
-          latitude: place.location?.coordinates?.[1] || place.location?.latitude,
-          longitude: place.location?.coordinates?.[0] || place.location?.longitude,
+          address: buildRadarAddress(place.location),
+          latitude: lat,
+          longitude: lon,
           cuisine_type: cuisineType,
           price_range: '$$',
           rating: 0,
@@ -300,6 +302,23 @@ serve(async (req) => {
           source: 'radar',
         };
       });
+
+    // Reverse-geocode venues with missing addresses (batch with delay to respect Nominatim rate limit)
+    let geocodedCount = 0;
+    for (const venue of venues) {
+      if ((!venue.address || venue.address.trim() === '' || venue.address.trim() === ',') && venue.latitude && venue.longitude) {
+        const addr = await reverseGeocode(venue.latitude, venue.longitude);
+        if (addr) {
+          venue.address = addr;
+          geocodedCount++;
+        }
+        // Nominatim asks for max 1 req/sec
+        await new Promise(r => setTimeout(r, 1100));
+      }
+    }
+    if (geocodedCount > 0) {
+      console.log(`📍 RADAR: Reverse-geocoded ${geocodedCount} missing addresses via Nominatim`);
+    }
 
     // Save to database
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
