@@ -413,7 +413,6 @@ const AdminTeam: React.FC = () => {
                   <tr key={perm.key} className="border-b border-border/20">
                     <td className="py-2 pr-4 text-foreground">{perm.label}</td>
                     {(['owner', 'tech', 'support', 'moderator', 'viewer'] as AdminRole[]).map((role) => {
-                      const { [perm.key as keyof typeof import('@/hooks/useAdminRole').AdminPermissions]: _unused, ...rest } = {} as any;
                       const perms = {
                         owner: { canManageTeam: true, canViewUsers: true, canViewAnalytics: true, canModerate: true, canViewErrors: true, canViewSystemHealth: true, canManagePartners: true },
                         tech: { canManageTeam: false, canViewUsers: true, canViewAnalytics: true, canModerate: true, canViewErrors: true, canViewSystemHealth: true, canManagePartners: true },
