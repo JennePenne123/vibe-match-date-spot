@@ -32,34 +32,40 @@
 - [ ] Rate Limiting + API Usage Monitoring aktiv
 
 ### Phase 6: Partner Onboarding
-- [ ] Automatische Verifizierung (VIES API) aktiv
-- [ ] Manuelle Admin-Verifizierung-UI für Ausnahmen
+- [x] Automatische Verifizierung (VIES API) aktiv
+- [x] Manuelle Admin-Verifizierung-UI für Ausnahmen
+- [x] KI-Tag-Vorschläge aus Venue-Websites (Edge Function `analyze-venue-website`)
 
 ---
 
-## Automatische Partner-Verifizierung (Post-Launch Optimierung)
+## Heute erledigt (12.04.2026)
 
-### Schritt 1: Edge Function `auto-verify-partner`
-- Nimmt `partner_profile_id` entgegen
-- Prüft die USt-IdNr. über die **EU VIES API** (kostenlos, kein API-Key nötig)
-- **Gültig** → Status automatisch auf `verified` setzen, `verified_at` + `verification_notes` aktualisieren
-- **Ungültig/Fehler** → Status auf `pending_review` belassen, Notiz mit Fehlgrund hinterlegen
-- **Keine USt-IdNr.** → Status auf `pending_review` für manuelle Admin-Prüfung
+### KI-gestützte Venue-Tag-Vorschläge ✅
+- Edge Function `analyze-venue-website` erstellt: Analysiert Venue-Websites + ähnliche erfolgreiche Venues
+- Generiert optimale Tags mit Confidence-Score, Quelle (Website/KI/ähnliche Venues) und Begründung
+- Behebt Fehlkategorisierungen (z.B. Schweinske: "Burger" → "Schnitzel, Hausmannskost")
+- AITagSuggestions-Komponente erweitert: Toggle zwischen "Website + KI" und "Gäste-Feedback"
 
-### Schritt 2: Automatischer Trigger
-- Wenn ein Partner seinen Status auf `pending_review` setzt (z.B. nach Tax-ID-Eingabe), wird die Edge Function automatisch vom Frontend aufgerufen
-- Optional: Cron-Job der täglich `pending_review` Partner erneut prüft (falls VIES temporär nicht erreichbar war)
+### Date-Planning: Mode-Auswahl ✅
+- Neuer erster Schritt "Wie möchtest du daten?" mit drei Modi:
+  - **Solo-Date**: Alleine Venues entdecken (überspringt Partner-Auswahl)
+  - **Zu zweit**: Klassisches Date mit Partner-Einladung
+  - **Gruppen-Date**: Mehrteilnehmer-Planung
+- Übersetzungen in DE/EN/ES hinzugefügt
 
-### Schritt 3: In-App Benachrichtigungen
-- Push-Notification an den Partner bei Verifizierung/Ablehnung
-- Toast-Benachrichtigung wenn Partner die App öffnet
+### Sicherheits-Fixes ✅
+- **Partner-Profil-Schutz**: Trigger `protect_partner_profile_fields` aktiviert – verhindert Selbst-Verifizierung, Membership-Manipulation und Gründerstatus-Änderung durch Nicht-Admins
+- **Rollen-Escalation-Schutz**: Trigger `validate_role_insert` – nur `regular`-Rolle ohne Admin-Rechte vergabbar, verhindert Privilege Escalation über SECURITY DEFINER-Pfade
+- **Realtime Voucher-Broadcast entfernt**: `vouchers` und `voucher_redemptions` aus Realtime-Publication entfernt, Hook auf sicheres Polling (15s) umgestellt
 
-### Schritt 4: E-Mail Benachrichtigungen
-- ⚠️ **Aktuell ist keine E-Mail-Domain konfiguriert**
-- Muss zuerst über Cloud → Emails eingerichtet werden
-- Danach: Transaktionale E-Mails bei Status-Änderung (verifiziert / abgelehnt / Nachbesserung nötig)
+### Test-Setup ✅
+- Freundschaft zwischen Lenny und Jan Wiechmann für gegenseitiges Testen eingerichtet
 
-### Zusammenfassung des Flows:
+---
+
+## Automatische Partner-Verifizierung
+
+### Flow:
 ```
 Partner gibt USt-IdNr. ein → Status: pending_review
   → auto-verify-partner Edge Function wird aufgerufen
@@ -69,35 +75,10 @@ Partner gibt USt-IdNr. ein → Status: pending_review
       ⚠️ Keine USt-IdNr. → Manuelle Admin-Prüfung
 ```
 
-### Schritt 1: Edge Function `auto-verify-partner`
-- Nimmt `partner_profile_id` entgegen
-- Prüft die USt-IdNr. über die **EU VIES API** (kostenlos, kein API-Key nötig)
-- **Gültig** → Status automatisch auf `verified` setzen, `verified_at` + `verification_notes` aktualisieren
-- **Ungültig/Fehler** → Status auf `pending_review` belassen, Notiz mit Fehlgrund hinterlegen
-- **Keine USt-IdNr.** → Status auf `pending_review` für manuelle Admin-Prüfung
-
-### Schritt 2: Automatischer Trigger
-- Wenn ein Partner seinen Status auf `pending_review` setzt (z.B. nach Tax-ID-Eingabe), wird die Edge Function automatisch vom Frontend aufgerufen
-- Optional: Cron-Job der täglich `pending_review` Partner erneut prüft (falls VIES temporär nicht erreichbar war)
-
-### Schritt 3: In-App Benachrichtigungen
-- Push-Notification an den Partner bei Verifizierung/Ablehnung
-- Toast-Benachrichtigung wenn Partner die App öffnet
-
-### Schritt 4: E-Mail Benachrichtigungen
+### E-Mail Benachrichtigungen
 - ⚠️ **Aktuell ist keine E-Mail-Domain konfiguriert**
 - Muss zuerst über Cloud → Emails eingerichtet werden
-- Danach: Transaktionale E-Mails bei Status-Änderung (verifiziert / abgelehnt / Nachbesserung nötig)
-
-### Zusammenfassung des Flows:
-```
-Partner gibt USt-IdNr. ein → Status: pending_review
-  → auto-verify-partner Edge Function wird aufgerufen
-    → VIES API prüft USt-IdNr.
-      ✅ Gültig → Status: verified + E-Mail + Push
-      ❌ Ungültig → Status: pending_review + Admin-Notiz
-      ⚠️ Keine USt-IdNr. → Manuelle Admin-Prüfung
-```
+- Danach: Transaktionale E-Mails bei Status-Änderung
 
 ---
 
@@ -105,6 +86,7 @@ Partner gibt USt-IdNr. ein → Status: pending_review
 
 ### Monetarisierung & Payments
 - [ ] Stripe-Integration für Premium-Modelle
+- [ ] Premium-Vouchers für Top-3-Matches (abhängig von Stripe)
 - [ ] Bei eigener Zahlungsabwicklung (nicht App Store): Muster-Widerrufsformular in AGB ergänzen (§ 355 BGB)
 
 ### Features
