@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/accordion';
 import { 
   ArrowLeft, Lock, Trash2, Shield, Loader2, Check, PauseCircle, 
-  Bell, Mail, Download, ExternalLink, FileText, Scale, HelpCircle, MessageCircle
+  Bell, Mail, Download, ExternalLink, FileText, Scale, HelpCircle, MessageCircle, Brain
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
@@ -376,6 +376,33 @@ const Settings = () => {
                 {t('settings.trackingInfo', 'Mehr dazu in unserer')}{' '}
                 <button onClick={() => navigate('/datenschutz')} className="text-primary underline underline-offset-2 hover:text-primary/80">
                   {t('settings.privacyPolicy', 'Datenschutzerklärung')}
+                </button>
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* AI Profiling Notice (GDPR Art. 22) */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base text-foreground">
+                <Brain className="w-4 h-4 text-primary" />
+                {t('settings.aiProfiling', 'KI-gestützte Empfehlungen')}
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {t('settings.aiProfilingDesc', 'Informationen zur automatisierten Verarbeitung deiner Daten (DSGVO Art. 22).')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t('settings.aiProfilingExplanation', 'Wir nutzen Künstliche Intelligenz, um dir passende Date-Locations vorzuschlagen. Dazu analysieren wir deine Präferenzen, vergangene Bewertungen und dein Nutzungsverhalten (z. B. welche Orte du favorisierst).')}
+              </p>
+              <p className="text-sm font-medium text-foreground">
+                {t('settings.aiProfilingRight', 'Du hast das Recht, einer solchen automatisierten Verarbeitung jederzeit zu widersprechen.')}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t('settings.aiProfilingLearnMore', 'Mehr dazu in unserer Datenschutzerklärung')}{' '}
+                <button onClick={() => navigate('/datenschutz')} className="text-primary underline underline-offset-2 hover:text-primary/80">
+                  →
                 </button>
               </p>
             </CardContent>

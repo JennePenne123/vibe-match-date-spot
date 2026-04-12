@@ -547,7 +547,13 @@
     "deleteRequestedDesc": "Your account will be deleted shortly. You will now be logged out.",
     "language": "Language",
     "languageDesc": "Choose the display language of the app.",
-    "somethingWrong": "Something went wrong."
+    "somethingWrong": "Something went wrong.",
+    "aiProfiling": "AI-Powered Recommendations",
+    "aiProfilingDesc": "Information about automated processing of your data (GDPR Art. 22).",
+    "aiProfilingExplanation": "We use Artificial Intelligence to suggest matching date locations. For this, we analyze your preferences, past ratings, and your usage behavior (e.g., which places you favor).",
+    "aiProfilingRight": "You have the right to object to such automated processing at any time.",
+    "aiProfilingLearnMore": "Learn more in our Privacy Policy",
+    "aiProfilingOnboarding": "We use AI to suggest personalized date ideas. More in our"
   },
   "partner": {
     "dashboard": "Partner Dashboard",
