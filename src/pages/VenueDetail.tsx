@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
+import { openDirectionsFromCurrentLocation } from '@/utils/navigationHelpers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -111,10 +112,17 @@ const VenueDetail = () => {
     matchScore: appVenue.matchScore,
   };
 
-  const openDirections = () => {
-    if (appVenue.google_place_id) {
-      window.open(`https://www.google.com/maps/place/?q=place_id:${appVenue.google_place_id}`, '_blank');
+  const handleDirections = () => {
+    const lat = sourceVenue.latitude;
+    const lng = sourceVenue.longitude;
+    if (lat && lng) {
+      openDirectionsFromCurrentLocation({
+        destLat: lat,
+        destLng: lng,
+        destName: appVenue.name,
+      });
     } else {
+      // Fallback: search by name
       window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appVenue.name + ' ' + appVenue.address)}`, '_blank');
     }
   };
@@ -300,16 +308,17 @@ const VenueDetail = () => {
               <Button 
                 variant="outline" 
                 className="h-12"
-                onClick={openDirections}
+                onClick={handleDirections}
               >
                 Get Directions
               </Button>
               <Button 
                 variant="outline" 
                 className="h-12"
-                onClick={appVenue.phone ? callVenue : visitWebsite}
+                onClick={appVenue.website ? visitWebsite : (appVenue.phone ? callVenue : undefined)}
+                disabled={!appVenue.website && !appVenue.phone}
               >
-                {appVenue.phone ? 'Call Now' : 'Visit Website'}
+                {appVenue.website ? 'Visit Website' : (appVenue.phone ? 'Call Now' : 'No Website')}
               </Button>
             </div>
           </div>
