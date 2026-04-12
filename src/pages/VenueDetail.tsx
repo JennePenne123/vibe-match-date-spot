@@ -21,6 +21,7 @@ const VenueDetail = () => {
   const [dbVenue, setDbVenue] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
 
   const venue = appState.venues.find(v => v.id === id);
 
