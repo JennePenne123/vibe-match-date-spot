@@ -119,6 +119,7 @@ const PartnerTerms = lazy(() => import("./pages/partner/Terms"));
 const PartnerPrivacy = lazy(() => import("./pages/partner/Privacy"));
 const PartnerStaff = lazy(() => import("./pages/partner/Staff"));
 const JoinStaff = lazy(() => import("./pages/JoinStaff"));
+const StaffScanner = lazy(() => import("./pages/staff/Scanner"));
 
 // Admin routes – lazy loaded
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
