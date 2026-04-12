@@ -15,7 +15,7 @@ export default function JoinStaff() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { toast } = useToast();
+  const _toast = useToast();
 
   const partnerId = searchParams.get('partner');
   const token = searchParams.get('token');
@@ -256,8 +256,8 @@ export default function JoinStaff() {
 
           {status === 'success' && (
             <>
-              <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
-                <CheckCircle className="w-10 h-10 text-green-500" />
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <CheckCircle className="w-10 h-10 text-primary" />
               </div>
               <div>
                 <h1 className="text-xl font-bold">Willkommen im Team!</h1>

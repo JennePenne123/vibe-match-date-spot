@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenueStaff, StaffMember } from '@/hooks/useVenueStaff';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -53,7 +53,7 @@ import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 
 export default function PartnerStaff() {
-  const { t } = useTranslation();
+  const _t = useTranslation();
   const { role, loading: roleLoading } = useUserRole();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -66,7 +66,6 @@ export default function PartnerStaff() {
     deactivateStaff,
     reactivateStaff,
     removeStaff,
-    generateStaffInviteQR,
   } = useVenueStaff();
 
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -140,7 +139,7 @@ export default function PartnerStaff() {
       case 'invited':
         return <Badge variant="outline" className="text-xs gap-1"><Mail className="w-3 h-3" />Eingeladen</Badge>;
       case 'active':
-        return <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-xs gap-1"><UserCheck className="w-3 h-3" />Aktiv</Badge>;
+        return <Badge className="bg-primary/10 text-primary border-primary/20 text-xs gap-1"><UserCheck className="w-3 h-3" />Aktiv</Badge>;
       case 'deactivated':
         return <Badge variant="secondary" className="text-xs gap-1"><UserX className="w-3 h-3" />Deaktiviert</Badge>;
       default:
