@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_team: {
+        Row: {
+          admin_role: string
+          assigned_by: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_role?: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_role?: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_compatibility_scores: {
         Row: {
           activity_score: number
@@ -2051,6 +2078,7 @@ export type Database = {
       count_perfect_pairs: { Args: { target_user_id: string }; Returns: number }
       create_test_venues: { Args: { venues_data: Json }; Returns: boolean }
       delete_user_data: { Args: { target_user_id: string }; Returns: boolean }
+      get_admin_role: { Args: { _user_id: string }; Returns: string }
       get_city_venue_rankings: {
         Args: { _city: string }
         Returns: {
@@ -2086,6 +2114,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      is_admin_owner: { Args: { _user_id: string }; Returns: boolean }
       reset_user_preferences_to_default: {
         Args: { target_user_id: string }
         Returns: boolean
