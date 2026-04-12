@@ -82,12 +82,14 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       sessionId: sessionId || 'from-state',
       currentStep: state.currentStep,
       collaborativeSessionExists: !!state.collaborativeSession,
-      currentSessionExists: !!currentSession
+      currentSessionExists: !!currentSession,
+      dateMode: state.dateMode
     });
     
     // Store preferences for later use when completing session
     setCurrentPreferences(preferences);
     
+    const isSoloMode = state.dateMode === 'solo';
     const effectiveSessionId = sessionId || currentSession?.id;
     
     // First, save preferences to the session to trigger completion flags
@@ -105,6 +107,46 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         });
         return;
       }
+    }
+    
+    // Solo mode: skip partner/session checks, go straight to venue search
+    if (isSoloMode) {
+      const locationToUse = freshLocation || state.userLocation;
+      
+      if (!locationToUse) {
+        toast({
+          variant: 'destructive',
+          title: 'Fehlende Informationen',
+          description: 'Bitte aktiviere deinen Standort oder gib eine Adresse ein.'
+        });
+        return;
+      }
+
+      console.log('🎯 SOLO MODE - Starting venue search without partner');
+      
+      try {
+        // Use user's own ID as partnerId for the AI analysis (self-match = venue discovery)
+        const userId = state.user?.id;
+        if (!userId) return;
+        
+        await state.analyzeCompatibilityAndVenues(
+          effectiveSessionId || `solo-${userId}`,
+          userId, // partner = self for solo mode
+          preferences,
+          locationToUse
+        );
+        
+        console.log('✅ SOLO MODE - Venue search completed');
+        setCurrentStep('plan-together');
+      } catch (error: any) {
+        console.error('❌ SOLO MODE - Venue search failed:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Venue-Suche fehlgeschlagen',
+          description: error.message || 'Bitte versuche es erneut.'
+        });
+      }
+      return;
     }
     
     // Check if we're in collaborative mode and need to wait for partner
@@ -133,18 +175,6 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       
       // Check if both users have completed preferences
       const bothComplete = currentSession?.both_preferences_complete || state.collaborativeSession?.canShowResults;
-      
-      console.log('🔧 PREFERENCES COMPLETE - Both complete check:', {
-        bothComplete,
-        currentSessionBothComplete: currentSession?.both_preferences_complete,
-        collaborativeSessionCanShow: state.collaborativeSession?.canShowResults,
-        collaborativeSessionData: state.collaborativeSession ? {
-          id: state.collaborativeSession.id,
-          bothPreferencesComplete: state.collaborativeSession.both_preferences_complete,
-          initiatorPrefsComplete: state.collaborativeSession.initiator_preferences_complete,
-          partnerPrefsComplete: state.collaborativeSession.partner_preferences_complete
-        } : null
-      });
       
       if (!bothComplete) {
         console.log('🔧 PREFERENCES COMPLETE - Not all preferences complete yet, staying on preferences step...');
@@ -176,27 +206,13 @@ export const createSmartDatePlannerHandlers = (state: any) => {
           locationToUse
         );
         
-        console.log('🔄 PREFERENCES COMPLETE - Analysis promise created:', !!analysisPromise);
-        
         const analysisResult = await analysisPromise;
         
         console.log('✅ PREFERENCES COMPLETE - AI analysis completed successfully', analysisResult);
-        console.log('✅ PREFERENCES COMPLETE - Venue recommendations available:', state.venueRecommendations?.length || 0);
         
         // Skip match review and go directly to plan-together
-        console.log('🎯 PREFERENCES COMPLETE - Skipping match review, going directly to plan-together');
         setCurrentStep('plan-together');
-        
-        // Add debugging to verify state after transition
-        setTimeout(() => {
-          console.log('🔍 PREFERENCES COMPLETE - Post-transition state check:', {
-            currentStep: state.currentStep,
-            venueCount: state.venueRecommendations?.length || 0,
-            hasVenues: (state.venueRecommendations?.length || 0) > 0,
-            compatibilityScore: state.compatibilityScore
-          });
-        }, 100);
-      } catch (analysisError) {
+      } catch (analysisError: any) {
         console.error('❌ PREFERENCES COMPLETE - AI analysis error:', analysisError);
         toast({
           variant: 'destructive',
@@ -208,12 +224,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       console.error('🔧 PREFERENCES COMPLETE - Missing required data for AI analysis:', {
         hasSession: !!effectiveSessionId,
         hasPartnerId: !!selectedPartnerId,
-        hasLocation: !!locationToUse,
-        hasStateLocation: !!state.userLocation,
-        hasFreshLocation: !!freshLocation,
-        effectiveSessionId,
-        selectedPartnerId,
-        locationData: locationToUse
+        hasLocation: !!locationToUse
       });
       
       const missingItems = [];
