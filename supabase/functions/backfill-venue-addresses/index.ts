@@ -57,9 +57,13 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: corsHeaders });
   }
 
-  // Filter in code: only venues with empty/null addresses
-  const emptyAddressVenues = (venues || []).filter(v => !v.address || v.address.trim() === '' || v.address.trim() === ',' || v.address.trim() === ', ');
-  console.log(`📍 Backfill: Found ${emptyAddressVenues.length} venues with empty addresses (of ${venues?.length || 0} total)`);
+  // Filter in code: only venues with empty/null/placeholder addresses
+  const emptyAddressVenues = (venues || []).filter(v => {
+    if (!v.address) return true;
+    const trimmed = v.address.replace(/[\s,]+/g, '').trim();
+    return trimmed === '' || v.address === 'Address unknown';
+  }).slice(0, 25); // Process max 25 per call to avoid timeout
+  console.log(`📍 Backfill: Found ${emptyAddressVenues.length} venues to process (of ${venues?.length || 0} total)`);
 
   const results: { id: string; name: string; address: string }[] = [];
   let updatedCount = 0;
