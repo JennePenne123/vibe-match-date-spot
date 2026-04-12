@@ -1,11 +1,12 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { BarChart3, Users, Shield, AlertTriangle } from 'lucide-react'
+import { BarChart3, Users, Shield, AlertTriangle, UserCog } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const ADMIN_TABS = [
   { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
   { icon: Users, label: 'Nutzer', path: '/admin/users' },
+  { icon: UserCog, label: 'Team', path: '/admin/team' },
   { icon: Shield, label: 'Tickets', path: '/admin/moderation' },
   { icon: AlertTriangle, label: 'Errors', path: '/admin/errors' },
 ]
