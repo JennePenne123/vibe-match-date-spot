@@ -244,6 +244,12 @@ export default function Datenschutz() {
                 <td className="py-1">USA</td>
               </tr>
               <tr>
+                <td className="pr-3 py-1">Lovable AI Gateway</td>
+                <td className="pr-3 py-1">Lovable (Supabase AI Gateway)</td>
+                <td className="pr-3 py-1">KI-gestützte Textgenerierung (Date-Ideen, Einladungstexte, Concierge)</td>
+                <td className="py-1">EU/USA</td>
+              </tr>
+              <tr>
                 <td className="pr-3 py-1">Open-Meteo</td>
                 <td className="pr-3 py-1">Open-Meteo, Schweiz</td>
                 <td className="pr-3 py-1">Wetterdaten für Empfehlungen</td>
