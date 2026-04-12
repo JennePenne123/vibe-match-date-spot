@@ -349,7 +349,9 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           if (prefVibes.includes('adventurous') && (
             effectiveCuisine.includes('thai') || effectiveCuisine.includes('chinese') || 
             effectiveCuisine.includes('korean') || effectiveCuisine.includes('indian') ||
-            effectiveCuisine.includes('vietnamese') || effectiveCuisine.includes('japanese'))) {
+            effectiveCuisine.includes('vietnamese') || effectiveCuisine.includes('japanese') ||
+            effectiveCuisine.includes('oriental') || effectiveCuisine.includes('turkish') ||
+            effectiveCuisine.includes('lebanese'))) {
             score += 10;
             inferred = true;
           }
