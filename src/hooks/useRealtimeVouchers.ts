@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -40,19 +40,73 @@ interface UseRealtimeVouchersReturn {
   lastRedemption: RedemptionEvent | null;
 }
 
+const POLL_INTERVAL = 15000; // 15 seconds
+
 export const useRealtimeVouchers = (partnerId: string | undefined): UseRealtimeVouchersReturn => {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   const [lastRedemption, setLastRedemption] = useState<RedemptionEvent | null>(null);
-  
-  // Use ref to access latest vouchers without causing re-subscriptions
+  const lastRedemptionCheckRef = useRef<string>(new Date().toISOString());
   const vouchersRef = useRef<Voucher[]>([]);
-  
-  // Keep ref in sync with state
+
   useEffect(() => {
     vouchersRef.current = vouchers;
   }, [vouchers]);
+
+  const fetchVouchers = useCallback(async (showLoading = false) => {
+    if (!partnerId) return;
+    if (showLoading) setLoading(true);
+
+    try {
+      const { data, error } = await supabase
+        .from('vouchers')
+        .select('*')
+        .eq('partner_id', partnerId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setVouchers(data || []);
+    } catch (error) {
+      console.error('Error fetching vouchers:', error);
+      if (showLoading) toast.error('Failed to load vouchers');
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  }, [partnerId]);
+
+  const checkNewRedemptions = useCallback(async () => {
+    if (!partnerId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('voucher_redemptions')
+        .select('*')
+        .gt('redeemed_at', lastRedemptionCheckRef.current)
+        .order('redeemed_at', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        for (const redemption of data) {
+          const affectedVoucher = vouchersRef.current.find(v => v.id === redemption.voucher_id);
+          if (affectedVoucher) {
+            setLastRedemption(redemption as RedemptionEvent);
+            toast.success(`🎉 New redemption for "${affectedVoucher.title}"!`, {
+              description: `$${redemption.discount_applied.toFixed(2)} discount applied`,
+              duration: 5000,
+            });
+          }
+        }
+        lastRedemptionCheckRef.current = data[0].redeemed_at;
+        // Refresh vouchers to get updated redemption counts
+        await fetchVouchers();
+      }
+    } catch (error) {
+      console.error('Error checking redemptions:', error);
+    }
+  }, [partnerId, fetchVouchers]);
 
   // Initial fetch
   useEffect(() => {
@@ -60,140 +114,30 @@ export const useRealtimeVouchers = (partnerId: string | undefined): UseRealtimeV
       setVouchers([]);
       setLastRedemption(null);
       setLoading(false);
-      return;
-    }
-
-    const fetchVouchers = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('vouchers')
-          .select('*')
-          .eq('partner_id', partnerId)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setVouchers(data || []);
-      } catch (error) {
-        console.error('Error fetching vouchers:', error);
-        toast.error('Failed to load vouchers');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVouchers();
-  }, [partnerId]);
-
-  // Real-time subscriptions
-  useEffect(() => {
-    if (!partnerId) {
       setConnected(false);
       return;
     }
 
-    const channelName = `${partnerId}:vouchers-realtime-${Date.now()}`;
+    fetchVouchers(true);
+    lastRedemptionCheckRef.current = new Date().toISOString();
+  }, [partnerId, fetchVouchers]);
 
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'vouchers',
-          filter: `partner_id=eq.${partnerId}`
-        },
-        (payload) => {
-          console.log('Voucher updated:', payload);
-          const updatedVoucher = payload.new as Voucher;
-          
-          setVouchers((prev) => {
-            const index = prev.findIndex((v) => v.id === updatedVoucher.id);
-            if (index !== -1) {
-              const newVouchers = [...prev];
-              newVouchers[index] = updatedVoucher;
-              return newVouchers;
-            }
-            return prev;
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'vouchers',
-          filter: `partner_id=eq.${partnerId}`
-        },
-        (payload) => {
-          console.log('New voucher created:', payload);
-          const newVoucher = payload.new as Voucher;
-          setVouchers((prev) => [newVoucher, ...prev]);
-          toast.success(`Voucher "${newVoucher.title}" created`);
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'vouchers',
-          filter: `partner_id=eq.${partnerId}`
-        },
-        (payload) => {
-          console.log('Voucher deleted:', payload);
-          const deletedId = payload.old.id as string;
-          setVouchers((prev) => prev.filter((v) => v.id !== deletedId));
-          toast.info('Voucher deleted');
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'voucher_redemptions'
-        },
-        async (payload) => {
-          console.log('New redemption detected:', payload);
-          const redemption = payload.new as RedemptionEvent;
-          
-          // Check if this redemption belongs to one of our vouchers using ref
-          const affectedVoucher = vouchersRef.current.find((v) => v.id === redemption.voucher_id);
-          
-          if (affectedVoucher) {
-            setLastRedemption(redemption);
-            
-            // Show toast notification
-            toast.success(
-              `🎉 New redemption for "${affectedVoucher.title}"!`,
-              {
-                description: `$${redemption.discount_applied.toFixed(2)} discount applied`,
-                duration: 5000,
-              }
-            );
-          }
-        }
-      )
-      .subscribe((status) => {
-        console.log('Real-time subscription status:', status);
-        setConnected(status === 'SUBSCRIBED');
-        
-        if (status === 'SUBSCRIBED') {
-          toast.success('Live updates enabled', { duration: 2000 });
-        } else if (status === 'CHANNEL_ERROR') {
-          toast.error('Real-time connection failed');
-        }
-      });
+  // Polling instead of Realtime (vouchers removed from publication for security)
+  useEffect(() => {
+    if (!partnerId) return;
+
+    setConnected(true);
+
+    const interval = setInterval(async () => {
+      await fetchVouchers();
+      await checkNewRedemptions();
+    }, POLL_INTERVAL);
 
     return () => {
-      console.log('Cleaning up real-time subscription');
-      supabase.removeChannel(channel);
+      clearInterval(interval);
       setConnected(false);
     };
-  }, [partnerId]); // Removed vouchers dependency to prevent infinite loop
+  }, [partnerId, fetchVouchers, checkNewRedemptions]);
 
   return {
     vouchers,
