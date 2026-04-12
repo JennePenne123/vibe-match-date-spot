@@ -215,7 +215,7 @@ const VenueDetail = () => {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4 shrink-0" />
-                <span className="truncate">{appVenue.address || 'Adresse nicht verfügbar'}</span>
+                <span className="truncate">{displayAddress}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <span className="font-medium">{appVenue.price_range || '$$'}</span>
