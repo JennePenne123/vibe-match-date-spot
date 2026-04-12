@@ -234,8 +234,8 @@ export default function PartnerVenues() {
                       </div>
                     )}
 
-                    {(partnership.status === 'active' || partnership.status === 'approved') && (
-                      <div className="flex gap-2 mt-2">
+                    <div className="flex gap-2 mt-2">
+                      {(partnership.status === 'active' || partnership.status === 'approved') && (
                         <Button
                           className="flex-1 gap-2"
                           variant="outline"
@@ -245,32 +245,33 @@ export default function PartnerVenues() {
                           <Settings className="w-3.5 h-3.5" />
                           {t('partner.venues.manage', 'Verwalten')}
                         </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Standort entfernen?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Möchtest du <strong>{partnership.venues.name}</strong> wirklich aus deinen Standorten entfernen? Zugehörige Gutscheine bleiben bestehen.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                onClick={() => deletePartnership(partnership.id, partnership.venues.name)}
-                              >
-                                Entfernen
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    )}
+                      )}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10 gap-1.5">
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Entfernen
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Standort entfernen?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Möchtest du "{partnership.venues.name}" wirklich aus deinen Standorten entfernen? Zugehörige Gutscheine bleiben bestehen.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={() => deletePartnership(partnership.id, partnership.venues.name)}
+                            >
+                              Entfernen
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
