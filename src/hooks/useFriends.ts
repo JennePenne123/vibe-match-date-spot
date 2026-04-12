@@ -44,6 +44,9 @@ export const useFriends = () => {
         // Handle the case where friendProfile might be an array
         const profile = Array.isArray(friendProfile) ? friendProfile[0] : friendProfile;
         
+        // Skip if profile is null (e.g. deleted user)
+        if (!profile || !profile.id) return;
+
         // Only add if we haven't seen this friend before
         if (!friendsMap.has(profile.id)) {
           friendsMap.set(profile.id, {
