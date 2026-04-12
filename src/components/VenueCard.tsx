@@ -236,7 +236,6 @@ const VenueCard = ({
           
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <DollarSign className="w-3 h-3" />
               {venuePriceRange}
             </div>
             {showMatchScore && venue.matchScore && (
