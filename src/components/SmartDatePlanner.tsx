@@ -168,7 +168,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       initialProposedDate={proposalDateISO}
       planningMode={isSoloMode ? 'collaborative' : 'collaborative'}
       collaborativeSession={!isSoloMode && collaborativeSession ? { hasUserSetPreferences, hasPartnerSetPreferences, canShowResults } : undefined}
-      onManualContinue={handleManualContinue}
+      onManualContinue={() => handleManualContinue(userLocationRef.current)}
       onDisplayVenues={state.navigateToResults}
       venueRecommendations={venueRecommendations}
     />
