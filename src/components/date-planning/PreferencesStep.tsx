@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Heart, Loader2, Settings, MapPin } from 'lucide-react';
+import { Heart, Loader2, Settings, MapPin, Navigation, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import SafeComponent from '@/components/SafeComponent';
