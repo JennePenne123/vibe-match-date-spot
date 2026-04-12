@@ -51,6 +51,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   const state = usePreferencesState(props);
   const { t } = useTranslation();
+  const { state: appState, requestLocation } = useApp();
 
   const {
     flowState, loading, hasSubmitted, onboardingPrefs, onboardingLoaded,
