@@ -64,7 +64,7 @@ serve(async (req) => {
   const results: { id: string; name: string; address: string }[] = [];
   let updatedCount = 0;
 
-  for (const venue of (venues || [])) {
+  for (const venue of emptyAddressVenues) {
     const addr = await reverseGeocode(venue.latitude, venue.longitude);
     if (addr) {
       const { error: updateError } = await supabase
