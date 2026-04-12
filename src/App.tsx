@@ -119,6 +119,7 @@ const PartnerTerms = lazy(() => import("./pages/partner/Terms"));
 const PartnerPrivacy = lazy(() => import("./pages/partner/Privacy"));
 const PartnerStaff = lazy(() => import("./pages/partner/Staff"));
 const JoinStaff = lazy(() => import("./pages/JoinStaff"));
+const StaffScanner = lazy(() => import("./pages/staff/Scanner"));
 
 // Admin routes – lazy loaded
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -251,6 +252,9 @@ const App = () => (
                     <Route path="/partner/privacy" element={<LazyPage><PartnerPrivacy /></LazyPage>} />
                     <Route path="/partner/staff" element={<LazyPage><PartnerStaff /></LazyPage>} />
                     <Route path="/join-staff" element={<LazyPageNoLayout><JoinStaff /></LazyPageNoLayout>} />
+                    
+                    {/* Staff Routes */}
+                    <Route path="/staff/scan" element={<LazyPageNoLayout><StaffScanner /></LazyPageNoLayout>} />
                     
                     {/* Admin Routes – protected by role check */}
                     <Route path="/admin" element={<LazyPage><AdminRouteGuard><AdminDashboard /></AdminRouteGuard></LazyPage>} />

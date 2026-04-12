@@ -265,7 +265,7 @@ export default function JoinStaff() {
                   Du bist jetzt als Mitarbeiter registriert. Du kannst ab sofort Voucher einlösen.
                 </p>
               </div>
-              <Button onClick={() => navigate('/home')} className="w-full">
+              <Button onClick={() => navigate('/staff/scan')} className="w-full">
                 Zur App
               </Button>
             </>
