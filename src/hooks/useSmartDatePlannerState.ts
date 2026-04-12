@@ -266,6 +266,7 @@ export const useSmartDatePlannerState = ({
     locationRequested,
     dateMode,
     setDateMode,
+    handleModeSelect,
     selectedPartnerIds,
     setSelectedPartnerIds,
     currentPreferences,
