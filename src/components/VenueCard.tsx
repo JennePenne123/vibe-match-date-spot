@@ -155,7 +155,6 @@ const VenueCard = ({
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               {venuePriceRange && (
                 <div className="flex items-center gap-1">
-                  <DollarSign className="w-4 h-4" />
                   <span>{venuePriceRange}</span>
                 </div>
               )}
