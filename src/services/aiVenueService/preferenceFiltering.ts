@@ -147,6 +147,7 @@ const CUISINE_NAME_PATTERNS: Record<string, string[]> = {
   'american': ['burger', 'bbq', 'barbecue', 'steakhouse', 'steak house', 'wings', 'diner', 'smokehouse'],
   'mediterranean': ['hummus', 'falafel', 'mezze', 'olive', 'mediterran'],
   'spanish': ['tapas', 'paella', 'churros', 'sangria', 'bodega'],
+  'oriental': ['oriental', 'orientalisch', 'levante', 'mezze', 'shawarma', 'shisha', 'hookah', 'manakish', 'fattoush', 'tabbouleh', 'halloumi'],
 };
 
 function inferCuisineFromVenue(venue: any): string | null {
