@@ -557,7 +557,13 @@
     "deleteRequestedDesc": "Tu cuenta será eliminada en breve.",
     "language": "Idioma",
     "languageDesc": "Elige el idioma de la aplicación.",
-    "somethingWrong": "Algo salió mal."
+    "somethingWrong": "Algo salió mal.",
+    "aiProfiling": "Recomendaciones con IA",
+    "aiProfilingDesc": "Información sobre el procesamiento automatizado de tus datos (RGPD Art. 22).",
+    "aiProfilingExplanation": "Utilizamos Inteligencia Artificial para sugerirte lugares para citas. Para ello, analizamos tus preferencias, valoraciones anteriores y tu comportamiento de uso (por ejemplo, qué lugares prefieres).",
+    "aiProfilingRight": "Tienes derecho a oponerte a este procesamiento automatizado en cualquier momento.",
+    "aiProfilingLearnMore": "Más información en nuestra Política de Privacidad",
+    "aiProfilingOnboarding": "Usamos IA para sugerir ideas de citas personalizadas. Más en nuestra"
   },
   "partner": {
     "dashboard": "Panel de Socio",

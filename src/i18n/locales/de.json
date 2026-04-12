@@ -547,7 +547,13 @@
     "deleteRequestedDesc": "Dein Account wird in Kürze gelöscht. Du wirst jetzt abgemeldet.",
     "language": "Sprache",
     "languageDesc": "Wähle die Anzeigesprache der App.",
-    "somethingWrong": "Etwas ist schiefgelaufen."
+    "somethingWrong": "Etwas ist schiefgelaufen.",
+    "aiProfiling": "KI-gestützte Empfehlungen",
+    "aiProfilingDesc": "Informationen zur automatisierten Verarbeitung deiner Daten (DSGVO Art. 22).",
+    "aiProfilingExplanation": "Wir nutzen Künstliche Intelligenz, um dir passende Date-Locations vorzuschlagen. Dazu analysieren wir deine Präferenzen, vergangene Bewertungen und dein Nutzungsverhalten (z. B. welche Orte du favorisierst).",
+    "aiProfilingRight": "Du hast das Recht, einer solchen automatisierten Verarbeitung jederzeit zu widersprechen.",
+    "aiProfilingLearnMore": "Mehr dazu in unserer Datenschutzerklärung",
+    "aiProfilingOnboarding": "Wir nutzen KI, um dir personalisierte Date-Ideen vorzuschlagen. Mehr in unserer"
   },
   "partner": {
     "dashboard": "Partner-Dashboard",
