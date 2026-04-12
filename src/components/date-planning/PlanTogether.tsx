@@ -26,6 +26,47 @@ interface PlanTogetherProps {
   compatibilityScore?: number | CompatibilityScore;
 }
 
+const getVenueId = (venue: AIVenueRecommendation): string | null => {
+  console.log('🔍 VENUE ID EXTRACTION: Processing venue:', {
+    venue_name: venue.venue_name,
+    venue_id: venue.venue_id,
+    venue_id_type: typeof venue.venue_id,
+    hasVenueId: !!venue.venue_id,
+    fallbackId: (venue as any).id,
+    placeId: (venue as any).place_id
+  });
+
+  if (typeof venue.venue_id === 'string' && venue.venue_id.trim() && venue.venue_id !== 'undefined') {
+    console.log('✅ Using primary venue_id:', venue.venue_id);
+    return venue.venue_id.trim();
+  }
+
+  if (venue.venue_id && typeof venue.venue_id === 'object') {
+    if ('value' in (venue.venue_id as any)) {
+      const extractedValue = (venue.venue_id as any).value;
+      if (typeof extractedValue === 'string' && extractedValue.trim() && extractedValue !== 'undefined') {
+        console.log('✅ Using extracted venue_id.value:', extractedValue);
+        return extractedValue.trim();
+      }
+    }
+    console.warn('⚠️ VENUE ID EXTRACTION: Invalid object venue_id for', venue.venue_name, venue.venue_id);
+  }
+
+  const fallbackId = (venue as any).id || (venue as any).place_id || (venue as any).google_place_id;
+  if (fallbackId && typeof fallbackId === 'string' && fallbackId.trim()) {
+    console.log('✅ Using fallback ID:', fallbackId);
+    return fallbackId.trim();
+  }
+
+  console.error('❌ VENUE ID EXTRACTION: No valid ID found for venue:', {
+    venue_name: venue.venue_name,
+    venue_id: venue.venue_id,
+    allKeys: Object.keys(venue),
+    venue
+  });
+  return null;
+};
+
 const PlanTogether: React.FC<PlanTogetherProps> = ({
   partnerName,
   partnerId,
@@ -39,15 +80,10 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
 }) => {
   const { user } = useAuth();
 
-  // Extract venue IDs and fetch vouchers
-  const venueIds = useMemo(() => {
-    return venueRecommendations
-      .map(rec => {
-        const venueId = getVenueId(rec);
-        return venueId;
-      })
-      .filter((id): id is string => id !== null);
-  }, [venueRecommendations]);
+  const venueIds = useMemo(
+    () => venueRecommendations.map(getVenueId).filter((id): id is string => id !== null),
+    [venueRecommendations]
+  );
 
   const { vouchers } = useVenueVouchers(venueIds);
 
@@ -57,51 +93,6 @@ const PlanTogether: React.FC<PlanTogetherProps> = ({
     sessionId,
     venuesSample: venueRecommendations?.slice(0, 2)
   });
-
-  // Enhanced helper function to extract venue ID from various formats
-  const getVenueId = (venue: AIVenueRecommendation): string | null => {
-    console.log('🔍 VENUE ID EXTRACTION: Processing venue:', {
-      venue_name: venue.venue_name,
-      venue_id: venue.venue_id,
-      venue_id_type: typeof venue.venue_id,
-      hasVenueId: !!venue.venue_id,
-      fallbackId: (venue as any).id,
-      placeId: (venue as any).place_id
-    });
-
-    // Primary: Handle venue_id as a string (expected format)
-    if (typeof venue.venue_id === 'string' && venue.venue_id.trim() && venue.venue_id !== 'undefined') {
-      console.log('✅ Using primary venue_id:', venue.venue_id);
-      return venue.venue_id.trim();
-    }
-    
-    // Handle venue_id as an object with value property (data transformation issue)
-    if (venue.venue_id && typeof venue.venue_id === 'object') {
-      if ('value' in (venue.venue_id as any)) {
-        const extractedValue = (venue.venue_id as any).value;
-        if (typeof extractedValue === 'string' && extractedValue.trim() && extractedValue !== 'undefined') {
-          console.log('✅ Using extracted venue_id.value:', extractedValue);
-          return extractedValue.trim();
-        }
-      }
-      console.warn('⚠️ VENUE ID EXTRACTION: Invalid object venue_id for', venue.venue_name, venue.venue_id);
-    }
-    
-    // Fallback: try to use any available ID field
-    const fallbackId = (venue as any).id || (venue as any).place_id || (venue as any).google_place_id;
-    if (fallbackId && typeof fallbackId === 'string' && fallbackId.trim()) {
-      console.log('✅ Using fallback ID:', fallbackId);
-      return fallbackId.trim();
-    }
-    
-    console.error('❌ VENUE ID EXTRACTION: No valid ID found for venue:', {
-      venue_name: venue.venue_name,
-      venue_id: venue.venue_id,
-      allKeys: Object.keys(venue),
-      venue: venue
-    });
-    return null;
-  };
 
 
   if (error) {
