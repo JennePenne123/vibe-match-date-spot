@@ -290,9 +290,9 @@ export const getAIVenueRecommendations = async (
     const sortedRecommendations = deduped
       .sort((a, b) => b.ai_score - a.ai_score);
 
-    // Quality gate: Top 3 must have ≥80% match score
+    // Quality gate: Top 3 must have ≥65% match score
     // Venues below threshold are demoted out of the top 3
-    const MIN_TOP3_SCORE = 0.80;
+    const MIN_TOP3_SCORE = 0.65;
     const qualifiedTop3 = sortedRecommendations.filter(r => r.ai_score >= MIN_TOP3_SCORE);
     const belowThreshold = sortedRecommendations.filter(r => r.ai_score < MIN_TOP3_SCORE);
     
