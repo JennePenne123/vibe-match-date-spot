@@ -263,14 +263,22 @@ serve(async (req) => {
     const venues = places
       .filter((place: any) => {
         const cats = (place.categories || []).map((c: string) => c.toLowerCase());
-        const name = (place.name || '').toLowerCase();
+        const name = (place.name || '').trim();
+        const nameLower = name.toLowerCase();
+        
+        // Exclude venues with invalid names (too short, numeric-only, or empty)
+        if (!name || name.length < 3 || /^\d+$/.test(name)) {
+          console.log(`🚫 RADAR: Excluded invalid name: "${name}"`);
+          return false;
+        }
+        
         // Exclude if any blocked category or name matches
         const hasBlockedCat = cats.some((cat: string) => 
           blockedCategories.some(b => cat.includes(b))
         );
-        const hasBlockedName = blockedNames.some(b => name.includes(b));
+        const hasBlockedName = blockedNames.some(b => nameLower.includes(b));
         if (hasBlockedCat || hasBlockedName) {
-          console.log(`🚫 RADAR: Excluded non-venue: ${place.name}`);
+          console.log(`🚫 RADAR: Excluded non-venue: ${name}`);
         }
         return !hasBlockedCat && !hasBlockedName;
       })
