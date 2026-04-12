@@ -1681,6 +1681,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           cuisine_type: string | null
+          data_quality_issues: Json | null
+          data_quality_score: number | null
           description: string | null
           foursquare_data: Json | null
           foursquare_id: string | null
@@ -1689,10 +1691,12 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          last_validated_at: string | null
           latitude: number | null
           longitude: number | null
           menu_highlights: string[] | null
           name: string
+          nominatim_match_name: string | null
           opening_hours: Json | null
           pair_friendly_features: string[] | null
           phone: string | null
@@ -1713,6 +1717,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           cuisine_type?: string | null
+          data_quality_issues?: Json | null
+          data_quality_score?: number | null
           description?: string | null
           foursquare_data?: Json | null
           foursquare_id?: string | null
@@ -1721,10 +1727,12 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          last_validated_at?: string | null
           latitude?: number | null
           longitude?: number | null
           menu_highlights?: string[] | null
           name: string
+          nominatim_match_name?: string | null
           opening_hours?: Json | null
           pair_friendly_features?: string[] | null
           phone?: string | null
@@ -1745,6 +1753,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           cuisine_type?: string | null
+          data_quality_issues?: Json | null
+          data_quality_score?: number | null
           description?: string | null
           foursquare_data?: Json | null
           foursquare_id?: string | null
@@ -1753,10 +1763,12 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          last_validated_at?: string | null
           latitude?: number | null
           longitude?: number | null
           menu_highlights?: string[] | null
           name?: string
+          nominatim_match_name?: string | null
           opening_hours?: Json | null
           pair_friendly_features?: string[] | null
           phone?: string | null
