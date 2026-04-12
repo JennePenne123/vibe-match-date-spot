@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck, ShieldAlert, Database, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface PlatformStats {
@@ -104,6 +106,9 @@ const AdminDashboard: React.FC = () => {
         ))}
       </div>
 
+      {/* Data Quality */}
+      <DataQualityCard />
+
       {/* Recent activity */}
       <RecentActivity />
     </div>
@@ -160,6 +165,93 @@ const RecentActivity: React.FC = () => {
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">{t('admin.noActivity', 'Keine Aktivitäten vorhanden')}</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+const DataQualityCard: React.FC = () => {
+  const [isRunning, setIsRunning] = useState(false);
+  const [result, setResult] = useState<{
+    summary?: {
+      total_validated: number;
+      avg_quality_score: number;
+      issues_found: number;
+      critical_issues: number;
+      name_mismatches: number;
+      location_mismatches: number;
+    };
+  } | null>(null);
+
+  const runValidation = async (dryRun: boolean) => {
+    setIsRunning(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('validate-venue-data', {
+        body: { limit: 50, dry_run: dryRun },
+      });
+      if (error) throw error;
+      setResult(data);
+      toast.success(
+        `${data.summary.total_validated} Venues geprüft – Durchschnitt: ${data.summary.avg_quality_score}%`
+      );
+    } catch (err: any) {
+      toast.error(`Validierung fehlgeschlagen: ${err.message}`);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  return (
+    <Card className="bg-card/80 backdrop-blur border-border/40">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Database className="w-5 h-5 text-primary" />
+          Datenqualität – Venues
+        </CardTitle>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => runValidation(true)}
+            disabled={isRunning}
+          >
+            {isRunning && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
+            Prüfen (Dry Run)
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => runValidation(false)}
+            disabled={isRunning}
+          >
+            {isRunning && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
+            Prüfen & Speichern
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {result?.summary ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[
+              { label: 'Geprüft', value: result.summary.total_validated },
+              { label: 'Ø Score', value: `${result.summary.avg_quality_score}%` },
+              { label: 'Mit Issues', value: result.summary.issues_found },
+              { label: 'Kritisch', value: result.summary.critical_issues, critical: true },
+              { label: 'Name-Mismatch', value: result.summary.name_mismatches },
+              { label: 'Ort-Mismatch', value: result.summary.location_mismatches },
+            ].map((item) => (
+              <div key={item.label} className="p-3 rounded-lg bg-muted/30 text-center">
+                <p className={`text-xl font-bold ${item.critical && Number(item.value) > 0 ? 'text-destructive' : 'text-foreground'}`}>
+                  {item.value}
+                </p>
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Klicke auf "Prüfen", um die Datenqualität aller Venues zu validieren. Ein wöchentlicher Cron-Job läuft automatisch.
+          </p>
         )}
       </CardContent>
     </Card>
