@@ -170,17 +170,17 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     />
   );
 
-  const venueStepContent = selectedPartner && (
+  const venueStepContent = (isSoloMode || selectedPartner) && (
     <PlanTogether
-      partnerName={selectedPartner.name}
-      partnerId={selectedPartnerId}
+      partnerName={isSoloMode ? '' : (selectedPartner?.name || '')}
+      partnerId={isSoloMode ? '' : selectedPartnerId}
       venueRecommendations={venueRecommendations || []}
       onVenueSelect={handleVenueSelection}
       error={datePlanningError || undefined}
       onRetrySearch={() => console.log('Retrying venue search...')}
       sessionId={collaborativeSession?.id || currentSession?.id}
-      isCollaborative
-      compatibilityScore={compatibilityScore}
+      isCollaborative={!isSoloMode}
+      compatibilityScore={isSoloMode ? null : compatibilityScore}
     />
   );
 
