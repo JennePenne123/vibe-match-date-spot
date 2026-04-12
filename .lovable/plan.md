@@ -95,6 +95,7 @@ Partner gibt USt-IdNr. ein → Status: pending_review
 - [ ] Nutzergenerierte Venue-Reviews
 - [ ] KI: Automatisierter Support-Agent
 - [ ] KI: Date Recaps
+- [ ] KI: Venue Metadata-Enrichment (fehlende Küche/Vibe/Tags automatisch via Google Places, Partner-Eingaben oder Web-Scraping anreichern → höhere AI-Score-Qualität)
 
 ### POS-/Kassensystem-Integration
 - [ ] Partner-Umfrage: Welches Kassensystem nutzen eure Venues? (orderbird, Lightspeed, SumUp, ready2order, gastrofix)
