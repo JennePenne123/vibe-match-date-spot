@@ -41,12 +41,17 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
 
   const goBack = (preselectedFriend?: { id: string; name: string } | null, navigate?: (path: string) => void) => {
     switch (currentStep) {
-      case 'select-partner':
+      case 'select-mode':
         if (navigate) navigate('/home');
+        break;
+      case 'select-partner':
+        setCurrentStepInternal('select-mode');
         break;
       case 'set-preferences':
         if (preselectedFriend) {
           if (navigate) navigate('/home');
+        } else if (dateMode === 'solo') {
+          setCurrentStepInternal('select-mode');
         } else {
           setCurrentStepInternal('select-partner');
         }
@@ -66,6 +71,9 @@ export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborat
     selectedPartnerId,
     setSelectedPartnerId,
     getStepProgress,
-    goBack
+    goBack,
+    dateMode,
+    setDateMode,
+    handleModeSelect,
   };
 };
