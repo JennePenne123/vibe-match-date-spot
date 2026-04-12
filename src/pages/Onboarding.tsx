@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -388,6 +389,7 @@ const Onboarding = () => {
 };
 
 function WelcomeScreen() {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center flex-1 text-center px-4 py-12">
       <div className="relative w-40 h-40 mb-8">
@@ -411,6 +413,14 @@ function WelcomeScreen() {
         <Sparkles className="w-3.5 h-3.5" />
         <span>7 kurze Schritte · Kein richtig oder falsch</span>
       </div>
+
+      {/* AI Profiling notice (GDPR Art. 22) */}
+      <p className="mt-6 text-[11px] text-muted-foreground/50 max-w-xs leading-relaxed">
+        {t('settings.aiProfilingOnboarding', 'Wir nutzen KI, um dir personalisierte Date-Ideen vorzuschlagen. Mehr in unserer')}{' '}
+        <Link to="/datenschutz" className="text-primary/60 underline underline-offset-2 hover:text-primary/80">
+          {t('settings.privacy', 'Datenschutzerklärung')}
+        </Link>.
+      </p>
     </div>
   );
 }
