@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { AdminPermissionGuard } from '@/components/admin/AdminPermissionGuard';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,8 +53,8 @@ const AdminUsers: React.FC = () => {
     : users || [];
 
   return (
+    <AdminPermissionGuard permission="canViewUsers">
     <div className="space-y-6">
-      <div>
         <h1 className="text-2xl font-bold text-foreground">{t('admin.usersTitle', 'Nutzer-Übersicht')}</h1>
         <p className="text-muted-foreground text-sm mt-1">
           {t('admin.usersSubtitle', 'Alle registrierten Nutzer und deren Rollen')}
@@ -118,6 +119,7 @@ const AdminUsers: React.FC = () => {
         </CardContent>
       </Card>
     </div>
+    </AdminPermissionGuard>
   );
 };
 
