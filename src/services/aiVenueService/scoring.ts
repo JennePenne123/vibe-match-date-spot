@@ -18,17 +18,18 @@ const CUISINE_FAMILIES: Record<string, { members: string[]; similarity: number }
   'greek':         [{ members: ['mediterranean', 'turkish', 'lebanese'], similarity: 0.8 }, { members: ['italian', 'spanish'], similarity: 0.65 }],
   'mediterranean': [{ members: ['italian', 'greek', 'spanish', 'turkish', 'lebanese'], similarity: 0.8 }, { members: ['french', 'moroccan'], similarity: 0.6 }],
   'spanish':       [{ members: ['mediterranean', 'italian', 'portuguese'], similarity: 0.75 }, { members: ['mexican', 'latin'], similarity: 0.5 }],
-  'turkish':       [{ members: ['mediterranean', 'greek', 'lebanese', 'arabic', 'middle_eastern'], similarity: 0.8 }, { members: ['indian'], similarity: 0.4 }],
+  'turkish':       [{ members: ['mediterranean', 'greek', 'lebanese', 'arabic', 'middle_eastern', 'oriental'], similarity: 0.8 }, { members: ['indian'], similarity: 0.4 }],
   'japanese':      [{ members: ['korean', 'asian'], similarity: 0.7 }, { members: ['chinese', 'vietnamese', 'thai'], similarity: 0.55 }],
   'chinese':       [{ members: ['asian', 'vietnamese'], similarity: 0.7 }, { members: ['thai', 'korean', 'japanese'], similarity: 0.55 }],
   'korean':        [{ members: ['japanese', 'asian'], similarity: 0.7 }, { members: ['chinese'], similarity: 0.55 }],
   'vietnamese':    [{ members: ['asian', 'thai', 'chinese'], similarity: 0.7 }, { members: ['japanese', 'korean'], similarity: 0.5 }],
   'thai':          [{ members: ['asian', 'vietnamese'], similarity: 0.7 }, { members: ['indian', 'chinese'], similarity: 0.5 }],
-  'indian':        [{ members: ['curry'], similarity: 0.9 }, { members: ['thai', 'middle_eastern'], similarity: 0.4 }],
+  'indian':        [{ members: ['curry', 'oriental'], similarity: 0.7 }, { members: ['thai', 'middle_eastern'], similarity: 0.5 }],
   'mexican':       [{ members: ['latin', 'tex-mex'], similarity: 0.85 }, { members: ['spanish'], similarity: 0.5 }],
   'french':        [{ members: ['european'], similarity: 0.7 }, { members: ['italian', 'mediterranean'], similarity: 0.6 }],
   'german':        [{ members: ['european', 'regional'], similarity: 0.7 }, { members: ['french'], similarity: 0.45 }],
   'american':      [{ members: ['burger', 'bbq', 'steakhouse', 'grill'], similarity: 0.85 }, { members: ['mexican'], similarity: 0.4 }],
+  'oriental':      [{ members: ['turkish', 'lebanese', 'arabic', 'middle_eastern', 'persian', 'moroccan', 'syrian'], similarity: 0.85 }, { members: ['indian', 'mediterranean', 'greek'], similarity: 0.55 }],
 };
 
 function getCuisineSimilarity(userCuisine: string, venueCuisine: string): number {

@@ -78,7 +78,7 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
     'american': ['american', 'burger', 'bbq', 'steakhouse', 'steak house', 'diner', 'grill'],
     'cafe': ['café', 'cafe', 'coffee', 'bakery', 'brunch', 'breakfast', 'patisserie'],
     'bar': ['bar', 'pub', 'cocktail', 'wine bar', 'lounge', 'biergarten'],
-    'middle_eastern': ['persian', 'arabic', 'falafel', 'kebab', 'döner'],
+    'middle_eastern': ['persian', 'arabic', 'falafel', 'kebab', 'döner', 'oriental', 'syrian', 'lebanese', 'turkish', 'moroccan'],
     'latin': ['mexican', 'brazilian', 'peruvian', 'argentinian', 'tapas'],
   };
   
@@ -147,6 +147,7 @@ const CUISINE_NAME_PATTERNS: Record<string, string[]> = {
   'american': ['burger', 'bbq', 'barbecue', 'steakhouse', 'steak house', 'wings', 'diner', 'smokehouse'],
   'mediterranean': ['hummus', 'falafel', 'mezze', 'olive', 'mediterran'],
   'spanish': ['tapas', 'paella', 'churros', 'sangria', 'bodega'],
+  'oriental': ['oriental', 'orientalisch', 'levante', 'mezze', 'shawarma', 'shisha', 'hookah', 'manakish', 'fattoush', 'tabbouleh', 'halloumi'],
 };
 
 function inferCuisineFromVenue(venue: any): string | null {
@@ -223,6 +224,10 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       'american': ['casual', 'fun', 'lively'],
       'korean': ['trendy', 'adventurous', 'casual'],
       'vietnamese': ['casual', 'adventurous', 'trendy'],
+      'oriental': ['adventurous', 'exotic', 'cozy', 'cultural'],
+      'turkish': ['casual', 'cozy', 'adventurous'],
+      'lebanese': ['casual', 'cozy', 'adventurous'],
+      'arabic': ['adventurous', 'exotic', 'cultural'],
     };
 
     // Infer price range from cuisine type
@@ -236,6 +241,9 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       'mexican': ['$', '$$'],
       'german': ['$$'],
       'american': ['$$'],
+      'oriental': ['$', '$$'],
+      'turkish': ['$', '$$'],
+      'lebanese': ['$', '$$'],
     };
 
     // Score all venues - don't filter out, just rank
@@ -341,7 +349,9 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           if (prefVibes.includes('adventurous') && (
             effectiveCuisine.includes('thai') || effectiveCuisine.includes('chinese') || 
             effectiveCuisine.includes('korean') || effectiveCuisine.includes('indian') ||
-            effectiveCuisine.includes('vietnamese') || effectiveCuisine.includes('japanese'))) {
+            effectiveCuisine.includes('vietnamese') || effectiveCuisine.includes('japanese') ||
+            effectiveCuisine.includes('oriental') || effectiveCuisine.includes('turkish') ||
+            effectiveCuisine.includes('lebanese'))) {
             score += 10;
             inferred = true;
           }
