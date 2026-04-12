@@ -77,8 +77,8 @@ export function usePushNotifications() {
     init();
   }, [user, checkSupport]);
 
-  // Get service worker registration (managed by vite-plugin-pwa)
-  const getServiceWorkerRegistration = useCallback(async () => {
+  // Register service worker
+  const registerServiceWorker = useCallback(async () => {
     if (isLovablePreviewEnvironment()) {
       throw new Error('Service Worker is disabled in Lovable preview');
     }
@@ -87,9 +87,31 @@ export function usePushNotifications() {
       throw new Error('Service Worker not supported');
     }
 
-    const registration = await navigator.serviceWorker.ready;
-    console.log('Service Worker ready:', registration);
-    return registration;
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      await registration.update();
+
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+
+      registration.addEventListener('updatefound', () => {
+        const installingWorker = registration.installing;
+        if (!installingWorker) return;
+
+        installingWorker.addEventListener('statechange', () => {
+          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            installingWorker.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+
+      console.log('Service Worker registered:', registration);
+      return registration;
+    } catch (error) {
+      console.error('Service Worker registration failed:', error);
+      throw error;
+    }
   }, []);
 
   // Request notification permission
@@ -137,8 +159,11 @@ export function usePushNotifications() {
         return false;
       }
 
-      // Get service worker registration (managed by vite-plugin-pwa)
-      const registration = await getServiceWorkerRegistration();
+      // Register service worker
+      const registration = await registerServiceWorker();
+
+      // Wait for service worker to be ready
+      await navigator.serviceWorker.ready;
 
       // Subscribe to push
       const subscription = await registration.pushManager.subscribe({
@@ -191,7 +216,7 @@ export function usePushNotifications() {
       setState(prev => ({ ...prev, isLoading: false }));
       return false;
     }
-  }, [user, requestPermission, getServiceWorkerRegistration, toast]);
+  }, [user, requestPermission, registerServiceWorker, toast]);
 
   // Unsubscribe from push notifications
   const unsubscribe = useCallback(async () => {
