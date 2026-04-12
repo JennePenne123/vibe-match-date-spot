@@ -308,16 +308,17 @@ const VenueDetail = () => {
               <Button 
                 variant="outline" 
                 className="h-12"
-                onClick={openDirections}
+                onClick={handleDirections}
               >
                 Get Directions
               </Button>
               <Button 
                 variant="outline" 
                 className="h-12"
-                onClick={appVenue.phone ? callVenue : visitWebsite}
+                onClick={appVenue.website ? visitWebsite : (appVenue.phone ? callVenue : undefined)}
+                disabled={!appVenue.website && !appVenue.phone}
               >
-                {appVenue.phone ? 'Call Now' : 'Visit Website'}
+                {appVenue.website ? 'Visit Website' : (appVenue.phone ? 'Call Now' : 'No Website')}
               </Button>
             </div>
           </div>
