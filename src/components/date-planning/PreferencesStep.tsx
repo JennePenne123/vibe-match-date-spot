@@ -180,11 +180,17 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                         <span className="text-sm text-foreground flex-1">
                           {appState.userLocation.address || `${appState.userLocation.latitude.toFixed(4)}, ${appState.userLocation.longitude.toFixed(4)}`}
                         </span>
+                        <button
+                          onClick={reqLoc}
+                          className="text-xs text-primary hover:text-primary/80 font-medium transition-colors whitespace-nowrap"
+                        >
+                          {t('datePlanning.changeLocation', 'Ändern')}
+                        </button>
                       </div>
                     ) : (
                       <button
                         onClick={reqLoc}
-                        className="flex items-center gap-2 w-full rounded-lg py-2.5 px-3 bg-muted/50 border border-border/50 hover:bg-muted transition-colors text-sm text-muted-foreground"
+                        className="flex items-center gap-2 w-full rounded-lg py-2.5 px-3 bg-primary/10 border border-primary/20 hover:bg-primary/15 transition-colors text-sm text-primary font-medium"
                       >
                         <MapPin className="h-4 w-4" />
                         {t('datePlanning.enableLocation', 'Standort aktivieren')}
