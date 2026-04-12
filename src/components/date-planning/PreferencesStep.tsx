@@ -51,7 +51,35 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   const state = usePreferencesState(props);
   const { t } = useTranslation();
-  const { appState, requestLocation: reqLoc } = useApp();
+  const { appState, requestLocation: reqLoc, updateUserLocation } = useApp();
+  const [showAddressInput, setShowAddressInput] = useState(false);
+  const [addressQuery, setAddressQuery] = useState('');
+  const [addressSearching, setAddressSearching] = useState(false);
+
+  const handleAddressSearch = async () => {
+    if (!addressQuery.trim()) return;
+    setAddressSearching(true);
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addressQuery.trim())}&format=json&limit=1&addressdetails=1`);
+      const data = await res.json();
+      if (data?.[0]) {
+        const result = data[0];
+        const addr = result.address;
+        const displayName = [addr?.city || addr?.town || addr?.village, addr?.state, addr?.country].filter(Boolean).join(', ') || result.display_name;
+        updateUserLocation({
+          latitude: parseFloat(result.lat),
+          longitude: parseFloat(result.lon),
+          address: displayName,
+        });
+        setShowAddressInput(false);
+        setAddressQuery('');
+      }
+    } catch (err) {
+      console.error('Address search failed:', err);
+    } finally {
+      setAddressSearching(false);
+    }
+  };
 
   const {
     flowState, loading, hasSubmitted, onboardingPrefs, onboardingLoaded,
