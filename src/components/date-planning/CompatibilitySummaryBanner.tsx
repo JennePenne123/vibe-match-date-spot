@@ -11,7 +11,7 @@ interface CompatibilityScore {
 }
 
 interface CompatibilitySummaryBannerProps {
-  compatibilityScore: number | CompatibilityScore;
+  compatibilityScore: number | CompatibilityScore | null;
   partnerName: string;
   venueCount: number;
   compact?: boolean;
