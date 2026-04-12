@@ -309,6 +309,23 @@ serve(async (req) => {
 
     console.log('✅ OVERPASS: Processed', venues.length, 'venues');
 
+    // Reverse-geocode venues with missing addresses
+    let geocodedCount = 0;
+    for (const venue of venues) {
+      if ((!venue.address || venue.address.trim() === '') && venue.latitude && venue.longitude) {
+        const addr = await reverseGeocode(venue.latitude, venue.longitude);
+        if (addr) {
+          venue.address = addr;
+          geocodedCount++;
+        }
+        // Nominatim asks for max 1 req/sec
+        await new Promise(r => setTimeout(r, 1100));
+      }
+    }
+    if (geocodedCount > 0) {
+      console.log(`📍 OVERPASS: Reverse-geocoded ${geocodedCount} missing addresses via Nominatim`);
+    }
+
     // Save to database
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
