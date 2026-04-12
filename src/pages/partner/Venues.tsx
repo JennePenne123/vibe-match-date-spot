@@ -87,6 +87,24 @@ export default function PartnerVenues() {
     }
   };
 
+  const deletePartnership = async (partnershipId: string, venueName: string) => {
+    try {
+      const { error } = await supabase
+        .from('venue_partnerships')
+        .delete()
+        .eq('id', partnershipId)
+        .eq('partner_id', user!.id);
+
+      if (error) throw error;
+
+      setPartnerships(prev => prev.filter(p => p.id !== partnershipId));
+      toast({ title: 'Standort entfernt', description: `${venueName} wurde erfolgreich entfernt.` });
+    } catch (error) {
+      console.error('Error deleting partnership:', error);
+      toast({ title: 'Fehler', description: 'Standort konnte nicht entfernt werden', variant: 'destructive' });
+    }
+  };
+
   if (isPageLoading || loading) {
     return <div className="flex items-center justify-center min-h-[50vh]"><LoadingSpinner /></div>;
   }
