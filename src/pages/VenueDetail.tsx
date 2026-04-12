@@ -44,6 +44,32 @@ const VenueDetail = () => {
     }
   }, [id, venue, dbVenue]);
 
+  const sourceVenue = venue || dbVenue;
+
+  // Reverse-geocode if address is missing/poor but we have coordinates
+  useEffect(() => {
+    if (!sourceVenue) return;
+    const addr = sourceVenue.address || '';
+    const hasGoodAddress = addr.length > 5 && !/^\d+\.\d+/.test(addr);
+    const lat = sourceVenue.latitude;
+    const lon = sourceVenue.longitude;
+    
+    if (!hasGoodAddress && lat && lon) {
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1&zoom=18`, {
+        headers: { 'User-Agent': 'HiOutz/1.0' }
+      })
+        .then(r => r.json())
+        .then(data => {
+          const a = data.address || {};
+          const street = [a.road || a.pedestrian || '', a.house_number || ''].filter(Boolean).join(' ');
+          const city = [a.postcode || '', a.city || a.town || a.village || ''].filter(Boolean).join(' ');
+          const resolved = [street, city].filter(Boolean).join(', ');
+          if (resolved) setResolvedAddress(resolved);
+        })
+        .catch(() => {});
+    }
+  }, [sourceVenue]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -55,8 +81,6 @@ const VenueDetail = () => {
       </div>
     );
   }
-
-  const sourceVenue = venue || dbVenue;
 
   if (!sourceVenue) {
     if (notFound) {
@@ -74,6 +98,8 @@ const VenueDetail = () => {
 
   // Convert to AppVenue format for UI
   const appVenue = venueToAppVenue(sourceVenue, appState.userLocation?.latitude, appState.userLocation?.longitude);
+  // Use resolved address if available, otherwise format the existing one
+  const displayAddress = resolvedAddress || formatVenueAddress(appVenue);
 
   const shareCardData: ShareCardData = {
     type: 'venue',
