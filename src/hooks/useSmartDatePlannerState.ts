@@ -9,7 +9,7 @@ import { useCollaborativeSessionState } from '@/hooks/useCollaborativeSessionSta
 
 interface UseSmartDatePlannerStateProps {
   preselectedFriend?: { id: string; name: string } | null;
-  planningMode?: 'collaborative'; // Only collaborative mode supported
+  planningMode?: 'collaborative';
   sessionId?: string | null;
 }
 
@@ -22,10 +22,6 @@ export const useSmartDatePlannerState = ({
   const { user } = useAuth();
   const { appState, requestLocation } = useApp();
 
-  console.log('SmartDatePlanner - Starting with user:', user?.id);
-  console.log('SmartDatePlanner - Preselected friend:', preselectedFriend);
-  console.log('SmartDatePlanner - User location:', appState.userLocation);
-
   // Initialize hooks - must be called unconditionally (Rules of Hooks)
   const friendsResult = useFriends();
   const datePlanningState = useDatePlanning(appState.userLocation);
@@ -37,24 +33,12 @@ export const useSmartDatePlannerState = ({
     userLocation: appState.userLocation 
   });
 
-  // Extract data with error handling after hooks are called
   const friends = friendsResult.friends || [];
-  const friendsError = null; // Remove try-catch error handling for hooks
-  const datePlanningError = null; // Remove try-catch error handling for hooks  
-  const planningStepsError = null; // Remove try-catch error handling for hooks
+  const friendsError = null;
+  const datePlanningError = null;
+  const planningStepsError = null;
 
-  console.log('SmartDatePlanner - Friends loaded:', friends.length);
-  console.log('✅ SmartDatePlanner - Date planning state loaded with location:', appState.userLocation);
-  console.log('✅ SmartDatePlanner - analyzeCompatibilityAndVenues function available:', typeof datePlanningState?.analyzeCompatibilityAndVenues);
-  console.log('🔧 SmartDatePlanner - Collaborative state:', {
-    hasCollaborativeSession: !!collaborativeState.collaborativeSession,
-    collaborativeVenueCount: collaborativeState.collaborativeVenueRecommendations?.length || 0,
-    collaborativeCompatibilityScore: collaborativeState.collaborativeCompatibilityScore,
-    collaborativeVenueRecommendations: collaborativeState.collaborativeVenueRecommendations,
-    collaborativeSessionPreferencesData: collaborativeState.collaborativeSession?.preferences_data
-  });
-
-  // Extract states from hooks (with defaults if null) - prioritize collaborative session data
+  // Extract states from hooks - prioritize collaborative session data
   const {
     currentSession,
     loading,
@@ -85,15 +69,6 @@ export const useSmartDatePlannerState = ({
     ? collaborativeState.collaborativeVenueRecommendations 
     : singleUserVenueRecommendations || [];
   const aiAnalyzing = collaborativeState.collaborativeAiAnalyzing || loading;
-  
-  console.log('🔧 VENUE RECOMMENDATIONS STATE CHECK:', {
-    collaborativeVenues: collaborativeState.collaborativeVenueRecommendations?.length || 0,
-    singleUserVenues: singleUserVenueRecommendations?.length || 0,
-    finalVenues: venueRecommendations?.length || 0,
-    usingCollaborative: (collaborativeState.collaborativeVenueRecommendations?.length || 0) > 0,
-    collaborativeVenueData: collaborativeState.collaborativeVenueRecommendations?.slice(0, 2),
-    sessionData: collaborativeState.collaborativeSession?.preferences_data?.slice(0, 2)
-  });
 
   const {
     currentStep,
@@ -134,16 +109,9 @@ export const useSmartDatePlannerState = ({
       const venueStillExists = venueRecommendations.some(v => v.venue_id === selectedVenueId);
       
       if (!venueStillExists) {
-        console.log('🔄 VENUE SYNC: Selected venue no longer exists in recommendations, clearing selection:', {
-          selectedVenueId,
-          currentVenueIds: venueRecommendations.map(v => v.venue_id).slice(0, 3),
-          venueCount: venueRecommendations.length
-        });
-        
         setSelectedVenueId('');
         setInvitationMessage('');
         
-        // If user was on invitation step, move them back to venue selection
         if (currentStep === 'create-invitation') {
           setCurrentStep('plan-together');
         }
@@ -154,9 +122,6 @@ export const useSmartDatePlannerState = ({
   // Manual navigation helper function for Display Venues button
   const navigateToResults = useCallback(() => {
     if (venueRecommendations && venueRecommendations.length > 0) {
-      console.log('🎯 Manually navigating to Results page with', venueRecommendations.length, 'venues');
-      
-      // Convert AI venue recommendations to app venues format
       const appVenues = venueRecommendations.map(rec => ({
         id: rec.venue_id,
         name: rec.venue_name,
@@ -165,11 +130,10 @@ export const useSmartDatePlannerState = ({
         rating: rec.match_factors?.rating || 4.5,
         price_range: rec.match_factors?.price_range || '$$',
         cuisine_type: 'unknown',
-        matchScore: Math.round(rec.ai_score * 100), // Convert to percentage
+        matchScore: Math.round(rec.ai_score * 100),
         tags: rec.match_factors?.vibe_matches || []
       }));
       
-      // Navigate to results
       navigate('/results', { 
         state: { 
           fromSmartDatePlanning: true,
@@ -185,45 +149,30 @@ export const useSmartDatePlannerState = ({
 
   // Firefox-optimized location request to prevent flickering
   const handleLocationRequest = useCallback(async () => {
-    // Prevent multiple simultaneous requests that cause flickering
-    if (locationRequestInProgress) {
-      console.log('🦊 Location request already in progress, skipping...');
-      return;
-    }
+    if (locationRequestInProgress) return;
 
-    console.log('🦊 SmartDatePlanner - Requesting location permission');
     setLocationRequestInProgress(true);
     setLocationRequested(true);
     
     try {
       await requestLocation();
     } catch (error) {
-      console.error('🦊 Location request failed:', error);
+      console.error('Location request failed:', error);
     } finally {
-      // Reset flags after a delay to prevent rapid retries
       setTimeout(() => {
         setLocationRequestInProgress(false);
         setLocationRequested(false);
-      }, 3000); // 3 second cooldown
+      }, 3000);
     }
   }, [requestLocation, locationRequestInProgress]);
 
-  // Request location only once when user is detected, with Firefox-specific handling
+  // Request location only once when user is detected
   useEffect(() => {
     if (user && !appState.userLocation && !appState.locationError && !locationRequestInProgress) {
       const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
       
-      console.log('🎯 PLANNER STATE: User detected, requesting location', { 
-        isFirefox, 
-        hasLocation: !!appState.userLocation,
-        hasError: !!appState.locationError
-      });
-      
-      // For Firefox, add a small delay to prevent issues with rapid state changes
       if (isFirefox) {
-        setTimeout(() => {
-          handleLocationRequest();
-        }, 500);
+        setTimeout(() => handleLocationRequest(), 500);
       } else {
         handleLocationRequest();
       }
@@ -271,7 +220,6 @@ export const useSmartDatePlannerState = ({
     setSelectedPartnerIds,
     currentPreferences,
     setCurrentPreferences,
-    // Navigation helper for Display Venues button
     navigateToResults,
     // Include collaborative session state
     ...collaborativeState

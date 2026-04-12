@@ -1,4 +1,3 @@
-
 import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -18,7 +17,6 @@ import { createSmartDatePlannerHandlers } from '@/components/smart-date-planner/
 import SmartDatePlannerError from '@/components/smart-date-planner/SmartDatePlannerError';
 import SmartDatePlannerAuth from '@/components/smart-date-planner/SmartDatePlannerAuth';
 import LocationDisplay from '@/components/smart-date-planner/LocationDisplay';
-import { useCollaborativeSession } from '@/hooks/useCollaborativeSession';
 import { useFriends } from '@/hooks/useFriends';
 import { useGroupDatePlanning } from '@/hooks/useGroupDatePlanning';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,15 +33,23 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   const { friends: allFriends } = useFriends();
   const groupPlanning = useGroupDatePlanning();
 
+  // Use collaborative session data from the state hook (single instance, no duplicate)
+  const state = useSmartDatePlannerState({
+    preselectedFriend,
+    planningMode: 'collaborative',
+    sessionId,
+  });
+
+  // Extract collaborative session data from state (already provided by useCollaborativeSessionState inside)
   const {
-    session: collaborativeSession,
+    collaborativeSession,
+    sessionLoading,
     isUserInitiator,
-    loading: sessionLoading,
     hasUserSetPreferences,
     hasPartnerSetPreferences,
     canShowResults,
     triggerAIAnalysisManually,
-  } = useCollaborativeSession(sessionId);
+  } = state;
 
   const sessionPartner = useMemo(() => {
     if (!collaborativeSession || !allFriends.length) return null;
@@ -53,12 +59,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   }, [collaborativeSession, allFriends, isUserInitiator]);
 
   const effectivePreselectedFriend = sessionPartner ?? preselectedFriend;
-
-  const state = useSmartDatePlannerState({
-    preselectedFriend: effectivePreselectedFriend,
-    planningMode: 'collaborative',
-    sessionId,
-  });
 
   const handlers = createSmartDatePlannerHandlers({ ...state, collaborativeSession, sessionId });
 
@@ -95,7 +95,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
 
   const handlePartnerContinue = async () => {
     if (dateMode === 'group' && selectedPartnerIds.length > 0) {
-      // Create a group date
       const friendNames = selectedPartnerIds.map(id => {
         const f = friends.find(fr => fr.id === id);
         return f?.name || 'Freund';
@@ -104,7 +103,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       
       const group = await groupPlanning.createGroup(groupName, selectedPartnerIds);
       if (group) {
-        // Set first partner as main partner for the preferences step
         setSelectedPartnerId(selectedPartnerIds[0]);
         setCurrentStep('set-preferences');
       }
