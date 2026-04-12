@@ -27,8 +27,8 @@ const ProFeatureGate: React.FC<ProFeatureGateProps> = ({
 
   return (
     <Card variant="glass" className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 flex items-center justify-center">
-        <div className="text-center p-6 max-w-sm">
+      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 flex items-center justify-center overflow-auto py-4">
+        <div className="text-center p-4 max-w-sm">
           <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-3">
             <Lock className="w-6 h-6 text-amber-500" />
           </div>
