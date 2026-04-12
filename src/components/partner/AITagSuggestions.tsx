@@ -4,14 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles, Check, X, Loader2, Brain, TrendingUp } from 'lucide-react';
+import { Sparkles, Check, X, Loader2, Brain, TrendingUp, Globe, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface TagSuggestion {
   tag: string;
   confidence: number;
   reason: string;
-  sourceCount: number;
+  sourceCount?: number;
+  source?: 'website' | 'similar_venues' | 'ai_analysis' | 'feedback';
 }
 
 interface AITagSuggestionsProps {
@@ -21,17 +22,21 @@ interface AITagSuggestionsProps {
   onTagsUpdated: () => void;
 }
 
+type AnalysisMode = 'feedback' | 'website';
+
 export default function AITagSuggestions({ venueId, venueName, existingTags, onTagsUpdated }: AITagSuggestionsProps) {
   const { toast } = useToast();
   const [suggestions, setSuggestions] = useState<TagSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [analyzed, setAnalyzed] = useState(false);
-  const [stats, setStats] = useState<{ analyzedUsers: number; analyzedDates: number } | null>(null);
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode | null>(null);
+  const [stats, setStats] = useState<{ analyzedUsers?: number; analyzedDates?: number; websiteAnalyzed?: boolean; similarVenuesAnalyzed?: number } | null>(null);
   const [acceptingTag, setAcceptingTag] = useState<string | null>(null);
   const [dismissedTags, setDismissedTags] = useState<Set<string>>(new Set());
 
-  const fetchSuggestions = useCallback(async () => {
+  const fetchFeedbackSuggestions = useCallback(async () => {
     setLoading(true);
+    setAnalysisMode('feedback');
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Nicht eingeloggt');
@@ -55,7 +60,7 @@ export default function AITagSuggestions({ venueId, venueName, existingTags, onT
       }
 
       const data = await response.json();
-      setSuggestions(data.suggestions || []);
+      setSuggestions((data.suggestions || []).map((s: any) => ({ ...s, source: 'feedback' })));
       setStats({ analyzedUsers: data.analyzedUsers || 0, analyzedDates: data.analyzedDates || 0 });
       setAnalyzed(true);
 
@@ -64,6 +69,57 @@ export default function AITagSuggestions({ venueId, venueName, existingTags, onT
       }
     } catch (error: any) {
       console.error('Tag learning error:', error);
+      toast({ title: 'Fehler', description: error.message, variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  }, [venueId, toast]);
+
+  const fetchWebsiteSuggestions = useCallback(async () => {
+    setLoading(true);
+    setAnalysisMode('website');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Nicht eingeloggt');
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-venue-website`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ venue_id: venueId }),
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Website-Analyse fehlgeschlagen');
+      }
+
+      const data = await response.json();
+      setSuggestions(data.suggestions || []);
+      setStats({
+        websiteAnalyzed: data.websiteAnalyzed,
+        similarVenuesAnalyzed: data.similarVenuesAnalyzed,
+      });
+      setAnalyzed(true);
+
+      if (data.suggestions?.length === 0) {
+        toast({ title: 'Keine neuen Vorschläge', description: 'Die aktuellen Tags sind bereits optimal.' });
+      } else {
+        toast({
+          title: `${data.suggestions.length} Vorschläge gefunden`,
+          description: data.websiteAnalyzed
+            ? 'Website und ähnliche Venues analysiert.'
+            : 'Basierend auf ähnlichen Venues (keine Website verfügbar).',
+        });
+      }
+    } catch (error: any) {
+      console.error('Website analysis error:', error);
       toast({ title: 'Fehler', description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
@@ -98,6 +154,15 @@ export default function AITagSuggestions({ venueId, venueName, existingTags, onT
 
   const visibleSuggestions = suggestions.filter(s => !dismissedTags.has(s.tag));
 
+  const sourceIcon = (source?: string) => {
+    switch (source) {
+      case 'website': return '🌐';
+      case 'similar_venues': return '📊';
+      case 'ai_analysis': return '🤖';
+      default: return '💬';
+    }
+  };
+
   return (
     <Card variant="glass">
       <CardHeader className="pb-3">
@@ -106,36 +171,72 @@ export default function AITagSuggestions({ venueId, venueName, existingTags, onT
             <Brain className="w-4 h-4 text-primary" />
             KI-Tag-Vorschläge
           </CardTitle>
-          <Button
-            size="sm"
-            variant={analyzed ? 'outline' : 'default'}
-            onClick={fetchSuggestions}
-            disabled={loading}
-            className="text-xs h-7 gap-1.5"
-          >
-            {loading ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
-            ) : (
-              <Sparkles className="w-3 h-3" />
-            )}
-            {loading ? 'Analysiere...' : analyzed ? 'Erneut prüfen' : 'Feedback analysieren'}
-          </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
+        {/* Action buttons */}
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant={analysisMode === 'website' && analyzed ? 'outline' : 'default'}
+            onClick={fetchWebsiteSuggestions}
+            disabled={loading}
+            className="text-xs h-8 gap-1.5 flex-1"
+          >
+            {loading && analysisMode === 'website' ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Globe className="w-3 h-3" />
+            )}
+            {loading && analysisMode === 'website' ? 'Analysiere...' : 'Website + KI'}
+          </Button>
+          <Button
+            size="sm"
+            variant={analysisMode === 'feedback' && analyzed ? 'outline' : 'secondary'}
+            onClick={fetchFeedbackSuggestions}
+            disabled={loading}
+            className="text-xs h-8 gap-1.5 flex-1"
+          >
+            {loading && analysisMode === 'feedback' ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Users className="w-3 h-3" />
+            )}
+            {loading && analysisMode === 'feedback' ? 'Analysiere...' : 'Gäste-Feedback'}
+          </Button>
+        </div>
+
         {!analyzed && !loading && (
           <p className="text-xs text-muted-foreground">
-            Analysiert Feedback zufriedener Gäste und schlägt neue Tags vor, die dein KI-Matching verbessern.
+            <strong>Website + KI:</strong> Analysiert die Venue-Website und ähnliche Locations für optimale Tags.
+            <br />
+            <strong>Gäste-Feedback:</strong> Leitet Tags aus Bewertungen zufriedener Gäste ab.
           </p>
         )}
 
         {stats && (
-          <div className="flex gap-3 text-[10px] text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" />
-              {stats.analyzedDates} Dates analysiert
-            </span>
-            <span>{stats.analyzedUsers} zufriedene Gäste</span>
+          <div className="flex gap-3 text-[10px] text-muted-foreground flex-wrap">
+            {stats.websiteAnalyzed !== undefined && (
+              <span className="flex items-center gap-1">
+                <Globe className="w-3 h-3" />
+                Website {stats.websiteAnalyzed ? '✓' : '✗'}
+              </span>
+            )}
+            {stats.similarVenuesAnalyzed !== undefined && (
+              <span className="flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                {stats.similarVenuesAnalyzed} ähnliche Venues
+              </span>
+            )}
+            {stats.analyzedDates !== undefined && (
+              <span className="flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                {stats.analyzedDates} Dates analysiert
+              </span>
+            )}
+            {stats.analyzedUsers !== undefined && (
+              <span>{stats.analyzedUsers} zufriedene Gäste</span>
+            )}
           </div>
         )}
 
@@ -152,7 +253,7 @@ export default function AITagSuggestions({ venueId, venueName, existingTags, onT
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <Badge variant="secondary" className="text-[10px]">
-                    {suggestion.tag}
+                    {sourceIcon(suggestion.source)} {suggestion.tag}
                   </Badge>
                   <span className="text-[10px] text-muted-foreground">
                     {Math.round(suggestion.confidence * 100)}% Konfidenz
