@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Star, AlertTriangle, CheckCircle2, MapPin, ThumbsUp, ThumbsDown, Shield, ShieldCheck } from 'lucide-react';
+import { MessageCircle, Star, AlertTriangle, CheckCircle2, MapPin, ThumbsUp, ThumbsDown, Shield, ShieldCheck, XCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import PartnerVerificationReview from '@/components/admin/PartnerVerificationReview';
