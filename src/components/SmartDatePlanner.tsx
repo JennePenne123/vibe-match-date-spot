@@ -160,7 +160,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       partnerName={isSoloMode ? '' : (effectivePreselectedFriend?.name || selectedPartner?.name || '')}
       compatibilityScore={isSoloMode ? null : compatibilityScore}
       aiAnalyzing={aiAnalyzing}
-      onPreferencesComplete={(prefs) => handlePreferencesComplete(prefs, collaborativeSession?.id || sessionId)}
+      onPreferencesComplete={(prefs) => handlePreferencesComplete(prefs, collaborativeSession?.id || sessionId, userLocation)}
       initialProposedDate={proposalDateISO}
       planningMode={isSoloMode ? 'collaborative' : 'collaborative'}
       collaborativeSession={!isSoloMode && collaborativeSession ? { hasUserSetPreferences, hasPartnerSetPreferences, canShowResults } : undefined}
