@@ -96,5 +96,11 @@ Partner gibt USt-IdNr. ein → Status: pending_review
 - [ ] KI: Automatisierter Support-Agent
 - [ ] KI: Date Recaps
 
+### POS-/Kassensystem-Integration
+- [ ] Partner-Umfrage: Welches Kassensystem nutzen eure Venues? (orderbird, Lightspeed, SumUp, ready2order, gastrofix)
+- [ ] Phase 1: Voucher-Einlösung im meistgenutzten POS-System (API-Integration)
+- [ ] Phase 2: Besuchstracking & automatische Feedback-Auslösung über POS
+- [ ] Phase 3: Umsatz-Analytics als Premium-Partner-Feature
+
 ### Marketing
 - [ ] Effizienter, kostengünstiger Marketingplan entwickeln
