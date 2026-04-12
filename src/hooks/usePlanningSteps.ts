@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-export type PlanningStep = 'select-partner' | 'set-preferences' | 'plan-together' | 'create-invitation';
+export type PlanningStep = 'select-mode' | 'select-partner' | 'set-preferences' | 'plan-together' | 'create-invitation';
+export type DateModeType = 'solo' | 'single' | 'group';
 
 interface UsePlanningStepsProps {
   preselectedFriend?: { id: string; name: string } | null;
@@ -8,9 +9,10 @@ interface UsePlanningStepsProps {
 }
 
 export const usePlanningSteps = ({ preselectedFriend, planningMode = 'collaborative' }: UsePlanningStepsProps) => {
-  const initialStep: PlanningStep = preselectedFriend ? 'set-preferences' : 'select-partner';
+  const initialStep: PlanningStep = preselectedFriend ? 'set-preferences' : 'select-mode';
   const [currentStep, setCurrentStepInternal] = useState<PlanningStep>(initialStep);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(preselectedFriend?.id || '');
+  const [dateMode, setDateMode] = useState<DateModeType>('single');
 
   const setCurrentStep = (step: PlanningStep) => {
     setCurrentStepInternal(step);
