@@ -9,7 +9,6 @@ import { Heading, Text } from '@/design-system/components';
 import { 
   MapPin, 
   Star, 
-  DollarSign, 
   Sparkles, 
   ChevronDown, 
   ChevronUp,
