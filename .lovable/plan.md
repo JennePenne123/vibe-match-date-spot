@@ -98,3 +98,21 @@ Partner gibt USt-IdNr. ein → Status: pending_review
       ❌ Ungültig → Status: pending_review + Admin-Notiz
       ⚠️ Keine USt-IdNr. → Manuelle Admin-Prüfung
 ```
+
+---
+
+## Post-Launch Roadmap
+
+### Monetarisierung & Payments
+- [ ] Stripe-Integration für Premium-Modelle
+- [ ] Bei eigener Zahlungsabwicklung (nicht App Store): Muster-Widerrufsformular in AGB ergänzen (§ 355 BGB)
+
+### Features
+- [ ] Favoriten-System: DB-Migration für Persistenz und KI-Signale
+- [ ] Transportdienst-Integration (FREE NOW, MOIA)
+- [ ] Nutzergenerierte Venue-Reviews
+- [ ] KI: Automatisierter Support-Agent
+- [ ] KI: Date Recaps
+
+### Marketing
+- [ ] Effizienter, kostengünstiger Marketingplan entwickeln
