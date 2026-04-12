@@ -80,6 +80,7 @@ export const cuisines: Preference[] = [
   { id: 'Thai', name: 'datePlanning.cuisineThai', emoji: '🍜' },
   { id: 'Chinese', name: 'datePlanning.cuisineChinese', emoji: '🥢' },
   { id: 'Korean', name: 'datePlanning.cuisineKorean', emoji: '🍲' },
+  { id: 'Oriental', name: 'datePlanning.cuisineOriental', emoji: '🧆' },
 ];
 
 export const durationModels: DurationModel[] = [
