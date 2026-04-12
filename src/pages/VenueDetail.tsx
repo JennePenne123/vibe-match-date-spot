@@ -11,6 +11,7 @@ import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
 import { supabase } from '@/integrations/supabase/client';
 import ShareDateButton from '@/components/ShareDateButton';
 import type { ShareCardData } from '@/components/share/ShareCardGenerator';
+import { formatVenueAddress } from '@/utils/addressHelpers';
 
 const VenueDetail = () => {
   const { id } = useParams();
