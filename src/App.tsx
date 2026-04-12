@@ -134,6 +134,7 @@ const AdminTeam = lazy(() => import("./pages/admin/Team"));
 // Demo/debug routes – lazy loaded
 const Debug = lazy(() => import("./pages/Debug"));
 const ShareholderReport = lazy(() => import("./pages/ShareholderReport"));
+const Downloads = lazy(() => import("./pages/Downloads"));
 const AIVenueCardDemo = lazy(() => import("./pages/AIVenueCardDemo"));
 const PremiumDesignSystemDemo = lazy(() => import("./pages/PremiumDesignSystemDemo"));
 const RatingDemo = lazy(() => import("./pages/RatingDemo"));
@@ -275,6 +276,7 @@ const App = () => (
                     <Route path="/demo/venue-design-system" element={<LazyPageNoLayout><VenueDesignSystemDemo /></LazyPageNoLayout>} />
                     <Route path="/demo/modern-venue-design" element={<LazyPageNoLayout><ModernDesignSystemDemo /></LazyPageNoLayout>} />
                     <Route path="/shareholder-report" element={<LazyPageNoLayout><ShareholderReport /></LazyPageNoLayout>} />
+                    <Route path="/downloads" element={<LazyPageNoLayout><Downloads /></LazyPageNoLayout>} />
                     <Route path="*" element={<LazyPageNoLayout><NotFound /></LazyPageNoLayout>} />
                   </Routes>
                 </ErrorBoundary>
