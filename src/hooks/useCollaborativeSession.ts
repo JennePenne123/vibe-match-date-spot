@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSessionRealtime } from '@/hooks/useSessionRealtime';
@@ -32,7 +32,6 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
   const [aiAnalysisTriggered, setAiAnalysisTriggered] = useState(false);
   const [sessionVenueRecommendations, setSessionVenueRecommendations] = useState<AIVenueRecommendation[]>([]);
   
-  // AI Analysis hook for automatic triggering
   const { 
     analyzeCompatibilityAndVenues, 
     resetAIState, 
@@ -43,13 +42,9 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
   } = useAIAnalysis();
 
   // Get session details with validation
-  const fetchSession = async (id: string, forceRefresh = false) => {
-    if (!user) {
-      console.log('🔧 SESSION: No user found, skipping fetch');
-      return;
-    }
+  const fetchSession = useCallback(async (id: string, forceRefresh = false) => {
+    if (!user) return;
     
-    console.log('🔧 SESSION: Fetching session', { id, userId: user.id, forceRefresh });
     setLoading(true);
     setError(null);
     
@@ -60,79 +55,34 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
         .eq('id', id)
         .single();
 
-      if (error) {
-        console.error('🔧 SESSION: Database error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('🔧 SESSION: Raw data from database:', {
-        sessionId: data.id,
-        initiator_id: data.initiator_id,
-        partner_id: data.partner_id,
-        initiator_preferences_complete: data.initiator_preferences_complete,
-        partner_preferences_complete: data.partner_preferences_complete,
-        both_preferences_complete: data.both_preferences_complete,
-        has_initiator_prefs: !!data.initiator_preferences,
-        has_partner_prefs: !!data.partner_preferences,
-        session_status: data.session_status
-      });
-
-      // Enhanced validation: Check for preference data consistency AND duplication
+      // Enhanced validation: Check for preference data consistency
       const hasInitiatorPrefsData = !!data.initiator_preferences;
       const hasPartnerPrefsData = !!data.partner_preferences;
       
       let needsUpdate = false;
       const updates: any = {};
 
-      // Import preference duplication detection
-      const { detectPreferenceDuplication } = await import('@/services/testUserService');
-      
-      // Check for suspicious preference duplication - but only if BOTH users are complete AND we have a compatibility score
-      // This prevents false positives during normal preference setting flow
-      if (hasInitiatorPrefsData && hasPartnerPrefsData && 
-          data.initiator_preferences_complete && data.partner_preferences_complete && 
-          data.ai_compatibility_score !== null) {
-        const isDuplicated = detectPreferenceDuplication(data.initiator_preferences, data.partner_preferences);
-        
-        if (isDuplicated) {
-          console.warn('⚠️ SESSION: PREFERENCE DUPLICATION DETECTED - but allowing for now since both users actively set preferences');
-          console.log('🔍 SESSION: Duplication details:', {
-            hasInitiatorData: hasInitiatorPrefsData,
-            hasPartnerData: hasPartnerPrefsData,
-            initiatorComplete: data.initiator_preferences_complete,
-            partnerComplete: data.partner_preferences_complete,
-            hasCompatibilityScore: data.ai_compatibility_score !== null
-          });
-          // Don't automatically reset - let the flow continue for now
-          // Only reset if this is clearly test data pollution
-        }
-      }
-
       // Fix initiator flag if inconsistent
       if (data.initiator_preferences_complete && !hasInitiatorPrefsData) {
-        console.warn('🔧 SESSION: Initiator flag inconsistent, fixing...');
         updates.initiator_preferences_complete = false;
         needsUpdate = true;
       }
 
       // Fix partner flag if inconsistent  
       if (data.partner_preferences_complete && !hasPartnerPrefsData) {
-        console.warn('🔧 SESSION: Partner flag inconsistent, fixing...');
         updates.partner_preferences_complete = false;
         needsUpdate = true;
       }
 
-      // Recalculate both_preferences_complete (only if no duplication detected)
+      // Recalculate both_preferences_complete
       if (!updates.hasOwnProperty('both_preferences_complete')) {
         const correctBothComplete = 
           (data.initiator_preferences_complete && hasInitiatorPrefsData) &&
           (data.partner_preferences_complete && hasPartnerPrefsData);
 
         if (data.both_preferences_complete !== correctBothComplete) {
-          console.warn('🔧 SESSION: Both preferences flag inconsistent, fixing...', {
-            current: data.both_preferences_complete,
-            correct: correctBothComplete
-          });
           updates.both_preferences_complete = correctBothComplete;
           needsUpdate = true;
         }
@@ -140,36 +90,30 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
 
       // Apply fixes if needed
       if (needsUpdate) {
-        console.log('🔧 SESSION: Applying consistency fixes:', updates);
         const { error: updateError } = await supabase
           .from('date_planning_sessions')
           .update({ ...updates, updated_at: new Date().toISOString() })
           .eq('id', id);
 
-        if (updateError) {
-          console.error('🔧 SESSION: Failed to apply fixes:', updateError);
-        } else {
-          // Update local data with fixes
+        if (!updateError) {
           Object.assign(data, updates);
-          console.log('🔧 SESSION: Consistency fixes applied successfully');
         }
       }
 
       setSession(data);
-      console.log('🔧 SESSION: Session set successfully:', data.id);
       
       // Trigger AI analysis if conditions are met
       await triggerAIAnalysisIfReady(data);
     } catch (err) {
-      console.error('🔧 SESSION: Error fetching session:', err);
+      console.error('SESSION: Error fetching session:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch session');
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, userLocation, aiAnalysisTriggered]);
 
   // Automatic AI Analysis Trigger Function
-  const triggerAIAnalysisIfReady = async (sessionData: DatePlanningSession) => {
+  const triggerAIAnalysisIfReady = useCallback(async (sessionData: DatePlanningSession) => {
     if (!user || !sessionData) return;
     
     const shouldTriggerAI = 
@@ -177,16 +121,7 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
       !sessionData.ai_compatibility_score && 
       !aiAnalysisTriggered;
     
-    console.log('🤖 SESSION: AI Analysis Check:', {
-      sessionId: sessionData.id,
-      both_preferences_complete: sessionData.both_preferences_complete,
-      has_ai_score: !!sessionData.ai_compatibility_score,
-      already_triggered: aiAnalysisTriggered,
-      should_trigger: shouldTriggerAI
-    });
-    
     if (shouldTriggerAI) {
-      console.log('🚀 SESSION: AUTO-TRIGGERING AI ANALYSIS for session:', sessionData.id);
       setAiAnalysisTriggered(true);
       
       try {
@@ -194,7 +129,6 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
           ? sessionData.partner_id 
           : sessionData.initiator_id;
         
-        // Get user preferences for analysis
         const { data: userPrefs } = await supabase
           .from('user_preferences')
           .select('*')
@@ -202,16 +136,11 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
           .single();
         
         if (userPrefs) {
-          console.log('🤖 SESSION: Using location for AI analysis:', userLocation);
-          
-          // Ensure we have a valid location or use fallback
           const locationForAnalysis = userLocation || {
             latitude: 37.7749,
             longitude: -122.4194,
             address: 'San Francisco, CA (fallback)'
           };
-          
-          console.log('📍 SESSION: Location for AI analysis:', locationForAnalysis);
           
           await analyzeCompatibilityAndVenues(
             sessionData.id,
@@ -219,16 +148,13 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
             userPrefs,
             locationForAnalysis
           );
-          console.log('✅ SESSION: AI Analysis triggered successfully');
-        } else {
-          console.warn('⚠️ SESSION: No user preferences found for AI analysis');
         }
       } catch (error) {
-        console.error('❌ SESSION: AI Analysis failed:', error);
-        setAiAnalysisTriggered(false); // Reset to allow retry
+        console.error('SESSION: AI Analysis failed:', error);
+        setAiAnalysisTriggered(false);
       }
     }
-  };
+  }, [user, userLocation, aiAnalysisTriggered, analyzeCompatibilityAndVenues]);
 
   // Reset AI trigger state when session changes
   useEffect(() => {
@@ -238,14 +164,11 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     }
   }, [sessionId, resetAIState]);
 
-  // Set up real-time subscription for session updates with deduplication
+  // Set up real-time subscription for session updates
   useEffect(() => {
     if (!sessionId || !session) return;
     
-    // Create unique channel name to avoid conflicts
     const channelName = `${user?.id}:collab-session-${sessionId}`;
-    console.log('🔄 COLLAB SESSION: Setting up real-time subscription:', channelName);
-    
     let isActive = true;
     
     const channel = supabase
@@ -260,14 +183,11 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
         (payload) => {
           if (!isActive) return;
           
-          console.log('🔄 COLLAB SESSION: Real-time session update received:', payload);
           if (payload.new) {
             const updatedSession = payload.new as DatePlanningSession;
             setSession(updatedSession);
             
-            // Check if we need to trigger AI analysis after update
             if (updatedSession.both_preferences_complete && !updatedSession.ai_compatibility_score && !aiAnalysisTriggered) {
-              console.log('🤖 COLLAB SESSION: Session update shows both preferences complete, may trigger AI analysis');
               triggerAIAnalysisIfReady(updatedSession);
             }
           }
@@ -276,7 +196,6 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
       .subscribe();
 
     return () => {
-      console.log('🔄 COLLAB SESSION: Cleaning up real-time subscription:', channelName);
       isActive = false;
       supabase.removeChannel(channel);
     };
@@ -288,99 +207,42 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     }
   }, [sessionId, user]);
 
-  // Enhanced helper functions with detailed logging
+  // Helper functions
   const isUserInitiator = session ? session.initiator_id === user?.id : false;
   const isUserPartner = session ? session.partner_id === user?.id : false;
   
-  // Key fix: Ensure we have proper user identification before checking preferences
   const hasUserSetPreferences = (() => {
     if (!session || !user?.id) return false;
-    
     const isInitiator = session.initiator_id === user.id;
-    const isPartner = session.partner_id === user.id;
-    
-    if (!isInitiator && !isPartner) {
-      console.warn('🔧 SESSION: User is neither initiator nor partner!', {
-        userId: user.id,
-        initiatorId: session.initiator_id,
-        partnerId: session.partner_id
-      });
-      return false;
-    }
-    
-    const userPrefsComplete = isInitiator 
-      ? session.initiator_preferences_complete 
-      : session.partner_preferences_complete;
-      
-    console.log('🔧 SESSION: User preferences check:', {
-      userId: user.id,
-      isInitiator,
-      isPartner,
-      userPrefsComplete,
-      initiatorComplete: session.initiator_preferences_complete,
-      partnerComplete: session.partner_preferences_complete
-    });
-    
-    return userPrefsComplete;
+    if (!isInitiator && session.partner_id !== user.id) return false;
+    return isInitiator ? session.initiator_preferences_complete : session.partner_preferences_complete;
   })();
   
   const hasPartnerSetPreferences = (() => {
     if (!session || !user?.id) return false;
-    
     const isInitiator = session.initiator_id === user.id;
-    const partnerPrefsComplete = isInitiator 
-      ? session.partner_preferences_complete 
-      : session.initiator_preferences_complete;
-      
-    console.log('🔧 SESSION: Partner preferences check:', {
-      partnerPrefsComplete,
-      isUserInitiator: isInitiator
-    });
-    
-    return partnerPrefsComplete;
+    return isInitiator ? session.partner_preferences_complete : session.initiator_preferences_complete;
   })();
   
   const canShowResults = session?.both_preferences_complete || false;
 
-  // Debug logging for state synchronization
-  console.log('🔧 COLLABORATIVE SESSION DEBUG:', {
-    sessionId: session?.id,
-    userId: user?.id,
-    isUserInitiator,
-    isUserPartner,
-    initiatorPrefsComplete: session?.initiator_preferences_complete,
-    partnerPrefsComplete: session?.partner_preferences_complete,
-    bothPrefsComplete: session?.both_preferences_complete,
-    hasUserSetPreferences,
-    hasPartnerSetPreferences,
-    canShowResults,
-    databaseFlags: {
-      initiator_preferences_complete: session?.initiator_preferences_complete,
-      partner_preferences_complete: session?.partner_preferences_complete,
-      both_preferences_complete: session?.both_preferences_complete
-    }
-  });
-
-  // Force refresh function for debugging
-  const forceRefreshSession = async () => {
+  // Force refresh function
+  const forceRefreshSession = useCallback(async () => {
     if (!sessionId) return;
-    console.log('🔧 SESSION: Force refreshing session data...');
     await fetchSession(sessionId, true);
-  };
+  }, [sessionId, fetchSession]);
 
-  // Manual AI Analysis Trigger for debugging/recovery
-  const triggerAIAnalysisManually = async (userLocation?: { latitude: number; longitude: number; address?: string } | null) => {
+  // Manual AI Analysis Trigger
+  const triggerAIAnalysisManually = useCallback(async (manualLocation?: { latitude: number; longitude: number; address?: string } | null) => {
     if (!session || !user) return;
     
-    console.log('🔧 SESSION: Manual AI Analysis trigger requested with location:', userLocation);
-    setAiAnalysisTriggered(false); // Reset state
+    setAiAnalysisTriggered(false);
     
     try {
       const partnerId = session.initiator_id === user.id 
         ? session.partner_id 
         : session.initiator_id;
       
-      // Get user preferences for analysis
       const { data: userPrefs } = await supabase
         .from('user_preferences')
         .select('*')
@@ -388,16 +250,11 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
         .single();
       
       if (userPrefs) {
-        console.log('🤖 SESSION: Manual trigger - Using location:', userLocation);
-        
-        // Ensure we have a valid location or use fallback
-        const locationForAnalysis = userLocation || {
+        const locationForAnalysis = manualLocation || userLocation || {
           latitude: 37.7749,
           longitude: -122.4194,
           address: 'San Francisco, CA (fallback)'
         };
-        
-        console.log('📍 SESSION: Manual trigger location:', locationForAnalysis);
         
         await analyzeCompatibilityAndVenues(
           session.id,
@@ -405,116 +262,44 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
           userPrefs,
           locationForAnalysis
         );
-        console.log('✅ SESSION: Manual AI Analysis triggered successfully');
-      } else {
-        console.warn('⚠️ SESSION: No user preferences found for manual AI analysis');
       }
     } catch (error) {
-      console.error('❌ SESSION: Manual AI Analysis failed:', error);
-      setAiAnalysisTriggered(false); // Reset to allow retry
+      console.error('SESSION: Manual AI Analysis failed:', error);
+      setAiAnalysisTriggered(false);
     }
-  };
+  }, [session, user, userLocation, analyzeCompatibilityAndVenues]);
 
   // Process venue data when session preferences_data changes
   useEffect(() => {
-    console.log('🔄 SESSION: useEffect running for venue data processing:', {
-      hasSession: !!session,
-      hasPrefsData: !!session?.preferences_data,
-      isArray: Array.isArray(session?.preferences_data),
-      dataLength: Array.isArray(session?.preferences_data) ? session.preferences_data.length : 0,
-      rawData: session?.preferences_data
-    });
-
     const processVenueData = async () => {
       if (session?.preferences_data && Array.isArray(session.preferences_data)) {
         try {
-          console.log('🔄 SESSION: Starting venue transformation for:', session.preferences_data.length, 'venues');
-          
-          // Import the transformation function
           const venueHelpers = await import('@/utils/venueDataHelpers');
           const transformToVenueRecommendation = venueHelpers.transformToVenueRecommendation;
           
-          if (!transformToVenueRecommendation) {
-            console.error('❌ SESSION: transformToVenueRecommendation not found in import');
-            return;
-          }
+          if (!transformToVenueRecommendation) return;
           
-          // Process each venue with detailed logging
           const transformedVenues: AIVenueRecommendation[] = [];
           
-          for (let i = 0; i < session.preferences_data.length; i++) {
-            const venue = session.preferences_data[i];
-            console.log(`🔄 SESSION: Processing venue ${i + 1}:`, {
-              venue_id: venue.venue_id || venue.id,
-              venue_name: venue.venue_name || venue.name,
-              ai_score: venue.ai_score,
-              hasAllFields: !!(venue.venue_id || venue.id) && !!(venue.venue_name || venue.name) && typeof venue.ai_score === 'number'
-            });
-            
+          for (const venue of session.preferences_data) {
             const transformed = transformToVenueRecommendation(venue);
             if (transformed) {
               transformedVenues.push(transformed);
-              console.log(`✅ SESSION: Successfully transformed venue ${i + 1}:`, transformed.venue_id);
-            } else {
-              console.warn(`❌ SESSION: Failed to transform venue ${i + 1}:`, venue);
             }
           }
           
-          console.log('🔄 SESSION: Final transformation results:', {
-            originalCount: session.preferences_data.length,
-            transformedCount: transformedVenues.length,
-            venues: transformedVenues.slice(0, 2).map(v => ({
-              venue_id: v.venue_id,
-              venue_name: v.venue_name,
-              ai_score: v.ai_score
-            }))
-          });
-          
-          console.log('🔄 SESSION: Setting sessionVenueRecommendations to:', transformedVenues.length, 'venues');
           setSessionVenueRecommendations(transformedVenues);
         } catch (error) {
-          console.error('❌ SESSION: Error transforming venue data:', error);
+          console.error('SESSION: Error transforming venue data:', error);
           setSessionVenueRecommendations([]);
         }
       } else {
-        console.log('🔄 SESSION: No valid venue data to process');
         setSessionVenueRecommendations([]);
       }
     };
     
     processVenueData();
   }, [session?.preferences_data]);
-
-  // Enhanced logging for venue data transformation
-  useEffect(() => {
-    const debugVenueData = async () => {
-      if (session?.preferences_data) {
-        try {
-          const { debugVenueData: debugFn } = await import('@/utils/venueDataHelpers');
-          debugFn(session.preferences_data, 'Collaborative Session');
-        } catch (error) {
-          console.error('❌ SESSION: Error in venue data debugging:', error);
-        }
-      }
-    };
-    
-    debugVenueData();
-  }, [session?.preferences_data]);
-  
-  console.log('🔍 COLLAB SESSION: Final venue recommendations:', {
-    fromAI: aiVenueRecommendations?.length || 0,
-    fromSession: sessionVenueRecommendations?.length || 0,
-    sessionHasPrefsData: !!session?.preferences_data,
-    prefsDataType: typeof session?.preferences_data,
-    prefsDataLength: Array.isArray(session?.preferences_data) ? session.preferences_data.length : 0,
-    finalVenueData: sessionVenueRecommendations?.slice(0, 2)?.map(v => ({
-      venue_id: v.venue_id,
-      venue_name: v.venue_name,
-      ai_score: v.ai_score,
-      valid: Boolean(v.venue_id && v.venue_name && typeof v.ai_score === 'number')
-    })),
-    prioritizingSessionData: sessionVenueRecommendations.length > 0
-  });
 
   return {
     session,
@@ -529,7 +314,6 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     forceRefreshSession,
     triggerAIAnalysisManually,
     aiAnalysisTriggered,
-    // Expose AI analysis results - prioritize session data over AI state
     compatibilityScore: session?.ai_compatibility_score || aiCompatibilityScore,
     venueRecommendations: sessionVenueRecommendations.length > 0 ? sessionVenueRecommendations : aiVenueRecommendations,
     venueSearchError: aiVenueSearchError,
