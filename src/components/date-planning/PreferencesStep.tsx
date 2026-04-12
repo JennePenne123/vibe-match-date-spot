@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Heart, Loader2, Settings, MapPin } from 'lucide-react';
+import { Heart, Loader2, Settings, MapPin, Navigation, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import SafeComponent from '@/components/SafeComponent';
@@ -51,7 +51,35 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
 
   const state = usePreferencesState(props);
   const { t } = useTranslation();
-  const { appState, requestLocation: reqLoc } = useApp();
+  const { appState, requestLocation: reqLoc, updateUserLocation } = useApp();
+  const [showAddressInput, setShowAddressInput] = useState(false);
+  const [addressQuery, setAddressQuery] = useState('');
+  const [addressSearching, setAddressSearching] = useState(false);
+
+  const handleAddressSearch = async () => {
+    if (!addressQuery.trim()) return;
+    setAddressSearching(true);
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addressQuery.trim())}&format=json&limit=1&addressdetails=1`);
+      const data = await res.json();
+      if (data?.[0]) {
+        const result = data[0];
+        const addr = result.address;
+        const displayName = [addr?.city || addr?.town || addr?.village, addr?.state, addr?.country].filter(Boolean).join(', ') || result.display_name;
+        updateUserLocation({
+          latitude: parseFloat(result.lat),
+          longitude: parseFloat(result.lon),
+          address: displayName,
+        });
+        setShowAddressInput(false);
+        setAddressQuery('');
+      }
+    } catch (err) {
+      console.error('Address search failed:', err);
+    } finally {
+      setAddressSearching(false);
+    }
+  };
 
   const {
     flowState, loading, hasSubmitted, onboardingPrefs, onboardingLoaded,
@@ -174,27 +202,60 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                   {/* Current location */}
                   <div>
                     <p className="text-sm font-medium mb-2">{t('datePlanning.yourLocation', 'Dein Standort')}</p>
-                    {appState.userLocation ? (
-                      <div className="flex items-center gap-2 rounded-lg py-2 px-3 bg-primary/5 border border-primary/10">
-                        <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                        <span className="text-sm text-foreground flex-1">
-                          {appState.userLocation.address || `${appState.userLocation.latitude.toFixed(4)}, ${appState.userLocation.longitude.toFixed(4)}`}
-                        </span>
-                        <button
-                          onClick={reqLoc}
-                          className="text-xs text-primary hover:text-primary/80 font-medium transition-colors whitespace-nowrap"
-                        >
-                          {t('datePlanning.changeLocation', 'Ändern')}
-                        </button>
+                    {appState.userLocation && !showAddressInput ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 rounded-lg py-2 px-3 bg-primary/5 border border-primary/10">
+                          <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                          <span className="text-sm text-foreground flex-1">
+                            {appState.userLocation.address || `${appState.userLocation.latitude.toFixed(4)}, ${appState.userLocation.longitude.toFixed(4)}`}
+                          </span>
+                          <button
+                            onClick={() => setShowAddressInput(true)}
+                            className="text-xs text-primary hover:text-primary/80 font-medium transition-colors whitespace-nowrap"
+                          >
+                            {t('datePlanning.changeLocation', 'Ändern')}
+                          </button>
+                        </div>
                       </div>
                     ) : (
-                      <button
-                        onClick={reqLoc}
-                        className="flex items-center gap-2 w-full rounded-lg py-2.5 px-3 bg-primary/10 border border-primary/20 hover:bg-primary/15 transition-colors text-sm text-primary font-medium"
-                      >
-                        <MapPin className="h-4 w-4" />
-                        {t('datePlanning.enableLocation', 'Standort aktivieren')}
-                      </button>
+                      <div className="space-y-2">
+                        {/* Address input */}
+                        <div className="flex gap-2">
+                          <div className="relative flex-1">
+                            <input
+                              type="text"
+                              value={addressQuery}
+                              onChange={e => setAddressQuery(e.target.value)}
+                              onKeyDown={e => e.key === 'Enter' && handleAddressSearch()}
+                              placeholder={t('datePlanning.enterAddress', 'Stadt oder Adresse eingeben...')}
+                              className="w-full h-10 rounded-lg border border-border/50 bg-background px-3 pr-9 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+                            />
+                            <button
+                              onClick={handleAddressSearch}
+                              disabled={addressSearching || !addressQuery.trim()}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors disabled:opacity-40"
+                            >
+                              {addressSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                            </button>
+                          </div>
+                        </div>
+                        {/* GPS button */}
+                        <button
+                          onClick={() => { reqLoc(); setShowAddressInput(false); }}
+                          className="flex items-center gap-2 w-full rounded-lg py-2 px-3 bg-muted/50 border border-border/50 hover:bg-muted transition-colors text-sm text-muted-foreground"
+                        >
+                          <Navigation className="h-4 w-4" />
+                          {t('datePlanning.useGPS', 'Aktuellen GPS-Standort verwenden')}
+                        </button>
+                        {showAddressInput && appState.userLocation && (
+                          <button
+                            onClick={() => setShowAddressInput(false)}
+                            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            {t('common.cancel', 'Abbrechen')}
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                   <div>
