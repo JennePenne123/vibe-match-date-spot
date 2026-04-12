@@ -171,17 +171,27 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   );
 
   const venueStepContent = (isSoloMode || selectedPartner) && (
-    <PlanTogether
-      partnerName={isSoloMode ? '' : (selectedPartner?.name || '')}
-      partnerId={isSoloMode ? '' : selectedPartnerId}
-      venueRecommendations={venueRecommendations || []}
-      onVenueSelect={handleVenueSelection}
-      error={datePlanningError || undefined}
-      onRetrySearch={() => console.log('Retrying venue search...')}
-      sessionId={collaborativeSession?.id || currentSession?.id}
-      isCollaborative={!isSoloMode}
-      compatibilityScore={isSoloMode ? null : compatibilityScore}
-    />
+    <div className="space-y-4">
+      <ErrorBoundaryWrapper silent>
+        <LocationDisplay
+          userLocation={userLocation}
+          locationError={locationError}
+          locationRequested={locationRequested}
+          onRequestLocation={requestLocation}
+        />
+      </ErrorBoundaryWrapper>
+      <PlanTogether
+        partnerName={isSoloMode ? '' : (selectedPartner?.name || '')}
+        partnerId={isSoloMode ? '' : selectedPartnerId}
+        venueRecommendations={venueRecommendations || []}
+        onVenueSelect={handleVenueSelection}
+        error={datePlanningError || undefined}
+        onRetrySearch={() => console.log('Retrying venue search...')}
+        sessionId={collaborativeSession?.id || currentSession?.id}
+        isCollaborative={!isSoloMode}
+        compatibilityScore={isSoloMode ? null : compatibilityScore}
+      />
+    </div>
   );
 
   return (
