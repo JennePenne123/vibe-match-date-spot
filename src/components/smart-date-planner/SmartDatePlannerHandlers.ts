@@ -469,11 +469,11 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     navigate('/home');
   }
 
-  async function handleManualContinue() {
+  async function handleManualContinue(freshLocation?: { latitude: number; longitude: number; address?: string }) {
     console.log('🔄 MANUAL TRIGGER - Manual continue triggered');
     
-    // Resolve session ID from multiple sources (collaborative session, current session, or URL param)
     const effectiveSessionId = collaborativeSession?.id || currentSession?.id || sessionId;
+    const locationToUse = freshLocation || state.userLocation;
     
     console.log('🔄 MANUAL TRIGGER - Session resolution:', {
       collaborativeSessionId: collaborativeSession?.id,
@@ -481,19 +481,19 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       urlSessionId: sessionId,
       effectiveSessionId,
       hasPartnerId: !!selectedPartnerId,
-      hasLocation: !!state.userLocation
+      hasLocation: !!locationToUse
     });
     
-    if (!effectiveSessionId || !selectedPartnerId || !state.userLocation) {
+    if (!effectiveSessionId || !selectedPartnerId || !locationToUse) {
       console.error('❌ MANUAL TRIGGER - Missing required data:', {
         hasSession: !!effectiveSessionId,
         hasPartnerId: !!selectedPartnerId,
-        hasLocation: !!state.userLocation
+        hasLocation: !!locationToUse
       });
       toast({
         variant: 'destructive',
-        title: 'Missing Information',
-        description: 'Session or location data missing. Please try refreshing the page.'
+        title: 'Fehlende Informationen',
+        description: !locationToUse ? 'Bitte aktiviere deinen Standort oder gib eine Adresse ein.' : 'Session-Daten fehlen. Bitte lade die Seite neu.'
       });
       return;
     }
@@ -505,7 +505,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         effectiveSessionId,
         selectedPartnerId,
         currentPreferences,
-        state.userLocation
+        locationToUse
       );
       
       console.log('✅ MANUAL TRIGGER - AI analysis completed successfully');
