@@ -137,11 +137,8 @@ export function usePushNotifications() {
         return false;
       }
 
-      // Register service worker
-      const registration = await registerServiceWorker();
-
-      // Wait for service worker to be ready
-      await navigator.serviceWorker.ready;
+      // Get service worker registration (managed by vite-plugin-pwa)
+      const registration = await getServiceWorkerRegistration();
 
       // Subscribe to push
       const subscription = await registration.pushManager.subscribe({
@@ -194,7 +191,7 @@ export function usePushNotifications() {
       setState(prev => ({ ...prev, isLoading: false }));
       return false;
     }
-  }, [user, requestPermission, registerServiceWorker, toast]);
+  }, [user, requestPermission, getServiceWorkerRegistration, toast]);
 
   // Unsubscribe from push notifications
   const unsubscribe = useCallback(async () => {
