@@ -251,12 +251,39 @@ serve(async (req) => {
       'grocery', 'supermarket', 'convenience-store', 'gas-station',
       'food-delivery', 'catering', 'food-truck', 'vending-machine',
       'liquor-store', 'discount-store', 'department-store', 'drugstore',
-      'market', 'deli', 'butcher', 'wholesale',
+      'market', 'deli', 'butcher', 'wholesale', 'pharmacy', 'hardware-store',
+      'pet-store', 'auto-repair', 'car-wash', 'laundry', 'dry-cleaner',
     ];
     const blockedNames = [
-      'netto', 'aldi', 'lidl', 'rewe', 'edeka', 'penny', 'kaufland',
-      'lieferando', 'delivery hero', 'wolt', 'uber eats', 'domino',
-      'pizza hut delivery', 'just eat', 'flink', 'gorillas', 'getir',
+      // 🇩🇪 Germany
+      'netto', 'aldi', 'lidl', 'rewe', 'edeka', 'penny', 'kaufland', 'norma', 'rossmann', 'dm-drogerie',
+      // 🇺🇸 USA
+      'walmart', 'target', 'costco', 'kroger', 'whole foods', 'trader joe', 'safeway', 'publix',
+      'walgreens', 'cvs', '7-eleven', 'circle k', 'dollar general', 'dollar tree', 'family dollar',
+      // 🇬🇧 UK
+      'tesco', 'sainsbury', 'asda', 'morrisons', 'waitrose', 'co-op food', 'iceland', 'spar',
+      // 🇫🇷 France
+      'carrefour', 'leclerc', 'auchan', 'intermarché', 'monoprix', 'casino', 'franprix',
+      // 🇪🇸 Spain
+      'mercadona', 'dia', 'eroski', 'hipercor', 'el corte inglés',
+      // 🇮🇹 Italy
+      'esselunga', 'conad', 'coop italia', 'eurospin',
+      // 🇳🇱 Netherlands
+      'albert heijn', 'jumbo', 'dirk',
+      // 🇦🇹 Austria
+      'billa', 'hofer', 'interspar',
+      // 🇨🇭 Switzerland
+      'migros', 'coop schweiz', 'denner',
+      // 🇯🇵 Japan
+      'lawson', 'familymart', 'ministop',
+      // 🇦🇺 Australia
+      'woolworths', 'coles',
+      // 🌍 Global delivery / ghost kitchens
+      'lieferando', 'delivery hero', 'wolt', 'uber eats', 'domino', 'pizza hut delivery',
+      'just eat', 'flink', 'gorillas', 'getir', 'doordash', 'grubhub', 'postmates',
+      'deliveroo', 'glovo', 'rappi', 'ifood', 'swiggy', 'zomato',
+      // 🌍 Global gas stations
+      'shell', 'bp ', 'total energies', 'aral', 'esso',
     ];
 
     // Transform Radar data to our venue schema
