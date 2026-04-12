@@ -4,7 +4,7 @@ import VenueQuickReaction from '@/components/VenueQuickReaction';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Star, MapPin, DollarSign, Sparkles, Navigation, Clock } from 'lucide-react';
+import { Heart, Star, MapPin, Sparkles, Navigation, Clock } from 'lucide-react';
 import { Venue } from '@/types';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
@@ -155,7 +155,6 @@ const VenueCard = ({
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               {venuePriceRange && (
                 <div className="flex items-center gap-1">
-                  <DollarSign className="w-4 h-4" />
                   <span>{venuePriceRange}</span>
                 </div>
               )}
@@ -237,7 +236,6 @@ const VenueCard = ({
           
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <DollarSign className="w-3 h-3" />
               {venuePriceRange}
             </div>
             {showMatchScore && venue.matchScore && (
@@ -318,7 +316,6 @@ const VenueCard = ({
             )}
             {venuePriceRange && (
               <div className="flex items-center gap-1">
-                <DollarSign className="w-4 h-4" />
                 <span>{venuePriceRange}</span>
               </div>
             )}

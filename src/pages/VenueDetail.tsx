@@ -5,12 +5,13 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Star, MapPin, DollarSign, Clock, Phone, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Clock, Phone, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
 import { venueToAppVenue } from '@/utils/typeHelpers';
 import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
 import { supabase } from '@/integrations/supabase/client';
 import ShareDateButton from '@/components/ShareDateButton';
 import type { ShareCardData } from '@/components/share/ShareCardGenerator';
+import { formatVenueAddress } from '@/utils/addressHelpers';
 
 const VenueDetail = () => {
   const { id } = useParams();
@@ -20,6 +21,7 @@ const VenueDetail = () => {
   const [dbVenue, setDbVenue] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
 
   const venue = appState.venues.find(v => v.id === id);
 
@@ -42,6 +44,32 @@ const VenueDetail = () => {
     }
   }, [id, venue, dbVenue]);
 
+  const sourceVenue = venue || dbVenue;
+
+  // Reverse-geocode if address is missing/poor but we have coordinates
+  useEffect(() => {
+    if (!sourceVenue) return;
+    const addr = sourceVenue.address || '';
+    const hasGoodAddress = addr.length > 5 && !/^\d+\.\d+/.test(addr);
+    const lat = sourceVenue.latitude;
+    const lon = sourceVenue.longitude;
+    
+    if (!hasGoodAddress && lat && lon) {
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1&zoom=18`, {
+        headers: { 'User-Agent': 'HiOutz/1.0' }
+      })
+        .then(r => r.json())
+        .then(data => {
+          const a = data.address || {};
+          const street = [a.road || a.pedestrian || '', a.house_number || ''].filter(Boolean).join(' ');
+          const city = [a.postcode || '', a.city || a.town || a.village || ''].filter(Boolean).join(' ');
+          const resolved = [street, city].filter(Boolean).join(', ');
+          if (resolved) setResolvedAddress(resolved);
+        })
+        .catch(() => {});
+    }
+  }, [sourceVenue]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -53,8 +81,6 @@ const VenueDetail = () => {
       </div>
     );
   }
-
-  const sourceVenue = venue || dbVenue;
 
   if (!sourceVenue) {
     if (notFound) {
@@ -72,13 +98,15 @@ const VenueDetail = () => {
 
   // Convert to AppVenue format for UI
   const appVenue = venueToAppVenue(sourceVenue, appState.userLocation?.latitude, appState.userLocation?.longitude);
+  // Use resolved address if available, otherwise format the existing one
+  const displayAddress = resolvedAddress || formatVenueAddress(appVenue);
 
   const shareCardData: ShareCardData = {
     type: 'venue',
     venueName: appVenue.name,
     venueImage: appVenue.image_url || appVenue.image,
     rating: appVenue.rating,
-    address: appVenue.address,
+    address: displayAddress,
     tags: appVenue.tags,
     matchScore: appVenue.matchScore,
   };
@@ -186,12 +214,14 @@ const VenueDetail = () => {
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <MapPin className="w-4 h-4" />
-                {appVenue.distance || appVenue.address}
+                <MapPin className="w-4 h-4 shrink-0" />
+                <span className="truncate">{displayAddress}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <DollarSign className="w-4 h-4" />
-                {appVenue.price_range || '$$'}
+                <span className="font-medium">{appVenue.price_range || '$$'}</span>
+                {appVenue.distance && (
+                  <span className="text-xs">• {appVenue.distance}</span>
+                )}
               </div>
             </div>
 
@@ -225,7 +255,7 @@ const VenueDetail = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-muted-foreground" />
-                <span className="text-muted-foreground">{appVenue.address}</span>
+                <span className="text-muted-foreground">{displayAddress}</span>
               </div>
               {appVenue.phone && (
                 <div className="flex items-center gap-3">
