@@ -76,7 +76,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     }
   }
 
-  async function handlePreferencesComplete(preferences: any, sessionId?: string) {
+  async function handlePreferencesComplete(preferences: any, sessionId?: string, freshLocation?: { latitude: number; longitude: number; address?: string }) {
     console.log('🔧 PREFERENCES COMPLETE - Function called with:', {
       preferences: preferences ? 'provided' : 'missing',
       sessionId: sessionId || 'from-state',
@@ -154,13 +154,17 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       console.log('🔧 PREFERENCES COMPLETE - Both partners have set preferences, proceeding with AI analysis...');
     }
     
+    // Use fresh location if provided, otherwise fall back to state
+    const locationToUse = freshLocation || state.userLocation;
+    
     // Run AI analysis only if we have all required data and (solo mode OR both partners have set preferences)
-    if (effectiveSessionId && selectedPartnerId && state.userLocation) {
+    if (effectiveSessionId && selectedPartnerId && locationToUse) {
       console.log('🚀 PREFERENCES COMPLETE - Starting AI analysis with:', {
         sessionId: effectiveSessionId,
         partnerId: selectedPartnerId,
         preferences: preferences ? 'provided' : 'missing',
-        userLocation: state.userLocation ? 'provided' : 'missing',
+        userLocation: locationToUse ? 'provided' : 'missing',
+        locationSource: freshLocation ? 'fresh' : 'state',
         hasAnalyzeFunction: typeof state.analyzeCompatibilityAndVenues === 'function'
       });
       
@@ -169,7 +173,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
           effectiveSessionId,
           selectedPartnerId,
           preferences,
-          state.userLocation
+          locationToUse
         );
         
         console.log('🔄 PREFERENCES COMPLETE - Analysis promise created:', !!analysisPromise);
@@ -204,15 +208,25 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       console.error('🔧 PREFERENCES COMPLETE - Missing required data for AI analysis:', {
         hasSession: !!effectiveSessionId,
         hasPartnerId: !!selectedPartnerId,
-        hasLocation: !!state.userLocation,
+        hasLocation: !!locationToUse,
+        hasStateLocation: !!state.userLocation,
+        hasFreshLocation: !!freshLocation,
         effectiveSessionId,
         selectedPartnerId,
-        locationData: state.userLocation
+        locationData: locationToUse
       });
+      
+      const missingItems = [];
+      if (!effectiveSessionId) missingItems.push('Session');
+      if (!selectedPartnerId) missingItems.push('Partner');
+      if (!locationToUse) missingItems.push('Standort');
+      
       toast({
         variant: 'destructive',
-        title: 'Missing Information',
-        description: 'Please ensure location is enabled and try again.'
+        title: 'Fehlende Informationen',
+        description: missingItems.includes('Standort')
+          ? 'Bitte aktiviere deinen Standort oder gib eine Adresse ein.'
+          : `Fehlende Daten: ${missingItems.join(', ')}. Bitte versuche es erneut.`
       });
     }
   }
@@ -455,11 +469,11 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     navigate('/home');
   }
 
-  async function handleManualContinue() {
+  async function handleManualContinue(freshLocation?: { latitude: number; longitude: number; address?: string }) {
     console.log('🔄 MANUAL TRIGGER - Manual continue triggered');
     
-    // Resolve session ID from multiple sources (collaborative session, current session, or URL param)
     const effectiveSessionId = collaborativeSession?.id || currentSession?.id || sessionId;
+    const locationToUse = freshLocation || state.userLocation;
     
     console.log('🔄 MANUAL TRIGGER - Session resolution:', {
       collaborativeSessionId: collaborativeSession?.id,
@@ -467,19 +481,19 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       urlSessionId: sessionId,
       effectiveSessionId,
       hasPartnerId: !!selectedPartnerId,
-      hasLocation: !!state.userLocation
+      hasLocation: !!locationToUse
     });
     
-    if (!effectiveSessionId || !selectedPartnerId || !state.userLocation) {
+    if (!effectiveSessionId || !selectedPartnerId || !locationToUse) {
       console.error('❌ MANUAL TRIGGER - Missing required data:', {
         hasSession: !!effectiveSessionId,
         hasPartnerId: !!selectedPartnerId,
-        hasLocation: !!state.userLocation
+        hasLocation: !!locationToUse
       });
       toast({
         variant: 'destructive',
-        title: 'Missing Information',
-        description: 'Session or location data missing. Please try refreshing the page.'
+        title: 'Fehlende Informationen',
+        description: !locationToUse ? 'Bitte aktiviere deinen Standort oder gib eine Adresse ein.' : 'Session-Daten fehlen. Bitte lade die Seite neu.'
       });
       return;
     }
@@ -491,7 +505,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
         effectiveSessionId,
         selectedPartnerId,
         currentPreferences,
-        state.userLocation
+        locationToUse
       );
       
       console.log('✅ MANUAL TRIGGER - AI analysis completed successfully');

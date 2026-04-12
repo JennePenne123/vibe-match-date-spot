@@ -1,5 +1,5 @@
 
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useBreakpoint } from '@/hooks/use-mobile';
@@ -89,6 +89,10 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     dateMode, setDateMode, handleModeSelect, selectedPartnerIds, setSelectedPartnerIds,
   } = state;
 
+  // Keep a ref to the latest userLocation so closures always see the current value
+  const userLocationRef = useRef(userLocation);
+  useEffect(() => { userLocationRef.current = userLocation; }, [userLocation]);
+
   const handlePartnerContinue = async () => {
     if (dateMode === 'group' && selectedPartnerIds.length > 0) {
       // Create a group date
@@ -160,11 +164,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       partnerName={isSoloMode ? '' : (effectivePreselectedFriend?.name || selectedPartner?.name || '')}
       compatibilityScore={isSoloMode ? null : compatibilityScore}
       aiAnalyzing={aiAnalyzing}
-      onPreferencesComplete={(prefs) => handlePreferencesComplete(prefs, collaborativeSession?.id || sessionId)}
+      onPreferencesComplete={(prefs) => handlePreferencesComplete(prefs, collaborativeSession?.id || sessionId, userLocationRef.current)}
       initialProposedDate={proposalDateISO}
       planningMode={isSoloMode ? 'collaborative' : 'collaborative'}
       collaborativeSession={!isSoloMode && collaborativeSession ? { hasUserSetPreferences, hasPartnerSetPreferences, canShowResults } : undefined}
-      onManualContinue={handleManualContinue}
+      onManualContinue={() => handleManualContinue(userLocationRef.current)}
       onDisplayVenues={state.navigateToResults}
       venueRecommendations={venueRecommendations}
     />
