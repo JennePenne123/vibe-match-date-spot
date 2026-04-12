@@ -1,11 +1,10 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import SmartDatePlanner from '@/components/SmartDatePlanner';
 import { FirstUseNudge } from '@/components/FirstUseNudge';
 import { useFirstUseNudge } from '@/hooks/useFirstUseNudge';
-import { useCollaborativeSession } from '@/hooks/useCollaborativeSession';
 import { useSessionManagement } from '@/hooks/useSessionManagement';
 import HomeHeader from '@/components/HomeHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -13,6 +12,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { getUserName } from '@/utils/typeHelpers';
 import { safeFirstWord } from '@/lib/utils';
 import { useBreakpoint } from '@/hooks/use-mobile';
+import { supabase } from '@/integrations/supabase/client';
 
 
 const SmartDatePlanning: React.FC = () => {
