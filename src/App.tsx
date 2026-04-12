@@ -134,6 +134,7 @@ const AdminTeam = lazy(() => import("./pages/admin/Team"));
 // Demo/debug routes – lazy loaded
 const Debug = lazy(() => import("./pages/Debug"));
 const ShareholderReport = lazy(() => import("./pages/ShareholderReport"));
+const Downloads = lazy(() => import("./pages/Downloads"));
 const AIVenueCardDemo = lazy(() => import("./pages/AIVenueCardDemo"));
 const PremiumDesignSystemDemo = lazy(() => import("./pages/PremiumDesignSystemDemo"));
 const RatingDemo = lazy(() => import("./pages/RatingDemo"));
