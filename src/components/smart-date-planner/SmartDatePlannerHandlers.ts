@@ -76,7 +76,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     }
   }
 
-  async function handlePreferencesComplete(preferences: any, sessionId?: string) {
+  async function handlePreferencesComplete(preferences: any, sessionId?: string, freshLocation?: { latitude: number; longitude: number; address?: string }) {
     console.log('🔧 PREFERENCES COMPLETE - Function called with:', {
       preferences: preferences ? 'provided' : 'missing',
       sessionId: sessionId || 'from-state',
@@ -154,13 +154,17 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       console.log('🔧 PREFERENCES COMPLETE - Both partners have set preferences, proceeding with AI analysis...');
     }
     
+    // Use fresh location if provided, otherwise fall back to state
+    const locationToUse = freshLocation || state.userLocation;
+    
     // Run AI analysis only if we have all required data and (solo mode OR both partners have set preferences)
-    if (effectiveSessionId && selectedPartnerId && state.userLocation) {
+    if (effectiveSessionId && selectedPartnerId && locationToUse) {
       console.log('🚀 PREFERENCES COMPLETE - Starting AI analysis with:', {
         sessionId: effectiveSessionId,
         partnerId: selectedPartnerId,
         preferences: preferences ? 'provided' : 'missing',
-        userLocation: state.userLocation ? 'provided' : 'missing',
+        userLocation: locationToUse ? 'provided' : 'missing',
+        locationSource: freshLocation ? 'fresh' : 'state',
         hasAnalyzeFunction: typeof state.analyzeCompatibilityAndVenues === 'function'
       });
       
@@ -169,7 +173,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
           effectiveSessionId,
           selectedPartnerId,
           preferences,
-          state.userLocation
+          locationToUse
         );
         
         console.log('🔄 PREFERENCES COMPLETE - Analysis promise created:', !!analysisPromise);
