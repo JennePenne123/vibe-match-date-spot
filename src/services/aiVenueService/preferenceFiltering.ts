@@ -224,6 +224,10 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       'american': ['casual', 'fun', 'lively'],
       'korean': ['trendy', 'adventurous', 'casual'],
       'vietnamese': ['casual', 'adventurous', 'trendy'],
+      'oriental': ['adventurous', 'exotic', 'cozy', 'cultural'],
+      'turkish': ['casual', 'cozy', 'adventurous'],
+      'lebanese': ['casual', 'cozy', 'adventurous'],
+      'arabic': ['adventurous', 'exotic', 'cultural'],
     };
 
     // Infer price range from cuisine type
@@ -237,6 +241,9 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
       'mexican': ['$', '$$'],
       'german': ['$$'],
       'american': ['$$'],
+      'oriental': ['$', '$$'],
+      'turkish': ['$', '$$'],
+      'lebanese': ['$', '$$'],
     };
 
     // Score all venues - don't filter out, just rank
