@@ -151,17 +151,19 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     return <SmartDatePlannerAuth onSignIn={() => navigate('/?auth=required')} />;
   }
 
+  const isSoloMode = dateMode === 'solo';
+
   const preferencesStepContent = (
     <PreferencesStep
       sessionId={collaborativeSession?.id || currentSession?.id || sessionId || ''}
-      partnerId={effectivePreselectedFriend?.id || selectedPartnerId}
-      partnerName={effectivePreselectedFriend?.name || selectedPartner?.name || ''}
-      compatibilityScore={compatibilityScore}
+      partnerId={isSoloMode ? '' : (effectivePreselectedFriend?.id || selectedPartnerId)}
+      partnerName={isSoloMode ? '' : (effectivePreselectedFriend?.name || selectedPartner?.name || '')}
+      compatibilityScore={isSoloMode ? null : compatibilityScore}
       aiAnalyzing={aiAnalyzing}
       onPreferencesComplete={(prefs) => handlePreferencesComplete(prefs, collaborativeSession?.id || sessionId)}
       initialProposedDate={proposalDateISO}
-      planningMode="collaborative"
-      collaborativeSession={collaborativeSession ? { hasUserSetPreferences, hasPartnerSetPreferences, canShowResults } : undefined}
+      planningMode={isSoloMode ? 'collaborative' : 'collaborative'}
+      collaborativeSession={!isSoloMode && collaborativeSession ? { hasUserSetPreferences, hasPartnerSetPreferences, canShowResults } : undefined}
       onManualContinue={handleManualContinue}
       onDisplayVenues={state.navigateToResults}
       venueRecommendations={venueRecommendations}
