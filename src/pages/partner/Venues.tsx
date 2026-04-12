@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Phone, Globe, Plus, Settings, List, Map as MapIcon } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { MapPin, Phone, Globe, Plus, Settings, List, Map as MapIcon, Trash2 } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
 import { VenueManagementSheet } from '@/components/partner/VenueManagementSheet';
@@ -83,6 +84,24 @@ export default function PartnerVenues() {
       toast({ title: 'Error', description: 'Failed to load venues', variant: 'destructive' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deletePartnership = async (partnershipId: string, venueName: string) => {
+    try {
+      const { error } = await supabase
+        .from('venue_partnerships')
+        .delete()
+        .eq('id', partnershipId)
+        .eq('partner_id', user!.id);
+
+      if (error) throw error;
+
+      setPartnerships(prev => prev.filter(p => p.id !== partnershipId));
+      toast({ title: 'Standort entfernt', description: `${venueName} wurde erfolgreich entfernt.` });
+    } catch (error) {
+      console.error('Error deleting partnership:', error);
+      toast({ title: 'Fehler', description: 'Standort konnte nicht entfernt werden', variant: 'destructive' });
     }
   };
 
@@ -216,15 +235,41 @@ export default function PartnerVenues() {
                     )}
 
                     {(partnership.status === 'active' || partnership.status === 'approved') && (
-                      <Button
-                        className="w-full mt-2 gap-2"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setManagingVenue({ id: partnership.venue_id, name: partnership.venues.name })}
-                      >
-                        <Settings className="w-3.5 h-3.5" />
-                        {t('partner.venues.manage', 'Verwalten')}
-                      </Button>
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          className="flex-1 gap-2"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setManagingVenue({ id: partnership.venue_id, name: partnership.venues.name })}
+                        >
+                          <Settings className="w-3.5 h-3.5" />
+                          {t('partner.venues.manage', 'Verwalten')}
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Standort entfernen?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Möchtest du <strong>{partnership.venues.name}</strong> wirklich aus deinen Standorten entfernen? Zugehörige Gutscheine bleiben bestehen.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                onClick={() => deletePartnership(partnership.id, partnership.venues.name)}
+                              >
+                                Entfernen
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
