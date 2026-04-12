@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { getLocationFallback } from '@/utils/locationFallback';
 import { searchVenuesOverpass } from '@/services/overpassSearchService';
 import { isVenueOpenNow } from '@/utils/openingHoursParser';
+import { formatVenueAddress } from '@/utils/addressHelpers';
 
 interface DBVenue {
   id: string;
@@ -466,7 +467,7 @@ const Venues = () => {
                           </button>
                         </div>
 
-                        <p className="text-xs text-muted-foreground truncate mt-0.5">{venue.address}</p>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">{formatVenueAddress(venue)}</p>
 
                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                           {venue.cuisine_type && (
