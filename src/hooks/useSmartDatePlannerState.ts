@@ -101,20 +101,25 @@ export const useSmartDatePlannerState = ({
     selectedPartnerId,
     setSelectedPartnerId,
     getStepProgress,
-    goBack
+    goBack,
+    dateMode,
+    setDateMode,
+    handleModeSelect,
   } = planningStepsState || {
-    currentStep: 'select-partner',
+    currentStep: 'select-mode' as const,
     setCurrentStep: () => {},
     selectedPartnerId: '',
     setSelectedPartnerId: () => {},
     getStepProgress: () => 0,
-    goBack: () => {}
+    goBack: () => {},
+    dateMode: 'single' as const,
+    setDateMode: () => {},
+    handleModeSelect: () => {},
   };
 
   const [selectedVenueId, setSelectedVenueId] = useState<string>('');
   const [invitationMessage, setInvitationMessage] = useState<string>('');
   const [locationRequested, setLocationRequested] = useState(false);
-  const [dateMode, setDateMode] = useState<'single' | 'group'>('single');
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<string[]>([]);
   const [currentPreferences, setCurrentPreferences] = useState<any>(null);
   const [locationRequestInProgress, setLocationRequestInProgress] = useState(false);
