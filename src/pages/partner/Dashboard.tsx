@@ -278,6 +278,18 @@ export default function PartnerDashboard() {
           </CardContent>
         </Card>
 
+        <Card variant="glass" className="group hover:scale-[1.02] transition-all duration-300 cursor-pointer" onClick={() => navigate('/partner/staff')}>
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Users className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold">Mitarbeiter</h3>
+              <p className="text-sm text-muted-foreground">Team & QR-Codes verwalten</p>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card variant="glass" className={`group hover:scale-[1.02] transition-all duration-300 cursor-pointer ${!membership.canUseFeature.partnerNetwork ? 'opacity-60' : ''}`} onClick={() => membership.canUseFeature.partnerNetwork ? navigate('/partner/network-map') : null}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">

@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Store, Ticket, Trophy, FileText, Map, User, QrCode, ScanLine, LogOut, ArrowLeft } from 'lucide-react'
+import { LayoutDashboard, Store, Ticket, Trophy, FileText, Map, User, QrCode, ScanLine, LogOut, ArrowLeft, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -38,6 +38,7 @@ export function PartnerSidebar() {
 
   const settingsNavItems = [
     { title: t('partnerNav.profile', 'Firmenprofil'), url: '/partner/profile', icon: User },
+    { title: t('partnerNav.staff', 'Mitarbeiter'), url: '/partner/staff', icon: Users },
     { title: t('partnerNav.qrCode', 'Mein QR-Code'), url: '/partner/qr-code', icon: QrCode },
     { title: t('partnerNav.scanner', 'QR-Scanner'), url: '/partner/qr-scanner', icon: ScanLine },
   ]
