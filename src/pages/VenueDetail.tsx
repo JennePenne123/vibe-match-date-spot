@@ -106,7 +106,7 @@ const VenueDetail = () => {
     venueName: appVenue.name,
     venueImage: appVenue.image_url || appVenue.image,
     rating: appVenue.rating,
-    address: appVenue.address,
+    address: displayAddress,
     tags: appVenue.tags,
     matchScore: appVenue.matchScore,
   };
