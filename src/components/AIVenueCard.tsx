@@ -310,7 +310,6 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
                         )}
                         {priceRange && (
                           <span className="flex items-center gap-0.5">
-                            <DollarSign className="w-3 h-3" />
                             {priceRange}
                           </span>
                         )}

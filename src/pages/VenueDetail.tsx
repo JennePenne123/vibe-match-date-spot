@@ -186,12 +186,14 @@ const VenueDetail = () => {
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <MapPin className="w-4 h-4" />
-                {appVenue.distance || appVenue.address}
+                <MapPin className="w-4 h-4 shrink-0" />
+                <span className="truncate">{appVenue.address || 'Adresse nicht verfügbar'}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <DollarSign className="w-4 h-4" />
-                {appVenue.price_range || '$$'}
+                <span className="font-medium">{appVenue.price_range || '$$'}</span>
+                {appVenue.distance && (
+                  <span className="text-xs">• {appVenue.distance}</span>
+                )}
               </div>
             </div>
 
