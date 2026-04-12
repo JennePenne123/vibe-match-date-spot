@@ -19,12 +19,22 @@ const Downloads = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           {files.map((f) => (
-            <a key={f.file} href={f.file} download className="block">
-              <Button variant="outline" className="w-full justify-between">
-                <span>{f.name}</span>
-                <span className="text-xs text-muted-foreground">{f.type}</span>
-              </Button>
-            </a>
+            <Button
+              key={f.file}
+              variant="outline"
+              className="w-full justify-between"
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = f.file;
+                link.download = f.name + '.' + f.type.toLowerCase();
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+            >
+              <span>{f.name}</span>
+              <span className="text-xs text-muted-foreground">{f.type}</span>
+            </Button>
           ))}
         </CardContent>
       </Card>
