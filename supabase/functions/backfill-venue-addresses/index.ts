@@ -45,14 +45,13 @@ serve(async (req) => {
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Fetch venues with empty addresses
+  // Fetch venues with empty/missing addresses
   const { data: venues, error } = await supabase
     .from('venues')
     .select('id, name, latitude, longitude, address')
-    .or("address.is.null,address.eq.,address.eq., ")
     .not('latitude', 'is', null)
     .not('longitude', 'is', null)
-    .limit(100);
+    .limit(200);
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: corsHeaders });
