@@ -297,7 +297,7 @@ export default function Datenschutz() {
             widerrufen werden. Wir speichern dazu Push-Subscription-Daten (Endpoint, Keys) auf unseren Servern.
           </p>
 
-          <h2>9. Speicherdauer</h2>
+          <h2>10. Speicherdauer</h2>
           <ul className="text-muted-foreground">
             <li><strong>Account-Daten:</strong> Bis zur Kontolöschung durch den Nutzer.</li>
             <li><strong>Nutzungsdaten und Präferenzen:</strong> Bis zur Kontolöschung oder Widerruf.</li>
@@ -306,7 +306,7 @@ export default function Datenschutz() {
             <li><strong>Abrechnungsdaten:</strong> 10 Jahre (gesetzliche Aufbewahrungspflicht).</li>
           </ul>
 
-          <h2>10. Ihre Rechte nach der DSGVO</h2>
+          <h2>11. Ihre Rechte nach der DSGVO</h2>
           <p className="text-muted-foreground">
             Sie haben gegenüber uns folgende Rechte hinsichtlich Ihrer personenbezogenen Daten:
           </p>
@@ -326,7 +326,7 @@ export default function Datenschutz() {
             <a href="mailto:datenschutz@dzeng.app" className="text-primary">datenschutz@dzeng.app</a>.
           </p>
 
-          <h2>11. Datenlöschung und Datenexport</h2>
+          <h2>12. Datenlöschung und Datenexport</h2>
           <p className="text-muted-foreground">
             Sie können Ihr Konto und alle damit verbundenen Daten jederzeit in den Einstellungen löschen.
             Eine Datenexport-Funktion (Art.&nbsp;20 DSGVO) steht ebenfalls in den Einstellungen zur Verfügung.
@@ -334,7 +334,7 @@ export default function Datenschutz() {
             unwiderruflich gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
           </p>
 
-          <h2>12. Datensicherheit</h2>
+          <h2>13. Datensicherheit</h2>
           <p className="text-muted-foreground">
             Wir setzen technische und organisatorische Maßnahmen (TOM) ein, um Ihre Daten zu schützen:
           </p>
@@ -346,13 +346,13 @@ export default function Datenschutz() {
             <li>Regelmäßige Sicherheitsaudits</li>
           </ul>
 
-          <h2>13. Minderjährige</h2>
+          <h2>14. Minderjährige</h2>
           <p className="text-muted-foreground">
             Die Nutzung von HiOutz ist ab 16 Jahren gestattet (Art.&nbsp;8 DSGVO i.&nbsp;V.&nbsp;m. § 25 TDDDG).
             Personen unter 16 Jahren dürfen die App nur mit Einwilligung eines Erziehungsberechtigten nutzen.
           </p>
 
-          <h2>14. Änderungen dieser Datenschutzerklärung</h2>
+          <h2>15. Änderungen dieser Datenschutzerklärung</h2>
           <p className="text-muted-foreground">
             Wir behalten uns vor, diese Datenschutzerklärung anzupassen, um sie stets den aktuellen rechtlichen
             Anforderungen anzupassen. Die jeweils aktuelle Fassung gilt bei Ihrem nächsten Besuch.
