@@ -197,15 +197,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
             />
           </ErrorBoundaryWrapper>
 
-          <ErrorBoundaryWrapper silent>
-            <LocationDisplay
-              userLocation={userLocation}
-              locationError={locationError}
-              locationRequested={locationRequested}
-              onRequestLocation={requestLocation}
-            />
-          </ErrorBoundaryWrapper>
-
           <div className={isDesktop ? 'grid grid-cols-1 lg:grid-cols-2 gap-8' : 'space-y-6'}>
             <div className="space-y-6">
               {/* Back button */}
