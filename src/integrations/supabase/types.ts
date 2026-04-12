@@ -1595,6 +1595,57 @@ export type Database = {
           },
         ]
       }
+      venue_staff: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          id: string
+          invited_at: string
+          last_scan_at: string | null
+          name: string
+          partner_id: string
+          qr_code_token: string
+          staff_role: string
+          status: string
+          updated_at: string
+          user_id: string | null
+          venue_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          invited_at?: string
+          last_scan_at?: string | null
+          name?: string
+          partner_id: string
+          qr_code_token?: string
+          staff_role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          venue_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          invited_at?: string
+          last_scan_at?: string | null
+          name?: string
+          partner_id?: string
+          qr_code_token?: string
+          staff_role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          venue_id?: string | null
+        }
+        Relationships: []
+      }
       venues: {
         Row: {
           address: string
