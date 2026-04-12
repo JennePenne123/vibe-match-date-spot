@@ -78,7 +78,7 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
     'american': ['american', 'burger', 'bbq', 'steakhouse', 'steak house', 'diner', 'grill'],
     'cafe': ['café', 'cafe', 'coffee', 'bakery', 'brunch', 'breakfast', 'patisserie'],
     'bar': ['bar', 'pub', 'cocktail', 'wine bar', 'lounge', 'biergarten'],
-    'middle_eastern': ['persian', 'arabic', 'falafel', 'kebab', 'döner'],
+    'middle_eastern': ['persian', 'arabic', 'falafel', 'kebab', 'döner', 'oriental', 'syrian', 'lebanese', 'turkish', 'moroccan'],
     'latin': ['mexican', 'brazilian', 'peruvian', 'argentinian', 'tapas'],
   };
   
