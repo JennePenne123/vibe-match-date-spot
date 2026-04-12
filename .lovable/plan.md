@@ -7,6 +7,8 @@
 - [ ] Landing Page Hero Assets
 
 ### Phase 2: Rechtstexte & Compliance
+- [ ] Anforderungskatalog für ITMR Legal finalisieren (Unternehmensdaten aktualisieren nach UG-Gründung)
+- [ ] Erstberatung bei ITMR Legal durchführen
 - [ ] AGB: Platzhalter ersetzen (Firma, Adresse, Geschäftsführer)
 - [ ] Datenschutz: Platzhalter ersetzen + DSFA prüfen
 - [ ] Impressum: Vollständige Angaben
