@@ -152,7 +152,37 @@ function buildAddress(tags: Record<string, string>): string {
   }
   if (parts.length > 0) return parts.join(' ');
   if (cityParts.length > 0) return cityParts.join(' ');
-  return tags.name || 'Address unknown';
+  // Return empty string instead of fallback — will be reverse-geocoded later
+  return '';
+}
+
+// Reverse-geocode via Nominatim (free, no API key)
+async function reverseGeocode(lat: number, lon: number): Promise<string> {
+  try {
+    const resp = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1&zoom=18`,
+      { headers: { 'User-Agent': 'HiOutz/1.0 (contact@hioutz.de)' } }
+    );
+    if (!resp.ok) return '';
+    const data = await resp.json();
+    
+    const addr = data.address || {};
+    const street = addr.road || addr.pedestrian || addr.footway || '';
+    const number = addr.house_number || '';
+    const postcode = addr.postcode || '';
+    const city = addr.city || addr.town || addr.village || addr.municipality || '';
+    
+    const streetLine = [street, number].filter(Boolean).join(' ');
+    const cityLine = [postcode, city].filter(Boolean).join(' ');
+    
+    if (streetLine && cityLine) return `${streetLine}, ${cityLine}`;
+    if (streetLine) return streetLine;
+    if (cityLine) return cityLine;
+    return data.display_name?.split(',').slice(0, 3).join(',') || '';
+  } catch (e) {
+    console.warn('⚠️ Nominatim reverse-geocode failed:', e);
+    return '';
+  }
 }
 
 function extractTags(tags: Record<string, string>): string[] {
