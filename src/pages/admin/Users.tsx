@@ -54,12 +54,13 @@ const AdminUsers: React.FC = () => {
 
   return (
     <AdminPermissionGuard permission="canViewUsers">
-    <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-foreground">{t('admin.usersTitle', 'Nutzer-Übersicht')}</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {t('admin.usersSubtitle', 'Alle registrierten Nutzer und deren Rollen')}
-        </p>
-      </div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">{t('admin.usersTitle', 'Nutzer-Übersicht')}</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {t('admin.usersSubtitle', 'Alle registrierten Nutzer und deren Rollen')}
+          </p>
+        </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
