@@ -112,10 +112,17 @@ const VenueDetail = () => {
     matchScore: appVenue.matchScore,
   };
 
-  const openDirections = () => {
-    if (appVenue.google_place_id) {
-      window.open(`https://www.google.com/maps/place/?q=place_id:${appVenue.google_place_id}`, '_blank');
+  const handleDirections = () => {
+    const lat = sourceVenue.latitude;
+    const lng = sourceVenue.longitude;
+    if (lat && lng) {
+      openDirectionsFromCurrentLocation({
+        destLat: lat,
+        destLng: lng,
+        destName: appVenue.name,
+      });
     } else {
+      // Fallback: search by name
       window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appVenue.name + ' ' + appVenue.address)}`, '_blank');
     }
   };
