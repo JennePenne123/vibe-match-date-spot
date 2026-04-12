@@ -54,10 +54,7 @@ const SmartDatePlanning: React.FC = () => {
   const isProposalFlow = Boolean(fromProposal && sessionId);
   const hasInvalidProposalState = Boolean(fromProposal && !sessionId);
   
-  // Get session data to check if it needs reset
-  const { session: collaborativeSession } = useCollaborativeSession(sessionId);
   const { createPlanningSession, getActiveSession } = useSessionManagement();
-  
 
   useEffect(() => {
     if (!isProposalFlow || !sessionId) return;
@@ -73,71 +70,71 @@ const SmartDatePlanning: React.FC = () => {
     });
   }, [isProposalFlow, sessionId, searchParams, navigate, buildPlanDateUrl, planningMode, location.state]);
 
+  // Session recovery guardrail — one-time fetch, no realtime subscription
   useEffect(() => {
-    if (!user || !collaborativeSession || !sessionId) return;
-    
-    const userRole = collaborativeSession.initiator_id === user.id ? 'initiator' : 'partner';
-    const isExpired = new Date() > new Date(collaborativeSession.expires_at);
-    const isCompleted = collaborativeSession.session_status === 'completed';
-    const isInactive = collaborativeSession.session_status !== 'active';
-    
-    const userHasNoPreferences = userRole === 'initiator' 
-      ? !collaborativeSession.initiator_preferences_complete || !collaborativeSession.initiator_preferences
-      : !collaborativeSession.partner_preferences_complete || !collaborativeSession.partner_preferences;
+    if (!user || !sessionId) return;
+    if (sessionStorage.getItem(`guardrail-${sessionId}`)) return;
 
-    const sessionIsValid = !isExpired && !isCompleted && !isInactive;
-    
-    if (sessionIsValid && userHasNoPreferences && !sessionStorage.getItem(`inherit-${sessionId}-${user.id}`)) {
-      sessionStorage.setItem(`inherit-${sessionId}-${user.id}`, 'attempted');
-      window.location.reload();
-      return;
-    }
-    
-    const needsFreshSession = isExpired || isCompleted || isInactive;
-    
-    if (needsFreshSession && !sessionStorage.getItem(`guardrail-${sessionId}`)) {
-      console.log('🔄 SESSION GUARDRAIL: Session is invalid, looking for existing active session first');
-      
-      sessionStorage.setItem(`guardrail-${sessionId}`, 'processed');
-      
-      const partnerId = collaborativeSession.initiator_id === user.id 
-        ? collaborativeSession.partner_id 
-        : collaborativeSession.initiator_id;
-      
-      getActiveSession(partnerId)
-        .then((existingSession) => {
+    const checkSession = async () => {
+      const { data: session } = await supabase
+        .from('date_planning_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (!session) return;
+
+      const userRole = session.initiator_id === user.id ? 'initiator' : 'partner';
+      const isExpired = new Date() > new Date(session.expires_at);
+      const isCompleted = session.session_status === 'completed';
+      const isInactive = session.session_status !== 'active';
+
+      const userHasNoPreferences = userRole === 'initiator'
+        ? !session.initiator_preferences_complete || !session.initiator_preferences
+        : !session.partner_preferences_complete || !session.partner_preferences;
+
+      const sessionIsValid = !isExpired && !isCompleted && !isInactive;
+
+      if (sessionIsValid && userHasNoPreferences && !sessionStorage.getItem(`inherit-${sessionId}-${user.id}`)) {
+        sessionStorage.setItem(`inherit-${sessionId}-${user.id}`, 'attempted');
+        window.location.reload();
+        return;
+      }
+
+      const needsFreshSession = isExpired || isCompleted || isInactive;
+
+      if (needsFreshSession) {
+        sessionStorage.setItem(`guardrail-${sessionId}`, 'processed');
+
+        const partnerId = session.initiator_id === user.id
+          ? session.partner_id
+          : session.initiator_id;
+
+        try {
+          const existingSession = await getActiveSession(partnerId);
           if (existingSession && existingSession.id !== sessionId) {
-            console.log('✅ SESSION GUARDRAIL: Found existing active session, joining:', existingSession.id);
             navigate(buildPlanDateUrl(existingSession.id), {
-              state: {
-                sessionId: existingSession.id,
-                fromProposal: true,
-                planningMode: 'collaborative'
-              },
-              replace: true
+              state: { sessionId: existingSession.id, fromProposal: true, planningMode: 'collaborative' },
+              replace: true,
             });
           } else {
-            return createPlanningSession(partnerId, undefined, 'collaborative', true);
+            const newSession = await createPlanningSession(partnerId, undefined, 'collaborative', true);
+            if (newSession?.id) {
+              navigate(buildPlanDateUrl(newSession.id), {
+                state: { sessionId: newSession.id, fromProposal: true, planningMode: 'collaborative' },
+                replace: true,
+              });
+            }
           }
-        })
-        .then((newSession) => {
-          if (newSession?.id) {
-            navigate(buildPlanDateUrl(newSession.id), {
-              state: {
-                sessionId: newSession.id,
-                fromProposal: true,
-                planningMode: 'collaborative'
-              },
-              replace: true
-            });
-          }
-        })
-        .catch((error) => {
-          console.error('❌ SESSION GUARDRAIL: Failed to handle session:', error);
+        } catch (error) {
+          console.error('SESSION GUARDRAIL: Failed to handle session:', error);
           sessionStorage.removeItem(`guardrail-${sessionId}`);
-        });
-    }
-  }, [user, collaborativeSession, sessionId, createPlanningSession, navigate, getActiveSession, buildPlanDateUrl]);
+        }
+      }
+    };
+
+    checkSession();
+  }, [user, sessionId, createPlanningSession, navigate, getActiveSession, buildPlanDateUrl]);
   
   if (hasInvalidProposalState) {
     navigate('/home', { replace: true });
