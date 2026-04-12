@@ -171,6 +171,26 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                 summary={`${maxDistance} km${selectedDietary.length > 0 ? ` · ${selectedDietary.length} ${t('datePlanning.diet')}` : ''}`} count={selectedDietary.length}
                 open={openSections.includes('advanced')} onToggle={() => toggleSection('advanced')}>
                 <div className="space-y-4">
+                  {/* Current location */}
+                  <div>
+                    <p className="text-sm font-medium mb-2">{t('datePlanning.yourLocation', 'Dein Standort')}</p>
+                    {appState.userLocation ? (
+                      <div className="flex items-center gap-2 rounded-lg py-2 px-3 bg-primary/5 border border-primary/10">
+                        <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="text-sm text-foreground flex-1">
+                          {appState.userLocation.address || `${appState.userLocation.latitude.toFixed(4)}, ${appState.userLocation.longitude.toFixed(4)}`}
+                        </span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={reqLoc}
+                        className="flex items-center gap-2 w-full rounded-lg py-2.5 px-3 bg-muted/50 border border-border/50 hover:bg-muted transition-colors text-sm text-muted-foreground"
+                      >
+                        <MapPin className="h-4 w-4" />
+                        {t('datePlanning.enableLocation', 'Standort aktivieren')}
+                      </button>
+                    )}
+                  </div>
                   <div>
                     <p className="text-sm font-medium mb-2">{t('datePlanning.distance')}</p>
                     <Slider value={[maxDistance]} onValueChange={v => setMaxDistance(v[0])} max={50} min={1} step={1} className="w-full" />
