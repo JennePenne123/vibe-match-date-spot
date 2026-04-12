@@ -11,6 +11,7 @@ import InvitationCreation from '@/components/date-planning/InvitationCreation';
 import PlanningHeader from '@/components/date-planning/PlanningHeader';
 import PreferencesStep from '@/components/date-planning/PreferencesStep';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
+import DateModeSelection from '@/components/date-planning/DateModeSelection';
 
 import { useSmartDatePlannerState } from '@/hooks/useSmartDatePlannerState';
 import { createSmartDatePlannerHandlers } from '@/components/smart-date-planner/SmartDatePlannerHandlers';
@@ -85,7 +86,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     selectedVenueId, invitationMessage, setInvitationMessage, aiAnalyzing,
     selectedPartner, selectedVenue, navigate, userLocation, locationError,
     locationRequested, requestLocation,
-    dateMode, setDateMode, selectedPartnerIds, setSelectedPartnerIds,
+    dateMode, setDateMode, handleModeSelect, selectedPartnerIds, setSelectedPartnerIds,
   } = state;
 
   const handlePartnerContinue = async () => {
