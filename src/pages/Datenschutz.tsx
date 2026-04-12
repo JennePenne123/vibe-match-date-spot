@@ -176,9 +176,15 @@ export default function Datenschutz() {
             <li>Adaptiven Gewichtungen basierend auf Ihrem Feedback</li>
           </ul>
           <p className="text-muted-foreground">
-            Die Verarbeitung erfolgt serverseitig in unserer eigenen Infrastruktur (Supabase Edge Functions).
-            Es werden <strong>keine personenbezogenen Daten an externe KI-Dienste</strong> (z.&nbsp;B. OpenAI, Google AI)
-            übermittelt. Rechtsgrundlage: Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).
+            Die Venue-Matching-Scores und Kompatibilitätswerte werden lokal in unserer eigenen Infrastruktur
+            (Supabase Edge Functions) berechnet. Für bestimmte Zusatzfunktionen – wie KI-generierte
+            Date-Ideen, Einladungstexte und den Concierge-Chat – nutzen wir den <strong>Lovable AI Gateway</strong>,
+            einen KI-Textgenerierungsdienst (siehe Abschnitt&nbsp;7). Dabei werden ausschließlich anonymisierte
+            Präferenzdaten (z.&nbsp;B. bevorzugte Küchen, Stimmungen) übermittelt – <strong>keine
+            persönlich identifizierbaren Daten</strong> wie Name, E-Mail oder Standort.
+          </p>
+          <p className="text-muted-foreground">
+            Rechtsgrundlage: Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).
           </p>
           <p className="text-muted-foreground">
             <strong>Kein Profiling im Sinne des Art.&nbsp;22 DSGVO:</strong> Die KI-Ergebnisse dienen ausschließlich
