@@ -264,7 +264,32 @@ export default function Datenschutz() {
             blockiert. Rechtsgrundlage: berechtigtes Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO).
           </p>
 
-          <h2>8. Push-Benachrichtigungen</h2>
+          <h2>8. Mitarbeiterverwaltung für Venue-Partner</h2>
+          <p className="text-muted-foreground">
+            Venue-Partner können Mitarbeiter über die App einladen und verwalten. Im Rahmen der Mitarbeiterverwaltung
+            werden folgende Daten verarbeitet:
+          </p>
+          <ul className="text-muted-foreground">
+            <li><strong>E-Mail-Adresse</strong> des eingeladenen Mitarbeiters (zur Einladung und Kontozuordnung)</li>
+            <li><strong>Name</strong> des Mitarbeiters</li>
+            <li><strong>Rolle</strong> innerhalb des Betriebs (z.&nbsp;B. Manager oder Mitarbeiter)</li>
+            <li><strong>Individueller QR-Code-Token</strong> – ein pseudonymisierter, zufällig generierter Identifikator
+              zur eindeutigen Zuordnung bei der Voucher-Einlösung</li>
+            <li><strong>Zeitstempel des letzten Scans</strong> zur betrieblichen Nachvollziehbarkeit</li>
+          </ul>
+          <p className="text-muted-foreground">
+            <strong>Onboarding per QR-Code:</strong> Mitarbeiter können alternativ zur E-Mail-Einladung auch einen
+            vom Partner bereitgestellten QR-Code scannen, um sich dem Betrieb zuzuordnen. Dabei wird lediglich
+            ein tokenisierter Link verarbeitet – es werden keine zusätzlichen personenbezogenen Daten erhoben.
+          </p>
+          <p className="text-muted-foreground">
+            Rechtsgrundlage: Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO) zwischen dem Partner
+            und seinem Mitarbeiter bzw. berechtigtes Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO) an der
+            betrieblichen Organisation der Voucher-Einlösung. Mitarbeiter können ihre Zuordnung jederzeit
+            über den Partner oder durch Kontolöschung aufheben.
+          </p>
+
+          <h2>9. Push-Benachrichtigungen</h2>
           <p className="text-muted-foreground">
             Sie können Push-Benachrichtigungen aktivieren (z.&nbsp;B. Date-Erinnerungen, Einladungsstatus).
             Die Aktivierung erfolgt ausschließlich auf Ihre ausdrückliche Einwilligung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO).
