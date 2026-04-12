@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
-import { openDirectionsFromCurrentLocation } from '@/utils/navigationHelpers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -113,17 +112,16 @@ const VenueDetail = () => {
   };
 
   const handleDirections = () => {
-    const lat = sourceVenue.latitude;
-    const lng = sourceVenue.longitude;
-    if (lat && lng) {
-      openDirectionsFromCurrentLocation({
-        destLat: lat,
-        destLng: lng,
-        destName: appVenue.name,
-      });
+    // Always use venue name + address as destination for accuracy
+    const destination = encodeURIComponent(
+      [appVenue.name, displayAddress].filter(Boolean).join(', ')
+    );
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      window.open(`maps://maps.apple.com/?daddr=${destination}`, '_blank');
     } else {
-      // Fallback: search by name
-      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appVenue.name + ' ' + appVenue.address)}`, '_blank');
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank');
     }
   };
 
