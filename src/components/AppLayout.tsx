@@ -9,7 +9,8 @@ import { AdminMobileBottomNav } from './AdminMobileBottomNav'
 import { PartnerMobileBottomNav } from './PartnerMobileBottomNav'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
-import { Menu, Sparkles } from 'lucide-react'
+import { Menu } from 'lucide-react'
+import hioutzLogo from '@/assets/hioutz-logo.png'
 import { ThemeToggle } from '@/components/ThemeToggle'
 const AIConcierge = lazy(() => import('@/components/AIConcierge'))
 
