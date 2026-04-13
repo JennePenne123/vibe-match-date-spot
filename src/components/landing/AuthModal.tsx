@@ -368,14 +368,14 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                 {!isLogin && (
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-foreground font-medium">
-                      Name
+                      {t('auth.name')}
                     </Label>
                     <Input
                       id="name"
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter your name"
+                      placeholder={t('auth.enterName')}
                       autoComplete="name"
                       className="h-12 bg-background/50 border-border/50 focus:border-primary transition-colors"
                       disabled={loading || isOAuthLoading}
@@ -388,14 +388,14 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
 
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-foreground font-medium">
-                    Email
+                    {t('auth.email')}
                   </Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
+                    placeholder={t('auth.enterEmail')}
                     autoComplete="email"
                     className="h-12 bg-background/50 border-border/50 focus:border-primary transition-colors"
                     disabled={loading || isOAuthLoading}
@@ -407,14 +407,14 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
 
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-foreground font-medium">
-                    Password
+                    {t('auth.password')}
                   </Label>
                   <Input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
+                    placeholder={t('auth.enterPassword')}
                     autoComplete={isLogin ? "current-password" : "new-password"}
                     className="h-12 bg-background/50 border-border/50 focus:border-primary transition-colors"
                     disabled={loading || isOAuthLoading}
@@ -429,15 +429,15 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   <div className="space-y-2">
                     <Label htmlFor="referralCode" className="text-foreground font-medium flex items-center gap-2">
                       <Gift className="h-4 w-4 text-primary" />
-                      Referral Code
-                      <span className="text-xs text-muted-foreground">(optional)</span>
+                      {t('auth.referralCode')}
+                      <span className="text-xs text-muted-foreground">({t('auth.optional')})</span>
                     </Label>
                     <Input
                       id="referralCode"
                       type="text"
                       value={referralCode}
                       onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                      placeholder="Enter referral code"
+                      placeholder={t('auth.enterReferralCode')}
                       className={`h-12 bg-background/50 border-border/50 focus:border-primary transition-colors font-mono uppercase ${
                         referralValid === true ? 'border-green-500 bg-green-500/5' : 
                         referralValid === false ? 'border-destructive bg-destructive/5' : ''
@@ -447,11 +447,11 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     />
                     {referralValid === true && (
                       <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
-                        ✓ Valid code! You'll get 10 bonus points
+                        ✓ {t('auth.validCode')}
                       </p>
                     )}
                     {referralValid === false && referralCode.length >= 8 && (
-                      <p className="text-sm text-destructive">Invalid referral code</p>
+                      <p className="text-sm text-destructive">{t('auth.invalidCode')}</p>
                     )}
                   </div>
                 )}
@@ -508,10 +508,10 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      {isLogin ? 'Signing in...' : 'Creating account...'}
+                      {isLogin ? t('auth.signingIn') : t('auth.creatingAccount')}
                     </>
                   ) : (
-                    isLogin ? 'Sign In' : 'Sign Up'
+                    isLogin ? t('auth.signIn') : t('auth.signUp')
                   )}
                 </Button>
               </form>
@@ -525,13 +525,13 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                 >
                   {isLogin ? (
                     <>
-                      Don't have an account?{' '}
-                      <span className="text-primary font-semibold">Sign up</span>
+                      {t('auth.noAccount')}{' '}
+                      <span className="text-primary font-semibold">{t('auth.signUpLink')}</span>
                     </>
                   ) : (
                     <>
-                      Already have an account?{' '}
-                      <span className="text-primary font-semibold">Sign in</span>
+                      {t('auth.hasAccount')}{' '}
+                      <span className="text-primary font-semibold">{t('auth.signInLink')}</span>
                     </>
                   )}
                 </button>
