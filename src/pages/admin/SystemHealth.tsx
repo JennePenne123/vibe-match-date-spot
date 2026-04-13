@@ -121,6 +121,28 @@ const SystemHealth: React.FC = () => {
   const criticalErrors = (errorLogs || []).filter(e => e.severity === 'critical');
   const totalApiCost = apiCostTrend?.reduce((s, d) => s + d.cost, 0) || 0;
 
+  const handleResolveAll = async () => {
+    if (unresolvedErrors.length === 0) return;
+    setResolving(true);
+    try {
+      const ids = unresolvedErrors.map(e => e.id);
+      // Update in batches of 50
+      for (let i = 0; i < ids.length; i += 50) {
+        const batch = ids.slice(i, i + 50);
+        await supabase
+          .from('error_logs')
+          .update({ resolved: true, resolved_at: new Date().toISOString() })
+          .in('id', batch);
+      }
+      toast({ title: `${ids.length} Fehler als gelöst markiert` });
+      queryClient.invalidateQueries({ queryKey: ['admin-error-logs'] });
+    } catch (err) {
+      toast({ title: 'Fehler beim Markieren', variant: 'destructive' });
+    } finally {
+      setResolving(false);
+    }
+  };
+
   // Error by type for pie
   const errorByType = (() => {
     const map = new Map<string, number>();
