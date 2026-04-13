@@ -10,11 +10,24 @@ export function formatVenueAddress(venue: any): string {
   const address = venue.address || venue.venue_address || venue.location || venue.formatted_address;
   
   if (!address || address.trim() === '') {
-    return 'Address not available';
+    return getCoordinateFallback(venue.latitude, venue.longitude);
   }
   
-  // Clean up the address - remove extra spaces and common prefixes
   let cleanAddress = address.trim();
+  
+  // Detect bad address patterns:
+  // 1. Address equals the venue name (OSM import artifact)
+  if (venue.name && cleanAddress.toLowerCase() === venue.name.toLowerCase()) {
+    return getCoordinateFallback(venue.latitude, venue.longitude);
+  }
+  
+  // 2. Address is just a postal code (e.g. "22305")
+  if (/^\d{4,5}$/.test(cleanAddress)) {
+    return getCoordinateFallback(venue.latitude, venue.longitude);
+  }
+  
+  // 3. Address is just a street name without number and without city (no comma, no digits)
+  //    e.g. "Hellbrookstraße" — keep it but append city if possible
   
   // If address is very long, truncate it intelligently
   if (cleanAddress.length > 60) {
