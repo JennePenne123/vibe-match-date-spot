@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -95,8 +96,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
           const success = await processReferralSignup(pendingReferral, user.id);
           if (success) {
             toast({
-              title: 'Welcome bonus! 🎉',
-              description: 'You earned 10 bonus points from your referral!',
+              title: t('auth.welcomeBonus'),
+              description: t('auth.welcomeBonusDesc'),
             });
           }
         } catch (err) {
@@ -151,7 +152,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
       }
       // Note: On success, page will redirect to Google
     } catch (err) {
-      setError('Failed to connect to Google. Please try again.');
+      setError(t('auth.googleError'));
       setGoogleLoading(false);
     }
   };
@@ -173,7 +174,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
       }
       // Note: On success, page will redirect to Apple
     } catch (err) {
-      setError('Failed to connect to Apple. Please try again.');
+      setError(t('auth.appleError'));
       setAppleLoading(false);
     }
   };
@@ -181,15 +182,15 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const getOAuthErrorMessage = (error: any): string => {
     const errorMessage = error?.message?.toLowerCase() || '';
     if (errorMessage.includes('access_denied') || errorMessage.includes('cancelled')) {
-      return 'Sign in was cancelled';
+      return t('auth.signInCancelled');
     }
     if (errorMessage.includes('invalid_request')) {
-      return 'Unable to connect to provider. Please try again.';
+      return t('auth.providerError');
     }
     if (errorMessage.includes('timeout')) {
-      return 'Connection timed out. Please try again.';
+      return t('auth.timeoutError');
     }
-    return 'An error occurred. Please try email sign in.';
+    return t('auth.genericError');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -210,7 +211,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     }
 
     if (!isLogin && (!agbAccepted || !datenschutzAccepted)) {
-      setError('Bitte akzeptiere die AGB und Datenschutzerklärung.');
+      setError(t('auth.acceptTerms'));
       return;
     }
 
@@ -221,7 +222,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
         const { user: signedInUser, error: signInError } = await signIn(sanitizedEmail, password);
         
         if (signInError) {
-          setError(signInError.message || 'Failed to sign in');
+          setError(signInError.message || t('auth.signInFailed'));
           setLoading(false);
           return;
         }
@@ -251,7 +252,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
         );
 
         if (signUpError) {
-          setError(signUpError.message || 'Failed to sign up');
+          setError(signUpError.message || t('auth.signUpFailed'));
           setLoading(false);
           return;
         }
@@ -263,8 +264,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
               const success = await processReferralSignup(referralCode, signedUpUser.id);
               if (success) {
                 toast({
-                  title: 'Welcome bonus! 🎉',
-                  description: 'You earned 10 bonus points from your referral!',
+                  title: t('auth.welcomeBonus'),
+                  description: t('auth.welcomeBonusDesc'),
                 });
               }
             } catch (err) {
@@ -306,12 +307,12 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
           <div className="relative p-6 sm:p-8">
             <DialogHeader className="space-y-3 text-center">
               <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                {isLogin ? 'Welcome Back' : 'Get Started'}
+                {isLogin ? t('auth.welcomeBack') : t('auth.getStarted')}
               </DialogTitle>
               <DialogDescription className="text-base text-muted-foreground">
                 {isLogin 
-                  ? 'Sign in to continue your journey' 
-                  : 'Create an account to start planning amazing dates'}
+                  ? t('auth.signInSubtitle') 
+                  : t('auth.signUpSubtitle')}
               </DialogDescription>
             </DialogHeader>
 
@@ -330,7 +331,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   ) : (
                     <GoogleIcon />
                   )}
-                  Continue with Google
+                  {t('auth.continueWithGoogle')}
                 </Button>
 
                 <Button
@@ -345,7 +346,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   ) : (
                     <AppleIcon />
                   )}
-                  Continue with Apple
+                  {t('auth.continueWithApple')}
                 </Button>
               </div>
 
