@@ -277,8 +277,7 @@ export default function LandingDemo() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <Link to="/" className="flex items-center space-x-2 group">
-              <img src="/icon-192.png" alt="HiOutz" className="w-8 h-8 rounded-xl shadow-gentle-md animate-logo-pulse group-hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.3s' }} />
-              <span className="text-xl font-semibold text-foreground">HiOutz</span>
+              <img src={hioutzLogo} alt="HiOutz" className="h-8 w-auto group-hover:scale-105 transition-all duration-300" />
             </Link>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <Link to="/impressum" className="hover:text-foreground transition-colors">Impressum</Link>
