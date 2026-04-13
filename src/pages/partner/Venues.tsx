@@ -81,7 +81,7 @@ export default function PartnerVenues() {
       setPartnerships(data || []);
     } catch (error) {
       console.error('Error fetching partnerships:', error);
-      toast({ title: 'Error', description: 'Failed to load venues', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('common.error'), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
