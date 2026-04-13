@@ -1,116 +1,96 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, Sequence, staticFile, Img } from "remotion";
+import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 
-const features = [
-  { icon: "AI", label: "KI-Matching", color: "hsla(239, 84%, 67%, 0.9)", img: "couple-restaurant.jpg" },
-  { icon: "GO", label: "Top Venues", color: "hsla(263, 70%, 66%, 0.9)", img: "venue-terrace.jpg" },
-  { icon: "%", label: "Exklusive Deals", color: "hsla(330, 81%, 60%, 0.9)", img: "venue-bar.jpg" },
+const highlights = [
+  { icon: "⚡", label: "KI-Matching", color: "#14b8a6" },
+  { icon: "🤝", label: "Zusammen planen", color: "#f97316" },
+  { icon: "🎁", label: "Exklusive Voucher", color: "#14b8a6" },
 ];
-
-const FeatureCard = ({ icon, label, color, index, img }: { icon: string; label: string; color: string; index: number; img: string }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-
-  const s = spring({ frame, fps, config: { damping: 12, stiffness: 130 } });
-  const scale = interpolate(s, [0, 1], [0.3, 1]);
-  const opacity = interpolate(s, [0, 1], [0, 1]);
-  const floatY = Math.sin((frame + index * 20) * 0.08) * 4;
-  const slideX = interpolate(s, [0, 1], [index % 2 === 0 ? -150 : 150, 0]);
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 18,
-        transform: `scale(${scale}) translateY(${floatY}px) translateX(${slideX}px)`,
-        opacity,
-        background: "hsla(217, 33%, 14%, 0.8)",
-        borderRadius: 22,
-        padding: "12px 20px 12px 12px",
-        border: `1px solid ${color.replace("0.9", "0.25")}`,
-        width: 440,
-      }}
-    >
-      {/* Venue thumbnail */}
-      <div style={{ width: 80, height: 80, borderRadius: 16, overflow: "hidden", flexShrink: 0 }}>
-        <Img src={staticFile(`images/${img}`)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-      </div>
-      {/* Icon badge overlapping thumbnail */}
-      <div style={{
-        position: "absolute",
-        left: 65,
-        top: "50%",
-        transform: "translateY(-50%)",
-        width: 36,
-        height: 36,
-        borderRadius: 10,
-        background: `linear-gradient(135deg, ${color}, transparent)`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 14,
-        fontWeight: 800,
-        fontFamily: "sans-serif",
-        color: "white",
-        border: "2px solid hsla(217, 33%, 14%, 0.9)",
-      }}>
-        {icon}
-      </div>
-      <div style={{ marginLeft: 16 }}>
-        <p style={{ fontSize: 30, fontWeight: 600, fontFamily: "sans-serif", color: "white", margin: 0 }}>
-          {label}
-        </p>
-        <p style={{ fontSize: 16, fontWeight: 400, fontFamily: "sans-serif", color: "hsla(210, 40%, 98%, 0.5)", margin: 0, marginTop: 2 }}>
-          {index === 0 ? "Perfekt abgestimmt" : index === 1 ? "Handverlesen für dich" : "Spare bei jedem Date"}
-        </p>
-      </div>
-    </div>
-  );
-};
 
 export const SceneFeatures = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const titleS = spring({ frame, fps, config: { damping: 18 } });
-  const titleY = interpolate(titleS, [0, 1], [50, 0]);
-
-  // Background image with parallax
-  const bgY = interpolate(frame, [0, 140], [0, -40]);
+  const titleScale = spring({ frame, fps, config: { damping: 15 } });
+  const titleOpacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: "clamp" });
 
   return (
-    <AbsoluteFill>
-      {/* Subtle background venue image */}
-      <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-        <Img
-          src={staticFile("images/cheers.jpg")}
+    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", padding: 60 }}>
+      <div
+        style={{
+          transform: `scale(${interpolate(titleScale, [0, 1], [0.8, 1])})`,
+          opacity: titleOpacity,
+          fontSize: 52,
+          fontWeight: 900,
+          color: "white",
+          textAlign: "center",
+          fontFamily: "sans-serif",
+          marginBottom: 80,
+          lineHeight: 1.2,
+        }}
+      >
+        Warum{" "}
+        <span
           style={{
-            width: "100%",
-            height: "120%",
-            objectFit: "cover",
-            opacity: 0.15,
-            transform: `translateY(${bgY}px)`,
+            background: "linear-gradient(90deg, #14b8a6, #f97316)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
           }}
-        />
+        >
+          H!Outz
+        </span>
+        ?
       </div>
 
-      <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
-        {/* Title */}
-        <div style={{ position: "absolute", top: "18%", textAlign: "center", transform: `translateY(${titleY}px)`, opacity: interpolate(titleS, [0, 1], [0, 1]) }}>
-          <p style={{ fontSize: 52, fontWeight: 700, fontFamily: "sans-serif", color: "white" }}>
-            Alles was du brauchst
-          </p>
-        </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 40, alignItems: "center" }}>
+        {highlights.map((h, i) => {
+          const s = spring({ frame: frame - 15 - i * 12, fps, config: { damping: 12, stiffness: 100 } });
+          const scale = interpolate(s, [0, 1], [0, 1]);
+          const opacity = interpolate(frame, [15 + i * 12, 25 + i * 12], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
 
-        {/* Feature cards */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 24, alignItems: "center", marginTop: 60 }}>
-          {features.map((f, i) => (
-            <Sequence key={i} from={15 + i * 20} durationInFrames={140 - 15 - i * 20} layout="none">
-              <FeatureCard {...f} index={i} />
-            </Sequence>
-          ))}
-        </div>
-      </AbsoluteFill>
+          return (
+            <div
+              key={h.label}
+              style={{
+                transform: `scale(${scale})`,
+                opacity,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 16,
+              }}
+            >
+              <div
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: "50%",
+                  background: `${h.color}22`,
+                  border: `2px solid ${h.color}55`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 52,
+                }}
+              >
+                {h.icon}
+              </div>
+              <span
+                style={{
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: "white",
+                  fontFamily: "sans-serif",
+                }}
+              >
+                {h.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </AbsoluteFill>
   );
 };

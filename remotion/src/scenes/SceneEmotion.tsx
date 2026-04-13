@@ -1,84 +1,81 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, staticFile, Img } from "remotion";
+import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
+
+const features = [
+  { emoji: "🍽️", text: "Restaurants", delay: 0 },
+  { emoji: "🍸", text: "Bars & Lounges", delay: 8 },
+  { emoji: "🎭", text: "Events", delay: 16 },
+  { emoji: "☕", text: "Cafés", delay: 24 },
+];
 
 export const SceneEmotion = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const lines = [
-    { text: "Keine Ideen mehr?", delay: 0 },
-    { text: "Immer das Gleiche?", delay: 20 },
-    { text: "Wir ändern das.", delay: 50, accent: true },
-  ];
-
-  // Venue images reveal
-  const img1Opacity = interpolate(frame, [60, 80], [0, 1], { extrapolateRight: "clamp", extrapolateLeft: "clamp" });
-  const img1Scale = spring({ frame: frame - 60, fps, config: { damping: 15 } });
-  const img2Opacity = interpolate(frame, [75, 95], [0, 1], { extrapolateRight: "clamp", extrapolateLeft: "clamp" });
-  const img2Scale = spring({ frame: frame - 75, fps, config: { damping: 15 } });
+  const titleOpacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: "clamp" });
+  const titleY = interpolate(
+    spring({ frame, fps, config: { damping: 20 } }),
+    [0, 1],
+    [50, 0]
+  );
 
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", padding: 80 }}>
-      {/* Decorative "?" */}
-      <div style={{ position: "absolute", top: "12%", fontSize: 120, fontWeight: 200, fontFamily: "sans-serif", color: "hsla(330, 81%, 60%, 0.12)", opacity: interpolate(frame, [0, 20], [0, 1], { extrapolateRight: "clamp", extrapolateLeft: "clamp" }) }}>
-        ?
+    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", padding: 60 }}>
+      <div
+        style={{
+          opacity: titleOpacity,
+          transform: `translateY(${titleY}px)`,
+          fontSize: 56,
+          fontWeight: 800,
+          color: "white",
+          textAlign: "center",
+          marginBottom: 80,
+          fontFamily: "sans-serif",
+          lineHeight: 1.2,
+        }}
+      >
+        Die besten Venues
+        <br />
+        <span style={{ color: "#14b8a6" }}>deiner Stadt</span>
       </div>
 
-      {/* Text lines */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 30, alignItems: "center", marginTop: -120 }}>
-        {lines.map((line, i) => {
-          const s = spring({ frame: frame - line.delay, fps, config: { damping: 14, stiffness: 120 } });
-          const y = interpolate(s, [0, 1], [80, 0]);
-          const opacity = interpolate(frame, [line.delay, line.delay + 15], [0, 1], { extrapolateRight: "clamp", extrapolateLeft: "clamp" });
-          const strikeWidth = line.accent ? 0 : interpolate(frame, [60, 80], [0, 100], { extrapolateRight: "clamp", extrapolateLeft: "clamp" });
+      <div style={{ display: "flex", flexDirection: "column", gap: 24, width: "100%" }}>
+        {features.map((feat) => {
+          const s = spring({ frame: frame - feat.delay - 10, fps, config: { damping: 15, stiffness: 150 } });
+          const cardX = interpolate(s, [0, 1], [400, 0]);
+          const cardOpacity = interpolate(frame, [feat.delay + 10, feat.delay + 25], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
 
           return (
-            <div key={i} style={{ position: "relative", transform: `translateY(${y}px)`, opacity }}>
-              <p style={{
-                fontSize: line.accent ? 60 : 48,
-                fontWeight: line.accent ? 800 : 400,
-                fontFamily: "sans-serif",
-                color: line.accent ? "white" : "hsla(210, 40%, 98%, 0.6)",
-                textAlign: "center",
-                background: line.accent ? "linear-gradient(135deg, hsl(239, 84%, 67%), hsl(330, 81%, 60%))" : "none",
-                WebkitBackgroundClip: line.accent ? "text" : undefined,
-                WebkitTextFillColor: line.accent ? "transparent" : undefined,
-              }}>
-                {line.text}
-              </p>
-              {!line.accent && (
-                <div style={{ position: "absolute", top: "50%", left: 0, width: `${strikeWidth}%`, height: 3, background: "hsla(330, 81%, 60%, 0.8)", transform: "translateY(-50%)" }} />
-              )}
+            <div
+              key={feat.text}
+              style={{
+                transform: `translateX(${cardX}px)`,
+                opacity: cardOpacity,
+                display: "flex",
+                alignItems: "center",
+                gap: 24,
+                background: "rgba(255,255,255,0.08)",
+                borderRadius: 20,
+                padding: "28px 36px",
+                border: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <span style={{ fontSize: 52 }}>{feat.emoji}</span>
+              <span
+                style={{
+                  fontSize: 38,
+                  fontWeight: 600,
+                  color: "white",
+                  fontFamily: "sans-serif",
+                }}
+              >
+                {feat.text}
+              </span>
             </div>
           );
         })}
-      </div>
-
-      {/* Venue preview images that appear after "Wir ändern das" */}
-      <div style={{ position: "absolute", bottom: "10%", display: "flex", gap: 20, justifyContent: "center" }}>
-        <div style={{
-          width: 200,
-          height: 260,
-          borderRadius: 20,
-          overflow: "hidden",
-          opacity: img1Opacity,
-          transform: `scale(${interpolate(img1Scale, [0, 1], [0.7, 1])}) rotate(-5deg)`,
-          border: "2px solid hsla(239, 84%, 67%, 0.3)",
-          boxShadow: "0 20px 50px hsla(0, 0%, 0%, 0.4)",
-        }}>
-          <Img src={staticFile("images/venue-bar.jpg")} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        </div>
-        <div style={{
-          width: 200,
-          height: 260,
-          borderRadius: 20,
-          overflow: "hidden",
-          opacity: img2Opacity,
-          transform: `scale(${interpolate(img2Scale, [0, 1], [0.7, 1])}) rotate(4deg) translateY(-20px)`,
-          border: "2px solid hsla(330, 81%, 60%, 0.3)",
-          boxShadow: "0 20px 50px hsla(0, 0%, 0%, 0.4)",
-        }}>
-          <Img src={staticFile("images/venue-terrace.jpg")} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        </div>
       </div>
     </AbsoluteFill>
   );
