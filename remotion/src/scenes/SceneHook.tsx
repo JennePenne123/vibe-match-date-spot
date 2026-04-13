@@ -1,163 +1,113 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, staticFile, Img } from "remotion";
 
+// Scene 1: HOOK — "90% aller Dates sind mittelmäßig."
+// Provocative statement over a desaturated boring-planning image
 export const SceneHook = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Dramatic zoom-in entrance for logo
-  const logoSpring = spring({ frame, fps, config: { damping: 10, stiffness: 80 } });
-  const logoScale = interpolate(logoSpring, [0, 1], [3, 1]);
-  const logoOpacity = interpolate(frame, [0, 12], [0, 1], { extrapolateRight: "clamp" });
-  const logoRotate = interpolate(logoSpring, [0, 1], [-8, 0]);
+  // Image zoom
+  const imgScale = interpolate(frame, [0, 80], [1.0, 1.15]);
+  const imgOpacity = interpolate(frame, [0, 8], [0, 0.5], { extrapolateRight: "clamp" });
 
-  // Bright glow behind logo for contrast
-  const glowPulse = interpolate(Math.sin(frame * 0.06), [-1, 1], [0.5, 0.9]);
+  // "90%" number — dramatic scale entrance
+  const numSpring = spring({ frame: frame - 3, fps, config: { damping: 8, stiffness: 100 } });
+  const numScale = interpolate(numSpring, [0, 1], [4, 1]);
+  const numOpacity = interpolate(frame, [3, 10], [0, 1], { extrapolateRight: "clamp" });
 
-  // Main text - kinetic reveal with per-word stagger
-  const word1Spring = spring({ frame: frame - 22, fps, config: { damping: 12, stiffness: 150 } });
-  const word2Spring = spring({ frame: frame - 30, fps, config: { damping: 12, stiffness: 150 } });
-  const word1Y = interpolate(word1Spring, [0, 1], [120, 0]);
-  const word2Y = interpolate(word2Spring, [0, 1], [120, 0]);
-  const word1Opacity = interpolate(frame, [22, 32], [0, 1], { extrapolateRight: "clamp" });
-  const word2Opacity = interpolate(frame, [30, 40], [0, 1], { extrapolateRight: "clamp" });
+  // Rest of text
+  const textSpring = spring({ frame: frame - 18, fps, config: { damping: 15 } });
+  const textY = interpolate(textSpring, [0, 1], [60, 0]);
+  const textOpacity = interpolate(frame, [18, 28], [0, 1], { extrapolateRight: "clamp" });
 
-  // "Date" word with dramatic scale
-  const dateSpring = spring({ frame: frame - 38, fps, config: { damping: 8, stiffness: 100 } });
-  const dateScale = interpolate(dateSpring, [0, 1], [0.3, 1]);
-  const dateOpacity = interpolate(frame, [38, 48], [0, 1], { extrapolateRight: "clamp" });
+  // Red accent underline
+  const lineWidth = interpolate(
+    spring({ frame: frame - 30, fps, config: { damping: 20 } }),
+    [0, 1],
+    [0, 480]
+  );
 
-  // Subtitle
-  const subSpring = spring({ frame: frame - 55, fps, config: { damping: 18 } });
-  const subY = interpolate(subSpring, [0, 1], [30, 0]);
-  const subOpacity = interpolate(frame, [55, 65], [0, 1], { extrapolateRight: "clamp" });
-
-  // Flash effect at entrance
-  const flashOpacity = interpolate(frame, [0, 5, 12], [0.8, 0.3, 0], {
-    extrapolateRight: "clamp",
-  });
+  // Screen shake at entrance
+  const shakeX = frame < 12 ? Math.sin(frame * 3) * (12 - frame) * 0.8 : 0;
+  const shakeY = frame < 12 ? Math.cos(frame * 4) * (12 - frame) * 0.5 : 0;
 
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
-      {/* Flash */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "radial-gradient(circle at 50% 40%, rgba(20,184,166,0.6), transparent 70%)",
-          opacity: flashOpacity,
-        }}
-      />
-
-      {/* Glow behind logo for contrast */}
-      <div
-        style={{
-          position: "absolute",
-          top: "22%",
-          width: 500,
-          height: 300,
-          borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(5,10,21,0.95) 0%, rgba(5,10,21,0.7) 50%, transparent 80%)",
-          opacity: glowPulse,
-          transform: "translateY(-50%)",
-        }}
-      />
-
-      {/* Logo */}
-      <div
-        style={{
-          transform: `scale(${logoScale}) rotate(${logoRotate}deg)`,
-          opacity: logoOpacity,
-          marginBottom: 50,
-          position: "relative",
-          zIndex: 2,
-        }}
-      >
+    <AbsoluteFill style={{ transform: `translate(${shakeX}px, ${shakeY}px)` }}>
+      {/* Background image — boring phone scrolling */}
+      <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
         <Img
-          src={staticFile("images/hioutz-logo.png")}
-          style={{ width: 380, height: "auto" }}
+          src={staticFile("images/boring-planning.jpg")}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transform: `scale(${imgScale})`,
+            opacity: imgOpacity,
+            filter: "saturate(0.3) brightness(0.4)",
+          }}
         />
       </div>
+      {/* Dark vignette */}
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%)" }} />
 
-      {/* Main headline */}
-      <div style={{ textAlign: "center", paddingLeft: 50, paddingRight: 50, position: "relative", zIndex: 2 }}>
-        <div style={{ overflow: "hidden", marginBottom: 8 }}>
-          <div
-            style={{
-              transform: `translateY(${word1Y}px)`,
-              opacity: word1Opacity,
-              fontSize: 68,
-              fontWeight: 800,
-              color: "white",
-              fontFamily: "sans-serif",
-              textShadow: "0 4px 30px rgba(0,0,0,0.5)",
-            }}
-          >
-            Das perfekte
-          </div>
+      <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", padding: 60 }}>
+        {/* Big number */}
+        <div
+          style={{
+            transform: `scale(${numScale})`,
+            opacity: numOpacity,
+            fontSize: 200,
+            fontWeight: 900,
+            fontFamily: "sans-serif",
+            color: "#f97316",
+            lineHeight: 1,
+            textShadow: "0 0 60px rgba(249,115,22,0.4)",
+          }}
+        >
+          90%
         </div>
 
-        <div style={{ overflow: "hidden" }}>
+        {/* Text */}
+        <div
+          style={{
+            transform: `translateY(${textY}px)`,
+            opacity: textOpacity,
+            textAlign: "center",
+            marginTop: 20,
+          }}
+        >
           <div
             style={{
-              transform: `translateY(${word2Y}px) scale(${dateScale})`,
-              opacity: Math.min(word2Opacity, dateOpacity),
-              fontSize: 96,
-              fontWeight: 900,
+              fontSize: 48,
+              fontWeight: 700,
+              color: "white",
               fontFamily: "sans-serif",
-              lineHeight: 1.1,
+              lineHeight: 1.3,
+              textShadow: "0 4px 30px rgba(0,0,0,0.8)",
             }}
           >
-            <span
-              style={{
-                background: "linear-gradient(90deg, #14b8a6, #f97316, #14b8a6)",
-                backgroundSize: "200% 100%",
-                backgroundPosition: `${interpolate(frame, [30, 80], [100, 0], { extrapolateRight: "clamp" })}% 0`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                filter: "drop-shadow(0 0 30px rgba(20,184,166,0.4))",
-              }}
-            >
-              Date.
+            aller Dates sind
+            <br />
+            <span style={{ position: "relative", display: "inline-block" }}>
+              mittelmäßig.
+              {/* Underline */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: -4,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: lineWidth,
+                  maxWidth: "100%",
+                  height: 4,
+                  background: "#f97316",
+                  borderRadius: 2,
+                }}
+              />
             </span>
           </div>
         </div>
-      </div>
-
-      {/* Subtitle with accent line */}
-      <div
-        style={{
-          transform: `translateY(${subY}px)`,
-          opacity: subOpacity,
-          marginTop: 40,
-          textAlign: "center",
-          position: "relative",
-          zIndex: 2,
-        }}
-      >
-        <div
-          style={{
-            width: interpolate(
-              spring({ frame: frame - 58, fps, config: { damping: 20 } }),
-              [0, 1],
-              [0, 200]
-            ),
-            height: 2,
-            background: "linear-gradient(90deg, transparent, #14b8a6, #f97316, transparent)",
-            margin: "0 auto 16px",
-          }}
-        />
-        <span
-          style={{
-            fontSize: 34,
-            color: "rgba(255,255,255,0.7)",
-            fontFamily: "sans-serif",
-            fontWeight: 400,
-            letterSpacing: 2,
-          }}
-        >
-          KI-gesteuert. Unvergesslich.
-        </span>
-      </div>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };

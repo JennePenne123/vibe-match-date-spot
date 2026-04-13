@@ -1,109 +1,113 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
+import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, staticFile, Img } from "remotion";
 
-const features = [
-  { emoji: "🍽️", text: "Restaurants", color: "#14b8a6" },
-  { emoji: "🍸", text: "Bars & Lounges", color: "#f97316" },
-  { emoji: "🎭", text: "Events & Kultur", color: "#14b8a6" },
-  { emoji: "☕", text: "Cafés & mehr", color: "#f97316" },
-];
-
+// Scene 2: PAIN — "Wohin gehen wir?" frustration
 export const SceneEmotion = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Title with dramatic scale entrance
-  const titleSpring = spring({ frame, fps, config: { damping: 10, stiffness: 100 } });
-  const titleScale = interpolate(titleSpring, [0, 1], [0.4, 1]);
-  const titleOpacity = interpolate(frame, [0, 12], [0, 1], { extrapolateRight: "clamp" });
+  // Chat bubble messages appearing one by one
+  const messages = [
+    { text: "Wohin gehen wir heute?", delay: 5, align: "left" as const },
+    { text: "Mir egal, du?", delay: 18, align: "right" as const },
+    { text: "Keine Ahnung 🤷", delay: 30, align: "left" as const },
+    { text: "Pizza wie immer?", delay: 40, align: "right" as const },
+    { text: "...", delay: 50, align: "left" as const },
+  ];
+
+  // Boring image in background
+  const bgOpacity = interpolate(frame, [0, 10], [0, 0.25], { extrapolateRight: "clamp" });
+
+  // "Kommt dir bekannt vor?" text
+  const revealSpring = spring({ frame: frame - 58, fps, config: { damping: 15 } });
+  const revealOpacity = interpolate(frame, [58, 65], [0, 1], { extrapolateRight: "clamp" });
+  const revealScale = interpolate(revealSpring, [0, 1], [0.7, 1]);
 
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", padding: 50 }}>
-      {/* Title */}
-      <div
-        style={{
-          transform: `scale(${titleScale})`,
-          opacity: titleOpacity,
-          fontSize: 54,
-          fontWeight: 800,
-          color: "white",
-          textAlign: "center",
-          marginBottom: 70,
-          fontFamily: "sans-serif",
-          lineHeight: 1.2,
-          textShadow: "0 4px 30px rgba(0,0,0,0.5)",
-        }}
-      >
-        Die besten Venues
-        <br />
-        <span
+    <AbsoluteFill>
+      {/* Subtle bg */}
+      <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+        <Img
+          src={staticFile("images/boring-planning.jpg")}
           style={{
-            background: "linear-gradient(90deg, #14b8a6, #0d9488)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            opacity: bgOpacity,
+            filter: "saturate(0.2) brightness(0.3)",
+          }}
+        />
+      </div>
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(5,10,21,0.9) 0%, rgba(5,10,21,0.95) 100%)" }} />
+
+      <AbsoluteFill style={{ justifyContent: "center", padding: "0 50px" }}>
+        {/* Chat bubbles */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: -100 }}>
+          {messages.map((msg, i) => {
+            const s = spring({ frame: frame - msg.delay, fps, config: { damping: 14, stiffness: 160 } });
+            const scale = interpolate(s, [0, 1], [0.3, 1]);
+            const opacity = interpolate(frame, [msg.delay, msg.delay + 6], [0, 1], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            });
+            const isLeft = msg.align === "left";
+
+            return (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  justifyContent: isLeft ? "flex-start" : "flex-end",
+                }}
+              >
+                <div
+                  style={{
+                    transform: `scale(${scale})`,
+                    opacity,
+                    background: isLeft ? "rgba(255,255,255,0.1)" : "#14b8a620",
+                    borderRadius: isLeft ? "20px 20px 20px 6px" : "20px 20px 6px 20px",
+                    padding: "18px 28px",
+                    maxWidth: "75%",
+                    border: isLeft ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(20,184,166,0.2)",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 32,
+                      color: isLeft ? "rgba(255,255,255,0.8)" : "rgba(20,184,166,0.9)",
+                      fontFamily: "sans-serif",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {msg.text}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* "Kommt dir bekannt vor?" */}
+        <div
+          style={{
+            opacity: revealOpacity,
+            transform: `scale(${revealScale})`,
+            textAlign: "center",
+            marginTop: 80,
           }}
         >
-          deiner Stadt
-        </span>
-      </div>
-
-      {/* Feature cards - alternating left/right slide */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 20, width: "100%" }}>
-        {features.map((feat, i) => {
-          const delay = 8 + i * 10;
-          const s = spring({ frame: frame - delay, fps, config: { damping: 12, stiffness: 140 } });
-          const slideX = interpolate(s, [0, 1], [i % 2 === 0 ? -500 : 500, 0]);
-          const cardOpacity = interpolate(frame, [delay, delay + 10], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          });
-          const floatY = Math.sin((frame + i * 30) * 0.07) * 3;
-
-          return (
-            <div
-              key={feat.text}
-              style={{
-                transform: `translateX(${slideX}px) translateY(${floatY}px)`,
-                opacity: cardOpacity,
-                display: "flex",
-                alignItems: "center",
-                gap: 24,
-                background: "rgba(255,255,255,0.06)",
-                borderRadius: 24,
-                padding: "24px 32px",
-                border: `1px solid ${feat.color}33`,
-                boxShadow: `0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)`,
-              }}
-            >
-              <div
-                style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: 18,
-                  background: `${feat.color}15`,
-                  border: `1px solid ${feat.color}30`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 42,
-                  flexShrink: 0,
-                }}
-              >
-                {feat.emoji}
-              </div>
-              <span
-                style={{
-                  fontSize: 36,
-                  fontWeight: 700,
-                  color: "white",
-                  fontFamily: "sans-serif",
-                }}
-              >
-                {feat.text}
-              </span>
-            </div>
-          );
-        })}
-      </div>
+          <span
+            style={{
+              fontSize: 40,
+              fontWeight: 700,
+              color: "rgba(255,255,255,0.5)",
+              fontFamily: "sans-serif",
+              fontStyle: "italic",
+            }}
+          >
+            Kommt dir bekannt vor?
+          </span>
+        </div>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };
