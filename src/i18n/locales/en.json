@@ -1083,5 +1083,21 @@
   },
   "feedback": {
     "errorRecording": "Failed to record feedback. Please try again."
+  },
+  "partnerAuth": {
+    "title": "Partner Portal",
+    "description": "Sign in to manage your venues and vouchers",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "submit": "Sign In to Partner Portal",
+    "signingIn": "Signing in...",
+    "becomePartner": "Want to become a partner?",
+    "contactUs": "Contact us to get started",
+    "errorEmpty": "Please enter your email and password",
+    "errorNotPartner": "This account is not registered as a venue partner.",
+    "errorNotPartnerDetail": "This account is not registered as a venue partner. Please contact us to become a partner.",
+    "errorUnexpected": "An unexpected error occurred"
   }
 }
