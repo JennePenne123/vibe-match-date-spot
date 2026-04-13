@@ -10,58 +10,49 @@ import { SceneSocial } from "./scenes/SceneSocial";
 import { SceneCTA } from "./scenes/SceneCTA";
 import { PersistentBackground } from "./components/PersistentBackground";
 
-// Storytelling structure:
-// 1. HOOK: "90% aller Dates sind mittelmäßig" (2s = 60f)
-// 2. PAIN: Chat conversation showing frustration (2.5s = 75f)
-// 3. TWIST: "Stell dir vor..." + venue reveal (2.5s = 75f)
-// 4. SOLUTION: H!Outz brand + features (2s = 60f)
-// 5. CTA: Urgency + waitlist (2.5s = 75f)
-// Transitions: 4 × 15f = 60f overlap
-// Total: 60+75+75+60+75 - 60 = 285 ≈ 300 frames (10s)
+// Slower pacing — ~14 seconds
+// 1. HOOK: 90f (3s)
+// 2. PAIN: 105f (3.5s)
+// 3. TWIST: 100f (3.3s)
+// 4. SOLUTION: 85f (2.8s)
+// 5. CTA: 105f (3.5s)
+// Transitions: 4 × 18f = 72f overlap
+// Total: 90+105+100+85+105 - 72 = 413 ≈ 420 frames
 
 export const MainVideo = () => {
   return (
     <AbsoluteFill>
       <PersistentBackground />
       <TransitionSeries>
-        {/* HOOK — provocative stat */}
-        <TransitionSeries.Sequence durationInFrames={65}>
+        <TransitionSeries.Sequence durationInFrames={90}>
           <SceneHook />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
           presentation={fade()}
-          timing={springTiming({ config: { damping: 200 }, durationInFrames: 15 })}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 18 })}
         />
-
-        {/* PAIN — boring chat */}
-        <TransitionSeries.Sequence durationInFrames={78}>
+        <TransitionSeries.Sequence durationInFrames={105}>
           <SceneEmotion />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
           presentation={wipe({ direction: "from-top-left" })}
           timing={springTiming({ config: { damping: 200 }, durationInFrames: 18 })}
         />
-
-        {/* TWIST — beautiful venue reveal */}
-        <TransitionSeries.Sequence durationInFrames={78}>
+        <TransitionSeries.Sequence durationInFrames={100}>
           <SceneFeatures />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
           presentation={fade()}
-          timing={springTiming({ config: { damping: 200 }, durationInFrames: 15 })}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 18 })}
         />
-
-        {/* SOLUTION — H!Outz brand */}
-        <TransitionSeries.Sequence durationInFrames={60}>
+        <TransitionSeries.Sequence durationInFrames={85}>
           <SceneSocial />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
           presentation={slide({ direction: "from-bottom" })}
-          timing={springTiming({ config: { damping: 200 }, durationInFrames: 15 })}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 18 })}
         />
-
-        {/* CTA — urgency + signup */}
-        <TransitionSeries.Sequence durationInFrames={80}>
+        <TransitionSeries.Sequence durationInFrames={105}>
           <SceneCTA />
         </TransitionSeries.Sequence>
       </TransitionSeries>
