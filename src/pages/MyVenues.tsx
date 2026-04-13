@@ -13,6 +13,7 @@ import { Venue } from '@/types';
 
 const MyVenues = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [likedVenues, setLikedVenues] = useState<string[]>([]);

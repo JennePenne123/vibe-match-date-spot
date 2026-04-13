@@ -18,6 +18,7 @@ const VenueDetail = () => {
   const { id } = useParams();
   useVenueImplicitTracking(id);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { appState } = useApp();
   const [dbVenue, setDbVenue] = useState<any>(null);
   const [loading, setLoading] = useState(false);
