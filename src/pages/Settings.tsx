@@ -26,7 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import LanguageSelector from '@/components/LanguageSelector';
 
-const TRACKING_OPT_OUT_KEY = 'vybepulse_tracking_opt_out';
+const TRACKING_OPT_OUT_KEY = 'hioutz_tracking_opt_out';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -177,7 +177,7 @@ const Settings = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `vybepulse-data-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `hioutz-data-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
       toast({ title: t('settings.dataExported'), description: t('settings.dataExportedDesc') });
@@ -489,7 +489,7 @@ const Settings = () => {
                   onClick={() => {
                     const subject = encodeURIComponent('HiOutz Support');
                     const body = encodeURIComponent(`Hallo HiOutz-Team,\n\n[Beschreibe dein Anliegen hier]\n\n---\nUser-ID: ${user.id}\nApp-Version: 1.0\n`);
-                    window.open(`mailto:support@vybepulse.de?subject=${subject}&body=${body}`, '_blank');
+                    window.open(`mailto:support@hioutz.app?subject=${subject}&body=${body}`, '_blank');
                   }}
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />

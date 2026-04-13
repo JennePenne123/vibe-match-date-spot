@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-const STORAGE_KEY = 'vybepulse_tutorial_completed';
+const STORAGE_KEY = 'hioutz_tutorial_completed';
 
 export function hasCompletedTutorial(): boolean {
   try {

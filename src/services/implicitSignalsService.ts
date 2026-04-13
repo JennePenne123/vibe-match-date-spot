@@ -23,7 +23,7 @@ export interface ImplicitSignal {
   metadata?: Record<string, any>;
 }
 
-const TRACKING_OPT_OUT_KEY = 'vybepulse_tracking_opt_out';
+const TRACKING_OPT_OUT_KEY = 'hioutz_tracking_opt_out';
 
 /** Check if the user has opted out of implicit tracking */
 function isTrackingOptedOut(): boolean {

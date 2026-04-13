@@ -63,7 +63,7 @@ function ServiceWorkerCacheReset() {
         const cacheNames = await caches.keys();
         await Promise.all(
           cacheNames
-            .filter((cacheName) => cacheName.startsWith('vybepulse-'))
+            .filter((cacheName) => cacheName.startsWith('hioutz-'))
             .map((cacheName) => caches.delete(cacheName))
         );
       } catch (error) {

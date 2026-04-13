@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sparkles, Heart, Zap, CheckCircle, ArrowRight } from 'lucide-react';
+import { Zap, Heart, CheckCircle, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
@@ -79,7 +79,7 @@ export default function Waitlist() {
           transition={{ duration: 0.5 }}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30 mb-8"
         >
-          <Sparkles className="w-4 h-4 text-primary" />
+          <Zap className="w-4 h-4 text-primary" />
           <span className="text-sm font-medium text-primary">Bald verfügbar</span>
         </motion.div>
 
@@ -172,7 +172,7 @@ export default function Waitlist() {
           className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-20 w-full max-w-3xl"
         >
           {[
-            { icon: Sparkles, title: 'KI-Matching', desc: 'Venues die zu euch passen – automatisch.' },
+            { icon: Zap, title: 'KI-Matching', desc: 'Venues die zu euch passen – automatisch.' },
             { icon: Zap, title: 'Echtzeit-Planung', desc: 'Plant zusammen, entscheidet gemeinsam.' },
             { icon: Heart, title: 'Exklusive Deals', desc: 'Voucher & Specials nur für HiOutz-User.' },
           ].map((feature) => (
