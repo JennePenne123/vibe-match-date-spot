@@ -97,9 +97,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {isPartnerRoute && (
           <header className="sticky top-0 z-40 flex items-center justify-between h-12 px-4 border-b border-border/40 bg-card/90 backdrop-blur-xl">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-primary flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-white" />
-              </div>
+              <img src={hioutzLogo} alt="HiOutz" className="h-7 w-auto" />
               <span className="font-semibold text-sm text-foreground">Partner Portal</span>
             </div>
             <ThemeToggle />
@@ -140,12 +138,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <SidebarTrigger className="text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-lg p-2 transition-colors">
                 <Menu className="w-5 h-5" />
               </SidebarTrigger>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow-primary/30">
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-                <h1 className="font-semibold text-foreground text-lg">HiOutz</h1>
-              </div>
+              <img src={hioutzLogo} alt="HiOutz" className="h-9 w-auto" />
             </div>
             <ThemeToggle />
           </header>
