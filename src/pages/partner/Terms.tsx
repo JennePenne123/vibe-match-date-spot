@@ -4,7 +4,7 @@ import { ArrowLeft, FileText } from 'lucide-react';
 
 /**
  * Partner-AGB – Allgemeine Geschäftsbedingungen für Venue-Partner
- * Rechtsform: VybePulse UG (haftungsbeschränkt) (i. Gr.)
+ * Rechtsform: HiOutz GmbH (i. Gr.)
  * Anwendbares Recht: Deutsches Recht / EU-Recht
  */
 export default function PartnerTerms() {
@@ -27,13 +27,13 @@ export default function PartnerTerms() {
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <p className="text-muted-foreground text-xs">
-            Stand: März 2026 · VybePulse UG (haftungsbeschränkt) (i.&nbsp;Gr.)
+            Stand: März 2026 · HiOutz GmbH (i.&nbsp;Gr.)
           </p>
 
           <h2>§ 1 Geltungsbereich</h2>
           <p className="text-muted-foreground">
             (1) Diese Allgemeinen Geschäftsbedingungen (nachfolgend „Partner-AGB") regeln das Vertragsverhältnis
-            zwischen der VybePulse UG (haftungsbeschränkt) (i.&nbsp;Gr.), [Adresse] (nachfolgend „Betreiber" oder „wir")
+            zwischen der HiOutz GmbH (i.&nbsp;Gr.), [Adresse] (nachfolgend „Betreiber" oder „wir")
             und dem Venue-Partner (nachfolgend „Partner") hinsichtlich der Nutzung der Partner-Plattform
             der App „HiOutz" (nachfolgend „Plattform").
           </p>
