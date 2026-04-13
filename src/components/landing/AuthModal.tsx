@@ -358,7 +358,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background px-2 text-muted-foreground">
-                    or continue with email
+                    {t('auth.orContinueWithEmail')}
                   </span>
                 </div>
               </div>
