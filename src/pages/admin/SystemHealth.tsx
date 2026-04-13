@@ -240,7 +240,15 @@ const SystemHealth: React.FC = () => {
           )}
 
           <Card className="bg-card/80 border-border/40">
-            <CardHeader><CardTitle className="text-lg">Neueste Fehler</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg">Neueste Fehler</CardTitle>
+              {unresolvedErrors.length > 0 && (
+                <Button size="sm" variant="outline" onClick={handleResolveAll} disabled={resolving}>
+                  {resolving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCheck className="mr-2 h-4 w-4" />}
+                  Alle als gelöst markieren ({unresolvedErrors.length})
+                </Button>
+              )}
+            </CardHeader>
             <CardContent>
               {errLoading ? <Skeleton className="h-40 w-full" /> : unresolvedErrors.length > 0 ? (
                 <ScrollArea className="h-[400px]">
