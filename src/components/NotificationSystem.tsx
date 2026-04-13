@@ -28,12 +28,10 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
           event: 'UPDATE',
           schema: 'public',
           table: 'date_invitations',
+          filter: `sender_id=eq.${user.id}`,
         },
         async (payload) => {
           const { new: newInvitation, old: oldInvitation } = payload;
-          
-          // Client-side filter: only process invitations where we are the sender
-          if (newInvitation.sender_id !== user.id) return;
           
           // Only show notification when status changes
           if (newInvitation.status !== oldInvitation.status) {
@@ -82,12 +80,10 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
           event: 'INSERT',
           schema: 'public',
           table: 'date_invitations',
+          filter: `recipient_id=eq.${user.id}`,
         },
         async (payload) => {
           const { new: newInvitation } = payload;
-          
-          // Client-side filter: only process invitations where we are the recipient
-          if (newInvitation.recipient_id !== user.id) return;
           
           const { data: sender } = await supabase
             .from('profiles')
