@@ -7,7 +7,7 @@ import { Sparkles, Heart, Zap, CheckCircle, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
-import hioutzLogo from '@/assets/hioutz-logo-final.png';
+import hioutzLogo from '@/assets/hioutz-logo-final-v2.png';
 
 export default function Waitlist() {
   const [name, setName] = useState('');
