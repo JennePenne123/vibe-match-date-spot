@@ -130,7 +130,7 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
       
     } catch (error) {
       console.error('Error recording feedback:', error);
-      toast.error('Failed to record feedback. Please try again.');
+      toast.error(t('feedback.errorRecording'));
     } finally {
       setIsLoading(false);
     }
