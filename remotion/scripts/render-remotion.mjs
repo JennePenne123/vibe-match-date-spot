@@ -28,11 +28,11 @@ await renderMedia({
   composition,
   serveUrl: bundled,
   codec: "h264",
-  outputLocation: "/mnt/documents/dzeng-promo.mp4",
+  outputLocation: "/mnt/documents/HiOutz_Waitlist_Promo.mp4",
   puppeteerInstance: browser,
   muted: true,
   concurrency: 1,
 });
 
 await browser.close({ silent: false });
-console.log("Done! Output: /mnt/documents/dzeng-promo.mp4");
+console.log("Done! Output: /mnt/documents/HiOutz_Waitlist_Promo.mp4");
