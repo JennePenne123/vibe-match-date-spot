@@ -23,6 +23,7 @@ import PartnerMatchFeedback from '@/components/partner/PartnerMatchFeedback';
 import VenueOptimizationNudges from '@/components/partner/VenueOptimizationNudges';
 import { VenueManagementSheet } from '@/components/partner/VenueManagementSheet';
 import PartnerVerificationBanner from '@/components/partner/PartnerVerificationBanner';
+import TermsReacceptanceBanner from '@/components/partner/TermsReacceptanceBanner';
 import SupportContactCard from '@/components/partner/SupportContactCard';
 import RealtimeRedemptionToast from '@/components/partner/RealtimeRedemptionToast';
 import ConversionRateCard from '@/components/partner/ConversionRateCard';
@@ -124,6 +125,9 @@ export default function PartnerDashboard() {
           hasVouchers={onboarding.hasVouchers}
         />
       )}
+
+      {/* Terms Re-acceptance Banner */}
+      <TermsReacceptanceBanner />
 
       {/* Verification Banner */}
       <PartnerVerificationBanner />
