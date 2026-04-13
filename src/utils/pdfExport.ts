@@ -67,7 +67,7 @@ export const printReport = (elementId: string): void => {
   printWindow.document.write(`
     <html>
       <head>
-        <title>VybePulse - Report</title>
+        <title>HiOutz - Report</title>
         <style>
           body { margin: 0; padding: 20px; font-family: Inter, sans-serif; }
           @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }

@@ -180,7 +180,7 @@ export function PartnerAuthModal({ isOpen, onClose }: PartnerAuthModalProps) {
                 Want to become a partner?
               </p>
               <a 
-                href="mailto:partners@vybepulse.com" 
+                href="mailto:partners@hioutz.app" 
                 className="inline-flex items-center gap-1 text-sm text-orange-500 hover:text-orange-600 font-medium mt-1 transition-colors"
               >
                 <Mail className="w-4 h-4" />

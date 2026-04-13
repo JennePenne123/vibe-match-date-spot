@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Sparkles, Users, Heart, ArrowRight, Menu, X, Zap, Shield, Star } from 'lucide-react';
+import { Users, Heart, ArrowRight, Menu, X, Zap, Shield, Star } from 'lucide-react';
+import hioutzLogo from '@/assets/hioutz-logo.png';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthModal } from '@/components/landing/AuthModal';
 import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
@@ -61,8 +62,7 @@ export default function LandingDemo() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             <Link to="/" className="flex items-center space-x-2 group">
-              <img src="/icon-192.png" alt="HiOutz" className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl shadow-gentle-md animate-logo-pulse group-hover:scale-105 transition-all duration-300" />
-              <span className="text-xl lg:text-2xl font-semibold text-foreground">HiOutz</span>
+              <img src={hioutzLogo} alt="HiOutz" className="h-8 lg:h-10 w-auto group-hover:scale-105 transition-all duration-300" />
             </Link>
             <div className="hidden md:flex items-center space-x-8">
               <button onClick={() => scrollToSection(featuresRef)} className="text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium">{t('landing.features')}</button>
@@ -104,7 +104,7 @@ export default function LandingDemo() {
               transition={{ duration: 0.8, ease: 'easeOut' }}
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 backdrop-blur-sm">
-                <Sparkles className="w-4 h-4" />
+                <Zap className="w-4 h-4" />
                 {t('landing.aiBadge', 'KI-gestützte Date-Planung')}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-semibold leading-tight tracking-tight">
@@ -192,7 +192,7 @@ export default function LandingDemo() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {[
-              { icon: Sparkles, gradient: 'bg-gradient-primary', title: t('landing.feature1Title'), desc: t('landing.feature1Desc'), delay: 0 },
+              { icon: Zap, gradient: 'bg-gradient-primary', title: t('landing.feature1Title'), desc: t('landing.feature1Desc'), delay: 0 },
               { icon: Shield, gradient: 'bg-gradient-secondary', title: t('landing.feature2Title'), desc: t('landing.feature2Desc'), delay: 0.1 },
               { icon: Heart, gradient: 'from-primary to-accent', title: t('landing.feature3Title'), desc: t('landing.feature3Desc'), delay: 0.2 },
             ].map((feature, i) => (
@@ -241,7 +241,7 @@ export default function LandingDemo() {
                 <h3 className="text-3xl lg:text-4xl font-semibold text-foreground">{t('landing.step2Title')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{t('landing.step2Desc')}</p>
               </div>
-              <div className="order-1"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-secondary rounded-xl flex items-center justify-center"><Sparkles className="w-20 h-20 text-white/70" /></div></Card></div>
+              <div className="order-1"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-secondary rounded-xl flex items-center justify-center"><img src={hioutzLogo} alt="HiOutz" className="h-16 w-auto opacity-70" loading="lazy" /></div></Card></div>
             </div>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center scroll-animate opacity-0">
               <div className="order-2 lg:order-1 space-y-6">
@@ -277,8 +277,7 @@ export default function LandingDemo() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <Link to="/" className="flex items-center space-x-2 group">
-              <img src="/icon-192.png" alt="HiOutz" className="w-8 h-8 rounded-xl shadow-gentle-md animate-logo-pulse group-hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.3s' }} />
-              <span className="text-xl font-semibold text-foreground">HiOutz</span>
+              <img src={hioutzLogo} alt="HiOutz" className="h-8 w-auto group-hover:scale-105 transition-all duration-300" />
             </Link>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <Link to="/impressum" className="hover:text-foreground transition-colors">Impressum</Link>
