@@ -229,7 +229,7 @@ const VenueCard = ({
             {venue.isOpen !== undefined && (
               <span className={`flex items-center gap-1 ${venue.isOpen ? 'text-emerald-500' : 'text-destructive'}`}>
                 • <Clock className="w-3 h-3" />
-                {venue.isOpen ? 'Open' : 'Closed'}
+                {venue.isOpen ? t('venue.open') : t('venue.closed')}
               </span>
             )}
           </div>
@@ -240,7 +240,7 @@ const VenueCard = ({
             </div>
             {showMatchScore && venue.matchScore && (
               <Badge className="bg-primary text-primary-foreground text-xs">
-                {venue.matchScore}% match
+                {venue.matchScore}% {t('venue.match')}
               </Badge>
             )}
           </div>
@@ -262,7 +262,7 @@ const VenueCard = ({
           <div className="absolute top-3 left-3">
             <Badge className="bg-primary text-primary-foreground font-semibold">
               <Zap className="w-3 h-3 mr-1" />
-              {venue.matchScore}% match
+              {venue.matchScore}% {t('venue.match')}
             </Badge>
           </div>
         )}
@@ -327,7 +327,7 @@ const VenueCard = ({
           {venue.isOpen !== undefined && (
           <div className={`flex items-center gap-1 text-sm ${venue.isOpen ? 'text-emerald-500' : 'text-destructive'}`}>
               <Clock className="w-4 h-4" />
-              <span>{venue.isOpen ? 'Open now' : 'Currently closed'}</span>
+              <span>{venue.isOpen ? t('venue.openNow') : t('venue.currentlyClosed')}</span>
             </div>
           )}
         </div>
