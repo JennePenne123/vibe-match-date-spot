@@ -80,7 +80,7 @@ const VenueCard = ({
                 variant="secondary" 
                 className="bg-background/90 text-foreground backdrop-blur-sm"
               >
-                <Sparkles className="w-3 h-3 mr-1" />
+                <Zap className="w-3 h-3 mr-1" />
                 {venue.matchScore}% Match
               </Badge>
             )}
@@ -261,7 +261,7 @@ const VenueCard = ({
         {showMatchScore && venue.matchScore && (
           <div className="absolute top-3 left-3">
             <Badge className="bg-primary text-primary-foreground font-semibold">
-              <Sparkles className="w-3 h-3 mr-1" />
+              <Zap className="w-3 h-3 mr-1" />
               {venue.matchScore}% match
             </Badge>
           </div>
