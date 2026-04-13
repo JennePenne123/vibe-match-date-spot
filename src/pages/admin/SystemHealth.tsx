@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,7 +14,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   LineChart, Line, CartesianGrid, PieChart, Pie, Cell
 } from 'recharts';
-import { ShieldAlert, Clock, Activity, AlertTriangle, Zap, DollarSign, Server, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Activity, AlertTriangle, Zap, DollarSign, CheckCheck, Loader2 } from 'lucide-react';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
 
@@ -21,6 +22,9 @@ type TimeRange = '24h' | '7d' | '30d';
 
 const SystemHealth: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
+  const [resolving, setResolving] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const daysBack = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : 30;
   const startDate = startOfDay(subDays(new Date(), daysBack));
 
@@ -116,6 +120,28 @@ const SystemHealth: React.FC = () => {
   const unresolvedErrors = (errorLogs || []).filter(e => !e.resolved);
   const criticalErrors = (errorLogs || []).filter(e => e.severity === 'critical');
   const totalApiCost = apiCostTrend?.reduce((s, d) => s + d.cost, 0) || 0;
+
+  const handleResolveAll = async () => {
+    if (unresolvedErrors.length === 0) return;
+    setResolving(true);
+    try {
+      const ids = unresolvedErrors.map(e => e.id);
+      // Update in batches of 50
+      for (let i = 0; i < ids.length; i += 50) {
+        const batch = ids.slice(i, i + 50);
+        await supabase
+          .from('error_logs')
+          .update({ resolved: true, resolved_at: new Date().toISOString() })
+          .in('id', batch);
+      }
+      toast({ title: `${ids.length} Fehler als gelöst markiert` });
+      queryClient.invalidateQueries({ queryKey: ['admin-error-logs'] });
+    } catch (err) {
+      toast({ title: 'Fehler beim Markieren', variant: 'destructive' });
+    } finally {
+      setResolving(false);
+    }
+  };
 
   // Error by type for pie
   const errorByType = (() => {
@@ -214,7 +240,15 @@ const SystemHealth: React.FC = () => {
           )}
 
           <Card className="bg-card/80 border-border/40">
-            <CardHeader><CardTitle className="text-lg">Neueste Fehler</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg">Neueste Fehler</CardTitle>
+              {unresolvedErrors.length > 0 && (
+                <Button size="sm" variant="outline" onClick={handleResolveAll} disabled={resolving}>
+                  {resolving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCheck className="mr-2 h-4 w-4" />}
+                  Alle als gelöst markieren ({unresolvedErrors.length})
+                </Button>
+              )}
+            </CardHeader>
             <CardContent>
               {errLoading ? <Skeleton className="h-40 w-full" /> : unresolvedErrors.length > 0 ? (
                 <ScrollArea className="h-[400px]">
