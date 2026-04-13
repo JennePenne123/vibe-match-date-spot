@@ -58,11 +58,18 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: corsHeaders });
   }
 
-  // Filter in code: only venues with empty/null/placeholder addresses
+  // Filter in code: only venues with empty/null/placeholder/bad addresses
   const emptyAddressVenues = (venues || []).filter(v => {
     if (!v.address) return true;
     const trimmed = v.address.replace(/[\s,]+/g, '').trim();
-    return trimmed === '' || v.address === 'Address unknown';
+    if (trimmed === '' || v.address === 'Address unknown') return true;
+    // Address equals venue name (OSM import artifact)
+    if (v.name && v.address.trim().toLowerCase() === v.name.trim().toLowerCase()) return true;
+    // Address is just a postal code
+    if (/^\d{4,5}$/.test(v.address.trim())) return true;
+    // Address has no digits at all and no comma (likely just a street name without number/city)
+    if (!/\d/.test(v.address) && !v.address.includes(',')) return true;
+    return false;
   }).slice(0, 25); // Process max 25 per call to avoid timeout
   console.log(`📍 Backfill: Found ${emptyAddressVenues.length} venues to process (of ${venues?.length || 0} total)`);
 
