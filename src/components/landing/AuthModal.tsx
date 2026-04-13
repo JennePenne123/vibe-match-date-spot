@@ -62,6 +62,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Check for referral code in URL
   useEffect(() => {
