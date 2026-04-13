@@ -2,6 +2,7 @@
 import React from 'react';
 import VenueQuickReaction from '@/components/VenueQuickReaction';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, Star, MapPin, Zap, Navigation, Clock } from 'lucide-react';
@@ -34,7 +35,7 @@ const VenueCard = ({
   const navigate = useNavigate();
   const { isDesktop } = useBreakpoint();
 
-  // Use actual database fields or fallback to computed values
+  const { t } = useTranslation();
   const venueImage = venue.image_url || venue.image;
   const venueLocation = formatVenueAddress(venue);
   const venuePriceRange = venue.price_range || venue.priceRange;
