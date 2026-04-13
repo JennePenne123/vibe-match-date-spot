@@ -1083,5 +1083,21 @@
   },
   "feedback": {
     "errorRecording": "Feedback konnte nicht gespeichert werden. Bitte versuche es erneut."
+  },
+  "partnerAuth": {
+    "title": "Partner Portal",
+    "description": "Melde dich an, um deine Standorte und Gutscheine zu verwalten",
+    "email": "E-Mail",
+    "emailPlaceholder": "Deine E-Mail-Adresse",
+    "password": "Passwort",
+    "passwordPlaceholder": "Dein Passwort",
+    "submit": "Zum Partner Portal anmelden",
+    "signingIn": "Anmeldung...",
+    "becomePartner": "Partner werden?",
+    "contactUs": "Kontaktiere uns",
+    "errorEmpty": "Bitte gib deine E-Mail und dein Passwort ein",
+    "errorNotPartner": "Dieses Konto ist nicht als Venue-Partner registriert.",
+    "errorNotPartnerDetail": "Dieses Konto ist nicht als Venue-Partner registriert. Kontaktiere uns, um Partner zu werden.",
+    "errorUnexpected": "Ein unerwarteter Fehler ist aufgetreten"
   }
 }
