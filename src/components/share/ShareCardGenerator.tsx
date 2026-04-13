@@ -141,7 +141,7 @@ export default function ShareCard({ data }: ShareCardGeneratorProps) {
 
         {/* Footer */}
         <div className="pt-2 border-t border-white/20">
-          <p className="text-white/50 text-xs">Entdecke mehr auf vybepulse.app</p>
+          <p className="text-white/50 text-xs">Entdecke mehr auf hioutz.app</p>
         </div>
       </div>
     </div>
