@@ -206,7 +206,7 @@ const App = () => (
                     <Route path="/index.html" element={<Navigate to="/" replace />} />
                     <Route path="/welcome" element={<LazyPageNoLayout><Onboarding /></LazyPageNoLayout>} />
                     <Route path="/mood" element={<LazyPageNoLayout><MoodCheckIn /></LazyPageNoLayout>} />
-                    <Route path="/auth" element={<Navigate to="/?auth=required" replace />} />
+                    <Route path="/waitlist" element={<LazyPageNoLayout><Waitlist /></LazyPageNoLayout>} />
                     <Route path="/register-login" element={<Navigate to="/?auth=required" replace />} />
                     
                     {/* Protected routes with responsive layout */}
