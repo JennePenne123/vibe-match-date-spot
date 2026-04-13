@@ -22,6 +22,9 @@ type TimeRange = '24h' | '7d' | '30d';
 
 const SystemHealth: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
+  const [resolving, setResolving] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const daysBack = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : 30;
   const startDate = startOfDay(subDays(new Date(), daysBack));
 
