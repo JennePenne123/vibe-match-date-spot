@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, HeartOff, Sparkles, SkipForward, Loader2, Eye, ThumbsUp } from 'lucide-react';
+import { Heart, HeartOff, Star, SkipForward, Loader2, Eye, ThumbsUp, Zap } from 'lucide-react';
 import { 
   recordVenueFeedback, 
   getUserVenueFeedback, 
@@ -205,7 +205,7 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
           {isLoading && currentFeedback === 'super_like' ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Sparkles className={`h-4 w-4 ${currentFeedback === 'super_like' ? 'fill-current' : ''}`} />
+            <Star className={`h-4 w-4 ${currentFeedback === 'super_like' ? 'fill-current' : ''}`} />
           )}
         </Button>
         
@@ -243,7 +243,7 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
           {isLoading && currentFeedback === 'super_like' ? (
             <Loader2 className="h-4 w-4 mr-1 animate-spin" />
           ) : (
-            <Sparkles className={`h-4 w-4 mr-1 ${currentFeedback === 'super_like' ? 'fill-current' : ''}`} />
+            <Star className={`h-4 w-4 mr-1 ${currentFeedback === 'super_like' ? 'fill-current' : ''}`} />
           )}
           Super Like
         </Button>
@@ -336,8 +336,8 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
       {showStats && popularityStats.totalFeedback > 0 && (
         <div className="flex items-center gap-2 flex-wrap">
           {popularityStats.superLikes > 0 && (
-            <Badge variant="secondary" className="text-xs bg-purple-100 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300">
-              <Sparkles className="h-3 w-3 mr-1 fill-current" />
+            <Badge variant="secondary" className="text-xs bg-accent/20 dark:bg-accent/20 text-accent-foreground">
+              <Star className="h-3 w-3 mr-1 fill-current" />
               {popularityStats.superLikes} super like{popularityStats.superLikes !== 1 ? 's' : ''}
             </Badge>
           )}
@@ -357,8 +357,8 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
           )}
           
           {popularityStats.popularityScore > 0.7 && (
-            <Badge variant="secondary" className="text-xs bg-yellow-100 dark:bg-yellow-950/30 text-yellow-700 dark:text-yellow-300">
-              <Sparkles className="h-3 w-3 mr-1" />
+            <Badge variant="secondary" className="text-xs bg-primary/20 dark:bg-primary/20 text-primary">
+              <Star className="h-3 w-3 mr-1" />
               Popular Choice
             </Badge>
           )}
@@ -382,8 +382,8 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
 
       {/* AI Learning Note */}
       {currentFeedback && ['like', 'super_like', 'dislike', 'not_interested'].includes(currentFeedback) && (
-        <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 px-2 py-1 rounded flex items-center gap-1">
-          <Sparkles className="h-3 w-3" />
+        <div className="text-xs text-primary bg-primary/10 dark:bg-primary/10 px-2 py-1 rounded flex items-center gap-1">
+          <Zap className="h-3 w-3" />
           <span>Your feedback helps improve AI recommendations</span>
         </div>
       )}
