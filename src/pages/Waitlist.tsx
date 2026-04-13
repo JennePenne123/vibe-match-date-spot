@@ -65,10 +65,7 @@ export default function Waitlist() {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <Heart className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="text-xl font-bold text-foreground">HiOutz</span>
+          <img src={hioutzLogo} alt="HiOutz" className="h-10" />
         </Link>
         <ThemeToggle />
       </header>
