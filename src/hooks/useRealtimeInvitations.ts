@@ -24,7 +24,7 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
     // Create a unique channel name to prevent conflicts
     const channelName = `${user.id}:date-invitations-${Date.now()}`;
     
-// Create a channel for real-time updates
+    // Create a channel for real-time updates with server-side filters
     const channel = supabase
       .channel(channelName)
       .on(
@@ -33,12 +33,11 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
           event: 'INSERT',
           schema: 'public',
           table: 'date_invitations',
+          filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          if (payload.new && (payload.new as any).recipient_id === user.id) {
-            console.log('New invitation received:', payload);
-            onInvitationReceived();
-          }
+          console.log('New invitation received:', payload);
+          onInvitationReceived();
         }
       )
       .on(
@@ -47,12 +46,11 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
           event: 'UPDATE',
           schema: 'public',
           table: 'date_invitations',
+          filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          if (payload.new && (payload.new as any).recipient_id === user.id) {
-            console.log('Invitation updated:', payload);
-            onInvitationUpdated();
-          }
+          console.log('Invitation updated:', payload);
+          onInvitationUpdated();
         }
       )
       .on(
@@ -61,12 +59,11 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
           event: 'INSERT',
           schema: 'public',
           table: 'date_proposals',
+          filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          if (payload.new && (payload.new as any).recipient_id === user.id) {
-            console.log('New date proposal received:', payload);
-            onInvitationReceived();
-          }
+          console.log('New date proposal received:', payload);
+          onInvitationReceived();
         }
       )
       .on(
@@ -75,12 +72,11 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
           event: 'UPDATE',
           schema: 'public',
           table: 'date_proposals',
+          filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          if (payload.new && (payload.new as any).recipient_id === user.id) {
-            console.log('Date proposal updated:', payload);
-            onInvitationUpdated();
-          }
+          console.log('Date proposal updated:', payload);
+          onInvitationUpdated();
         }
       )
       .subscribe();
