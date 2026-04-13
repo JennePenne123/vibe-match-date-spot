@@ -33,11 +33,12 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
           event: 'INSERT',
           schema: 'public',
           table: 'date_invitations',
-          filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log('New invitation received:', payload);
-          onInvitationReceived();
+          if (payload.new && (payload.new as any).recipient_id === user.id) {
+            console.log('New invitation received:', payload);
+            onInvitationReceived();
+          }
         }
       )
       .on(
@@ -46,11 +47,12 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
           event: 'UPDATE',
           schema: 'public',
           table: 'date_invitations',
-          filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log('Invitation updated:', payload);
-          onInvitationUpdated();
+          if (payload.new && (payload.new as any).recipient_id === user.id) {
+            console.log('Invitation updated:', payload);
+            onInvitationUpdated();
+          }
         }
       )
       .on(
@@ -59,11 +61,12 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
           event: 'INSERT',
           schema: 'public',
           table: 'date_proposals',
-          filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log('New date proposal received:', payload);
-          onInvitationReceived();
+          if (payload.new && (payload.new as any).recipient_id === user.id) {
+            console.log('New date proposal received:', payload);
+            onInvitationReceived();
+          }
         }
       )
       .on(
@@ -72,11 +75,12 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
           event: 'UPDATE',
           schema: 'public',
           table: 'date_proposals',
-          filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log('Date proposal updated:', payload);
-          onInvitationUpdated();
+          if (payload.new && (payload.new as any).recipient_id === user.id) {
+            console.log('Date proposal updated:', payload);
+            onInvitationUpdated();
+          }
         }
       )
       .subscribe();
