@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Sparkles } from 'lucide-react';
+import { Heart, Star } from 'lucide-react';
 
 interface SmartDatePlannerAuthProps {
   onSignIn: () => void;
@@ -31,7 +31,7 @@ const SmartDatePlannerAuth: React.FC<SmartDatePlannerAuthProps> = ({ onSignIn })
                 <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
                   <Heart className="w-8 h-8 text-primary-foreground" />
                 </div>
-                <Sparkles className="w-6 h-6 text-primary absolute -top-1 -right-1 animate-pulse" />
+                <Star className="w-6 h-6 text-accent absolute -top-1 -right-1 animate-pulse" />
               </div>
             </div>
             
@@ -59,7 +59,7 @@ const SmartDatePlannerAuth: React.FC<SmartDatePlannerAuthProps> = ({ onSignIn })
             {/* Decorative element */}
             <div className="mt-6 flex items-center justify-center space-x-2 text-muted-foreground/60">
               <div className="w-8 h-px bg-gradient-primary opacity-30" />
-              <Sparkles className="w-4 h-4" />
+              <Star className="w-4 h-4 text-accent" />
               <div className="w-8 h-px bg-gradient-primary opacity-30" />
             </div>
           </div>
