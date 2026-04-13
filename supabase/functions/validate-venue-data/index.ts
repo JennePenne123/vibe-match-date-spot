@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
 const NOMINATIM_BASE = "https://nominatim.openstreetmap.org";
-const USER_AGENT = "Mavenu/1.0 (venue-validation)";
+const USER_AGENT = "HiOutz/1.0 (venue-validation)";
 const BATCH_SIZE = 10; // Process 10 venues at a time to respect rate limits
 const DELAY_MS = 1100; // Nominatim requires max 1 req/sec
 

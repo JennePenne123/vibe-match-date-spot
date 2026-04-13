@@ -21,12 +21,12 @@ export default function AGB() {
         </div>
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
-          <p className="text-muted-foreground text-xs">Stand: März 2026 · VybePulse GmbH (i.&nbsp;Gr.)</p>
+          <p className="text-muted-foreground text-xs">Stand: März 2026 · HiOutz GmbH (i.&nbsp;Gr.)</p>
 
           <h2>§ 1 Geltungsbereich</h2>
           <p className="text-muted-foreground">
             (1) Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der mobilen Anwendung „HiOutz"
-            (nachfolgend „App"), betrieben von VybePulse GmbH (i.&nbsp;Gr.), [Adresse] (nachfolgend „Anbieter").
+            (nachfolgend „App"), betrieben von HiOutz GmbH (i.&nbsp;Gr.), [Adresse] (nachfolgend „Anbieter").
           </p>
           <p className="text-muted-foreground">
             (2) Abweichende Bedingungen des Nutzers werden nicht anerkannt, es sei denn, der Anbieter stimmt
@@ -157,8 +157,8 @@ export default function AGB() {
             diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses.
           </p>
           <p className="text-muted-foreground">
-            Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (VybePulse GmbH (i.&nbsp;Gr.), [Adresse],
-            E-Mail: support@dzeng.app) mittels einer eindeutigen Erklärung (z.&nbsp;B. per E-Mail) über Ihren
+             Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (HiOutz GmbH (i.&nbsp;Gr.), [Adresse],
+             E-Mail: support@hioutz.app) mittels einer eindeutigen Erklärung (z.&nbsp;B. per E-Mail) über Ihren
             Entschluss, diesen Vertrag zu widerrufen, informieren.
           </p>
           <p className="text-muted-foreground">
@@ -174,7 +174,7 @@ export default function AGB() {
 
           <h2>§ 10 Kündigung</h2>
           <p className="text-muted-foreground">
-            (1) Der Nutzer kann sein Konto jederzeit über die Einstellungen oder per E-Mail an support@dzeng.app
+            (1) Der Nutzer kann sein Konto jederzeit über die Einstellungen oder per E-Mail an support@hioutz.app
             kündigen.
           </p>
           <p className="text-muted-foreground">

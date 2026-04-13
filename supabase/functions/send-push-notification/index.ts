@@ -83,7 +83,7 @@ async function sendWebPush(
   const url = new URL(subscription.endpoint);
   const audience = `${url.protocol}//${url.host}`;
 
-  const jwt = await generateJWT(vapidPrivateKey, audience, 'mailto:push@vybepulse.com');
+  const jwt = await generateJWT(vapidPrivateKey, audience, 'mailto:push@hioutz.app');
 
   const response = await fetch(subscription.endpoint, {
     method: 'POST',

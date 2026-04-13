@@ -16,4 +16,4 @@ Disallow: /admin
 Disallow: /debug
 Disallow: /demo/
 
-Sitemap: https://vybepulse.app/sitemap.xml
+Sitemap: https://hioutz.app/sitemap.xml

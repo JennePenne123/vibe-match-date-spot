@@ -27,7 +27,7 @@
     <meta property="og:title" content="HiOutz – KI-gestützte Date-Planung" />
     <meta property="og:description" content="Personalisierte Venue-Empfehlungen für euer perfektes Date – powered by AI." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://vybepulse.app/" />
+    <meta property="og:url" content="https://hioutz.app/" />
     <meta property="og:image" content="/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -77,11 +77,11 @@
       // Pre-React service worker cleanup – runs even if React never mounts
       (function(){
         if(!('serviceWorker' in navigator) || !('caches' in window)) return;
-        var RESET_KEY = 'vybe-html-sw-reset-v1';
-        if(sessionStorage.getItem(RESET_KEY) === 'done') return;
-        sessionStorage.setItem(RESET_KEY, 'done');
-        caches.keys().then(function(names){
-          names.filter(function(n){return n.startsWith('vybepulse-');}).forEach(function(n){caches.delete(n);});
+         var RESET_KEY = 'hioutz-html-sw-reset-v1';
+         if(sessionStorage.getItem(RESET_KEY) === 'done') return;
+         sessionStorage.setItem(RESET_KEY, 'done');
+         caches.keys().then(function(names){
+           names.filter(function(n){return n.startsWith('hioutz-');}).forEach(function(n){caches.delete(n);});
         });
         navigator.serviceWorker.getRegistrations().then(function(regs){
           regs.forEach(function(r){

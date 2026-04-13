@@ -28,7 +28,7 @@ i18n
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
-      lookupLocalStorage: 'vybe-language',
+      lookupLocalStorage: 'hioutz-language',
     },
   });
 

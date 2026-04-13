@@ -22,10 +22,10 @@ export default function SupportContactCard() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium">{t('partner.support.email', 'E-Mail Support')}</p>
-            <p className="text-xs text-muted-foreground">partner@vybepulse.com</p>
+            <p className="text-xs text-muted-foreground">partner@hioutz.app</p>
           </div>
           <Button variant="ghost" size="sm" asChild>
-            <a href="mailto:partner@vybepulse.com">
+            <a href="mailto:partner@hioutz.app">
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </Button>

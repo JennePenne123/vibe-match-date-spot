@@ -16,8 +16,8 @@ interface CacheStats {
   size: number;
 }
 
-const CACHE_KEY_PREFIX = 'vybepulse_venue_cache_';
-const CACHE_STATS_KEY = 'vybepulse_cache_stats';
+const CACHE_KEY_PREFIX = 'hioutz_venue_cache_';
+const CACHE_STATS_KEY = 'hioutz_cache_stats';
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 const MAX_CACHE_ENTRIES = 50;
 

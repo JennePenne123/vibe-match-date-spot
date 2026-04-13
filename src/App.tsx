@@ -43,7 +43,7 @@ function ServiceWorkerCacheReset() {
       return;
     }
 
-    const RESET_KEY = 'vybe-sw-reset-v3';
+    const RESET_KEY = 'hioutz-sw-reset-v3';
 
     const resetCaches = async () => {
       if (sessionStorage.getItem(RESET_KEY) === 'done') return;
@@ -184,7 +184,7 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <ErrorBoundary level="app">
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="vybe-theme">
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="hioutz-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
         <Toaster />
