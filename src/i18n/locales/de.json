@@ -697,7 +697,7 @@
       "validUntil": "Gültig bis",
       "redeemed": "Eingelöst",
       "discountSettings": "Rabatt, den du gewährst",
-      "discountSettingsDesc": "Bestimme, wie viel Prozent Rabatt du anderen Venue-Partnern gibst, wenn diese deinen QR-Code bei dir vor Ort scannen.",
+      "discountSettingsDesc": "Bestimme, wie viel Prozent Rabatt du anderen Venue-Partnern gibst, wenn diese ihren QR-Code bei dir vor Ort scannen.",
       "discountLabel": "Dein gewährter Rabatt",
       "discountSaved": "Dein gewährter Rabatt wurde aktualisiert.",
       "alreadyScannedToday": "Diesen Partner hast du heute bereits gescannt. Morgen kannst du erneut scannen."
