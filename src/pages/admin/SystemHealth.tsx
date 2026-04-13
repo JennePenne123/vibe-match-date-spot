@@ -14,7 +14,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   LineChart, Line, CartesianGrid, PieChart, Pie, Cell
 } from 'recharts';
-import { ShieldAlert, Clock, Activity, AlertTriangle, Zap, DollarSign, Server, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Activity, AlertTriangle, Zap, DollarSign, CheckCheck, Loader2 } from 'lucide-react';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
 
