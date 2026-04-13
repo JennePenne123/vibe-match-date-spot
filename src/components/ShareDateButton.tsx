@@ -78,7 +78,7 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
         const blob = await generateImage();
         setGenerating(false);
 
-        if (blob && navigator.canShare?.({ files: [new File([blob], 'vybepulse-share.png', { type: 'image/png' })] })) {
+        if (blob && navigator.canShare?.({ files: [new File([blob], 'hioutz-share.png', { type: 'image/png' })] })) {
           const file = new File([blob], 'vybepulse-share.png', { type: 'image/png' });
           await navigator.share({ title, text: shareText, url: shareUrl, files: [file] });
           return;

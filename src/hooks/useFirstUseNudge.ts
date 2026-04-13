@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const STORAGE_KEY = 'vybepulse_seen_nudges';
+const STORAGE_KEY = 'hioutz_seen_nudges';
 
 function getSeenNudges(): string[] {
   try {

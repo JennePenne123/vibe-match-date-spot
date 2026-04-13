@@ -136,7 +136,7 @@ serve(async (req) => {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'VybePulse-App/1.0'
+        'User-Agent': 'HiOutz-App/1.0'
       }
     });
     
