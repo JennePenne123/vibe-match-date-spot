@@ -696,10 +696,10 @@
       "noExclusiveDesc": "Scan partner codes or let your code be scanned to share exclusive perks.",
       "validUntil": "Valid until",
       "redeemed": "Redeemed",
-      "discountSettings": "Network Discount",
-      "discountSettingsDesc": "Set the discount percentage other partners receive when they scan your QR code.",
-      "discountLabel": "Discount",
-      "discountSaved": "Network discount updated successfully.",
+      "discountSettings": "Discount you offer",
+      "discountSettingsDesc": "Set the discount percentage you grant other venue partners when they scan your QR code at your venue.",
+      "discountLabel": "Your offered discount",
+      "discountSaved": "Your offered discount has been updated.",
       "alreadyScannedToday": "You already scanned this partner today. Try again tomorrow."
     },
     "reports": {
