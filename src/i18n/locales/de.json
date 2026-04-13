@@ -683,7 +683,7 @@
       "atVenue": "Rabatt bei",
       "exclusiveDesc": "Exklusiver Partner-Rabatt bei {{venue}}",
       "exclusiveBadge": "Nur für Partner",
-      "shareHint": "Lass andere Partner deinen Code scannen, um ihnen einen exklusiven Rabatt bei deinem Venue anzubieten.",
+      "shareHint": "Zeige diesen Code anderen Venue-Partnern. Wenn sie ihn bei dir vor Ort scannen, erhalten sie deinen festgelegten Rabatt.",
       "invalidQR": "Ungültiger QR-Code",
       "notPartnerCode": "Dies ist kein Partner-Code",
       "ownCode": "Du kannst deinen eigenen Code nicht scannen",
