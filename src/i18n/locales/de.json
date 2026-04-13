@@ -696,10 +696,10 @@
       "noExclusiveDesc": "Scanne Partner-Codes oder lass deinen Code scannen, um exklusive Vorteile zu teilen.",
       "validUntil": "Gültig bis",
       "redeemed": "Eingelöst",
-      "discountSettings": "Netzwerk-Rabatt",
-      "discountSettingsDesc": "Lege fest, wie viel Prozent Rabatt andere Partner erhalten, wenn sie deinen QR-Code scannen.",
-      "discountLabel": "Rabatt",
-      "discountSaved": "Netzwerk-Rabatt erfolgreich aktualisiert.",
+      "discountSettings": "Rabatt, den du gewährst",
+      "discountSettingsDesc": "Bestimme, wie viel Prozent Rabatt du anderen Venue-Partnern gibst, wenn diese deinen QR-Code bei dir vor Ort scannen.",
+      "discountLabel": "Dein gewährter Rabatt",
+      "discountSaved": "Dein gewährter Rabatt wurde aktualisiert.",
       "alreadyScannedToday": "Diesen Partner hast du heute bereits gescannt. Morgen kannst du erneut scannen."
     },
     "reports": {
