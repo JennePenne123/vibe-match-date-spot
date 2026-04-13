@@ -3,69 +3,56 @@ import { AbsoluteFill, useCurrentFrame, interpolate } from "remotion";
 export const PersistentBackground = () => {
   const frame = useCurrentFrame();
 
-  const hueShift = interpolate(frame, [0, 600], [0, 40]);
-  const orb1X = interpolate(frame, [0, 300, 600], [20, 70, 30]);
-  const orb1Y = interpolate(frame, [0, 200, 400, 600], [20, 60, 30, 50]);
-  const orb2X = interpolate(frame, [0, 250, 500, 600], [70, 30, 60, 40]);
-  const orb2Y = interpolate(frame, [0, 300, 600], [70, 25, 65]);
-  const orb3X = interpolate(frame, [0, 350, 600], [50, 20, 80]);
-  const orb3Y = interpolate(frame, [0, 200, 450, 600], [50, 80, 20, 60]);
+  const gradientAngle = interpolate(frame, [0, 300], [135, 195]);
+  const pulseOpacity = interpolate(
+    Math.sin(frame * 0.03),
+    [-1, 1],
+    [0.08, 0.18]
+  );
 
   return (
-    <AbsoluteFill
-      style={{
-        background: `hsl(${222 + hueShift * 0.3}, 47%, 8%)`,
-      }}
-    >
-      {/* Orb 1 - Primary indigo */}
+    <AbsoluteFill>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          background: `linear-gradient(${gradientAngle}deg, #0f172a 0%, #1a1a2e 40%, #16213e 70%, #0f172a 100%)`,
+        }}
+      />
       <div
         style={{
           position: "absolute",
-          left: `${orb1X}%`,
-          top: `${orb1Y}%`,
-          width: 500,
-          height: 500,
+          top: "-15%",
+          left: "-10%",
+          width: 700,
+          height: 700,
           borderRadius: "50%",
-          background: "radial-gradient(circle, hsla(239, 84%, 67%, 0.35) 0%, transparent 70%)",
-          transform: "translate(-50%, -50%)",
-          filter: "blur(80px)",
+          background: "radial-gradient(circle, rgba(20,184,166,0.25) 0%, transparent 70%)",
+          opacity: pulseOpacity + 0.05,
+          transform: `translate(${Math.sin(frame * 0.015) * 30}px, ${Math.cos(frame * 0.012) * 20}px)`,
         }}
       />
-      {/* Orb 2 - Violet */}
       <div
         style={{
           position: "absolute",
-          left: `${orb2X}%`,
-          top: `${orb2Y}%`,
-          width: 450,
-          height: 450,
+          bottom: "-10%",
+          right: "-15%",
+          width: 600,
+          height: 600,
           borderRadius: "50%",
-          background: "radial-gradient(circle, hsla(263, 70%, 66%, 0.3) 0%, transparent 70%)",
-          transform: "translate(-50%, -50%)",
-          filter: "blur(70px)",
+          background: "radial-gradient(circle, rgba(249,115,22,0.2) 0%, transparent 70%)",
+          opacity: pulseOpacity,
+          transform: `translate(${Math.cos(frame * 0.02) * 25}px, ${Math.sin(frame * 0.018) * 30}px)`,
         }}
       />
-      {/* Orb 3 - Pink accent */}
-      <div
-        style={{
-          position: "absolute",
-          left: `${orb3X}%`,
-          top: `${orb3Y}%`,
-          width: 400,
-          height: 400,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, hsla(330, 81%, 60%, 0.25) 0%, transparent 70%)",
-          transform: "translate(-50%, -50%)",
-          filter: "blur(60px)",
-        }}
-      />
-      {/* Subtle grain overlay */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\"><filter id=\"n\"><feTurbulence baseFrequency=\"0.9\" numOctaves=\"4\" stitchTiles=\"stitch\"/></filter><rect width=\"200\" height=\"200\" filter=\"url(%23n)\" opacity=\"0.03\"/></svg>')",
-          opacity: 0.4,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+          opacity: 0.5,
         }}
       />
     </AbsoluteFill>
