@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { Venue } from '@/types';
 
 const MyVenues = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [likedVenues, setLikedVenues] = useState<string[]>([]);
@@ -100,12 +102,12 @@ const MyVenues = () => {
                   <Heart className="w-16 h-16 mx-auto" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">
-                  {likedVenues.length === 0 ? 'No Favorite Venues Yet' : 'No Matching Venues'}
+                  {likedVenues.length === 0 ? t('myVenues.noFavorites') : t('myVenues.noMatching')}
                 </h3>
                 <p className="text-muted-foreground mb-4">
                   {likedVenues.length === 0 
-                    ? 'Start exploring and add venues to your favorites!' 
-                    : 'Try adjusting your search terms to find more venues.'
+                    ? t('myVenues.noFavoritesDesc')
+                    : t('myVenues.noMatchingDesc')
                   }
                 </p>
                 <div className="space-y-2">

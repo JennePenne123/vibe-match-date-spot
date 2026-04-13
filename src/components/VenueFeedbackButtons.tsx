@@ -2,6 +2,7 @@
 // Complete optimized venue feedback buttons with AI learning
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Heart, HeartOff, Star, SkipForward, Loader2, Eye, ThumbsUp, Zap } from 'lucide-react';
@@ -36,6 +37,7 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
   className = ''
 }) => {
   const [currentFeedback, setCurrentFeedback] = useState<FeedbackType | null>(null);
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [popularityStats, setPopularityStats] = useState<VenuePopularityStats>({
     likes: 0,
@@ -130,7 +132,7 @@ const VenueFeedbackButtons: React.FC<VenueFeedbackButtonsProps> = ({
       
     } catch (error) {
       console.error('Error recording feedback:', error);
-      toast.error('Failed to record feedback. Please try again.');
+      toast.error(t('feedback.errorRecording'));
     } finally {
       setIsLoading(false);
     }

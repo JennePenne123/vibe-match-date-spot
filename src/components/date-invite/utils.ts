@@ -1,6 +1,9 @@
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { DateInvitation } from '@/types/index';
 import { StatusConfig, DisplayData } from './types';
+import i18next from 'i18next';
+
+const t = (key: string, fallback?: string) => i18next.t(key, fallback);
 
 export const getStatusConfig = (status: string): StatusConfig => {
   switch (status) {
@@ -11,7 +14,7 @@ export const getStatusConfig = (status: string): StatusConfig => {
         bgGradient: '[background:var(--gradient-accepted)]',
         textColor: 'text-foreground',
         borderColor: 'border-emerald-200 dark:border-emerald-800',
-        label: 'Accepted'
+        label: t('dateInvite.accepted', 'Angenommen')
       };
     case 'declined':
       return {
@@ -20,7 +23,7 @@ export const getStatusConfig = (status: string): StatusConfig => {
         bgGradient: 'bg-red-50 dark:bg-red-950',
         textColor: 'text-red-700 dark:text-red-300',
         borderColor: 'border-red-200 dark:border-red-800',
-        label: 'Declined'
+        label: t('dateInvite.declined', 'Abgelehnt')
       };
     case 'cancelled':
       return {
@@ -29,7 +32,7 @@ export const getStatusConfig = (status: string): StatusConfig => {
         bgGradient: 'bg-red-50 dark:bg-red-950',
         textColor: 'text-red-700 dark:text-red-300',
         borderColor: 'border-red-200 dark:border-red-800',
-        label: 'Cancelled'
+        label: t('dateInvite.cancelled', 'Abgesagt')
       };
     default:
       return {
@@ -38,13 +41,14 @@ export const getStatusConfig = (status: string): StatusConfig => {
         bgGradient: '[background:var(--gradient-pending)]',
         textColor: 'text-foreground',
         borderColor: 'border-orange-200 dark:border-orange-800',
-        label: 'Pending'
+        label: t('dateInvite.pending', 'Ausstehend')
       };
   }
 };
 
 export const extractVenueFromMessage = (message: string, fallback: string): string => {
-  if (fallback === 'Selected Venue' || fallback === 'Venue TBD') {
+  const venueTbd = t('dateInvite.venueTbd', 'Venue TBD');
+  if (fallback === 'Selected Venue' || fallback === venueTbd) {
     const venueMatch = message.match(/take you to ([^\.]+?) based on/i);
     if (venueMatch) {
       return venueMatch[1].trim();
@@ -65,9 +69,9 @@ export const getVenueImage = (invitation: DateInvitation): string => {
 
 export const getRelationLabel = (status: string, dateStatus: string | null, direction: 'received' | 'sent'): string => {
   if (status === 'accepted' || dateStatus === 'scheduled') {
-    return 'With';
+    return t('dateInvite.with', 'Mit');
   }
-  return direction === 'received' ? 'From' : 'To';
+  return direction === 'received' ? t('dateInvite.from', 'Von') : t('dateInvite.to', 'An');
 };
 
 export const transformToDisplayData = (
@@ -75,10 +79,16 @@ export const transformToDisplayData = (
   direction: 'received' | 'sent'
 ): DisplayData => {
   const message = invitation.message || '';
-  const venueName = invitation.venue?.name || 'Venue TBD';
+  const venueTbd = t('dateInvite.venueTbd', 'Venue TBD');
+  const addressTbd = t('dateInvite.addressTbd', 'Adresse TBD');
+  const timeTbd = t('dateInvite.timeTbd', 'Zeit TBD');
+  const dateInvitation = t('dateInvite.dateInvitation', 'Date-Einladung');
+  const duration = t('dateInvite.duration', '2–3 Stunden');
+
+  const venueName = invitation.venue?.name || venueTbd;
   const venueAddress = invitation.venue?.address === 'Venue details will be available soon' 
-    ? 'Address TBD' 
-    : invitation.venue?.address || 'Address TBD';
+    ? addressTbd 
+    : invitation.venue?.address || addressTbd;
   
   const extractedVenueName = extractVenueFromMessage(message, venueName);
   const venueImage = getVenueImage(invitation);
@@ -89,16 +99,16 @@ export const transformToDisplayData = (
       friendName: invitation.sender?.name || 'Unknown',
       friendAvatar: invitation.sender?.avatar_url,
       relationLabel,
-      dateType: invitation.title || 'Date Invitation',
-      timeProposed: invitation.proposed_date || 'Time TBD',
+      dateType: invitation.title || dateInvitation,
+      timeProposed: invitation.proposed_date || timeTbd,
       location: extractedVenueName,
       address: venueAddress,
       venueImage,
       message,
       venueName: extractedVenueName,
       venueAddress,
-      time: invitation.proposed_date || 'Time TBD',
-      duration: '2-3 hours',
+      time: invitation.proposed_date || timeTbd,
+      duration,
       estimatedCost: '$$',
       specialNotes: ''
     };
@@ -108,16 +118,16 @@ export const transformToDisplayData = (
     friendName: invitation.recipient?.name || 'Recipient',
     friendAvatar: invitation.recipient?.avatar_url,
     relationLabel,
-    dateType: invitation.title || 'Date Invitation',
-    timeProposed: invitation.proposed_date || 'Time TBD',
+    dateType: invitation.title || dateInvitation,
+    timeProposed: invitation.proposed_date || timeTbd,
     location: extractedVenueName,
     address: venueAddress,
     venueImage,
     message,
     venueName: extractedVenueName,
     venueAddress,
-    time: invitation.proposed_date || 'Time TBD',
-    duration: '2-3 hours',
+    time: invitation.proposed_date || timeTbd,
+    duration,
     estimatedCost: '$$',
     specialNotes: ''
   };

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Star, MapPin, Clock, Phone, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { venueToAppVenue } from '@/utils/typeHelpers';
 import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,6 +18,7 @@ const VenueDetail = () => {
   const { id } = useParams();
   useVenueImplicitTracking(id);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { appState } = useApp();
   const [dbVenue, setDbVenue] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -292,7 +294,7 @@ const VenueDetail = () => {
                       <div key={index} className="text-sm">{hours}</div>
                     ))}
                     {appVenue.openingHours.length > 3 && (
-                      <div className="text-sm text-muted-foreground">+ {appVenue.openingHours.length - 3} more</div>
+                      <div className="text-sm text-muted-foreground">+ {appVenue.openingHours.length - 3} {t('venue.moreHours', { count: appVenue.openingHours.length - 3 })}</div>
                     )}
                   </div>
                 </div>
@@ -308,7 +310,7 @@ const VenueDetail = () => {
                 className="h-12"
                 onClick={handleDirections}
               >
-                Get Directions
+                {t('venue.getDirections')}
               </Button>
               <Button 
                 variant="outline" 
@@ -316,7 +318,7 @@ const VenueDetail = () => {
                 onClick={appVenue.website ? visitWebsite : (appVenue.phone ? callVenue : undefined)}
                 disabled={!appVenue.website && !appVenue.phone}
               >
-                {appVenue.website ? 'Visit Website' : (appVenue.phone ? 'Call Now' : 'No Website')}
+                {appVenue.website ? t('venue.visitWebsite') : (appVenue.phone ? t('venue.callNow') : t('venue.noWebsite'))}
               </Button>
             </div>
           </div>
