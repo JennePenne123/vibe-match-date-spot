@@ -27,7 +27,7 @@ const TutorialSlides: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
     {
       icon: <Sparkles className="w-10 h-10" />,
       gradient: 'from-primary via-secondary to-accent',
-      title: t('tutorial.slide1Title', 'Willkommen bei VybePulse'),
+      title: t('tutorial.slide1Title', 'Willkommen bei HiOutz'),
       subtitle: t('tutorial.slide1Subtitle', 'Dein KI-Date-Planer'),
       description: t('tutorial.slide1Desc', 'Entdecke perfekte Date-Spots, die zu euch passen — powered by KI, die mit jedem Date dazulernt.'),
       emoji: '✨',

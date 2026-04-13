@@ -1,16 +1,15 @@
-# VybePulse Design System
+# HiOutz Design System
 
-A comprehensive design system for the VybePulse dating app, built with React, TypeScript, Tailwind CSS, and modern design principles.
+A comprehensive design system for the HiOutz dating app, built with React, TypeScript, Tailwind CSS, and modern design principles.
 
 ## 🎨 Features
 
 - **Comprehensive Design Tokens**: Colors, spacing, typography, effects, and animations
 - **Enhanced Components**: Extended shadcn/ui components with additional variants
 - **Typography System**: Inter + Playfair Display with semantic sizing
-- **Brand Integration**: VybePulse pink theme with semantic color meanings
+- **Brand Integration**: HiOutz teal-to-orange theme with semantic color meanings
 - **Dark Mode Support**: Fully compatible dark mode implementation
 - **Figma Integration**: Design token sync and component library export
-- **Builder.io Support**: Visual editing and page building capabilities
 
 ## 📁 Structure
 
@@ -35,7 +34,7 @@ src/design-system/
 
 ### Installation
 
-The design system is already integrated into your VybePulse app. The fonts are loaded from Google Fonts and the tokens are configured in your Tailwind config.
+The design system is already integrated into your HiOutz app. The fonts are loaded from Google Fonts and the tokens are configured in your Tailwind config.
 
 ### Basic Usage
 
@@ -46,7 +45,7 @@ function MyComponent() {
   return (
     <div className="space-y-6">
       <Display size="xl" color="primary">
-        Welcome to VybePulse
+        Welcome to HiOutz
       </Display>
       
       <Heading size="h2">
@@ -134,8 +133,8 @@ For labels and small text:
 ## 🎨 Color System
 
 ### Brand Colors
-- `primary-*` - VybePulse pink (330° hue)
-- `secondary-*` - Complementary red-pink
+- `primary-*` - HiOutz teal-to-orange (180°-30° hue)
+- `secondary-*` - Complementary red-orange
 - `accent-*` - Blue accent color
 
 ### Semantic Colors

@@ -30,10 +30,10 @@ export default function Datenschutz() {
             Datenschutz-Grundverordnung (DSGVO) ist:
           </p>
           <p className="text-muted-foreground">
-            VybePulse GmbH (i.&nbsp;Gr.)<br />
-            [Straße und Hausnummer]<br />
-            [PLZ] [Ort], Deutschland<br />
-            E-Mail: datenschutz@dzeng.app
+             HiOutz GmbH (i.&nbsp;Gr.)<br />
+             [Straße und Hausnummer]<br />
+             [PLZ] [Ort], Deutschland<br />
+             E-Mail: datenschutz@hioutz.app
           </p>
 
           <h2>2. Rechtsgrundlagen der Verarbeitung</h2>
@@ -335,7 +335,7 @@ export default function Datenschutz() {
           <p className="text-muted-foreground">
             Die zuständige Aufsichtsbehörde ist der Landesbeauftragte für Datenschutz und Informationsfreiheit
             des jeweiligen Bundeslandes. Sie erreichen uns unter:{' '}
-            <a href="mailto:datenschutz@dzeng.app" className="text-primary">datenschutz@dzeng.app</a>.
+            <a href="mailto:datenschutz@hioutz.app" className="text-primary">datenschutz@hioutz.app</a>.
           </p>
 
           <h2>12. Datenlöschung und Datenexport</h2>

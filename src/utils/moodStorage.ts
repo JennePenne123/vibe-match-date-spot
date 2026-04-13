@@ -1,4 +1,4 @@
-const MOOD_STORAGE_KEY = 'vybe-daily-mood';
+const MOOD_STORAGE_KEY = 'hioutz-daily-mood';
 
 export type DailyMood = 'great' | 'okay' | 'me-time';
 export type StoredMood = DailyMood | 'skipped';

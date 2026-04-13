@@ -103,7 +103,7 @@ serve(async (req) => {
         const timeout = setTimeout(() => controller.abort(), 10000);
         
         const webResponse = await fetch(websiteUrl, {
-          headers: { 'User-Agent': 'VybePulse-Bot/1.0 (tag-analysis)' },
+          headers: { 'User-Agent': 'HiOutz-Bot/1.0 (tag-analysis)' },
           signal: controller.signal,
         });
         clearTimeout(timeout);

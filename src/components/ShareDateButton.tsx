@@ -79,7 +79,7 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
         setGenerating(false);
 
         if (blob && navigator.canShare?.({ files: [new File([blob], 'hioutz-share.png', { type: 'image/png' })] })) {
-          const file = new File([blob], 'vybepulse-share.png', { type: 'image/png' });
+          const file = new File([blob], 'hioutz-share.png', { type: 'image/png' });
           await navigator.share({ title, text: shareText, url: shareUrl, files: [file] });
           return;
         }
@@ -105,7 +105,7 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `vybepulse-${Date.now()}.png`;
+    a.download = `hioutz-${Date.now()}.png`;
     a.click();
     URL.revokeObjectURL(url);
     toast({ title: 'Share-Card heruntergeladen! 🎨' });

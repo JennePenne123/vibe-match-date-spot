@@ -4,7 +4,7 @@ import { ArrowLeft, Shield } from 'lucide-react';
 
 /**
  * Partner-Datenschutzerklärung – DSGVO-konform
- * Rechtsform: VybePulse UG (haftungsbeschränkt) (i. Gr.)
+ * Rechtsform: HiOutz GmbH (i. Gr.)
  */
 export default function PartnerPrivacy() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export default function PartnerPrivacy() {
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <p className="text-muted-foreground text-xs">
-            Stand: März 2026 · VybePulse UG (haftungsbeschränkt) (i.&nbsp;Gr.)
+            Stand: März 2026 · HiOutz GmbH (i.&nbsp;Gr.)
           </p>
 
           <h2>1. Verantwortlicher</h2>
@@ -34,7 +34,7 @@ export default function PartnerPrivacy() {
             Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:
           </p>
           <p className="text-muted-foreground">
-            VybePulse UG (haftungsbeschränkt) (i.&nbsp;Gr.)<br />
+            HiOutz GmbH (i.&nbsp;Gr.)<br />
             [Straße und Hausnummer]<br />
             [PLZ] [Ort], Deutschland<br />
             E-Mail: datenschutz@hioutz.app
