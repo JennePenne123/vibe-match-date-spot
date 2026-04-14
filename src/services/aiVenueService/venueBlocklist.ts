@@ -47,14 +47,18 @@ export const BLOCKED_VENUE_TAGS = [
   'pet-store', 'auto-repair', 'car-wash', 'laundry', 'dry-cleaner',
   'supermarkt', 'tankstelle',
   'food-grocery',
-  // Non-gastronomy entertainment/culture
-  'museum', 'theatre', 'cinema', 'theater',
+  // Note: museum, theatre, cinema are NOT blocked — they are kept for future activities feature
 ];
 
 export const BLOCKED_CUISINE_TYPES = [
-  'museum', 'theater', 'cinema', 'theatre',
+  // Museum, Theater, Cinema are kept for future "Activities" feature
+  // They are imported as is_active=false instead of blocked
 ];
 
+// Cuisine types that should be imported but marked inactive (for future activities feature)
+export const INACTIVE_CUISINE_TYPES = [
+  'museum', 'theater', 'cinema', 'theatre',
+];
 /**
  * Filters out non-restaurant venues from a list of venue objects.
  * Works with any object that has `name` and optionally `tags` and `cuisine_type` fields.
