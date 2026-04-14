@@ -1,114 +1,197 @@
-## MVP Pre-Launch Checklist
+## H!Outz – Projektstand (14.04.2026)
 
-### Phase 1: Branding & Assets
-- [ ] Final App Icons (iOS/Android adaptive icons)
-- [ ] Favicons für Web
-- [ ] App Store Screenshots
-- [ ] Landing Page Hero Assets
+### 📊 Codebase-Statistiken
+| Metrik | Anzahl |
+|---|---|
+| Seiten | 57 |
+| Komponenten | 193 |
+| Custom Hooks | 52 |
+| Services | 61 |
+| Edge Functions | 38 |
+| DB-Migrationen | 153 |
+| Sprachen (i18n) | 3 (DE, EN, ES) |
 
-### Phase 2: Rechtstexte & Compliance
-- [ ] Anforderungskatalog für ITMR Legal finalisieren (Unternehmensdaten aktualisieren nach UG-Gründung)
-- [ ] Erstberatung bei ITMR Legal durchführen
-- [ ] AGB: Platzhalter ersetzen (Firma, Adresse, Geschäftsführer)
-- [ ] Datenschutz: Platzhalter ersetzen + DSFA prüfen
-- [ ] Impressum: Vollständige Angaben
-- [ ] AI-Profiling Hinweis (Verarbeitung durch KI-Systeme)
+### Tech-Stack
+- **Frontend**: React 18, Vite 5, TypeScript 5, Tailwind CSS v3, shadcn/ui
+- **Backend**: Supabase (Auth, DB, RLS, Edge Functions, Storage)
+- **KI**: Lovable AI Gateway (Venue-Matching, Kompatibilität, Concierge, Tag-Analyse)
+- **Internationalisierung**: i18next (DE/EN/ES)
+- **Mobile**: Capacitor (vorbereitet für iOS/Android)
+- **Marketing**: Remotion (Promo-Videos)
 
-### Phase 3: OAuth & Authentifizierung
-- [ ] Google OAuth in Produktion aktivieren (richtiges Google-Konto einrichten, dann Authorized origins + redirect URIs auf hioutz.app setzen)
-- [ ] Apple OAuth in Produktion aktivieren (Apple Developer Program, dann Return URLs + Domains auf hioutz.app setzen)
-- [x] Supabase Site-URLs auf Produktionsdomain umstellen
+---
 
-### Phase 4: Native Mobile App (Capacitor)
-- [ ] iOS: `npx cap add ios` + Xcode Permissions prüfen
-- [ ] Android: `npx cap add android` + AndroidManifest Permissions prüfen
-- [ ] Camera/QR-Scan: NSCameraUsageDescription in Info.plist
-- [ ] Geolocation: NSLocationWhenInUseUsageDescription + Android Location Permissions
-- [ ] Push Notifications: Firebase + APNS Certificates einrichten
-- [ ] Native Build Tests vor App Store Submission
+## ✅ Erledigt (Gesamt)
 
-### Phase 5: E-Mail & Infrastruktur
-- [ ] E-Mail-Domain einrichten (z.B. notify@hioutz.app) über Cloud → Emails
-- [ ] DNS-Records (NS-Delegation) beim Domain-Provider setzen + verifizieren
-- [ ] Auth-E-Mail-Templates mit H!Outz-Branding erstellen (Passwort-Reset, Verifizierung, Magic Link)
-- [ ] Auth-E-Mails auf Produktions-Domain testen
+### Kern-Features
+- [x] KI-basiertes Venue-Matching mit personalisierten Scores
+- [x] Mood-Check-In → Venue-Empfehlungen in 30 Sekunden
+- [x] Date-Planning (Solo, Zu zweit, Gruppen-Dates)
+- [x] Freundschaftssystem + Kompatibilitäts-Scores
+- [x] Einladungs- & Chat-System für Dates
+- [x] Voucher-System (Erstellen, Einlösen, QR-Scan)
+- [x] Belohnungssystem (Punkte, XP, Level, Badges, Streaks)
+- [x] Referral-System mit Codes
+- [x] Favoriten-System
+- [x] Date-Feedback mit Gamification-Rewards
+- [x] KI-Concierge (Chat-basierte Venue-Empfehlungen)
+
+### Partner-Portal
+- [x] Partner-Dashboard mit Analytics
+- [x] Venue-Verwaltung + Voucher-Management
+- [x] QR-Code-Generierung & Scanner
+- [x] Netzwerk-Karte (Partner-zu-Partner-Verbindungen)
+- [x] City-Rankings
+- [x] Venue-Vergleich
+- [x] Staff-Management (Einladen, QR-Token, Scanner)
+- [x] Partner-exklusive Vouchers (Netzwerk-Rabatte)
+- [x] Automatische Partner-Verifizierung (VIES API)
+- [x] Manuelle Admin-Verifizierung für Ausnahmen
+- [x] KI-Tag-Vorschläge aus Venue-Websites
+
+### Admin-Panel
+- [x] Dashboard mit Übersicht
+- [x] User-Management
+- [x] Moderation
+- [x] System-Health-Monitoring
+- [x] Error-Logs
+- [x] Team-Verwaltung (Rollen: Owner, Admin, Moderator, Viewer)
+- [x] Analytics
+
+### Sicherheit
+- [x] Row-Level Security (RLS) auf allen Tabellen
+- [x] Rollen-System (admin, venue_partner, regular) via `user_roles`
+- [x] `has_role()` Security Definer Funktion
+- [x] Partner-Profil-Schutz (Trigger gegen Selbst-Verifizierung)
+- [x] Rollen-Escalation-Schutz (Trigger `validate_role_insert`)
+- [x] Rate-Limiting auf Edge Functions
+- [x] Realtime-Channel-Security (Prefix-only Pattern)
+- [x] Storage-Bucket-Schutz (kein Dateilisten für Unbefugte)
+- [x] Waitlist-Validierung (Name/E-Mail-Format)
+- [x] Account-Löschung (DSGVO-konform, `delete_user_data`)
+- [x] Profil-Sichtbarkeit (ohne E-Mail-Leak)
+
+### Venue-Daten
+- [x] Multi-Provider-Suche (Foursquare, Overpass, Radar, TripAdvisor)
+- [x] Google Places Validierung
+- [x] Datenqualitäts-Scoring
+- [x] Venue-Daten-Cleanup (Nicht-Gastronomie entfernt, Museen/Theater/Kinos behalten)
+
+### E-Mail & Notifications
+- [x] E-Mail-Domain (support.hioutz.app) konfiguriert + DNS verifiziert
+- [x] Auth-E-Mail-Templates mit H!Outz-Branding
+- [x] Transaktionale E-Mails (Verifizierung, Einladung, Erinnerung)
+- [x] Push-Notifications (VAPID/Web Push)
+- [x] In-App Benachrichtigungssystem
+
+### Rechtstexte
+- [x] AGB (Entwurf, Platzhalter für Firmendaten)
+- [x] Datenschutzerklärung (Entwurf, DSGVO + KI-Profiling-Hinweis)
+- [x] Impressum (Entwurf)
+- [x] Widerrufsformular (Entwurf)
+- [x] Partner-AGB + Datenschutz
+
+### Branding & Assets
+- [x] Logo (H!Outz mit Kompass-Stern)
+- [x] Favicon (H! mit 4-Punkt-Sparkle ✦)
+- [x] App-Icons (PWA: icon-192, icon-512, app-icon)
+- [x] Dark-Mode Design-System (Teal #0D9488 + Orange #F97316)
+- [x] Logo-Klick → Home Navigation
+
+### Infrastruktur
+- [x] Supabase Site-URLs auf Produktions-Domain
+- [x] Service Worker + Offline-Banner
+- [x] Geo-Privacy-Banner
+- [x] Error Boundary (App + Page Level)
+- [x] Lazy Loading aller Routen
+- [x] Wartelisten-Seite (/waitlist)
+
+### Marketing
+- [x] Remotion Promo-Video (Pop Art Comic Style)
+- [x] Marketingplan (PDF) mit 12-Wochen-Timeline
+- [x] Waitlist-Landingpage
+
+---
+
+## 🔲 Noch offen (Pre-Launch)
+
+### Phase 1: Rechtstexte & Compliance
+- [ ] UG-Gründung abschließen
+- [ ] Platzhalter in AGB, Datenschutz, Impressum ersetzen (Firma, Adresse, HRB, Geschäftsführer)
+- [ ] ITMR Legal Erstberatung durchführen
+- [ ] DSFA (Datenschutz-Folgenabschätzung) prüfen
+
+### Phase 2: OAuth & Authentifizierung
+- [ ] Google OAuth → Produktion (hioutz.app Origins + Redirect URIs)
+- [ ] Apple OAuth → Apple Developer Program ($99/Jahr) + Konfiguration
+
+### Phase 3: Native Mobile App (Capacitor)
+- [ ] iOS: `npx cap add ios` + Xcode Permissions
+- [ ] Android: `npx cap add android` + AndroidManifest Permissions
+- [ ] Kamera (QR-Scan): NSCameraUsageDescription
+- [ ] Geolocation: Location Permissions
+- [ ] Push: Firebase + APNS Certificates
+- [ ] Native Build Tests
+
+### Phase 4: Domain & Infrastruktur
 - [ ] Custom Domain hioutz.app verbinden (A-Records + TXT-Verify)
-- [ ] SSL-Zertifikat provisionieren lassen
-- [ ] Edge Functions Deployment auf Production prüfen
-- [ ] Rate Limiting + API Usage Monitoring aktiv
+- [ ] SSL-Zertifikat provisionieren
+- [ ] Rate Limiting & API Monitoring validieren
 
-### Phase 6: Partner Onboarding
-- [x] Automatische Verifizierung (VIES API) aktiv
-- [x] Manuelle Admin-Verifizierung-UI für Ausnahmen
-- [x] KI-Tag-Vorschläge aus Venue-Websites (Edge Function `analyze-venue-website`)
+### Nice-to-have vor Launch
+- [ ] OG-Image für Social Sharing (1200×630)
+- [ ] App Store Screenshots
 
 ---
 
-## Heute erledigt (12.04.2026)
-
-### KI-gestützte Venue-Tag-Vorschläge ✅
-- Edge Function `analyze-venue-website` erstellt: Analysiert Venue-Websites + ähnliche erfolgreiche Venues
-- Generiert optimale Tags mit Confidence-Score, Quelle (Website/KI/ähnliche Venues) und Begründung
-- Behebt Fehlkategorisierungen (z.B. Schweinske: "Burger" → "Schnitzel, Hausmannskost")
-- AITagSuggestions-Komponente erweitert: Toggle zwischen "Website + KI" und "Gäste-Feedback"
-
-### Date-Planning: Mode-Auswahl ✅
-- Neuer erster Schritt "Wie möchtest du daten?" mit drei Modi:
-  - **Solo-Date**: Alleine Venues entdecken (überspringt Partner-Auswahl)
-  - **Zu zweit**: Klassisches Date mit Partner-Einladung
-  - **Gruppen-Date**: Mehrteilnehmer-Planung
-- Übersetzungen in DE/EN/ES hinzugefügt
-
-### Sicherheits-Fixes ✅
-- **Partner-Profil-Schutz**: Trigger `protect_partner_profile_fields` aktiviert – verhindert Selbst-Verifizierung, Membership-Manipulation und Gründerstatus-Änderung durch Nicht-Admins
-- **Rollen-Escalation-Schutz**: Trigger `validate_role_insert` – nur `regular`-Rolle ohne Admin-Rechte vergabbar, verhindert Privilege Escalation über SECURITY DEFINER-Pfade
-- **Realtime Voucher-Broadcast entfernt**: `vouchers` und `voucher_redemptions` aus Realtime-Publication entfernt, Hook auf sicheres Polling (15s) umgestellt
-
-### Test-Setup ✅
-- Freundschaft zwischen Lenny und Jan Wiechmann für gegenseitiges Testen eingerichtet
-
----
-
-## Automatische Partner-Verifizierung
-
-### Flow:
-```
-Partner gibt USt-IdNr. ein → Status: pending_review
-  → auto-verify-partner Edge Function wird aufgerufen
-    → VIES API prüft USt-IdNr.
-      ✅ Gültig → Status: verified + E-Mail + Push
-      ❌ Ungültig → Status: pending_review + Admin-Notiz
-      ⚠️ Keine USt-IdNr. → Manuelle Admin-Prüfung
-```
-
-### E-Mail Benachrichtigungen
-- ⚠️ **Aktuell ist keine E-Mail-Domain konfiguriert**
-- Muss zuerst über Cloud → Emails eingerichtet werden
-- Danach: Transaktionale E-Mails bei Status-Änderung
-
----
-
-## Post-Launch Roadmap
+## 📋 Post-Launch Roadmap
 
 ### Monetarisierung & Payments
-- [ ] Stripe-Integration für Premium-Modelle
-- [ ] Premium-Vouchers für Top-3-Matches (abhängig von Stripe)
-- [ ] Widerrufsformular: Platzhalter ersetzen (Adresse)
-- [ ] Bei eigener Zahlungsabwicklung (nicht App Store): Muster-Widerrufsformular in AGB ergänzen (§ 355 BGB)
+- [ ] Stripe-Integration (4,99 €/Monat, 39,99 €/Jahr, Lifetime 79,99 €)
+- [ ] Founding Member Preis (2,99 €/Monat, erste 1.000 Nutzer)
+- [ ] Premium-Vouchers für Top-3-Matches
+- [ ] Widerrufsformular: Platzhalter ersetzen
 
 ### Features
-- [ ] Favoriten-System: DB-Migration für Persistenz und KI-Signale
+- [ ] Favoriten-Persistenz + KI-Signale (DB-Migration)
 - [ ] Transportdienst-Integration (FREE NOW, MOIA)
 - [ ] Nutzergenerierte Venue-Reviews
 - [ ] KI: Automatisierter Support-Agent
 - [ ] KI: Date Recaps
-- [ ] KI: Venue Metadata-Enrichment (fehlende Küche/Vibe/Tags automatisch via Google Places, Partner-Eingaben oder Web-Scraping anreichern → höhere AI-Score-Qualität)
+- [ ] KI: Venue Metadata-Enrichment (Google Places/Scraping)
 
 ### POS-/Kassensystem-Integration
-- [ ] Partner-Umfrage: Welches Kassensystem nutzen eure Venues? (orderbird, Lightspeed, SumUp, ready2order, gastrofix)
-- [ ] Phase 1: Voucher-Einlösung im meistgenutzten POS-System (API-Integration)
-- [ ] Phase 2: Besuchstracking & automatische Feedback-Auslösung über POS
+- [ ] Partner-Umfrage: Welches Kassensystem?
+- [ ] Phase 1: Voucher-Einlösung im meistgenutzten POS
+- [ ] Phase 2: Besuchstracking über POS
 - [ ] Phase 3: Umsatz-Analytics als Premium-Partner-Feature
 
 ### Marketing
-- [ ] Effizienter, kostengünstiger Marketingplan entwickeln
+- [ ] ASO (App Store Optimization)
+- [ ] Google Business Profil
+- [ ] Instagram/TikTok Content-Strategie starten
+- [ ] Partner-QR-Codes in Venues verteilen
+
+---
+
+## 📅 Heute erledigt (14.04.2026)
+
+### Security-Fixes ✅
+- Waitlist-Validierung (Name/E-Mail-Format Check in RLS)
+- Storage-Bucket-Schutz (kein Dateilisten für Unbefugte in avatars/venue-photos)
+- Realtime-Channel-Security (Prefix-only Pattern, kein Channel-Bypass)
+- Profil-Sichtbarkeit für Social Features (ohne E-Mail-Leak)
+
+### Branding ✅
+- Favicon generiert: "H!" Monogramm mit 4-Punkt-Sparkle ✦ (Teal auf Dark Slate)
+- App-Icons aktualisiert (PWA icon-192, icon-512, app-icon)
+
+### UX ✅
+- Logo-Klick navigiert jetzt zu /home (Mobile + Desktop Header)
+
+### Venue-Daten Cleanup ✅
+- Nicht-Gastronomie-Betriebe weltweit bereinigt (Museen/Theater/Kinos für spätere Aktivitäten-Integration behalten)
+
+### Pre-Launch Planung ✅
+- Feature-Icons als nicht nötig eingestuft (Lucide reicht)
+- Landing Page Hero Assets als nicht blockend eingestuft
