@@ -31,10 +31,12 @@ export const BLOCKED_VENUE_NAMES = [
   'deliveroo', 'glovo', 'rappi', 'ifood', 'swiggy', 'zomato',
   // 🌍 Gas stations
   'shell', 'bp ', 'total energies', 'aral', 'esso',
-  // Pharmacies / Drugstores
-  'apotheke', 'pharmacy',
+  // Pharmacies / Drugstores (removed 'apotheke' - some real cafés contain the word)
+  'pharmacy',
   // Hardware / DIY
-  'bauhaus', 'obi', 'hornbach', 'toom', 'hagebau',
+  'bauhaus', 'obi ', 'hornbach', 'toom', 'hagebau',
+  // Convenience (exact-ish matches)
+  'rewe to go',
 ];
 
 export const BLOCKED_VENUE_TAGS = [
@@ -43,7 +45,8 @@ export const BLOCKED_VENUE_TAGS = [
   'liquor-store', 'discount-store', 'department-store', 'drugstore',
   'market', 'deli', 'butcher', 'wholesale', 'pharmacy', 'hardware-store',
   'pet-store', 'auto-repair', 'car-wash', 'laundry', 'dry-cleaner',
-  'supermarkt', 'kiosk', 'tankstelle',
+  'supermarkt', 'tankstelle',
+  'food-grocery',
 ];
 
 /**
