@@ -166,35 +166,85 @@ export default function Datenschutz() {
             widerrufen.
           </p>
 
-          <h2>6. KI-gestützte Verarbeitung und automatisierte Entscheidungsfindung</h2>
+          <h2>6. KI-gestützte Verarbeitung und automatisierte Entscheidungsfindung (Art.&nbsp;13 Abs.&nbsp;2 lit.&nbsp;f DSGVO)</h2>
+
+          <h3>6.1 Einsatzbereiche der KI</h3>
           <p className="text-muted-foreground">
-            HiOutz verwendet KI-Algorithmen zur Berechnung von:
+            HiOutz verwendet KI-Algorithmen in folgenden Bereichen:
           </p>
           <ul className="text-muted-foreground">
-            <li>Venue-Matching-Scores und personalisierten Empfehlungen</li>
-            <li>Kompatibilitätswerten zwischen zwei Nutzern</li>
-            <li>Adaptiven Gewichtungen basierend auf Ihrem Feedback</li>
+            <li><strong>Venue-Matching:</strong> Berechnung personalisierter Matching-Scores (0–100&nbsp;%) zwischen Ihnen und verfügbaren Venues</li>
+            <li><strong>Kompatibilitätsbewertung:</strong> Vergleich von Präferenz-Vektoren zweier Nutzer zur Berechnung eines Date-Kompatibilitätswerts</li>
+            <li><strong>Adaptive Gewichtung:</strong> Anpassung der Scoring-Faktoren basierend auf Ihrem Feedback (z.&nbsp;B. Date-Bewertungen, Favoriten)</li>
+            <li><strong>Kontextuelles Scoring:</strong> Einbeziehung von Tageszeit, Wochentag, Saison und optional Wetterdaten zur Verfeinerung der Empfehlungen</li>
+            <li><strong>Textgenerierung:</strong> Erstellung von Date-Ideen, Einladungstexten und Concierge-Antworten über den Lovable AI Gateway</li>
+          </ul>
+
+          <h3>6.2 Verwendete Datenkategorien</h3>
+          <p className="text-muted-foreground">
+            Für die KI-gestützte Verarbeitung werden folgende Daten herangezogen:
+          </p>
+          <ul className="text-muted-foreground">
+            <li><strong>Explizite Präferenzen:</strong> Bevorzugte Küchen, Vibes, Preisklassen, Aktivitäten, Zeiten (im Onboarding und in den Einstellungen angegeben)</li>
+            <li><strong>Bewertungsdaten:</strong> Ihre Bewertungen vergangener Dates (1–5 Sterne), Venue-Bewertungen und KI-Genauigkeitsbewertungen</li>
+            <li><strong>Implizite Signale (optional):</strong> Verweildauer auf Venue-Karten, Favorisierungen, Swipe-Verhalten – nur mit Ihrer Zustimmung (Opt-in in den Einstellungen)</li>
+            <li><strong>Kontextdaten:</strong> Tageszeit, Wochentag, Saison, ungefähre Region (Stadtniveau, keine exakte Adresse)</li>
           </ul>
           <p className="text-muted-foreground">
-            Die Venue-Matching-Scores und Kompatibilitätswerte werden lokal in unserer eigenen Infrastruktur
-            (Supabase Edge Functions) berechnet. Für bestimmte Zusatzfunktionen – wie KI-generierte
-            Date-Ideen, Einladungstexte und den Concierge-Chat – nutzen wir den <strong>Lovable AI Gateway</strong>,
-            einen KI-Textgenerierungsdienst (siehe Abschnitt&nbsp;7). Dabei werden ausschließlich anonymisierte
-            Präferenzdaten (z.&nbsp;B. bevorzugte Küchen, Stimmungen) übermittelt – <strong>keine
-            persönlich identifizierbaren Daten</strong> wie Name, E-Mail oder Standort.
+            Es werden <strong>keine</strong> besonderen Kategorien personenbezogener Daten (Art.&nbsp;9 DSGVO) wie Gesundheitsdaten,
+            politische Meinungen oder religiöse Überzeugungen verarbeitet.
+          </p>
+
+          <h3>6.3 Logik und Funktionsweise</h3>
+          <p className="text-muted-foreground">
+            Das Matching-System arbeitet mit einem gewichteten Multi-Faktor-Scoring:
+          </p>
+          <ul className="text-muted-foreground">
+            <li>Jeder Venue erhält Teilbewertungen in Kategorien wie Küche, Vibe, Preis, Aktivität und Timing</li>
+            <li>Die Gewichtung dieser Faktoren wird pro Nutzer individuell angepasst (z.&nbsp;B. wenn Sie Vibe-Übereinstimmung höher bewerten als Preis)</li>
+            <li>Ein Explorationsfaktor stellt sicher, dass auch unbekannte Venues vorgeschlagen werden, um eine „Filterblase" zu vermeiden</li>
+            <li>Die Berechnung erfolgt deterministisch auf unserer Infrastruktur (Supabase Edge Functions) – es handelt sich nicht um eine „Black Box"</li>
+          </ul>
+
+          <h3>6.4 Externe KI-Dienste</h3>
+          <p className="text-muted-foreground">
+            Für bestimmte Textgenerierungsfunktionen (Date-Ideen, Einladungstexte, Concierge-Chat) nutzen wir den
+            <strong> Lovable AI Gateway</strong> (siehe Abschnitt&nbsp;7). Dabei werden ausschließlich anonymisierte
+            Präferenzdaten übermittelt – <strong>keine persönlich identifizierbaren Daten</strong> wie Name, E-Mail oder
+            exakter Standort. Die Venue-Matching-Scores und Kompatibilitätswerte werden vollständig lokal berechnet.
+          </p>
+
+          <h3>6.5 Tragweite und angestrebte Auswirkungen</h3>
+          <p className="text-muted-foreground">
+            Die KI-Ergebnisse haben folgende Auswirkungen:
+          </p>
+          <ul className="text-muted-foreground">
+            <li>Venues werden in einer personalisierten Reihenfolge angezeigt (höher bewertete Venues erscheinen weiter oben)</li>
+            <li>Kompatibilitätswerte werden als Prozentzahl dargestellt, um die Entscheidungsfindung zu unterstützen</li>
+            <li>Die KI schlägt konkrete Venues und Zeiten für Date-Einladungen vor</li>
+          </ul>
+          <p className="text-muted-foreground">
+            <strong>Kein Profiling im Sinne des Art.&nbsp;22 Abs.&nbsp;1 DSGVO:</strong> Die KI-Ergebnisse dienen
+            ausschließlich als unverbindliche Vorschläge und erzeugen keine rechtliche oder ähnlich erhebliche Wirkung.
+            Sie treffen die finale Entscheidung über Venue-Auswahl und Date-Planung stets selbst. Kein Nutzer wird
+            aufgrund von KI-Scores von der Nutzung des Dienstes ausgeschlossen oder benachteiligt.
+          </p>
+
+          <h3>6.6 Ihre Rechte bezüglich der KI-Verarbeitung</h3>
+          <p className="text-muted-foreground">
+            Rechtsgrundlage: Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO) für das Matching-System;
+            berechtigtes Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO) für die adaptive Gewichtung.
           </p>
           <p className="text-muted-foreground">
-            Rechtsgrundlage: Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).
+            Sie haben folgende Kontrollmöglichkeiten:
           </p>
-          <p className="text-muted-foreground">
-            <strong>Kein Profiling im Sinne des Art.&nbsp;22 DSGVO:</strong> Die KI-Ergebnisse dienen ausschließlich
-            als Vorschläge und erzeugen keine rechtliche oder ähnlich erhebliche Wirkung. Sie treffen die finale
-            Entscheidung über Venue-Auswahl und Date-Planung stets selbst.
-          </p>
-          <p className="text-muted-foreground">
-            Sie können die Lernhistorie der KI jederzeit in Ihrem Profil einsehen und in den Einstellungen
-            zurücksetzen.
-          </p>
+          <ul className="text-muted-foreground">
+            <li><strong>Transparenz:</strong> Sie können Ihre aktuellen KI-Gewichtungen und die Lernhistorie jederzeit in Ihrem Profil einsehen</li>
+            <li><strong>Zurücksetzen:</strong> Sie können die gesamte KI-Lernhistorie in den Einstellungen zurücksetzen – die KI beginnt dann wieder „bei null"</li>
+            <li><strong>Implizite Signale deaktivieren:</strong> In den Einstellungen können Sie die Erfassung impliziter Nutzungssignale jederzeit deaktivieren (Opt-out)</li>
+            <li><strong>Widerspruchsrecht:</strong> Sie können der KI-gestützten Verarbeitung jederzeit widersprechen unter datenschutz@hioutz.app</li>
+            <li><strong>Datenauskunft:</strong> Sie können eine vollständige Auskunft über Ihre gespeicherten Präferenz-Vektoren und Lernhistorie anfordern</li>
+          </ul>
 
           <h2>7. Externe Dienste und Auftragsverarbeiter</h2>
           <table className="text-muted-foreground text-xs">
