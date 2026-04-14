@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Star, Users, Calendar, MessageCircle, Award, Sparkles } from 'lucide-react';
+import { Heart, Star, Users, Calendar, Sparkles, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
@@ -18,6 +18,16 @@ interface ActivityItem {
   accentColor: string;
 }
 
+const DISMISSED_KEY = 'hioutz-dismissed-activities';
+
+const getDismissedIds = (): string[] => {
+  try {
+    return JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]');
+  } catch {
+    return [];
+  }
+};
+
 const ActivityFeed: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -25,6 +35,13 @@ const ActivityFeed: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const locale = i18n.language === 'de' ? de : enUS;
+
+  const dismissActivity = useCallback((id: string) => {
+    setActivities(prev => prev.filter(a => a.id !== id));
+    const dismissed = getDismissedIds();
+    dismissed.push(id);
+    localStorage.setItem(DISMISSED_KEY, JSON.stringify(dismissed));
+  }, []);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -53,13 +70,15 @@ const ActivityFeed: React.FC = () => {
             .limit(3),
         ]);
 
+        const dismissedIds = getDismissedIds();
         const items: ActivityItem[] = [];
 
-        // Date invitations
         invitationsRes.data?.forEach((inv) => {
           const isSender = inv.sender_id === user.id;
+          const id = `inv-${inv.id}`;
+          if (dismissedIds.includes(id)) return;
           items.push({
-            id: `inv-${inv.id}`,
+            id,
             type: isSender ? 'date_sent' : 'date_received',
             title: inv.title || (isSender ? t('profile.activity.dateSent') : t('profile.activity.dateReceived')),
             subtitle: isSender
@@ -71,10 +90,11 @@ const ActivityFeed: React.FC = () => {
           });
         });
 
-        // Feedback
         feedbackRes.data?.forEach((fb) => {
+          const id = `fb-${fb.id}`;
+          if (dismissedIds.includes(id)) return;
           items.push({
-            id: `fb-${fb.id}`,
+            id,
             type: 'feedback',
             title: t('profile.activity.ratedDate'),
             subtitle: `${fb.rating ? `${fb.rating}/5 ⭐` : ''} ${fb.venue_rating ? `Venue: ${fb.venue_rating}/5` : ''}`.trim(),
@@ -84,10 +104,11 @@ const ActivityFeed: React.FC = () => {
           });
         });
 
-        // Friendships
         friendsRes.data?.forEach((f) => {
+          const id = `fr-${f.id}`;
+          if (dismissedIds.includes(id)) return;
           items.push({
-            id: `fr-${f.id}`,
+            id,
             type: 'friend',
             title: t('profile.activity.newFriend'),
             subtitle: t('profile.activity.connectionMade'),
@@ -97,7 +118,6 @@ const ActivityFeed: React.FC = () => {
           });
         });
 
-        // Sort by timestamp
         items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
         setActivities(items.slice(0, 8));
       } catch (error) {
@@ -158,7 +178,7 @@ const ActivityFeed: React.FC = () => {
         {activities.map((activity, index) => (
           <div
             key={activity.id}
-            className={`flex items-center gap-3 p-2.5 rounded-xl bg-gradient-to-r ${activity.accentColor} border hover:scale-[1.01] transition-all duration-300 animate-fade-in`}
+            className={`flex items-center gap-3 p-2.5 rounded-xl bg-gradient-to-r ${activity.accentColor} border hover:scale-[1.01] transition-all duration-300 animate-fade-in group`}
             style={{ animationDelay: `${index * 60}ms` }}
           >
             <div className="w-9 h-9 rounded-lg bg-card/80 backdrop-blur-sm flex items-center justify-center shrink-0 shadow-sm">
@@ -171,6 +191,13 @@ const ActivityFeed: React.FC = () => {
             <span className="text-[10px] text-muted-foreground shrink-0">
               {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true, locale })}
             </span>
+            <button
+              onClick={() => dismissActivity(activity.id)}
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-card/80 text-muted-foreground hover:text-foreground shrink-0"
+              aria-label={t('common.delete', 'Entfernen')}
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
         ))}
       </CardContent>
