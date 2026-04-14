@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +10,7 @@ import { ArrowLeft, Search, Heart, MapPin, Plus } from 'lucide-react';
 import VenueCard from '@/components/VenueCard';
 import { mockVenues } from '@/data/mockVenues';
 import { Venue } from '@/types';
+import { useFavorites } from '@/hooks/useFavorites';
 
 const MyVenues = () => {
   const navigate = useNavigate();
