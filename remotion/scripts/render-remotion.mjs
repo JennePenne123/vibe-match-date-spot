@@ -28,7 +28,7 @@ await renderMedia({
   composition,
   serveUrl: bundled,
   codec: "h264",
-  outputLocation: "/mnt/documents/HiOutz_Waitlist_Promo_v3.mp4",
+  outputLocation: "/mnt/documents/HiOutz_Comic_Promo_v1.mp4",
   puppeteerInstance: browser,
   muted: true,
   concurrency: 1,
