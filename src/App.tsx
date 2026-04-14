@@ -22,6 +22,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationSystem from "./components/NotificationSystem";
 import PushNotificationPrompt from "./components/PushNotificationPrompt";
 import OfflineBanner from "./components/OfflineBanner";
+import GeoPrivacyBanner from "./components/GeoPrivacyBanner";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { useAppUsageTracking } from "./hooks/useImplicitSignals";
