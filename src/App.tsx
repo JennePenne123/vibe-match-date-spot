@@ -106,6 +106,7 @@ const Rewards = lazy(() => import("./pages/Rewards"));
 const Impressum = lazy(() => import("./pages/Impressum"));
 const Datenschutz = lazy(() => import("./pages/Datenschutz"));
 const AGB = lazy(() => import("./pages/AGB"));
+const Widerrufsformular = lazy(() => import("./pages/Widerrufsformular"));
 
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
