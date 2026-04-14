@@ -34,7 +34,9 @@ export const BLOCKED_VENUE_NAMES = [
   // Pharmacies / Drugstores
   'apotheke', 'pharmacy',
   // Hardware / DIY
-  'bauhaus', 'obi', 'hornbach', 'toom', 'hagebau',
+  'bauhaus', 'obi ', 'hornbach', 'toom', 'hagebau',
+  // Convenience (exact-ish matches)
+  'rewe to go',
 ];
 
 export const BLOCKED_VENUE_TAGS = [
