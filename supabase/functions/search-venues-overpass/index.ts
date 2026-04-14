@@ -12,8 +12,6 @@ import { checkRateLimitWithLogging, getRateLimitIdentifier, rateLimitResponse, R
 const OVERPASS_MIRRORS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
-  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
-  'https://overpass.openstreetmap.ru/api/interpreter',
 ];
 
 // Map cuisine preferences to OSM cuisine tags
