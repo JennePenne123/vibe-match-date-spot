@@ -100,9 +100,15 @@ export const SceneLogoIntro = () => {
           opacity: logoOpacity,
           filter: `drop-shadow(0 0 ${glowSize}px rgba(20,184,166,0.5)) drop-shadow(0 15px 40px rgba(0,0,0,0.5))`,
         }}>
+          {/* Dark backing for logo contrast */}
+          <div style={{
+            position: "absolute", inset: -40,
+            background: "radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 50%, transparent 75%)",
+            borderRadius: 40,
+          }} />
           <Img
             src={staticFile("images/hioutz-logo.png")}
-            style={{ width: 520, height: "auto" }}
+            style={{ width: 520, height: "auto", position: "relative", zIndex: 1 }}
           />
         </div>
 
