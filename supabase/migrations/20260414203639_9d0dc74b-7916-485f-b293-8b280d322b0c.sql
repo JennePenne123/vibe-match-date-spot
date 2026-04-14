@@ -1,0 +1,4 @@
+DELETE FROM venues WHERE id IN (
+  '607f21ac4669ec27bf841305',
+  '607f21995368e10ed4c70948'
+);
