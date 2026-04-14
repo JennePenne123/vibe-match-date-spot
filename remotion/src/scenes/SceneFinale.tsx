@@ -95,14 +95,16 @@ export const SceneFinale = () => {
           filter: `drop-shadow(0 0 ${logoPulse}px rgba(20,184,166,0.6))`,
           marginTop: -220,
         }}>
+          {/* Solid dark panel behind logo for max contrast */}
           <div style={{
-            position: "absolute", inset: -50,
-            background: "radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 45%, transparent 72%)",
-            borderRadius: 40,
+            position: "absolute", inset: -30,
+            background: "rgba(0,0,0,0.88)",
+            borderRadius: 30,
+            boxShadow: "0 0 80px 40px rgba(0,0,0,0.7)",
           }} />
           <Img
             src={staticFile("images/hioutz-logo.png")}
-            style={{ width: 540, height: "auto", position: "relative", zIndex: 1 }}
+            style={{ width: 540, height: "auto", position: "relative", zIndex: 1, filter: "brightness(1.4) saturate(1.2)" }}
           />
         </div>
 

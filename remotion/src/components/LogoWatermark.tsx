@@ -22,9 +22,9 @@ export const LogoWatermark = () => {
     }}>
       <div style={{ position: "relative" }}>
         <div style={{
-          position: "absolute", inset: -30,
-          background: "radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, transparent 65%)",
-          borderRadius: 30,
+          position: "absolute", inset: -50,
+          background: "radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 50%, transparent 75%)",
+          borderRadius: 40,
         }} />
         <Img
           src={staticFile("images/hioutz-logo.png")}
