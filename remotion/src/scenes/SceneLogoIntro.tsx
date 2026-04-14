@@ -102,9 +102,10 @@ export const SceneLogoIntro = () => {
         }}>
           {/* Dark backing for logo contrast */}
           <div style={{
-            position: "absolute", inset: -60,
-            background: "radial-gradient(ellipse at center, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.3) 65%, transparent 85%)",
-            borderRadius: 50,
+            position: "absolute", inset: -30,
+            background: "rgba(0,0,0,0.8)",
+            borderRadius: 30,
+            boxShadow: "0 0 60px 30px rgba(0,0,0,0.5)",
           }} />
           <Img
             src={staticFile("images/hioutz-logo.png")}
