@@ -106,6 +106,7 @@ const Rewards = lazy(() => import("./pages/Rewards"));
 const Impressum = lazy(() => import("./pages/Impressum"));
 const Datenschutz = lazy(() => import("./pages/Datenschutz"));
 const AGB = lazy(() => import("./pages/AGB"));
+const Widerrufsformular = lazy(() => import("./pages/Widerrufsformular"));
 
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
@@ -237,6 +238,7 @@ const App = () => (
                     <Route path="/impressum" element={<LazyPageNoLayout><Impressum /></LazyPageNoLayout>} />
                     <Route path="/datenschutz" element={<LazyPageNoLayout><Datenschutz /></LazyPageNoLayout>} />
                     <Route path="/agb" element={<LazyPageNoLayout><AGB /></LazyPageNoLayout>} />
+                    <Route path="/widerrufsformular" element={<LazyPageNoLayout><Widerrufsformular /></LazyPageNoLayout>} />
                     <Route path="/unsubscribe" element={<LazyPageNoLayout><Unsubscribe /></LazyPageNoLayout>} />
                     
                     {/* Debug route */}

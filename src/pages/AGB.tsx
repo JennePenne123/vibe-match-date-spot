@@ -157,9 +157,13 @@ export default function AGB() {
             diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses.
           </p>
           <p className="text-muted-foreground">
-             Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (HiOutz GmbH (i.&nbsp;Gr.), [Adresse],
-             E-Mail: support@hioutz.app) mittels einer eindeutigen Erklärung (z.&nbsp;B. per E-Mail) über Ihren
-            Entschluss, diesen Vertrag zu widerrufen, informieren.
+              Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (HiOutz GmbH (i.&nbsp;Gr.), [Adresse],
+              E-Mail: support@hioutz.app) mittels einer eindeutigen Erklärung (z.&nbsp;B. per E-Mail) über Ihren
+              Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das{' '}
+              <a href="/widerrufsformular" target="_blank" className="text-primary underline hover:text-primary/80">
+                Muster-Widerrufsformular
+              </a>{' '}
+              verwenden, das jedoch nicht vorgeschrieben ist.
           </p>
           <p className="text-muted-foreground">
             Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung über die Ausübung des
