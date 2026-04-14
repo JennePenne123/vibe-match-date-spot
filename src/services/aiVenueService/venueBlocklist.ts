@@ -47,6 +47,8 @@ export const BLOCKED_VENUE_TAGS = [
   'pet-store', 'auto-repair', 'car-wash', 'laundry', 'dry-cleaner',
   'supermarkt', 'tankstelle',
   'food-grocery',
+  // Non-gastronomy entertainment/culture
+  'museum', 'theatre', 'cinema', 'theater',
 ];
 
 /**
