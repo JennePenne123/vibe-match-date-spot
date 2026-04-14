@@ -119,7 +119,7 @@ export const SceneFinale = () => {
               fontFamily, fontSize: 56, color: "white",
               letterSpacing: 4,
             }}>
-              NIE WIEDER LANGWEILIG!
+              NIE WIEDER LANGWEILIGE DATES!
             </span>
           </div>
         </div>
