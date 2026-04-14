@@ -3,64 +3,68 @@ import { TransitionSeries, springTiming } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import { slide } from "@remotion/transitions/slide";
 import { wipe } from "@remotion/transitions/wipe";
-import { ComicPanel1 } from "./scenes/ComicPanel1";
-import { ComicPanel2 } from "./scenes/ComicPanel2";
-import { ComicPanel3 } from "./scenes/ComicPanel3";
-import { ComicPanel4 } from "./scenes/ComicPanel4";
-import { ComicPanel5 } from "./scenes/ComicPanel5";
-import { ComicCTA } from "./scenes/ComicCTA";
+import { SceneLogoIntro } from "./scenes/SceneLogoIntro";
+import { SceneBored } from "./scenes/SceneBored";
+import { SceneFrustrated } from "./scenes/SceneFrustrated";
+import { SceneBling } from "./scenes/SceneBling";
+import { SceneHappyDate } from "./scenes/SceneHappyDate";
+import { SceneFinale } from "./scenes/SceneFinale";
+import { LogoWatermark } from "./components/LogoWatermark";
 
-// Comic video — ~18 seconds at 30fps
-// 1. Bored couple: 105f (3.5s)
-// 2. Annoyed face: 90f (3s)
-// 3. BLING! phone: 75f (2.5s)
-// 4. AI recommendation: 105f (3.5s)
-// 5. Happy couple: 100f (3.3s)
-// 6. CTA: 120f (4s)
-// Transitions: 5 × 15f = 75f overlap
-// Total: 105+90+75+105+100+120 - 75 = 520 frames
+// Pop Art Comic v2 — ~22 seconds
+// 1. LOGO INTRO: 75f (2.5s) — dramatic brand entrance
+// 2. BORED COUPLE: 130f (4.3s) — slow zoom, desaturation
+// 3. FRUSTRATED FACE: 100f (3.3s) — dramatic close-up
+// 4. BLING! PHONE: 90f (3s) — explosive notification + logo from phone
+// 5. HAPPY DATE: 110f (3.7s) — payoff with hearts
+// 6. CTA FINALE: 160f (5.3s) — giant logo + waitlist counter
+// Transitions: 5 × 18f = 90f overlap
+// Total: 75+130+100+90+110+160 - 90 = 575 frames
 
 export const MainVideo = () => {
   return (
-    <AbsoluteFill style={{ background: "#FFE500" }}>
+    <AbsoluteFill style={{ background: "#050A15" }}>
+      {/* Subtle logo watermark throughout */}
+      <LogoWatermark />
+
       <TransitionSeries>
-        <TransitionSeries.Sequence durationInFrames={105}>
-          <ComicPanel1 />
+        <TransitionSeries.Sequence durationInFrames={75}>
+          <SceneLogoIntro />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
           presentation={wipe({ direction: "from-right" })}
-          timing={springTiming({ config: { damping: 200 }, durationInFrames: 15 })}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 18 })}
         />
-        <TransitionSeries.Sequence durationInFrames={90}>
-          <ComicPanel2 />
+        <TransitionSeries.Sequence durationInFrames={130}>
+          <SceneBored />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
           presentation={fade()}
-          timing={springTiming({ config: { damping: 200 }, durationInFrames: 15 })}
-        />
-        <TransitionSeries.Sequence durationInFrames={75}>
-          <ComicPanel3 />
-        </TransitionSeries.Sequence>
-        <TransitionSeries.Transition
-          presentation={slide({ direction: "from-left" })}
-          timing={springTiming({ config: { damping: 200 }, durationInFrames: 15 })}
-        />
-        <TransitionSeries.Sequence durationInFrames={105}>
-          <ComicPanel4 />
-        </TransitionSeries.Sequence>
-        <TransitionSeries.Transition
-          presentation={wipe({ direction: "from-bottom" })}
-          timing={springTiming({ config: { damping: 200 }, durationInFrames: 15 })}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 18 })}
         />
         <TransitionSeries.Sequence durationInFrames={100}>
-          <ComicPanel5 />
+          <SceneFrustrated />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={slide({ direction: "from-bottom" })}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 18 })}
+        />
+        <TransitionSeries.Sequence durationInFrames={90}>
+          <SceneBling />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={wipe({ direction: "from-left" })}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 18 })}
+        />
+        <TransitionSeries.Sequence durationInFrames={110}>
+          <SceneHappyDate />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
           presentation={fade()}
-          timing={springTiming({ config: { damping: 200 }, durationInFrames: 15 })}
+          timing={springTiming({ config: { damping: 200 }, durationInFrames: 18 })}
         />
-        <TransitionSeries.Sequence durationInFrames={120}>
-          <ComicCTA />
+        <TransitionSeries.Sequence durationInFrames={160}>
+          <SceneFinale />
         </TransitionSeries.Sequence>
       </TransitionSeries>
     </AbsoluteFill>
