@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { AIVenueRecommendation } from '@/services/aiVenueService';
+import { filterBlockedVenues } from '@/services/aiVenueService/venueBlocklist';
 
 interface UserLocation {
   latitude: number;
