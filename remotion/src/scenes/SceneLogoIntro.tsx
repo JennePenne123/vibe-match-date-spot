@@ -109,7 +109,7 @@ export const SceneLogoIntro = () => {
           }} />
           <Img
             src={staticFile("images/hioutz-logo.png")}
-            style={{ width: 520, height: "auto", position: "relative", zIndex: 1 }}
+            style={{ width: 520, height: "auto", position: "relative", zIndex: 1, filter: "brightness(1.4) saturate(1.2)" }}
           />
         </div>
 
