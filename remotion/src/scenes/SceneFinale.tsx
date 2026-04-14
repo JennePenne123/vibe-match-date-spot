@@ -1,50 +1,59 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, staticFile, Img } from "remotion";
+import { loadFont } from "@remotion/google-fonts/Bangers";
 
-// Scene 6: CTA Finale — explosive bullseye with giant logo and waitlist
+const { fontFamily } = loadFont();
+
+// Scene 6: CTA Finale — explosive bullseye, giant logo, waitlist counter
 export const SceneFinale = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Bullseye bg spins in
+  // Bullseye bg spin
   const bgSpring = spring({ frame, fps, config: { damping: 10, stiffness: 120 } });
   const bgScale = interpolate(bgSpring, [0, 1], [0.1, 1]);
-  const bgRotation = interpolate(frame, [0, 180], [30, 0]);
+  const bgRotation = interpolate(frame, [0, 160], [40, 0], { extrapolateRight: "clamp" });
 
   // Flash
   const flash = interpolate(frame, [0, 5, 15], [1, 0.6, 0], { extrapolateRight: "clamp" });
 
   // Shake
-  const shakeX = frame < 15 ? Math.sin(frame * 7) * (15 - frame) * 2 : 0;
-  const shakeY = frame < 15 ? Math.cos(frame * 10) * (15 - frame) * 1.2 : 0;
+  const shakeX = frame < 18 ? Math.sin(frame * 8) * (18 - frame) * 2.5 : 0;
+  const shakeY = frame < 18 ? Math.cos(frame * 11) * (18 - frame) * 1.5 : 0;
 
-  // GIANT logo — this is the hero moment
-  const logoSpring = spring({ frame: frame - 10, fps, config: { damping: 8, stiffness: 80 } });
-  const logoScale = interpolate(logoSpring, [0, 1], [6, 1]);
-  const logoRotate = interpolate(logoSpring, [0, 1], [-15, 0]);
-  const logoOpacity = interpolate(frame, [10, 20], [0, 1], { extrapolateRight: "clamp" });
+  // GIANT logo
+  const logoSpring = spring({ frame: frame - 8, fps, config: { damping: 7, stiffness: 90 } });
+  const logoScale = interpolate(logoSpring, [0, 1], [8, 1]);
+  const logoRotate = interpolate(logoSpring, [0, 1], [-20, 0]);
+  const logoOpacity = interpolate(frame, [8, 18], [0, 1], { extrapolateRight: "clamp" });
+  const logoPulse = Math.sin(frame * 0.15) * 8 + 30;
 
-  // Logo glow pulse
-  const logoPulse = Math.sin(frame * 0.15) * 5 + 25;
+  // "Nie wieder langweilig!" text
+  const textSpring = spring({ frame: frame - 28, fps, config: { damping: 10, stiffness: 140 } });
+  const textScale = interpolate(textSpring, [0, 1], [0.2, 1]);
+  const textOpacity = interpolate(frame, [28, 38], [0, 1], { extrapolateRight: "clamp" });
 
-  // "Nie wieder langweilig" text
-  const textSpring = spring({ frame: frame - 30, fps, config: { damping: 12 } });
-  const textScale = interpolate(textSpring, [0, 1], [0.3, 1]);
-  const textOpacity = interpolate(frame, [30, 40], [0, 1], { extrapolateRight: "clamp" });
-
-  // Waitlist CTA
-  const ctaSpring = spring({ frame: frame - 55, fps, config: { damping: 15 } });
-  const ctaY = interpolate(ctaSpring, [0, 1], [100, 0]);
-  const ctaOpacity = interpolate(frame, [55, 65], [0, 1], { extrapolateRight: "clamp" });
-
-  // Counter
+  // Waitlist counter
   const countTo = 847;
-  const countProgress = interpolate(frame, [70, 120], [0, 1], {
+  const countProgress = interpolate(frame, [60, 110], [0, 1], {
     extrapolateLeft: "clamp", extrapolateRight: "clamp",
   });
   const currentCount = Math.round(countProgress * countTo);
 
-  // Bouncing arrow
-  const arrowBounce = Math.sin(frame * 0.25) * 10;
+  // CTA block
+  const ctaSpring = spring({ frame: frame - 50, fps, config: { damping: 14 } });
+  const ctaY = interpolate(ctaSpring, [0, 1], [120, 0]);
+  const ctaOpacity = interpolate(frame, [50, 60], [0, 1], { extrapolateRight: "clamp" });
+
+  // CTA button pulse
+  const ctaPulse = frame > 80 ? Math.sin(frame * 0.2) * 3 + 1 : 1;
+
+  // Arrow bounce
+  const arrowBounce = Math.sin(frame * 0.3) * 12;
+
+  // Speed lines in finale
+  const finaleLines = interpolate(frame, [0, 15, 40], [0.5, 0.3, 0.08], {
+    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  });
 
   return (
     <AbsoluteFill style={{ transform: `translate(${shakeX}px, ${shakeY}px)` }}>
@@ -60,10 +69,17 @@ export const SceneFinale = () => {
         />
       </div>
 
-      {/* Dark overlay for readability */}
+      {/* Dark overlay */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.6) 100%)",
+        background: "radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.65) 100%)",
+      }} />
+
+      {/* Speed lines */}
+      <div style={{
+        position: "absolute", inset: -200,
+        background: `repeating-conic-gradient(from 0deg, rgba(255,255,255,0.1) 0deg 2deg, transparent 2deg 10deg)`,
+        opacity: finaleLines,
       }} />
 
       {/* Flash */}
@@ -77,31 +93,31 @@ export const SceneFinale = () => {
           opacity: logoOpacity,
           transform: `scale(${logoScale}) rotate(${logoRotate}deg)`,
           filter: `drop-shadow(0 0 ${logoPulse}px rgba(20,184,166,0.6))`,
-          marginTop: -200,
+          marginTop: -220,
         }}>
           <Img
             src={staticFile("images/hioutz-logo.png")}
-            style={{ width: 500, height: "auto" }}
+            style={{ width: 540, height: "auto" }}
           />
         </div>
 
-        {/* "Nie wieder langweilig" */}
+        {/* "Nie wieder langweilig!" */}
         <div style={{
-          position: "absolute", top: "48%",
+          position: "absolute", top: "47%",
           opacity: textOpacity,
           transform: `scale(${textScale})`,
           textAlign: "center",
         }}>
           <div style={{
-            background: "rgba(255,0,0,0.9)",
-            padding: "18px 50px",
-            border: "5px solid white",
-            boxShadow: "8px 8px 0 rgba(0,0,0,0.4)",
+            background: "rgba(255,0,0,0.92)",
+            padding: "20px 55px",
+            border: "6px solid white",
+            boxShadow: "10px 10px 0 rgba(0,0,0,0.45)",
             transform: "rotate(-2deg)",
           }}>
             <span style={{
-              fontFamily: "sans-serif", fontWeight: 900, fontSize: 50,
-              color: "white", letterSpacing: 2,
+              fontFamily, fontSize: 56, color: "white",
+              letterSpacing: 4,
             }}>
               NIE WIEDER LANGWEILIG!
             </span>
@@ -110,20 +126,20 @@ export const SceneFinale = () => {
 
         {/* Waitlist CTA */}
         <div style={{
-          position: "absolute", bottom: 200,
+          position: "absolute", bottom: 180,
           opacity: ctaOpacity,
           transform: `translateY(${ctaY}px)`,
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 22,
         }}>
           <div style={{
-            background: "rgba(0,0,0,0.9)",
-            padding: "20px 50px",
-            border: "4px solid #FFE500",
+            background: "rgba(0,0,0,0.92)",
+            padding: "22px 55px",
+            border: "5px solid #FFE500",
             boxShadow: "0 0 40px rgba(255,229,0,0.3)",
           }}>
             <span style={{
-              fontFamily: "sans-serif", fontWeight: 900, fontSize: 44,
-              color: "#FFE500",
+              fontFamily, fontSize: 50, color: "#FFE500",
+              letterSpacing: 2,
             }}>
               {currentCount}+ warten schon!
             </span>
@@ -131,13 +147,14 @@ export const SceneFinale = () => {
 
           <div style={{
             background: "#14b8a6",
-            padding: "16px 44px",
-            border: "4px solid black",
-            boxShadow: "6px 6px 0 black",
+            padding: "18px 48px",
+            border: "5px solid black",
+            boxShadow: "8px 8px 0 black",
+            transform: `scale(${ctaPulse})`,
           }}>
             <span style={{
-              fontFamily: "sans-serif", fontWeight: 900, fontSize: 36,
-              color: "white", letterSpacing: 1,
+              fontFamily, fontSize: 40, color: "white",
+              letterSpacing: 2,
             }}>
               JETZT AUF DIE WAITLIST →
             </span>
@@ -146,7 +163,7 @@ export const SceneFinale = () => {
           {/* Bouncing arrow */}
           <div style={{
             transform: `translateY(${arrowBounce}px)`,
-            fontSize: 50,
+            fontSize: 55,
           }}>
             ⬇️
           </div>

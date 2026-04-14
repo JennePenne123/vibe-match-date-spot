@@ -1,33 +1,56 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, staticFile, Img } from "remotion";
+import { loadFont } from "@remotion/google-fonts/Bangers";
 
-// Scene 2: Bored couple — multi-panel comic page with zoom
+const { fontFamily } = loadFont();
+
+// Scene 2: Bored couple — comic page with Ken Burns + thought bubbles
 export const SceneBored = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Full page panel slam
-  const panelSpring = spring({ frame, fps, config: { damping: 12, stiffness: 140 } });
-  const panelScale = interpolate(panelSpring, [0, 1], [1.5, 1]);
-  const panelOpacity = interpolate(frame, [0, 8], [0, 1], { extrapolateRight: "clamp" });
+  // Panel slam entrance
+  const panelSpring = spring({ frame, fps, config: { damping: 10, stiffness: 160 } });
+  const panelScale = interpolate(panelSpring, [0, 1], [1.6, 1]);
+  const panelOpacity = interpolate(frame, [0, 6], [0, 1], { extrapolateRight: "clamp" });
 
   // Shake on slam
-  const shakeX = frame < 10 ? Math.sin(frame * 5) * (10 - frame) * 1.2 : 0;
-  const shakeY = frame < 10 ? Math.cos(frame * 7) * (10 - frame) * 0.8 : 0;
+  const shakeX = frame < 12 ? Math.sin(frame * 6) * (12 - frame) * 1.5 : 0;
+  const shakeY = frame < 12 ? Math.cos(frame * 8) * (12 - frame) * 1 : 0;
 
-  // Ken Burns zoom into the couple
-  const zoom = interpolate(frame, [10, 130], [1, 1.25], { extrapolateRight: "clamp" });
-  const panX = interpolate(frame, [10, 130], [0, -30], { extrapolateRight: "clamp" });
-  const panY = interpolate(frame, [10, 130], [0, -60], { extrapolateRight: "clamp" });
+  // Ken Burns zoom
+  const zoom = interpolate(frame, [10, 130], [1, 1.3], { extrapolateRight: "clamp" });
+  const panX = interpolate(frame, [10, 130], [0, -40], { extrapolateRight: "clamp" });
+  const panY = interpolate(frame, [10, 130], [0, -70], { extrapolateRight: "clamp" });
 
-  // Caption bar at top
-  const capSpring = spring({ frame: frame - 3, fps, config: { damping: 18 } });
-  const capX = interpolate(capSpring, [0, 1], [-600, 0]);
+  // Caption bar slides in
+  const capSpring = spring({ frame: frame - 3, fps, config: { damping: 15, stiffness: 120 } });
+  const capX = interpolate(capSpring, [0, 1], [-700, 0]);
 
-  // "Freitagabend" text pulse
-  const textPulse = Math.sin(frame * 0.15) * 0.03 + 1;
+  // Desaturation — color drains to show boredom
+  const saturation = interpolate(frame, [25, 100], [1, 0.3], { extrapolateRight: "clamp" });
 
-  // Desaturation effect — starts colorful, goes grey to emphasize boredom
-  const saturation = interpolate(frame, [30, 90], [1, 0.4], { extrapolateRight: "clamp" });
+  // Thought bubble "..." appearing
+  const bubbleOpacity = interpolate(frame, [40, 55], [0, 1], { extrapolateRight: "clamp" });
+  const bubbleScale = interpolate(
+    spring({ frame: frame - 40, fps, config: { damping: 10 } }),
+    [0, 1], [0.3, 1]
+  );
+
+  // Dots animate one by one
+  const dot1 = interpolate(frame, [50, 58], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const dot2 = interpolate(frame, [58, 66], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const dot3 = interpolate(frame, [66, 74], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
+  // Bottom text
+  const textSpring = spring({ frame: frame - 55, fps, config: { damping: 8 } });
+  const textScale = interpolate(textSpring, [0, 1], [0.4, 1]);
+  const textOpacity = interpolate(frame, [55, 68], [0, 1], { extrapolateRight: "clamp" });
+
+  // Yawn emoji floating
+  const yawnY = interpolate(frame, [80, 130], [0, -60], { extrapolateRight: "clamp" });
+  const yawnOpacity = interpolate(frame, [80, 90, 120, 130], [0, 1, 1, 0], {
+    extrapolateLeft: "clamp", extrapolateRight: "clamp",
+  });
 
   return (
     <AbsoluteFill style={{ transform: `translate(${shakeX}px, ${shakeY}px)` }}>
@@ -35,17 +58,17 @@ export const SceneBored = () => {
       <div style={{ position: "absolute", inset: 0, background: "#FFE500" }} />
       <div style={{
         position: "absolute", inset: 0,
-        background: "radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px)",
+        background: "radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px)",
         backgroundSize: "8px 8px",
       }} />
 
-      {/* Main panel with zoom */}
+      {/* Main panel */}
       <div style={{
-        position: "absolute", top: 180, left: 40, right: 40, bottom: 250,
+        position: "absolute", top: 180, left: 35, right: 35, bottom: 280,
         opacity: panelOpacity,
         overflow: "hidden",
-        border: "7px solid black",
-        boxShadow: "12px 12px 0 rgba(0,0,0,0.3)",
+        border: "8px solid black",
+        boxShadow: "14px 14px 0 rgba(0,0,0,0.35)",
       }}>
         <Img
           src={staticFile("images/comic-v2-panel1.png")}
@@ -57,43 +80,84 @@ export const SceneBored = () => {
         />
       </div>
 
+      {/* Thought bubble */}
+      <div style={{
+        position: "absolute", top: 120, right: 80,
+        opacity: bubbleOpacity,
+        transform: `scale(${bubbleScale})`,
+      }}>
+        <div style={{
+          background: "white", borderRadius: "50%",
+          width: 200, height: 120,
+          border: "5px solid black",
+          display: "flex", justifyContent: "center", alignItems: "center",
+          gap: 12,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.2)",
+        }}>
+          <span style={{ fontSize: 40, opacity: dot1 }}>•</span>
+          <span style={{ fontSize: 40, opacity: dot2 }}>•</span>
+          <span style={{ fontSize: 40, opacity: dot3 }}>•</span>
+        </div>
+        {/* Small bubble connectors */}
+        <div style={{
+          position: "absolute", bottom: -20, left: 40,
+          width: 22, height: 22, borderRadius: "50%",
+          background: "white", border: "4px solid black",
+        }} />
+        <div style={{
+          position: "absolute", bottom: -38, left: 20,
+          width: 14, height: 14, borderRadius: "50%",
+          background: "white", border: "3px solid black",
+        }} />
+      </div>
+
       {/* Caption bar */}
       <div style={{
         position: "absolute", top: 70, left: 0,
-        transform: `translateX(${capX}px) scale(${textPulse})`,
+        transform: `translateX(${capX}px)`,
       }}>
         <div style={{
           background: "#FF0000",
-          padding: "14px 60px 14px 40px",
-          borderRight: "5px solid black",
-          borderBottom: "5px solid black",
-          boxShadow: "6px 6px 0 rgba(0,0,0,0.2)",
+          padding: "16px 65px 16px 40px",
+          borderRight: "6px solid black",
+          borderBottom: "6px solid black",
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.25)",
         }}>
           <span style={{
-            fontFamily: "sans-serif", fontWeight: 900, fontSize: 40,
-            color: "white", textTransform: "uppercase", letterSpacing: 3,
+            fontFamily, fontSize: 46, color: "white",
+            textTransform: "uppercase", letterSpacing: 4,
           }}>
             📅 Freitagabend
           </span>
         </div>
       </div>
 
-      {/* Bottom text that fades in */}
+      {/* Floating yawn */}
+      <div style={{
+        position: "absolute", top: 350, left: 120,
+        fontSize: 60, opacity: yawnOpacity,
+        transform: `translateY(${yawnY}px)`,
+      }}>
+        😴
+      </div>
+
+      {/* Bottom text */}
       <div style={{
         position: "absolute", bottom: 80, left: 0, right: 0,
         display: "flex", justifyContent: "center",
+        opacity: textOpacity,
+        transform: `scale(${textScale})`,
       }}>
         <div style={{
-          opacity: interpolate(frame, [50, 65], [0, 1], { extrapolateRight: "clamp" }),
-          transform: `scale(${interpolate(
-            spring({ frame: frame - 50, fps, config: { damping: 10 } }),
-            [0, 1], [0.5, 1]
-          )})`,
+          background: "rgba(0,0,0,0.85)",
+          padding: "14px 40px",
+          border: "4px solid #FFE500",
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.3)",
+          transform: "rotate(-1deg)",
         }}>
           <span style={{
-            fontFamily: "sans-serif", fontWeight: 800, fontSize: 52,
-            color: "#333", textShadow: "3px 3px 0 rgba(255,229,0,0.8)",
-            fontStyle: "italic",
+            fontFamily, fontSize: 54, color: "#FFE500",
+            letterSpacing: 2,
           }}>
             Wohin heute...? 🤷
           </span>

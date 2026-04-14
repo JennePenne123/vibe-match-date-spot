@@ -1,14 +1,15 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, staticFile, Img, Sequence } from "remotion";
+import { useCurrentFrame, interpolate, staticFile, Img } from "remotion";
 
-// Persistent logo watermark that appears throughout the video
+// Persistent logo watermark — subtle but branded
 export const LogoWatermark = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
 
-  // Logo fades in early and stays
-  const opacity = interpolate(frame, [0, 20], [0, 0.15], { extrapolateRight: "clamp" });
+  // Delayed fade in, stays subtle
+  const opacity = interpolate(frame, [30, 60], [0, 0.12], { extrapolateRight: "clamp" });
   // Subtle breathing
-  const breathe = Math.sin(frame * 0.03) * 0.02 + 1;
+  const breathe = Math.sin(frame * 0.025) * 0.015 + 1;
+  // Very slow rotation
+  const rotate = Math.sin(frame * 0.008) * 1;
 
   return (
     <div style={{
@@ -22,10 +23,10 @@ export const LogoWatermark = () => {
       <Img
         src={staticFile("images/hioutz-logo.png")}
         style={{
-          width: 500,
+          width: 480,
           height: "auto",
-          transform: `scale(${breathe})`,
-          filter: "brightness(2)",
+          transform: `scale(${breathe}) rotate(${rotate}deg)`,
+          filter: "brightness(2) saturate(0.5)",
         }}
       />
     </div>
