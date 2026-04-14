@@ -47,8 +47,7 @@ export const BLOCKED_VENUE_TAGS = [
   'pet-store', 'auto-repair', 'car-wash', 'laundry', 'dry-cleaner',
   'supermarkt', 'tankstelle',
   'food-grocery',
-  // Non-gastronomy entertainment/culture
-  'museum', 'theatre', 'cinema', 'theater',
+  // Note: museum, theatre, cinema are NOT blocked — they are kept for future activities feature
 ];
 
 export const BLOCKED_CUISINE_TYPES = [
