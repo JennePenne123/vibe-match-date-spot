@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { filterBlockedVenues } from './venueBlocklist';
 
 export const getActiveVenues = async (
   limit: number = 50,
@@ -14,7 +15,7 @@ export const getActiveVenues = async (
 
     // Filter by bounding box if location is provided
     if (userLocation?.latitude && userLocation?.longitude) {
-      const latDelta = radiusKm / 111; // ~111km per degree latitude
+      const latDelta = radiusKm / 111;
       const lngDelta = radiusKm / (111 * Math.cos(userLocation.latitude * Math.PI / 180));
       query = query
         .gte('latitude', userLocation.latitude - latDelta)
@@ -25,7 +26,7 @@ export const getActiveVenues = async (
 
     const { data: venues, error: venuesError } = await query.limit(limit);
     if (venuesError) throw venuesError;
-    return venues || [];
+    return filterBlockedVenues(venues || []);
   } catch (error) {
     console.error('Error fetching venues:', error);
     return [];
