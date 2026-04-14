@@ -1,76 +1,55 @@
 project_id = "dfjwubatslzblagthbdw"
 
-[functions.analyze-compatibility]
-verify_jwt = true
-
-[functions.ai-venue-recommendations]
-verify_jwt = true
-
-[functions.generate-invitation-message]
-verify_jwt = true
-
-[functions.suggest-date-ideas]
-verify_jwt = true
-
-[functions.check-completed-dates]
-verify_jwt = false
-
-[functions.calculate-feedback-rewards]
-verify_jwt = false
-
-[functions.search-venues]
-verify_jwt = true
-
-[functions.search-venues-overpass]
-verify_jwt = true
-
-[functions.process-referral]
-verify_jwt = false
-
-[functions.learn-from-feedback]
-verify_jwt = true
-
-[functions.get-ai-insights]
-verify_jwt = true
-
-[functions.send-push-notification]
-verify_jwt = false
-
-[functions.cleanup-sessions]
-verify_jwt = false
-
-[functions.validate-google-places-setup]
-verify_jwt = true
-
-[functions.notify-venue-partner]
-verify_jwt = false
-
-[functions.redeem-voucher]
-verify_jwt = true
-
-[functions.redeem-reward]
-verify_jwt = false
-
-[functions.check-streaks]
-verify_jwt = false
-
-[functions.search-venues-radar]
-verify_jwt = true
-
-[functions.search-venues-tripadvisor]
-verify_jwt = true
-
-[functions.ai-quick-tip]
-verify_jwt = true
-
-[functions.check-verification-reminders]
-verify_jwt = false
-
-[functions.verify-partner]
-verify_jwt = true
-
-[functions.ai-concierge]
-verify_jwt = false
-
-[functions.validate-venue-data]
-verify_jwt = false
+[functions]
+  [functions.ai-concierge]
+    verify_jwt = false
+  [functions.ai-quick-tip]
+    verify_jwt = true
+  [functions.ai-venue-recommendations]
+    verify_jwt = true
+  [functions.analyze-compatibility]
+    verify_jwt = true
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.calculate-feedback-rewards]
+    verify_jwt = false
+  [functions.check-completed-dates]
+    verify_jwt = false
+  [functions.check-streaks]
+    verify_jwt = false
+  [functions.check-verification-reminders]
+    verify_jwt = false
+  [functions.cleanup-sessions]
+    verify_jwt = false
+  [functions.generate-invitation-message]
+    verify_jwt = true
+  [functions.get-ai-insights]
+    verify_jwt = true
+  [functions.learn-from-feedback]
+    verify_jwt = true
+  [functions.notify-venue-partner]
+    verify_jwt = false
+  [functions.process-referral]
+    verify_jwt = false
+  [functions.redeem-reward]
+    verify_jwt = false
+  [functions.redeem-voucher]
+    verify_jwt = true
+  [functions.search-venues]
+    verify_jwt = true
+  [functions.search-venues-overpass]
+    verify_jwt = true
+  [functions.search-venues-radar]
+    verify_jwt = true
+  [functions.search-venues-tripadvisor]
+    verify_jwt = true
+  [functions.send-push-notification]
+    verify_jwt = false
+  [functions.suggest-date-ideas]
+    verify_jwt = true
+  [functions.validate-google-places-setup]
+    verify_jwt = true
+  [functions.validate-venue-data]
+    verify_jwt = false
+  [functions.verify-partner]
+    verify_jwt = true
