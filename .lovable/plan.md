@@ -93,7 +93,7 @@ Partner gibt USt-IdNr. ein → Status: pending_review
 ### Monetarisierung & Payments
 - [ ] Stripe-Integration für Premium-Modelle
 - [ ] Premium-Vouchers für Top-3-Matches (abhängig von Stripe)
-- [ ] Bei eigener Zahlungsabwicklung (nicht App Store): Muster-Widerrufsformular in AGB ergänzen (§ 355 BGB)
+- [x] Muster-Widerrufsformular erstellt (`/widerrufsformular`) + in AGB § 9 verlinkt + in Settings verlinkt
 
 ### Features
 - [ ] Favoriten-System: DB-Migration für Persistenz und KI-Signale
