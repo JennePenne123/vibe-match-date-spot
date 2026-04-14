@@ -523,6 +523,47 @@ export const useDatePlanning = (userLocation?: { latitude: number; longitude: nu
 
       console.log('💾 COMPLETE PLANNING SESSION - Invitation created successfully:', insertedInvitation);
 
+      // Send date invitation email to recipient
+      try {
+        const { data: recipientProfile } = await supabase
+          .from('profiles')
+          .select('email, name')
+          .eq('id', recipientId)
+          .single();
+
+        const { data: senderProfile } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('id', user.id)
+          .single();
+
+        if (recipientProfile?.email) {
+          const venueName = recommendedVenue?.name || recommendedVenue?.venue_name || undefined;
+          const formattedDate = proposedDateTime
+            ? proposedDateTime.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
+            : undefined;
+
+          await supabase.functions.invoke('send-transactional-email', {
+            body: {
+              templateName: 'date-invitation',
+              recipientEmail: recipientProfile.email,
+              idempotencyKey: `date-invite-${insertedInvitation.id}`,
+              templateData: {
+                senderName: senderProfile?.name || 'Jemand',
+                title: invitationData.title,
+                venueName,
+                proposedDate: formattedDate,
+                message: finalMessage?.substring(0, 200),
+                invitationId: insertedInvitation.id,
+              },
+            },
+          });
+          console.log('📧 Date invitation email sent to', recipientProfile.email);
+        }
+      } catch (emailError) {
+        console.error('Date invitation email error (non-critical):', emailError);
+      }
+
       // Mark related proposal as converted (if exists) - Enhanced logic
       try {
         // First, try to update by planning_session_id
