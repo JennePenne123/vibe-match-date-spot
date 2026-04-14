@@ -47,19 +47,31 @@ export const BLOCKED_VENUE_TAGS = [
   'pet-store', 'auto-repair', 'car-wash', 'laundry', 'dry-cleaner',
   'supermarkt', 'tankstelle',
   'food-grocery',
+  // Non-gastronomy entertainment/culture
+  'museum', 'theatre', 'cinema', 'theater',
+];
+
+export const BLOCKED_CUISINE_TYPES = [
+  'museum', 'theater', 'cinema', 'theatre',
 ];
 
 /**
  * Filters out non-restaurant venues from a list of venue objects.
- * Works with any object that has `name` and optionally `tags` fields.
+ * Works with any object that has `name` and optionally `tags` and `cuisine_type` fields.
  */
-export function filterBlockedVenues<T extends { name: string; tags?: string[] | null }>(venues: T[]): T[] {
+export function filterBlockedVenues<T extends { name: string; tags?: string[] | null; cuisine_type?: string | null }>(venues: T[]): T[] {
   return venues.filter(venue => {
     const nameLower = (venue.name || '').toLowerCase();
     
     // Check blocked names
     const hasBlockedName = BLOCKED_VENUE_NAMES.some(b => nameLower.includes(b));
     if (hasBlockedName) return false;
+    
+    // Check blocked cuisine types
+    if (venue.cuisine_type) {
+      const cuisineLower = venue.cuisine_type.toLowerCase();
+      if (BLOCKED_CUISINE_TYPES.includes(cuisineLower)) return false;
+    }
     
     // Check blocked tags
     if (venue.tags && Array.isArray(venue.tags)) {
