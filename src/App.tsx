@@ -238,6 +238,7 @@ const App = () => (
                     <Route path="/impressum" element={<LazyPageNoLayout><Impressum /></LazyPageNoLayout>} />
                     <Route path="/datenschutz" element={<LazyPageNoLayout><Datenschutz /></LazyPageNoLayout>} />
                     <Route path="/agb" element={<LazyPageNoLayout><AGB /></LazyPageNoLayout>} />
+                    <Route path="/widerrufsformular" element={<LazyPageNoLayout><Widerrufsformular /></LazyPageNoLayout>} />
                     <Route path="/unsubscribe" element={<LazyPageNoLayout><Unsubscribe /></LazyPageNoLayout>} />
                     
                     {/* Debug route */}
