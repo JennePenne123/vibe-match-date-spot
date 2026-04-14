@@ -140,7 +140,8 @@ const fetchFallbackVenues = async (
   const { data, error } = await query.limit(100);
   if (error) throw error;
 
-  return applyVenueFilters((data || []) as Venue[], selectedCuisines, selectedVibes);
+  const filtered = filterBlockedVenues((data || []) as Venue[]);
+  return applyVenueFilters(filtered, selectedCuisines, selectedVibes);
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
