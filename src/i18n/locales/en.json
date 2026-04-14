@@ -1099,5 +1099,20 @@
     "errorNotPartner": "This account is not registered as a venue partner.",
     "errorNotPartnerDetail": "This account is not registered as a venue partner. Please contact us to become a partner.",
     "errorUnexpected": "An unexpected error occurred"
+  },
+  "privacyBanner": {
+    "titleGdpr": "🇪🇺 Privacy Notice (GDPR)",
+    "titleCcpa": "🇺🇸 Privacy Notice (CCPA)",
+    "titleUs": "🇺🇸 Privacy Notice",
+    "titleLgpd": "🇧🇷 Privacy Notice (LGPD)",
+    "titleOther": "🔒 Privacy Notice",
+    "textGdpr": "We do not use tracking cookies. Your data is processed in accordance with the GDPR. Our AI recommendations are based on your preferences – you can adjust this anytime in your <link>settings</link>.",
+    "textCcpa": "We do not sell your personal information. Under the California Consumer Privacy Act (CCPA), you have the right to opt out of data sharing and request deletion of your data. <link>Privacy Policy</link>",
+    "textUs": "We respect your privacy. We don't use tracking cookies or sell your data. Our AI recommendations are based on your preferences – you can adjust this anytime. <link>Privacy Policy</link>",
+    "textLgpd": "Your data is processed in accordance with the LGPD. We do not use tracking cookies. Our AI recommendations are based on your preferences. <link>Privacy Policy</link>",
+    "textOther": "We respect your privacy. No tracking cookies are used. Our AI recommendations are based on your preferences – you can adjust this anytime in your settings. <link>Privacy Policy</link>",
+    "accept": "Got it",
+    "doNotSell": "Do Not Sell My Data",
+    "learnMore": "Learn more"
   }
 }

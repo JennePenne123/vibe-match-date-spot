@@ -1099,5 +1099,20 @@
     "errorNotPartner": "Dieses Konto ist nicht als Venue-Partner registriert.",
     "errorNotPartnerDetail": "Dieses Konto ist nicht als Venue-Partner registriert. Kontaktiere uns, um Partner zu werden.",
     "errorUnexpected": "Ein unerwarteter Fehler ist aufgetreten"
+  },
+  "privacyBanner": {
+    "titleGdpr": "🇪🇺 Datenschutz-Hinweis",
+    "titleCcpa": "🇺🇸 Datenschutz-Hinweis (CCPA)",
+    "titleUs": "🇺🇸 Datenschutz-Hinweis",
+    "titleLgpd": "🇧🇷 Datenschutz-Hinweis (LGPD)",
+    "titleOther": "🔒 Datenschutz-Hinweis",
+    "textGdpr": "Wir verwenden keine Tracking-Cookies. Deine Daten werden gemäß der DSGVO verarbeitet. Unsere KI-Empfehlungen basieren auf deinen Präferenzen – du kannst dies jederzeit in den <link>Einstellungen</link> anpassen.",
+    "textCcpa": "Wir verkaufen deine personenbezogenen Daten nicht. Gemäß dem California Consumer Privacy Act (CCPA) hast du das Recht, der Datenweitergabe zu widersprechen und die Löschung deiner Daten zu verlangen. <link>Datenschutzerklärung</link>",
+    "textUs": "Wir respektieren deine Privatsphäre. Wir verwenden keine Tracking-Cookies und verkaufen deine Daten nicht. Unsere KI-Empfehlungen basieren auf deinen Präferenzen – du kannst dies jederzeit anpassen. <link>Datenschutzerklärung</link>",
+    "textLgpd": "Deine Daten werden gemäß der LGPD verarbeitet. Wir verwenden keine Tracking-Cookies. Unsere KI-Empfehlungen basieren auf deinen Präferenzen. <link>Datenschutzerklärung</link>",
+    "textOther": "Wir respektieren deine Privatsphäre. Es werden keine Tracking-Cookies verwendet. Unsere KI-Empfehlungen basieren auf deinen Präferenzen – du kannst dies jederzeit in den Einstellungen anpassen. <link>Datenschutzerklärung</link>",
+    "accept": "Verstanden",
+    "doNotSell": "Meine Daten nicht verkaufen",
+    "learnMore": "Mehr erfahren"
   }
 }

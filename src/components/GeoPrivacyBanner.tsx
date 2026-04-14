@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 
 type PrivacyRegion = 'eu' | 'us-ca' | 'us' | 'br' | 'uk' | 'other';
 
@@ -10,7 +10,7 @@ const STORAGE_KEY = 'hioutz-privacy-consent-v1';
 interface ConsentState {
   region: PrivacyRegion;
   accepted: boolean;
-  optOutDataSale?: boolean; // CCPA
+  optOutDataSale?: boolean;
   timestamp: string;
 }
 
@@ -31,6 +31,24 @@ function detectRegion(timezone: string): PrivacyRegion {
   return 'other';
 }
 
+const regionTitleKey: Record<PrivacyRegion, string> = {
+  eu: 'privacyBanner.titleGdpr',
+  uk: 'privacyBanner.titleGdpr',
+  'us-ca': 'privacyBanner.titleCcpa',
+  us: 'privacyBanner.titleUs',
+  br: 'privacyBanner.titleLgpd',
+  other: 'privacyBanner.titleOther',
+};
+
+const regionTextKey: Record<PrivacyRegion, string> = {
+  eu: 'privacyBanner.textGdpr',
+  uk: 'privacyBanner.textGdpr',
+  'us-ca': 'privacyBanner.textCcpa',
+  us: 'privacyBanner.textUs',
+  br: 'privacyBanner.textLgpd',
+  other: 'privacyBanner.textOther',
+};
+
 export default function GeoPrivacyBanner() {
   const [visible, setVisible] = useState(false);
   const [region, setRegion] = useState<PrivacyRegion>('other');
@@ -41,14 +59,13 @@ export default function GeoPrivacyBanner() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed: ConsentState = JSON.parse(stored);
-        if (parsed.accepted) return; // Already consented
+        if (parsed.accepted) return;
       }
     } catch { /* no stored consent */ }
 
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
     const detected = detectRegion(tz);
     setRegion(detected);
-    // Small delay so it doesn't flash on page load
     const timer = setTimeout(() => setVisible(true), 1500);
     return () => clearTimeout(timer);
   }, []);
@@ -74,77 +91,35 @@ export default function GeoPrivacyBanner() {
           <div className="flex-1 space-y-3">
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-semibold text-sm text-foreground">
-                {region === 'eu' || region === 'uk' ? '🇪🇺 Datenschutz-Hinweis' :
-                 region === 'us-ca' ? '🇺🇸 Privacy Notice (CCPA)' :
-                 region === 'us' ? '🇺🇸 Privacy Notice' :
-                 region === 'br' ? '🇧🇷 Aviso de Privacidade (LGPD)' :
-                 '🔒 Privacy Notice'}
+                {t(regionTitleKey[region])}
               </h3>
               <button onClick={() => handleAccept()} className="text-muted-foreground hover:text-foreground">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* EU/UK GDPR */}
-            {(region === 'eu' || region === 'uk') && (
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Wir verwenden keine Tracking-Cookies. Deine Daten werden gemäß der DSGVO verarbeitet. 
-                Unsere KI-Empfehlungen basieren auf deinen Präferenzen – du kannst dies jederzeit in den{' '}
-                <a href="/datenschutz" className="underline text-primary hover:text-primary/80">Einstellungen</a> anpassen.
-              </p>
-            )}
-
-            {/* California CCPA */}
-            {region === 'us-ca' && (
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                We do not sell your personal information. Under the California Consumer Privacy Act (CCPA), 
-                you have the right to opt out of data sharing and request deletion of your data.{' '}
-                <a href="/datenschutz" className="underline text-primary hover:text-primary/80">Privacy Policy</a>
-              </p>
-            )}
-
-            {/* US general */}
-            {region === 'us' && (
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                We respect your privacy. We don't use tracking cookies or sell your data. 
-                Our AI recommendations are based on your preferences – you can adjust this anytime.{' '}
-                <a href="/datenschutz" className="underline text-primary hover:text-primary/80">Privacy Policy</a>
-              </p>
-            )}
-
-            {/* Brazil LGPD */}
-            {region === 'br' && (
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Seus dados são tratados conforme a LGPD. Não usamos cookies de rastreamento. 
-                Nossas recomendações de IA são baseadas em suas preferências.{' '}
-                <a href="/datenschutz" className="underline text-primary hover:text-primary/80">Política de Privacidade</a>
-              </p>
-            )}
-
-            {/* Other regions */}
-            {region === 'other' && (
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                We respect your privacy. No tracking cookies are used. Our AI recommendations are based 
-                on your preferences – you can adjust this anytime in your settings.{' '}
-                <a href="/datenschutz" className="underline text-primary hover:text-primary/80">Privacy Policy</a>
-              </p>
-            )}
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <Trans
+                i18nKey={regionTextKey[region]}
+                components={{
+                  link: <a href="/datenschutz" className="underline text-primary hover:text-primary/80" />,
+                }}
+              />
+            </p>
 
             <div className="flex items-center gap-2 flex-wrap">
               <Button size="sm" onClick={() => handleAccept()} className="text-xs h-8">
-                {region === 'eu' || region === 'uk' ? 'Verstanden' :
-                 region === 'br' ? 'Entendi' : 'Got it'}
+                {t('privacyBanner.accept')}
               </Button>
 
               {region === 'us-ca' && (
                 <Button size="sm" variant="outline" onClick={() => handleAccept(true)} className="text-xs h-8">
-                  Do Not Sell My Data
+                  {t('privacyBanner.doNotSell')}
                 </Button>
               )}
 
               <a href="/datenschutz" className="text-xs text-muted-foreground hover:text-foreground underline ml-1">
-                {region === 'eu' || region === 'uk' ? 'Mehr erfahren' :
-                 region === 'br' ? 'Saiba mais' : 'Learn more'}
+                {t('privacyBanner.learnMore')}
               </a>
             </div>
           </div>
