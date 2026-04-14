@@ -98,6 +98,7 @@ const Chats = lazy(() => import("./pages/Chats"));
 const GroupDates = lazy(() => import("./pages/GroupDates"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Waitlist = lazy(() => import("./pages/Waitlist"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const AIRecommendations = lazy(() => import("./pages/AIRecommendations"));
 const SmartDatePlanning = lazy(() => import("./pages/SmartDatePlanning"));
 const AIInsights = lazy(() => import("./pages/AIInsights"));
@@ -236,6 +237,7 @@ const App = () => (
                     <Route path="/impressum" element={<LazyPageNoLayout><Impressum /></LazyPageNoLayout>} />
                     <Route path="/datenschutz" element={<LazyPageNoLayout><Datenschutz /></LazyPageNoLayout>} />
                     <Route path="/agb" element={<LazyPageNoLayout><AGB /></LazyPageNoLayout>} />
+                    <Route path="/unsubscribe" element={<LazyPageNoLayout><Unsubscribe /></LazyPageNoLayout>} />
                     
                     {/* Debug route */}
                     <Route path="/debug" element={<LazyPage><Debug /></LazyPage>} />
