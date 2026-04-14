@@ -977,5 +977,20 @@
     "noVenueSelected": "Ningún lugar seleccionado",
     "noVenueHint": "Por favor vuelve y selecciona un lugar.",
     "backToVenues": "Volver a selección de lugares"
+  },
+  "privacyBanner": {
+    "titleGdpr": "🇪🇺 Aviso de Privacidad (RGPD)",
+    "titleCcpa": "🇺🇸 Aviso de Privacidad (CCPA)",
+    "titleUs": "🇺🇸 Aviso de Privacidad",
+    "titleLgpd": "🇧🇷 Aviso de Privacidade (LGPD)",
+    "titleOther": "🔒 Aviso de Privacidad",
+    "textGdpr": "No usamos cookies de seguimiento. Tus datos se procesan conforme al RGPD. Nuestras recomendaciones de IA se basan en tus preferencias – puedes ajustarlas en cualquier momento en la <link>configuración</link>.",
+    "textCcpa": "No vendemos tu información personal. Según la Ley de Privacidad del Consumidor de California (CCPA), tienes derecho a optar por no compartir datos y solicitar su eliminación. <link>Política de Privacidad</link>",
+    "textUs": "Respetamos tu privacidad. No usamos cookies de seguimiento ni vendemos tus datos. Nuestras recomendaciones de IA se basan en tus preferencias – puedes ajustarlas en cualquier momento. <link>Política de Privacidad</link>",
+    "textLgpd": "Seus dados são tratados conforme a LGPD. Não usamos cookies de rastreamento. Nossas recomendações de IA são baseadas em suas preferências. <link>Política de Privacidade</link>",
+    "textOther": "Respetamos tu privacidad. No se usan cookies de seguimiento. Nuestras recomendaciones de IA se basan en tus preferencias – puedes ajustarlas en cualquier momento. <link>Política de Privacidad</link>",
+    "accept": "Entendido",
+    "doNotSell": "No vender mis datos",
+    "learnMore": "Más información"
   }
 }
