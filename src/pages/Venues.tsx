@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useFavorites } from '@/hooks/useFavorites';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -45,7 +46,7 @@ const Venues = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cityQuery, setCityQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  const [likedVenues, setLikedVenues] = useState<string[]>([]);
+  const { likedVenues, toggleLike } = useFavorites();
   const [venues, setVenues] = useState<VenueWithScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchingCity, setSearchingCity] = useState(false);
@@ -57,11 +58,6 @@ const Venues = () => {
   useEffect(() => {
     if (!authLoading && !user) navigate('/?auth=required', { replace: true });
   }, [authLoading, user, navigate]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('likedVenues');
-    if (saved) setLikedVenues(JSON.parse(saved));
-  }, []);
 
   // Get user's home location on mount
   const [initialSearchDone, setInitialSearchDone] = useState(false);
@@ -240,13 +236,8 @@ const Venues = () => {
   const toggleFilter = (filter: string) =>
     setSelectedFilters(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
 
-  const toggleLike = (venueId: string) => {
-    const updated = likedVenues.includes(venueId)
-      ? likedVenues.filter(id => id !== venueId)
-      : [...likedVenues, venueId];
-    setLikedVenues(updated);
-    localStorage.setItem('likedVenues', JSON.stringify(updated));
-  };
+
+
 
   const filteredVenues = venues.filter(venue => {
     const matchesSearch = !searchQuery ||

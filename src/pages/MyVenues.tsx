@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,37 +10,21 @@ import { ArrowLeft, Search, Heart, MapPin, Plus } from 'lucide-react';
 import VenueCard from '@/components/VenueCard';
 import { mockVenues } from '@/data/mockVenues';
 import { Venue } from '@/types';
+import { useFavorites } from '@/hooks/useFavorites';
 
 const MyVenues = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [likedVenues, setLikedVenues] = useState<string[]>([]);
-  const [venues, setVenues] = useState<Venue[]>(mockVenues);
+  const { likedVenues, toggleLike } = useFavorites();
+  const [venues] = useState<Venue[]>(mockVenues);
 
   React.useEffect(() => {
     if (!loading && !user) {
       navigate('/');
     }
   }, [loading, user, navigate]);
-
-  useEffect(() => {
-    // Load liked venues from localStorage
-    const saved = localStorage.getItem('likedVenues');
-    if (saved) {
-      setLikedVenues(JSON.parse(saved));
-    }
-  }, []);
-
-  const toggleLike = (venueId: string) => {
-    const newLikedVenues = likedVenues.includes(venueId)
-      ? likedVenues.filter(id => id !== venueId)
-      : [...likedVenues, venueId];
-    
-    setLikedVenues(newLikedVenues);
-    localStorage.setItem('likedVenues', JSON.stringify(newLikedVenues));
-  };
 
   const filteredVenues = venues.filter(venue => 
     likedVenues.includes(venue.id) &&
