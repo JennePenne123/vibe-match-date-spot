@@ -17,7 +17,7 @@ const MyVenues = () => {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const { likedVenues, toggleLike, loading: favLoading } = useFavorites();
+  const { likedVenues, toggleLike } = useFavorites();
   const [venues] = useState<Venue[]>(mockVenues);
 
   React.useEffect(() => {

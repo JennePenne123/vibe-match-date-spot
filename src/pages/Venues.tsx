@@ -55,6 +55,10 @@ const Venues = () => {
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [openNowFilter, setOpenNowFilter] = useState(false);
 
+  useEffect(() => {
+    if (!authLoading && !user) navigate('/?auth=required', { replace: true });
+  }, [authLoading, user, navigate]);
+
   // Get user's home location on mount
   const [initialSearchDone, setInitialSearchDone] = useState(false);
   useEffect(() => {
@@ -232,13 +236,8 @@ const Venues = () => {
   const toggleFilter = (filter: string) =>
     setSelectedFilters(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
 
-  const toggleLike = (venueId: string) => {
-    const updated = likedVenues.includes(venueId)
-      ? likedVenues.filter(id => id !== venueId)
-      : [...likedVenues, venueId];
-    setLikedVenues(updated);
-    localStorage.setItem('likedVenues', JSON.stringify(updated));
-  };
+
+
 
   const filteredVenues = venues.filter(venue => {
     const matchesSearch = !searchQuery ||
