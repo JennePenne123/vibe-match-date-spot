@@ -530,6 +530,7 @@ const Settings = () => {
               {[
                 { href: '/datenschutz', label: t('settings.privacy') },
                 { href: '/agb', label: t('settings.terms') },
+                { href: '/widerrufsformular', label: 'Widerrufsformular' },
                 { href: '/impressum', label: t('settings.imprint') },
               ].map(({ href, label }) => (
                 <a key={href} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between py-2 px-1 rounded-md hover:bg-accent/50 transition-colors group">
