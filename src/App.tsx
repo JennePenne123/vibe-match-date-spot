@@ -197,6 +197,7 @@ const App = () => (
               <NotificationSystem>
                 <ServiceWorkerCacheReset />
                 <OfflineBanner />
+                <GeoPrivacyBanner />
                 <PushNotificationPrompt />
                 <AppUsageTracker />
                 <ErrorBoundary level="page">
