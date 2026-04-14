@@ -17,31 +17,14 @@ const MyVenues = () => {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [likedVenues, setLikedVenues] = useState<string[]>([]);
-  const [venues, setVenues] = useState<Venue[]>(mockVenues);
+  const { likedVenues, toggleLike, loading: favLoading } = useFavorites();
+  const [venues] = useState<Venue[]>(mockVenues);
 
   React.useEffect(() => {
     if (!loading && !user) {
       navigate('/');
     }
   }, [loading, user, navigate]);
-
-  useEffect(() => {
-    // Load liked venues from localStorage
-    const saved = localStorage.getItem('likedVenues');
-    if (saved) {
-      setLikedVenues(JSON.parse(saved));
-    }
-  }, []);
-
-  const toggleLike = (venueId: string) => {
-    const newLikedVenues = likedVenues.includes(venueId)
-      ? likedVenues.filter(id => id !== venueId)
-      : [...likedVenues, venueId];
-    
-    setLikedVenues(newLikedVenues);
-    localStorage.setItem('likedVenues', JSON.stringify(newLikedVenues));
-  };
 
   const filteredVenues = venues.filter(venue => 
     likedVenues.includes(venue.id) &&

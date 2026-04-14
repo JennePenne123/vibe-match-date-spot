@@ -46,7 +46,7 @@ const Venues = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cityQuery, setCityQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  const [likedVenues, setLikedVenues] = useState<string[]>([]);
+  const { likedVenues, toggleLike } = useFavorites();
   const [venues, setVenues] = useState<VenueWithScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchingCity, setSearchingCity] = useState(false);
@@ -54,15 +54,6 @@ const Venues = () => {
   const [searchRadius, setSearchRadius] = useState(25);
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [openNowFilter, setOpenNowFilter] = useState(false);
-
-  useEffect(() => {
-    if (!authLoading && !user) navigate('/?auth=required', { replace: true });
-  }, [authLoading, user, navigate]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('likedVenues');
-    if (saved) setLikedVenues(JSON.parse(saved));
-  }, []);
 
   // Get user's home location on mount
   const [initialSearchDone, setInitialSearchDone] = useState(false);
