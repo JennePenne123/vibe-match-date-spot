@@ -169,6 +169,44 @@ export interface OverpassSearchResult {
   source: string;
 }
 
+const OVERPASS_MIRRORS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+  'https://overpass.openstreetmap.ru/api/interpreter',
+];
+
+async function fetchWithMirrorRotation(query: string): Promise<any> {
+  for (const mirror of OVERPASS_MIRRORS) {
+    try {
+      console.log(`🗺️ OVERPASS CLIENT: Trying ${mirror}`);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      const response = await fetch(mirror, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `data=${encodeURIComponent(query)}`,
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (response.ok) {
+        console.log(`✅ OVERPASS CLIENT: Mirror ${mirror} succeeded`);
+        return await response.json();
+      }
+      await response.text(); // consume body
+      console.warn(`⚠️ OVERPASS CLIENT: Mirror ${mirror} returned ${response.status}`);
+      if (response.status === 429 || response.status >= 500) continue;
+      throw new Error(`Overpass error: ${response.status}`);
+    } catch (err: any) {
+      if (err.name === 'AbortError') { console.warn(`⚠️ OVERPASS CLIENT: ${mirror} timed out`); continue; }
+      if (err.message?.startsWith('Overpass error')) throw err;
+      continue;
+    }
+  }
+  console.error('🔴 OVERPASS CLIENT: All mirrors failed');
+  return null;
+}
+
 export async function searchVenuesOverpass(
   lat: number,
   lng: number,
@@ -179,19 +217,12 @@ export async function searchVenuesOverpass(
   console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters });
 
   const query = buildOverpassQuery(lat, lng, radiusMeters, Math.min(limit * 2, 80));
+  const data = await fetchWithMirrorRotation(query);
 
-  const response = await fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `data=${encodeURIComponent(query)}`,
-  });
-
-  if (!response.ok) {
-    console.error('🔴 OVERPASS CLIENT: Query failed', response.status);
-    throw new Error(`Overpass API error: ${response.status}`);
+  if (!data) {
+    console.warn('🔶 OVERPASS CLIENT: All mirrors unavailable, returning empty');
+    return { venues: [], count: 0, source: 'openstreetmap' };
   }
-
-  const data = await response.json();
   const elements = data.elements || [];
   console.log('✅ OVERPASS CLIENT: Raw results:', elements.length);
 
