@@ -131,48 +131,64 @@ export const SceneFinale = () => {
           </div>
         </div>
 
-        {/* Waitlist CTA */}
+        {/* Waitlist CTA with Smartphone */}
         <div style={{
-          position: "absolute", bottom: 180,
+          position: "absolute", bottom: 100,
           opacity: ctaOpacity,
           transform: `translateY(${ctaY}px)`,
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 22,
+          display: "flex", flexDirection: "row", alignItems: "center", gap: 30,
         }}>
+          {/* Smartphone mockup */}
           <div style={{
-            background: "rgba(0,0,0,0.92)",
-            padding: "22px 55px",
-            border: "5px solid #FFE500",
-            boxShadow: "0 0 40px rgba(255,229,0,0.3)",
+            transform: `rotate(${interpolate(frame, [50, 80], [-8, 3], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}deg) scale(${interpolate(ctaSpring, [0, 1], [0.3, 1])})`,
+            filter: `drop-shadow(0 0 30px rgba(20,184,166,0.5))`,
           }}>
-            <span style={{
-              fontFamily, fontSize: 50, color: "#FFE500",
-              letterSpacing: 2,
-            }}>
-              {currentCount}+ warten schon!
-            </span>
+            <Img
+              src={staticFile("images/smartphone-mockup.png")}
+              style={{ width: 220, height: "auto" }}
+            />
           </div>
 
+          {/* CTA text block */}
           <div style={{
-            background: "#14b8a6",
-            padding: "18px 48px",
-            border: "5px solid black",
-            boxShadow: "8px 8px 0 black",
-            transform: `scale(${ctaPulse})`,
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 18,
           }}>
-            <span style={{
-              fontFamily, fontSize: 40, color: "white",
-              letterSpacing: 2,
+            <div style={{
+              background: "rgba(0,0,0,0.92)",
+              padding: "18px 40px",
+              border: "5px solid #FFE500",
+              boxShadow: "0 0 40px rgba(255,229,0,0.3)",
             }}>
-              JETZT AUF DIE WAITLIST →
-            </span>
-          </div>
+              <span style={{
+                fontFamily, fontSize: 44, color: "#FFE500",
+                letterSpacing: 2,
+              }}>
+                {currentCount}+ warten schon!
+              </span>
+            </div>
 
-          {/* Bouncing arrow */}
-          <div style={{
-            transform: `translateY(${arrowBounce}px)`,
-            fontSize: 55,
-          }}>
-            ⬇️
+            <div style={{
+              background: "#14b8a6",
+              padding: "16px 40px",
+              border: "5px solid black",
+              boxShadow: "8px 8px 0 black",
+              transform: `scale(${ctaPulse})`,
+            }}>
+              <span style={{
+                fontFamily, fontSize: 36, color: "white",
+                letterSpacing: 2,
+              }}>
+                JETZT EINTRAGEN →
+              </span>
+            </div>
+
+            {/* Bouncing arrow */}
+            <div style={{
+              transform: `translateY(${arrowBounce}px)`,
+              fontSize: 50,
+            }}>
+              ⬇️
+            </div>
           </div>
         </div>
       </AbsoluteFill>
