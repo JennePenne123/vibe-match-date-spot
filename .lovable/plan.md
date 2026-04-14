@@ -15,9 +15,9 @@
 - [ ] AI-Profiling Hinweis (Verarbeitung durch KI-Systeme)
 
 ### Phase 3: OAuth & Authentifizierung
-- [ ] Google OAuth in Produktion aktivieren
-- [ ] Apple OAuth in Produktion aktivieren
-- [ ] Supabase Site-URLs auf Produktionsdomain umstellen
+- [ ] Google OAuth in Produktion aktivieren (richtiges Google-Konto einrichten, dann Authorized origins + redirect URIs auf hioutz.app setzen)
+- [ ] Apple OAuth in Produktion aktivieren (Apple Developer Program, dann Return URLs + Domains auf hioutz.app setzen)
+- [x] Supabase Site-URLs auf Produktionsdomain umstellen
 
 ### Phase 4: Native Mobile App (Capacitor)
 - [ ] iOS: `npx cap add ios` + Xcode Permissions prüfen
