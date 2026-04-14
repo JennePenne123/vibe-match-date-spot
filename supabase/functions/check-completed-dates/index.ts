@@ -39,11 +39,74 @@ Deno.serve(async (req) => {
     
     const { data: eligibleDates, error: queryError } = await supabase
       .from('date_invitations')
-      .select('id, sender_id, recipient_id, actual_date_time, title')
+      .select('id, sender_id, recipient_id, actual_date_time, title, venue_id')
       .eq('status', 'accepted')
       .eq('date_status', 'scheduled')
       .not('actual_date_time', 'is', null)
       .lt('actual_date_time', twoHoursAgo);
+
+    // Send date reminder emails for upcoming dates (within the next 2 hours)
+    const twoHoursFromNow = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+    const now = new Date().toISOString();
+    
+    const { data: upcomingDates } = await supabase
+      .from('date_invitations')
+      .select('id, sender_id, recipient_id, actual_date_time, title, venue_id')
+      .eq('status', 'accepted')
+      .eq('date_status', 'scheduled')
+      .not('actual_date_time', 'is', null)
+      .gte('actual_date_time', now)
+      .lte('actual_date_time', twoHoursFromNow);
+
+    if (upcomingDates && upcomingDates.length > 0) {
+      console.log(`📨 Sending reminders for ${upcomingDates.length} upcoming dates`);
+      for (const date of upcomingDates) {
+        try {
+          // Get participant emails and venue name
+          const [senderRes, recipientRes, venueRes] = await Promise.all([
+            supabase.from('profiles').select('email, name').eq('id', date.sender_id).single(),
+            supabase.from('profiles').select('email, name').eq('id', date.recipient_id).single(),
+            date.venue_id ? supabase.from('venues').select('name, address').eq('id', date.venue_id).single() : null,
+          ]);
+
+          const dateTime = new Date(date.actual_date_time!);
+          const formattedDate = dateTime.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+          const formattedTime = dateTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+          // Send reminder to both participants
+          for (const participant of [
+            { profile: senderRes.data, partnerName: recipientRes.data?.name },
+            { profile: recipientRes.data, partnerName: senderRes.data?.name },
+          ]) {
+            if (participant.profile?.email) {
+              await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${supabaseServiceKey}`,
+                },
+                body: JSON.stringify({
+                  templateName: 'date-reminder',
+                  recipientEmail: participant.profile.email,
+                  idempotencyKey: `date-reminder-${date.id}-${participant.profile.email}`,
+                  templateData: {
+                    partnerName: participant.partnerName || 'Dein Date',
+                    title: date.title,
+                    venueName: venueRes?.data?.name,
+                    venueAddress: venueRes?.data?.address,
+                    dateFormatted: formattedDate,
+                    timeFormatted: formattedTime,
+                  },
+                }),
+              });
+            }
+          }
+          console.log(`  📧 Reminder sent for date "${date.title}"`);
+        } catch (reminderError) {
+          console.error(`  ⚠️ Reminder error for date ${date.id}:`, reminderError);
+        }
+      }
+    }
 
     if (queryError) {
       console.error('❌ Error querying eligible dates:', queryError);

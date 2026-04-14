@@ -312,6 +312,42 @@ serve(async (req) => {
       console.error('Push notification error (non-critical):', pushError);
     }
 
+    // Send transactional verification email
+    try {
+      const { data: partnerProfile } = await adminSupabase
+        .from('partner_profiles')
+        .select('business_email, business_name')
+        .eq('user_id', user.id)
+        .single();
+
+      if (partnerProfile?.business_email) {
+        const emailStatus = verificationStatus === 'verified' ? 'verified'
+          : verificationStatus === 'failed' ? 'rejected'
+          : 'pending_review';
+
+        await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${serviceRoleKey}`,
+          },
+          body: JSON.stringify({
+            templateName: 'partner-verification',
+            recipientEmail: partnerProfile.business_email,
+            idempotencyKey: `partner-verify-${user.id}-${Date.now()}`,
+            templateData: {
+              businessName: partnerProfile.business_name,
+              status: emailStatus,
+              notes: verificationNotes,
+            },
+          }),
+        });
+        console.log(`📧 Verification email sent to ${partnerProfile.business_email}`);
+      }
+    } catch (emailError) {
+      console.error('Verification email error (non-critical):', emailError);
+    }
+
     return new Response(JSON.stringify({
       status: verificationStatus,
       tax_id_valid: taxVerification.valid,
