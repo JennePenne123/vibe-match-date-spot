@@ -27,9 +27,13 @@
 - [ ] Push Notifications: Firebase + APNS Certificates einrichten
 - [ ] Native Build Tests vor App Store Submission
 
-### Phase 5: Infrastruktur
-- [ ] E-Mail-Domain in Cloud → Emails einrichten
-- [ ] Auth-E-Mails (Verification, Password Reset) testen
+### Phase 5: E-Mail & Infrastruktur
+- [ ] E-Mail-Domain einrichten (z.B. notify@hioutz.app) über Cloud → Emails
+- [ ] DNS-Records (NS-Delegation) beim Domain-Provider setzen + verifizieren
+- [ ] Auth-E-Mail-Templates mit H!Outz-Branding erstellen (Passwort-Reset, Verifizierung, Magic Link)
+- [ ] Auth-E-Mails auf Produktions-Domain testen
+- [ ] Custom Domain hioutz.app verbinden (A-Records + TXT-Verify)
+- [ ] SSL-Zertifikat provisionieren lassen
 - [ ] Edge Functions Deployment auf Production prüfen
 - [ ] Rate Limiting + API Usage Monitoring aktiv
 
