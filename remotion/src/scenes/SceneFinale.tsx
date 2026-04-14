@@ -96,9 +96,9 @@ export const SceneFinale = () => {
           marginTop: -220,
         }}>
           <div style={{
-            position: "absolute", inset: -50,
-            background: "radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 45%, transparent 72%)",
-            borderRadius: 40,
+            position: "absolute", inset: -70,
+            background: "radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.3) 60%, transparent 80%)",
+            borderRadius: 50,
           }} />
           <Img
             src={staticFile("images/hioutz-logo.png")}
