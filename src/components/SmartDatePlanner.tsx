@@ -248,7 +248,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   )}
                   {currentStep === 'set-preferences' && preferencesStepContent}
                   {currentStep === 'plan-together' && venueStepContent}
-                  {currentStep === 'create-invitation' && selectedPartner && renderInvitationStep()}
+                  {currentStep === 'create-invitation' && (selectedPartner || effectivePreselectedFriend) && renderInvitationStep()}
                 </div>
               </ErrorBoundaryWrapper>
             </div>
