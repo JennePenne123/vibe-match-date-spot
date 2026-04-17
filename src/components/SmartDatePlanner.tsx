@@ -143,7 +143,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     }
     return (
       <InvitationCreation
-        partnerName={selectedPartner?.name || ''}
+        partnerName={selectedPartner?.name || effectivePreselectedFriend?.name || ''}
         selectedVenue={venue}
         invitationMessage={invitationMessage}
         loading={loading}
