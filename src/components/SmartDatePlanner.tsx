@@ -62,6 +62,14 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
 
   const handlers = createSmartDatePlannerHandlers({ ...state, collaborativeSession, sessionId });
 
+  // Sync selectedPartnerId from restored collaborative session so InvitationStep can render
+  useEffect(() => {
+    if (effectivePreselectedFriend?.id && state.selectedPartnerId !== effectivePreselectedFriend.id) {
+      console.log('🔄 SYNC: Setting selectedPartnerId from session partner:', effectivePreselectedFriend.id);
+      state.setSelectedPartnerId(effectivePreselectedFriend.id);
+    }
+  }, [effectivePreselectedFriend?.id, state.selectedPartnerId]);
+
   // Prefill proposed date/time
   const [proposalDateISO, setProposalDateISO] = useState<string | undefined>();
   useEffect(() => {
