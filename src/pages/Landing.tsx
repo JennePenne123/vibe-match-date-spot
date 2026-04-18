@@ -62,7 +62,7 @@ export default function LandingDemo() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             <Link to="/" className="flex items-center space-x-2 group">
-              <img src={hioutzLogo} alt="HiOutz" className="h-8 lg:h-10 w-auto group-hover:scale-105 transition-all duration-300" />
+              <img src={hioutzLogo} alt="H!Outz" className="h-8 lg:h-10 w-auto group-hover:scale-105 transition-all duration-300" />
             </Link>
             <div className="hidden md:flex items-center space-x-8">
               <button onClick={() => scrollToSection(featuresRef)} className="text-foreground/70 hover:text-foreground transition-colors duration-300 font-medium">{t('landing.features')}</button>
@@ -233,7 +233,7 @@ export default function LandingDemo() {
                 <h3 className="text-3xl lg:text-4xl font-semibold text-foreground">{t('landing.step1Title')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{t('landing.step1Desc')}</p>
               </div>
-              <div className="order-1 lg:order-2"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-calm rounded-xl flex items-center justify-center"><img src="/icon-512.png" alt="HiOutz" className="w-24 h-24 rounded-2xl shadow-lg" loading="lazy" /></div></Card></div>
+              <div className="order-1 lg:order-2"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-calm rounded-xl flex items-center justify-center"><img src="/icon-512.png" alt="H!Outz" className="w-24 h-24 rounded-2xl shadow-lg" loading="lazy" /></div></Card></div>
             </div>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center scroll-animate opacity-0">
               <div className="order-2 space-y-6">
@@ -241,7 +241,7 @@ export default function LandingDemo() {
                 <h3 className="text-3xl lg:text-4xl font-semibold text-foreground">{t('landing.step2Title')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{t('landing.step2Desc')}</p>
               </div>
-              <div className="order-1"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-secondary rounded-xl flex items-center justify-center"><img src={hioutzLogo} alt="HiOutz" className="h-16 w-auto opacity-70" loading="lazy" /></div></Card></div>
+              <div className="order-1"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-secondary rounded-xl flex items-center justify-center"><img src={hioutzLogo} alt="H!Outz" className="h-16 w-auto opacity-70" loading="lazy" /></div></Card></div>
             </div>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center scroll-animate opacity-0">
               <div className="order-2 lg:order-1 space-y-6">
@@ -277,7 +277,7 @@ export default function LandingDemo() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <Link to="/" className="flex items-center space-x-2 group">
-              <img src={hioutzLogo} alt="HiOutz" className="h-8 w-auto group-hover:scale-105 transition-all duration-300" />
+              <img src={hioutzLogo} alt="H!Outz" className="h-8 w-auto group-hover:scale-105 transition-all duration-300" />
             </Link>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <Link to="/impressum" className="hover:text-foreground transition-colors">Impressum</Link>

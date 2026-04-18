@@ -4,7 +4,7 @@ import { ArrowLeft, FileText } from 'lucide-react';
 
 /**
  * Partner-AGB – Allgemeine Geschäftsbedingungen für Venue-Partner
- * Rechtsform: HiOutz GmbH (i. Gr.)
+ * Rechtsform: H!Outz GmbH (i. Gr.)
  * Anwendbares Recht: Deutsches Recht / EU-Recht
  */
 export default function PartnerTerms() {
@@ -27,15 +27,15 @@ export default function PartnerTerms() {
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <p className="text-muted-foreground text-xs">
-            Stand: März 2026 · HiOutz GmbH (i.&nbsp;Gr.)
+            Stand: März 2026 · H!Outz GmbH (i.&nbsp;Gr.)
           </p>
 
           <h2>§ 1 Geltungsbereich</h2>
           <p className="text-muted-foreground">
             (1) Diese Allgemeinen Geschäftsbedingungen (nachfolgend „Partner-AGB") regeln das Vertragsverhältnis
-            zwischen der HiOutz GmbH (i.&nbsp;Gr.), [Adresse] (nachfolgend „Betreiber" oder „wir")
+            zwischen der H!Outz GmbH (i.&nbsp;Gr.), [Adresse] (nachfolgend „Betreiber" oder „wir")
             und dem Venue-Partner (nachfolgend „Partner") hinsichtlich der Nutzung der Partner-Plattform
-            der App „HiOutz" (nachfolgend „Plattform").
+            der App „H!Outz" (nachfolgend „Plattform").
           </p>
           <p className="text-muted-foreground">
             (2) Die Plattform ermöglicht es Partnern, ihre Venues zu präsentieren, Voucher zu erstellen und
@@ -210,7 +210,7 @@ export default function PartnerTerms() {
             ist untersagt.
           </p>
           <p className="text-muted-foreground">
-            (4) Der Partner darf das HiOutz-Logo und die Partnerbezeichnung ausschließlich im Rahmen
+            (4) Der Partner darf das H!Outz-Logo und die Partnerbezeichnung ausschließlich im Rahmen
             der Partnerschaft und nach den Vorgaben des Betreibers verwenden.
           </p>
 

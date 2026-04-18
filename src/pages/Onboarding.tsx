@@ -402,7 +402,7 @@ function WelcomeScreen() {
       </div>
 
       <h1 className="text-2xl font-bold text-foreground mb-3">
-        Willkommen bei HiOutz
+        Willkommen bei H!Outz
       </h1>
 
       <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">

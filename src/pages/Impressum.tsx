@@ -23,7 +23,7 @@ export default function Impressum() {
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <h2>Angaben gemäß § 5 DDG</h2>
           <p className="text-muted-foreground">
-            HiOutz GmbH (i.&nbsp;Gr.)<br />
+            H!Outz GmbH (i.&nbsp;Gr.)<br />
             [Straße und Hausnummer]<br />
             [PLZ] [Ort]<br />
             Deutschland

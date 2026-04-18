@@ -62,7 +62,7 @@ export default function StaffScanner() {
             <ScanLine className="w-4 h-4 text-primary-foreground" />
           </div>
           <div>
-            <p className="text-sm font-semibold">{partnerName || 'HiOutz'}</p>
+            <p className="text-sm font-semibold">{partnerName || 'H!Outz'}</p>
             <p className="text-[11px] text-muted-foreground">Staff Scanner</p>
           </div>
         </div>

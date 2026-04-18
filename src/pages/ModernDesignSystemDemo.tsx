@@ -67,7 +67,7 @@ const ModernDesignSystemDemo: React.FC = () => {
             <div className="flex items-center gap-3">
               <img 
                 src="/icon-192.png" 
-                alt="HiOutz" 
+                alt="H!Outz" 
                 className="w-10 h-10 rounded-xl shadow-lg animate-logo-pulse"
               />
               <div>
