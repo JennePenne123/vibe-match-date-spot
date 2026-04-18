@@ -26,11 +26,11 @@ export default function Datenschutz() {
           <h2>1. Datenschutz auf einen Blick</h2>
           <p className="text-muted-foreground">
             Die folgenden Hinweise geben einen Überblick darüber, was mit Ihren personenbezogenen Daten passiert,
-            wenn Sie die App „HiOutz" (nachfolgend „App" oder „Dienst") nutzen. Verantwortlicher im Sinne der
+            wenn Sie die App „H!Outz" (nachfolgend „App" oder „Dienst") nutzen. Verantwortlicher im Sinne der
             Datenschutz-Grundverordnung (DSGVO) ist:
           </p>
           <p className="text-muted-foreground">
-             HiOutz GmbH (i.&nbsp;Gr.)<br />
+             H!Outz GmbH (i.&nbsp;Gr.)<br />
              [Straße und Hausnummer]<br />
              [PLZ] [Ort], Deutschland<br />
              E-Mail: datenschutz@hioutz.app
@@ -170,7 +170,7 @@ export default function Datenschutz() {
 
           <h3>6.1 Einsatzbereiche der KI</h3>
           <p className="text-muted-foreground">
-            HiOutz verwendet KI-Algorithmen in folgenden Bereichen:
+            H!Outz verwendet KI-Algorithmen in folgenden Bereichen:
           </p>
           <ul className="text-muted-foreground">
             <li><strong>Venue-Matching:</strong> Berechnung personalisierter Matching-Scores (0–100&nbsp;%) zwischen Ihnen und verfügbaren Venues</li>
@@ -410,7 +410,7 @@ export default function Datenschutz() {
 
           <h2>14. Minderjährige</h2>
           <p className="text-muted-foreground">
-            Die Nutzung von HiOutz ist ab 16 Jahren gestattet (Art.&nbsp;8 DSGVO i.&nbsp;V.&nbsp;m. § 25 TDDDG).
+            Die Nutzung von H!Outz ist ab 16 Jahren gestattet (Art.&nbsp;8 DSGVO i.&nbsp;V.&nbsp;m. § 25 TDDDG).
             Personen unter 16 Jahren dürfen die App nur mit Einwilligung eines Erziehungsberechtigten nutzen.
           </p>
 

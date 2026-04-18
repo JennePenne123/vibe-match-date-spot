@@ -65,7 +65,7 @@ export default function Waitlist() {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
         <Link to="/" className="flex items-center gap-2">
-          <img src={hioutzLogo} alt="HiOutz" className="h-10" />
+          <img src={hioutzLogo} alt="H!Outz" className="h-10" />
         </Link>
         <ThemeToggle />
       </header>
@@ -103,7 +103,7 @@ export default function Waitlist() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-lg sm:text-xl text-muted-foreground max-w-2xl mb-12 leading-relaxed"
         >
-          HiOutz findet die besten Venues, plant euer Date und sorgt dafür, 
+          H!Outz findet die besten Venues, plant euer Date und sorgt dafür, 
           dass jedes Erlebnis unvergesslich wird. Sei von Anfang an dabei.
         </motion.p>
 
@@ -121,7 +121,7 @@ export default function Waitlist() {
               </div>
               <h2 className="text-2xl font-bold text-foreground">Du bist dabei! 🎉</h2>
               <p className="text-muted-foreground text-center">
-                Wir melden uns bei dir, sobald HiOutz startet. Halte dein Postfach im Auge!
+                Wir melden uns bei dir, sobald H!Outz startet. Halte dein Postfach im Auge!
               </p>
             </div>
           ) : (
@@ -174,7 +174,7 @@ export default function Waitlist() {
           {[
             { icon: Zap, title: 'KI-Matching', desc: 'Venues die zu euch passen – automatisch.' },
             { icon: Zap, title: 'Echtzeit-Planung', desc: 'Plant zusammen, entscheidet gemeinsam.' },
-            { icon: Heart, title: 'Exklusive Deals', desc: 'Voucher & Specials nur für HiOutz-User.' },
+            { icon: Heart, title: 'Exklusive Deals', desc: 'Voucher & Specials nur für H!Outz-User.' },
           ].map((feature) => (
             <div
               key={feature.title}

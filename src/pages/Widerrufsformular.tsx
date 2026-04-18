@@ -24,7 +24,7 @@ export default function Widerrufsformular() {
           <div className="p-5 rounded-xl bg-muted/30 border border-border/50 space-y-3">
             <p className="text-muted-foreground">An:</p>
             <p className="font-medium">
-              HiOutz GmbH (i.&nbsp;Gr.)
+              H!Outz GmbH (i.&nbsp;Gr.)
               <br />
               [Adresse]
               <br />

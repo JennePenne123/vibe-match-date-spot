@@ -58,7 +58,7 @@ const VenueDetail = () => {
     
     if (!hasGoodAddress && lat && lon) {
       fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1&zoom=18`, {
-        headers: { 'User-Agent': 'HiOutz/1.0' }
+        headers: { 'User-Agent': 'H!Outz/1.0' }
       })
         .then(r => r.json())
         .then(data => {

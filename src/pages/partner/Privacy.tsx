@@ -4,7 +4,7 @@ import { ArrowLeft, Shield } from 'lucide-react';
 
 /**
  * Partner-Datenschutzerklärung – DSGVO-konform
- * Rechtsform: HiOutz GmbH (i. Gr.)
+ * Rechtsform: H!Outz GmbH (i. Gr.)
  */
 export default function PartnerPrivacy() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export default function PartnerPrivacy() {
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <p className="text-muted-foreground text-xs">
-            Stand: März 2026 · HiOutz GmbH (i.&nbsp;Gr.)
+            Stand: März 2026 · H!Outz GmbH (i.&nbsp;Gr.)
           </p>
 
           <h2>1. Verantwortlicher</h2>
@@ -34,14 +34,14 @@ export default function PartnerPrivacy() {
             Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:
           </p>
           <p className="text-muted-foreground">
-            HiOutz GmbH (i.&nbsp;Gr.)<br />
+            H!Outz GmbH (i.&nbsp;Gr.)<br />
             [Straße und Hausnummer]<br />
             [PLZ] [Ort], Deutschland<br />
             E-Mail: datenschutz@hioutz.app
           </p>
           <p className="text-muted-foreground">
             Diese Datenschutzerklärung gilt speziell für Venue-Partner, die die Partner-Plattform
-            der App „HiOutz" nutzen. Für Endnutzer gilt die{' '}
+            der App „H!Outz" nutzen. Für Endnutzer gilt die{' '}
             <a href="/datenschutz" className="text-primary">allgemeine Datenschutzerklärung</a>.
           </p>
 

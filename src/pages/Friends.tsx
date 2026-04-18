@@ -108,20 +108,20 @@ const Friends = () => {
 
   const shareViaEmail = () => {
     const link = generateReferralLink();
-    const subject = "Join me on HiOutz - Find Amazing Date Ideas!";
-    const body = `Hey! I've been using HiOutz to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
+    const subject = "Join me on H!Outz - Find Amazing Date Ideas!";
+    const body = `Hey! I've been using H!Outz to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const shareViaWhatsApp = () => {
     const link = generateReferralLink();
-    const text = `Hey! Ich nutze HiOutz um tolle Date-Spots zu finden. Komm dazu: ${link}`;
+    const text = `Hey! Ich nutze H!Outz um tolle Date-Spots zu finden. Komm dazu: ${link}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
   const shareViaTelegram = () => {
     const link = generateReferralLink();
-    const text = `Hey! Ich nutze HiOutz um tolle Date-Spots zu finden. Komm dazu!`;
+    const text = `Hey! Ich nutze H!Outz um tolle Date-Spots zu finden. Komm dazu!`;
     window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
@@ -249,7 +249,7 @@ const Friends = () => {
                 <div className="text-center py-8">
                   <div className="text-4xl mb-4">👥</div>
                   <h3 className="text-foreground font-semibold mb-2">No friends found</h3>
-                  <p className="text-muted-foreground">Invite your friends to join HiOutz!</p>
+                  <p className="text-muted-foreground">Invite your friends to join H!Outz!</p>
                 </div>
 
                 {/* Referral Link Section */}
@@ -258,7 +258,7 @@ const Friends = () => {
                     <div className="bg-primary/10 rounded-full p-3 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                       <Share2 className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">{t('datePlanning.inviteFriendsToHiOutz')}</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">{t('datePlanning.inviteFriendsToH!Outz')}</h3>
                     <p className="text-sm text-muted-foreground">{t('datePlanning.shareReferralDesc')}</p>
                   </div>
 

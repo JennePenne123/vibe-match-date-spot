@@ -22,7 +22,7 @@ const InviteFriendsSection: React.FC = () => {
   const inviteText = t('myFriends.inviteMessage', { link: inviteLink });
 
   const handleInviteEmail = () => {
-    const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu HiOutz!'));
+    const subject = encodeURIComponent(t('myFriends.inviteEmailSubject', 'Komm zu H!Outz!'));
     const body = encodeURIComponent(inviteText);
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
