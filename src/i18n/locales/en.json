@@ -1141,5 +1141,37 @@
     "accept": "Got it",
     "doNotSell": "Do Not Sell My Data",
     "learnMore": "Learn more"
+  },
+  "aiLearning": {
+    "title": "AI Learning",
+    "progress": "Learning Progress",
+    "experiencesRated": "Experiences Rated",
+    "aiAccuracy": "AI Accuracy",
+    "confidence": "Confidence",
+    "confidenceLow": "low",
+    "confidenceMedium": "medium",
+    "confidenceHigh": "high",
+    "aiInsights": "AI Insights",
+    "learnedPreferences": "Learned Preferences",
+    "viewDetails": "View Detailed Insights",
+    "emptyState": "Rate your experiences to help the AI learn your preferences!",
+    "charts": {
+      "ratingHistory": "Rating History",
+      "ratingHistoryAndPredictions": "Rating History & AI Predictions",
+      "noRatingHistory": "No rating history yet",
+      "yourRating": "Your Rating",
+      "aiPredicted": "AI Predicted",
+      "preferenceMap": "Preference Map",
+      "yourPreferenceMap": "Your Preference Map",
+      "rateMoreToSee": "Rate more experiences to see your preferences",
+      "importance": "Importance",
+      "categoryPerformance": "Category Performance",
+      "notEnoughData": "Not enough data yet",
+      "avgRating": "Avg Rating",
+      "accuracyTrend": "AI Accuracy Trend",
+      "accuracyOverTime": "AI Accuracy Over Time",
+      "needMoreRatings": "Need more ratings to show trend",
+      "accuracy": "Accuracy"
+    }
   }
 }
