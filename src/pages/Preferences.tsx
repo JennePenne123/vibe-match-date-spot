@@ -306,6 +306,7 @@ const Preferences = () => {
           if (data.preferred_times) setSelectedTimePreferences(data.preferred_times);
           if (data.dietary_restrictions) setSelectedDietary(data.dietary_restrictions);
           if ((data as any).accessibility_needs) setSelectedAccessibility((data as any).accessibility_needs);
+          if ((data as any).preferred_venue_types) setSelectedVenueTypes((data as any).preferred_venue_types);
           // Load AI signal preferences from lifestyle_data
           if (data.lifestyle_data) {
             const ld = data.lifestyle_data as any;
@@ -442,6 +443,7 @@ const Preferences = () => {
           preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
           dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
           accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
+          preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
           lifestyle_data: {
             occasion: selectedOccasion,
             mood: selectedMood,
