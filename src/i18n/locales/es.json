@@ -1040,5 +1040,37 @@
     "emailBody": "¡Hola! Uso H!Outz para encontrar lugares geniales para cualquier ocasión — solo, en pareja o en grupo. Únete: {{link}}",
     "shareText": "¡Hola! Uso H!Outz para descubrir lugares geniales. Únete: {{link}}",
     "shareTextShort": "¡Hola! Uso H!Outz para descubrir lugares geniales. ¡Únete!"
+  },
+  "aiLearning": {
+    "title": "Aprendizaje IA",
+    "progress": "Progreso de aprendizaje",
+    "experiencesRated": "Experiencias valoradas",
+    "aiAccuracy": "Precisión de la IA",
+    "confidence": "Confianza",
+    "confidenceLow": "baja",
+    "confidenceMedium": "media",
+    "confidenceHigh": "alta",
+    "aiInsights": "Insights de la IA",
+    "learnedPreferences": "Preferencias aprendidas",
+    "viewDetails": "Ver insights detallados",
+    "emptyState": "¡Valora tus experiencias para que la IA aprenda tus preferencias!",
+    "charts": {
+      "ratingHistory": "Historial de valoraciones",
+      "ratingHistoryAndPredictions": "Valoraciones y predicciones IA",
+      "noRatingHistory": "Aún no hay valoraciones",
+      "yourRating": "Tu valoración",
+      "aiPredicted": "Predicción IA",
+      "preferenceMap": "Mapa de preferencias",
+      "yourPreferenceMap": "Tu mapa de preferencias",
+      "rateMoreToSee": "Valora más experiencias para ver tus preferencias",
+      "importance": "Importancia",
+      "categoryPerformance": "Rendimiento por categoría",
+      "notEnoughData": "Aún no hay suficientes datos",
+      "avgRating": "Valoración media",
+      "accuracyTrend": "Tendencia de precisión IA",
+      "accuracyOverTime": "Precisión IA en el tiempo",
+      "needMoreRatings": "Se necesitan más valoraciones",
+      "accuracy": "Precisión"
+    }
   }
 }

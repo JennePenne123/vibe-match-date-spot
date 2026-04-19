@@ -6,7 +6,7 @@ import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail, Loader2, MessageCircle, Send } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search, UserPlus, Check, Share2, Copy, Mail, MessageCircle, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useFriends } from '@/hooks/useFriends';
 import { getInitials } from '@/lib/utils';

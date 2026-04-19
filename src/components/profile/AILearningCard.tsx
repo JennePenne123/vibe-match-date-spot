@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,7 @@ import { useAILearning } from '@/hooks/useAILearning';
 
 const AILearningCard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { insights, loading, refreshInsights } = useAILearning();
 
   if (loading) {
@@ -17,7 +19,7 @@ const AILearningCard: React.FC = () => {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Brain className="h-5 w-5 text-primary" />
-            AI Learning
+            {t('aiLearning.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -43,7 +45,7 @@ const AILearningCard: React.FC = () => {
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <Brain className="h-5 w-5 text-primary" />
-            AI Learning
+            {t('aiLearning.title')}
           </CardTitle>
           <Button
             variant="ghost"
@@ -61,7 +63,7 @@ const AILearningCard: React.FC = () => {
             {/* Learning Progress */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Learning Progress</span>
+                <span className="text-muted-foreground">{t('aiLearning.progress')}</span>
                 <span className="font-medium">{insights.learningProgress}%</span>
               </div>
               <Progress value={insights.learningProgress} className="h-2" />
@@ -71,23 +73,23 @@ const AILearningCard: React.FC = () => {
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-primary">{insights.totalDates}</div>
-                <div className="text-xs text-muted-foreground">Dates Rated</div>
+                <div className="text-xs text-muted-foreground">{t('aiLearning.experiencesRated')}</div>
               </div>
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-primary">{insights.aiAccuracy}%</div>
-                <div className="text-xs text-muted-foreground">AI Accuracy</div>
+                <div className="text-xs text-muted-foreground">{t('aiLearning.aiAccuracy')}</div>
               </div>
             </div>
 
             {/* Confidence Badge */}
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Confidence:</span>
+              <span className="text-sm text-muted-foreground">{t('aiLearning.confidence')}:</span>
               <Badge 
                 variant="outline" 
                 className={confidenceColor[insights.confidenceLevel]}
               >
-                {insights.confidenceLevel}
+                {t(`aiLearning.confidence${insights.confidenceLevel.charAt(0).toUpperCase() + insights.confidenceLevel.slice(1)}`)}
               </Badge>
             </div>
 
@@ -96,7 +98,7 @@ const AILearningCard: React.FC = () => {
               <div className="space-y-2 pt-2 border-t border-border/50">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <Sparkles className="h-4 w-4 text-primary" />
-                  AI Insights
+                  {t('aiLearning.aiInsights')}
                 </div>
                 <ul className="space-y-1">
                   {insights.textInsights.map((insight, index) => (
@@ -112,7 +114,7 @@ const AILearningCard: React.FC = () => {
             {/* Feature Weights */}
             {insights.featureWeights && (
               <div className="space-y-2 pt-2 border-t border-border/50">
-                <div className="text-sm font-medium">Learned Preferences</div>
+                <div className="text-sm font-medium">{t('aiLearning.learnedPreferences')}</div>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(insights.featureWeights)
                     .filter(([key]) => key !== 'distance')
@@ -135,7 +137,7 @@ const AILearningCard: React.FC = () => {
               className="w-full mt-2"
               onClick={() => navigate('/ai-insights')}
             >
-              View Detailed Insights
+              {t('aiLearning.viewDetails')}
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </>
@@ -143,7 +145,7 @@ const AILearningCard: React.FC = () => {
           <div className="text-center py-4">
             <Brain className="h-12 w-12 text-muted-foreground/50 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">
-              Rate your dates to help the AI learn your preferences!
+              {t('aiLearning.emptyState')}
             </p>
           </div>
         )}

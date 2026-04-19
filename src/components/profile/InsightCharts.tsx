@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   LineChart,
   Line,
@@ -26,14 +27,16 @@ interface RatingTimelineChartProps {
 }
 
 export const RatingTimelineChart: React.FC<RatingTimelineChartProps> = ({ data }) => {
+  const { t } = useTranslation();
+
   if (!data || data.length === 0) {
     return (
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Rating History</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('aiLearning.charts.ratingHistory')}</CardTitle>
         </CardHeader>
         <CardContent className="h-[200px] flex items-center justify-center">
-          <p className="text-sm text-muted-foreground">No rating history yet</p>
+          <p className="text-sm text-muted-foreground">{t('aiLearning.charts.noRatingHistory')}</p>
         </CardContent>
       </Card>
     );
@@ -42,7 +45,7 @@ export const RatingTimelineChart: React.FC<RatingTimelineChartProps> = ({ data }
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">Rating History & AI Predictions</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('aiLearning.charts.ratingHistoryAndPredictions')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={200}>
@@ -72,7 +75,7 @@ export const RatingTimelineChart: React.FC<RatingTimelineChartProps> = ({ data }
               stroke="hsl(var(--primary))" 
               strokeWidth={2}
               dot={{ fill: 'hsl(var(--primary))' }}
-              name="Your Rating"
+              name={t('aiLearning.charts.yourRating')}
             />
             <Line 
               type="monotone" 
@@ -81,7 +84,7 @@ export const RatingTimelineChart: React.FC<RatingTimelineChartProps> = ({ data }
               strokeWidth={2}
               strokeDasharray="5 5"
               dot={{ fill: 'hsl(var(--muted-foreground))' }}
-              name="AI Predicted"
+              name={t('aiLearning.charts.aiPredicted')}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -95,14 +98,16 @@ interface PreferenceRadarChartProps {
 }
 
 export const PreferenceRadarChart: React.FC<PreferenceRadarChartProps> = ({ data }) => {
+  const { t } = useTranslation();
+
   if (!data || data.length === 0) {
     return (
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Preference Map</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('aiLearning.charts.preferenceMap')}</CardTitle>
         </CardHeader>
         <CardContent className="h-[250px] flex items-center justify-center">
-          <p className="text-sm text-muted-foreground">Rate more dates to see your preferences</p>
+          <p className="text-sm text-muted-foreground">{t('aiLearning.charts.rateMoreToSee')}</p>
         </CardContent>
       </Card>
     );
@@ -111,7 +116,7 @@ export const PreferenceRadarChart: React.FC<PreferenceRadarChartProps> = ({ data
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">Your Preference Map</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('aiLearning.charts.yourPreferenceMap')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={250}>
@@ -128,7 +133,7 @@ export const PreferenceRadarChart: React.FC<PreferenceRadarChartProps> = ({ data
               className="text-muted-foreground"
             />
             <Radar
-              name="Importance"
+              name={t('aiLearning.charts.importance')}
               dataKey="value"
               stroke="hsl(var(--primary))"
               fill="hsl(var(--primary))"
@@ -153,6 +158,8 @@ interface CategoryPerformanceChartProps {
 }
 
 export const CategoryPerformanceChart: React.FC<CategoryPerformanceChartProps> = ({ data }) => {
+  const { t } = useTranslation();
+
   // Convert category data to chart format
   const chartData = Object.entries(data.byCuisine)
     .filter(([, stat]) => stat.count >= 1)
@@ -168,10 +175,10 @@ export const CategoryPerformanceChart: React.FC<CategoryPerformanceChartProps> =
     return (
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Category Performance</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('aiLearning.charts.categoryPerformance')}</CardTitle>
         </CardHeader>
         <CardContent className="h-[200px] flex items-center justify-center">
-          <p className="text-sm text-muted-foreground">Not enough data yet</p>
+          <p className="text-sm text-muted-foreground">{t('aiLearning.charts.notEnoughData')}</p>
         </CardContent>
       </Card>
     );
@@ -180,7 +187,7 @@ export const CategoryPerformanceChart: React.FC<CategoryPerformanceChartProps> =
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">Category Performance</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('aiLearning.charts.categoryPerformance')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={200}>
@@ -199,7 +206,7 @@ export const CategoryPerformanceChart: React.FC<CategoryPerformanceChartProps> =
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px'
               }}
-              formatter={(value: number) => [`${value} ⭐`, 'Avg Rating']}
+              formatter={(value: number) => [`${value} ⭐`, t('aiLearning.charts.avgRating')]}
             />
             <Bar 
               dataKey="rating" 
@@ -218,14 +225,16 @@ interface AccuracyTrendChartProps {
 }
 
 export const AccuracyTrendChart: React.FC<AccuracyTrendChartProps> = ({ data }) => {
+  const { t } = useTranslation();
+
   if (!data || data.length < 2) {
     return (
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">AI Accuracy Trend</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('aiLearning.charts.accuracyTrend')}</CardTitle>
         </CardHeader>
         <CardContent className="h-[180px] flex items-center justify-center">
-          <p className="text-sm text-muted-foreground">Need more ratings to show trend</p>
+          <p className="text-sm text-muted-foreground">{t('aiLearning.charts.needMoreRatings')}</p>
         </CardContent>
       </Card>
     );
@@ -234,7 +243,7 @@ export const AccuracyTrendChart: React.FC<AccuracyTrendChartProps> = ({ data }) 
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">AI Accuracy Over Time</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('aiLearning.charts.accuracyOverTime')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={180}>
@@ -254,7 +263,7 @@ export const AccuracyTrendChart: React.FC<AccuracyTrendChartProps> = ({ data }) 
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px'
               }}
-              formatter={(value: number) => [`${value}%`, 'Accuracy']}
+              formatter={(value: number) => [`${value}%`, t('aiLearning.charts.accuracy')]}
             />
             <Area 
               type="monotone" 

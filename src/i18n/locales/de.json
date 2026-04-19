@@ -1141,5 +1141,37 @@
     "accept": "Verstanden",
     "doNotSell": "Meine Daten nicht verkaufen",
     "learnMore": "Mehr erfahren"
+  },
+  "aiLearning": {
+    "title": "KI-Lernfortschritt",
+    "progress": "Lernfortschritt",
+    "experiencesRated": "Bewertete Erlebnisse",
+    "aiAccuracy": "KI-Treffsicherheit",
+    "confidence": "Konfidenz",
+    "confidenceLow": "gering",
+    "confidenceMedium": "mittel",
+    "confidenceHigh": "hoch",
+    "aiInsights": "KI-Erkenntnisse",
+    "learnedPreferences": "Gelernte Vorlieben",
+    "viewDetails": "Detaillierte Insights ansehen",
+    "emptyState": "Bewerte deine Erlebnisse, damit die KI deine Vorlieben lernt!",
+    "charts": {
+      "ratingHistory": "Bewertungs-Historie",
+      "ratingHistoryAndPredictions": "Bewertungen & KI-Vorhersagen",
+      "noRatingHistory": "Noch keine Bewertungen",
+      "yourRating": "Deine Bewertung",
+      "aiPredicted": "KI-Vorhersage",
+      "preferenceMap": "Vorlieben-Karte",
+      "yourPreferenceMap": "Deine Vorlieben-Karte",
+      "rateMoreToSee": "Bewerte mehr Erlebnisse, um deine Vorlieben zu sehen",
+      "importance": "Wichtigkeit",
+      "categoryPerformance": "Kategorie-Performance",
+      "notEnoughData": "Noch nicht genug Daten",
+      "avgRating": "Ø Bewertung",
+      "accuracyTrend": "KI-Treffsicherheit Trend",
+      "accuracyOverTime": "KI-Treffsicherheit über Zeit",
+      "needMoreRatings": "Mehr Bewertungen für Trend nötig",
+      "accuracy": "Treffsicherheit"
+    }
   }
 }

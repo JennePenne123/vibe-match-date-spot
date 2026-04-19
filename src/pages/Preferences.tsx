@@ -9,7 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { bowlChopsticks } from '@lucide/lab';
-import { Waves as WavesIcon, Palette as PaletteIcon, Landmark as LandmarkIcon, Gem as GemIcon } from 'lucide-react';
+
 import {
   ArrowLeft, ArrowRight, Check, Clock, MapPin, Heart, Navigation, Loader2, X,
   Icon, ChevronDown, Save, HeartHandshake, Ban,
