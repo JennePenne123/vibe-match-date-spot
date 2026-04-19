@@ -103,7 +103,27 @@
     "wizardStep3": "Practical",
     "wizardStep3Desc": "When, how long & where?",
     "wizardBack": "Back",
-    "wizardNext": "Next"
+    "wizardNext": "Next",
+    "situational": {
+      "sectionTitle": "What's the vibe today?",
+      "sectionSubtitle": "Pick an occasion for tailored recommendations",
+      "food": {
+        "label": "Food & Drinks",
+        "desc": "Restaurants, cafés, bars"
+      },
+      "culture": {
+        "label": "Culture & Entertainment",
+        "desc": "Museums, cinema, theatre, concerts"
+      },
+      "activity": {
+        "label": "Activities & Sports",
+        "desc": "Bowling, climbing, wellness"
+      },
+      "nightlife": {
+        "label": "Nightlife & Events",
+        "desc": "Clubs, live music, pub crawls"
+      }
+    }
   },
   "landing": {
     "features": "Features",

@@ -103,7 +103,27 @@
     "wizardStep3": "Práctico",
     "wizardStep3Desc": "¿Cuándo, cuánto tiempo y dónde?",
     "wizardBack": "Atrás",
-    "wizardNext": "Siguiente"
+    "wizardNext": "Siguiente",
+    "situational": {
+      "sectionTitle": "¿Qué planes tienes hoy?",
+      "sectionSubtitle": "Elige una ocasión para recomendaciones personalizadas",
+      "food": {
+        "label": "Comida y Bebidas",
+        "desc": "Restaurantes, cafés, bares"
+      },
+      "culture": {
+        "label": "Cultura y Entretenimiento",
+        "desc": "Museos, cine, teatro, conciertos"
+      },
+      "activity": {
+        "label": "Actividades y Deporte",
+        "desc": "Bolos, escalada, bienestar"
+      },
+      "nightlife": {
+        "label": "Vida Nocturna y Eventos",
+        "desc": "Clubes, música en vivo, pub crawls"
+      }
+    }
   },
   "landing": {
     "features": "Funciones",
