@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Sparkles, Users, Star, X } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
 import RealtimeContextBanner from '@/components/RealtimeContextBanner';
@@ -10,7 +11,7 @@ import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenueVouchers } from '@/hooks/useVenueVouchers';
-import { getSituationalCategory, SITUATIONAL_CATEGORIES } from '@/lib/situationalCategories';
+import { getSituationalCategory } from '@/lib/situationalCategories';
 import { motion } from 'framer-motion';
 
 // Skeleton loader for venue cards
