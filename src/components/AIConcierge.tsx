@@ -99,6 +99,7 @@ async function streamChat({
 
 export default function AIConcierge() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
@@ -207,8 +208,8 @@ export default function AIConcierge() {
                   <Sparkles className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Date Concierge</p>
-                  <p className="text-[10px] text-muted-foreground">Dein persönlicher Assistent</p>
+                  <p className="text-sm font-semibold text-foreground">{t('aiConcierge.brandName', 'Concierge')}</p>
+                  <p className="text-[10px] text-muted-foreground">{t('aiConcierge.assistantSubtitle', 'Dein persönlicher Assistent')}</p>
                 </div>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="h-8 w-8 rounded-full">
@@ -224,18 +225,18 @@ export default function AIConcierge() {
                     <Sparkles className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">Hey! 👋</p>
+                    <p className="text-sm font-medium text-foreground">{t('aiConcierge.welcomeGreeting', 'Hey! 👋')}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Ich bin dein Date-Concierge. Frag mich nach Date-Ideen, Restaurant-Tipps oder Hilfe mit der App!
+                      {t('aiConcierge.welcomeIntro', 'Ich bin dein Concierge. Frag mich nach Ideen, Restaurant-Tipps oder Hilfe mit der App!')}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-1.5 justify-center pt-2">
                     {[
-                      '💡 Date-Idee für heute?',
-                      '🍽️ Restaurant-Tipps',
-                      '❓ Wie plane ich ein Date?',
-                      '🎫 Wie löse ich Gutscheine ein?',
-                      '⚙️ App-Hilfe',
+                      t('aiConcierge.suggestion1', '💡 Idee für heute?'),
+                      t('aiConcierge.suggestion2', '🍽️ Restaurant-Tipps'),
+                      t('aiConcierge.suggestion3', '❓ Wie plane ich etwas?'),
+                      t('aiConcierge.suggestion4', '🎫 Wie löse ich Gutscheine ein?'),
+                      t('aiConcierge.suggestion5', '⚙️ App-Hilfe'),
                     ].map(q => (
                       <button
                         key={q}
