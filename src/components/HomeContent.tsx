@@ -199,7 +199,7 @@ const HomeContent: React.FC = () => {
                   </>
                 ) : (
                   <p className="text-sm font-medium text-foreground leading-snug">
-                    {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].tip}
+                    {t(`home.dailyTips.${DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].key}`)}
                   </p>
                 )}
                 {dailyTipVenue && (
@@ -249,7 +249,7 @@ const HomeContent: React.FC = () => {
             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
             <CardContent className="py-4 px-5 relative">
               <p className="text-sm italic text-muted-foreground leading-relaxed text-center">
-                {QUOTES[getDailyIndex(0) % QUOTES.length]}
+                {t(`home.quotes.${QUOTE_KEYS[getDailyIndex(0) % QUOTE_KEYS.length]}`)}
               </p>
             </CardContent>
           </Card>
