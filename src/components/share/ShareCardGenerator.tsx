@@ -1,4 +1,5 @@
 import { useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import html2canvas from 'html2canvas';
 import { Star, MapPin, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +52,7 @@ export function useShareCardCapture() {
 }
 
 export default function ShareCard({ data }: ShareCardGeneratorProps) {
+  const { t } = useTranslation();
   const fallbackImage = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=400&fit=crop';
 
   return (
@@ -93,7 +95,9 @@ export default function ShareCard({ data }: ShareCardGeneratorProps) {
       <div className="absolute bottom-0 left-0 right-0 p-6 space-y-3">
         {/* Type label */}
         <div className="text-primary text-xs font-semibold uppercase tracking-wider">
-          {data.type === 'date-experience' ? '💜 Date-Erlebnis' : '📍 Venue-Empfehlung'}
+          {data.type === 'date-experience'
+            ? t('shareCard.typeExperience', '💜 Erlebnis')
+            : t('shareCard.typeRecommendation', '📍 Empfehlung')}
         </div>
 
         {/* Date title if experience */}
@@ -141,7 +145,7 @@ export default function ShareCard({ data }: ShareCardGeneratorProps) {
 
         {/* Footer */}
         <div className="pt-2 border-t border-white/20">
-          <p className="text-white/50 text-xs">Entdecke mehr auf hioutz.app</p>
+          <p className="text-white/50 text-xs">{t('shareCard.footer', 'Entdecke mehr auf hioutz.app')}</p>
         </div>
       </div>
     </div>

@@ -123,6 +123,24 @@
         "label": "Nightlife & Events",
         "desc": "Clubs, live music, pub crawls"
       }
+    },
+    "quotes": {
+      "q1": "\"Life's too short for mediocre experiences.\" ✨",
+      "q2": "\"Shared experiences are the best gift.\" 💫",
+      "q3": "\"Every day is a new chance to do something special.\" 🌟",
+      "q4": "\"The best memories happen spontaneously.\" 🎯",
+      "q5": "\"Discover together, grow together.\" 🌱",
+      "q6": "\"A great experience starts with curiosity.\" 💡",
+      "q7": "\"Small adventures make life big.\" 🚀"
+    },
+    "dailyTips": {
+      "t_relaxed": "Perfect day for a cozy café visit",
+      "t_outdoor1": "Catch the golden hour — perfect for a walk",
+      "t_evening": "How about a wine bar after work?",
+      "t_culture": "Culture tip: gallery or museum as the perfect spot",
+      "t_food": "Up for something new? Try an unfamiliar cuisine",
+      "t_entertainment": "Live music makes any evening unforgettable",
+      "t_outdoor2": "Get out in nature — parks & gardens are underrated"
     }
   },
   "landing": {
@@ -1265,5 +1283,21 @@
     "basedOn_one": "Based on {{count}} experience",
     "basedOn_other": "Based on {{count}} experiences",
     "aiLabel": "AI:"
+  },
+  "aiConcierge": {
+    "brandName": "Concierge",
+    "assistantSubtitle": "Your personal assistant",
+    "welcomeGreeting": "Hey! 👋",
+    "welcomeIntro": "I'm your Concierge. Ask me for ideas, restaurant tips, or help with the app!",
+    "suggestion1": "💡 Idea for today?",
+    "suggestion2": "🍽️ Restaurant tips",
+    "suggestion3": "❓ How do I plan something?",
+    "suggestion4": "🎫 How do I redeem vouchers?",
+    "suggestion5": "⚙️ App help"
+  },
+  "shareCard": {
+    "typeExperience": "💜 Experience",
+    "typeRecommendation": "📍 Recommendation",
+    "footer": "Discover more at hioutz.app"
   }
 }

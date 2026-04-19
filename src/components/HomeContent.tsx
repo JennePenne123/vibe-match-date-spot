@@ -25,24 +25,16 @@ import { useHomeTipVenues } from '@/hooks/useHomeTipVenues';
 import { supabase } from '@/integrations/supabase/client';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
-const QUOTES = [
-  '„Das Leben ist zu kurz für schlechte Dates." ✨',
-  '„Gemeinsame Erlebnisse sind das schönste Geschenk." 💫',
-  '„Jeder Tag ist eine neue Chance, etwas Besonderes zu erleben." 🌟',
-  '„Die besten Erinnerungen entstehen spontan." 🎯',
-  '„Zusammen entdecken, zusammen wachsen." 🌱',
-  '„Ein gutes Date beginnt mit Neugier." 💡',
-  '„Kleine Abenteuer machen das Leben groß." 🚀',
-];
+const QUOTE_KEYS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7'] as const;
 
 const DAILY_TIPS = [
-  { emoji: '☕', tip: 'Perfekter Tag für ein gemütliches Café-Date', category: 'relaxed' },
-  { emoji: '🌅', tip: 'Golden Hour genießen — ideal für einen Spaziergang', category: 'outdoor' },
-  { emoji: '🍷', tip: 'Wie wäre es mit einer Weinbar zum Feierabend?', category: 'evening' },
-  { emoji: '🎨', tip: 'Kultur-Tipp: Galerie oder Museum als Date-Spot', category: 'culture' },
-  { emoji: '🍜', tip: 'Lust auf was Neues? Probiert eine unbekannte Küche', category: 'food' },
-  { emoji: '🎵', tip: 'Live-Musik macht jedes Date unvergesslich', category: 'entertainment' },
-  { emoji: '🌿', tip: 'Natur tanken — Parks & Gärten sind unterschätzt', category: 'outdoor' },
+  { emoji: '☕', key: 't_relaxed', category: 'relaxed' },
+  { emoji: '🌅', key: 't_outdoor1', category: 'outdoor' },
+  { emoji: '🍷', key: 't_evening', category: 'evening' },
+  { emoji: '🎨', key: 't_culture', category: 'culture' },
+  { emoji: '🍜', key: 't_food', category: 'food' },
+  { emoji: '🎵', key: 't_entertainment', category: 'entertainment' },
+  { emoji: '🌿', key: 't_outdoor2', category: 'outdoor' },
 ];
 
 const getDailyIndex = (offset: number) => {
@@ -83,7 +75,7 @@ const HomeContent: React.FC = () => {
   const handleProposalSent = () => {
     setShowProposalCreation(false);
     setSelectedPartnerId('');
-    toast({ title: t('home.proposalSentTitle', 'Vorschlag gesendet!'), description: t('home.proposalSentDesc', 'Dein Date-Vorschlag wurde erfolgreich gesendet.'), duration: 3000 });
+      toast({ title: t('home.proposalSentTitle', 'Vorschlag gesendet!'), description: t('home.proposalSentDesc', 'Dein Vorschlag wurde erfolgreich gesendet.'), duration: 3000 });
   };
   const handleProposalAccepted = (sessionId: string) => {
     const params = new URLSearchParams({ sessionId, planningMode: 'collaborative', fromProposal: 'true' });
@@ -207,7 +199,7 @@ const HomeContent: React.FC = () => {
                   </>
                 ) : (
                   <p className="text-sm font-medium text-foreground leading-snug">
-                    {DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].tip}
+                    {t(`home.dailyTips.${DAILY_TIPS[getDailyIndex(0) % DAILY_TIPS.length].key}`)}
                   </p>
                 )}
                 {dailyTipVenue && (
@@ -257,7 +249,7 @@ const HomeContent: React.FC = () => {
             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
             <CardContent className="py-4 px-5 relative">
               <p className="text-sm italic text-muted-foreground leading-relaxed text-center">
-                {QUOTES[getDailyIndex(0) % QUOTES.length]}
+                {t(`home.quotes.${QUOTE_KEYS[getDailyIndex(0) % QUOTE_KEYS.length]}`)}
               </p>
             </CardContent>
           </Card>

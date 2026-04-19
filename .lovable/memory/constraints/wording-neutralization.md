@@ -23,6 +23,9 @@ H!Outz positioniert sich als KI-Concierge für Erlebnisse (Solo, Duo, Gruppe). D
 - `aiLearning.charts.*` — Chart-Titel und Achsenbeschriftungen
 - `aiRecommendations.*` — AIRecommendations-Seite (Title, CTAs, Sortierung)
 - `aiProgress.*` — AIProgressIndicator-Stage-Labels mit Plural-Support (`basedOn_one`/`basedOn_other`)
+- `home.quotes.*` / `home.dailyTips.*` — Solo-First Daily-Inspiration & Quote-Carousel (Home)
+- `aiConcierge.*` — Concierge-Welcome (brandName, suggestions, intro) — "Date Concierge" → "Concierge"
+- `shareCard.*` — Share-Card-Labels ("💜 Erlebnis" / "📍 Empfehlung")
 
 **Bleibt "Date" (echte Paar-Dating-Flows):**
 - `dateInvite.*`, `dateProposal.*`, `dateCancel.*` — explizite Einladungen
