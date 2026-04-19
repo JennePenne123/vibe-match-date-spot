@@ -893,6 +893,26 @@
     "proposalSent": "¡Propuesta Enviada!",
     "proposalSentTo": "Tu propuesta de cita ha sido enviada a {{name}}"
   },
+  "results": {
+    "title": "Recomendaciones IA",
+    "dateVenues": "Lugares para Citas",
+    "situationalLabel": "Ocasión seleccionada",
+    "clearSituational": "Borrar ocasión",
+    "collaborativeMatches": "{{count}} coincidencias compartidas",
+    "perfectMatches": "{{count}} coincidencias perfectas",
+    "noVenuesTitle": "Sin lugares encontrados",
+    "noVenuesDescAuth": "No se encontraron lugares en esta área. Intenta otra ubicación o ajusta tus preferencias.",
+    "noVenuesDescAnon": "Por favor inicia sesión para que la IA pueda encontrar recomendaciones personalizadas.",
+    "signIn": "Iniciar sesión",
+    "changeLocation": "Cambiar ubicación",
+    "aiMatchesTitle": "Coincidencias con IA",
+    "aiMatchesDesc": "Cada lugar es evaluado personalmente — basado en {{type}} preferencias",
+    "aiMatchesDescYour": "tus",
+    "aiMatchesDescShared": "tus compartidas",
+    "premiumVoucherTitle": "Premium: Vouchers exclusivos para tus Top 3",
+    "premiumVoucherDesc": "Como miembro Premium, obtén vouchers de descuento para los 3 mejores lugares.",
+    "upgrade": "Mejorar"
+  },
   "invitationsSection": {
     "title": "Invitaciones de Cita",
     "total": "{{count}} total",

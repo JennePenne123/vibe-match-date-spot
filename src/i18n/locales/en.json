@@ -886,6 +886,8 @@
   "results": {
     "title": "AI Recommendations",
     "dateVenues": "Date Venues",
+    "situationalLabel": "Selected Occasion",
+    "clearSituational": "Clear occasion",
     "collaborativeMatches": "{{count}} collaborative matches",
     "perfectMatches": "{{count}} perfect matches",
     "noVenuesTitle": "No venues found",
