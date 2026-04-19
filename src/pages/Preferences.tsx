@@ -623,32 +623,55 @@ const Preferences = () => {
           {/* Step 1: Geschmack + Vibes */}
           {step === 1 && (
             <>
-              <AccordionSection title={t('preferences.whatCraving') || 'Küche'} icon={<Heart className="w-5 h-5 text-pink-500" />} selectedCount={selectedCuisines.length} defaultOpen>
-                <SelectionGrid items={cuisines} selected={selectedCuisines} onToggle={(id) => toggleSelection(id, selectedCuisines, setSelectedCuisines)} />
-              </AccordionSection>
+              {has('mainPicker') && (
+                <AccordionSection
+                  title={t(cfg.mainPickerTitleKey) || (isFood ? 'Küche' : 'Was?')}
+                  icon={<Heart className="w-5 h-5 text-pink-500" />}
+                  selectedCount={mainSelected.length}
+                  defaultOpen
+                >
+                  {cfg.mainPickerHintKey && (
+                    <p className="text-xs text-muted-foreground mb-3">{t(cfg.mainPickerHintKey)}</p>
+                  )}
+                  <SelectionGrid
+                    items={mainPickerItems}
+                    selected={mainSelected}
+                    onToggle={(id) => toggleSelection(id, mainSelected, setMainSelected)}
+                  />
+                </AccordionSection>
+              )}
 
-              <AccordionSection title={'Nie wieder vorschlagen'} icon={<Ban className="w-5 h-5 text-destructive" />} selectedCount={excludedCuisines.length}>
-                <p className="text-xs text-muted-foreground mb-3">Küchen, die du <strong>nie</strong> vorgeschlagen bekommen möchtest.</p>
-                <SelectionGrid items={cuisines} selected={excludedCuisines} onToggle={(id) => toggleSelection(id, excludedCuisines, setExcludedCuisines)} />
-              </AccordionSection>
+              {has('excluded') && (
+                <AccordionSection title={'Nie wieder vorschlagen'} icon={<Ban className="w-5 h-5 text-destructive" />} selectedCount={excludedCuisines.length}>
+                  <p className="text-xs text-muted-foreground mb-3">Küchen, die du <strong>nie</strong> vorgeschlagen bekommen möchtest.</p>
+                  <SelectionGrid items={cuisines} selected={excludedCuisines} onToggle={(id) => toggleSelection(id, excludedCuisines, setExcludedCuisines)} />
+                </AccordionSection>
+              )}
 
-              <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
-                <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
-              </AccordionSection>
+              {has('vibe') && (
+                <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
+                  <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
+                </AccordionSection>
+              )}
 
-              <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
-                <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
-              </AccordionSection>
+              {has('dietary') && (
+                <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
+                  <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
+                </AccordionSection>
+              )}
             </>
           )}
 
           {/* Step 2: Praktisches */}
           {step === 2 && (
             <>
-              <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length} defaultOpen>
-                <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
-              </AccordionSection>
+              {has('budget') && (
+                <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length} defaultOpen>
+                  <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
+                </AccordionSection>
+              )}
 
+              {has('location') && (
               <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0}>
                 <div className="space-y-3">
                   <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
