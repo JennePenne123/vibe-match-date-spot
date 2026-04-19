@@ -748,14 +748,19 @@ const Preferences = () => {
                   </div>
                 </div>
               </AccordionSection>
+              )}
 
-              <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
-                <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
-              </AccordionSection>
+              {has('timing') && (
+                <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
+                  <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
+                </AccordionSection>
+              )}
 
-              <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
-                <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
-              </AccordionSection>
+              {has('accessibility') && (
+                <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
+                  <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
+                </AccordionSection>
+              )}
             </>
           )}
         </div>
