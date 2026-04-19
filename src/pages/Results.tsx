@@ -1,17 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, Users, Star } from 'lucide-react';
+import { ArrowLeft, Sparkles, Users, Star, X } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
 import RealtimeContextBanner from '@/components/RealtimeContextBanner';
 import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
 import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenueVouchers } from '@/hooks/useVenueVouchers';
-
-import { Skeleton } from '@/components/ui/skeleton';
+import { getSituationalCategory, SITUATIONAL_CATEGORIES } from '@/lib/situationalCategories';
 import { motion } from 'framer-motion';
 
 // Skeleton loader for venue cards
@@ -36,6 +35,23 @@ const Results = () => {
   const { t } = useTranslation();
   const { appState } = useApp();
   const { user } = useAuth();
+
+  // Read active situational category from session storage
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const stored = sessionStorage.getItem('hioutz-situational-category');
+    if (stored) {
+      setActiveCategory(stored);
+    }
+  }, []);
+
+  const clearCategory = () => {
+    sessionStorage.removeItem('hioutz-situational-category');
+    setActiveCategory(null);
+  };
+
+  const categoryData = activeCategory ? getSituationalCategory(activeCategory) : null;
 
   const smartPlanningState = location.state as {
     fromSmartDatePlanning?: boolean;
@@ -188,6 +204,34 @@ const Results = () => {
           <div className="flex items-center gap-2 mb-3">
             <AIProgressIndicator variant="inline" className="flex-shrink-0" />
           </div>
+          
+          {/* Active Situational Category Banner */}
+          {categoryData && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`mb-4 rounded-xl border border-primary/30 bg-gradient-to-br p-3 flex items-center gap-3 ${categoryData.gradient}`}
+            >
+              <div className="text-2xl shrink-0" aria-hidden>{categoryData.emoji}</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                  {t('results.situationalLabel')}
+                </p>
+                <p className="text-sm font-medium text-foreground truncate">
+                  {t(categoryData.labelKey)}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={clearCategory}
+                aria-label={t('results.clearSituational')}
+                className="shrink-0 p-1.5 rounded-lg hover:bg-foreground/10 transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </motion.div>
+          )}
+          
           <RealtimeContextBanner
             userLocation={appState.userLocation}
             className="mb-4"
@@ -196,7 +240,7 @@ const Results = () => {
           {(() => {
             const STORAGE_KEY = 'ai_matches_banner_views';
             const views = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
-            if (views < 3) {
+            if (views < 3 && !categoryData) {
               localStorage.setItem(STORAGE_KEY, String(views + 1));
               return (
                 <motion.div 
