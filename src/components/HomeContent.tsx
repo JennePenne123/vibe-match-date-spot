@@ -16,6 +16,7 @@ import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
 import FeedbackImpactBanner from '@/components/home/FeedbackImpactBanner';
+import SituationalQuickActions from '@/components/home/SituationalQuickActions';
 import { FirstUseNudge } from '@/components/FirstUseNudge';
 import { useFirstUseNudge } from '@/hooks/useFirstUseNudge';
 import { useToast } from '@/hooks/use-toast';
@@ -221,6 +222,9 @@ const HomeContent: React.FC = () => {
 
         {/* Feedback Impact Banner */}
         <FeedbackImpactBanner />
+
+        {/* Situational Quick-Actions — pick today's vibe */}
+        <SituationalQuickActions />
 
         {/* Pending ratings — compact, above fold */}
         <PendingRatingsCard />
