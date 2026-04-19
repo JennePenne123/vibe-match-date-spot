@@ -140,8 +140,8 @@ const Friends = () => {
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div className="text-center">
-              <h1 className="text-xl font-semibold text-foreground">Invite Friends</h1>
-              <p className="text-sm text-muted-foreground">Step 2 of 3</p>
+              <h1 className="text-xl font-semibold text-foreground">{t('friends.inviteFriends')}</h1>
+              <p className="text-sm text-muted-foreground">{t('friends.step2of3')}</p>
             </div>
             <Button
               onClick={handleSkip}
@@ -149,7 +149,7 @@ const Friends = () => {
               className="text-muted-foreground hover:bg-muted text-sm"
               disabled={isGenerating}
             >
-              Skip
+              {t('common.skip')}
             </Button>
           </div>
           {/* Progress Bar */}
@@ -191,7 +191,7 @@ const Friends = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <Input
               type="text"
-              placeholder="Search friends..."
+              placeholder={t('friends.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 h-12 bg-card border-border"
@@ -217,7 +217,7 @@ const Friends = () => {
                       </Avatar>
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground">{friend.name}</h3>
-                        <p className="text-sm text-muted-foreground">Available for dates</p>
+                        <p className="text-sm text-muted-foreground">{t('friends.available')}</p>
                       </div>
                       <Button
                         onClick={() => handleInviteFriend(friend.id)}
@@ -230,12 +230,12 @@ const Friends = () => {
                         {isInvited ? (
                           <>
                             <Check className="w-4 h-4 mr-2" />
-                            Invited
+                            {t('friends.invited')}
                           </>
                         ) : (
                           <>
                             <UserPlus className="w-4 h-4 mr-2" />
-                            Invite
+                            {t('friends.invite')}
                           </>
                         )}
                       </Button>
@@ -248,8 +248,8 @@ const Friends = () => {
                 {/* No Friends Found Message */}
                 <div className="text-center py-8">
                   <div className="text-4xl mb-4">👥</div>
-                  <h3 className="text-foreground font-semibold mb-2">No friends found</h3>
-                  <p className="text-muted-foreground">Invite your friends to join H!Outz!</p>
+                  <h3 className="text-foreground font-semibold mb-2">{t('friends.noFriendsFound')}</h3>
+                  <p className="text-muted-foreground">{t('friends.inviteToVybe')}</p>
                 </div>
 
                 {/* Referral Link Section */}
@@ -285,11 +285,11 @@ const Friends = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <Button onClick={copyReferralLink} variant="outline" className="w-full">
                       <Copy className="w-4 h-4 mr-2" />
-                      Copy Link
+                      {t('friends.copyLink')}
                     </Button>
                     <Button onClick={shareViaEmail} variant="outline" className="w-full">
                       <Mail className="w-4 h-4 mr-2" />
-                      Email
+                      {t('friendsShare.email', 'Email')}
                     </Button>
                     <Button onClick={shareViaWhatsApp} variant="outline" className="w-full text-green-600 border-green-200 hover:bg-green-50 dark:text-green-400 dark:border-green-800 dark:hover:bg-green-900/20">
                       <MessageCircle className="w-4 h-4 mr-2" />
@@ -310,10 +310,10 @@ const Friends = () => {
             <div className="bg-card rounded-xl p-4 shadow-sm border border-border mb-6">
               <div className="text-center text-foreground">
                 <h3 className="font-semibold mb-1">
-                  {(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length)} friend{(isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length) !== 1 ? 's' : ''} invited
+                  {t('friends.friendsInvited', { count: isDemoMode ? invitedIds.length : friends.filter(f => f.isInvited).length })}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  They'll get recommendations that work for the group
+                  {t('friends.groupRecommendations')}
                 </p>
               </div>
             </div>
