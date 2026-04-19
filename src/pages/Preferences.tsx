@@ -31,6 +31,7 @@ import type { DailyMood } from '@/utils/moodStorage';
 import SituationalActiveBanner from '@/components/date-planning/preferences/SituationalActiveBanner';
 import SecondaryCategoryPicker from '@/components/date-planning/preferences/SecondaryCategoryPicker';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
+import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
 
 // Icon + color mapping (slimmed down)
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
@@ -263,6 +264,10 @@ const Preferences = () => {
 
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [excludedCuisines, setExcludedCuisines] = useState<string[]>([]);
+  // Selected items for the adaptive main picker when the situational
+  // category is NOT food (Culture / Activity / Nightlife). Stored in
+  // user_preferences.preferred_venue_types so no schema change is needed.
+  const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState<string[]>([]);
   const [selectedTimePreferences, setSelectedTimePreferences] = useState<string[]>([]);
@@ -301,6 +306,7 @@ const Preferences = () => {
           if (data.preferred_times) setSelectedTimePreferences(data.preferred_times);
           if (data.dietary_restrictions) setSelectedDietary(data.dietary_restrictions);
           if ((data as any).accessibility_needs) setSelectedAccessibility((data as any).accessibility_needs);
+          if ((data as any).preferred_venue_types) setSelectedVenueTypes((data as any).preferred_venue_types);
           // Load AI signal preferences from lifestyle_data
           if (data.lifestyle_data) {
             const ld = data.lifestyle_data as any;
@@ -437,6 +443,7 @@ const Preferences = () => {
           preferred_times: selectedTimePreferences.length > 0 ? selectedTimePreferences : null,
           dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
           accessibility_needs: selectedAccessibility.length > 0 ? selectedAccessibility : null,
+          preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null,
           lifestyle_data: {
             occasion: selectedOccasion,
             mood: selectedMood,
@@ -524,6 +531,17 @@ const Preferences = () => {
   ];
 
   const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 2));
+  // Resolve the adaptive wizard config from the active situational category.
+  // Drives which sections are visible and what the "main picker" shows.
+  const cfg = getCategoryWizardConfig(situationalCategory?.id ?? null);
+  const isFood = cfg.mainPickerStorage === 'preferred_cuisines';
+  const mainPickerItems: Preference[] = isFood
+    ? cuisines
+    : cfg.mainPickerItems.map(it => ({ id: it.id, name: t(it.nameKey), emoji: '' }));
+  const mainSelected = isFood ? selectedCuisines : selectedVenueTypes;
+  const setMainSelected = isFood ? setSelectedCuisines : setSelectedVenueTypes;
+  const has = (s: import('@/lib/categoryWizardConfig').WizardSectionId) => cfg.visibleSections.has(s);
+
   const steps = [
     { title: t('preferences.stepContext', 'Dein Kontext'), subtitle: t('preferences.stepContextDesc', 'Anlass, Stimmung & was dir wichtig ist'), icon: <Sparkles className="w-5 h-5 text-primary" /> },
     { title: t('preferences.stepTaste', 'Geschmack'), subtitle: t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
@@ -605,32 +623,55 @@ const Preferences = () => {
           {/* Step 1: Geschmack + Vibes */}
           {step === 1 && (
             <>
-              <AccordionSection title={t('preferences.whatCraving') || 'Küche'} icon={<Heart className="w-5 h-5 text-pink-500" />} selectedCount={selectedCuisines.length} defaultOpen>
-                <SelectionGrid items={cuisines} selected={selectedCuisines} onToggle={(id) => toggleSelection(id, selectedCuisines, setSelectedCuisines)} />
-              </AccordionSection>
+              {has('mainPicker') && (
+                <AccordionSection
+                  title={t(cfg.mainPickerTitleKey) || (isFood ? 'Küche' : 'Was?')}
+                  icon={<Heart className="w-5 h-5 text-pink-500" />}
+                  selectedCount={mainSelected.length}
+                  defaultOpen
+                >
+                  {cfg.mainPickerHintKey && (
+                    <p className="text-xs text-muted-foreground mb-3">{t(cfg.mainPickerHintKey)}</p>
+                  )}
+                  <SelectionGrid
+                    items={mainPickerItems}
+                    selected={mainSelected}
+                    onToggle={(id) => toggleSelection(id, mainSelected, setMainSelected)}
+                  />
+                </AccordionSection>
+              )}
 
-              <AccordionSection title={'Nie wieder vorschlagen'} icon={<Ban className="w-5 h-5 text-destructive" />} selectedCount={excludedCuisines.length}>
-                <p className="text-xs text-muted-foreground mb-3">Küchen, die du <strong>nie</strong> vorgeschlagen bekommen möchtest.</p>
-                <SelectionGrid items={cuisines} selected={excludedCuisines} onToggle={(id) => toggleSelection(id, excludedCuisines, setExcludedCuisines)} />
-              </AccordionSection>
+              {has('excluded') && (
+                <AccordionSection title={'Nie wieder vorschlagen'} icon={<Ban className="w-5 h-5 text-destructive" />} selectedCount={excludedCuisines.length}>
+                  <p className="text-xs text-muted-foreground mb-3">Küchen, die du <strong>nie</strong> vorgeschlagen bekommen möchtest.</p>
+                  <SelectionGrid items={cuisines} selected={excludedCuisines} onToggle={(id) => toggleSelection(id, excludedCuisines, setExcludedCuisines)} />
+                </AccordionSection>
+              )}
 
-              <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
-                <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
-              </AccordionSection>
+              {has('vibe') && (
+                <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
+                  <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
+                </AccordionSection>
+              )}
 
-              <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
-                <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
-              </AccordionSection>
+              {has('dietary') && (
+                <AccordionSection title={t('preferences.dietaryRequirements') || 'Ernährung'} icon={<Salad className="w-5 h-5 text-green-500" />} selectedCount={selectedDietary.length}>
+                  <SelectionGrid items={dietaryRequirements} selected={selectedDietary} onToggle={(id) => toggleSelection(id, selectedDietary, setSelectedDietary)} />
+                </AccordionSection>
+              )}
             </>
           )}
 
           {/* Step 2: Praktisches */}
           {step === 2 && (
             <>
-              <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length} defaultOpen>
-                <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
-              </AccordionSection>
+              {has('budget') && (
+                <AccordionSection title={t('preferences.whatBudget') || 'Budget'} icon={<CreditCard className="w-5 h-5 text-blue-500" />} selectedCount={selectedPriceRange.length} defaultOpen>
+                  <SelectionList items={priceRanges} selected={selectedPriceRange} onToggle={(id) => toggleSelection(id, selectedPriceRange, setSelectedPriceRange)} />
+                </AccordionSection>
+              )}
 
+              {has('location') && (
               <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0}>
                 <div className="space-y-3">
                   <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
@@ -707,14 +748,19 @@ const Preferences = () => {
                   </div>
                 </div>
               </AccordionSection>
+              )}
 
-              <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
-                <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
-              </AccordionSection>
+              {has('timing') && (
+                <AccordionSection title={t('preferences.whenBest') || 'Timing'} icon={<Clock className="w-5 h-5 text-amber-500" />} selectedCount={selectedTimePreferences.length}>
+                  <SelectionGrid items={timePreferences} selected={selectedTimePreferences} onToggle={(id) => toggleSelection(id, selectedTimePreferences, setSelectedTimePreferences)} />
+                </AccordionSection>
+              )}
 
-              <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
-                <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
-              </AccordionSection>
+              {has('accessibility') && (
+                <AccordionSection title={t('preferences.specialNeedsTitle') || 'Barrierefreiheit'} icon={<Accessibility className="w-5 h-5 text-blue-500" />} selectedCount={selectedAccessibility.length}>
+                  <SelectionList items={accessibilityNeeds} selected={selectedAccessibility} onToggle={(id) => toggleSelection(id, selectedAccessibility, setSelectedAccessibility)} />
+                </AccordionSection>
+              )}
             </>
           )}
         </div>
