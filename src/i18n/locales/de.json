@@ -167,15 +167,15 @@
     "addFriends": "Freunde finden",
     "activity": {
       "title": "Meine Aktivitäten",
-      "dateSent": "Date-Einladung gesendet",
-      "dateReceived": "Date-Einladung erhalten",
+      "dateSent": "Einladung gesendet",
+      "dateReceived": "Einladung erhalten",
       "youInvited": "Du hast jemanden eingeladen",
       "youWereInvited": "Du wurdest eingeladen",
-      "ratedDate": "Date bewertet",
+      "ratedDate": "Erlebnis bewertet",
       "newFriend": "Neue Verbindung",
       "connectionMade": "Du hast einen neuen Freund gefunden",
       "noActivity": "Noch keine Aktivitäten",
-      "startExploring": "Plane Dates, um hier deine Aktivitäten zu sehen!"
+      "startExploring": "Plane Erlebnisse, um hier deine Aktivitäten zu sehen!"
     }
   },
   "invitations": {
