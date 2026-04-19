@@ -502,7 +502,11 @@
     "venue_spa": "Spa & Wellness",
     "venue_spaDesc": "Entspannung & Selbstpflege",
     "situationalBannerLabel": "Heutiger Anlass",
-    "situationalBannerClear": "Filter entfernen"
+    "situationalBannerClear": "Filter entfernen",
+    "secondaryCategoryTitle": "Danach noch …?",
+    "secondaryCategorySubtitle": "Optional: Eine zweite Kategorie kombinieren",
+    "secondaryCategoryClear": "Entfernen",
+    "secondaryCategoryActive": "Plus"
   },
   "notFound": {
     "title": "404",
