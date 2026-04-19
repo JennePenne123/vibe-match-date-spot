@@ -122,8 +122,8 @@
     "featuresSubtitle": "Durchdacht gestaltete Funktionen für mühelose Planung",
     "feature1Title": "Intelligentes Matching",
     "feature1Desc": "Intelligente Empfehlungen basierend auf deinen Vorlieben und Kompatibilität. Finde Orte, die zu dir passen.",
-    "feature2Title": "Gemeinsam planen",
-    "feature2Desc": "Arbeitet in Echtzeit zusammen, um den perfekten Ort zu finden. Teilt Vorlieben und entdeckt Orte, die euch beiden gefallen.",
+    "feature2Title": "Solo & gemeinsam planen",
+    "feature2Desc": "Plane allein oder in Echtzeit mit Freund:innen. Teilt Vorlieben und entdeckt Orte, die zu allen passen.",
     "feature3Title": "Nahtloses Erlebnis",
     "feature3Desc": "Von der Entdeckung bis zur Einladung in wenigen Klicks. Verfolge deine Pläne und schaffe bleibende Erinnerungen.",
     "howItWorksTitle1": "Dein perfekter Plan in",
@@ -139,7 +139,18 @@
     "ctaTitle2": "bedeutungsvolle Momente?",
     "ctaSubtitle": "Werde Teil einer Community, die Absicht und Verbindung schätzt. Plane Erlebnisse, die zählen.",
     "startJourney": "Starte deine Reise",
-    "footer": "© 2024 H!Outz. Designed für bedeutungsvolle Verbindungen."
+    "footer": "© 2024 H!Outz. Designed für bedeutungsvolle Verbindungen.",
+    "aiBadge": "KI-gestützte Erlebnis-Planung",
+    "socialProof": {
+      "activeUsers": "Aktive Nutzer",
+      "satisfaction": "Zufriedenheit",
+      "matchAccuracy": "Match-Genauigkeit"
+    },
+    "footerLinks": {
+      "imprint": "Impressum",
+      "privacy": "Datenschutz",
+      "terms": "AGB"
+    }
   },
   "onboarding": {
     "skip": "Überspringen",

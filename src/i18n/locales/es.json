@@ -122,8 +122,8 @@
     "featuresSubtitle": "Funciones diseñadas para facilitar la planificación",
     "feature1Title": "Coincidencias Inteligentes",
     "feature1Desc": "Recomendaciones inteligentes basadas en tus preferencias y compatibilidad. Encuentra lugares que resuenen contigo.",
-    "feature2Title": "Planifica Juntos",
-    "feature2Desc": "Colabora en tiempo real para encontrar el lugar perfecto. Comparte preferencias y descubre lugares que todos disfruten.",
+    "feature2Title": "Solo o Juntos",
+    "feature2Desc": "Planifica solo o colabora en tiempo real con amigos. Comparte preferencias y descubre lugares que todos disfruten.",
     "feature3Title": "Experiencia Fluida",
     "feature3Desc": "De la búsqueda a la invitación en pocos toques. Sigue tus planes y crea recuerdos duraderos.",
     "howItWorksTitle1": "Tu Plan Perfecto en",
@@ -139,7 +139,18 @@
     "ctaTitle2": "Momentos Significativos?",
     "ctaSubtitle": "Únete a una comunidad que valora la intención y la conexión. Planifica experiencias que importan.",
     "startJourney": "Comienza tu Viaje",
-    "footer": "© 2024 H!Outz. Diseñado para conexiones significativas."
+    "footer": "© 2024 H!Outz. Diseñado para conexiones significativas.",
+    "aiBadge": "Planificación de experiencias con IA",
+    "socialProof": {
+      "activeUsers": "Usuarios Activos",
+      "satisfaction": "Satisfacción",
+      "matchAccuracy": "Precisión de Coincidencias"
+    },
+    "footerLinks": {
+      "imprint": "Aviso Legal",
+      "privacy": "Privacidad",
+      "terms": "Términos"
+    }
   },
   "onboarding": {
     "skip": "Omitir",
