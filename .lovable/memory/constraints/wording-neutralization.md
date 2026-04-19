@@ -26,6 +26,7 @@ H!Outz positioniert sich als KI-Concierge für Erlebnisse (Solo, Duo, Gruppe). D
 - `home.quotes.*` / `home.dailyTips.*` — Solo-First Daily-Inspiration & Quote-Carousel (Home)
 - `aiConcierge.*` — Concierge-Welcome (brandName, suggestions, intro) — "Date Concierge" → "Concierge"
 - `shareCard.*` — Share-Card-Labels ("💜 Erlebnis" / "📍 Empfehlung")
+- `landing.heroTitle1/2` + `heroSubtitle/2` — Solo-First "Action + Vibe" Hero ("Raus aus dem Alltag. Rein ins Erlebnis." / "Solo, zu zweit oder in der Gruppe")
 
 **Bleibt "Date" (echte Paar-Dating-Flows):**
 - `dateInvite.*`, `dateProposal.*`, `dateCancel.*` — explizite Einladungen
