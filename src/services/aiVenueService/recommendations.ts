@@ -60,7 +60,8 @@ export const getAIVenueRecommendations = async (
   selectedArea?: string,
   occasion?: DateOccasion | null,
   priorityWeights?: SessionPriorityWeights,
-  situationalCategoryId?: SituationalCategoryId | null
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ): Promise<AIVenueRecommendation[]> => {
   try {
     // Get venues using hybrid multi-source strategy
@@ -187,9 +188,11 @@ export const getAIVenueRecommendations = async (
         + (seasonalResult.modifier * 100);  // Convert 0-0.08 to 0-8 scale
 
       // ── Situational Category Boost (today's intent) ──
-      // Multiplicative: 1.35x for matching venues, 0.7x for off-category, 1.0x neutral
+      // Multiplicative: up to 1.45x combined (primary 1.35x × secondary 1.20x, capped),
+      // 0.7x only when both primary AND secondary signal off-bucket, 1.0x neutral.
       const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
-      const situationalBoost = getSituationalBoost(situationalCat, venue);
+      const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
+      const situationalBoost = getSituationalBoost(situationalCat, venue, secondaryCat);
       const finalScore = Math.max(5, Math.min(98, rawScore * situationalBoost));
 
       // Generate reasoning based on actual matches

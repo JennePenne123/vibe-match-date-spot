@@ -184,10 +184,16 @@ export const useAIAnalysis = () => {
             ? (window.sessionStorage.getItem('hioutz-situational-category') as
                 | 'food' | 'culture' | 'activity' | 'nightlife' | null)
             : null) || null;
+        const secondaryCategoryId =
+          (typeof window !== 'undefined'
+            ? (window.sessionStorage.getItem('hioutz-situational-secondary') as
+                | 'food' | 'culture' | 'activity' | 'nightlife' | null)
+            : null) || null;
         return await getAIVenueRecommendations(
           user.id, partnerId, 6, userLocation, undefined,
           preferences?.occasion, preferences?.priority_weights,
-          situationalCategoryId
+          situationalCategoryId,
+          secondaryCategoryId,
         );
       }, 3, 3000); // 3 Retries with 3s, 6s, 12s delays
 
