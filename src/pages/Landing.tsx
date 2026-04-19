@@ -105,7 +105,7 @@ export default function LandingDemo() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 backdrop-blur-sm">
                 <Zap className="w-4 h-4" />
-                {t('landing.aiBadge', 'KI-gestützte Date-Planung')}
+                {t('landing.aiBadge')}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-semibold leading-tight tracking-tight">
                 <span className="block text-foreground">{t('landing.heroTitle1')}</span>
@@ -156,7 +156,7 @@ export default function LandingDemo() {
                   <AnimatedCounter target={500} suffix="+" />
                 </span>
               </div>
-              <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">Aktive Nutzer</span>
+              <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">{t('landing.socialProof.activeUsers')}</span>
             </div>
             <div className="hidden sm:block w-px h-12 bg-border/50" />
             <div className="flex flex-col items-center gap-1.5">
@@ -166,7 +166,7 @@ export default function LandingDemo() {
                   <AnimatedCounter target={4.8} suffix="/5" decimals={1} />
                 </span>
               </div>
-              <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">Zufriedenheit</span>
+              <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">{t('landing.socialProof.satisfaction')}</span>
             </div>
             <div className="hidden sm:block w-px h-12 bg-border/50" />
             <div className="flex flex-col items-center gap-1.5">
@@ -176,7 +176,7 @@ export default function LandingDemo() {
                   <AnimatedCounter target={92} suffix="%" />
                 </span>
               </div>
-              <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">Match-Genauigkeit</span>
+              <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">{t('landing.socialProof.matchAccuracy')}</span>
             </div>
           </div>
         </div>
@@ -280,9 +280,9 @@ export default function LandingDemo() {
               <img src={hioutzLogo} alt="H!Outz" className="h-8 w-auto group-hover:scale-105 transition-all duration-300" />
             </Link>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <Link to="/impressum" className="hover:text-foreground transition-colors">Impressum</Link>
-              <Link to="/datenschutz" className="hover:text-foreground transition-colors">Datenschutz</Link>
-              <Link to="/agb" className="hover:text-foreground transition-colors">AGB</Link>
+              <Link to="/impressum" className="hover:text-foreground transition-colors">{t('landing.footerLinks.imprint')}</Link>
+              <Link to="/datenschutz" className="hover:text-foreground transition-colors">{t('landing.footerLinks.privacy')}</Link>
+              <Link to="/agb" className="hover:text-foreground transition-colors">{t('landing.footerLinks.terms')}</Link>
             </div>
             <p className="text-sm text-muted-foreground">{t('landing.footer')}</p>
           </div>

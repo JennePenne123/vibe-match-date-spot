@@ -122,8 +122,8 @@
     "featuresSubtitle": "Thoughtfully designed features that bring ease to planning",
     "feature1Title": "Thoughtful Matching",
     "feature1Desc": "Intelligent recommendations based on your preferences and compatibility. Find places that resonate with you.",
-    "feature2Title": "Plan Together",
-    "feature2Desc": "Collaborate in real-time to find the perfect venue. Share preferences and discover places you'll all enjoy.",
+    "feature2Title": "Solo or Together",
+    "feature2Desc": "Plan on your own or collaborate in real-time with friends. Share preferences and discover places everyone enjoys.",
     "feature3Title": "Seamless Experience",
     "feature3Desc": "From discovery to invitation in just a few taps. Track your plans and create lasting memories.",
     "howItWorksTitle1": "Your Perfect Plan in",
@@ -139,7 +139,18 @@
     "ctaTitle2": "Meaningful Moments?",
     "ctaSubtitle": "Join a community that values intention and connection. Start planning experiences that matter.",
     "startJourney": "Start Your Journey",
-    "footer": "© 2024 H!Outz. Designed for meaningful connections."
+    "footer": "© 2024 H!Outz. Designed for meaningful connections.",
+    "aiBadge": "AI-powered experience planning",
+    "socialProof": {
+      "activeUsers": "Active Users",
+      "satisfaction": "Satisfaction",
+      "matchAccuracy": "Match Accuracy"
+    },
+    "footerLinks": {
+      "imprint": "Imprint",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    }
   },
   "onboarding": {
     "skip": "Skip",
