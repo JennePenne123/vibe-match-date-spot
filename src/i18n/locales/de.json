@@ -886,6 +886,8 @@
   "results": {
     "title": "KI-Empfehlungen",
     "dateVenues": "Date Venues",
+    "situationalLabel": "Ausgewählter Anlass",
+    "clearSituational": "Anlass zurücksetzen",
     "collaborativeMatches": "{{count}} gemeinsame Matches",
     "perfectMatches": "{{count}} perfekte Matches",
     "noVenuesTitle": "Keine Venues gefunden",
