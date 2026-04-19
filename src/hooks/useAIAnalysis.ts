@@ -178,7 +178,17 @@ export const useAIAnalysis = () => {
       const venues = await retryAnalysisWithBackoff(async () => {
         console.log('🎯 AI ANALYSIS: Calling getAIVenueRecommendations...');
         setCurrentStep('Finding perfect matches...');
-        return await getAIVenueRecommendations(user.id, partnerId, 6, userLocation, undefined, preferences?.occasion, preferences?.priority_weights);
+        // Read ephemeral situational category from session (set by Home quick-actions)
+        const situationalCategoryId =
+          (typeof window !== 'undefined'
+            ? (window.sessionStorage.getItem('hioutz-situational-category') as
+                | 'food' | 'culture' | 'activity' | 'nightlife' | null)
+            : null) || null;
+        return await getAIVenueRecommendations(
+          user.id, partnerId, 6, userLocation, undefined,
+          preferences?.occasion, preferences?.priority_weights,
+          situationalCategoryId
+        );
       }, 3, 3000); // 3 Retries with 3s, 6s, 12s delays
 
       if (!venues || venues.length === 0) {
