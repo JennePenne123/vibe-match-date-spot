@@ -470,7 +470,7 @@ const Preferences = () => {
 
   const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 2));
   const steps = [
-    { title: 'Dein Date-Kontext', subtitle: 'Anlass, Stimmung & was dir wichtig ist', icon: <Sparkles className="w-5 h-5 text-primary" /> },
+    { title: t('preferences.stepContext', 'Dein Kontext'), subtitle: t('preferences.stepContextDesc', 'Anlass, Stimmung & was dir wichtig ist'), icon: <Sparkles className="w-5 h-5 text-primary" /> },
     { title: t('preferences.stepTaste', 'Geschmack'), subtitle: t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
     { title: t('preferences.stepPractical', 'Praktisches'), subtitle: t('preferences.stepPracticalDesc', 'Budget, Timing & Standort'), icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
   ];
