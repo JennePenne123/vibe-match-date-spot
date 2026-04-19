@@ -49,6 +49,7 @@ const Results = () => {
 
   const clearCategory = () => {
     sessionStorage.removeItem('hioutz-situational-category');
+    sessionStorage.removeItem('hioutz-situational-secondary');
     setActiveCategory(null);
   };
 

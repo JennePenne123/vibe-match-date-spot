@@ -512,7 +512,11 @@
     "venue_spa": "Spa y Bienestar",
     "venue_spaDesc": "Relajación y autocuidado",
     "situationalBannerLabel": "Ocasión de hoy",
-    "situationalBannerClear": "Quitar filtro"
+    "situationalBannerClear": "Quitar filtro",
+    "secondaryCategoryTitle": "¿Y luego …?",
+    "secondaryCategorySubtitle": "Opcional: combinar con una segunda ocasión",
+    "secondaryCategoryClear": "Quitar",
+    "secondaryCategoryActive": "Plus"
   },
   "notFound": {
     "title": "404",

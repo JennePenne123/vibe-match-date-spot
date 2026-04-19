@@ -502,7 +502,11 @@
     "venue_spa": "Spa & Wellness",
     "venue_spaDesc": "Relaxation & self-care",
     "situationalBannerLabel": "Today's vibe",
-    "situationalBannerClear": "Clear filter"
+    "situationalBannerClear": "Clear filter",
+    "secondaryCategoryTitle": "And then …?",
+    "secondaryCategorySubtitle": "Optional: combine with a second vibe",
+    "secondaryCategoryClear": "Remove",
+    "secondaryCategoryActive": "Plus"
   },
   "notFound": {
     "title": "404",

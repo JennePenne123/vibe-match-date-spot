@@ -29,6 +29,7 @@ import type { DateOccasion } from '@/components/date-planning/preferences/prefer
 import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
 import SituationalActiveBanner from '@/components/date-planning/preferences/SituationalActiveBanner';
+import SecondaryCategoryPicker from '@/components/date-planning/preferences/SecondaryCategoryPicker';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
 
 // Icon + color mapping (slimmed down)
@@ -235,6 +236,28 @@ const Preferences = () => {
   const clearSituationalCategory = useCallback(() => {
     setSituationalCategory(null);
     try { window.sessionStorage.removeItem('hioutz-situational-category'); } catch {}
+    // Clearing the primary also clears the secondary — it has no meaning alone.
+    setSecondaryCategoryId(null);
+    try { window.sessionStorage.removeItem('hioutz-situational-secondary'); } catch {}
+  }, []);
+
+  // Optional secondary "Danach noch …?" category — combines with the primary
+  // one in the recommendation pipeline. Persisted in sessionStorage so it
+  // survives navigation between Preferences → Results.
+  const [secondaryCategoryId, setSecondaryCategoryId] = useState<SituationalCategoryId | null>(null);
+  useEffect(() => {
+    try {
+      const stored = window.sessionStorage.getItem('hioutz-situational-secondary') as SituationalCategoryId | null;
+      if (stored && getSituationalCategory(stored)) setSecondaryCategoryId(stored);
+    } catch {}
+  }, []);
+
+  const handleSecondaryChange = useCallback((id: SituationalCategoryId | null) => {
+    setSecondaryCategoryId(id);
+    try {
+      if (id) window.sessionStorage.setItem('hioutz-situational-secondary', id);
+      else window.sessionStorage.removeItem('hioutz-situational-secondary');
+    } catch {}
   }, []);
 
 
@@ -516,6 +539,13 @@ const Preferences = () => {
         {situationalCategory && (
           <div className="px-4 pt-4">
             <SituationalActiveBanner category={situationalCategory} onClear={clearSituationalCategory} />
+            <div className="mt-2">
+              <SecondaryCategoryPicker
+                primary={situationalCategory}
+                secondaryId={secondaryCategoryId}
+                onChange={handleSecondaryChange}
+              />
+            </div>
           </div>
         )}
         {/* Header */}
