@@ -500,7 +500,9 @@
     "venue_live_event": "Live Events",
     "venue_live_eventDesc": "Festivals & special events",
     "venue_spa": "Spa & Wellness",
-    "venue_spaDesc": "Relaxation & self-care"
+    "venue_spaDesc": "Relaxation & self-care",
+    "situationalBannerLabel": "Today's vibe",
+    "situationalBannerClear": "Clear filter"
   },
   "notFound": {
     "title": "404",

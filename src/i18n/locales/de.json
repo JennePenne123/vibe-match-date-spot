@@ -500,7 +500,9 @@
     "venue_live_event": "Live Events",
     "venue_live_eventDesc": "Festivals & Sonderevents",
     "venue_spa": "Spa & Wellness",
-    "venue_spaDesc": "Entspannung & Selbstpflege"
+    "venue_spaDesc": "Entspannung & Selbstpflege",
+    "situationalBannerLabel": "Heutiger Anlass",
+    "situationalBannerClear": "Filter entfernen"
   },
   "notFound": {
     "title": "404",

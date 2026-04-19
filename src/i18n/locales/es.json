@@ -510,7 +510,9 @@
     "venue_live_event": "Eventos en vivo",
     "venue_live_eventDesc": "Festivales y eventos especiales",
     "venue_spa": "Spa y Bienestar",
-    "venue_spaDesc": "Relajación y autocuidado"
+    "venue_spaDesc": "Relajación y autocuidado",
+    "situationalBannerLabel": "Ocasión de hoy",
+    "situationalBannerClear": "Quitar filtro"
   },
   "notFound": {
     "title": "404",
