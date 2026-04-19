@@ -86,6 +86,12 @@ export function getSituationalCategory(id: string | null | undefined): Situation
  * - 1.15 → keyword match in name/tags/description
  * - 1.0  → no signal either way
  * - 0.7  → known to be in a different category bucket (de-prioritise)
+ *
+ * When a `secondary` category is provided (the optional "Danach noch …?" pick
+ * from the preferences wizard), its match contributes an additional, smaller
+ * boost (max 1.20×) that is multiplied onto the primary one. The combined
+ * factor is capped at 1.45× to avoid runaway scores. Off-category penalties
+ * are only applied when BOTH primary and secondary signal "wrong bucket".
  */
 export function getSituationalBoost(
   category: SituationalCategory | null,
@@ -95,8 +101,9 @@ export function getSituationalBoost(
     description?: string | null;
     tags?: string[] | null;
   },
+  secondary?: SituationalCategory | null,
 ): number {
-  if (!category) return 1;
+  if (!category && !secondary) return 1;
 
   const haystack = [
     venue.name ?? '',
@@ -107,16 +114,30 @@ export function getSituationalBoost(
     .join(' ')
     .toLowerCase();
 
-  const matchesKeyword = category.boostKeywords.some(kw => haystack.includes(kw));
-  if (matchesKeyword) return 1.35;
+  const scoreFor = (cat: SituationalCategory | null, matchValue: number): number => {
+    if (!cat) return 1;
+    return cat.boostKeywords.some(kw => haystack.includes(kw)) ? matchValue : 1;
+  };
 
-  // De-prioritise venues that clearly belong to a *different* situational bucket.
-  // We check the OTHER categories' strong keywords; if any matches, this venue
-  // is "wrong category" for today's intent.
-  const otherCategoriesStrongKeywords = SITUATIONAL_CATEGORIES
-    .filter(c => c.id !== category.id)
+  // Primary contributes up to 1.35x, secondary up to 1.20x.
+  const primaryFactor = scoreFor(category ?? null, 1.35);
+  const secondaryFactor = scoreFor(secondary ?? null, 1.20);
+
+  // If at least one matches → multiplicative combo, capped at 1.45x
+  if (primaryFactor > 1 || secondaryFactor > 1) {
+    return Math.min(1.45, primaryFactor * secondaryFactor);
+  }
+
+  // Off-category de-prioritisation only when ALL active categories signal
+  // "wrong bucket" — a venue that matches the secondary intent should NOT
+  // be penalised just because it's off the primary one.
+  const activeIds = new Set(
+    [category?.id, secondary?.id].filter(Boolean) as SituationalCategoryId[],
+  );
+  const otherKeywords = SITUATIONAL_CATEGORIES
+    .filter(c => !activeIds.has(c.id))
     .flatMap(c => c.boostKeywords);
-  const matchesOther = otherCategoriesStrongKeywords.some(kw => haystack.includes(kw));
+  const matchesOther = otherKeywords.some(kw => haystack.includes(kw));
   if (matchesOther) return 0.7;
 
   return 1;
