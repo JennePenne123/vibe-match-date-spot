@@ -13,12 +13,16 @@ H!Outz positioniert sich als KI-Concierge für Erlebnisse (Solo, Duo, Gruppe). D
 - "Upcoming Dates" → "Anstehende Pläne" / "Upcoming Plans" / "Planes Próximos"
 - "Date Invitation" toasts → "Einladung" / "Invitation" / "Invitación"
 
-**Neue i18n-Sektionen (Step 1a):**
+**Neue i18n-Sektionen (Step 1a + 1b):**
 - `notifications.*` — Toast-Texte für Einladungs-Events
 - `groupDates.*` — Empty-State und CTA für Gruppen
 - `friendsShare.*` — Referral-Link Sharing-Texte
 - `tutorial.*` — Solo-First neu formuliert
 - `preferences.stepContext` / `stepContextDesc` — ersetzt hardcoded "Date-Kontext"
+- `aiLearning.*` — KI-Lern-Komponenten ("Bewertete Erlebnisse" statt "Dates Rated")
+- `aiLearning.charts.*` — Chart-Titel und Achsenbeschriftungen
+- `aiRecommendations.*` — AIRecommendations-Seite (Title, CTAs, Sortierung)
+- `aiProgress.*` — AIProgressIndicator-Stage-Labels mit Plural-Support (`basedOn_one`/`basedOn_other`)
 
 **Bleibt "Date" (echte Paar-Dating-Flows):**
 - `dateInvite.*`, `dateProposal.*`, `dateCancel.*` — explizite Einladungen

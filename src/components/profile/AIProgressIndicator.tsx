@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Brain } from 'lucide-react';
 import { useAILearning } from '@/hooks/useAILearning';
 import { cn } from '@/lib/utils';
@@ -12,20 +13,20 @@ const AIProgressIndicator: React.FC<AIProgressIndicatorProps> = ({
   variant = 'compact',
   className 
 }) => {
+  const { t } = useTranslation();
   const { insights, loading } = useAILearning();
 
   if (loading || !insights) return null;
 
   const accuracy = Math.round(parseFloat(insights.aiAccuracy) || 0);
   const totalDates = insights.totalDates || 0;
-  const confidence = insights.confidenceLevel || 'low';
 
   const getStage = () => {
-    if (totalDates === 0) return { label: 'Lernphase', emoji: '🌱', color: 'text-amber-600 dark:text-amber-400' };
-    if (totalDates < 3) return { label: 'Kennenlernen', emoji: '🧠', color: 'text-blue-600 dark:text-blue-400' };
-    if (accuracy < 60) return { label: 'Wird besser', emoji: '📈', color: 'text-blue-600 dark:text-blue-400' };
-    if (accuracy < 80) return { label: 'Gute Trefferquote', emoji: '🎯', color: 'text-emerald-600 dark:text-emerald-400' };
-    return { label: 'Kennt dich gut', emoji: '✨', color: 'text-primary' };
+    if (totalDates === 0) return { label: t('aiProgress.learningPhase'), emoji: '🌱', color: 'text-amber-600 dark:text-amber-400' };
+    if (totalDates < 3) return { label: t('aiProgress.gettingToKnowYou'), emoji: '🧠', color: 'text-blue-600 dark:text-blue-400' };
+    if (accuracy < 60) return { label: t('aiProgress.gettingBetter'), emoji: '📈', color: 'text-blue-600 dark:text-blue-400' };
+    if (accuracy < 80) return { label: t('aiProgress.goodAccuracy'), emoji: '🎯', color: 'text-emerald-600 dark:text-emerald-400' };
+    return { label: t('aiProgress.knowsYouWell'), emoji: '✨', color: 'text-primary' };
   };
 
   const stage = getStage();
@@ -37,9 +38,9 @@ const AIProgressIndicator: React.FC<AIProgressIndicatorProps> = ({
         className
       )}>
         <Brain className="w-3.5 h-3.5 text-primary" />
-        <span className="text-muted-foreground">KI:</span>
+        <span className="text-muted-foreground">{t('aiProgress.aiLabel')}</span>
         <span className={cn('font-semibold', stage.color)}>
-          {totalDates === 0 ? 'Lernphase' : `${accuracy}%`}
+          {totalDates === 0 ? t('aiProgress.learningPhase') : `${accuracy}%`}
         </span>
       </div>
     );
@@ -55,7 +56,7 @@ const AIProgressIndicator: React.FC<AIProgressIndicatorProps> = ({
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium text-foreground">KI-Personalisierung</span>
+          <span className="text-sm font-medium text-foreground">{t('aiProgress.personalization')}</span>
           <span className="text-sm">{stage.emoji}</span>
         </div>
         <div className="flex items-center gap-2 mt-0.5">
@@ -71,7 +72,7 @@ const AIProgressIndicator: React.FC<AIProgressIndicatorProps> = ({
         </div>
         {totalDates > 0 && (
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            Basierend auf {totalDates} {totalDates === 1 ? 'Date' : 'Dates'}
+            {t('aiProgress.basedOn', { count: totalDates })}
           </p>
         )}
       </div>
