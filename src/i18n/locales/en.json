@@ -167,15 +167,15 @@
     "addFriends": "Find Friends",
     "activity": {
       "title": "My Activity",
-      "dateSent": "Date invitation sent",
-      "dateReceived": "Date invitation received",
+      "dateSent": "Invitation sent",
+      "dateReceived": "Invitation received",
       "youInvited": "You invited someone",
       "youWereInvited": "You were invited",
-      "ratedDate": "Date rated",
+      "ratedDate": "Experience rated",
       "newFriend": "New connection",
       "connectionMade": "You found a new friend",
       "noActivity": "No activity yet",
-      "startExploring": "Plan dates to see your activity here!"
+      "startExploring": "Plan experiences to see your activity here!"
     }
   },
   "invitations": {
