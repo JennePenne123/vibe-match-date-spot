@@ -513,6 +513,11 @@ const Preferences = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <div className="max-w-md mx-auto">
+        {situationalCategory && (
+          <div className="px-4 pt-4">
+            <SituationalActiveBanner category={situationalCategory} onClear={clearSituationalCategory} />
+          </div>
+        )}
         {/* Header */}
         <div className="p-4 pt-12 bg-card shadow-sm sticky top-0 z-10 space-y-3">
           <div className="flex items-center gap-3">
