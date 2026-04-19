@@ -103,7 +103,27 @@
     "wizardStep3": "Praktisches",
     "wizardStep3Desc": "Wann, wie lange & wo?",
     "wizardBack": "Zurück",
-    "wizardNext": "Weiter"
+    "wizardNext": "Weiter",
+    "situational": {
+      "sectionTitle": "Was hast du heute vor?",
+      "sectionSubtitle": "Wähle einen Anlass für personalisierte Empfehlungen",
+      "food": {
+        "label": "Essen & Trinken",
+        "desc": "Restaurants, Cafés, Bars"
+      },
+      "culture": {
+        "label": "Kultur & Entertainment",
+        "desc": "Museen, Kino, Theater, Konzerte"
+      },
+      "activity": {
+        "label": "Aktivitäten & Sport",
+        "desc": "Bowling, Klettern, Wellness"
+      },
+      "nightlife": {
+        "label": "Nightlife & Events",
+        "desc": "Clubs, Live-Musik, Pub-Crawls"
+      }
+    }
   },
   "landing": {
     "features": "Funktionen",
@@ -480,7 +500,9 @@
     "venue_live_event": "Live Events",
     "venue_live_eventDesc": "Festivals & Sonderevents",
     "venue_spa": "Spa & Wellness",
-    "venue_spaDesc": "Entspannung & Selbstpflege"
+    "venue_spaDesc": "Entspannung & Selbstpflege",
+    "situationalBannerLabel": "Heutiger Anlass",
+    "situationalBannerClear": "Filter entfernen"
   },
   "notFound": {
     "title": "404",

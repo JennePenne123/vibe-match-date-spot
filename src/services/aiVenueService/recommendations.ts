@@ -20,6 +20,7 @@ import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringU
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
+import { getSituationalCategory, getSituationalBoost, type SituationalCategoryId } from '@/lib/situationalCategories';
 
 export interface AIVenueRecommendation {
   venue_id: string;
@@ -58,7 +59,8 @@ export const getAIVenueRecommendations = async (
   userLocation?: { latitude: number; longitude: number; address?: string },
   selectedArea?: string,
   occasion?: DateOccasion | null,
-  priorityWeights?: SessionPriorityWeights
+  priorityWeights?: SessionPriorityWeights,
+  situationalCategoryId?: SituationalCategoryId | null
 ): Promise<AIVenueRecommendation[]> => {
   try {
     // Get venues using hybrid multi-source strategy
@@ -183,7 +185,12 @@ export const getAIVenueRecommendations = async (
         + (photoVibeResult.modifier * 100)  // Convert 0-0.12 to 0-12 scale
         + (pairResult.modifier * 100)       // Convert 0-0.15 to 0-15 scale
         + (seasonalResult.modifier * 100);  // Convert 0-0.08 to 0-8 scale
-      const finalScore = Math.max(5, Math.min(98, rawScore));
+
+      // ── Situational Category Boost (today's intent) ──
+      // Multiplicative: 1.35x for matching venues, 0.7x for off-category, 1.0x neutral
+      const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
+      const situationalBoost = getSituationalBoost(situationalCat, venue);
+      const finalScore = Math.max(5, Math.min(98, rawScore * situationalBoost));
 
       // Generate reasoning based on actual matches
       const matchReasons: string[] = [];
