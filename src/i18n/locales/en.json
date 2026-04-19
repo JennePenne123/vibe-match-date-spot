@@ -992,20 +992,46 @@
     "next": "Next",
     "start": "Let's go! 🚀",
     "slide1Title": "Welcome to H!Outz",
-    "slide1Subtitle": "Your AI Date Planner",
-    "slide1Desc": "Discover perfect date spots that match your vibe — powered by AI that learns with every date.",
+    "slide1Subtitle": "Your AI Concierge",
+    "slide1Desc": "Discover perfect spots that match your vibe — powered by AI that learns with every experience.",
     "slide2Title": "Tell us what you like",
     "slide2Subtitle": "Preferences & Mood",
     "slide2Desc": "Pick cuisine, vibe and budget — or just check in your daily mood. The more you share, the better the suggestions.",
     "slide3Title": "AI Recommendations",
     "slide3Subtitle": "Perfectly matched",
-    "slide3Desc": "Our AI finds venues that match your mood, taste and location — with real-time context.",
-    "slide4Title": "Plan & invite",
-    "slide4Subtitle": "Decide together",
-    "slide4Desc": "Plan solo or together with your date partner. Send proposals via link — easily through WhatsApp, Telegram or email.",
+    "slide3Desc": "Our AI finds spots that match your mood, taste and location — with real-time context.",
+    "slide4Title": "Plan solo or together",
+    "slide4Subtitle": "Solo, duo or group",
+    "slide4Desc": "Plan for yourself, invite someone or decide together as a group. Share proposals via link — easily through WhatsApp, Telegram or email.",
     "slide5Title": "Earn Points & Rewards",
     "slide5Subtitle": "Rate & benefit",
-    "slide5Desc": "Rate your dates, earn points and redeem vouchers at partner venues. Your feedback makes the AI smarter!"
+    "slide5Desc": "Rate your experiences, earn points and redeem vouchers at partner venues. Your feedback makes the AI smarter!"
+  },
+  "notifications": {
+    "inviteAccepted": "Invitation accepted!",
+    "inviteAcceptedDesc": "{{name}} accepted your invitation! Time to plan the details.",
+    "inviteResponse": "Invitation response",
+    "inviteDeclinedDesc": "{{name}} isn't available this time. Maybe try a different time or another spot!",
+    "newInvite": "New invitation!",
+    "newInviteDesc": "{{name}} sent you an invitation. Check it out and respond!",
+    "actionView": "View",
+    "actionPlanNew": "Plan new"
+  },
+  "groupDates": {
+    "emptyText": "No group plans yet. Create one via \"Where to?\"!",
+    "createGroup": "Create group plan"
+  },
+  "friendsShare": {
+    "uninvited": "Friend uninvited",
+    "invited": "Friend invited!",
+    "uninvitedDesc": "Removed from your plans",
+    "invitedDesc": "Will receive your recommendations",
+    "linkCopied": "Link copied!",
+    "linkCopiedDesc": "Your referral link has been copied.",
+    "emailSubject": "Join me on H!Outz — Discover amazing spots!",
+    "emailBody": "Hey! I'm using H!Outz to find great spots for any occasion — solo, with a date or as a group. Join me: {{link}}",
+    "shareText": "Hey! I'm using H!Outz to discover great spots. Join me: {{link}}",
+    "shareTextShort": "Hey! I'm using H!Outz to discover great spots. Join me!"
   },
   "auth": {
     "welcomeBack": "Welcome Back",

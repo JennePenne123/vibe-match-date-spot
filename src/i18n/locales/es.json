@@ -992,5 +992,52 @@
     "accept": "Entendido",
     "doNotSell": "No vender mis datos",
     "learnMore": "Más información"
+  },
+  "tutorial": {
+    "skip": "Omitir",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "start": "¡Vamos! 🚀",
+    "slide1Title": "Bienvenido a H!Outz",
+    "slide1Subtitle": "Tu concierge con IA",
+    "slide1Desc": "Descubre lugares perfectos que encajan contigo — impulsado por una IA que aprende con cada experiencia.",
+    "slide2Title": "Dinos qué te gusta",
+    "slide2Subtitle": "Preferencias y estado de ánimo",
+    "slide2Desc": "Elige cocina, vibra y presupuesto — o simplemente registra tu ánimo del día. Cuanto más compartas, mejores las sugerencias.",
+    "slide3Title": "Recomendaciones con IA",
+    "slide3Subtitle": "Perfectamente combinadas",
+    "slide3Desc": "Nuestra IA encuentra lugares que encajan con tu ánimo, tu gusto y tu ubicación — con contexto en tiempo real.",
+    "slide4Title": "Planea solo o en grupo",
+    "slide4Subtitle": "Solo, en pareja o en grupo",
+    "slide4Desc": "Planea para ti, invita a alguien o decidan juntos en grupo. Comparte propuestas por enlace — fácil por WhatsApp, Telegram o email.",
+    "slide5Title": "Gana puntos y recompensas",
+    "slide5Subtitle": "Valora y benefíciate",
+    "slide5Desc": "Valora tus experiencias, gana puntos y canjea cupones en lugares aliados. ¡Tu feedback hace la IA más inteligente!"
+  },
+  "notifications": {
+    "inviteAccepted": "¡Invitación aceptada!",
+    "inviteAcceptedDesc": "¡{{name}} aceptó tu invitación! Hora de planear los detalles.",
+    "inviteResponse": "Respuesta a la invitación",
+    "inviteDeclinedDesc": "{{name}} no está disponible esta vez. ¡Quizás otra hora u otro lugar funcione!",
+    "newInvite": "¡Nueva invitación!",
+    "newInviteDesc": "{{name}} te envió una invitación. ¡Échale un vistazo y responde!",
+    "actionView": "Ver",
+    "actionPlanNew": "Planear nuevo"
+  },
+  "groupDates": {
+    "emptyText": "Aún no hay planes de grupo. ¡Crea uno desde \"¿A dónde?\"!",
+    "createGroup": "Crear plan de grupo"
+  },
+  "friendsShare": {
+    "uninvited": "Amigo retirado",
+    "invited": "¡Amigo invitado!",
+    "uninvitedDesc": "Eliminado de tus planes",
+    "invitedDesc": "Recibirá tus recomendaciones",
+    "linkCopied": "¡Enlace copiado!",
+    "linkCopiedDesc": "Tu enlace de referido se copió.",
+    "emailSubject": "Únete a H!Outz — ¡Descubre lugares increíbles!",
+    "emailBody": "¡Hola! Uso H!Outz para encontrar lugares geniales para cualquier ocasión — solo, en pareja o en grupo. Únete: {{link}}",
+    "shareText": "¡Hola! Uso H!Outz para descubrir lugares geniales. Únete: {{link}}",
+    "shareTextShort": "¡Hola! Uso H!Outz para descubrir lugares geniales. ¡Únete!"
   }
 }

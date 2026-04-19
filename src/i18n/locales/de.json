@@ -992,20 +992,46 @@
     "next": "Weiter",
     "start": "Los geht's! 🚀",
     "slide1Title": "Willkommen bei H!Outz",
-    "slide1Subtitle": "Dein KI-Date-Planer",
-    "slide1Desc": "Entdecke perfekte Date-Spots, die zu euch passen — powered by KI, die mit jedem Date dazulernt.",
+    "slide1Subtitle": "Dein KI-Concierge",
+    "slide1Desc": "Entdecke perfekte Spots, die zu dir passen — powered by KI, die mit jedem Erlebnis dazulernt.",
     "slide2Title": "Sag uns, was du magst",
     "slide2Subtitle": "Präferenzen & Stimmung",
     "slide2Desc": "Wähle Küche, Vibe und Budget — oder check einfach deine Tagesstimmung ein. Je mehr du teilst, desto besser die Vorschläge.",
     "slide3Title": "KI-Empfehlungen",
     "slide3Subtitle": "Perfekt gematcht",
-    "slide3Desc": "Unsere KI findet Venues die zu eurer Stimmung, eurem Geschmack und eurer Location passen — mit Echtzeit-Kontext.",
-    "slide4Title": "Date planen & einladen",
-    "slide4Subtitle": "Gemeinsam entscheiden",
-    "slide4Desc": "Plane solo oder zusammen mit deinem Date-Partner. Sende Vorschläge per Link — ganz easy über WhatsApp, Telegram oder E-Mail.",
+    "slide3Desc": "Unsere KI findet Spots, die zu deiner Stimmung, deinem Geschmack und deiner Location passen — mit Echtzeit-Kontext.",
+    "slide4Title": "Plane solo oder gemeinsam",
+    "slide4Subtitle": "Allein, zu zweit oder als Gruppe",
+    "slide4Desc": "Plane für dich, lade jemanden ein oder entscheidet gemeinsam in der Gruppe. Vorschläge teilen per Link — ganz easy über WhatsApp, Telegram oder E-Mail.",
     "slide5Title": "Sammle Punkte & Rewards",
     "slide5Subtitle": "Bewerte & profitiere",
-    "slide5Desc": "Bewerte deine Dates, sammle Punkte und löse Gutscheine bei Partner-Venues ein. Dein Feedback macht die KI schlauer!"
+    "slide5Desc": "Bewerte deine Erlebnisse, sammle Punkte und löse Gutscheine bei Partner-Venues ein. Dein Feedback macht die KI schlauer!"
+  },
+  "notifications": {
+    "inviteAccepted": "Einladung angenommen!",
+    "inviteAcceptedDesc": "{{name}} hat deine Einladung angenommen! Jetzt geht's an die Details.",
+    "inviteResponse": "Antwort auf Einladung",
+    "inviteDeclinedDesc": "{{name}} kann leider nicht. Vielleicht klappt's mit einer anderen Zeit oder einem anderen Spot!",
+    "newInvite": "Neue Einladung!",
+    "newInviteDesc": "{{name}} hat dir eine Einladung geschickt. Schau rein und antworte!",
+    "actionView": "Anzeigen",
+    "actionPlanNew": "Neu planen"
+  },
+  "groupDates": {
+    "emptyText": "Noch keine Gruppen-Pläne. Erstelle einen über \"Wohin?\"!",
+    "createGroup": "Gruppen-Plan erstellen"
+  },
+  "friendsShare": {
+    "uninvited": "Freund:in ausgeladen",
+    "invited": "Freund:in eingeladen!",
+    "uninvitedDesc": "Aus deinen Plänen entfernt",
+    "invitedDesc": "Erhält deine Empfehlungen",
+    "linkCopied": "Link kopiert!",
+    "linkCopiedDesc": "Dein Empfehlungslink wurde kopiert.",
+    "emailSubject": "Komm zu H!Outz – Entdecke tolle Spots!",
+    "emailBody": "Hey! Ich nutze H!Outz um coole Spots für jeden Anlass zu entdecken — solo, zu zweit oder in der Gruppe. Komm dazu: {{link}}",
+    "shareText": "Hey! Ich nutze H!Outz um coole Spots zu entdecken. Komm dazu: {{link}}",
+    "shareTextShort": "Hey! Ich nutze H!Outz um coole Spots zu entdecken. Komm dazu!"
   },
   "auth": {
     "welcomeBack": "Willkommen zurück",
