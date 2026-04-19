@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
 import AIConfidenceBanner from '@/components/home/AIConfidenceBanner';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
+import LocationPermissionBanner from '@/components/home/LocationPermissionBanner';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
 import PartnerSelection from '@/components/date-planning/PartnerSelection';
@@ -157,6 +158,9 @@ const HomeContent: React.FC = () => {
 
         {/* First-Use Nudge for Home */}
         <HomeNudge />
+
+        {/* Location permission banner — only shown if no home location set */}
+        <LocationPermissionBanner />
 
         {/* AI Confidence Banner */}
         <AIConfidenceBanner />
