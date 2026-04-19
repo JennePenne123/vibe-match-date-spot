@@ -531,6 +531,17 @@ const Preferences = () => {
   ];
 
   const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 2));
+  // Resolve the adaptive wizard config from the active situational category.
+  // Drives which sections are visible and what the "main picker" shows.
+  const cfg = getCategoryWizardConfig(situationalCategory?.id ?? null);
+  const isFood = cfg.mainPickerStorage === 'preferred_cuisines';
+  const mainPickerItems: Preference[] = isFood
+    ? cuisines
+    : cfg.mainPickerItems.map(it => ({ id: it.id, name: t(it.nameKey), emoji: '' }));
+  const mainSelected = isFood ? selectedCuisines : selectedVenueTypes;
+  const setMainSelected = isFood ? setSelectedCuisines : setSelectedVenueTypes;
+  const has = (s: import('@/lib/categoryWizardConfig').WizardSectionId) => cfg.visibleSections.has(s);
+
   const steps = [
     { title: t('preferences.stepContext', 'Dein Kontext'), subtitle: t('preferences.stepContextDesc', 'Anlass, Stimmung & was dir wichtig ist'), icon: <Sparkles className="w-5 h-5 text-primary" /> },
     { title: t('preferences.stepTaste', 'Geschmack'), subtitle: t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
