@@ -9,20 +9,18 @@ interface OnboardingProgressProps {
 
 const stepLabels = [
   '', // step 0 = welcome
-  'Persönlichkeit',
-  'Beziehungsziel',
+  'Geschmack & Vibes',
+  'Venue-Swipe',
   'Lifestyle',
-  'Szenarien',
-  'Food & Vibes'
+  'Bestätigung',
 ];
 
 const completionMessages = [
   '',
-  '🎯 Großartig! Wir kennen deine Persönlichkeit.',
-  '💫 Super! Dein Beziehungsziel ist gesetzt.',
-  '🌟 Perfekt! Dein Lifestyle-Profil steht.',
-  '🧠 Nice! Die KI versteht dich schon besser.',
-  '🎉 Fast fertig! Noch die letzten Feinheiten.',
+  '🍜 Geschmack erkannt!',
+  '✨ KI lernt deine Vorlieben!',
+  '🎯 Lifestyle-Profil steht!',
+  '🎉 Fast fertig!',
 ];
 
 const OnboardingProgress: React.FC<OnboardingProgressProps> = ({ currentStep, totalSteps }) => {

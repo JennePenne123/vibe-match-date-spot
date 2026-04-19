@@ -8,23 +8,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
-import PersonalitySliders, { type PersonalityTraits } from '@/components/onboarding/PersonalitySliders';
-import RelationshipGoal from '@/components/onboarding/RelationshipGoal';
 import LifestylePicks, { type LifestyleData } from '@/components/onboarding/LifestylePicks';
-import ExperienceScenarios, { type ScenarioAnswers, scenarios } from '@/components/onboarding/ExperienceScenarios';
 import FoodVibeQuickPick from '@/components/onboarding/FoodVibeQuickPick';
 import VenueSwipeCards, { type VenueSwipeData, deriveSwipePreferences } from '@/components/onboarding/VenueSwipeCards';
 import ReferralInspiration, { type AdoptedPreferences } from '@/components/onboarding/ReferralInspiration';
 
 import onboarding1 from '@/assets/onboarding-1.png';
 
-const TOTAL_STEPS = 6;
+// Reduced from 6 → 4 steps. Removed: Personality, RelationshipGoal, Scenarios
+// (kept in DB schema with sensible defaults; can be set later in profile settings)
+const TOTAL_STEPS = 4;
 
 const Onboarding = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
-  const [step, setStep] = useState(0); // 0 = welcome, 1-6 = steps
+  const [step, setStep] = useState(0); // 0 = welcome, 1-4 = steps
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [microFeedback, setMicroFeedback] = useState<string | null>(null);
@@ -33,30 +32,19 @@ const Onboarding = () => {
   const [referrerId, setReferrerId] = useState<string | null>(null);
   const [referralAdopted, setReferralAdopted] = useState(false);
 
-  // Step 1: Personality
-  const [personality, setPersonality] = useState<PersonalityTraits>({
-    spontaneity: 50, adventure: 50, social_energy: 50,
-  });
-
-  // Step 2: Relationship Goal
-  const [relationshipGoal, setRelationshipGoal] = useState('');
-
-  // Step 3: Lifestyle
-  const [lifestyle, setLifestyle] = useState<LifestyleData>({
-    chronotype: '', budget_style: '', mobility: '',
-  });
-
-  // Step 4: Scenarios
-  const [scenarioAnswers, setScenarioAnswers] = useState<ScenarioAnswers>({});
-
-  // Step 5: Food & Vibes
+  // Step 1: Food & Vibes (was step 5)
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
 
-  // Step 6: Venue Swipe (NEW)
+  // Step 2: Venue Swipe (was step 6)
   const [venueSwipeData, setVenueSwipeData] = useState<VenueSwipeData>({
     liked: [], disliked: [],
+  });
+
+  // Step 3: Lifestyle (was step 3) — moved later, made lighter
+  const [lifestyle, setLifestyle] = useState<LifestyleData>({
+    chronotype: '', budget_style: '', mobility: '',
   });
 
   // Distance & Location
@@ -86,9 +74,6 @@ const Onboarding = () => {
   const handleAdoptPreferences = (prefs: AdoptedPreferences) => {
     setSelectedCuisines(prev => Array.from(new Set([...prev, ...prefs.cuisines])));
     setSelectedVibes(prev => Array.from(new Set([...prev, ...prefs.vibes])));
-    if (prefs.personalityTraits) {
-      setPersonality(prefs.personalityTraits);
-    }
     if (prefs.maxDistance) {
       setDistanceKm(prefs.maxDistance);
     }
@@ -96,19 +81,16 @@ const Onboarding = () => {
   };
 
   const stepFeedback: Record<number, string> = {
-    1: '🧠 Die KI versteht deine Persönlichkeit!',
-    2: '💕 Perfekt – dein Ziel ist gesetzt!',
-    3: '🎯 Lifestyle-Daten erfasst!',
-    4: '✨ Szenarien analysiert – schon 60% genauer!',
-    5: '🍜 Geschmack erkannt – fast fertig!',
-    6: '🎉 Alle Signale erfasst!',
+    1: '🍜 Geschmack erkannt!',
+    2: '✨ KI lernt deine Vorlieben!',
+    3: '🎯 Profil fast fertig!',
+    4: '🎉 Alle Signale erfasst!',
   };
 
   const animateTransition = useCallback((nextStep: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
 
-    // Show micro-feedback for the step we're leaving (only when going forward)
     if (nextStep > step && step > 0) {
       const msg = stepFeedback[step];
       if (msg) {
@@ -121,55 +103,29 @@ const Onboarding = () => {
       setStep(nextStep);
       setIsAnimating(false);
     }, 250);
-  }, [isAnimating]);
-
-  const derivePreferencesFromScenarios = (): { vibes: string[]; activities: string[] } => {
-    const derivedVibes = new Set<string>();
-    const derivedActivities = new Set<string>();
-
-    for (const scenario of scenarios) {
-      const choice = scenarioAnswers[scenario.id];
-      if (!choice) continue;
-      const opt = choice === 'a' ? scenario.optionA : scenario.optionB;
-      opt.tags.forEach((tag) => {
-        if (['romantic', 'casual', 'outdoor', 'nightlife', 'cultural', 'adventurous'].includes(tag)) {
-          derivedVibes.add(tag);
-        } else {
-          derivedActivities.add(tag);
-        }
-      });
-    }
-
-    return { vibes: Array.from(derivedVibes), activities: Array.from(derivedActivities) };
-  };
+  }, [isAnimating, step]);
 
   const handleFinish = async () => {
     if (isSaving) return;
     setIsSaving(true);
 
     try {
-      const { vibes: scenarioVibes, activities: scenarioActivities } = derivePreferencesFromScenarios();
-
-      // Merge scenario-derived vibes with explicitly selected vibes
-      const mergedVibes = Array.from(new Set([...selectedVibes, ...scenarioVibes]));
-      const mergedActivities = Array.from(new Set(scenarioActivities));
-
       // Enrich from venue swipes
       const swipePrefs = deriveSwipePreferences(venueSwipeData);
       const enrichedCuisines = Array.from(new Set([...selectedCuisines, ...swipePrefs.likedCuisines]));
-      const enrichedVibes = Array.from(new Set([...mergedVibes, ...swipePrefs.likedVibes]));
+      const enrichedVibes = Array.from(new Set([...selectedVibes, ...swipePrefs.likedVibes]));
       const enrichedPrices = swipePrefs.inferredPrices;
 
-      // Map lifestyle budget to price range
+      // Map lifestyle budget to price range (with sensible default)
       const priceRangeMap: Record<string, string[]> = {
         saver: ['budget'],
         balanced: ['budget', 'moderate'],
         spender: ['moderate', 'upscale', 'luxury'],
       };
-      const basePriceRange = priceRangeMap[lifestyle.budget_style] || ['moderate'];
+      const basePriceRange = priceRangeMap[lifestyle.budget_style] || ['budget', 'moderate'];
       const derivedPriceRange = Array.from(new Set([...basePriceRange, ...enrichedPrices]));
 
-      // Map chronotype to preferred times
+      // Map chronotype to preferred times (with sensible default)
       const timeMap: Record<string, string[]> = {
         morning: ['brunch', 'lunch', 'afternoon'],
         evening: ['dinner', 'evening'],
@@ -185,17 +141,18 @@ const Onboarding = () => {
           preferred_vibes: enrichedVibes.length > 0 ? enrichedVibes : null,
           preferred_price_range: derivedPriceRange,
           preferred_times: derivedTimes,
-          preferred_activities: mergedActivities.length > 0 ? mergedActivities : null,
           dietary_restrictions: selectedDietary.length > 0 ? selectedDietary : null,
-          personality_traits: personality,
-          relationship_goal: relationshipGoal || null,
+          // Default neutral personality (50/50/50) — user can fine-tune later in profile
+          personality_traits: { spontaneity: 50, adventure: 50, social_energy: 50 },
+          // No relationship_goal forced — keeps onboarding inclusive (solo + duo)
+          relationship_goal: null,
           lifestyle_data: lifestyle,
           max_distance: distanceKm,
           excluded_cuisines: swipePrefs.dislikedCuisines.length > 0 ? swipePrefs.dislikedCuisines : null,
           ...(userLocation ? { home_latitude: userLocation.lat, home_longitude: userLocation.lng } : {}),
         };
 
-        // Upsert preference
+        // Upsert preference (select-then-insert/update pattern per project memory)
         const { data: existing } = await supabase
           .from('user_preferences')
           .select('id')
@@ -213,7 +170,7 @@ const Onboarding = () => {
             .insert(preferencePayload);
         }
 
-        // Initialize AI preference vectors (now with swipe + distance data)
+        // Initialize AI preference vectors
         try {
           const { initializePreferenceVectors } = await import('@/services/preferenceInitService');
           await initializePreferenceVectors(currentUserId, {
@@ -222,7 +179,7 @@ const Onboarding = () => {
             priceRange: derivedPriceRange,
             times: derivedTimes,
             dietary: selectedDietary,
-            activities: mergedActivities,
+            activities: [],
             swipeData: venueSwipeData,
             distanceKm,
           });
@@ -241,7 +198,7 @@ const Onboarding = () => {
 
       toast({
         title: '🎉 Profil komplett!',
-        description: 'Die KI kennt dich jetzt – deine ersten personalisierten Empfehlungen warten!',
+        description: 'Die KI kennt dich jetzt – deine ersten Empfehlungen warten!',
       });
 
       navigate('/home', { replace: true });
@@ -279,12 +236,10 @@ const Onboarding = () => {
 
   const getStepLabel = () => {
     switch (step) {
-      case 1: return 'Persönlichkeit';
-      case 2: return 'Beziehungsziel';
-      case 3: return 'Lifestyle';
-      case 4: return 'Szenarien';
-      case 5: return 'Essen & Vibes';
-      case 6: return 'Venue-Geschmack';
+      case 1: return 'Geschmack & Vibes';
+      case 2: return 'Venue-Swipe';
+      case 3: return 'Lifestyle (optional)';
+      case 4: return 'Standort & Reichweite';
       default: return '';
     }
   };
@@ -311,7 +266,7 @@ const Onboarding = () => {
             <span className="text-xs text-muted-foreground/60 font-medium">
               {getStepLabel()}
             </span>
-            {step >= 3 && (
+            {step >= 2 && (
               <Button onClick={handleSkip} variant="ghost" size="sm" className="text-muted-foreground text-xs ml-auto">
                 Überspringen
               </Button>
@@ -333,11 +288,7 @@ const Onboarding = () => {
           }`}
         >
           {step === 0 && <WelcomeScreen />}
-          {step === 1 && <PersonalitySliders traits={personality} onChange={setPersonality} />}
-          {step === 2 && <RelationshipGoal selected={relationshipGoal} onChange={setRelationshipGoal} />}
-          {step === 3 && <LifestylePicks data={lifestyle} onChange={setLifestyle} />}
-          {step === 4 && <ExperienceScenarios answers={scenarioAnswers} onChange={setScenarioAnswers} />}
-          {step === 5 && (
+          {step === 1 && (
             <>
               {/* Referral inspiration banner (if available) */}
               <ReferralInspiration
@@ -355,8 +306,21 @@ const Onboarding = () => {
               />
             </>
           )}
-          {step === 6 && (
-            <VenueSwipeCards data={venueSwipeData} onChange={setVenueSwipeData} distanceKm={distanceKm} onDistanceChange={setDistanceKm} onLocationCaptured={(lat, lng) => setUserLocation({ lat, lng })} />
+          {step === 2 && (
+            <VenueSwipeCards
+              data={venueSwipeData}
+              onChange={setVenueSwipeData}
+              distanceKm={distanceKm}
+              onDistanceChange={setDistanceKm}
+              onLocationCaptured={(lat, lng) => setUserLocation({ lat, lng })}
+            />
+          )}
+          {step === 3 && <LifestylePicks data={lifestyle} onChange={setLifestyle} />}
+          {step === 4 && (
+            <FinalConfirmStep
+              distanceKm={distanceKm}
+              hasLocation={!!userLocation}
+            />
           )}
         </div>
 
@@ -406,20 +370,54 @@ function WelcomeScreen() {
       </h1>
 
       <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-        In unter 60 Sekunden lernen wir dich kennen – damit die KI dir sofort die besten Date-Ideen vorschlagen kann.
+        Sag uns kurz, was dir gefällt – die KI entscheidet, wo du heute hingehst. Allein, zu zweit oder mit Freunden.
       </p>
 
       <div className="flex items-center gap-2 mt-6 text-xs text-muted-foreground/60">
         <Sparkles className="w-3.5 h-3.5" />
-        <span>7 kurze Schritte · Kein richtig oder falsch</span>
+        <span>4 kurze Schritte · ca. 60 Sekunden</span>
       </div>
 
       {/* AI Profiling notice (GDPR Art. 22) */}
       <p className="mt-6 text-[11px] text-muted-foreground/50 max-w-xs leading-relaxed">
-        {t('settings.aiProfilingOnboarding', 'Wir nutzen KI, um dir personalisierte Date-Ideen vorzuschlagen. Mehr in unserer')}{' '}
+        {t('settings.aiProfilingOnboarding', 'Wir nutzen KI, um dir personalisierte Empfehlungen vorzuschlagen. Mehr in unserer')}{' '}
         <Link to="/datenschutz" className="text-primary/60 underline underline-offset-2 hover:text-primary/80">
           {t('settings.privacy', 'Datenschutzerklärung')}
         </Link>.
+      </p>
+    </div>
+  );
+}
+
+function FinalConfirmStep({ distanceKm, hasLocation }: { distanceKm: number; hasLocation: boolean }) {
+  return (
+    <div className="flex flex-col items-center justify-center flex-1 text-center px-4 py-8 space-y-6">
+      <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+        <Sparkles className="w-10 h-10 text-primary" />
+      </div>
+
+      <div className="space-y-2">
+        <h2 className="text-xl font-bold text-foreground">Fast geschafft!</h2>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          Die KI hat genug Signale, um dir gute Empfehlungen zu geben. Sie wird mit jeder Bewertung besser.
+        </p>
+      </div>
+
+      <div className="w-full max-w-xs space-y-3 bg-card/50 backdrop-blur-sm border border-border/40 rounded-xl p-4">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Standort</span>
+          <span className="text-foreground font-medium">
+            {hasLocation ? '✓ Erfasst' : 'Später hinzufügen'}
+          </span>
+        </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Reichweite</span>
+          <span className="text-foreground font-medium">{distanceKm} km</span>
+        </div>
+      </div>
+
+      <p className="text-[11px] text-muted-foreground/60 max-w-xs">
+        Du kannst jederzeit weitere Details (Persönlichkeit, Budget, Zeitfenster) in deinem Profil ergänzen.
       </p>
     </div>
   );
