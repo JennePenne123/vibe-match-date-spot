@@ -28,6 +28,8 @@ import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '
 import type { DateOccasion } from '@/components/date-planning/preferences/preferencesData';
 import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
+import SituationalActiveBanner from '@/components/date-planning/preferences/SituationalActiveBanner';
+import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
 
 // Icon + color mapping (slimmed down)
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
@@ -199,12 +201,42 @@ function SingleSelectionList({ items, selected, onToggle }: {
 
 const Preferences = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === 'true';
   const initialStep = parseInt(searchParams.get('step') || '0', 10);
   const { t } = useTranslation();
   const { updateCuisines, updateVibes, updateUserLocation } = useApp();
   const { user } = useAuth();
+
+  // Situational category — ephemeral filter from Home quick-actions
+  const [situationalCategory, setSituationalCategory] = useState<SituationalCategory | null>(null);
+  useEffect(() => {
+    const fromUrl = searchParams.get('category') as SituationalCategoryId | null;
+    if (fromUrl) {
+      const cat = getSituationalCategory(fromUrl);
+      if (cat) {
+        setSituationalCategory(cat);
+        try { window.sessionStorage.setItem('hioutz-situational-category', cat.id); } catch {}
+        // Clean URL so a refresh doesn't re-apply (session storage is the source of truth)
+        searchParams.delete('category');
+        setSearchParams(searchParams, { replace: true });
+        return;
+      }
+    }
+    // No URL param — restore from sessionStorage if present
+    try {
+      const stored = window.sessionStorage.getItem('hioutz-situational-category') as SituationalCategoryId | null;
+      const cat = getSituationalCategory(stored);
+      if (cat) setSituationalCategory(cat);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const clearSituationalCategory = useCallback(() => {
+    setSituationalCategory(null);
+    try { window.sessionStorage.removeItem('hioutz-situational-category'); } catch {}
+  }, []);
+
 
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [excludedCuisines, setExcludedCuisines] = useState<string[]>([]);
