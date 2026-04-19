@@ -189,7 +189,7 @@ const DatePlanningNudge = () => {
   return (
     <div className="px-4">
       <FirstUseNudge visible={visible} onDismiss={dismiss}>
-        <strong>Wusstest du?</strong> Der ✨ Concierge hilft dir mit Date-Ideen basierend auf euren gemeinsamen Vorlieben!
+        <strong>Wusstest du?</strong> Der ✨ Concierge hilft dir mit Ideen basierend auf deinen Vorlieben!
       </FirstUseNudge>
     </div>
   );
