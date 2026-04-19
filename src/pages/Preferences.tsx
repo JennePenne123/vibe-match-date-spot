@@ -264,6 +264,10 @@ const Preferences = () => {
 
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [excludedCuisines, setExcludedCuisines] = useState<string[]>([]);
+  // Selected items for the adaptive main picker when the situational
+  // category is NOT food (Culture / Activity / Nightlife). Stored in
+  // user_preferences.preferred_venue_types so no schema change is needed.
+  const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState<string[]>([]);
   const [selectedTimePreferences, setSelectedTimePreferences] = useState<string[]>([]);
