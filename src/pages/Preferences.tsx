@@ -31,6 +31,7 @@ import type { DailyMood } from '@/utils/moodStorage';
 import SituationalActiveBanner from '@/components/date-planning/preferences/SituationalActiveBanner';
 import SecondaryCategoryPicker from '@/components/date-planning/preferences/SecondaryCategoryPicker';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
+import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
 
 // Icon + color mapping (slimmed down)
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
