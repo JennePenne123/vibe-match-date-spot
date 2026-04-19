@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -12,6 +13,7 @@ interface NotificationSystemProps {
 const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,27 +43,27 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
               .eq('id', newInvitation.recipient_id)
               .single();
 
-            const recipientName = recipient?.name || 'Your friend';
+            const recipientName = recipient?.name || t('common.friend', 'Your friend');
 
             if (newInvitation.status === 'accepted') {
               toast({
-                title: "Date Accepted!",
-                description: `${recipientName} accepted your date invitation! Time to start planning the details.`,
+                title: t('notifications.inviteAccepted'),
+                description: t('notifications.inviteAcceptedDesc', { name: recipientName }),
                 duration: 8000,
                 action: (
-                  <ToastAction altText="View invitations" onClick={() => navigate('/invitations')}>
-                    View
+                  <ToastAction altText={t('notifications.actionView')} onClick={() => navigate('/invitations')}>
+                    {t('notifications.actionView')}
                   </ToastAction>
                 ),
               });
             } else if (newInvitation.status === 'declined') {
               toast({
-                title: "Invitation Response",
-                description: `${recipientName} isn't available for this date. Don't worry - maybe try a different time or venue!`,
+                title: t('notifications.inviteResponse'),
+                description: t('notifications.inviteDeclinedDesc', { name: recipientName }),
                 duration: 6000,
                 action: (
-                  <ToastAction altText="Plan new date" onClick={() => navigate('/smart-date-planning')}>
-                    Plan New
+                  <ToastAction altText={t('notifications.actionPlanNew')} onClick={() => navigate('/smart-date-planning')}>
+                    {t('notifications.actionPlanNew')}
                   </ToastAction>
                 ),
               });
@@ -91,15 +93,15 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
             .eq('id', newInvitation.sender_id)
             .single();
 
-          const senderName = sender?.name || 'A friend';
+          const senderName = sender?.name || t('common.friend', 'A friend');
 
           toast({
-            title: "New Date Invitation!",
-            description: `${senderName} sent you a date invitation. Check it out and respond!`,
+            title: t('notifications.newInvite'),
+            description: t('notifications.newInviteDesc', { name: senderName }),
             duration: 8000,
             action: (
-              <ToastAction altText="View invitations" onClick={() => navigate('/invitations')}>
-                View
+              <ToastAction altText={t('notifications.actionView')} onClick={() => navigate('/invitations')}>
+                {t('notifications.actionView')}
               </ToastAction>
             ),
           });
@@ -112,7 +114,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
       supabase.removeChannel(senderChannel);
       supabase.removeChannel(recipientChannel);
     };
-  }, [user?.id, toast, navigate]);
+  }, [user?.id, toast, navigate, t]);
 
   return <>{children}</>;
 };

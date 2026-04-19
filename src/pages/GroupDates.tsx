@@ -115,11 +115,11 @@ const GroupDates: React.FC = () => {
               <Users className="w-8 h-8 text-muted-foreground" />
             </div>
             <p className="text-muted-foreground text-sm mb-4">
-              Noch keine Gruppen-Dates. Erstelle eins über "Plan Date"!
+              {t('groupDates.emptyText', 'Noch keine Gruppen-Pläne. Erstelle einen über "Wohin?"!')}
             </p>
             <Button onClick={() => navigate('/plan-date')} className="gap-2">
               <Plus className="w-4 h-4" />
-              Gruppen-Date planen
+              {t('groupDates.createGroup', 'Gruppen-Plan erstellen')}
             </Button>
           </div>
         ) : (

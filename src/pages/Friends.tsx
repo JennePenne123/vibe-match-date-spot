@@ -60,10 +60,10 @@ const Friends = () => {
           : [...prev, friendId]
       );
       toast({
-        title: invitedIds.includes(friendId) ? "Friend uninvited" : "Friend invited!",
+        title: invitedIds.includes(friendId) ? t('friendsShare.uninvited', 'Friend uninvited') : t('friendsShare.invited', 'Friend invited!'),
         description: invitedIds.includes(friendId) 
-          ? "Friend removed from your date plans" 
-          : "Friend will receive your date recommendations",
+          ? t('friendsShare.uninvitedDesc', 'Removed from your plans')
+          : t('friendsShare.invitedDesc', 'Will receive your recommendations'),
       });
     }
   };
@@ -101,27 +101,27 @@ const Friends = () => {
     const link = generateReferralLink();
     navigator.clipboard.writeText(link);
     toast({
-      title: "Link copied!",
-      description: "Your referral link has been copied to clipboard.",
+      title: t('friendsShare.linkCopied', 'Link copied!'),
+      description: t('friendsShare.linkCopiedDesc', 'Your referral link has been copied.'),
     });
   };
 
   const shareViaEmail = () => {
     const link = generateReferralLink();
-    const subject = "Join me on H!Outz - Find Amazing Date Ideas!";
-    const body = `Hey! I've been using H!Outz to discover amazing date spots and thought you'd love it too. Join me using this link: ${link}`;
+    const subject = t('friendsShare.emailSubject', 'Join me on H!Outz — Discover amazing spots!');
+    const body = t('friendsShare.emailBody', { link, defaultValue: `Hey! I'm using H!Outz to find great spots. Join me: ${link}` });
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const shareViaWhatsApp = () => {
     const link = generateReferralLink();
-    const text = `Hey! Ich nutze H!Outz um tolle Date-Spots zu finden. Komm dazu: ${link}`;
+    const text = t('friendsShare.shareText', { link, defaultValue: `Hey! I'm using H!Outz to discover great spots. Join me: ${link}` });
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
   const shareViaTelegram = () => {
     const link = generateReferralLink();
-    const text = `Hey! Ich nutze H!Outz um tolle Date-Spots zu finden. Komm dazu!`;
+    const text = t('friendsShare.shareTextShort', "Hey! I'm using H!Outz to discover great spots. Join me!");
     window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
