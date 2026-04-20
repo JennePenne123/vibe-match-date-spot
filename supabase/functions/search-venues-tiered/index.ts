@@ -84,6 +84,59 @@ async function callTier(
   }
 }
 
+/**
+ * Nominatim Reverse-Geocoding for OSM venues with missing addresses.
+ * Free service – respects rate limit by enriching sequentially with 1100ms gap.
+ * Only enriches venues where address is missing/blank.
+ */
+async function enrichWithNominatim(venues: any[]): Promise<{ enrichedCount: number }> {
+  const NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse";
+  const USER_AGENT = "HiOutz/1.0 (https://hioutz.app; contact@hioutz.app)";
+  let enrichedCount = 0;
+
+  const needsEnrichment = (v: any) =>
+    !v?.address || String(v.address).trim().length < 5;
+
+  for (const venue of venues) {
+    if (!needsEnrichment(venue)) continue;
+    if (!venue?.latitude || !venue?.longitude) continue;
+
+    try {
+      const url = `${NOMINATIM_URL}?format=json&lat=${venue.latitude}&lon=${venue.longitude}&zoom=18&addressdetails=1`;
+      const res = await withTimeout(
+        fetch(url, {
+          headers: { "User-Agent": USER_AGENT, "Accept-Language": "de,en" },
+        }),
+        NOMINATIM_TIMEOUT_MS,
+        "nominatim",
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const addr = data?.address ?? {};
+        const street = [addr.road, addr.house_number].filter(Boolean).join(" ");
+        const cityPart = addr.city || addr.town || addr.village || addr.suburb || "";
+        const fullAddress = data?.display_name ||
+          [street, addr.postcode, cityPart].filter(Boolean).join(", ");
+
+        if (fullAddress && fullAddress.length > 5) {
+          venue.address = fullAddress;
+          venue.nominatim_match_name = data?.name || venue.nominatim_match_name;
+          enrichedCount++;
+        }
+      }
+    } catch (err) {
+      // Silent fail – enrichment is best-effort
+      console.warn("[Nominatim] Enrichment failed:", err instanceof Error ? err.message : err);
+    }
+
+    // Respect Nominatim's 1 req/sec policy
+    await new Promise((r) => setTimeout(r, 1100));
+  }
+
+  return { enrichedCount };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
