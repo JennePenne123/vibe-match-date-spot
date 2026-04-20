@@ -384,6 +384,10 @@ const SystemHealth: React.FC = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="cron" className="mt-4">
+          <CronJobsWidget />
+        </TabsContent>
       </Tabs>
     </div>
   );
