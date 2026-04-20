@@ -14,16 +14,19 @@ import {
  * Strategy (per user decision):
  *  1. Cache lookup (search results: 3 days TTL)
  *  2. Google Places (PRIMARY)        – best data quality, cost ~$17/1k (Standard field mask)
- *  3. Foursquare    (SECONDARY)      – fallback when Google fails OR returns 0 venues
- *  4. Overpass/OSM  (FINAL FALLBACK) – free, last resort
+ *  3. Overpass/OSM  (FALLBACK)       – free, triggered on Google error OR empty result
+ *     + Nominatim enrichment for venues with missing addresses (1 req/sec rate-limit aware)
  *
  * Fallback trigger: error/timeout OR empty result set
+ * Foursquare: DISABLED (code retained, toggle via FOURSQUARE_ENABLED constant)
  */
 
 const SEARCH_TTL_MS = 3 * 24 * 60 * 60 * 1000; // 3 days for search results
 const GOOGLE_TIMEOUT_MS = 8000;
 const FOURSQUARE_TIMEOUT_MS = 8000;
 const OVERPASS_TIMEOUT_MS = 12000;
+const NOMINATIM_TIMEOUT_MS = 3000;
+const FOURSQUARE_ENABLED = false; // Disabled per user decision (2026-04-20)
 
 interface SearchPayload {
   latitude: number;
@@ -79,6 +82,59 @@ async function callTier(
   } catch (err) {
     return { venues: [], error: err instanceof Error ? err.message : String(err) };
   }
+}
+
+/**
+ * Nominatim Reverse-Geocoding for OSM venues with missing addresses.
+ * Free service – respects rate limit by enriching sequentially with 1100ms gap.
+ * Only enriches venues where address is missing/blank.
+ */
+async function enrichWithNominatim(venues: any[]): Promise<{ enrichedCount: number }> {
+  const NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse";
+  const USER_AGENT = "HiOutz/1.0 (https://hioutz.app; contact@hioutz.app)";
+  let enrichedCount = 0;
+
+  const needsEnrichment = (v: any) =>
+    !v?.address || String(v.address).trim().length < 5;
+
+  for (const venue of venues) {
+    if (!needsEnrichment(venue)) continue;
+    if (!venue?.latitude || !venue?.longitude) continue;
+
+    try {
+      const url = `${NOMINATIM_URL}?format=json&lat=${venue.latitude}&lon=${venue.longitude}&zoom=18&addressdetails=1`;
+      const res = await withTimeout(
+        fetch(url, {
+          headers: { "User-Agent": USER_AGENT, "Accept-Language": "de,en" },
+        }),
+        NOMINATIM_TIMEOUT_MS,
+        "nominatim",
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const addr = data?.address ?? {};
+        const street = [addr.road, addr.house_number].filter(Boolean).join(" ");
+        const cityPart = addr.city || addr.town || addr.village || addr.suburb || "";
+        const fullAddress = data?.display_name ||
+          [street, addr.postcode, cityPart].filter(Boolean).join(", ");
+
+        if (fullAddress && fullAddress.length > 5) {
+          venue.address = fullAddress;
+          venue.nominatim_match_name = data?.name || venue.nominatim_match_name;
+          enrichedCount++;
+        }
+      }
+    } catch (err) {
+      // Silent fail – enrichment is best-effort
+      console.warn("[Nominatim] Enrichment failed:", err instanceof Error ? err.message : err);
+    }
+
+    // Respect Nominatim's 1 req/sec policy
+    await new Promise((r) => setTimeout(r, 1100));
+  }
+
+  return { enrichedCount };
 }
 
 serve(async (req) => {
@@ -168,38 +224,44 @@ serve(async (req) => {
 
     let finalSource: TierResult["source"] = "google_places";
     let finalVenues = r1.venues;
+    let nominatimEnrichedCount = 0;
 
     // Fallback trigger: error OR empty result
     if (!r1.venues.length) {
-      // 3️⃣ TIER 2: FOURSQUARE (SECONDARY)
-      const fsqPayload = {
-        latitude: payload.latitude,
-        longitude: payload.longitude,
-        radius: payload.radius ?? 5000,
-        cuisines: payload.cuisines ?? [],
-        venueTypes: payload.venueTypes ?? [],
-        activities: payload.activities ?? [],
-        limit: payload.limit ?? 20,
-      };
-      const t2Start = Date.now();
-      const r2 = await callTier(
-        supabase,
-        "search-venues-foursquare",
-        fsqPayload,
-        FOURSQUARE_TIMEOUT_MS,
-      );
-      tiersTried.push({
-        source: "foursquare",
-        venues: r2.venues,
-        durationMs: Date.now() - t2Start,
-        error: r2.error,
-      });
+      // 3️⃣ TIER 2 (optional): FOURSQUARE – disabled by default
+      let foursquareSucceeded = false;
+      if (FOURSQUARE_ENABLED) {
+        const fsqPayload = {
+          latitude: payload.latitude,
+          longitude: payload.longitude,
+          radius: payload.radius ?? 5000,
+          cuisines: payload.cuisines ?? [],
+          venueTypes: payload.venueTypes ?? [],
+          activities: payload.activities ?? [],
+          limit: payload.limit ?? 20,
+        };
+        const t2Start = Date.now();
+        const r2 = await callTier(
+          supabase,
+          "search-venues-foursquare",
+          fsqPayload,
+          FOURSQUARE_TIMEOUT_MS,
+        );
+        tiersTried.push({
+          source: "foursquare",
+          venues: r2.venues,
+          durationMs: Date.now() - t2Start,
+          error: r2.error,
+        });
+        if (r2.venues.length) {
+          finalSource = "foursquare";
+          finalVenues = r2.venues;
+          foursquareSucceeded = true;
+        }
+      }
 
-      if (r2.venues.length) {
-        finalSource = "foursquare";
-        finalVenues = r2.venues;
-      } else {
-        // 4️⃣ TIER 3: OVERPASS / OSM (FINAL FALLBACK)
+      // 4️⃣ TIER 3: OVERPASS / OSM (FALLBACK) + Nominatim enrichment
+      if (!foursquareSucceeded) {
         const osmPayload = {
           latitude: payload.latitude,
           longitude: payload.longitude,
@@ -224,6 +286,16 @@ serve(async (req) => {
         });
         finalSource = "overpass";
         finalVenues = r3.venues;
+
+        // 🌍 Nominatim enrichment for venues missing addresses
+        if (finalVenues.length > 0) {
+          const enrichStart = Date.now();
+          const { enrichedCount } = await enrichWithNominatim(finalVenues);
+          nominatimEnrichedCount = enrichedCount;
+          console.log(
+            `[Nominatim] Enriched ${enrichedCount}/${finalVenues.length} OSM venues in ${Date.now() - enrichStart}ms`,
+          );
+        }
       }
     }
 
@@ -254,6 +326,7 @@ serve(async (req) => {
         source: finalSource,
         cached: false,
         duration_ms: Date.now() - startedAt,
+        nominatim_enriched: nominatimEnrichedCount,
         tiers_tried: tiersTried.map((t) => ({
           source: t.source,
           venue_count: t.venues.length,
