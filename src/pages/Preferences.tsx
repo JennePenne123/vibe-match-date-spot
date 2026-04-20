@@ -544,7 +544,11 @@ const Preferences = () => {
 
   const steps = [
     { title: t('preferences.stepContext', 'Dein Kontext'), subtitle: t('preferences.stepContextDesc', 'Anlass, Stimmung & was dir wichtig ist'), icon: <Sparkles className="w-5 h-5 text-primary" /> },
-    { title: t('preferences.stepTaste', 'Geschmack'), subtitle: t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
+    {
+      title: cfg.step1TitleKey ? t(cfg.step1TitleKey) : t('preferences.stepTaste', 'Geschmack'),
+      subtitle: cfg.step1SubtitleKey ? t(cfg.step1SubtitleKey) : t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'),
+      icon: <Heart className="w-5 h-5 text-pink-500" />
+    },
     { title: t('preferences.stepPractical', 'Praktisches'), subtitle: t('preferences.stepPracticalDesc', 'Budget, Timing & Standort'), icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
   ];
 
