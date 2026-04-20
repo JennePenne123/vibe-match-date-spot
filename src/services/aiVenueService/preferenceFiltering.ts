@@ -72,14 +72,19 @@ function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: 
   // Related cuisine groups - higher score for same family
   // Tighter cuisine groups - avoid false positives (e.g. german ≠ mediterranean)
   const cuisineGroups: Record<string, string[]> = {
-    'asian': ['chinese', 'japanese', 'thai', 'korean', 'vietnamese', 'asian', 'sushi', 'ramen', 'wok', 'dim sum', 'curry'],
-    'mediterranean': ['italian', 'greek', 'mediterranean', 'spanish', 'turkish', 'lebanese', 'moroccan'],
-    'western_european': ['french', 'german', 'portuguese', 'european', 'regional', 'tarte flambee'],
+    'asian': ['chinese', 'japanese', 'thai', 'korean', 'vietnamese', 'indonesian', 'asian', 'sushi', 'ramen', 'wok', 'dim sum', 'curry', 'pho', 'satay'],
+    'indian': ['indian', 'curry', 'tandoori', 'biryani', 'masala'],
+    'mediterranean': ['italian', 'greek', 'mediterranean', 'spanish', 'portuguese', 'turkish', 'lebanese', 'moroccan', 'tapas'],
+    'western_european': ['french', 'german', 'austrian', 'swiss', 'british', 'european', 'regional', 'tarte flambee', 'pub'],
+    'eastern_european': ['polish', 'hungarian', 'russian', 'balkan', 'czech', 'pierogi', 'goulash'],
+    'nordic': ['nordic', 'scandinavian', 'swedish', 'danish', 'norwegian', 'finnish', 'smørrebrød'],
     'american': ['american', 'burger', 'bbq', 'steakhouse', 'steak house', 'diner', 'grill'],
     'cafe': ['café', 'cafe', 'coffee', 'bakery', 'brunch', 'breakfast', 'patisserie'],
     'bar': ['bar', 'pub', 'cocktail', 'wine bar', 'lounge', 'biergarten'],
     'middle_eastern': ['persian', 'arabic', 'falafel', 'kebab', 'döner', 'oriental', 'syrian', 'lebanese', 'turkish', 'moroccan'],
-    'latin': ['mexican', 'brazilian', 'peruvian', 'argentinian', 'tapas'],
+    'african': ['ethiopian', 'african', 'moroccan', 'tunisian', 'injera'],
+    'latin': ['mexican', 'brazilian', 'peruvian', 'argentinian', 'caribbean', 'cuban', 'tapas', 'taco', 'churrasco', 'ceviche'],
+    'fusion': ['fusion', 'international', 'world', 'global'],
   };
   
   for (const [, members] of Object.entries(cuisineGroups)) {
