@@ -255,6 +255,8 @@ export function passesSituationalHardFilter(
     cuisine_type?: string | null;
     description?: string | null;
     tags?: string[] | null;
+    nominatim_match_name?: string | null;
+    address?: string | null;
   },
   secondary?: SituationalCategory | null,
 ): boolean {
@@ -292,6 +294,8 @@ export function getSituationalBoost(
     cuisine_type?: string | null;
     description?: string | null;
     tags?: string[] | null;
+    nominatim_match_name?: string | null;
+    address?: string | null;
   },
   secondary?: SituationalCategory | null,
 ): number {
@@ -305,7 +309,13 @@ export function getSituationalBoost(
   const normalizedTags = new Set(
     (venue.tags ?? []).map(t => (t ?? '').toString().trim().toLowerCase()),
   );
-  const textBlob = [venue.name ?? '', venue.cuisine_type ?? '', venue.description ?? '']
+  const textBlob = [
+    venue.name ?? '',
+    venue.cuisine_type ?? '',
+    venue.description ?? '',
+    venue.nominatim_match_name ?? '',
+    venue.address ?? '',
+  ]
     .join(' ')
     .toLowerCase();
 

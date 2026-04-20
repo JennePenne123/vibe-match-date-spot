@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Sparkles, Users, Star, X } from 'lucide-react';
+import { ArrowLeft, Sparkles, Users, Star, X, AlertTriangle } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
 import RealtimeContextBanner from '@/components/RealtimeContextBanner';
 import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
@@ -39,11 +39,19 @@ const Results = () => {
 
   // Read active situational category from session storage
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [sparseInfo, setSparseInfo] = useState<{ categoryId: string; matchedCount: number } | null>(null);
   
   useEffect(() => {
     const stored = sessionStorage.getItem('hioutz-situational-category');
     if (stored) {
       setActiveCategory(stored);
+    }
+    const sparseRaw = sessionStorage.getItem('hioutz-situational-sparse');
+    if (sparseRaw) {
+      try {
+        const parsed = JSON.parse(sparseRaw);
+        if (parsed?.categoryId) setSparseInfo(parsed);
+      } catch {}
     }
   }, []);
 
@@ -238,6 +246,39 @@ const Results = () => {
             userLocation={appState.userLocation}
             className="mb-4"
           />
+
+          {/* Sparse-data warning banner */}
+          {sparseInfo && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3"
+            >
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">
+                    {t('results.sparseTitle', {
+                      category: t(`results.category${sparseInfo.categoryId.charAt(0).toUpperCase() + sparseInfo.categoryId.slice(1)}`),
+                    })}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('results.sparseDesc')}
+                  </p>
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => navigate('/preferences?step=1')}
+                      className="h-7 text-xs"
+                    >
+                      {t('results.sparseCtaWiden')}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {(() => {
             const STORAGE_KEY = 'ai_matches_banner_views';

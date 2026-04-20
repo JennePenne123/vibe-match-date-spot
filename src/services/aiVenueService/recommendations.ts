@@ -146,8 +146,21 @@ export const getAIVenueRecommendations = async (
         if (filtered.length >= 3) {
           venues = filtered;
           console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
+          // Clear any previous sparse flag — we have a healthy set
+          try { sessionStorage.removeItem('hioutz-situational-sparse'); } catch {}
         } else {
           console.warn(`⚠️ SITUATIONAL HARD FILTER (${primaryCat.id}) would leave only ${filtered.length} venues — falling back to soft boost`);
+          // Surface to the UI so we can show a "thin data" banner with CTA
+          try {
+            sessionStorage.setItem(
+              'hioutz-situational-sparse',
+              JSON.stringify({
+                categoryId: primaryCat.id,
+                matchedCount: filtered.length,
+                ts: Date.now(),
+              }),
+            );
+          } catch {}
         }
       }
     }
