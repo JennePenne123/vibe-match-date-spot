@@ -135,6 +135,7 @@ const AdminSystemHealth = lazy(() => import("./pages/admin/SystemHealth"));
 const AdminErrors = lazy(() => import("./pages/admin/Errors"));
 const AdminTeam = lazy(() => import("./pages/admin/Team"));
 const AdminVenueDiscovery = lazy(() => import("./pages/admin/VenueDiscovery"));
+const AdminCostMonitoring = lazy(() => import("./pages/admin/CostMonitoring"));
 
 // Demo/debug routes – lazy loaded
 const Debug = lazy(() => import("./pages/Debug"));
@@ -277,6 +278,7 @@ const App = () => (
                     <Route path="/admin/errors" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canViewErrors"><AdminErrors /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
                     <Route path="/admin/team" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canManageTeam"><AdminTeam /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
                     <Route path="/admin/venue-discovery" element={<LazyPage><AdminRouteGuard><AdminVenueDiscovery /></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/costs" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canViewSystemHealth"><AdminCostMonitoring /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
                     
                     {/* Demo routes */}
                     <Route path="/demo/ai-venue-card" element={<LazyPageNoLayout><AIVenueCardDemo /></LazyPageNoLayout>} />

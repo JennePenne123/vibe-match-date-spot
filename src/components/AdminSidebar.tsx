@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { LayoutDashboard, BarChart3, Shield, Users, Flag, Activity, LogOut, ArrowLeft, Bug, UserCog, Sparkles } from 'lucide-react'
+import { LayoutDashboard, BarChart3, Shield, Users, Flag, Activity, LogOut, ArrowLeft, Bug, UserCog, Sparkles, DollarSign } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -36,6 +36,7 @@ export function AdminSidebar() {
     { title: t('adminNav.errorMonitoring', 'Error Monitoring'), url: '/admin/errors', icon: Bug },
     { title: t('adminNav.reports', 'Reports'), url: '/admin/reports', icon: Flag },
     { title: t('adminNav.systemHealth', 'System Health'), url: '/admin/health', icon: Activity },
+    { title: t('adminNav.apiCosts', 'API Costs'), url: '/admin/costs', icon: DollarSign },
     { title: t('adminNav.venueDiscovery', 'Venue Discovery'), url: '/admin/venue-discovery', icon: Sparkles },
   ]
 
