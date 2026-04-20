@@ -558,7 +558,7 @@ const Preferences = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <div className="max-w-md mx-auto">
-        {situationalCategory && (
+        {situationalCategory && step === 0 && (
           <div className="px-4 pt-4">
             <SituationalActiveBanner category={situationalCategory} onClear={clearSituationalCategory} />
             <div className="mt-2">
