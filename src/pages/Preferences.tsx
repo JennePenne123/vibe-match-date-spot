@@ -28,7 +28,6 @@ import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '
 import type { DateOccasion } from '@/components/date-planning/preferences/preferencesData';
 import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
-import SituationalActiveBanner from '@/components/date-planning/preferences/SituationalActiveBanner';
 import SecondaryCategoryPicker from '@/components/date-planning/preferences/SecondaryCategoryPicker';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
@@ -560,14 +559,11 @@ const Preferences = () => {
       <div className="max-w-md mx-auto">
         {situationalCategory && step === 0 && (
           <div className="px-4 pt-4">
-            <SituationalActiveBanner category={situationalCategory} onClear={clearSituationalCategory} />
-            <div className="mt-2">
-              <SecondaryCategoryPicker
-                primary={situationalCategory}
-                secondaryId={secondaryCategoryId}
-                onChange={handleSecondaryChange}
-              />
-            </div>
+            <SecondaryCategoryPicker
+              primary={situationalCategory}
+              secondaryId={secondaryCategoryId}
+              onChange={handleSecondaryChange}
+            />
           </div>
         )}
         {/* Header */}
