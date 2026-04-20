@@ -444,6 +444,7 @@ const getVenuesFromMultipleSources = async (
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
   situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) => {
   // Fetch user preferences for cache key differentiation
   const { data: userPrefs } = await supabase
@@ -505,11 +506,11 @@ const getVenuesFromMultipleSources = async (
       : userLocation;
     
     if (strategy === 'radar-overpass') {
-      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier, isNonFoodMode);
+      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier, isNonFoodMode, situationalCategoryId, secondaryCategoryId);
     } else if (strategy === 'overpass-only') {
-      venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier);
+      venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier, situationalCategoryId, secondaryCategoryId);
     } else {
-      venues = await getVenuesParallel(userId, limit, expandedLocation, multiplier);
+      venues = await getVenuesParallel(userId, limit, expandedLocation, multiplier, situationalCategoryId, secondaryCategoryId);
     }
     
     if (venues.length >= MIN_VENUES_THRESHOLD) {
