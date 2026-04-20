@@ -37,6 +37,12 @@ export interface CategoryWizardConfig {
   visibleSections: Set<WizardSectionId>;
   /** Item ids for the main picker (used to build the grid) */
   mainPickerItems: { id: string; nameKey: string }[];
+  /** i18n key for Step 1's title in the header (defaults to "Geschmack") */
+  step1TitleKey?: string;
+  /** i18n key for Step 1's subtitle */
+  step1SubtitleKey?: string;
+  /** Optional whitelist of vibe ids to display — when omitted all vibes show */
+  vibeWhitelist?: string[];
 }
 
 // Reused across non-food categories — kept in sync with venue_type tags
@@ -86,6 +92,9 @@ const CULTURE: CategoryWizardConfig = {
     'mainPicker', 'vibe', 'budget', 'location', 'timing', 'accessibility',
   ]),
   mainPickerItems: cultureItems,
+  step1TitleKey: 'preferences.stepCulture',
+  step1SubtitleKey: 'preferences.stepCultureDesc',
+  vibeWhitelist: ['cultural', 'romantic', 'casual', 'adventurous'],
 };
 
 const ACTIVITY: CategoryWizardConfig = {
@@ -96,6 +105,9 @@ const ACTIVITY: CategoryWizardConfig = {
     'mainPicker', 'vibe', 'budget', 'location', 'timing', 'accessibility',
   ]),
   mainPickerItems: activityItems,
+  step1TitleKey: 'preferences.stepActivity',
+  step1SubtitleKey: 'preferences.stepActivityDesc',
+  vibeWhitelist: ['adventurous', 'outdoor', 'casual', 'romantic'],
 };
 
 const NIGHTLIFE: CategoryWizardConfig = {
@@ -106,6 +118,9 @@ const NIGHTLIFE: CategoryWizardConfig = {
     'mainPicker', 'vibe', 'budget', 'location', 'timing',
   ]),
   mainPickerItems: nightlifeItems,
+  step1TitleKey: 'preferences.stepNightlife',
+  step1SubtitleKey: 'preferences.stepNightlifeDesc',
+  vibeWhitelist: ['nightlife', 'romantic', 'casual', 'adventurous'],
 };
 
 const CONFIGS: Record<SituationalCategoryId, CategoryWizardConfig> = {

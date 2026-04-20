@@ -544,7 +544,11 @@ const Preferences = () => {
 
   const steps = [
     { title: t('preferences.stepContext', 'Dein Kontext'), subtitle: t('preferences.stepContextDesc', 'Anlass, Stimmung & was dir wichtig ist'), icon: <Sparkles className="w-5 h-5 text-primary" /> },
-    { title: t('preferences.stepTaste', 'Geschmack'), subtitle: t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'), icon: <Heart className="w-5 h-5 text-pink-500" /> },
+    {
+      title: cfg.step1TitleKey ? t(cfg.step1TitleKey) : t('preferences.stepTaste', 'Geschmack'),
+      subtitle: cfg.step1SubtitleKey ? t(cfg.step1SubtitleKey) : t('preferences.stepTasteDesc', 'Was isst du gerne & welche Stimmung magst du?'),
+      icon: <Heart className="w-5 h-5 text-pink-500" />
+    },
     { title: t('preferences.stepPractical', 'Praktisches'), subtitle: t('preferences.stepPracticalDesc', 'Budget, Timing & Standort'), icon: <MapPin className="w-5 h-5 text-emerald-500" /> },
   ];
 
@@ -554,7 +558,7 @@ const Preferences = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <div className="max-w-md mx-auto">
-        {situationalCategory && (
+        {situationalCategory && step === 0 && (
           <div className="px-4 pt-4">
             <SituationalActiveBanner category={situationalCategory} onClear={clearSituationalCategory} />
             <div className="mt-2">
@@ -650,7 +654,11 @@ const Preferences = () => {
 
               {has('vibe') && (
                 <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
-                  <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
+                  <SelectionList
+                    items={cfg.vibeWhitelist ? vibes.filter(v => cfg.vibeWhitelist!.includes(v.id)) : vibes}
+                    selected={selectedVibes}
+                    onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)}
+                  />
                 </AccordionSection>
               )}
 
