@@ -247,6 +247,39 @@ const Results = () => {
             className="mb-4"
           />
 
+          {/* Sparse-data warning banner */}
+          {sparseInfo && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3"
+            >
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">
+                    {t('results.sparseTitle', {
+                      category: t(`results.category${sparseInfo.categoryId.charAt(0).toUpperCase() + sparseInfo.categoryId.slice(1)}`),
+                    })}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('results.sparseDesc')}
+                  </p>
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => navigate('/preferences?step=1')}
+                      className="h-7 text-xs"
+                    >
+                      {t('results.sparseCtaWiden')}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {(() => {
             const STORAGE_KEY = 'ai_matches_banner_views';
             const views = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
