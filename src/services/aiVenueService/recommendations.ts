@@ -521,7 +521,8 @@ async function getVenuesRadarOverpass(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
-  radiusMultiplier: number = 1
+  radiusMultiplier: number = 1,
+  skipGoogleFallback: boolean = false,
 ) {
   // Step 1: Query Radar + Overpass IN PARALLEL for maximum speed
   const promises: Promise<any[]>[] = [];
@@ -551,8 +552,10 @@ async function getVenuesRadarOverpass(
   
   console.log(`🔀 MERGE: After dedup=${venues.length}`);
 
-  // Step 2: Google Places fallback for niche venue types only if needed
-  if (userLocation && API_CONFIG.useGooglePlaces) {
+  // Step 2: Google Places fallback for niche venue types only if needed.
+  // Skipped in non-food situational mode — those queries mostly return
+  // restaurants which would be hard-filtered out anyway, costing 2-5s.
+  if (userLocation && API_CONFIG.useGooglePlaces && !skipGoogleFallback) {
     const { data: userPrefs } = await supabase
       .from('user_preferences')
       .select('preferred_venue_types, preferred_activities')
