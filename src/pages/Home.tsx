@@ -20,7 +20,8 @@ const Home: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
   const { isMobile } = useBreakpoint();
   const { data: preferences, isLoading: prefsLoading } = useUserPreferences();
-  const { showTutorial, completeTutorial } = useTutorial();
+  const alreadyOnboarded = hasCompletedPreferenceSetup(preferences as any);
+  const { showTutorial, completeTutorial } = useTutorial({ alreadyOnboarded });
   const hasCheckedOnboarding = React.useRef(false);
 
   React.useEffect(() => {
