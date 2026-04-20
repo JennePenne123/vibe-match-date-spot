@@ -232,10 +232,20 @@ serve(async (req) => {
           const venueLat = el.lat ?? el.center?.lat;
           const venueLon = el.lon ?? el.center?.lon;
           const meta = categoryFromTags(tags);
+          const address = buildAddress(tags);
+          // Fallback chain so we never violate the NOT NULL address column
+          const fallbackAddress =
+            address
+            || [tags['addr:suburb'], tags['addr:city']].filter(Boolean).join(', ')
+            || tags['addr:city']
+            || tags['addr:suburb']
+            || tags['is_in:city']
+            || tags['is_in']
+            || tags.name; // last-resort: use the venue name itself
           return {
             id: `osm_${el.id}`,
             name: tags.name,
-            address: buildAddress(tags),
+            address: fallbackAddress,
             latitude: venueLat,
             longitude: venueLon,
             cuisine_type: meta.cuisine,
@@ -250,6 +260,7 @@ serve(async (req) => {
             updated_at: new Date().toISOString(),
           };
         })
+        // Require coordinates + a non-empty address (NOT NULL constraint)
         .filter((v) => v.latitude && v.longitude && v.address);
 
       let saved = 0;
