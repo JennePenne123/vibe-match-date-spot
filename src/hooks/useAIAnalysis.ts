@@ -75,7 +75,13 @@ export const useAIAnalysis = () => {
         return result;
       } catch (error) {
         console.error(`❌ AI ANALYSIS: Attempt ${attempt} failed:`, error);
-        
+
+        // Don't retry: this is a deterministic "no matches for this filter"
+        // outcome. Retrying just wastes time and money.
+        if (error instanceof NoSituationalMatchError) {
+          throw error;
+        }
+
         if (attempt < maxRetries) {
           const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
           console.log(`⏳ AI ANALYSIS: Waiting ${delay}ms before retry...`);
