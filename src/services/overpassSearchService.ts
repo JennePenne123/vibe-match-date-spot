@@ -3,6 +3,63 @@
  * Bypasses edge functions by calling Overpass directly and saving to Supabase.
  */
 import { supabase } from '@/integrations/supabase/client';
+import type { SituationalCategoryId } from '@/lib/situationalCategories';
+
+/**
+ * OSM tags grouped by situational category. When the user picks a Quick-Action
+ * on Home, we pull these tags PLUS the standard restaurant set so the database
+ * gets enriched with culture / activity / nightlife venues for that area.
+ *
+ * Each entry is an OSM `key=value` selector. We always query both `node` and
+ * `way` (for buildings).
+ */
+const CATEGORY_OSM_TAGS: Record<SituationalCategoryId, Array<[string, string]>> = {
+  food: [
+    // food is the default coverage — no extras needed
+  ],
+  culture: [
+    ['tourism', 'museum'],
+    ['tourism', 'gallery'],
+    ['tourism', 'artwork'],
+    ['amenity', 'theatre'],
+    ['amenity', 'cinema'],
+    ['amenity', 'arts_centre'],
+    ['amenity', 'concert_hall'],
+    ['amenity', 'planetarium'],
+    ['amenity', 'library'],
+    ['historic', 'monument'],
+    ['historic', 'castle'],
+  ],
+  activity: [
+    ['leisure', 'bowling_alley'],
+    ['leisure', 'miniature_golf'],
+    ['leisure', 'amusement_arcade'],
+    ['leisure', 'escape_game'],
+    ['leisure', 'climbing'],
+    ['sport', 'climbing'],
+    ['leisure', 'swimming_pool'],
+    ['leisure', 'water_park'],
+    ['leisure', 'spa'],
+    ['amenity', 'spa'],
+    ['leisure', 'sports_centre'],
+    ['leisure', 'fitness_centre'],
+    ['leisure', 'ice_rink'],
+    ['sport', 'go_kart'],
+    ['sport', 'paintball'],
+    ['sport', 'laser_tag'],
+    ['leisure', 'trampoline_park'],
+  ],
+  nightlife: [
+    ['amenity', 'bar'],
+    ['amenity', 'pub'],
+    ['amenity', 'nightclub'],
+    ['amenity', 'biergarten'],
+    ['amenity', 'casino'],
+    ['amenity', 'stripclub'],
+    ['amenity', 'karaoke_box'],
+    ['leisure', 'adult_gaming_centre'],
+  ],
+};
 
 const CUISINE_TO_OSM: Record<string, string[]> = {
   'Italian': ['italian', 'pizza'],
@@ -36,20 +93,63 @@ const EXCLUDED_TYPES = new Set([
   'dentist', 'veterinary', 'car_wash', 'car_repair', 'laundry',
 ]);
 
-function buildOverpassQuery(lat: number, lng: number, radius: number, limit: number): string {
+function buildOverpassQuery(
+  lat: number,
+  lng: number,
+  radius: number,
+  limit: number,
+  categoryId: SituationalCategoryId | null,
+  secondaryCategoryId: SituationalCategoryId | null,
+): string {
   const r = Math.min(radius, 25000);
-  return `[out:json][timeout:20];(
-    node["amenity"="restaurant"](around:${r},${lat},${lng});
-    node["amenity"="cafe"](around:${r},${lat},${lng});
-    node["amenity"="bar"](around:${r},${lat},${lng});
-    way["amenity"="restaurant"](around:${r},${lat},${lng});
-    way["amenity"="cafe"](around:${r},${lat},${lng});
-    way["amenity"="bar"](around:${r},${lat},${lng});
-    node["amenity"="theatre"](around:${r},${lat},${lng});
-    node["tourism"="museum"](around:${r},${lat},${lng});
-    node["amenity"="cinema"](around:${r},${lat},${lng});
-    node["leisure"="bowling_alley"](around:${r},${lat},${lng});
-    node["amenity"="nightclub"](around:${r},${lat},${lng});
+
+  // Always include the food baseline — even in non-food modes a restaurant or
+  // bar near a museum is useful as a follow-up suggestion.
+  const baseSelectors: Array<[string, string]> = [
+    ['amenity', 'restaurant'],
+    ['amenity', 'cafe'],
+    ['amenity', 'bar'],
+  ];
+
+  // Active categories (primary + optional secondary) get their full OSM tag
+  // set queried as both node and way. Deduplicated so the OR doesn't repeat.
+  const activeCategoryTags = new Map<string, [string, string]>();
+  for (const id of [categoryId, secondaryCategoryId]) {
+    if (!id) continue;
+    for (const tag of CATEGORY_OSM_TAGS[id] ?? []) {
+      activeCategoryTags.set(`${tag[0]}=${tag[1]}`, tag);
+    }
+  }
+
+  // When NO category is active, keep the legacy "broad culture+nightlife"
+  // baseline so generic searches still surface a museum or club nearby.
+  const fallbackSelectors: Array<[string, string]> =
+    categoryId || secondaryCategoryId
+      ? []
+      : [
+          ['amenity', 'theatre'],
+          ['tourism', 'museum'],
+          ['amenity', 'cinema'],
+          ['leisure', 'bowling_alley'],
+          ['amenity', 'nightclub'],
+        ];
+
+  const allSelectors = [
+    ...baseSelectors,
+    ...Array.from(activeCategoryTags.values()),
+    ...fallbackSelectors,
+  ];
+
+  // Build node + way clauses for each selector
+  const clauses = allSelectors
+    .flatMap(([k, v]) => [
+      `node["${k}"="${v}"](around:${r},${lat},${lng});`,
+      `way["${k}"="${v}"](around:${r},${lat},${lng});`,
+    ])
+    .join('\n    ');
+
+  return `[out:json][timeout:25];(
+    ${clauses}
   );out center body ${limit};`;
 }
 
@@ -60,12 +160,33 @@ function extractCuisineType(tags: Record<string, string>): string {
   }
   if (tags.amenity === 'cafe') return 'Café';
   if (tags.amenity === 'bar') return 'Bar';
+  if (tags.amenity === 'pub') return 'Pub';
+  if (tags.amenity === 'biergarten') return 'Biergarten';
   if (tags.amenity === 'fast_food') return 'Fast Food';
   if (tags.tourism === 'museum') return 'Museum';
+  if (tags.tourism === 'gallery') return 'Gallery';
   if (tags.amenity === 'theatre') return 'Theater';
   if (tags.amenity === 'cinema') return 'Cinema';
+  if (tags.amenity === 'concert_hall') return 'Concert Hall';
+  if (tags.amenity === 'arts_centre') return 'Arts Centre';
+  if (tags.amenity === 'planetarium') return 'Planetarium';
+  if (tags.amenity === 'library') return 'Library';
+  if (tags.historic === 'monument' || tags.historic === 'castle') return 'Historic';
   if (tags.leisure === 'bowling_alley') return 'Bowling';
+  if (tags.leisure === 'miniature_golf') return 'Mini Golf';
+  if (tags.leisure === 'amusement_arcade') return 'Arcade';
+  if (tags.leisure === 'escape_game') return 'Escape Room';
+  if (tags.leisure === 'climbing' || tags.sport === 'climbing') return 'Climbing';
+  if (tags.leisure === 'swimming_pool' || tags.leisure === 'water_park') return 'Swimming';
+  if (tags.leisure === 'spa' || tags.amenity === 'spa') return 'Spa & Wellness';
+  if (tags.leisure === 'ice_rink') return 'Ice Rink';
+  if (tags.leisure === 'trampoline_park') return 'Trampoline Park';
+  if (tags.sport === 'go_kart') return 'Go-Kart';
+  if (tags.sport === 'paintball') return 'Paintball';
+  if (tags.sport === 'laser_tag') return 'Laser Tag';
   if (tags.amenity === 'nightclub') return 'Nightclub';
+  if (tags.amenity === 'casino') return 'Casino';
+  if (tags.amenity === 'karaoke_box') return 'Karaoke';
   return 'Restaurant';
 }
 
