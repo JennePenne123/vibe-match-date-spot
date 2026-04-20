@@ -22,6 +22,20 @@ import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
 import { getSituationalCategory, getSituationalBoost, type SituationalCategoryId } from '@/lib/situationalCategories';
 
+/**
+ * Sentinel error thrown when a non-food situational category produced zero
+ * matching venues after the hard filter. Caught by useAIAnalysis to show
+ * a friendly "no venues for this category" hint instead of a generic error.
+ */
+export class NoSituationalMatchError extends Error {
+  categoryId: SituationalCategoryId;
+  constructor(categoryId: SituationalCategoryId) {
+    super(`No venues match situational category "${categoryId}"`);
+    this.name = 'NoSituationalMatchError';
+    this.categoryId = categoryId;
+  }
+}
+
 export interface AIVenueRecommendation {
   venue_id: string;
   venue_name: string;
@@ -67,7 +81,12 @@ export const getAIVenueRecommendations = async (
     // Get venues using hybrid multi-source strategy
     let venues = [];
     if (userLocation?.latitude && userLocation?.longitude) {
-      venues = await getVenuesFromMultipleSources(userId, limit * 8, userLocation);
+      venues = await getVenuesFromMultipleSources(
+        userId,
+        limit * 8,
+        userLocation,
+        situationalCategoryId ?? null,
+      );
     }
     
     // Fallback to database venues if all sources fail or no location
@@ -294,7 +313,30 @@ export const getAIVenueRecommendations = async (
 
     // Intra-source deduplication: remove duplicates within the same result set
     // (e.g., Overpass returning same venue as both Node and Way)
-    const deduped = deduplicateWithinSource(recommendations);
+    let deduped = deduplicateWithinSource(recommendations);
+
+    // ── HARD CATEGORY FILTER ──
+    // For non-food situational categories, only keep venues whose tags / name
+    // / description / cuisine signal a match. This is the user's explicit
+    // intent for this session and we should not show restaurants when they
+    // asked for culture or activities.
+    const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
+    if (situationalCat && situationalCat.id !== 'food') {
+      const before = deduped.length;
+      deduped = deduped.filter(rec => {
+        const haystack = [
+          rec.venue_name ?? '',
+          rec.cuisine_type ?? '',
+          ...(rec.amenities ?? []),
+        ].join(' ').toLowerCase();
+        return situationalCat.boostKeywords.some(kw => haystack.includes(kw));
+      });
+      console.log(`🎯 SITUATIONAL FILTER (${situationalCat.id}): ${before} → ${deduped.length} venues`);
+      if (deduped.length === 0) {
+        // Bubble up so useAIAnalysis can show a friendly hint (radius / try other category)
+        throw new NoSituationalMatchError(situationalCat.id);
+      }
+    }
     
     // Sort by AI score, then apply diversity filter
     const sortedRecommendations = deduped
@@ -350,6 +392,8 @@ export const getAIVenueRecommendations = async (
 
     return validateRecommendations(diverseRecommendations);
   } catch (error) {
+    // Preserve typed errors so callers (e.g. useAIAnalysis) can react to them.
+    if (error instanceof NoSituationalMatchError) throw error;
     console.error('Failed to get venue recommendations:', error);
     throw new Error(error instanceof Error ? error.message : 'Failed to get venue recommendations');
   }
@@ -398,7 +442,8 @@ function validateRecommendations(recommendations: AIVenueRecommendation[]): AIVe
 const getVenuesFromMultipleSources = async (
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  situationalCategoryId?: SituationalCategoryId | null,
 ) => {
   // Fetch user preferences for cache key differentiation
   const { data: userPrefs } = await supabase
@@ -410,6 +455,11 @@ const getVenuesFromMultipleSources = async (
   const cacheCuisines = userPrefs?.preferred_cuisines || [];
   const cacheVibes = userPrefs?.preferred_vibes || [];
   const cachePriceRange = userPrefs?.preferred_price_range || [];
+
+  // Non-food situational mode: skip the 2nd radius retry and the Google
+  // Places fallback entirely — both are tuned for restaurant discovery and
+  // mostly add restaurants we'd just hard-filter out anyway. Saves 2-30s.
+  const isNonFoodMode = !!situationalCategoryId && situationalCategoryId !== 'food';
 
   // Check cache first if we have location — now includes preferences in key
   if (userLocation?.latitude && userLocation?.longitude) {
@@ -442,7 +492,10 @@ const getVenuesFromMultipleSources = async (
 
   const strategy = API_CONFIG.venueSearchStrategy;
   const MIN_VENUES_THRESHOLD = 6;
-  const RADIUS_MULTIPLIERS = [1, 1.5, 2.5]; // Progressive radius expansion
+  // Performance: cap retries at 2 (was 3). Non-food modes get a single pass
+  // since we hard-filter the results and a wider radius mostly returns more
+  // restaurants we'd discard anyway.
+  const RADIUS_MULTIPLIERS = isNonFoodMode ? [1.5] : [1, 2];
   let venues: any[] = [];
   
   for (const multiplier of RADIUS_MULTIPLIERS) {
@@ -452,7 +505,7 @@ const getVenuesFromMultipleSources = async (
       : userLocation;
     
     if (strategy === 'radar-overpass') {
-      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier);
+      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier, isNonFoodMode);
     } else if (strategy === 'overpass-only') {
       venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier);
     } else {
@@ -493,7 +546,8 @@ async function getVenuesRadarOverpass(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
-  radiusMultiplier: number = 1
+  radiusMultiplier: number = 1,
+  skipGoogleFallback: boolean = false,
 ) {
   // Step 1: Query Radar + Overpass IN PARALLEL for maximum speed
   const promises: Promise<any[]>[] = [];
@@ -523,8 +577,10 @@ async function getVenuesRadarOverpass(
   
   console.log(`🔀 MERGE: After dedup=${venues.length}`);
 
-  // Step 2: Google Places fallback for niche venue types only if needed
-  if (userLocation && API_CONFIG.useGooglePlaces) {
+  // Step 2: Google Places fallback for niche venue types only if needed.
+  // Skipped in non-food situational mode — those queries mostly return
+  // restaurants which would be hard-filtered out anyway, costing 2-5s.
+  if (userLocation && API_CONFIG.useGooglePlaces && !skipGoogleFallback) {
     const { data: userPrefs } = await supabase
       .from('user_preferences')
       .select('preferred_venue_types, preferred_activities')

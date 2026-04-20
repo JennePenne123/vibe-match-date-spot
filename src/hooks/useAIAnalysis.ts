@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { getCompatibilityScore, CompatibilityScore } from '@/services/aiMatchingService';
 import { getAIVenueRecommendations } from '@/services/aiVenueService';
+import { NoSituationalMatchError } from '@/services/aiVenueService/recommendations';
 import { supabase } from '@/integrations/supabase/client';
 import { getLocationFallback } from '@/utils/locationFallback';
 import type { DateOccasion } from '@/services/aiVenueService/occasionScoring';
@@ -74,7 +75,13 @@ export const useAIAnalysis = () => {
         return result;
       } catch (error) {
         console.error(`❌ AI ANALYSIS: Attempt ${attempt} failed:`, error);
-        
+
+        // Don't retry: this is a deterministic "no matches for this filter"
+        // outcome. Retrying just wastes time and money.
+        if (error instanceof NoSituationalMatchError) {
+          throw error;
+        }
+
         if (attempt < maxRetries) {
           const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
           console.log(`⏳ AI ANALYSIS: Waiting ${delay}ms before retry...`);
@@ -246,6 +253,24 @@ export const useAIAnalysis = () => {
       console.log('✅ AI ANALYSIS: Enhanced analysis completed successfully');
 
     } catch (error) {
+      // Friendly path for "no venues match this category" — not a real error.
+      if (error instanceof NoSituationalMatchError) {
+        const labels: Record<string, string> = {
+          culture: 'Kultur',
+          activity: 'Aktivität',
+          nightlife: 'Nightlife',
+          food: 'Essen',
+        };
+        const label = labels[error.categoryId] || error.categoryId;
+        console.warn(`🎯 No "${error.categoryId}" venues found in radius`);
+        setVenueSearchError(
+          `Keine ${label}-Venues in deiner Nähe gefunden. Versuche eine andere Kategorie oder erweitere den Suchradius in deinen Präferenzen.`,
+        );
+        setVenueRecommendations([]);
+        if (!compatibilityScore) setCompatibilityScore(75);
+        return;
+      }
+
       console.error('❌ AI ANALYSIS: Critical error in enhanced analysis:', {
         message: error.message,
         stack: error.stack,
