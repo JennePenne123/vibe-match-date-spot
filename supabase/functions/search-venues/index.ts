@@ -218,7 +218,14 @@ serve(async (req) => {
     
     if (placesData.results && placesData.results.length > 0) {
       console.log('🏢 SEARCH VENUES: Processing', placesData.results.length, 'venues...');
-      
+
+      // Field Mask cost optimization:
+      //  - 'essentials'      → 1 photo, no opening_hours
+      //  - 'essentials+pro'  → up to 3 photos, opening_hours (DEFAULT, recommended)
+      //  - 'full'            → up to 5 photos, opening_hours, all metadata
+      const photoLimit = fieldMask === 'essentials' ? 1 : fieldMask === 'full' ? 5 : 3;
+      const includeOpeningHours = fieldMask !== 'essentials';
+
       for (const place of placesData.results.slice(0, 20)) {
         try {
           const venue = {
@@ -230,7 +237,7 @@ serve(async (req) => {
             rating: place.rating || 4.0,
             priceRange: '€'.repeat(place.price_level || 2),
             // Process photos - get multiple sizes and photos
-            photos: place.photos?.slice(0, 5).map((photo: any, index: number) => ({
+            photos: place.photos?.slice(0, photoLimit).map((photo: any, index: number) => ({
               url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${index === 0 ? 800 : 400}&photoreference=${photo.photo_reference}&key=${apiKey}`,
               thumbnail: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=${photo.photo_reference}&key=${apiKey}`,
               width: photo.width || 400,
@@ -244,7 +251,7 @@ serve(async (req) => {
               'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
             cuisineType: determineCuisineType(place, sanitizedCuisines),
             tags: place.types || ['restaurant'],
-            openNow: place.opening_hours?.open_now,
+            openNow: includeOpeningHours ? place.opening_hours?.open_now : undefined,
             phone: null,
             website: null,
             description: `${place.name} in ${place.vicinity || 'der Nähe'}`
