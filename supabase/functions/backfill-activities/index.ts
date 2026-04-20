@@ -310,8 +310,8 @@ serve(async (req) => {
     let grandTotal = 0;
 
     for (const category of requested) {
-      const queries = buildQueries(lat, lng, radiusM, CATEGORY_TAGS[category]);
-      const elements = await fetchOverpassBatched(queries);
+      const tagChunks = chunkTags(CATEGORY_TAGS[category]);
+      const elements = await fetchOverpassBatched(lat, lng, radiusM, CATEGORY_TAGS[category], category);
 
       const venues = elements
         .filter((el) => el.tags?.name)
@@ -361,7 +361,7 @@ serve(async (req) => {
 
       summary[category] = { fetched: venues.length, saved };
       grandTotal += saved;
-      console.log(`✅ backfill ${category}: ${saved}/${venues.length} (queries: ${queries.length})`);
+      console.log(`✅ backfill ${category}: ${saved}/${venues.length} (queries: ${tagChunks.length})`);
     }
 
     return new Response(
