@@ -560,14 +560,11 @@ const Preferences = () => {
       <div className="max-w-md mx-auto">
         {situationalCategory && step === 0 && (
           <div className="px-4 pt-4">
-            <SituationalActiveBanner category={situationalCategory} onClear={clearSituationalCategory} />
-            <div className="mt-2">
-              <SecondaryCategoryPicker
-                primary={situationalCategory}
-                secondaryId={secondaryCategoryId}
-                onChange={handleSecondaryChange}
-              />
-            </div>
+            <SecondaryCategoryPicker
+              primary={situationalCategory}
+              secondaryId={secondaryCategoryId}
+              onChange={handleSecondaryChange}
+            />
           </div>
         )}
         {/* Header */}
