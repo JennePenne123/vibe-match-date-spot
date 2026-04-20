@@ -98,34 +98,68 @@ async function fetchOverpass(query: string): Promise<any> {
 
 function categoryFromTags(tags: Record<string, string>): { cuisine: string; tags: string[] } {
   const a = tags.amenity, l = tags.leisure, t = tags.tourism, s = tags.sport, h = tags.historic;
+  const c = tags.craft, b = tags.building, sh = tags.shop;
+  // Culture (tourism)
   if (t === 'museum') return { cuisine: 'Museum', tags: ['museum', 'cultural', 'arts-entertainment', 'art', 'kunst', 'daytime'] };
   if (t === 'gallery') return { cuisine: 'Gallery', tags: ['gallery', 'galerie', 'art gallery', 'cultural', 'arts-entertainment'] };
+  if (t === 'aquarium') return { cuisine: 'Aquarium', tags: ['aquarium', 'cultural', 'arts-entertainment', 'family', 'daytime'] };
+  if (t === 'zoo') return { cuisine: 'Zoo', tags: ['zoo', 'tierpark', 'cultural', 'family', 'daytime'] };
+  if (t === 'theme_park') return { cuisine: 'Theme Park', tags: ['theme park', 'amusement park', 'family', 'fun', 'active'] };
+  if (t === 'attraction') return { cuisine: 'Attraction', tags: ['attraction', 'sightseeing', 'cultural', 'tourism'] };
+  if (t === 'artwork') return { cuisine: 'Public Art', tags: ['artwork', 'street art', 'cultural', 'art'] };
+  if (t === 'viewpoint') return { cuisine: 'Viewpoint', tags: ['viewpoint', 'aussichtspunkt', 'sightseeing', 'romantic'] };
+  // Culture (amenity)
   if (a === 'theatre') return { cuisine: 'Theater', tags: ['theatre', 'theater', 'cultural', 'arts-entertainment', 'evening'] };
   if (a === 'cinema') return { cuisine: 'Cinema', tags: ['cinema', 'kino', 'entertainment', 'arts-entertainment', 'evening'] };
   if (a === 'arts_centre') return { cuisine: 'Arts Centre', tags: ['arts-entertainment', 'cultural', 'kunst'] };
   if (a === 'concert_hall') return { cuisine: 'Concert Hall', tags: ['concert hall', 'konzerthaus', 'cultural', 'arts-entertainment', 'evening'] };
   if (a === 'planetarium') return { cuisine: 'Planetarium', tags: ['planetarium', 'cultural', 'arts-entertainment'] };
   if (a === 'library') return { cuisine: 'Library', tags: ['library', 'cultural', 'quiet'] };
+  if (a === 'exhibition_centre') return { cuisine: 'Exhibition', tags: ['exhibition', 'ausstellung', 'cultural', 'arts-entertainment'] };
+  if (a === 'community_centre') return { cuisine: 'Community Centre', tags: ['community centre', 'kulturzentrum', 'cultural'] };
+  if (a === 'studio') return { cuisine: 'Studio', tags: ['studio', 'cultural', 'arts-entertainment'] };
+  // Culture (historic / building)
   if (h === 'monument' || h === 'castle') return { cuisine: 'Historic', tags: ['historic', 'cultural', 'sightseeing'] };
+  if (h === 'memorial') return { cuisine: 'Memorial', tags: ['memorial', 'historic', 'cultural', 'sightseeing'] };
+  if (h === 'ruins' || h === 'archaeological_site') return { cuisine: 'Historic Site', tags: ['ruins', 'historic', 'cultural', 'sightseeing'] };
+  if (h === 'church' || b === 'cathedral' || b === 'church') return { cuisine: 'Church', tags: ['church', 'kirche', 'historic', 'cultural', 'sightseeing'] };
+  // Activities (leisure)
   if (l === 'bowling_alley') return { cuisine: 'Bowling', tags: ['bowling', 'bowling-alley', 'active', 'fun'] };
   if (l === 'miniature_golf') return { cuisine: 'Mini Golf', tags: ['mini golf', 'minigolf', 'active', 'fun'] };
   if (l === 'amusement_arcade') return { cuisine: 'Arcade', tags: ['arcade', 'fun', 'active'] };
   if (l === 'escape_game') return { cuisine: 'Escape Room', tags: ['escape room', 'escape-room', 'fun', 'active'] };
-  if (l === 'climbing' || s === 'climbing') return { cuisine: 'Climbing', tags: ['climbing', 'klettern', 'active', 'sport'] };
+  if (l === 'climbing' || (l as string) === 'climbing_adventure' || s === 'climbing' || s === 'bouldering') return { cuisine: 'Climbing', tags: ['climbing', 'bouldering', 'klettern', 'kletterhalle', 'boulderhalle', 'active', 'sport'] };
   if (l === 'swimming_pool' || l === 'water_park') return { cuisine: 'Swimming', tags: ['swimming', 'aquapark', 'active'] };
-  if (l === 'spa' || a === 'spa') return { cuisine: 'Spa & Wellness', tags: ['spa', 'wellness', 'relaxing'] };
+  if (l === 'spa' || a === 'spa' || (l as string) === 'sauna' || a === 'public_bath') return { cuisine: 'Spa & Wellness', tags: ['spa', 'sauna', 'wellness', 'therme', 'relaxing'] };
+  if ((l as string) === 'beach_resort') return { cuisine: 'Beach Resort', tags: ['beach', 'strand', 'relaxing'] };
   if (l === 'sports_centre' || l === 'fitness_centre') return { cuisine: 'Sport', tags: ['sport', 'active', 'fitness'] };
-  if (l === 'ice_rink') return { cuisine: 'Ice Rink', tags: ['ice skating', 'active', 'fun'] };
-  if (l === 'trampoline_park') return { cuisine: 'Trampoline Park', tags: ['trampoline', 'active', 'fun'] };
+  if (l === 'ice_rink') return { cuisine: 'Ice Rink', tags: ['ice skating', 'eislaufen', 'active', 'fun'] };
+  if (l === 'trampoline_park') return { cuisine: 'Trampoline Park', tags: ['trampoline', 'trampolinhalle', 'active', 'fun'] };
+  if ((l as string) === 'adventure_park') return { cuisine: 'Adventure Park', tags: ['adventure park', 'kletterpark', 'active', 'fun', 'outdoor'] };
+  if ((l as string) === 'horse_riding') return { cuisine: 'Horse Riding', tags: ['horse riding', 'reiten', 'active', 'outdoor'] };
+  if ((l as string) === 'dance' || a === 'dancing_school') return { cuisine: 'Dance', tags: ['dance', 'tanzschule', 'active', 'social'] };
+  if ((l as string) === 'park' || (l as string) === 'garden') return { cuisine: 'Park', tags: ['park', 'garden', 'outdoor', 'relaxing', 'walk'] };
+  // Activities (craft / amenity workshops)
+  if (c === 'pottery' || (a as string) === 'pottery') return { cuisine: 'Pottery', tags: ['pottery', 'töpfern', 'crafts', 'creative', 'workshop'] };
+  if (a === 'cooking_school') return { cuisine: 'Cooking School', tags: ['cooking school', 'kochkurs', 'workshop', 'creative'] };
+  // Activities (sport)
+  if (s === 'yoga') return { cuisine: 'Yoga', tags: ['yoga', 'wellness', 'relaxing', 'active'] };
+  if (s === 'tennis' || s === 'badminton' || s === 'squash' || s === 'table_tennis') return { cuisine: 'Racquet Sport', tags: [s, 'sport', 'active'] };
+  if (s === 'darts' || s === 'billiards') return { cuisine: 'Pub Sport', tags: [s, 'fun', 'social', 'pub'] };
+  if (s === 'surfing' || s === 'kitesurfing' || s === 'sailing' || s === 'canoe' || s === 'rowing') return { cuisine: 'Watersport', tags: [s, 'watersport', 'active', 'outdoor'] };
   if (s === 'go_kart') return { cuisine: 'Go-Kart', tags: ['kart', 'go-kart', 'active', 'fun'] };
   if (s === 'paintball') return { cuisine: 'Paintball', tags: ['paintball', 'active', 'fun'] };
   if (s === 'laser_tag') return { cuisine: 'Laser Tag', tags: ['lasertag', 'laser tag', 'active', 'fun'] };
+  // Nightlife
   if (a === 'bar') return { cuisine: 'Bar', tags: ['bar', 'evening', 'drinks', 'nightlife', 'cocktails'] };
   if (a === 'pub') return { cuisine: 'Pub', tags: ['pub', 'evening', 'drinks', 'nightlife'] };
   if (a === 'nightclub') return { cuisine: 'Nightclub', tags: ['nightclub', 'nightlife', 'party', 'lively', 'late night'] };
   if (a === 'biergarten') return { cuisine: 'Biergarten', tags: ['biergarten', 'outdoor seating', 'evening'] };
-  if (a === 'casino') return { cuisine: 'Casino', tags: ['casino', 'nightlife', 'late night'] };
+  if (a === 'casino' || (a as string) === 'gambling') return { cuisine: 'Casino', tags: ['casino', 'nightlife', 'late night'] };
   if (a === 'karaoke_box') return { cuisine: 'Karaoke', tags: ['karaoke', 'nightlife', 'lively'] };
+  if ((a as string) === 'stripclub') return { cuisine: 'Adult Club', tags: ['adult', 'nightlife', 'late night'] };
+  if ((a as string) === 'events_venue' || (a as string) === 'social_club') return { cuisine: 'Events Venue', tags: ['events', 'nightlife', 'party'] };
+  if (sh === 'shisha' || (a as string) === 'shisha') return { cuisine: 'Shisha Bar', tags: ['shisha', 'shishabar', 'hookah', 'nightlife', 'evening'] };
   return { cuisine: 'Venue', tags: [] };
 }
 
