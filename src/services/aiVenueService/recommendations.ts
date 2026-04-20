@@ -912,7 +912,9 @@ async function getVenuesFromOverpass(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
-  radiusMultiplier: number = 1
+  radiusMultiplier: number = 1,
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   const timer = apiUsageService.createTimer('overpass', '/client-overpass');
   
@@ -940,7 +942,9 @@ async function getVenuesFromOverpass(
       userLocation.longitude,
       radiusMeters,
       userPrefs.preferred_cuisines || [],
-      limit
+      limit,
+      situationalCategoryId ?? null,
+      secondaryCategoryId ?? null,
     );
     
     const venues = result.venues || [];
