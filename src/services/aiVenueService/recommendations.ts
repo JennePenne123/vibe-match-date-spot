@@ -130,6 +130,28 @@ export const getAIVenueRecommendations = async (
       });
     }
 
+    // ── Situational HARD filter ──
+    // When the user picked a non-food intent (Kultur/Aktivität/Nightlife),
+    // drop pure gastro venues from the candidate set. A soft boost is not
+    // enough because there are always 100× more restaurants than museums.
+    {
+      const primaryCat = getSituationalCategory(situationalCategoryId ?? null);
+      const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
+      if (primaryCat && primaryCat.id !== 'food') {
+        const before = venues.length;
+        const filtered = venues.filter(v => passesSituationalHardFilter(primaryCat, v, secondaryCat));
+        // Safety net: never collapse to fewer than 3 candidates — if the
+        // hard filter wipes everything (e.g. very small town), fall back to
+        // soft-boost mode so the user still sees something.
+        if (filtered.length >= 3) {
+          venues = filtered;
+          console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
+        } else {
+          console.warn(`⚠️ SITUATIONAL HARD FILTER (${primaryCat.id}) would leave only ${filtered.length} venues — falling back to soft boost`);
+        }
+      }
+    }
+
     // Build recommendations using the preferenceScore from filtering + local scoring
     for (const venue of venues) {
       if (!venue.id) {
