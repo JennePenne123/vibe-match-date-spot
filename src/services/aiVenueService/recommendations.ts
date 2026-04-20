@@ -639,10 +639,12 @@ async function getVenuesOverpassOnly(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
-  radiusMultiplier: number = 1
+  radiusMultiplier: number = 1,
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   if (API_CONFIG.useOverpass && userLocation) {
-    return await getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch(() => []);
+    return await getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier, situationalCategoryId, secondaryCategoryId).catch(() => []);
   }
   return [];
 }
@@ -654,7 +656,9 @@ async function getVenuesParallel(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
-  radiusMultiplier: number = 1
+  radiusMultiplier: number = 1,
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   const promises: Promise<any[]>[] = [];
   
@@ -663,7 +667,7 @@ async function getVenuesParallel(
   }
   
   if (API_CONFIG.useOverpass && userLocation) {
-    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch(() => []));
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier, situationalCategoryId, secondaryCategoryId).catch(() => []));
   }
   
   if (API_CONFIG.useGooglePlaces) {
