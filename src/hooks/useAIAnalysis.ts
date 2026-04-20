@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { getCompatibilityScore, CompatibilityScore } from '@/services/aiMatchingService';
 import { getAIVenueRecommendations } from '@/services/aiVenueService';
+import { NoSituationalMatchError } from '@/services/aiVenueService/recommendations';
 import { supabase } from '@/integrations/supabase/client';
 import { getLocationFallback } from '@/utils/locationFallback';
 import type { DateOccasion } from '@/services/aiVenueService/occasionScoring';
