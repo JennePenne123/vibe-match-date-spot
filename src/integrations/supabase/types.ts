@@ -1643,6 +1643,45 @@ export type Database = {
           },
         ]
       }
+      venue_search_cache: {
+        Row: {
+          cache_key: string
+          cache_type: string
+          created_at: string
+          expires_at: string
+          hit_count: number
+          id: string
+          last_hit_at: string | null
+          payload: Json
+          result_count: number
+          source: string
+        }
+        Insert: {
+          cache_key: string
+          cache_type: string
+          created_at?: string
+          expires_at: string
+          hit_count?: number
+          id?: string
+          last_hit_at?: string | null
+          payload: Json
+          result_count?: number
+          source: string
+        }
+        Update: {
+          cache_key?: string
+          cache_type?: string
+          created_at?: string
+          expires_at?: string
+          hit_count?: number
+          id?: string
+          last_hit_at?: string | null
+          payload?: Json
+          result_count?: number
+          source?: string
+        }
+        Relationships: []
+      }
       venue_staff: {
         Row: {
           accepted_at: string | null
@@ -2129,6 +2168,7 @@ export type Database = {
           expired_sessions: number
         }[]
       }
+      cleanup_venue_search_cache: { Args: never; Returns: number }
       count_perfect_pairs: { Args: { target_user_id: string }; Returns: number }
       create_test_venues: { Args: { venues_data: Json }; Returns: boolean }
       delete_user_data: { Args: { target_user_id: string }; Returns: boolean }
