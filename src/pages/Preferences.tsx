@@ -654,7 +654,11 @@ const Preferences = () => {
 
               {has('vibe') && (
                 <AccordionSection title={t('preferences.whatVibe') || 'Vibe'} icon={<HeartHandshake className="w-5 h-5 text-rose-500" />} selectedCount={selectedVibes.length} defaultOpen>
-                  <SelectionList items={vibes} selected={selectedVibes} onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)} />
+                  <SelectionList
+                    items={cfg.vibeWhitelist ? vibes.filter(v => cfg.vibeWhitelist!.includes(v.id)) : vibes}
+                    selected={selectedVibes}
+                    onToggle={(id) => toggleSelection(id, selectedVibes, setSelectedVibes)}
+                  />
                 </AccordionSection>
               )}
 
