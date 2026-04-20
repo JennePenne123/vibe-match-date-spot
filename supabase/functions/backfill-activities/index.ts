@@ -62,15 +62,24 @@ const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
   ],
 };
 
-function buildQuery(lat: number, lng: number, radiusM: number, tags: Array<[string, string]>): string {
+function buildQueries(lat: number, lng: number, radiusM: number, tags: Array<[string, string]>): string[] {
   const r = Math.min(radiusM, 50000);
-  const clauses = tags
-    .flatMap(([k, v]) => [
-      `node["${k}"="${v}"](around:${r},${lat},${lng});`,
-      `way["${k}"="${v}"](around:${r},${lat},${lng});`,
-    ])
-    .join('\n    ');
-  return `[out:json][timeout:30];(\n    ${clauses}\n  );out center body 500;`;
+  const chunkSize = 10;
+  const queries: string[] = [];
+
+  for (let i = 0; i < tags.length; i += chunkSize) {
+    const chunk = tags.slice(i, i + chunkSize);
+    const clauses = chunk
+      .flatMap(([k, v]) => [
+        `node["${k}"="${v}"](around:${r},${lat},${lng});`,
+        `way["${k}"="${v}"](around:${r},${lat},${lng});`,
+      ])
+      .join('\n    ');
+
+    queries.push(`[out:json][timeout:25];(\n    ${clauses}\n  );out center body 200;`);
+  }
+
+  return queries;
 }
 
 async function fetchOverpass(query: string): Promise<any> {
@@ -94,6 +103,25 @@ async function fetchOverpass(query: string): Promise<any> {
     }
   }
   return null;
+}
+
+async function fetchOverpassBatched(queries: string[]): Promise<any[]> {
+  const merged: any[] = [];
+  const seen = new Set<string>();
+
+  for (const query of queries) {
+    const data = await fetchOverpass(query);
+    const elements = (data?.elements ?? []) as any[];
+
+    for (const el of elements) {
+      const key = `${el.type ?? 'unknown'}:${el.id}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      merged.push(el);
+    }
+  }
+
+  return merged;
 }
 
 function categoryFromTags(tags: Record<string, string>): { cuisine: string; tags: string[] } {
@@ -221,9 +249,8 @@ serve(async (req) => {
     let grandTotal = 0;
 
     for (const category of requested) {
-      const query = buildQuery(lat, lng, radiusM, CATEGORY_TAGS[category]);
-      const data = await fetchOverpass(query);
-      const elements = (data?.elements ?? []) as any[];
+      const queries = buildQueries(lat, lng, radiusM, CATEGORY_TAGS[category]);
+      const elements = await fetchOverpassBatched(queries);
 
       const venues = elements
         .filter((el) => el.tags?.name)
@@ -273,7 +300,7 @@ serve(async (req) => {
 
       summary[category] = { fetched: venues.length, saved };
       grandTotal += saved;
-      console.log(`✅ backfill ${category}: ${saved}/${venues.length}`);
+      console.log(`✅ backfill ${category}: ${saved}/${venues.length} (queries: ${queries.length})`);
     }
 
     return new Response(
