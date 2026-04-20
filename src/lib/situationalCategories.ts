@@ -39,7 +39,11 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     gradient: 'from-orange-500/20 via-red-500/10 to-transparent',
     boostVenueTypes: [],
     boostActivities: [],
-    boostKeywords: ['restaurant', 'cafe', 'café', 'bistro', 'brunch', 'bakery', 'food'],
+    boostKeywords: [
+      'restaurant', 'cafe', 'café', 'bistro', 'brunch', 'bakery', 'food-beverage',
+      'dining', 'pizza', 'burger', 'kebab', 'steak house', 'steakhouse',
+      'ice cream', 'coffee shop', 'fast-food-restaurant',
+    ],
   },
   {
     id: 'culture',
@@ -49,7 +53,12 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     gradient: 'from-purple-500/20 via-indigo-500/10 to-transparent',
     boostVenueTypes: ['museum', 'gallery', 'theater_venue', 'cinema', 'concert_hall'],
     boostActivities: ['cultural_act'],
-    boostKeywords: ['museum', 'gallery', 'galerie', 'theater', 'theatre', 'cinema', 'kino', 'art', 'kunst', 'exhibition', 'ausstellung'],
+    boostKeywords: [
+      'museum', 'gallery', 'galerie', 'theater', 'theatre', 'cinema', 'kino',
+      'kunst', 'exhibition', 'ausstellung', 'arts-entertainment', 'art gallery',
+      'opera', 'oper', 'concert hall', 'konzerthaus', 'konzerthalle',
+      'philharmonie', 'literaturhaus', 'kulturzentrum', 'historic',
+    ],
   },
   {
     id: 'activity',
@@ -59,7 +68,13 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     gradient: 'from-emerald-500/20 via-teal-500/10 to-transparent',
     boostVenueTypes: ['bowling', 'mini_golf', 'arcade', 'climbing', 'swimming', 'spa_wellness', 'escape_room'],
     boostActivities: ['active'],
-    boostKeywords: ['bowling', 'climbing', 'klettern', 'park', 'sport', 'spa', 'wellness', 'arcade', 'escape', 'mini golf', 'minigolf'],
+    boostKeywords: [
+      'bowling', 'bowling-alley', 'climbing', 'klettern', 'kletterhalle',
+      'sport', 'spa', 'wellness', 'arcade', 'escape room', 'escape-room',
+      'mini golf', 'minigolf', 'lasertag', 'laser tag', 'paintball',
+      'kart', 'go-kart', 'trampolin', 'trampoline', 'aquapark', 'schwimmbad',
+      'billard', 'billiards', 'pool hall', 'darts',
+    ],
   },
   {
     id: 'nightlife',
@@ -69,7 +84,13 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     gradient: 'from-pink-500/20 via-fuchsia-500/10 to-transparent',
     boostVenueTypes: ['comedy_club', 'karaoke'],
     boostActivities: ['nightlife_act', 'cocktails'],
-    boostKeywords: ['club', 'nightclub', 'bar', 'cocktail', 'pub', 'live music', 'live-musik', 'karaoke', 'nightlife'],
+    boostKeywords: [
+      'nightclub', 'night club', 'bar', 'cocktail', 'cocktails', 'pub',
+      'live music', 'live-musik', 'karaoke', 'nightlife', 'late night',
+      'date night', 'lounge', 'rooftop', 'speakeasy', 'wine bar', 'weinbar',
+      'whisky bar', 'whiskybar', 'cocktailbar', 'sportsbar', 'sports bar',
+      'discothek', 'disco', 'dance club', 'lively',
+    ],
   },
 ];
 
@@ -105,18 +126,31 @@ export function getSituationalBoost(
 ): number {
   if (!category && !secondary) return 1;
 
-  const haystack = [
-    venue.name ?? '',
-    venue.cuisine_type ?? '',
-    venue.description ?? '',
-    ...(venue.tags ?? []),
-  ]
+  // Build a normalized haystack and a tag-set for precise (non-substring) matches.
+  // Substring matching is dangerous: `'art'` would match `'restaurant'`, falsely
+  // boosting every restaurant under the "culture" intent. We therefore:
+  //   1. match keywords against `tags` as exact (case-insensitive) entries, AND
+  //   2. match against name/cuisine/description using whole-word boundaries.
+  const normalizedTags = new Set(
+    (venue.tags ?? []).map(t => (t ?? '').toString().trim().toLowerCase()),
+  );
+  const textBlob = [venue.name ?? '', venue.cuisine_type ?? '', venue.description ?? '']
     .join(' ')
     .toLowerCase();
 
+  const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const matchesKeyword = (kw: string): boolean => {
+    const k = kw.toLowerCase().trim();
+    if (!k) return false;
+    if (normalizedTags.has(k)) return true;
+    // Whole-word / phrase boundary match in free text
+    const re = new RegExp(`(?:^|[^a-z0-9])${escapeRegex(k)}(?:$|[^a-z0-9])`, 'i');
+    return re.test(textBlob);
+  };
+
   const scoreFor = (cat: SituationalCategory | null, matchValue: number): number => {
     if (!cat) return 1;
-    return cat.boostKeywords.some(kw => haystack.includes(kw)) ? matchValue : 1;
+    return cat.boostKeywords.some(matchesKeyword) ? matchValue : 1;
   };
 
   // Primary contributes up to 1.35x, secondary up to 1.20x.
@@ -137,7 +171,7 @@ export function getSituationalBoost(
   const otherKeywords = SITUATIONAL_CATEGORIES
     .filter(c => !activeIds.has(c.id))
     .flatMap(c => c.boostKeywords);
-  const matchesOther = otherKeywords.some(kw => haystack.includes(kw));
+  const matchesOther = otherKeywords.some(matchesKeyword);
   if (matchesOther) return 0.7;
 
   return 1;
