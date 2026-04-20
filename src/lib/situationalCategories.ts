@@ -100,6 +100,41 @@ export function getSituationalCategory(id: string | null | undefined): Situation
 }
 
 /**
+ * Hard category filter — when the user explicitly picks a non-food intent
+ * ("Kultur", "Aktivität", "Nightlife"), pure restaurants/cafés should be
+ * EXCLUDED from the candidate set, not just down-weighted. Otherwise the
+ * recommendation pipeline will keep surfacing gastro because there are
+ * always 100x more restaurants than museums in any city.
+ *
+ * Returns true if the venue should be KEPT, false to exclude.
+ * - When `category` is null or "food" → no hard filter (keep all).
+ * - When `category` is culture/activity/nightlife → keep only venues that
+ *   match the active or secondary category, OR that are clearly not pure
+ *   gastronomy (e.g. multipurpose venues with art/live music).
+ */
+export function passesSituationalHardFilter(
+  category: SituationalCategory | null,
+  venue: {
+    name?: string | null;
+    cuisine_type?: string | null;
+    description?: string | null;
+    tags?: string[] | null;
+  },
+  secondary?: SituationalCategory | null,
+): boolean {
+  // No filter when no intent or when intent is "food" (food = anything goes).
+  if (!category) return true;
+  if (category.id === 'food' && (!secondary || secondary.id === 'food')) return true;
+
+  // Compute boost; if it's >= 1 (matches primary or secondary, or neutral
+  // with no off-category signal), keep the venue. The 0.7 factor returned by
+  // getSituationalBoost only fires when the venue clearly belongs to a
+  // different bucket — exactly the venues we want to drop here.
+  const boost = getSituationalBoost(category, venue, secondary ?? null);
+  return boost >= 1;
+}
+
+/**
  * Compute a multiplicative boost factor (0.6 – 1.35) for a venue based on
  * how well it matches the active situational category.
  *
