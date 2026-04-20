@@ -253,6 +253,24 @@ export const useAIAnalysis = () => {
       console.log('✅ AI ANALYSIS: Enhanced analysis completed successfully');
 
     } catch (error) {
+      // Friendly path for "no venues match this category" — not a real error.
+      if (error instanceof NoSituationalMatchError) {
+        const labels: Record<string, string> = {
+          culture: 'Kultur',
+          activity: 'Aktivität',
+          nightlife: 'Nightlife',
+          food: 'Essen',
+        };
+        const label = labels[error.categoryId] || error.categoryId;
+        console.warn(`🎯 No "${error.categoryId}" venues found in radius`);
+        setVenueSearchError(
+          `Keine ${label}-Venues in deiner Nähe gefunden. Versuche eine andere Kategorie oder erweitere den Suchradius in deinen Präferenzen.`,
+        );
+        setVenueRecommendations([]);
+        if (!compatibilityScore) setCompatibilityScore(75);
+        return;
+      }
+
       console.error('❌ AI ANALYSIS: Critical error in enhanced analysis:', {
         message: error.message,
         stack: error.stack,
