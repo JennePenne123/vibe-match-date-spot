@@ -22,6 +22,20 @@ import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
 import { getSituationalCategory, getSituationalBoost, type SituationalCategoryId } from '@/lib/situationalCategories';
 
+/**
+ * Sentinel error thrown when a non-food situational category produced zero
+ * matching venues after the hard filter. Caught by useAIAnalysis to show
+ * a friendly "no venues for this category" hint instead of a generic error.
+ */
+export class NoSituationalMatchError extends Error {
+  categoryId: SituationalCategoryId;
+  constructor(categoryId: SituationalCategoryId) {
+    super(`No venues match situational category "${categoryId}"`);
+    this.name = 'NoSituationalMatchError';
+    this.categoryId = categoryId;
+  }
+}
+
 export interface AIVenueRecommendation {
   venue_id: string;
   venue_name: string;
