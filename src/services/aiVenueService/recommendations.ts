@@ -313,7 +313,30 @@ export const getAIVenueRecommendations = async (
 
     // Intra-source deduplication: remove duplicates within the same result set
     // (e.g., Overpass returning same venue as both Node and Way)
-    const deduped = deduplicateWithinSource(recommendations);
+    let deduped = deduplicateWithinSource(recommendations);
+
+    // ── HARD CATEGORY FILTER ──
+    // For non-food situational categories, only keep venues whose tags / name
+    // / description / cuisine signal a match. This is the user's explicit
+    // intent for this session and we should not show restaurants when they
+    // asked for culture or activities.
+    const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
+    if (situationalCat && situationalCat.id !== 'food') {
+      const before = deduped.length;
+      deduped = deduped.filter(rec => {
+        const haystack = [
+          rec.venue_name ?? '',
+          rec.cuisine_type ?? '',
+          ...(rec.amenities ?? []),
+        ].join(' ').toLowerCase();
+        return situationalCat.boostKeywords.some(kw => haystack.includes(kw));
+      });
+      console.log(`🎯 SITUATIONAL FILTER (${situationalCat.id}): ${before} → ${deduped.length} venues`);
+      if (deduped.length === 0) {
+        // Bubble up so useAIAnalysis can show a friendly hint (radius / try other category)
+        throw new NoSituationalMatchError(situationalCat.id);
+      }
+    }
     
     // Sort by AI score, then apply diversity filter
     const sortedRecommendations = deduped
