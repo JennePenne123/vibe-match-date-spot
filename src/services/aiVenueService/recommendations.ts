@@ -417,7 +417,8 @@ function validateRecommendations(recommendations: AIVenueRecommendation[]): AIVe
 const getVenuesFromMultipleSources = async (
   userId: string,
   limit: number,
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  situationalCategoryId?: SituationalCategoryId | null,
 ) => {
   // Fetch user preferences for cache key differentiation
   const { data: userPrefs } = await supabase
@@ -429,6 +430,11 @@ const getVenuesFromMultipleSources = async (
   const cacheCuisines = userPrefs?.preferred_cuisines || [];
   const cacheVibes = userPrefs?.preferred_vibes || [];
   const cachePriceRange = userPrefs?.preferred_price_range || [];
+
+  // Non-food situational mode: skip the 2nd radius retry and the Google
+  // Places fallback entirely — both are tuned for restaurant discovery and
+  // mostly add restaurants we'd just hard-filter out anyway. Saves 2-30s.
+  const isNonFoodMode = !!situationalCategoryId && situationalCategoryId !== 'food';
 
   // Check cache first if we have location — now includes preferences in key
   if (userLocation?.latitude && userLocation?.longitude) {
