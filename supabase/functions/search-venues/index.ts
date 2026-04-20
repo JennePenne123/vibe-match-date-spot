@@ -32,7 +32,8 @@ serve(async (req) => {
       longitude, 
       radius = 5000,
       types = ['restaurant'],
-      minRating = 3.0 
+      minRating = 3.0,
+      fieldMask = 'essentials+pro' // 'essentials' | 'essentials+pro' | 'full'
     } = requestBody;
 
     // Input validation and sanitization
