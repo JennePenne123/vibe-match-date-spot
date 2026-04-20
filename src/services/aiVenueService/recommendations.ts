@@ -392,6 +392,8 @@ export const getAIVenueRecommendations = async (
 
     return validateRecommendations(diverseRecommendations);
   } catch (error) {
+    // Preserve typed errors so callers (e.g. useAIAnalysis) can react to them.
+    if (error instanceof NoSituationalMatchError) throw error;
     console.error('Failed to get venue recommendations:', error);
     throw new Error(error instanceof Error ? error.message : 'Failed to get venue recommendations');
   }
