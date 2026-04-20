@@ -224,38 +224,44 @@ serve(async (req) => {
 
     let finalSource: TierResult["source"] = "google_places";
     let finalVenues = r1.venues;
+    let nominatimEnrichedCount = 0;
 
     // Fallback trigger: error OR empty result
     if (!r1.venues.length) {
-      // 3️⃣ TIER 2: FOURSQUARE (SECONDARY)
-      const fsqPayload = {
-        latitude: payload.latitude,
-        longitude: payload.longitude,
-        radius: payload.radius ?? 5000,
-        cuisines: payload.cuisines ?? [],
-        venueTypes: payload.venueTypes ?? [],
-        activities: payload.activities ?? [],
-        limit: payload.limit ?? 20,
-      };
-      const t2Start = Date.now();
-      const r2 = await callTier(
-        supabase,
-        "search-venues-foursquare",
-        fsqPayload,
-        FOURSQUARE_TIMEOUT_MS,
-      );
-      tiersTried.push({
-        source: "foursquare",
-        venues: r2.venues,
-        durationMs: Date.now() - t2Start,
-        error: r2.error,
-      });
+      // 3️⃣ TIER 2 (optional): FOURSQUARE – disabled by default
+      let foursquareSucceeded = false;
+      if (FOURSQUARE_ENABLED) {
+        const fsqPayload = {
+          latitude: payload.latitude,
+          longitude: payload.longitude,
+          radius: payload.radius ?? 5000,
+          cuisines: payload.cuisines ?? [],
+          venueTypes: payload.venueTypes ?? [],
+          activities: payload.activities ?? [],
+          limit: payload.limit ?? 20,
+        };
+        const t2Start = Date.now();
+        const r2 = await callTier(
+          supabase,
+          "search-venues-foursquare",
+          fsqPayload,
+          FOURSQUARE_TIMEOUT_MS,
+        );
+        tiersTried.push({
+          source: "foursquare",
+          venues: r2.venues,
+          durationMs: Date.now() - t2Start,
+          error: r2.error,
+        });
+        if (r2.venues.length) {
+          finalSource = "foursquare";
+          finalVenues = r2.venues;
+          foursquareSucceeded = true;
+        }
+      }
 
-      if (r2.venues.length) {
-        finalSource = "foursquare";
-        finalVenues = r2.venues;
-      } else {
-        // 4️⃣ TIER 3: OVERPASS / OSM (FINAL FALLBACK)
+      // 4️⃣ TIER 3: OVERPASS / OSM (FALLBACK) + Nominatim enrichment
+      if (!foursquareSucceeded) {
         const osmPayload = {
           latitude: payload.latitude,
           longitude: payload.longitude,
@@ -280,6 +286,16 @@ serve(async (req) => {
         });
         finalSource = "overpass";
         finalVenues = r3.venues;
+
+        // 🌍 Nominatim enrichment for venues missing addresses
+        if (finalVenues.length > 0) {
+          const enrichStart = Date.now();
+          const { enrichedCount } = await enrichWithNominatim(finalVenues);
+          nominatimEnrichedCount = enrichedCount;
+          console.log(
+            `[Nominatim] Enriched ${enrichedCount}/${finalVenues.length} OSM venues in ${Date.now() - enrichStart}ms`,
+          );
+        }
       }
     }
 
@@ -310,6 +326,7 @@ serve(async (req) => {
         source: finalSource,
         cached: false,
         duration_ms: Date.now() - startedAt,
+        nominatim_enriched: nominatimEnrichedCount,
         tiers_tried: tiersTried.map((t) => ({
           source: t.source,
           venue_count: t.venues.length,
