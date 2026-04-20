@@ -467,7 +467,10 @@ const getVenuesFromMultipleSources = async (
 
   const strategy = API_CONFIG.venueSearchStrategy;
   const MIN_VENUES_THRESHOLD = 6;
-  const RADIUS_MULTIPLIERS = [1, 1.5, 2.5]; // Progressive radius expansion
+  // Performance: cap retries at 2 (was 3). Non-food modes get a single pass
+  // since we hard-filter the results and a wider radius mostly returns more
+  // restaurants we'd discard anyway.
+  const RADIUS_MULTIPLIERS = isNonFoodMode ? [1.5] : [1, 2];
   let venues: any[] = [];
   
   for (const multiplier of RADIUS_MULTIPLIERS) {
@@ -477,7 +480,7 @@ const getVenuesFromMultipleSources = async (
       : userLocation;
     
     if (strategy === 'radar-overpass') {
-      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier);
+      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier, isNonFoodMode);
     } else if (strategy === 'overpass-only') {
       venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier);
     } else {
