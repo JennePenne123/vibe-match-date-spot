@@ -549,6 +549,8 @@ async function getVenuesRadarOverpass(
   userLocation?: { latitude: number; longitude: number; address?: string },
   radiusMultiplier: number = 1,
   skipGoogleFallback: boolean = false,
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   // Step 1: Query Radar + Overpass IN PARALLEL for maximum speed
   const promises: Promise<any[]>[] = [];
@@ -561,7 +563,7 @@ async function getVenuesRadarOverpass(
   }
   
   if (API_CONFIG.useOverpass && userLocation) {
-    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch((err) => {
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier, situationalCategoryId, secondaryCategoryId).catch((err) => {
       console.warn('⚠️ Overpass failed:', err instanceof Error ? err.message : 'Unknown');
       return [];
     }));
