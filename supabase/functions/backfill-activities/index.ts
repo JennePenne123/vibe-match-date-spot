@@ -1,0 +1,227 @@
+// Backfill Activities Edge Function — Admin-only.
+// Importiert gezielt Kultur-/Aktivitäts-/Nightlife-Venues für eine Stadt
+// aus OpenStreetMap (Overpass), damit die situativen Quick-Actions auf
+// Home (Kultur, Aktivität, Nightlife) sinnvolle Empfehlungen liefern.
+//
+// Body: { latitude, longitude, radius_km?, categories?: ('culture'|'activity'|'nightlife')[] }
+
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { corsHeaders } from '../_shared/cors.ts';
+
+const OVERPASS_MIRRORS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+];
+
+type CategoryId = 'culture' | 'activity' | 'nightlife';
+
+const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
+  culture: [
+    ['tourism', 'museum'], ['tourism', 'gallery'],
+    ['amenity', 'theatre'], ['amenity', 'cinema'], ['amenity', 'arts_centre'],
+    ['amenity', 'concert_hall'], ['amenity', 'planetarium'], ['amenity', 'library'],
+    ['historic', 'monument'], ['historic', 'castle'],
+  ],
+  activity: [
+    ['leisure', 'bowling_alley'], ['leisure', 'miniature_golf'],
+    ['leisure', 'amusement_arcade'], ['leisure', 'escape_game'],
+    ['leisure', 'climbing'], ['sport', 'climbing'],
+    ['leisure', 'swimming_pool'], ['leisure', 'water_park'],
+    ['leisure', 'spa'], ['amenity', 'spa'],
+    ['leisure', 'sports_centre'], ['leisure', 'fitness_centre'],
+    ['leisure', 'ice_rink'], ['leisure', 'trampoline_park'],
+    ['sport', 'go_kart'], ['sport', 'paintball'], ['sport', 'laser_tag'],
+  ],
+  nightlife: [
+    ['amenity', 'bar'], ['amenity', 'pub'], ['amenity', 'nightclub'],
+    ['amenity', 'biergarten'], ['amenity', 'casino'], ['amenity', 'karaoke_box'],
+  ],
+};
+
+function buildQuery(lat: number, lng: number, radiusM: number, tags: Array<[string, string]>): string {
+  const r = Math.min(radiusM, 50000);
+  const clauses = tags
+    .flatMap(([k, v]) => [
+      `node["${k}"="${v}"](around:${r},${lat},${lng});`,
+      `way["${k}"="${v}"](around:${r},${lat},${lng});`,
+    ])
+    .join('\n    ');
+  return `[out:json][timeout:30];(\n    ${clauses}\n  );out center body 500;`;
+}
+
+async function fetchOverpass(query: string): Promise<any> {
+  for (const mirror of OVERPASS_MIRRORS) {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 25000);
+      const resp = await fetch(mirror, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `data=${encodeURIComponent(query)}`,
+        signal: ctrl.signal,
+      });
+      clearTimeout(t);
+      if (resp.ok) return await resp.json();
+      await resp.text();
+      if (resp.status === 429 || resp.status >= 500) continue;
+      throw new Error(`Overpass HTTP ${resp.status}`);
+    } catch (_e) {
+      continue;
+    }
+  }
+  return null;
+}
+
+function categoryFromTags(tags: Record<string, string>): { cuisine: string; tags: string[] } {
+  const a = tags.amenity, l = tags.leisure, t = tags.tourism, s = tags.sport, h = tags.historic;
+  if (t === 'museum') return { cuisine: 'Museum', tags: ['museum', 'cultural', 'arts-entertainment', 'art', 'kunst', 'daytime'] };
+  if (t === 'gallery') return { cuisine: 'Gallery', tags: ['gallery', 'galerie', 'art gallery', 'cultural', 'arts-entertainment'] };
+  if (a === 'theatre') return { cuisine: 'Theater', tags: ['theatre', 'theater', 'cultural', 'arts-entertainment', 'evening'] };
+  if (a === 'cinema') return { cuisine: 'Cinema', tags: ['cinema', 'kino', 'entertainment', 'arts-entertainment', 'evening'] };
+  if (a === 'arts_centre') return { cuisine: 'Arts Centre', tags: ['arts-entertainment', 'cultural', 'kunst'] };
+  if (a === 'concert_hall') return { cuisine: 'Concert Hall', tags: ['concert hall', 'konzerthaus', 'cultural', 'arts-entertainment', 'evening'] };
+  if (a === 'planetarium') return { cuisine: 'Planetarium', tags: ['planetarium', 'cultural', 'arts-entertainment'] };
+  if (a === 'library') return { cuisine: 'Library', tags: ['library', 'cultural', 'quiet'] };
+  if (h === 'monument' || h === 'castle') return { cuisine: 'Historic', tags: ['historic', 'cultural', 'sightseeing'] };
+  if (l === 'bowling_alley') return { cuisine: 'Bowling', tags: ['bowling', 'bowling-alley', 'active', 'fun'] };
+  if (l === 'miniature_golf') return { cuisine: 'Mini Golf', tags: ['mini golf', 'minigolf', 'active', 'fun'] };
+  if (l === 'amusement_arcade') return { cuisine: 'Arcade', tags: ['arcade', 'fun', 'active'] };
+  if (l === 'escape_game') return { cuisine: 'Escape Room', tags: ['escape room', 'escape-room', 'fun', 'active'] };
+  if (l === 'climbing' || s === 'climbing') return { cuisine: 'Climbing', tags: ['climbing', 'klettern', 'active', 'sport'] };
+  if (l === 'swimming_pool' || l === 'water_park') return { cuisine: 'Swimming', tags: ['swimming', 'aquapark', 'active'] };
+  if (l === 'spa' || a === 'spa') return { cuisine: 'Spa & Wellness', tags: ['spa', 'wellness', 'relaxing'] };
+  if (l === 'sports_centre' || l === 'fitness_centre') return { cuisine: 'Sport', tags: ['sport', 'active', 'fitness'] };
+  if (l === 'ice_rink') return { cuisine: 'Ice Rink', tags: ['ice skating', 'active', 'fun'] };
+  if (l === 'trampoline_park') return { cuisine: 'Trampoline Park', tags: ['trampoline', 'active', 'fun'] };
+  if (s === 'go_kart') return { cuisine: 'Go-Kart', tags: ['kart', 'go-kart', 'active', 'fun'] };
+  if (s === 'paintball') return { cuisine: 'Paintball', tags: ['paintball', 'active', 'fun'] };
+  if (s === 'laser_tag') return { cuisine: 'Laser Tag', tags: ['lasertag', 'laser tag', 'active', 'fun'] };
+  if (a === 'bar') return { cuisine: 'Bar', tags: ['bar', 'evening', 'drinks', 'nightlife', 'cocktails'] };
+  if (a === 'pub') return { cuisine: 'Pub', tags: ['pub', 'evening', 'drinks', 'nightlife'] };
+  if (a === 'nightclub') return { cuisine: 'Nightclub', tags: ['nightclub', 'nightlife', 'party', 'lively', 'late night'] };
+  if (a === 'biergarten') return { cuisine: 'Biergarten', tags: ['biergarten', 'outdoor seating', 'evening'] };
+  if (a === 'casino') return { cuisine: 'Casino', tags: ['casino', 'nightlife', 'late night'] };
+  if (a === 'karaoke_box') return { cuisine: 'Karaoke', tags: ['karaoke', 'nightlife', 'lively'] };
+  return { cuisine: 'Venue', tags: [] };
+}
+
+function buildAddress(tags: Record<string, string>): string {
+  const street = [tags['addr:street'], tags['addr:housenumber']].filter(Boolean).join(' ');
+  const city = [tags['addr:postcode'], tags['addr:city']].filter(Boolean).join(' ');
+  if (street && city) return `${street}, ${city}`;
+  return street || city || '';
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    );
+
+    // Auth: only admins
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const { data: userData, error: userErr } = await supabase.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Invalid token' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const { data: roleRow } = await supabase
+      .from('user_roles').select('role')
+      .eq('user_id', userData.user.id).eq('role', 'admin').maybeSingle();
+    if (!roleRow) {
+      return new Response(JSON.stringify({ error: 'Admin role required' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const body = await req.json();
+    const lat = Number(body.latitude);
+    const lng = Number(body.longitude);
+    const radiusKm = Math.min(Math.max(Number(body.radius_km ?? 25), 1), 50);
+    const requested: CategoryId[] = Array.isArray(body.categories) && body.categories.length > 0
+      ? body.categories.filter((c: string) => c === 'culture' || c === 'activity' || c === 'nightlife')
+      : ['culture', 'activity', 'nightlife'];
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return new Response(JSON.stringify({ error: 'latitude and longitude required' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const radiusM = radiusKm * 1000;
+    const summary: Record<string, { fetched: number; saved: number }> = {};
+    let grandTotal = 0;
+
+    for (const category of requested) {
+      const query = buildQuery(lat, lng, radiusM, CATEGORY_TAGS[category]);
+      const data = await fetchOverpass(query);
+      const elements = (data?.elements ?? []) as any[];
+
+      const venues = elements
+        .filter((el) => el.tags?.name)
+        .map((el) => {
+          const tags = el.tags || {};
+          const venueLat = el.lat ?? el.center?.lat;
+          const venueLon = el.lon ?? el.center?.lon;
+          const meta = categoryFromTags(tags);
+          return {
+            id: `osm_${el.id}`,
+            name: tags.name,
+            address: buildAddress(tags),
+            latitude: venueLat,
+            longitude: venueLon,
+            cuisine_type: meta.cuisine,
+            price_range: '$$',
+            rating: null as number | null,
+            description: tags.description || tags.note || '',
+            phone: tags.phone || tags['contact:phone'] || '',
+            website: tags.website || tags['contact:website'] || tags.url || '',
+            tags: meta.tags,
+            source: 'openstreetmap',
+            is_active: true,
+            updated_at: new Date().toISOString(),
+          };
+        })
+        .filter((v) => v.latitude && v.longitude && v.address);
+
+      let saved = 0;
+      for (let i = 0; i < venues.length; i += 100) {
+        const chunk = venues.slice(i, i + 100);
+        const { error } = await supabase.from('venues').upsert(chunk, { onConflict: 'id' });
+        if (!error) saved += chunk.length;
+        else console.error(`backfill chunk error (${category}):`, error.message);
+      }
+
+      summary[category] = { fetched: venues.length, saved };
+      grandTotal += saved;
+      console.log(`✅ backfill ${category}: ${saved}/${venues.length}`);
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        location: { latitude: lat, longitude: lng, radius_km: radiusKm },
+        total_saved: grandTotal,
+        per_category: summary,
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('🔴 backfill-activities error:', msg);
+    return new Response(JSON.stringify({ error: msg }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+});

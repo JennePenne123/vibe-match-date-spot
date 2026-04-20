@@ -86,6 +86,7 @@ export const getAIVenueRecommendations = async (
         limit * 8,
         userLocation,
         situationalCategoryId ?? null,
+        secondaryCategoryId ?? null,
       );
     }
     
@@ -444,6 +445,7 @@ const getVenuesFromMultipleSources = async (
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
   situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) => {
   // Fetch user preferences for cache key differentiation
   const { data: userPrefs } = await supabase
@@ -505,11 +507,11 @@ const getVenuesFromMultipleSources = async (
       : userLocation;
     
     if (strategy === 'radar-overpass') {
-      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier, isNonFoodMode);
+      venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier, isNonFoodMode, situationalCategoryId, secondaryCategoryId);
     } else if (strategy === 'overpass-only') {
-      venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier);
+      venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier, situationalCategoryId, secondaryCategoryId);
     } else {
-      venues = await getVenuesParallel(userId, limit, expandedLocation, multiplier);
+      venues = await getVenuesParallel(userId, limit, expandedLocation, multiplier, situationalCategoryId, secondaryCategoryId);
     }
     
     if (venues.length >= MIN_VENUES_THRESHOLD) {
@@ -548,6 +550,8 @@ async function getVenuesRadarOverpass(
   userLocation?: { latitude: number; longitude: number; address?: string },
   radiusMultiplier: number = 1,
   skipGoogleFallback: boolean = false,
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   // Step 1: Query Radar + Overpass IN PARALLEL for maximum speed
   const promises: Promise<any[]>[] = [];
@@ -560,7 +564,7 @@ async function getVenuesRadarOverpass(
   }
   
   if (API_CONFIG.useOverpass && userLocation) {
-    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch((err) => {
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier, situationalCategoryId, secondaryCategoryId).catch((err) => {
       console.warn('⚠️ Overpass failed:', err instanceof Error ? err.message : 'Unknown');
       return [];
     }));
@@ -636,10 +640,12 @@ async function getVenuesOverpassOnly(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
-  radiusMultiplier: number = 1
+  radiusMultiplier: number = 1,
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   if (API_CONFIG.useOverpass && userLocation) {
-    return await getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch(() => []);
+    return await getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier, situationalCategoryId, secondaryCategoryId).catch(() => []);
   }
   return [];
 }
@@ -651,7 +657,9 @@ async function getVenuesParallel(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
-  radiusMultiplier: number = 1
+  radiusMultiplier: number = 1,
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   const promises: Promise<any[]>[] = [];
   
@@ -660,7 +668,7 @@ async function getVenuesParallel(
   }
   
   if (API_CONFIG.useOverpass && userLocation) {
-    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier).catch(() => []));
+    promises.push(getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier, situationalCategoryId, secondaryCategoryId).catch(() => []));
   }
   
   if (API_CONFIG.useGooglePlaces) {
@@ -905,7 +913,9 @@ async function getVenuesFromOverpass(
   userId: string,
   limit: number,
   userLocation?: { latitude: number; longitude: number; address?: string },
-  radiusMultiplier: number = 1
+  radiusMultiplier: number = 1,
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   const timer = apiUsageService.createTimer('overpass', '/client-overpass');
   
@@ -933,7 +943,9 @@ async function getVenuesFromOverpass(
       userLocation.longitude,
       radiusMeters,
       userPrefs.preferred_cuisines || [],
-      limit
+      limit,
+      situationalCategoryId ?? null,
+      secondaryCategoryId ?? null,
     );
     
     const venues = result.venues || [];
