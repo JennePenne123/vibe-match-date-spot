@@ -14,6 +14,10 @@ const OVERPASS_MIRRORS = [
   'https://overpass.kumi.systems/api/interpreter',
 ];
 
+const OVERPASS_USER_AGENT = 'HiOutz/1.0 (+https://hioutz.app)';
+const OVERPASS_CHUNK_SIZE = 6;
+const OVERPASS_REQUEST_DELAY_MS = 900;
+
 type CategoryId = 'culture' | 'activity' | 'nightlife';
 
 const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
@@ -62,56 +66,111 @@ const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
   ],
 };
 
-function buildQueries(lat: number, lng: number, radiusM: number, tags: Array<[string, string]>): string[] {
-  const r = Math.min(radiusM, 50000);
-  const chunkSize = 10;
-  const queries: string[] = [];
-
-  for (let i = 0; i < tags.length; i += chunkSize) {
-    const chunk = tags.slice(i, i + chunkSize);
-    const clauses = chunk
-      .flatMap(([k, v]) => [
-        `node["${k}"="${v}"](around:${r},${lat},${lng});`,
-        `way["${k}"="${v}"](around:${r},${lat},${lng});`,
-      ])
-      .join('\n    ');
-
-    queries.push(`[out:json][timeout:25];(\n    ${clauses}\n  );out center body 200;`);
-  }
-
-  return queries;
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchOverpass(query: string): Promise<any> {
+function buildQuery(lat: number, lng: number, radiusM: number, tags: Array<[string, string]>): string {
+  const r = Math.min(radiusM, 50000);
+  const clauses = tags
+    .flatMap(([k, v]) => [
+      `node["${k}"="${v}"](around:${r},${lat},${lng});`,
+      `way["${k}"="${v}"](around:${r},${lat},${lng});`,
+    ])
+    .join('\n    ');
+
+  return `[out:json][timeout:25];(\n    ${clauses}\n  );out center body 200;`;
+}
+
+function chunkTags(tags: Array<[string, string]>, chunkSize = OVERPASS_CHUNK_SIZE): Array<Array<[string, string]>> {
+  const deduped = Array.from(new Map(tags.map((tag) => [tag.join(':'), tag])).values());
+  const chunks: Array<Array<[string, string]>> = [];
+
+  for (let i = 0; i < deduped.length; i += chunkSize) {
+    chunks.push(deduped.slice(i, i + chunkSize));
+  }
+
+  return chunks;
+}
+
+async function fetchOverpass(query: string, label: string): Promise<any> {
+  const errors: string[] = [];
+
   for (const mirror of OVERPASS_MIRRORS) {
     try {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), 25000);
       const resp = await fetch(mirror, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': OVERPASS_USER_AGENT,
+        },
         body: `data=${encodeURIComponent(query)}`,
         signal: ctrl.signal,
       });
       clearTimeout(t);
-      if (resp.ok) return await resp.json();
-      await resp.text();
+      if (resp.ok) {
+        const data = await resp.json();
+        console.log(`✅ overpass ${label}: mirror ok`, mirror, `(${data?.elements?.length ?? 0} elements)`);
+        return data;
+      }
+
+      const responseText = await resp.text();
+      errors.push(`${mirror}: HTTP ${resp.status}`);
+      console.warn(`⚠️ overpass ${label}:`, mirror, `HTTP ${resp.status}`, responseText.slice(0, 120));
       if (resp.status === 429 || resp.status >= 500) continue;
       throw new Error(`Overpass HTTP ${resp.status}`);
-    } catch (_e) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      errors.push(`${mirror}: ${message}`);
+      console.warn(`⚠️ overpass ${label}:`, mirror, message);
       continue;
     }
   }
+
+  console.error(`🔴 overpass ${label}: all mirrors failed`, errors.join(' | '));
   return null;
 }
 
-async function fetchOverpassBatched(queries: string[]): Promise<any[]> {
+async function fetchOverpassAdaptive(
+  lat: number,
+  lng: number,
+  radiusM: number,
+  tags: Array<[string, string]>,
+  label: string,
+  depth = 0,
+): Promise<any[]> {
+  const query = buildQuery(lat, lng, radiusM, tags);
+  const data = await fetchOverpass(query, `${label}/d${depth}/t${tags.length}`);
+  if (data) return (data.elements ?? []) as any[];
+
+  if (tags.length <= 2) {
+    console.warn(`⚠️ overpass ${label}: giving up on tiny chunk`, tags);
+    return [];
+  }
+
+  const mid = Math.ceil(tags.length / 2);
+  await sleep(OVERPASS_REQUEST_DELAY_MS);
+  const left = await fetchOverpassAdaptive(lat, lng, radiusM, tags.slice(0, mid), `${label}-a`, depth + 1);
+  await sleep(OVERPASS_REQUEST_DELAY_MS);
+  const right = await fetchOverpassAdaptive(lat, lng, radiusM, tags.slice(mid), `${label}-b`, depth + 1);
+  return [...left, ...right];
+}
+
+async function fetchOverpassBatched(
+  lat: number,
+  lng: number,
+  radiusM: number,
+  tags: Array<[string, string]>,
+  category: CategoryId,
+): Promise<any[]> {
   const merged: any[] = [];
   const seen = new Set<string>();
+  const tagChunks = chunkTags(tags);
 
-  for (const query of queries) {
-    const data = await fetchOverpass(query);
-    const elements = (data?.elements ?? []) as any[];
+  for (const [index, chunk] of tagChunks.entries()) {
+    const elements = await fetchOverpassAdaptive(lat, lng, radiusM, chunk, `${category}:${index + 1}`);
 
     for (const el of elements) {
       const key = `${el.type ?? 'unknown'}:${el.id}`;
@@ -119,6 +178,8 @@ async function fetchOverpassBatched(queries: string[]): Promise<any[]> {
       seen.add(key);
       merged.push(el);
     }
+
+    await sleep(OVERPASS_REQUEST_DELAY_MS);
   }
 
   return merged;
