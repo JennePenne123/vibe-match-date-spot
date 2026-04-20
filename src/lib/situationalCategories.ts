@@ -39,7 +39,11 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     gradient: 'from-orange-500/20 via-red-500/10 to-transparent',
     boostVenueTypes: [],
     boostActivities: [],
-    boostKeywords: ['restaurant', 'cafe', 'café', 'bistro', 'brunch', 'bakery', 'food'],
+    boostKeywords: [
+      'restaurant', 'cafe', 'café', 'bistro', 'brunch', 'bakery', 'food-beverage',
+      'dining', 'pizza', 'burger', 'kebab', 'steak house', 'steakhouse',
+      'ice cream', 'coffee shop', 'fast-food-restaurant',
+    ],
   },
   {
     id: 'culture',
@@ -49,7 +53,12 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     gradient: 'from-purple-500/20 via-indigo-500/10 to-transparent',
     boostVenueTypes: ['museum', 'gallery', 'theater_venue', 'cinema', 'concert_hall'],
     boostActivities: ['cultural_act'],
-    boostKeywords: ['museum', 'gallery', 'galerie', 'theater', 'theatre', 'cinema', 'kino', 'art', 'kunst', 'exhibition', 'ausstellung'],
+    boostKeywords: [
+      'museum', 'gallery', 'galerie', 'theater', 'theatre', 'cinema', 'kino',
+      'kunst', 'exhibition', 'ausstellung', 'arts-entertainment', 'art gallery',
+      'opera', 'oper', 'concert hall', 'konzerthaus', 'konzerthalle',
+      'philharmonie', 'literaturhaus', 'kulturzentrum', 'historic',
+    ],
   },
   {
     id: 'activity',
@@ -59,7 +68,13 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     gradient: 'from-emerald-500/20 via-teal-500/10 to-transparent',
     boostVenueTypes: ['bowling', 'mini_golf', 'arcade', 'climbing', 'swimming', 'spa_wellness', 'escape_room'],
     boostActivities: ['active'],
-    boostKeywords: ['bowling', 'climbing', 'klettern', 'park', 'sport', 'spa', 'wellness', 'arcade', 'escape', 'mini golf', 'minigolf'],
+    boostKeywords: [
+      'bowling', 'bowling-alley', 'climbing', 'klettern', 'kletterhalle',
+      'sport', 'spa', 'wellness', 'arcade', 'escape room', 'escape-room',
+      'mini golf', 'minigolf', 'lasertag', 'laser tag', 'paintball',
+      'kart', 'go-kart', 'trampolin', 'trampoline', 'aquapark', 'schwimmbad',
+      'billard', 'billiards', 'pool hall', 'darts',
+    ],
   },
   {
     id: 'nightlife',
@@ -69,7 +84,13 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     gradient: 'from-pink-500/20 via-fuchsia-500/10 to-transparent',
     boostVenueTypes: ['comedy_club', 'karaoke'],
     boostActivities: ['nightlife_act', 'cocktails'],
-    boostKeywords: ['club', 'nightclub', 'bar', 'cocktail', 'pub', 'live music', 'live-musik', 'karaoke', 'nightlife'],
+    boostKeywords: [
+      'nightclub', 'night club', 'bar', 'cocktail', 'cocktails', 'pub',
+      'live music', 'live-musik', 'karaoke', 'nightlife', 'late night',
+      'date night', 'lounge', 'rooftop', 'speakeasy', 'wine bar', 'weinbar',
+      'whisky bar', 'whiskybar', 'cocktailbar', 'sportsbar', 'sports bar',
+      'discothek', 'disco', 'dance club', 'lively',
+    ],
   },
 ];
 
