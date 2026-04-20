@@ -233,12 +233,15 @@ serve(async (req) => {
           const venueLon = el.lon ?? el.center?.lon;
           const meta = categoryFromTags(tags);
           const address = buildAddress(tags);
-          // Fallback: derive coarse address from city/suburb if no street info
-          const fallbackAddress = address
+          // Fallback chain so we never violate the NOT NULL address column
+          const fallbackAddress =
+            address
             || [tags['addr:suburb'], tags['addr:city']].filter(Boolean).join(', ')
             || tags['addr:city']
+            || tags['addr:suburb']
             || tags['is_in:city']
-            || '';
+            || tags['is_in']
+            || tags.name; // last-resort: use the venue name itself
           return {
             id: `osm_${el.id}`,
             name: tags.name,
@@ -257,13 +260,8 @@ serve(async (req) => {
             updated_at: new Date().toISOString(),
           };
         })
-        // Require coordinates; address is optional (will use empty string if missing)
-        .filter((v) => v.latitude && v.longitude);
-
-      // Ensure address column (NOT NULL) always has a value
-      for (const v of venues) {
-        if (!v.address) v.address = 'Hamburg'.length ? '' : '';
-      }
+        // Require coordinates + a non-empty address (NOT NULL constraint)
+        .filter((v) => v.latitude && v.longitude && v.address);
 
       let saved = 0;
       for (let i = 0; i < venues.length; i += 100) {
