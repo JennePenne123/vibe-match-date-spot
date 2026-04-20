@@ -17,6 +17,7 @@ import {
 import { ShieldAlert, Activity, AlertTriangle, Zap, DollarSign, CheckCheck, Loader2 } from 'lucide-react';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { CronJobsWidget } from '@/components/admin/CronJobsWidget';
 
 type TimeRange = '24h' | '7d' | '30d';
 
@@ -207,6 +208,7 @@ const SystemHealth: React.FC = () => {
           <TabsTrigger value="ratelimits">Rate-Limits</TabsTrigger>
           <TabsTrigger value="costs">API-Kosten</TabsTrigger>
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
+          <TabsTrigger value="cron">Cron-Jobs</TabsTrigger>
         </TabsList>
 
         {/* Errors */}
@@ -381,6 +383,10 @@ const SystemHealth: React.FC = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="cron" className="mt-4">
+          <CronJobsWidget />
         </TabsContent>
       </Tabs>
     </div>

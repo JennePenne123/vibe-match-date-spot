@@ -2186,6 +2186,21 @@ export type Database = {
           visit_count: number
         }[]
       }
+      get_cron_jobs_status: {
+        Args: never
+        Returns: {
+          active: boolean
+          failed_runs_24h: number
+          jobid: number
+          jobname: string
+          last_run_end: string
+          last_run_message: string
+          last_run_start: string
+          last_run_status: string
+          schedule: string
+          total_runs_24h: number
+        }[]
+      }
       get_friend_preferences: { Args: { _friend_id: string }; Returns: Json }
       has_role: {
         Args: {
