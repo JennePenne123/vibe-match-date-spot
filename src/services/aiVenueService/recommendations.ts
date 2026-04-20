@@ -86,6 +86,7 @@ export const getAIVenueRecommendations = async (
         limit * 8,
         userLocation,
         situationalCategoryId ?? null,
+        secondaryCategoryId ?? null,
       );
     }
     
