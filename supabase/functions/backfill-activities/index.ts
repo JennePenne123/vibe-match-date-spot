@@ -232,10 +232,17 @@ serve(async (req) => {
           const venueLat = el.lat ?? el.center?.lat;
           const venueLon = el.lon ?? el.center?.lon;
           const meta = categoryFromTags(tags);
+          const address = buildAddress(tags);
+          // Fallback: derive coarse address from city/suburb if no street info
+          const fallbackAddress = address
+            || [tags['addr:suburb'], tags['addr:city']].filter(Boolean).join(', ')
+            || tags['addr:city']
+            || tags['is_in:city']
+            || '';
           return {
             id: `osm_${el.id}`,
             name: tags.name,
-            address: buildAddress(tags),
+            address: fallbackAddress,
             latitude: venueLat,
             longitude: venueLon,
             cuisine_type: meta.cuisine,
@@ -250,7 +257,13 @@ serve(async (req) => {
             updated_at: new Date().toISOString(),
           };
         })
-        .filter((v) => v.latitude && v.longitude && v.address);
+        // Require coordinates; address is optional (will use empty string if missing)
+        .filter((v) => v.latitude && v.longitude);
+
+      // Ensure address column (NOT NULL) always has a value
+      for (const v of venues) {
+        if (!v.address) v.address = 'Hamburg'.length ? '' : '';
+      }
 
       let saved = 0;
       for (let i = 0; i < venues.length; i += 100) {
