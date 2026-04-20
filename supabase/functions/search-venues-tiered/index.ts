@@ -14,16 +14,19 @@ import {
  * Strategy (per user decision):
  *  1. Cache lookup (search results: 3 days TTL)
  *  2. Google Places (PRIMARY)        – best data quality, cost ~$17/1k (Standard field mask)
- *  3. Foursquare    (SECONDARY)      – fallback when Google fails OR returns 0 venues
- *  4. Overpass/OSM  (FINAL FALLBACK) – free, last resort
+ *  3. Overpass/OSM  (FALLBACK)       – free, triggered on Google error OR empty result
+ *     + Nominatim enrichment for venues with missing addresses (1 req/sec rate-limit aware)
  *
  * Fallback trigger: error/timeout OR empty result set
+ * Foursquare: DISABLED (code retained, toggle via FOURSQUARE_ENABLED constant)
  */
 
 const SEARCH_TTL_MS = 3 * 24 * 60 * 60 * 1000; // 3 days for search results
 const GOOGLE_TIMEOUT_MS = 8000;
 const FOURSQUARE_TIMEOUT_MS = 8000;
 const OVERPASS_TIMEOUT_MS = 12000;
+const NOMINATIM_TIMEOUT_MS = 3000;
+const FOURSQUARE_ENABLED = false; // Disabled per user decision (2026-04-20)
 
 interface SearchPayload {
   latitude: number;
