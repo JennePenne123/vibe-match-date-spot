@@ -354,11 +354,20 @@ export async function searchVenuesOverpass(
   lng: number,
   radiusMeters: number = 5000,
   cuisines: string[] = [],
-  limit: number = 40
+  limit: number = 40,
+  categoryId: SituationalCategoryId | null = null,
+  secondaryCategoryId: SituationalCategoryId | null = null,
 ): Promise<OverpassSearchResult> {
-  console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters });
+  console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters, categoryId, secondaryCategoryId });
 
-  const query = buildOverpassQuery(lat, lng, radiusMeters, Math.min(limit * 2, 80));
+  const query = buildOverpassQuery(
+    lat,
+    lng,
+    radiusMeters,
+    Math.min(limit * 2, 80),
+    categoryId,
+    secondaryCategoryId,
+  );
   const data = await fetchWithMirrorRotation(query);
 
   if (!data) {
@@ -377,15 +386,29 @@ export async function searchVenuesOverpass(
     return true;
   });
 
-  // Cuisine filter
+  // Cuisine filter — but ONLY for food-style venues. Activity / culture /
+  // nightlife venues don't have a cuisine tag (a museum has no "italian"
+  // cuisine), so applying this filter would discard all of them.
   const osmCuisineValues = cuisines.flatMap(c => CUISINE_TO_OSM[c] || []);
+  const isFoodVenue = (el: any): boolean => {
+    const a = el.tags?.amenity;
+    return a === 'restaurant' || a === 'cafe' || a === 'fast_food' || a === 'food_court';
+  };
   let matched = filtered;
   if (osmCuisineValues.length > 0) {
-    const cuisineMatched = filtered.filter((el: any) => {
+    // Apply cuisine match only to food-amenity venues; keep all non-food venues
+    // (museums, theatres, bars, bowling alleys, …) regardless of cuisine.
+    const filteredFood = filtered.filter((el: any) => {
+      if (!isFoodVenue(el)) return true;
       const venueCuisine = (el.tags.cuisine || '').toLowerCase();
       return osmCuisineValues.some(c => venueCuisine.includes(c));
     });
-    if (cuisineMatched.length >= 3) matched = cuisineMatched;
+    // Only commit to the cuisine narrowing if it left enough food venues —
+    // otherwise fall back to the unfiltered set so we don't strand the user.
+    const foodAfter = filteredFood.filter(isFoodVenue).length;
+    if (foodAfter >= 3 || filteredFood.length === filtered.length) {
+      matched = filteredFood;
+    }
   }
 
   const venues = matched.slice(0, limit).map((el: any) => {
