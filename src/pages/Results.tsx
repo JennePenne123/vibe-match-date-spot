@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Sparkles, Users, Star, X } from 'lucide-react';
+import { ArrowLeft, Sparkles, Users, Star, X, AlertTriangle } from 'lucide-react';
 import AIVenueCard from '@/components/AIVenueCard';
 import RealtimeContextBanner from '@/components/RealtimeContextBanner';
 import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
@@ -39,11 +39,19 @@ const Results = () => {
 
   // Read active situational category from session storage
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [sparseInfo, setSparseInfo] = useState<{ categoryId: string; matchedCount: number } | null>(null);
   
   useEffect(() => {
     const stored = sessionStorage.getItem('hioutz-situational-category');
     if (stored) {
       setActiveCategory(stored);
+    }
+    const sparseRaw = sessionStorage.getItem('hioutz-situational-sparse');
+    if (sparseRaw) {
+      try {
+        const parsed = JSON.parse(sparseRaw);
+        if (parsed?.categoryId) setSparseInfo(parsed);
+      } catch {}
     }
   }, []);
 
