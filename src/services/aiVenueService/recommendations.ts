@@ -1016,7 +1016,8 @@ async function getVenuesFromGooglePlaces(
   limit: number, 
   userLocation?: { latitude: number; longitude: number; address?: string }
 ) {
-  const timer = apiUsageService.createTimer('google_places', '/search-venues');
+  // Tiered orchestrator: Google Places → Foursquare → Overpass with 3-day search cache
+  const timer = apiUsageService.createTimer('google_places', '/search-venues-tiered');
   
   try {
     if (!userId || !userLocation?.latitude || !userLocation?.longitude) {
@@ -1047,37 +1048,40 @@ async function getVenuesFromGooglePlaces(
     }
 
     const { latitude, longitude } = userLocation;
-    const location = userLocation.address || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-
     const requestPayload = {
-      location,
-      cuisines: fixedPrefs.preferred_cuisines,
-      vibes: fixedPrefs.preferred_vibes,
       latitude,
       longitude,
-      radius: fixedPrefs.max_distance * 1609
+      cuisines: fixedPrefs.preferred_cuisines,
+      venueTypes: (userPrefs as any).preferred_venue_types || [],
+      activities: (userPrefs as any).preferred_activities || [],
+      radius: fixedPrefs.max_distance * 1609,
+      limit
     };
 
     let searchResult = null;
     
     try {
       const result = await Promise.race([
-        supabase.functions.invoke('search-venues', { body: requestPayload }),
+        supabase.functions.invoke('search-venues-tiered', { body: requestPayload }),
         new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 20000))
       ]) as any;
       
       if (result?.error) throw new Error(result.error.message);
       searchResult = result?.data;
       
-      // Log successful API call
+      // Log successful API call (track cache hit + actual source)
       const venues = searchResult?.venues || [];
+      const cacheHit = !!searchResult?.cached;
+      const actualSource = searchResult?.source || 'google_places';
       await timer.end({ 
         status: 200, 
-        cacheHit: false, 
+        cacheHit, 
         userId,
         metadata: { 
           venueCount: venues.length,
-          location: `${latitude.toFixed(4)},${longitude.toFixed(4)}`
+          location: `${latitude.toFixed(4)},${longitude.toFixed(4)}`,
+          tiered_source: actualSource,
+          tiers_tried: searchResult?.tiers_tried
         }
       });
     } catch (edgeFnError) {
