@@ -70,17 +70,45 @@ export interface QuickStartTemplate {
 // ── Data ──────────────────────────────────────────────────────
 
 export const cuisines: Preference[] = [
+  // Europäisch
   { id: 'Italian', name: 'datePlanning.cuisineItalian', emoji: '🍝' },
-  { id: 'Japanese', name: 'datePlanning.cuisineJapanese', emoji: '🍣' },
-  { id: 'Mexican', name: 'datePlanning.cuisineMexican', emoji: '🌮' },
   { id: 'French', name: 'datePlanning.cuisineFrench', emoji: '🥐' },
-  { id: 'Indian', name: 'datePlanning.cuisineIndian', emoji: '🍛' },
+  { id: 'Spanish', name: 'datePlanning.cuisineSpanish', emoji: '🥘' },
+  { id: 'Portuguese', name: 'datePlanning.cuisinePortuguese', emoji: '🐟' },
+  { id: 'Greek', name: 'datePlanning.cuisineGreek', emoji: '🥙' },
   { id: 'Mediterranean', name: 'datePlanning.cuisineMediterranean', emoji: '🫒' },
+  { id: 'German', name: 'datePlanning.cuisineGerman', emoji: '🥨' },
+  { id: 'Austrian', name: 'datePlanning.cuisineAustrian', emoji: '🥟' },
+  { id: 'Swiss', name: 'datePlanning.cuisineSwiss', emoji: '🧀' },
+  { id: 'British', name: 'datePlanning.cuisineBritish', emoji: '🥧' },
+  { id: 'Nordic', name: 'datePlanning.cuisineNordic', emoji: '🐟' },
+  { id: 'Polish', name: 'datePlanning.cuisinePolish', emoji: '🥟' },
+  { id: 'Hungarian', name: 'datePlanning.cuisineHungarian', emoji: '🌶️' },
+  { id: 'Russian', name: 'datePlanning.cuisineRussian', emoji: '🥟' },
+  { id: 'Balkan', name: 'datePlanning.cuisineBalkan', emoji: '🍖' },
+  // Amerikanisch
   { id: 'American', name: 'datePlanning.cuisineAmerican', emoji: '🍔' },
+  { id: 'Mexican', name: 'datePlanning.cuisineMexican', emoji: '🌮' },
+  { id: 'Brazilian', name: 'datePlanning.cuisineBrazilian', emoji: '🥩' },
+  { id: 'Argentinian', name: 'datePlanning.cuisineArgentinian', emoji: '🥩' },
+  { id: 'Peruvian', name: 'datePlanning.cuisinePeruvian', emoji: '🐟' },
+  { id: 'Caribbean', name: 'datePlanning.cuisineCaribbean', emoji: '🌴' },
+  // Asiatisch
+  { id: 'Japanese', name: 'datePlanning.cuisineJapanese', emoji: '🍣' },
   { id: 'Thai', name: 'datePlanning.cuisineThai', emoji: '🍜' },
   { id: 'Chinese', name: 'datePlanning.cuisineChinese', emoji: '🥢' },
   { id: 'Korean', name: 'datePlanning.cuisineKorean', emoji: '🍲' },
+  { id: 'Vietnamese', name: 'datePlanning.cuisineVietnamese', emoji: '🍲' },
+  { id: 'Indian', name: 'datePlanning.cuisineIndian', emoji: '🍛' },
+  { id: 'Indonesian', name: 'datePlanning.cuisineIndonesian', emoji: '🍤' },
+  // Naher Osten & Afrika
   { id: 'Oriental', name: 'datePlanning.cuisineOriental', emoji: '🧆' },
+  { id: 'Turkish', name: 'datePlanning.cuisineTurkish', emoji: '🥙' },
+  { id: 'Lebanese', name: 'datePlanning.cuisineLebanese', emoji: '🧆' },
+  { id: 'Moroccan', name: 'datePlanning.cuisineMoroccan', emoji: '🍲' },
+  { id: 'Ethiopian', name: 'datePlanning.cuisineEthiopian', emoji: '🍛' },
+  // Sonstiges
+  { id: 'Fusion', name: 'datePlanning.cuisineFusion', emoji: '🌍' },
 ];
 
 export const durationModels: DurationModel[] = [
