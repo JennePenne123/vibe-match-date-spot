@@ -110,7 +110,7 @@ const TutorialSlides: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
       </div>
 
       {/* Slide content */}
-      <div className="flex-1 flex items-center justify-center px-8">
+      <div className="flex-1 flex items-center justify-center px-6">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={currentSlide}
@@ -126,23 +126,21 @@ const TutorialSlides: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
             onDragEnd={handleDragEnd}
             className="flex flex-col items-center text-center max-w-sm mx-auto select-none"
           >
-            {/* Icon orb */}
-            <div className={`w-28 h-28 rounded-full bg-gradient-to-br ${slide.gradient} flex items-center justify-center mb-8 shadow-2xl shadow-primary/20`}>
-              <div className="text-primary-foreground">
+            {/* Icon orb with overlaid emoji */}
+            <div className={`relative w-20 h-20 rounded-full bg-gradient-to-br ${slide.gradient} flex items-center justify-center mb-5 shadow-xl shadow-primary/20`}>
+              <div className="text-primary-foreground [&>svg]:w-8 [&>svg]:h-8">
                 {slide.icon}
               </div>
+              <span className="absolute -bottom-1 -right-1 text-2xl drop-shadow">{slide.emoji}</span>
             </div>
 
-            {/* Emoji */}
-            <span className="text-4xl mb-4">{slide.emoji}</span>
-
             {/* Title */}
-            <h1 className="text-2xl font-bold text-foreground mb-2 leading-tight">
+            <h1 className="text-xl font-bold text-foreground mb-1.5 leading-tight">
               {slide.title}
             </h1>
 
             {/* Subtitle */}
-            <p className="text-sm font-medium text-primary mb-4">
+            <p className="text-xs font-medium text-primary mb-3 uppercase tracking-wide">
               {slide.subtitle}
             </p>
 
@@ -155,7 +153,7 @@ const TutorialSlides: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
       </div>
 
       {/* Bottom controls */}
-      <div className="px-8 pb-10 space-y-5">
+      <div className="px-6 pb-6 space-y-4">
         {/* Dots */}
         <div className="flex justify-center gap-2">
           {slides.map((_, i) => (
