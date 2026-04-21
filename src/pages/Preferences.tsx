@@ -30,6 +30,7 @@ import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
+import { trackFunnelStep } from '@/services/funnelAnalyticsService';
 
 // Icon + color mapping (slimmed down)
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
@@ -207,6 +208,17 @@ const Preferences = () => {
   const { t } = useTranslation();
   const { updateCuisines, updateVibes, updateUserLocation } = useApp();
   const { user } = useAuth();
+
+  // Funnel: track entry into the preferences wizard
+  useEffect(() => {
+    void trackFunnelStep({
+      stepKey: 'preferences_page',
+      stepIndex: 5,
+      action: 'entered',
+      metadata: { isOnboarding },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Situational category — ephemeral filter from Home quick-actions
   const [situationalCategory, setSituationalCategory] = useState<SituationalCategory | null>(null);
@@ -464,8 +476,25 @@ const Preferences = () => {
           updateUserLocation({ latitude: homeLatitude, longitude: homeLongitude, address: homeAddress || undefined });
         }
         toast({ title: t('preferences.prefsSaved'), description: t('preferences.prefsSavedDesc') });
+        void trackFunnelStep({
+          stepKey: 'preferences_page',
+          stepIndex: 5,
+          action: 'completed',
+          metadata: {
+            isOnboarding,
+            cuisines: selectedCuisines.length,
+            vibes: selectedVibes.length,
+            hasLocation: !!(homeLatitude && homeLongitude),
+          },
+        });
       } catch (error) {
         console.error('Error saving preferences:', error);
+        void trackFunnelStep({
+          stepKey: 'preferences_page',
+          stepIndex: 5,
+          action: 'error',
+          metadata: { message: error instanceof Error ? error.message : 'unknown' },
+        });
         toast({ variant: 'destructive', title: t('preferences.prefsError'), description: t('preferences.prefsErrorDesc') });
       } finally { setIsSaving(false); }
     }

@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useFriends } from '@/hooks/useFriends';
 import { getInitials } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { trackFunnelStep } from '@/services/funnelAnalyticsService';
 
 const Friends = () => {
   const { t } = useTranslation();
@@ -30,6 +31,17 @@ const Friends = () => {
       navigate('/?auth=required', { replace: true });
     }
   }, [authLoading, isDemoMode, user, navigate]);
+
+  // Funnel: entry into the friends step
+  useEffect(() => {
+    if (authLoading) return;
+    void trackFunnelStep({
+      stepKey: 'friends_page',
+      stepIndex: 6,
+      action: 'entered',
+      metadata: { demo: isDemoMode },
+    });
+  }, [authLoading, isDemoMode]);
 
   if (!authLoading && !isDemoMode && !user) {
     return null;
@@ -73,7 +85,19 @@ const Friends = () => {
     try {
       const finalInvitedIds = isDemoMode ? invitedIds : friends.filter(f => f.isInvited).map(f => f.id);
       updateInvitedFriends(finalInvitedIds);
+      void trackFunnelStep({
+        stepKey: 'friends_page',
+        stepIndex: 6,
+        action: 'completed',
+        metadata: { invitedCount: finalInvitedIds.length, demo: isDemoMode },
+      });
       await generateRecommendations();
+      void trackFunnelStep({
+        stepKey: 'results_reached',
+        stepIndex: 7,
+        action: 'completed',
+        metadata: { via: 'next', demo: isDemoMode },
+      });
       navigate(isDemoMode ? '/results?demo=true' : '/results');
     } finally {
       setIsGenerating(false);
@@ -84,7 +108,19 @@ const Friends = () => {
     setIsGenerating(true);
     try {
       updateInvitedFriends([]);
+      void trackFunnelStep({
+        stepKey: 'friends_page',
+        stepIndex: 6,
+        action: 'skipped',
+        metadata: { demo: isDemoMode },
+      });
       await generateRecommendations();
+      void trackFunnelStep({
+        stepKey: 'results_reached',
+        stepIndex: 7,
+        action: 'completed',
+        metadata: { via: 'skip', demo: isDemoMode },
+      });
       navigate(isDemoMode ? '/results?demo=true' : '/results');
     } finally {
       setIsGenerating(false);

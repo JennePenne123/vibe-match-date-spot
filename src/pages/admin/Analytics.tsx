@@ -15,6 +15,7 @@ import {
 import { Users, TrendingUp, Calendar, Activity, RefreshCw } from 'lucide-react';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
+import OnboardingFunnelWidget from '@/components/admin/OnboardingFunnelWidget';
 
 const COLORS = [
   'hsl(var(--primary))',
@@ -198,6 +199,7 @@ const AdminAnalytics: React.FC = () => {
           <TabsTrigger value="growth">Nutzerwachstum</TabsTrigger>
           <TabsTrigger value="dates">Date-Aktivität</TabsTrigger>
           <TabsTrigger value="api">API-Nutzung</TabsTrigger>
+          <TabsTrigger value="funnel">Onboarding</TabsTrigger>
         </TabsList>
 
         {/* User growth */}
@@ -319,6 +321,11 @@ const AdminAnalytics: React.FC = () => {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        {/* Onboarding funnel */}
+        <TabsContent value="funnel" className="mt-4">
+          <OnboardingFunnelWidget />
         </TabsContent>
       </Tabs>
     </div>
