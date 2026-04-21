@@ -18,6 +18,7 @@ import { ShieldAlert, Activity, AlertTriangle, Zap, DollarSign, CheckCheck, Load
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { CronJobsWidget } from '@/components/admin/CronJobsWidget';
+import { PushTestWidget } from '@/components/admin/PushTestWidget';
 
 type TimeRange = '24h' | '7d' | '30d';
 
@@ -209,6 +210,7 @@ const SystemHealth: React.FC = () => {
           <TabsTrigger value="costs">API-Kosten</TabsTrigger>
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
           <TabsTrigger value="cron">Cron-Jobs</TabsTrigger>
+          <TabsTrigger value="push">Push-Test</TabsTrigger>
         </TabsList>
 
         {/* Errors */}
@@ -387,6 +389,10 @@ const SystemHealth: React.FC = () => {
 
         <TabsContent value="cron" className="mt-4">
           <CronJobsWidget />
+        </TabsContent>
+
+        <TabsContent value="push" className="mt-4">
+          <PushTestWidget />
         </TabsContent>
       </Tabs>
     </div>
