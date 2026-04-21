@@ -769,7 +769,8 @@ async function getVenuesGooglePrimaryHybrid(
     console.log(
       `🧭 Smart Hybrid → Discovery mode (prefs=${concretePrefCount}); using Radar+Overpass (free)`,
     );
-    return await getVenuesRadarOverpass(
+    const discoveryStart = Date.now();
+    const discoveryVenues = await getVenuesRadarOverpass(
       userId,
       limit,
       userLocation,
@@ -778,6 +779,29 @@ async function getVenuesGooglePrimaryHybrid(
       situationalCategoryId,
       secondaryCategoryId,
     );
+    try {
+      await apiUsageService.logApiCall({
+        api_name: 'smart_hybrid',
+        endpoint: '/discovery-mode',
+        user_id: userId,
+        response_status: discoveryVenues.length > 0 ? 200 : 204,
+        response_time_ms: Date.now() - discoveryStart,
+        estimated_cost: 0,
+        cache_hit: false,
+        request_metadata: {
+          trigger: 'discovery',
+          situationalCategoryId: situationalCategoryId ?? null,
+          concretePrefCount,
+          google_timed_out: false,
+          google_count: 0,
+          merged_count: discoveryVenues.length,
+          used_fallback: false,
+        },
+      });
+    } catch {
+      // ignore telemetry errors
+    }
+    return discoveryVenues;
   }
 
   const reason = isNonFoodMode
@@ -789,6 +813,10 @@ async function getVenuesGooglePrimaryHybrid(
 
   const timeoutMs = (API_CONFIG as any).googlePrimaryTimeoutMs ?? 7000;
 
+  // Track timeout for Smart Hybrid telemetry
+  let googleTimedOut = false;
+  const googleStartedAt = Date.now();
+
   // Fire all three in parallel — Google with hard timeout
   const promises: Promise<any[]>[] = [
     Promise.race<any[]>([
@@ -799,6 +827,7 @@ async function getVenuesGooglePrimaryHybrid(
       new Promise<any[]>((resolve) =>
         setTimeout(() => {
           console.warn(`⏱️ Google primary exceeded ${timeoutMs}ms — falling back to Radar/Overpass`);
+          googleTimedOut = true;
           resolve([]);
         }, timeoutMs),
       ),
@@ -838,6 +867,32 @@ async function getVenuesGooglePrimaryHybrid(
   // already populated the merge — no extra fallback needed.
   if (googleVenues.length === 0 && venues.length === 0) {
     console.warn('⚠️ Smart Hybrid: all sources empty');
+  }
+
+  // Telemetry: log Smart Hybrid run for the admin dashboard.
+  try {
+    await apiUsageService.logApiCall({
+      api_name: 'smart_hybrid',
+      endpoint: '/google-primary-hybrid',
+      user_id: userId,
+      response_status: venues.length > 0 ? 200 : 204,
+      response_time_ms: Date.now() - googleStartedAt,
+      estimated_cost: 0,
+      cache_hit: false,
+      request_metadata: {
+        trigger: isNonFoodMode ? 'non_food' : 'concrete_prefs',
+        situationalCategoryId: situationalCategoryId ?? null,
+        concretePrefCount,
+        google_timed_out: googleTimedOut,
+        google_count: googleVenues.length,
+        radar_count: radarVenues.length,
+        overpass_count: osmVenues.length,
+        merged_count: venues.length,
+        used_fallback: googleVenues.length === 0 && (radarVenues.length + osmVenues.length) > 0,
+      },
+    });
+  } catch {
+    // Telemetry failures must never break the user-facing flow.
   }
 
   return venues;

@@ -17,6 +17,7 @@ import {
 } from 'recharts';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { SmartHybridInsights } from '@/components/admin/SmartHybridInsights';
 
 // API metadata: free tier limits, color, icon, friendly name, pricing
 const API_META: Record<string, {
@@ -199,6 +200,9 @@ const CostMonitoring: React.FC = () => {
           sub={`Ø ${Math.round(stats.avgResponse)}ms`} loading={isLoading}
         />
       </div>
+
+      {/* Smart Hybrid Insights — M1 monitoring */}
+      <SmartHybridInsights />
 
       {/* Free Tier Status */}
       <Card className="bg-card/80 backdrop-blur border-border/40">
