@@ -769,7 +769,8 @@ async function getVenuesGooglePrimaryHybrid(
     console.log(
       `🧭 Smart Hybrid → Discovery mode (prefs=${concretePrefCount}); using Radar+Overpass (free)`,
     );
-    return await getVenuesRadarOverpass(
+    const discoveryStart = Date.now();
+    const discoveryVenues = await getVenuesRadarOverpass(
       userId,
       limit,
       userLocation,
@@ -778,6 +779,29 @@ async function getVenuesGooglePrimaryHybrid(
       situationalCategoryId,
       secondaryCategoryId,
     );
+    try {
+      await apiUsageService.logApiCall({
+        api_name: 'smart_hybrid',
+        endpoint: '/discovery-mode',
+        user_id: userId,
+        response_status: discoveryVenues.length > 0 ? 200 : 204,
+        response_time_ms: Date.now() - discoveryStart,
+        estimated_cost: 0,
+        cache_hit: false,
+        request_metadata: {
+          trigger: 'discovery',
+          situationalCategoryId: situationalCategoryId ?? null,
+          concretePrefCount,
+          google_timed_out: false,
+          google_count: 0,
+          merged_count: discoveryVenues.length,
+          used_fallback: false,
+        },
+      });
+    } catch {
+      // ignore telemetry errors
+    }
+    return discoveryVenues;
   }
 
   const reason = isNonFoodMode
