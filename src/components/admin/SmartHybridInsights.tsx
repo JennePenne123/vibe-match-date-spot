@@ -5,13 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { STALE_TIMES } from '@/config/queryConfig';
-import { Sparkles, AlertTriangle, Zap, TrendingDown } from 'lucide-react';
+import { Sparkles, AlertTriangle, Zap, TrendingDown, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface HybridLog {
   response_time_ms: number | null;
   request_metadata: Record<string, any> | null;
   created_at: string | null;
 }
+
+const SENTRY_TIMEOUT_ISSUES_URL =
+  'https://vybepulse.sentry.io/issues/?query=' +
+  encodeURIComponent('is:unresolved "Google primary exceeded" OR "google_timed_out" OR "smart_hybrid"') +
+  '&statsPeriod=7d&sort=last_seen';
 
 const STAT_CARD =
   'bg-card/60 backdrop-blur border-border/40 p-3 rounded-lg flex flex-col gap-1';
