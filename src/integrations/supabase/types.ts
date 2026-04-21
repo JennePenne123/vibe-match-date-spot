@@ -983,6 +983,42 @@ export type Database = {
           },
         ]
       }
+      onboarding_funnel_events: {
+        Row: {
+          action: string
+          created_at: string
+          funnel_name: string
+          id: string
+          metadata: Json
+          session_id: string
+          step_index: number
+          step_key: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          funnel_name?: string
+          id?: string
+          metadata?: Json
+          session_id: string
+          step_index: number
+          step_key: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          funnel_name?: string
+          id?: string
+          metadata?: Json
+          session_id?: string
+          step_index?: number
+          step_key?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       partner_exclusive_vouchers: {
         Row: {
           code: string
