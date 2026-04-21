@@ -30,15 +30,26 @@ const generateCacheKey = (
   lng: number,
   cuisines?: string[],
   priceRange?: string[],
-  vibes?: string[]
+  vibes?: string[],
+  activities?: string[],
+  venueTypes?: string[]
 ): string => {
   const roundedLat = roundCoordinate(lat);
   const roundedLng = roundCoordinate(lng);
-  const cuisineStr = cuisines?.sort().join(',') || '';
-  const priceStr = priceRange?.sort().join(',') || '';
-  const vibeStr = vibes?.sort().join(',') || '';
-  
-  return `${CACHE_KEY_PREFIX}${roundedLat}_${roundedLng}_${cuisineStr}_${priceStr}_${vibeStr}`;
+  // Normalise to lowercase + sort so 'Italian' and 'italian' share a cache slot
+  // and the order in which the user picked items doesn't matter.
+  const norm = (arr?: string[]) =>
+    (arr || []).map((s) => (s || '').trim().toLowerCase()).filter(Boolean).sort().join(',');
+  const cuisineStr = norm(cuisines);
+  const priceStr = norm(priceRange);
+  const vibeStr = norm(vibes);
+  const actStr = norm(activities);
+  const typeStr = norm(venueTypes);
+  // Activities + venue_types only contribute to the key when present so we
+  // stay backward-compatible with cache entries written by older builds.
+  const extra = actStr || typeStr ? `_${actStr}_${typeStr}` : '';
+
+  return `${CACHE_KEY_PREFIX}${roundedLat}_${roundedLng}_${cuisineStr}_${priceStr}_${vibeStr}${extra}`;
 };
 
 // Get all cache keys from localStorage
@@ -112,10 +123,12 @@ export const venueCacheService = {
     lng: number,
     cuisines?: string[],
     priceRange?: string[],
-    vibes?: string[]
+    vibes?: string[],
+    activities?: string[],
+    venueTypes?: string[]
   ): any[] | null {
     try {
-      const key = generateCacheKey(lat, lng, cuisines, priceRange, vibes);
+      const key = generateCacheKey(lat, lng, cuisines, priceRange, vibes, activities, venueTypes);
       const cached = localStorage.getItem(key);
       
       if (!cached) {
@@ -151,13 +164,15 @@ export const venueCacheService = {
     venues: any[],
     cuisines?: string[],
     priceRange?: string[],
-    vibes?: string[]
+    vibes?: string[],
+    activities?: string[],
+    venueTypes?: string[]
   ): void {
     try {
       // Evict old entries if needed
       evictOldestEntries();
       
-      const key = generateCacheKey(lat, lng, cuisines, priceRange, vibes);
+      const key = generateCacheKey(lat, lng, cuisines, priceRange, vibes, activities, venueTypes);
       const data: CachedVenueSearch = {
         venues,
         timestamp: Date.now(),

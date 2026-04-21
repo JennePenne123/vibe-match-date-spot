@@ -378,8 +378,10 @@ export const getAIVenueRecommendations = async (
     const sortedRecommendations = deduped
       .sort((a, b) => b.ai_score - a.ai_score);
 
-    // Quality gate: Top 3 must have ≥65% match score
-    // Venues below threshold are demoted out of the top 3
+    // Quality gate: Top 3 must clear this match-score threshold to earn the
+    // "Top match" badge. Tuned to 0.65 (= 65%) — high enough that low-signal
+    // venues don't get a verified badge, low enough that we still surface
+    // 3 picks for users with sparse preference data.
     const MIN_TOP3_SCORE = 0.65;
     const qualifiedTop3 = sortedRecommendations.filter(r => r.ai_score >= MIN_TOP3_SCORE);
     const belowThreshold = sortedRecommendations.filter(r => r.ai_score < MIN_TOP3_SCORE);
@@ -420,7 +422,7 @@ export const getAIVenueRecommendations = async (
       }
     }
 
-    console.log(`🏆 TOP 3 QUALITY: ${qualifiedTop3.slice(0, 3).length}/3 venues meet ≥80% threshold`, 
+    console.log(`🏆 TOP 3 QUALITY: ${qualifiedTop3.slice(0, 3).length}/3 venues meet ≥${Math.round(MIN_TOP3_SCORE * 100)}% threshold`,
       qualifiedTop3.slice(0, 3).map(r => `${r.venue_name}: ${Math.round(r.ai_score * 100)}%`));
     if (qualifiedTop3.length < 3) {
       console.warn(`⚠️ QUALITY WARNING: Only ${qualifiedTop3.length}/3 venues passed the 80% quality gate`);
@@ -492,6 +494,8 @@ const getVenuesFromMultipleSources = async (
   const cacheCuisines = userPrefs?.preferred_cuisines || [];
   const cacheVibes = userPrefs?.preferred_vibes || [];
   const cachePriceRange = userPrefs?.preferred_price_range || [];
+  const cacheActivities = (userPrefs as any)?.preferred_activities || [];
+  const cacheVenueTypes = (userPrefs as any)?.preferred_venue_types || [];
 
   // Non-food situational mode: skip the 2nd radius retry and the Google
   // Places fallback entirely — both are tuned for restaurant discovery and
@@ -505,7 +509,9 @@ const getVenuesFromMultipleSources = async (
       userLocation.longitude,
       cacheCuisines,
       cachePriceRange,
-      cacheVibes
+      cacheVibes,
+      cacheActivities,
+      cacheVenueTypes
     );
     if (cachedVenues && cachedVenues.length > 0) {
       console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
@@ -569,7 +575,9 @@ const getVenuesFromMultipleSources = async (
       venues,
       cacheCuisines,
       cachePriceRange,
-      cacheVibes
+      cacheVibes,
+      cacheActivities,
+      cacheVenueTypes
     );
   }
   

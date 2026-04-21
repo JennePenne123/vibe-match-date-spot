@@ -60,14 +60,23 @@ export const AREA_VIBE_MAP: Record<string, { vibes: string[]; keywords: string[]
  */
 function cuisineMatchScore(venueCuisine: string | undefined, preferredCuisines: string[]): number {
   if (!venueCuisine || !preferredCuisines?.length) return 0;
-  
+
   const vc = venueCuisine.toLowerCase().trim();
-  
+  // Normalise prefs once: lowercase + trim + drop empties.
+  // Also strip non-cuisine venue-type words ("bar", "pub", "club") that some
+  // older onboarding flows accidentally stored alongside real cuisines —
+  // matching them as cuisine would otherwise inflate scores for every bar.
+  const NON_CUISINE = new Set(['bar', 'pub', 'club', 'cafe', 'café']);
+  const prefs = preferredCuisines
+    .map((c) => (c || '').toLowerCase().trim())
+    .filter((c) => c && !NON_CUISINE.has(c));
+  if (!prefs.length) return 0;
+
   // Exact match
-  if (preferredCuisines.some(c => c.toLowerCase().trim() === vc)) return 1.0;
-  
+  if (prefs.some((c) => c === vc)) return 1.0;
+
   // Partial / contains match (e.g. "Italian Restaurant" matches "Italian")
-  if (preferredCuisines.some(c => vc.includes(c.toLowerCase()) || c.toLowerCase().includes(vc))) return 0.9;
+  if (prefs.some((c) => vc.includes(c) || c.includes(vc))) return 0.9;
   
   // Related cuisine groups - higher score for same family
   // Tighter cuisine groups - avoid false positives (e.g. german ≠ mediterranean)
