@@ -733,9 +733,11 @@ async function getVenuesOverpassOnly(
  *   - User has no/few concrete preferences (discovery mode)
  *     → Radar+Overpass primary (free), Google as niche fallback
  *
- * In non-food situational mode (Kultur/Aktivität/Nightlife) we always skip
- * Google because Google's place types are heavily biased toward restaurants
- * and would just produce candidates we'd hard-filter out.
+ * Non-food situational mode (Kultur/Aktivität/Nightlife) ALSO benefits from
+ * Google because Google has rich data for museums, bowling alleys, spas,
+ * cinemas, concert halls etc. The edge function maps the user's
+ * venueTypes/activities to specific Google place types, so Google's results
+ * are correctly scoped — not biased toward restaurants.
  */
 async function getVenuesGooglePrimaryHybrid(
   userId: string,
@@ -756,14 +758,16 @@ async function getVenuesGooglePrimaryHybrid(
     ((userPrefs as any)?.preferred_activities?.length || 0);
 
   const minPrefs = (API_CONFIG as any).googlePrimaryMinPreferences ?? 1;
+  // Use Google as primary whenever the user has concrete preferences —
+  // regardless of food/non-food. Non-food categories actually benefit MORE
+  // from Google's richer metadata (Museen, Bowling, Spa-Reviews, Fotos).
   const useGooglePrimary =
-    !isNonFoodMode &&
     API_CONFIG.useGooglePlaces &&
-    concretePrefCount >= minPrefs;
+    (concretePrefCount >= minPrefs || isNonFoodMode);
 
   if (!useGooglePrimary) {
     console.log(
-      `🧭 Smart Hybrid → Discovery mode (prefs=${concretePrefCount}, nonFood=${isNonFoodMode}); using Radar+Overpass`,
+      `🧭 Smart Hybrid → Discovery mode (prefs=${concretePrefCount}); using Radar+Overpass (free)`,
     );
     return await getVenuesRadarOverpass(
       userId,
@@ -776,8 +780,11 @@ async function getVenuesGooglePrimaryHybrid(
     );
   }
 
+  const reason = isNonFoodMode
+    ? `Non-Food intent "${situationalCategoryId}" — Google has best metadata for this`
+    : `${concretePrefCount} concrete preferences set`;
   console.log(
-    `🎯 Smart Hybrid → Google PRIMARY (prefs=${concretePrefCount}); enriching with Radar+Overpass in parallel`,
+    `🎯 Smart Hybrid → Google PRIMARY (${reason}); enriching with Radar+Overpass in parallel`,
   );
 
   const timeoutMs = (API_CONFIG as any).googlePrimaryTimeoutMs ?? 7000;
