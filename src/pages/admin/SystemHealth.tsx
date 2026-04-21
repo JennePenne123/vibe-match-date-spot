@@ -19,6 +19,9 @@ import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { CronJobsWidget } from '@/components/admin/CronJobsWidget';
 import { PushTestWidget } from '@/components/admin/PushTestWidget';
+import { OAuthDiagnosticsWidget } from '@/components/admin/OAuthDiagnosticsWidget';
+import { RateLimitMonitorWidget } from '@/components/admin/RateLimitMonitorWidget';
+import { LegalPlaceholderAuditWidget } from '@/components/admin/LegalPlaceholderAuditWidget';
 
 type TimeRange = '24h' | '7d' | '30d';
 
@@ -204,13 +207,16 @@ const SystemHealth: React.FC = () => {
       </div>
 
       <Tabs defaultValue="errors" className="w-full">
-        <TabsList className="bg-muted/50">
+        <TabsList className="bg-muted/50 flex-wrap h-auto">
           <TabsTrigger value="errors">Errors</TabsTrigger>
           <TabsTrigger value="ratelimits">Rate-Limits</TabsTrigger>
           <TabsTrigger value="costs">API-Kosten</TabsTrigger>
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
           <TabsTrigger value="cron">Cron-Jobs</TabsTrigger>
           <TabsTrigger value="push">Push-Test</TabsTrigger>
+          <TabsTrigger value="ratemon">Rate-Monitor</TabsTrigger>
+          <TabsTrigger value="oauth">OAuth</TabsTrigger>
+          <TabsTrigger value="legal">Rechtstexte</TabsTrigger>
         </TabsList>
 
         {/* Errors */}
@@ -393,6 +399,18 @@ const SystemHealth: React.FC = () => {
 
         <TabsContent value="push" className="mt-4">
           <PushTestWidget />
+        </TabsContent>
+
+        <TabsContent value="ratemon" className="mt-4">
+          <RateLimitMonitorWidget />
+        </TabsContent>
+
+        <TabsContent value="oauth" className="mt-4">
+          <OAuthDiagnosticsWidget />
+        </TabsContent>
+
+        <TabsContent value="legal" className="mt-4">
+          <LegalPlaceholderAuditWidget />
         </TabsContent>
       </Tabs>
     </div>
