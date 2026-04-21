@@ -338,59 +338,82 @@ serve(async (req) => {
         };
       });
 
-    // Reverse-geocode venues with missing addresses (batch with delay to respect Nominatim rate limit)
-    let geocodedCount = 0;
+    // Synthesize a placeholder address from coordinates so the UI never shows
+    // "no address". Real reverse-geocoding happens asynchronously below and
+    // backfills the DB for next time — we never block the user on Nominatim
+    // (which costs ~1.1s per venue and can balloon to 50s for 45 venues).
     for (const venue of venues) {
       if ((!venue.address || venue.address.trim() === '' || venue.address.trim() === ',') && venue.latitude && venue.longitude) {
-        const addr = await reverseGeocode(venue.latitude, venue.longitude);
-        if (addr) {
-          venue.address = addr;
-          geocodedCount++;
-        }
-        // Nominatim asks for max 1 req/sec
-        await new Promise(r => setTimeout(r, 1100));
+        venue.address = `${venue.latitude.toFixed(4)}, ${venue.longitude.toFixed(4)}`;
       }
     }
-    if (geocodedCount > 0) {
-      console.log(`📍 RADAR: Reverse-geocoded ${geocodedCount} missing addresses via Nominatim`);
-    }
 
-    // Save to database
+    // Save to database in a single batched upsert (was: 45× sequential awaits)
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    let savedCount = 0;
-    for (const venue of venues) {
-      const { error } = await supabase
-        .from('venues')
-        .upsert({
-          id: venue.radar_id,
-          name: venue.name,
-          address: venue.address,
-          latitude: venue.latitude,
-          longitude: venue.longitude,
-          cuisine_type: venue.cuisine_type,
-          price_range: venue.price_range,
-          rating: venue.rating,
-          description: venue.description,
-          tags: venue.tags,
-          photos: venue.photos,
-          source: 'radar',
-          is_active: true,
-          updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'id',
-        });
+    const upsertRows = venues.map((venue: any) => ({
+      id: venue.radar_id,
+      name: venue.name,
+      address: venue.address,
+      latitude: venue.latitude,
+      longitude: venue.longitude,
+      cuisine_type: venue.cuisine_type,
+      price_range: venue.price_range,
+      rating: venue.rating,
+      description: venue.description,
+      tags: venue.tags,
+      photos: venue.photos,
+      source: 'radar',
+      is_active: true,
+      updated_at: new Date().toISOString(),
+    }));
 
-      if (error) {
-        console.error('⚠️ RADAR: Error saving venue', venue.name, error.message);
-      } else {
-        savedCount++;
-      }
+    const { error: upsertError } = await supabase
+      .from('venues')
+      .upsert(upsertRows, { onConflict: 'id' });
+
+    if (upsertError) {
+      console.error('⚠️ RADAR: Batch upsert error:', upsertError.message);
+    } else {
+      console.log('✅ RADAR: Batched upsert of', upsertRows.length, 'venues');
     }
 
-    console.log('✅ RADAR: Saved', savedCount, '/', venues.length, 'venues to database');
+    // Background: reverse-geocode missing addresses without blocking the response.
+    // Nominatim allows 1 req/s — we'll patch the DB record so the next user
+    // (or the same user on a refresh) sees a real street address.
+    const needsGeocode = venues.filter((v: any) =>
+      v.latitude && v.longitude &&
+      typeof v.address === 'string' &&
+      /^-?\d+\.\d+, -?\d+\.\d+$/.test(v.address)
+    );
+
+    if (needsGeocode.length > 0) {
+      const backgroundJob = (async () => {
+        for (const venue of needsGeocode) {
+          try {
+            const addr = await reverseGeocode(venue.latitude, venue.longitude);
+            if (addr) {
+              await supabase
+                .from('venues')
+                .update({ address: addr, updated_at: new Date().toISOString() })
+                .eq('id', venue.radar_id);
+            }
+          } catch (e) {
+            // Non-fatal — background work
+          }
+          await new Promise(r => setTimeout(r, 1100));
+        }
+        console.log(`📍 RADAR: Background-geocoded up to ${needsGeocode.length} addresses`);
+      })();
+
+      // @ts-ignore — EdgeRuntime is provided by Supabase Deno runtime
+      if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime.waitUntil) {
+        // @ts-ignore
+        EdgeRuntime.waitUntil(backgroundJob);
+      }
+    }
 
     return new Response(
       JSON.stringify({
