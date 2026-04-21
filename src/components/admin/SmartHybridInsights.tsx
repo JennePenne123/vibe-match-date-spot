@@ -106,6 +106,23 @@ export const SmartHybridInsights: React.FC = () => {
           <Badge variant="outline" className="ml-auto text-xs">
             Letzte 7 Tage
           </Badge>
+          <Button
+            asChild
+            variant="outline"
+            size="xs"
+            className="gap-1"
+            title="Google-Timeout Issues in Sentry öffnen (letzte 7 Tage)"
+          >
+            <a
+              href={SENTRY_TIMEOUT_ISSUES_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Google-Timeout Issues in Sentry öffnen"
+            >
+              <ExternalLink className="w-3 h-3" />
+              Sentry
+            </a>
+          </Button>
         </CardTitle>
         <p className="text-xs text-muted-foreground">
           Verteilung von Google-Primary vs. Discovery-Mode, Timeout-Rate und Fallback-Häufigkeit
