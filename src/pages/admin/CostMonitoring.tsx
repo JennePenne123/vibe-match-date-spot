@@ -17,6 +17,7 @@ import {
 } from 'recharts';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { SmartHybridInsights } from '@/components/admin/SmartHybridInsights';
 
 // API metadata: free tier limits, color, icon, friendly name, pricing
 const API_META: Record<string, {
