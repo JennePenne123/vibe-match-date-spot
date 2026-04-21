@@ -241,9 +241,29 @@ const Onboarding = () => {
         description: 'Die KI kennt dich jetzt – deine ersten Empfehlungen warten!',
       });
 
+      void trackFunnelStep({
+        stepKey: 'onboarding_finished',
+        stepIndex: 5,
+        action: 'completed',
+        metadata: {
+          hadReferrer: !!referrerId,
+          referralAdopted,
+          cuisineCount: selectedCuisines.length,
+          vibeCount: selectedVibes.length,
+          swipeLiked: venueSwipeData.liked.length,
+          swipeDisliked: venueSwipeData.disliked.length,
+        },
+      });
+
       navigate('/home', { replace: true });
     } catch (error) {
       console.error('Error saving onboarding data:', error);
+      void trackFunnelStep({
+        stepKey: 'onboarding_finished',
+        stepIndex: 5,
+        action: 'error',
+        metadata: { message: error instanceof Error ? error.message : 'unknown' },
+      });
       toast({
         variant: 'destructive',
         title: 'Fehler beim Speichern',
