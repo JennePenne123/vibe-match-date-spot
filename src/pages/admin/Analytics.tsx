@@ -322,6 +322,11 @@ const AdminAnalytics: React.FC = () => {
             </div>
           )}
         </TabsContent>
+
+        {/* Onboarding funnel */}
+        <TabsContent value="funnel" className="mt-4">
+          <OnboardingFunnelWidget />
+        </TabsContent>
       </Tabs>
     </div>
   );
