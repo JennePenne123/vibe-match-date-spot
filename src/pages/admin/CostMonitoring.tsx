@@ -201,6 +201,9 @@ const CostMonitoring: React.FC = () => {
         />
       </div>
 
+      {/* Smart Hybrid Insights — M1 monitoring */}
+      <SmartHybridInsights />
+
       {/* Free Tier Status */}
       <Card className="bg-card/80 backdrop-blur border-border/40">
         <CardHeader>
