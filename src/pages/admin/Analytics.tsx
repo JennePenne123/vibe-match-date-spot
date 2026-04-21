@@ -199,6 +199,7 @@ const AdminAnalytics: React.FC = () => {
           <TabsTrigger value="growth">Nutzerwachstum</TabsTrigger>
           <TabsTrigger value="dates">Date-Aktivität</TabsTrigger>
           <TabsTrigger value="api">API-Nutzung</TabsTrigger>
+          <TabsTrigger value="funnel">Onboarding</TabsTrigger>
         </TabsList>
 
         {/* User growth */}
