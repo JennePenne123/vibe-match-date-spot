@@ -33,16 +33,55 @@ serve(async (req) => {
       });
     }
 
-    // Test API key with a simple Places API call
-    const testUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=restaurant&inputtype=textquery&fields=place_id,name&key=${apiKey}`;
-    
-    console.log('📡 VALIDATE GOOGLE PLACES: Testing API key with test request...');
-    
-    const testResponse = await fetch(testUrl);
+    // Test API key with the new Places API (New) - Text Search
+    const testUrl = 'https://places.googleapis.com/v1/places:searchText';
+    console.log('📡 VALIDATE GOOGLE PLACES: Testing new Places API (New)...');
+
+    const testResponse = await fetch(testUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'places.id,places.displayName',
+      },
+      body: JSON.stringify({ textQuery: 'restaurant', maxResultCount: 1 }),
+    });
     const testData = await testResponse.json();
-    
+
     console.log('🏢 VALIDATE GOOGLE PLACES: Test response status:', testResponse.status);
     console.log('📊 VALIDATE GOOGLE PLACES: Test response data:', JSON.stringify(testData, null, 2));
+
+    // New API returns errors in `error` field with HTTP non-200 status
+    if (testResponse.status === 403 || testData?.error?.status === 'PERMISSION_DENIED') {
+      const msg = testData?.error?.message || 'Permission denied';
+      const denied = /billing/i.test(msg)
+        ? 'Billing not enabled'
+        : /API.*not.*enabled|SERVICE_DISABLED/i.test(msg)
+          ? 'Places API (New) not enabled in this Google Cloud project'
+          : msg;
+      return Response.json({
+        isValid: false,
+        error: 'Google Places API (New) request denied',
+        details: { status: testData?.error?.status || 'PERMISSION_DENIED', error_message: denied, raw: testData?.error },
+      }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    if (testResponse.status === 429 || testData?.error?.status === 'RESOURCE_EXHAUSTED') {
+      return Response.json({
+        isValid: false,
+        error: 'Google Places API quota exceeded',
+        details: { status: 'RESOURCE_EXHAUSTED', error_message: testData?.error?.message || 'Quota exceeded' },
+      }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    if (testResponse.status === 200) {
+      console.log('✅ VALIDATE GOOGLE PLACES: API key validation successful');
+      return Response.json({
+        isValid: true,
+        message: 'Google Places API (New) is working correctly',
+        details: { places_found: testData.places?.length || 0 },
+      }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
     if (testResponse.status !== 200) {
       return Response.json({
@@ -58,52 +97,12 @@ serve(async (req) => {
       });
     }
 
-    if (testData.status === 'REQUEST_DENIED') {
-      return Response.json({
-        isValid: false,
-        error: 'Google Places API request denied',
-        details: {
-          status: testData.status,
-          error_message: testData.error_message || 'API key invalid or billing not enabled'
-        }
-      }, { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      });
-    }
-
-    if (testData.status === 'OVER_QUERY_LIMIT') {
-      return Response.json({
-        isValid: false,
-        error: 'Google Places API quota exceeded',
-        details: {
-          status: testData.status,
-          error_message: testData.error_message || 'Daily quota exceeded'
-        }
-      }, { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      });
-    }
-
-    if (testData.status === 'OK' || testData.status === 'ZERO_RESULTS') {
-      console.log('✅ VALIDATE GOOGLE PLACES: API key validation successful');
-      return Response.json({
-        isValid: true,
-        message: 'Google Places API is working correctly',
-        details: {
-          status: testData.status,
-          candidates_found: testData.candidates?.length || 0
-        }
-      }, { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      });
-    }
-
     // Unknown status
     return Response.json({
       isValid: false,
       error: 'Unknown Google Places API response',
       details: {
-        status: testData.status,
+        status: testResponse.status,
         raw_response: testData
       }
     }, { 
