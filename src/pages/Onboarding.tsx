@@ -81,6 +81,36 @@ const Onboarding = () => {
     resolveReferrer();
   }, [searchParams]);
 
+  // Track entry into each funnel step.
+  useEffect(() => {
+    const def = STEP_KEY_BY_INDEX[step];
+    if (!def) return;
+    trackFunnelStep({
+      stepKey: def.key,
+      stepIndex: def.index,
+      action: 'entered',
+      metadata: { hasReferrer: !!referrerId },
+    });
+  }, [step, referrerId]);
+
+  // Track unload as "abandoned" if user leaves before finishing.
+  useEffect(() => {
+    const handler = () => {
+      if (step >= TOTAL_STEPS) return; // finished naturally
+      const def = STEP_KEY_BY_INDEX[step];
+      if (!def) return;
+      // Best effort – browser may kill before insert resolves.
+      void trackFunnelStep({
+        stepKey: def.key,
+        stepIndex: def.index,
+        action: 'abandoned',
+        metadata: { reason: 'page_unload' },
+      });
+    };
+    window.addEventListener('pagehide', handler);
+    return () => window.removeEventListener('pagehide', handler);
+  }, [step]);
+
   const handleAdoptPreferences = (prefs: AdoptedPreferences) => {
     setSelectedCuisines(prev => Array.from(new Set([...prev, ...prefs.cuisines])));
     setSelectedVibes(prev => Array.from(new Set([...prev, ...prefs.vibes])));
