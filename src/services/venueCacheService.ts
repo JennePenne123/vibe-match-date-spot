@@ -34,10 +34,14 @@ const generateCacheKey = (
 ): string => {
   const roundedLat = roundCoordinate(lat);
   const roundedLng = roundCoordinate(lng);
-  const cuisineStr = cuisines?.sort().join(',') || '';
-  const priceStr = priceRange?.sort().join(',') || '';
-  const vibeStr = vibes?.sort().join(',') || '';
-  
+  // Normalise to lowercase + sort so 'Italian' and 'italian' share a cache slot
+  // and the order in which the user picked items doesn't matter.
+  const norm = (arr?: string[]) =>
+    (arr || []).map((s) => (s || '').trim().toLowerCase()).filter(Boolean).sort().join(',');
+  const cuisineStr = norm(cuisines);
+  const priceStr = norm(priceRange);
+  const vibeStr = norm(vibes);
+
   return `${CACHE_KEY_PREFIX}${roundedLat}_${roundedLng}_${cuisineStr}_${priceStr}_${vibeStr}`;
 };
 
