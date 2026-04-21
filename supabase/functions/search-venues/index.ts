@@ -96,181 +96,203 @@ serve(async (req) => {
       });
     }
 
-    // 4. Build Google Places Request with validated inputs
-    const baseUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
-    
-    // Use the first valid type from request, default to 'restaurant'
+    // 4. Build Google Places API (New) request — Nearby or Text Search
     const primaryType = validTypes[0] || 'restaurant';
-    
-    const searchParams = new URLSearchParams({
-      location: `${validLatitude},${validLongitude}`,
-      radius: validRadius.toString(),
-      type: primaryType,
-      key: apiKey,
-      language: 'de'
-    });
 
-    // Add cuisine-based keyword search with sanitized inputs
-    // Also support additional types as keywords for niche venues
+    // Build cuisine/type keyword for text-based search
     const keywordParts: string[] = [];
     if (sanitizedCuisines && sanitizedCuisines.length > 0) {
       keywordParts.push(...sanitizedCuisines);
     }
-    // Add remaining types as keywords (e.g. 'bowling_alley', 'museum')
     if (validTypes.length > 1) {
       keywordParts.push(...validTypes.slice(1).map((t: string) => t.replace(/_/g, ' ')));
     }
-    if (keywordParts.length > 0) {
-      const keywords = keywordParts.join(' OR ');
-      searchParams.append('keyword', keywords);
-      console.log('🔍 SEARCH VENUES: Using keyword search:', keywords);
+    const useTextSearch = keywordParts.length > 0;
+
+    // Field mask cost optimization (New API uses comma-separated field paths)
+    const photoLimit = fieldMask === 'essentials' ? 1 : fieldMask === 'full' ? 5 : 3;
+    const includeOpeningHours = fieldMask !== 'essentials';
+    const fieldMaskParts = [
+      'places.id',
+      'places.displayName',
+      'places.formattedAddress',
+      'places.shortFormattedAddress',
+      'places.location',
+      'places.rating',
+      'places.priceLevel',
+      'places.types',
+      'places.photos',
+    ];
+    if (includeOpeningHours) fieldMaskParts.push('places.regularOpeningHours');
+    const fieldMaskHeader = fieldMaskParts.join(',');
+
+    let endpoint: string;
+    let requestBody: Record<string, unknown>;
+
+    if (useTextSearch) {
+      // Text Search: best for cuisine/keyword queries
+      endpoint = 'https://places.googleapis.com/v1/places:searchText';
+      requestBody = {
+        textQuery: `${keywordParts.join(' ')} ${primaryType}`.trim(),
+        languageCode: 'de',
+        maxResultCount: 20,
+        locationBias: {
+          circle: {
+            center: { latitude: validLatitude, longitude: validLongitude },
+            radius: validRadius,
+          },
+        },
+      };
+      console.log('🔍 SEARCH VENUES: Using Text Search with query:', requestBody.textQuery);
+    } else {
+      // Nearby Search: type-only filter
+      endpoint = 'https://places.googleapis.com/v1/places:searchNearby';
+      requestBody = {
+        includedTypes: [primaryType],
+        maxResultCount: 20,
+        languageCode: 'de',
+        locationRestriction: {
+          circle: {
+            center: { latitude: validLatitude, longitude: validLongitude },
+            radius: validRadius,
+          },
+        },
+      };
+      console.log('🔍 SEARCH VENUES: Using Nearby Search for type:', primaryType);
     }
 
-    const googleUrl = `${baseUrl}?${searchParams.toString()}`;
-    console.log('📡 SEARCH VENUES: Google Places URL (masked):', googleUrl.replace(apiKey, '[API_KEY_MASKED]'));
-
-    // 5. Make Google Places API Call
-    console.log('📡 SEARCH VENUES: Making API request...');
+    // 5. Make Google Places API (New) Call
+    console.log('📡 SEARCH VENUES: Making API request to', endpoint);
     const startTime = Date.now();
-    
-    const response = await fetch(googleUrl, {
-      method: 'GET',
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'HiOutz-App/1.0'
-      }
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': fieldMaskHeader,
+        'User-Agent': 'HiOutz-App/1.0',
+      },
+      body: JSON.stringify(requestBody),
     });
-    
+
     const requestDuration = Date.now() - startTime;
     console.log('⏱️ SEARCH VENUES: API request completed in:', requestDuration + 'ms');
     console.log('📡 SEARCH VENUES: Response status:', response.status, response.statusText);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ SEARCH VENUES: HTTP Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText
-      });
-      
-      return Response.json({
-        success: false,
-        error: `Google Places API HTTP error: ${response.status}`,
-        details: errorText,
-        venues: []
-      }, { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // 6. Parse Google Places Response
     const placesData = await response.json();
-    console.log('📊 SEARCH VENUES: Google Places API Response:', {
-      status: placesData.status,
-      results_count: placesData.results?.length || 0,
-      error_message: placesData.error_message,
-      next_page_token: !!placesData.next_page_token
-    });
 
-    // 7. Handle Google Places API Errors
-    if (placesData.status === 'REQUEST_DENIED') {
-      console.error('❌ SEARCH VENUES: REQUEST_DENIED:', placesData.error_message);
+    // 6. Handle Google Places API (New) Errors
+    if (response.status === 403 || placesData?.error?.status === 'PERMISSION_DENIED') {
+      console.error('❌ SEARCH VENUES: PERMISSION_DENIED:', placesData?.error?.message);
       return Response.json({
         success: false,
         error: 'Google Places API access denied',
-        details: placesData.error_message || 'Check API key and billing',
-        venues: []
-      }, { 
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+        details: placesData?.error?.message || 'Check API key, billing & enabled APIs',
+        venues: [],
+      }, { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    if (placesData.status === 'OVER_QUERY_LIMIT') {
-      console.error('❌ SEARCH VENUES: OVER_QUERY_LIMIT');
+    if (response.status === 429 || placesData?.error?.status === 'RESOURCE_EXHAUSTED') {
+      console.error('❌ SEARCH VENUES: RESOURCE_EXHAUSTED');
       return Response.json({
         success: false,
         error: 'Google Places API quota exceeded',
-        details: 'Daily request limit reached',
-        venues: []
-      }, { 
-        status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+        details: placesData?.error?.message || 'Quota reached',
+        venues: [],
+      }, { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    if (placesData.status !== 'OK' && placesData.status !== 'ZERO_RESULTS') {
-      console.error('❌ SEARCH VENUES: Unexpected status:', placesData.status);
+    if (!response.ok) {
+      console.error('❌ SEARCH VENUES: HTTP Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: placesData,
+      });
       return Response.json({
         success: false,
-        error: `Google Places API error: ${placesData.status}`,
-        details: placesData.error_message,
-        venues: []
-      }, { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+        error: `Google Places API HTTP error: ${response.status}`,
+        details: placesData?.error?.message || JSON.stringify(placesData),
+        venues: [],
+      }, { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // 8. Process Results
+    console.log('📊 SEARCH VENUES: Google Places API (New) Response:', {
+      results_count: placesData.places?.length || 0,
+    });
+
+    // 7. Process Results — Places API (New) shape
     const venues = [];
-    
-    if (placesData.results && placesData.results.length > 0) {
-      console.log('🏢 SEARCH VENUES: Processing', placesData.results.length, 'venues...');
+    const places = placesData.places || [];
 
-      // Field Mask cost optimization:
-      //  - 'essentials'      → 1 photo, no opening_hours
-      //  - 'essentials+pro'  → up to 3 photos, opening_hours (DEFAULT, recommended)
-      //  - 'full'            → up to 5 photos, opening_hours, all metadata
-      const photoLimit = fieldMask === 'essentials' ? 1 : fieldMask === 'full' ? 5 : 3;
-      const includeOpeningHours = fieldMask !== 'essentials';
+    if (places.length > 0) {
+      console.log('🏢 SEARCH VENUES: Processing', places.length, 'venues...');
 
-      for (const place of placesData.results.slice(0, 20)) {
+      // priceLevel in New API: PRICE_LEVEL_FREE / INEXPENSIVE / MODERATE / EXPENSIVE / VERY_EXPENSIVE
+      const priceLevelMap: Record<string, number> = {
+        PRICE_LEVEL_FREE: 0,
+        PRICE_LEVEL_INEXPENSIVE: 1,
+        PRICE_LEVEL_MODERATE: 2,
+        PRICE_LEVEL_EXPENSIVE: 3,
+        PRICE_LEVEL_VERY_EXPENSIVE: 4,
+      };
+
+      for (const place of places.slice(0, 20)) {
         try {
+          const placeName: string = place.displayName?.text || 'Unknown';
+          const formattedAddr: string = place.shortFormattedAddress || place.formattedAddress || '';
+          const lat: number | undefined = place.location?.latitude;
+          const lng: number | undefined = place.location?.longitude;
+          const priceNum = priceLevelMap[place.priceLevel] ?? 2;
+
+          // New API photo: photo.name = "places/{placeId}/photos/{photoId}"
+          // URL: https://places.googleapis.com/v1/{photo.name}/media?maxWidthPx=...&key=...
+          const buildPhotoUrl = (photoName: string, maxWidth: number) =>
+            `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=${maxWidth}&key=${apiKey}`;
+
+          const placePhotos = (place.photos || []).slice(0, photoLimit).map((photo: any, index: number) => ({
+            url: buildPhotoUrl(photo.name, index === 0 ? 800 : 400),
+            thumbnail: buildPhotoUrl(photo.name, 200),
+            width: photo.widthPx || 400,
+            height: photo.heightPx || 300,
+            attribution: cleanAttribution(photo.authorAttributions?.[0]?.displayName),
+            isGooglePhoto: true,
+          }));
+
           const venue = {
-            placeId: place.place_id,
-            name: place.name,
-            location: place.vicinity || place.formatted_address,
-            latitude: place.geometry?.location?.lat,
-            longitude: place.geometry?.location?.lng,
+            placeId: place.id,
+            name: placeName,
+            location: formattedAddr,
+            latitude: lat,
+            longitude: lng,
             rating: place.rating || 4.0,
-            priceRange: '€'.repeat(place.price_level || 2),
-            // Process photos - get multiple sizes and photos
-            photos: place.photos?.slice(0, photoLimit).map((photo: any, index: number) => ({
-              url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${index === 0 ? 800 : 400}&photoreference=${photo.photo_reference}&key=${apiKey}`,
-              thumbnail: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=${photo.photo_reference}&key=${apiKey}`,
-              width: photo.width || 400,
-              height: photo.height || 300,
-              attribution: cleanAttribution(photo.html_attributions?.[0]),
-              isGooglePhoto: true
-            })) || [],
-            // Fallback image for backwards compatibility
-            image: place.photos?.[0] ? 
-              `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${place.photos[0].photo_reference}&key=${apiKey}` :
-              'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
-            cuisineType: determineCuisineType(place, sanitizedCuisines),
+            priceRange: '€'.repeat(priceNum || 2),
+            photos: placePhotos,
+            image: place.photos?.[0]
+              ? buildPhotoUrl(place.photos[0].name, 800)
+              : 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+            cuisineType: determineCuisineType({ name: placeName, types: place.types }, sanitizedCuisines),
             tags: place.types || ['restaurant'],
-            openNow: includeOpeningHours ? place.opening_hours?.open_now : undefined,
+            openNow: includeOpeningHours ? place.regularOpeningHours?.openNow : undefined,
             phone: null,
             website: null,
-            description: `${place.name} in ${place.vicinity || 'der Nähe'}`
+            description: `${placeName} in ${formattedAddr || 'der Nähe'}`,
           };
-          
+
           venues.push(venue);
-          
+
           if (venues.length <= 3) {
             console.log(`🏢 SEARCH VENUES: Venue ${venues.length}:`, {
               name: venue.name,
               location: venue.location,
               rating: venue.rating,
-              cuisine: venue.cuisineType
+              cuisine: venue.cuisineType,
             });
           }
-          
         } catch (venueError) {
           const errorMessage = venueError instanceof Error ? venueError.message : 'Unknown error';
-          console.warn('⚠️ SEARCH VENUES: Error processing venue:', place.name, errorMessage);
+          console.warn('⚠️ SEARCH VENUES: Error processing venue:', place.displayName?.text, errorMessage);
         }
       }
     }
@@ -281,7 +303,7 @@ serve(async (req) => {
       success: true,
       venues: venues,
         metadata: {
-          total_found: placesData.results?.length || 0,
+          total_found: places.length,
           search_location: `${validLatitude}, ${validLongitude}`,
           search_radius: validRadius,
           search_cuisines: sanitizedCuisines,
