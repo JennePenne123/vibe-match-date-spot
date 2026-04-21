@@ -235,9 +235,83 @@ export default function PartnerQRCode({ defaultTab = 'my-qr' }: { defaultTab?: s
         return;
       }
 
+      // Handle rotating staff network QR codes (validated server-side)
+      if (data.type === 'vybe_staff_network') {
+        await handleStaffNetworkScan(data);
+        return;
+      }
+
       setScanResult({ status: 'error', message: t('partner.qr.invalidQR') });
     } catch {
       setScanResult({ status: 'error', message: t('partner.qr.invalidQR') });
+    }
+  };
+
+  const handleStaffNetworkScan = async (data: {
+    staff_id: string;
+    partner_id: string;
+    name?: string;
+    voucher_id?: string | null;
+    tc: string;
+    tw: number;
+  }) => {
+    try {
+      // Cannot scan a staff QR from your own venue (network exchange = different partners)
+      if (data.partner_id === user?.id) {
+        setScanResult({ status: 'error', message: t('partner.qr.ownCode') });
+        return;
+      }
+
+      const { data: result, error } = await supabase.functions.invoke('validate-staff-qr', {
+        body: {
+          staff_id: data.staff_id,
+          partner_id: data.partner_id,
+          voucher_id: data.voucher_id ?? null,
+          tc: data.tc,
+          tw: data.tw,
+        },
+      });
+
+      if (error) {
+        setScanResult({ status: 'error', message: 'Fehler bei der Staff-QR-Validierung' });
+        return;
+      }
+
+      if (!result?.valid) {
+        setScanResult({
+          status: 'error',
+          message: result?.reason || 'Staff-QR ungültig oder abgelaufen',
+        });
+        return;
+      }
+
+      // Success – show confirmation
+      setScanResult({
+        status: 'success',
+        message: result.voucher
+          ? `${data.name || 'Staff'} – Gutschein „${result.voucher.title}" eingelöst`
+          : `${data.name || 'Staff'} verifiziert ✅`,
+        voucher: result.voucher
+          ? {
+              title: result.voucher.title,
+              discount_value: result.voucher.discount_value,
+              code: '—',
+              venue_name: data.name || '',
+            }
+          : undefined,
+      });
+
+      toast({
+        title: '✅ Staff-QR verifiziert',
+        description: result.voucher
+          ? `${result.voucher.title} (${result.voucher.discount_value}${result.voucher.discount_type === 'percentage' ? '%' : '€'})`
+          : `${data.name || 'Staff'} verifiziert`,
+      });
+
+      fetchData();
+    } catch (err) {
+      console.error('Staff network scan error:', err);
+      setScanResult({ status: 'error', message: 'Verbindungsfehler bei Staff-QR-Validierung' });
     }
   };
 
