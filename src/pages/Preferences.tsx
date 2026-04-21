@@ -209,6 +209,17 @@ const Preferences = () => {
   const { updateCuisines, updateVibes, updateUserLocation } = useApp();
   const { user } = useAuth();
 
+  // Funnel: track entry into the preferences wizard
+  useEffect(() => {
+    void trackFunnelStep({
+      stepKey: 'preferences_page',
+      stepIndex: 5,
+      action: 'entered',
+      metadata: { isOnboarding },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Situational category — ephemeral filter from Home quick-actions
   const [situationalCategory, setSituationalCategory] = useState<SituationalCategory | null>(null);
   useEffect(() => {
