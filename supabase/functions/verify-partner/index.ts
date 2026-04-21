@@ -143,25 +143,36 @@ async function verifyAddress(businessName: string, address: string, city: string
   }
 
   try {
-    const query = encodeURIComponent(`${businessName} ${address} ${city}`);
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${apiKey}`
-    );
+    const textQuery = `${businessName} ${address} ${city}`.trim();
+    const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress',
+      },
+      body: JSON.stringify({ textQuery, maxResultCount: 1 }),
+    });
     const data = await response.json();
-    
-    if (data.status !== 'OK' || !data.results?.length) {
+
+    if (!response.ok || !data.places?.length) {
+      if (data?.error) {
+        console.warn('Google Places (New) verification error:', data.error.message);
+      }
       return { verified: false, confidence: 0 };
     }
 
-    const topResult = data.results[0];
-    const nameMatch = topResult.name?.toLowerCase().includes(businessName.toLowerCase().substring(0, 5));
-    const addressMatch = topResult.formatted_address?.toLowerCase().includes(city.toLowerCase());
-    
+    const top = data.places[0];
+    const topName: string = top.displayName?.text || '';
+    const topAddress: string = top.formattedAddress || '';
+    const nameMatch = topName.toLowerCase().includes(businessName.toLowerCase().substring(0, 5));
+    const addressMatch = topAddress.toLowerCase().includes(city.toLowerCase());
+
     let confidence = 0;
     if (nameMatch) confidence += 50;
     if (addressMatch) confidence += 50;
 
-    return { verified: confidence >= 50, confidence, matchedName: topResult.name };
+    return { verified: confidence >= 50, confidence, matchedName: topName };
   } catch (error) {
     console.error('Google Places verification error:', error);
     return { verified: false, confidence: 0 };
