@@ -30,6 +30,7 @@ import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
+import { trackFunnelStep } from '@/services/funnelAnalyticsService';
 
 // Icon + color mapping (slimmed down)
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
