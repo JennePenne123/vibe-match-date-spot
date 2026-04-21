@@ -551,6 +551,17 @@ const getVenuesFromMultipleSources = async (
       venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier, isNonFoodMode, situationalCategoryId, secondaryCategoryId);
     } else if (strategy === 'overpass-only') {
       venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier, situationalCategoryId, secondaryCategoryId);
+    } else if (strategy === 'google-primary-hybrid') {
+      venues = await getVenuesGooglePrimaryHybrid(
+        userId,
+        limit,
+        expandedLocation,
+        multiplier,
+        isNonFoodMode,
+        situationalCategoryId,
+        secondaryCategoryId,
+        userPrefs,
+      );
     } else {
       venues = await getVenuesParallel(userId, limit, expandedLocation, multiplier, situationalCategoryId, secondaryCategoryId);
     }
@@ -713,6 +724,116 @@ async function getVenuesOverpassOnly(
     return await getVenuesFromOverpass(userId, limit, userLocation, radiusMultiplier, situationalCategoryId, secondaryCategoryId).catch(() => []);
   }
   return [];
+}
+
+/**
+ * Smart Hybrid strategy:
+ *   - User has concrete cuisine / venue-type / activity preferences
+ *     → Google Places PRIMARY (best data quality), Radar+Overpass enrich in parallel
+ *   - User has no/few concrete preferences (discovery mode)
+ *     → Radar+Overpass primary (free), Google as niche fallback
+ *
+ * In non-food situational mode (Kultur/Aktivität/Nightlife) we always skip
+ * Google because Google's place types are heavily biased toward restaurants
+ * and would just produce candidates we'd hard-filter out.
+ */
+async function getVenuesGooglePrimaryHybrid(
+  userId: string,
+  limit: number,
+  userLocation: { latitude: number; longitude: number; address?: string } | undefined,
+  radiusMultiplier: number,
+  isNonFoodMode: boolean,
+  situationalCategoryId: SituationalCategoryId | null | undefined,
+  secondaryCategoryId: SituationalCategoryId | null | undefined,
+  userPrefs: any,
+) {
+  if (!userLocation) return [];
+
+  // Discovery mode (no specific intent) → cheap path
+  const concretePrefCount =
+    (userPrefs?.preferred_cuisines?.length || 0) +
+    ((userPrefs as any)?.preferred_venue_types?.length || 0) +
+    ((userPrefs as any)?.preferred_activities?.length || 0);
+
+  const minPrefs = (API_CONFIG as any).googlePrimaryMinPreferences ?? 1;
+  const useGooglePrimary =
+    !isNonFoodMode &&
+    API_CONFIG.useGooglePlaces &&
+    concretePrefCount >= minPrefs;
+
+  if (!useGooglePrimary) {
+    console.log(
+      `🧭 Smart Hybrid → Discovery mode (prefs=${concretePrefCount}, nonFood=${isNonFoodMode}); using Radar+Overpass`,
+    );
+    return await getVenuesRadarOverpass(
+      userId,
+      limit,
+      userLocation,
+      radiusMultiplier,
+      true /* skipGoogleFallback — already decided not to spend $$ */,
+      situationalCategoryId,
+      secondaryCategoryId,
+    );
+  }
+
+  console.log(
+    `🎯 Smart Hybrid → Google PRIMARY (prefs=${concretePrefCount}); enriching with Radar+Overpass in parallel`,
+  );
+
+  const timeoutMs = (API_CONFIG as any).googlePrimaryTimeoutMs ?? 7000;
+
+  // Fire all three in parallel — Google with hard timeout
+  const promises: Promise<any[]>[] = [
+    Promise.race<any[]>([
+      getVenuesFromGooglePlaces(userId, limit, userLocation).catch((err) => {
+        console.warn('⚠️ Google primary failed:', err instanceof Error ? err.message : err);
+        return [] as any[];
+      }),
+      new Promise<any[]>((resolve) =>
+        setTimeout(() => {
+          console.warn(`⏱️ Google primary exceeded ${timeoutMs}ms — falling back to Radar/Overpass`);
+          resolve([]);
+        }, timeoutMs),
+      ),
+    ]),
+  ];
+
+  if (API_CONFIG.useRadar) {
+    promises.push(
+      getVenuesFromRadar(userId, limit, userLocation, radiusMultiplier).catch(() => []),
+    );
+  }
+  if (API_CONFIG.useOverpass) {
+    promises.push(
+      getVenuesFromOverpass(
+        userId,
+        limit,
+        userLocation,
+        radiusMultiplier,
+        situationalCategoryId,
+        secondaryCategoryId,
+      ).catch(() => []),
+    );
+  }
+
+  const [googleVenues, radarVenues = [], osmVenues = []] = await Promise.all(promises);
+
+  console.log(
+    `🔀 SMART HYBRID MERGE: Google=${googleVenues.length}, Radar=${radarVenues.length}, Overpass=${osmVenues.length}`,
+  );
+
+  // Google as primary (richest metadata), then enrich/extend with Radar + Overpass
+  let venues: any[] = googleVenues;
+  venues = mergeAndDeduplicateVenues(venues, radarVenues);
+  venues = mergeAndDeduplicateVenues(venues, osmVenues);
+
+  // Safety net: if Google returned nothing (timeout/quota), Radar+Overpass
+  // already populated the merge — no extra fallback needed.
+  if (googleVenues.length === 0 && venues.length === 0) {
+    console.warn('⚠️ Smart Hybrid: all sources empty');
+  }
+
+  return venues;
 }
 
 /**

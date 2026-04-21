@@ -3,7 +3,7 @@
  * Strategy: Radar (primary, 100K free/month) + Overpass/OSM (free, unlimited) + Google Places (fallback)
  */
 
-export type VenueSearchStrategy = 'radar-overpass' | 'overpass-only' | 'parallel';
+export type VenueSearchStrategy = 'radar-overpass' | 'overpass-only' | 'parallel' | 'google-primary-hybrid';
 
 export const API_CONFIG = {
   // API toggles
@@ -13,7 +13,15 @@ export const API_CONFIG = {
   useTripAdvisor: true,    // Enrichment: TripAdvisor reviews
   
   // Search strategy
-  venueSearchStrategy: 'radar-overpass' as VenueSearchStrategy,
+  venueSearchStrategy: 'google-primary-hybrid' as VenueSearchStrategy,
+
+  // Smart Hybrid trigger: Google is used as primary when the user has at least
+  // this many concrete cuisine/venue-type/activity preferences set. Below the
+  // threshold we default to Radar+Overpass (cheap discovery).
+  googlePrimaryMinPreferences: 1,
+  // Hard timeout for Google when used as primary — if it exceeds this, we
+  // fall back to whatever Radar+Overpass returned.
+  googlePrimaryTimeoutMs: 7000,
   
   // Data merging
   mergeVenueData: true,
