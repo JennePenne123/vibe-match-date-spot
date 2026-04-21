@@ -286,7 +286,17 @@ const Onboarding = () => {
     if (step > 0) animateTransition(step - 1);
   };
 
-  const handleSkip = () => navigate('/home', { replace: true });
+  const handleSkip = () => {
+    const def = STEP_KEY_BY_INDEX[step];
+    if (def) {
+      void trackFunnelStep({
+        stepKey: def.key,
+        stepIndex: def.index,
+        action: 'skipped',
+      });
+    }
+    navigate('/home', { replace: true });
+  };
 
   const getNextLabel = () => {
     if (step === 0) return 'Los geht\'s';
