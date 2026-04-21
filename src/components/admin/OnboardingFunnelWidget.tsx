@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { STALE_TIMES } from '@/config/queryConfig';
-import { Funnel, TrendingDown, AlertCircle } from 'lucide-react';
+import { Filter as Funnel, TrendingDown, AlertCircle } from 'lucide-react';
 import {
   ONBOARDING_FUNNEL_STEPS,
   type FunnelAction,
