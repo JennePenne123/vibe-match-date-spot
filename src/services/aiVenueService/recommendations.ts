@@ -494,6 +494,8 @@ const getVenuesFromMultipleSources = async (
   const cacheCuisines = userPrefs?.preferred_cuisines || [];
   const cacheVibes = userPrefs?.preferred_vibes || [];
   const cachePriceRange = userPrefs?.preferred_price_range || [];
+  const cacheActivities = (userPrefs as any)?.preferred_activities || [];
+  const cacheVenueTypes = (userPrefs as any)?.preferred_venue_types || [];
 
   // Non-food situational mode: skip the 2nd radius retry and the Google
   // Places fallback entirely — both are tuned for restaurant discovery and
@@ -507,7 +509,9 @@ const getVenuesFromMultipleSources = async (
       userLocation.longitude,
       cacheCuisines,
       cachePriceRange,
-      cacheVibes
+      cacheVibes,
+      cacheActivities,
+      cacheVenueTypes
     );
     if (cachedVenues && cachedVenues.length > 0) {
       console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
@@ -571,7 +575,9 @@ const getVenuesFromMultipleSources = async (
       venues,
       cacheCuisines,
       cachePriceRange,
-      cacheVibes
+      cacheVibes,
+      cacheActivities,
+      cacheVenueTypes
     );
   }
   
