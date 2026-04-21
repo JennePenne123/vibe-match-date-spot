@@ -5,13 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { STALE_TIMES } from '@/config/queryConfig';
-import { Sparkles, AlertTriangle, Zap, TrendingDown } from 'lucide-react';
+import { Sparkles, AlertTriangle, Zap, TrendingDown, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface HybridLog {
   response_time_ms: number | null;
   request_metadata: Record<string, any> | null;
   created_at: string | null;
 }
+
+const SENTRY_TIMEOUT_ISSUES_URL =
+  'https://vybepulse.sentry.io/issues/?query=' +
+  encodeURIComponent('is:unresolved "Google primary exceeded" OR "google_timed_out" OR "smart_hybrid"') +
+  '&statsPeriod=7d&sort=last_seen';
 
 const STAT_CARD =
   'bg-card/60 backdrop-blur border-border/40 p-3 rounded-lg flex flex-col gap-1';
@@ -100,6 +106,23 @@ export const SmartHybridInsights: React.FC = () => {
           <Badge variant="outline" className="ml-auto text-xs">
             Letzte 7 Tage
           </Badge>
+          <Button
+            asChild
+            variant="outline"
+            size="xs"
+            className="gap-1"
+            title="Google-Timeout Issues in Sentry öffnen (letzte 7 Tage)"
+          >
+            <a
+              href={SENTRY_TIMEOUT_ISSUES_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Google-Timeout Issues in Sentry öffnen"
+            >
+              <ExternalLink className="w-3 h-3" />
+              Sentry
+            </a>
+          </Button>
         </CardTitle>
         <p className="text-xs text-muted-foreground">
           Verteilung von Google-Primary vs. Discovery-Mode, Timeout-Rate und Fallback-Häufigkeit
