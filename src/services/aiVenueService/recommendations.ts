@@ -644,9 +644,19 @@ async function getVenuesRadarOverpass(
       return nicheKeywords.some(kw => text.includes(kw));
     });
 
-    if (hasNichePreferences && nicheMatches.length < 3) {
+    // Performance gate: only invoke the (slow, ~15s) Google Places fallback
+    // when the merged Radar+Overpass set is genuinely thin on niche venues.
+    // If we already have ≥10 candidates total, the user has plenty of choice
+    // and the 15s wait is not worth the marginal upside.
+    const NICHE_FALLBACK_VENUE_THRESHOLD = 10;
+    const NICHE_FALLBACK_TIMEOUT_MS = 6000;
+    if (
+      hasNichePreferences &&
+      nicheMatches.length < 3 &&
+      venues.length < NICHE_FALLBACK_VENUE_THRESHOLD
+    ) {
       console.log('🔍 Google Places fallback: only', nicheMatches.length, 'niche matches, fetching from Google...');
-      
+
       const googleTypesMap: Record<string, string> = {
         'museum': 'museum', 'gallery': 'art_gallery', 'theater_venue': 'movie_theater',
         'cinema': 'movie_theater', 'concert_hall': 'night_club', 'bowling': 'bowling_alley',
@@ -661,7 +671,17 @@ async function getVenuesRadarOverpass(
 
       if (googleTypes.length > 0) {
         try {
-          const googleVenues = await getVenuesFromGooglePlaces(userId, 10, userLocation);
+          // Hard-cap the fallback at 6s. If Google takes longer, we surface
+          // what we already have rather than make the user wait further.
+          const googleVenues = await Promise.race<any[]>([
+            getVenuesFromGooglePlaces(userId, 10, userLocation),
+            new Promise<any[]>((resolve) =>
+              setTimeout(() => {
+                console.warn(`⏱️ Google Places fallback exceeded ${NICHE_FALLBACK_TIMEOUT_MS}ms — using current results`);
+                resolve([]);
+              }, NICHE_FALLBACK_TIMEOUT_MS),
+            ),
+          ]);
           if (googleVenues.length > 0) {
             console.log('✅ Google Places fallback found', googleVenues.length, 'additional venues');
             venues = mergeAndDeduplicateVenues(venues, googleVenues);
@@ -670,6 +690,8 @@ async function getVenuesRadarOverpass(
           console.warn('⚠️ Google Places fallback failed:', err instanceof Error ? err.message : 'Unknown error');
         }
       }
+    } else if (hasNichePreferences && nicheMatches.length < 3) {
+      console.log(`⏭️ Google Places fallback skipped: ${venues.length} venues already (≥${NICHE_FALLBACK_VENUE_THRESHOLD}), niche matches=${nicheMatches.length}`);
     }
   }
   
