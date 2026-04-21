@@ -14,10 +14,20 @@ import VenueSwipeCards, { type VenueSwipeData, deriveSwipePreferences } from '@/
 import ReferralInspiration, { type AdoptedPreferences } from '@/components/onboarding/ReferralInspiration';
 
 import onboarding1 from '@/assets/onboarding-1.png';
+import { trackFunnelStep, ONBOARDING_FUNNEL_STEPS } from '@/services/funnelAnalyticsService';
 
 // Reduced from 6 → 4 steps. Removed: Personality, RelationshipGoal, Scenarios
 // (kept in DB schema with sensible defaults; can be set later in profile settings)
 const TOTAL_STEPS = 4;
+
+// Map UI step (0..4) to canonical funnel step keys.
+const STEP_KEY_BY_INDEX: Record<number, { key: string; index: number }> = {
+  0: ONBOARDING_FUNNEL_STEPS[0], // welcome
+  1: ONBOARDING_FUNNEL_STEPS[1], // food_vibes
+  2: ONBOARDING_FUNNEL_STEPS[2], // venue_swipe
+  3: ONBOARDING_FUNNEL_STEPS[3], // lifestyle
+  4: ONBOARDING_FUNNEL_STEPS[4], // distance_location
+};
 
 const Onboarding = () => {
   const navigate = useNavigate();
