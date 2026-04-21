@@ -476,8 +476,25 @@ const Preferences = () => {
           updateUserLocation({ latitude: homeLatitude, longitude: homeLongitude, address: homeAddress || undefined });
         }
         toast({ title: t('preferences.prefsSaved'), description: t('preferences.prefsSavedDesc') });
+        void trackFunnelStep({
+          stepKey: 'preferences_page',
+          stepIndex: 5,
+          action: 'completed',
+          metadata: {
+            isOnboarding,
+            cuisines: selectedCuisines.length,
+            vibes: selectedVibes.length,
+            hasLocation: !!(homeLatitude && homeLongitude),
+          },
+        });
       } catch (error) {
         console.error('Error saving preferences:', error);
+        void trackFunnelStep({
+          stepKey: 'preferences_page',
+          stepIndex: 5,
+          action: 'error',
+          metadata: { message: error instanceof Error ? error.message : 'unknown' },
+        });
         toast({ variant: 'destructive', title: t('preferences.prefsError'), description: t('preferences.prefsErrorDesc') });
       } finally { setIsSaving(false); }
     }
