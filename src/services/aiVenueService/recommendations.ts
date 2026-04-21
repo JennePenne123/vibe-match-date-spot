@@ -551,6 +551,17 @@ const getVenuesFromMultipleSources = async (
       venues = await getVenuesRadarOverpass(userId, limit, expandedLocation, multiplier, isNonFoodMode, situationalCategoryId, secondaryCategoryId);
     } else if (strategy === 'overpass-only') {
       venues = await getVenuesOverpassOnly(userId, limit, expandedLocation, multiplier, situationalCategoryId, secondaryCategoryId);
+    } else if (strategy === 'google-primary-hybrid') {
+      venues = await getVenuesGooglePrimaryHybrid(
+        userId,
+        limit,
+        expandedLocation,
+        multiplier,
+        isNonFoodMode,
+        situationalCategoryId,
+        secondaryCategoryId,
+        userPrefs,
+      );
     } else {
       venues = await getVenuesParallel(userId, limit, expandedLocation, multiplier, situationalCategoryId, secondaryCategoryId);
     }
