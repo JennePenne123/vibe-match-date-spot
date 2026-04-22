@@ -507,7 +507,7 @@ export default function PartnerOnboarding() {
                 </div>
 
                 {/* Sticky bottom CTA on mobile */}
-                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-background/95 backdrop-blur-md border-t border-border/40 flex gap-2">
+                <div className="md:hidden fixed left-0 right-0 z-[60] px-4 py-3 bg-background/95 backdrop-blur-md border-t border-border/40 flex gap-2 bottom-[calc(64px+env(safe-area-inset-bottom))]">
                   <Button variant="outline" onClick={() => setCurrentStep('verification')} className="gap-2 min-h-[48px] flex-shrink-0" aria-label="Zurück">
                     <ArrowLeft className="w-4 h-4" />
                   </Button>
