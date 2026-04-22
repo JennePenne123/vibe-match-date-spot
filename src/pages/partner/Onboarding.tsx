@@ -497,11 +497,21 @@ export default function PartnerOnboarding() {
                   </Card>
                 </div>
 
-                <div className="flex justify-between pt-2">
-                  <Button variant="outline" onClick={() => setCurrentStep('verification')} className="gap-2">
+                <div className="hidden md:flex justify-between pt-2">
+                  <Button variant="outline" onClick={() => setCurrentStep('verification')} className="gap-2 min-h-[44px]">
                     <ArrowLeft className="w-4 h-4" /> Zurück
                   </Button>
-                  <Button variant="ghost" onClick={() => setCurrentStep('complete')} className="gap-2 text-muted-foreground">
+                  <Button variant="ghost" onClick={() => setCurrentStep('complete')} className="gap-2 min-h-[44px] text-muted-foreground">
+                    Überspringen <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {/* Sticky bottom CTA on mobile */}
+                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-background/95 backdrop-blur-md border-t border-border/40 flex gap-2">
+                  <Button variant="outline" onClick={() => setCurrentStep('verification')} className="gap-2 min-h-[48px] flex-shrink-0" aria-label="Zurück">
+                    <ArrowLeft className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" onClick={() => setCurrentStep('complete')} className="flex-1 gap-2 min-h-[48px] text-base text-muted-foreground">
                     Überspringen <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
