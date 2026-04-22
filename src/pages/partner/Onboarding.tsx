@@ -340,10 +340,21 @@ export default function PartnerOnboarding() {
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-2">
-                  <Button onClick={saveProfile} disabled={saving || !termsAccepted || !privacyAccepted} className="gap-2">
+                <div className="hidden md:flex justify-end pt-2">
+                  <Button onClick={saveProfile} disabled={saving || !termsAccepted || !privacyAccepted} className="gap-2 min-h-[44px]">
                     {saving ? <LoadingSpinner size="sm" /> : <ArrowRight className="w-4 h-4" />}
                     Weiter zur Verifizierung
+                  </Button>
+                </div>
+
+                {/* Sticky bottom CTA on mobile */}
+                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-background/95 backdrop-blur-md border-t border-border/40">
+                  <Button
+                    onClick={saveProfile}
+                    disabled={saving || !termsAccepted || !privacyAccepted}
+                    className="w-full gap-2 min-h-[48px] text-base"
+                  >
+                    {saving ? <LoadingSpinner size="sm" /> : <>Weiter zur Verifizierung <ArrowRight className="w-4 h-4" /></>}
                   </Button>
                 </div>
               </CardContent>
