@@ -433,13 +433,23 @@ export default function PartnerOnboarding() {
                   </div>
                 </div>
 
-                <div className="flex justify-between pt-2">
-                  <Button variant="outline" onClick={() => setCurrentStep('profile')} className="gap-2">
+                <div className="hidden md:flex justify-between pt-2">
+                  <Button variant="outline" onClick={() => setCurrentStep('profile')} className="gap-2 min-h-[44px]">
                     <ArrowLeft className="w-4 h-4" /> Zurück
                   </Button>
-                  <Button onClick={submitVerification} disabled={saving} className="gap-2">
+                  <Button onClick={submitVerification} disabled={saving} className="gap-2 min-h-[44px]">
                     {saving ? <LoadingSpinner size="sm" /> : <FileCheck className="w-4 h-4" />}
                     Verifizierung einreichen
+                  </Button>
+                </div>
+
+                {/* Sticky bottom CTA on mobile */}
+                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-background/95 backdrop-blur-md border-t border-border/40 flex gap-2">
+                  <Button variant="outline" onClick={() => setCurrentStep('profile')} className="gap-2 min-h-[48px] flex-shrink-0" aria-label="Zurück">
+                    <ArrowLeft className="w-4 h-4" />
+                  </Button>
+                  <Button onClick={submitVerification} disabled={saving} className="flex-1 gap-2 min-h-[48px] text-base">
+                    {saving ? <LoadingSpinner size="sm" /> : <><FileCheck className="w-4 h-4" /> Verifizierung einreichen</>}
                   </Button>
                 </div>
               </CardContent>
