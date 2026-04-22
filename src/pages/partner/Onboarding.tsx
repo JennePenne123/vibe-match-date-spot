@@ -177,7 +177,7 @@ export default function PartnerOnboarding() {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-2xl space-y-6 pb-28 md:pb-6">
+    <div className="container mx-auto p-4 md:p-6 max-w-2xl space-y-6 pb-44 md:pb-6">
       {/* Sticky Header with progress */}
       <div className="sticky top-0 z-30 -mx-4 md:mx-0 px-4 md:px-0 pt-2 pb-3 md:pb-4 bg-background/85 backdrop-blur-md border-b border-border/40 md:border-0 md:bg-transparent md:backdrop-blur-none space-y-3">
         <div className="text-center space-y-1">
