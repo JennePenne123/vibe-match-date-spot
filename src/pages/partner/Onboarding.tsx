@@ -177,39 +177,49 @@ export default function PartnerOnboarding() {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-2xl space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
-          Partner-Setup
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Richte dein Partner-Konto in wenigen Minuten ein
-        </p>
-      </div>
+    <div className="container mx-auto p-4 md:p-6 max-w-2xl space-y-6 pb-28 md:pb-6">
+      {/* Sticky Header with progress */}
+      <div className="sticky top-0 z-30 -mx-4 md:mx-0 px-4 md:px-0 pt-2 pb-3 md:pb-4 bg-background/85 backdrop-blur-md border-b border-border/40 md:border-0 md:bg-transparent md:backdrop-blur-none space-y-3">
+        <div className="text-center space-y-1">
+          <h1 className="text-xl md:text-3xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
+            Partner-Setup
+          </h1>
+          <p className="hidden md:block text-sm text-muted-foreground">
+            Richte dein Partner-Konto in wenigen Minuten ein
+          </p>
+        </div>
 
-      {/* Progress */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        {/* Step indicator – mobile-first with connectors */}
+        <div className="flex items-center justify-between gap-1">
           {steps.map((step, idx) => (
-            <div key={step.key} className="flex items-center gap-1.5">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all ${
-                idx < currentIdx ? 'bg-primary text-primary-foreground' :
-                idx === currentIdx ? 'bg-primary/20 text-primary border-2 border-primary' :
-                'bg-muted text-muted-foreground'
-              }`}>
-                {idx < currentIdx ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
+            <div key={step.key} className="flex items-center flex-1 last:flex-initial">
+              <div
+                className={`w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center text-sm font-semibold transition-all flex-shrink-0 ${
+                  idx < currentIdx ? 'bg-primary text-primary-foreground shadow-sm' :
+                  idx === currentIdx ? 'bg-primary/15 text-primary border-2 border-primary ring-4 ring-primary/10' :
+                  'bg-muted text-muted-foreground'
+                }`}
+                aria-current={idx === currentIdx ? 'step' : undefined}
+                aria-label={`Schritt ${idx + 1}: ${step.label}`}
+              >
+                {idx < currentIdx ? <CheckCircle2 className="w-5 h-5" /> : idx + 1}
               </div>
               {idx < steps.length - 1 && (
-                <div className={`hidden sm:block w-12 md:w-20 h-0.5 ${idx < currentIdx ? 'bg-primary' : 'bg-muted'}`} />
+                <div className={`flex-1 h-0.5 mx-1 transition-colors ${idx < currentIdx ? 'bg-primary' : 'bg-muted'}`} />
               )}
             </div>
           ))}
         </div>
-        <Progress value={progress} className="h-1.5" />
-        <p className="text-xs text-muted-foreground text-center">
-          Schritt {currentIdx + 1} von {steps.length}: {steps[currentIdx]?.label}
-        </p>
+
+        <Progress value={progress} className="h-1" aria-label={`Fortschritt: ${progress}%`} />
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">
+            Schritt {currentIdx + 1}/{steps.length}: <span className="text-foreground font-medium">{steps[currentIdx]?.label}</span>
+          </span>
+          <span className="hidden sm:inline-flex items-center gap-1 text-muted-foreground">
+            <Shield className="w-3 h-3" /> Vorbereitet für DEHOGA-Mitglieder
+          </span>
+        </div>
       </div>
 
       {/* Step Content */}
