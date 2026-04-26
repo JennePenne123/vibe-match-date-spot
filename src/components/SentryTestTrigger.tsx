@@ -1,5 +1,5 @@
 import React from 'react';
-import { captureError } from '@/services/sentryService';
+import * as Sentry from '@sentry/react';
 import { toast } from '@/hooks/use-toast';
 
 /**
@@ -16,21 +16,33 @@ const SentryTestTrigger: React.FC = () => {
   const tapsRef = React.useRef<number[]>([]);
 
   const fireTestError = React.useCallback((source: string) => {
-    const err = new Error(`[Sentry Test] Controlled error from ${source} @ ${new Date().toISOString()}`);
+    const timestamp = new Date().toISOString();
+    const err = new Error(`[Sentry Test] Controlled error from ${source} @ ${timestamp}`);
     err.name = 'SentryTestError';
-    // Forward to Sentry with extra context
-    captureError(err, {
-      test: true,
-      tag: 'sentry-test',
-      source,
-      route: window.location.pathname,
+
+    // 1) Explicit capture with tags + level so it's easy to find in Sentry
+    const eventId = Sentry.captureException(err, {
+      level: 'error',
+      tags: { test: 'sentry-test', source },
+      extra: { route: window.location.pathname, timestamp },
     });
-    // Also log so you can see it in console
-    console.warn('[SentryTest] Fired controlled test error:', err.message);
+
+    // 2) Force-flush so the event is sent immediately (not batched)
+    Sentry.flush(2000).then((ok) => {
+      console.warn('[SentryTest] flush result:', ok, 'eventId:', eventId);
+    });
+
+    console.warn('[SentryTest] Fired controlled test error:', err.message, 'eventId:', eventId);
     toast({
       title: 'Sentry test error sent',
-      description: 'Check sentry.io → Issues (may take ~10s).',
+      description: `eventId: ${eventId?.slice(0, 8) ?? 'n/a'} — check sentry.io → Issues (~10s).`,
     });
+
+    // 3) Also throw an uncaught error after a tick — this hits the global
+    //    error handler, which Sentry definitely captures.
+    setTimeout(() => {
+      throw new Error(`[Sentry Test UNCAUGHT] from ${source} @ ${timestamp}`);
+    }, 50);
   }, []);
 
   // Keyboard shortcut: Ctrl/Cmd + Shift + E
