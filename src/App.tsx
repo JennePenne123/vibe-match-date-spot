@@ -25,7 +25,6 @@ import OfflineBanner from "./components/OfflineBanner";
 import GeoPrivacyBanner from "./components/GeoPrivacyBanner";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
-import SentryTestTrigger from "./components/SentryTestTrigger";
 import { useAppUsageTracking } from "./hooks/useImplicitSignals";
 import { isLovablePreviewEnvironment } from "./utils/runtimeEnvironment";
 
@@ -205,7 +204,6 @@ const App = () => (
                 <GeoPrivacyBanner />
                 <PushNotificationPrompt />
                 <AppUsageTracker />
-                <SentryTestTrigger />
                 <ErrorBoundary level="page">
                   <Routes>
                     {/* Public routes without layout */}
