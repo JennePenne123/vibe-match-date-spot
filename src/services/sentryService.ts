@@ -1,8 +1,23 @@
 import * as Sentry from '@sentry/react';
+import { supabase } from '@/integrations/supabase/client';
 
-const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
+let SENTRY_DSN: string = import.meta.env.VITE_SENTRY_DSN ?? '';
 
-export function initSentry(): void {
+async function fetchDsnFromBackend(): Promise<string> {
+  try {
+    const { data, error } = await supabase.functions.invoke('get-sentry-config');
+    if (error || !data?.dsn) return '';
+    return data.dsn as string;
+  } catch {
+    return '';
+  }
+}
+
+export async function initSentry(): Promise<void> {
+  if (!SENTRY_DSN) {
+    SENTRY_DSN = await fetchDsnFromBackend();
+  }
+
   if (!SENTRY_DSN) {
     if (import.meta.env.DEV) {
       console.log('[Sentry] No DSN configured, skipping initialization');
