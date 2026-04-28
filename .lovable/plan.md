@@ -115,32 +115,30 @@
 
 ## 🔲 Noch offen (Pre-Launch)
 
-### Phase 1: Rechtstexte & Compliance
+### 🚨 Blocker (zwingend vor Launch)
 - [ ] UG-Gründung abschließen
-- [ ] Platzhalter in AGB, Datenschutz, Impressum ersetzen (Firma, Adresse, HRB, Geschäftsführer)
+- [ ] Platzhalter in AGB, Datenschutz, Impressum, Widerrufsformular ersetzen (Firma, Adresse, HRB, Geschäftsführer, USt-ID)
+- [ ] Google OAuth → Produktions-Credentials (hioutz.app Origins + Redirect URIs) + in Supabase eintragen
+- [ ] Supabase Site URL + Redirect URLs final auf https://hioutz.app verifizieren
+- [ ] Projekt in Lovable auf **Publish** klicken
+
+### ⚠️ Wichtig (sollte vor Launch)
+- [ ] Sentry Test-Event verifizieren + `SentryTestTrigger` Komponente entfernen
 - [ ] ITMR Legal Erstberatung durchführen
 - [ ] DSFA (Datenschutz-Folgenabschätzung) prüfen
+- [ ] Rate Limiting & API Quotas validieren (Foursquare, Google Places, Lovable AI)
+- [ ] Cron-Jobs Status final checken
 
-### Phase 2: OAuth & Authentifizierung
-- [ ] Google OAuth → Produktion (hioutz.app Origins + Redirect URIs)
+### ✅ Bereits erledigt
+- [x] Custom Domain hioutz.app verbunden (A-Records + TXT-Verify)
+- [x] SSL automatisch provisioniert
+- [x] OG-Image (1200×630) in public/og-image.jpg + index.html eingebunden
+
+### 📱 Post-Launch (optional)
 - [ ] Apple OAuth → Apple Developer Program ($99/Jahr) + Konfiguration
-
-### Phase 3: Native Mobile App (Capacitor)
-- [ ] iOS: `npx cap add ios` + Xcode Permissions
-- [ ] Android: `npx cap add android` + AndroidManifest Permissions
-- [ ] Kamera (QR-Scan): NSCameraUsageDescription
-- [ ] Geolocation: Location Permissions
-- [ ] Push: Firebase + APNS Certificates
-- [ ] Native Build Tests
-
-### Phase 4: Domain & Infrastruktur
-- [ ] Custom Domain hioutz.app verbinden (A-Records + TXT-Verify)
-- [ ] SSL-Zertifikat provisionieren
-- [ ] Rate Limiting & API Monitoring validieren
-
-### Nice-to-have vor Launch
-- [ ] OG-Image für Social Sharing (1200×630)
+- [ ] Native Mobile App (Capacitor: iOS/Android Build, Permissions, Push Certs)
 - [ ] App Store Screenshots
+- [ ] Stripe-Integration (Monetarisierung)
 
 ---
 
