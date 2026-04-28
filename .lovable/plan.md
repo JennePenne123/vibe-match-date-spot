@@ -133,6 +133,9 @@
 - [x] Custom Domain hioutz.app verbunden (A-Records + TXT-Verify)
 - [x] SSL automatisch provisioniert
 - [x] OG-Image (1200×630) in public/og-image.jpg + index.html eingebunden
+- [x] Security-Hardening: venue_staff RLS (Staff sieht nur eigenen Eintrag, Trigger gegen Self-Promotion)
+- [x] Security-Hardening: Storage-Bucket-Listing blockiert (avatars, venue-photos)
+- [x] Security-Hardening: pg_graphql Extension entfernt (nur REST in Nutzung)
 
 ### 📱 Post-Launch (optional)
 - [ ] Apple OAuth → Apple Developer Program ($99/Jahr) + Konfiguration
