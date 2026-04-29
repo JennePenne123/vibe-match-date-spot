@@ -111,6 +111,7 @@ const Widerrufsformular = lazy(() => import("./pages/Widerrufsformular"));
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
 const PartnerOnboarding = lazy(() => import("./pages/partner/Onboarding"));
+const PartnerDehogaOnboarding = lazy(() => import("./pages/partner/DehogaOnboarding"));
 const PartnerVouchers = lazy(() => import("./pages/partner/Vouchers"));
 const PartnerVenues = lazy(() => import("./pages/partner/Venues"));
 const PartnerReports = lazy(() => import("./pages/partner/Reports"));
