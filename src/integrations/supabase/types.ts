@@ -783,6 +783,42 @@ export type Database = {
           },
         ]
       }
+      dehoga_invitation_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          landesverband: string | null
+          notes: string | null
+          updated_at: string
+          used_at: string | null
+          used_by: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          landesverband?: string | null
+          notes?: string | null
+          updated_at?: string
+          used_at?: string | null
+          used_by?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          landesverband?: string | null
+          notes?: string | null
+          updated_at?: string
+          used_at?: string | null
+          used_by?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       error_logs: {
         Row: {
           component_name: string | null
@@ -828,6 +864,36 @@ export type Database = {
           severity?: string
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          flag_key: string
+          id: string
+          metadata: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          flag_key: string
+          id?: string
+          metadata?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          flag_key?: string
+          id?: string
+          metadata?: Json
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1088,9 +1154,14 @@ export type Database = {
           contact_person: string
           country: string | null
           created_at: string
+          dehoga_landesverband: string | null
+          dehoga_member_id: string | null
+          dehoga_verification_method: string | null
+          dehoga_verified_at: string | null
           description: string | null
           founding_partner_claimed_at: string | null
           id: string
+          is_dehoga_member: boolean
           is_founding_partner: boolean
           logo_url: string | null
           loyalty_bonus_awarded: boolean
@@ -1127,9 +1198,14 @@ export type Database = {
           contact_person?: string
           country?: string | null
           created_at?: string
+          dehoga_landesverband?: string | null
+          dehoga_member_id?: string | null
+          dehoga_verification_method?: string | null
+          dehoga_verified_at?: string | null
           description?: string | null
           founding_partner_claimed_at?: string | null
           id?: string
+          is_dehoga_member?: boolean
           is_founding_partner?: boolean
           logo_url?: string | null
           loyalty_bonus_awarded?: boolean
@@ -1166,9 +1242,14 @@ export type Database = {
           contact_person?: string
           country?: string | null
           created_at?: string
+          dehoga_landesverband?: string | null
+          dehoga_member_id?: string | null
+          dehoga_verification_method?: string | null
+          dehoga_verified_at?: string | null
           description?: string | null
           founding_partner_claimed_at?: string | null
           id?: string
+          is_dehoga_member?: boolean
           is_founding_partner?: boolean
           logo_url?: string | null
           loyalty_bonus_awarded?: boolean

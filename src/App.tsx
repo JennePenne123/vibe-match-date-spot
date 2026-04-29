@@ -111,6 +111,7 @@ const Widerrufsformular = lazy(() => import("./pages/Widerrufsformular"));
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
 const PartnerOnboarding = lazy(() => import("./pages/partner/Onboarding"));
+const PartnerDehogaOnboarding = lazy(() => import("./pages/partner/DehogaOnboarding"));
 const PartnerVouchers = lazy(() => import("./pages/partner/Vouchers"));
 const PartnerVenues = lazy(() => import("./pages/partner/Venues"));
 const PartnerReports = lazy(() => import("./pages/partner/Reports"));
@@ -260,6 +261,7 @@ const App = () => (
                     <Route path="/partner/notifications" element={<LazyPage><PartnerNotifications /></LazyPage>} />
                     <Route path="/partner/venue-comparison" element={<LazyPage><PartnerVenueComparison /></LazyPage>} />
                     <Route path="/partner/onboarding" element={<LazyPage><PartnerOnboarding /></LazyPage>} />
+                    <Route path="/partner/dehoga" element={<LazyPage><PartnerDehogaOnboarding /></LazyPage>} />
                     <Route path="/partner/terms" element={<LazyPage><PartnerTerms /></LazyPage>} />
                     <Route path="/partner/privacy" element={<LazyPage><PartnerPrivacy /></LazyPage>} />
                     <Route path="/partner/staff" element={<LazyPage><PartnerStaff /></LazyPage>} />
