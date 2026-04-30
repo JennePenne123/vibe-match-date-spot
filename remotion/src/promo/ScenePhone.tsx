@@ -1,4 +1,4 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
+import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, Img, staticFile } from "remotion";
 import { loadFont } from "@remotion/google-fonts/Inter";
 import { Emoji } from "./Emoji";
 
@@ -64,12 +64,12 @@ export const ScenePhone = () => {
           borderRadius: 48,
           padding: "60px 30px 30px",
         }}>
-          {/* H!Outz header */}
-          <div style={{
-            fontFamily, fontSize: 32, fontWeight: 900,
-            color: "white", textAlign: "center", marginBottom: 8,
-          }}>
-            H!<span style={{ color: "#F97316" }}>✦</span> Outz
+          {/* H!Outz header (real logo) */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+            <Img
+              src={staticFile("images/hioutz-logo.png")}
+              style={{ width: 220, height: "auto" }}
+            />
           </div>
           <div style={{
             fontFamily, fontSize: 18, fontWeight: 400,

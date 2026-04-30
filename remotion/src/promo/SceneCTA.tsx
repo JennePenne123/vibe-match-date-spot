@@ -1,4 +1,4 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
+import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, Img, staticFile } from "remotion";
 import { loadFont } from "@remotion/google-fonts/Inter";
 import { Emoji } from "./Emoji";
 
@@ -92,22 +92,17 @@ export const SceneCTA = () => {
         justifyContent: "center", alignItems: "center",
         padding: 60,
       }}>
-        {/* H!Outz Logo (text) */}
+        {/* H!Outz Logo (real PNG) */}
         <div style={{
           opacity: logoOpacity,
           transform: `scale(${logoScale})`,
           marginBottom: 30,
+          filter: `drop-shadow(0 0 ${60 * pulse}px rgba(13,148,136,0.6))`,
         }}>
-          <div style={{
-            fontFamily, fontSize: 180, fontWeight: 900,
-            color: "white",
-            letterSpacing: -6,
-            lineHeight: 1,
-            textAlign: "center",
-            textShadow: `0 0 ${60 * pulse}px rgba(13,148,136,0.6)`,
-          }}>
-            H!<span style={{ color: "#F97316" }}>✦</span>Outz
-          </div>
+          <Img
+            src={staticFile("images/hioutz-logo.png")}
+            style={{ width: 760, height: "auto", display: "block" }}
+          />
         </div>
 
         {/* Tagline */}
