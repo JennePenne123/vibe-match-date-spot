@@ -162,6 +162,35 @@ export const getAIVenueRecommendations = async (
             );
           } catch {}
         }
+
+        // ── Re-score for non-food intent ──
+        // The preference filter scores by cuisine match, which unfairly
+        // penalises bowling alleys / museums / mini-golf in an "activity"
+        // intent (they have no cuisine, so they end up at 12% while a Thai
+        // restaurant lands at 82%). Lift the floor for venues that actually
+        // match the active situational category so they win the ranking.
+        const matchesPrimaryIntent = (v: any): boolean => {
+          const haystack = [
+            v.name || '',
+            v.cuisine_type || '',
+            v.description || '',
+            ...((v.tags as string[]) || []),
+            v.venue_type || '',
+            ...((v.activities as string[]) || []),
+          ].join(' ').toLowerCase();
+          if (primaryCat.boostKeywords.some(kw => haystack.includes(kw))) return true;
+          if (primaryCat.boostVenueTypes.some(t => haystack.includes(t.toLowerCase()))) return true;
+          if (primaryCat.boostActivities.some(a => haystack.includes(a.toLowerCase()))) return true;
+          return false;
+        };
+        venues = venues.map(v => {
+          if (matchesPrimaryIntent(v)) {
+            const current = v.preferenceScore || 0;
+            // Strong floor so on-intent venues outrank off-intent gastro
+            v.preferenceScore = Math.max(current, 78);
+          }
+          return v;
+        });
       }
     }
 
