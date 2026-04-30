@@ -202,14 +202,18 @@ serve(async (req) => {
       }
     }
 
+    const venueTypes = payload.venueTypes ?? [];
+    const activities = payload.activities ?? [];
+    const hasNonFoodIntent = venueTypes.length > 0 || activities.some((act) => act !== "dining");
+
     // 2️⃣ TIER 1: GOOGLE PLACES (PRIMARY)
     const googlePayload = {
       latitude: payload.latitude,
       longitude: payload.longitude,
       radius: payload.radius ?? 5000,
-      cuisines: payload.cuisines ?? [],
-      originalCuisines: payload.cuisines ?? [],
-      types: payload.venueTypes?.length ? payload.venueTypes : ["restaurant"],
+      cuisines: hasNonFoodIntent ? [] : (payload.cuisines ?? []),
+      originalCuisines: hasNonFoodIntent ? [] : (payload.cuisines ?? []),
+      types: hasNonFoodIntent ? ["point_of_interest", ...venueTypes, ...activities] : ["restaurant"],
       // Field mask hint (Standard tier) – consumed by search-venues if it switches to Places API New
       fieldMask: "essentials+pro",
     };
