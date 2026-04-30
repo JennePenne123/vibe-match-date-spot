@@ -16,8 +16,8 @@ interface CacheStats {
   size: number;
 }
 
-const CACHE_KEY_PREFIX = 'hioutz_venue_cache_';
-const CACHE_STATS_KEY = 'hioutz_cache_stats';
+const CACHE_KEY_PREFIX = 'hioutz-venue-cache-v2_';
+const CACHE_STATS_KEY = 'hioutz-cache-stats-v2';
 // Smart Hybrid uses Google as primary which costs ~$17/1000 calls.
 // 24 h TTL keeps the hit-rate high without serving stale opening hours.
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
