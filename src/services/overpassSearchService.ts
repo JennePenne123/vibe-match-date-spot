@@ -123,6 +123,7 @@ function buildOverpassQuery(
   limit: number,
   categoryId: SituationalCategoryId | null,
   secondaryCategoryId: SituationalCategoryId | null,
+  extraVenueTypes: string[] = [],
 ): string {
   const r = Math.min(radius, 25000);
 
@@ -144,10 +145,19 @@ function buildOverpassQuery(
     }
   }
 
+  // User-selected niche venue types (mini_golf, bowling, museum, ...) — these
+  // come from the Preferences wizard and must be queried regardless of which
+  // (if any) situational quick-action is active.
+  for (const vt of extraVenueTypes) {
+    for (const tag of VENUE_TYPE_OSM_TAGS[vt] ?? []) {
+      activeCategoryTags.set(`${tag[0]}=${tag[1]}`, tag);
+    }
+  }
+
   // When NO category is active, keep the legacy "broad culture+nightlife"
   // baseline so generic searches still surface a museum or club nearby.
   const fallbackSelectors: Array<[string, string]> =
-    categoryId || secondaryCategoryId
+    categoryId || secondaryCategoryId || extraVenueTypes.length > 0
       ? []
       : [
           ['amenity', 'theatre'],
