@@ -390,8 +390,9 @@ export async function searchVenuesOverpass(
   limit: number = 40,
   categoryId: SituationalCategoryId | null = null,
   secondaryCategoryId: SituationalCategoryId | null = null,
+  extraVenueTypes: string[] = [],
 ): Promise<OverpassSearchResult> {
-  console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters, categoryId, secondaryCategoryId });
+  console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters, categoryId, secondaryCategoryId, extraVenueTypes });
 
   const query = buildOverpassQuery(
     lat,
@@ -400,6 +401,7 @@ export async function searchVenuesOverpass(
     Math.min(limit * 2, 80),
     categoryId,
     secondaryCategoryId,
+    extraVenueTypes,
   );
   const data = await fetchWithMirrorRotation(query);
 
