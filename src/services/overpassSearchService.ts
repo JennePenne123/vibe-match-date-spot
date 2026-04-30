@@ -61,6 +61,29 @@ const CATEGORY_OSM_TAGS: Record<SituationalCategoryId, Array<[string, string]>> 
   ],
 };
 
+/**
+ * Map a user-selected `preferred_venue_types` id (e.g. "mini_golf", "bowling")
+ * to the set of OSM selectors that should be queried so the user actually gets
+ * results for that activity, even outside the situational quick-action flow.
+ */
+const VENUE_TYPE_OSM_TAGS: Record<string, Array<[string, string]>> = {
+  mini_golf: [['leisure', 'miniature_golf']],
+  bowling: [['leisure', 'bowling_alley']],
+  arcade: [['leisure', 'amusement_arcade']],
+  escape_room: [['leisure', 'escape_game']],
+  climbing: [['leisure', 'climbing'], ['sport', 'climbing']],
+  swimming: [['leisure', 'swimming_pool'], ['leisure', 'water_park']],
+  spa_wellness: [['leisure', 'spa'], ['amenity', 'spa']],
+  museum: [['tourism', 'museum']],
+  gallery: [['tourism', 'gallery']],
+  theater_venue: [['amenity', 'theatre']],
+  cinema: [['amenity', 'cinema']],
+  concert_hall: [['amenity', 'concert_hall']],
+  karaoke: [['amenity', 'karaoke_box']],
+  comedy_club: [['amenity', 'theatre']],
+  live_music: [['amenity', 'concert_hall'], ['amenity', 'nightclub']],
+};
+
 const CUISINE_TO_OSM: Record<string, string[]> = {
   'Italian': ['italian', 'pizza'],
   'Pizza': ['pizza'],
