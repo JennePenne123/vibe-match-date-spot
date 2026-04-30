@@ -61,6 +61,29 @@ const CATEGORY_OSM_TAGS: Record<SituationalCategoryId, Array<[string, string]>> 
   ],
 };
 
+/**
+ * Map a user-selected `preferred_venue_types` id (e.g. "mini_golf", "bowling")
+ * to the set of OSM selectors that should be queried so the user actually gets
+ * results for that activity, even outside the situational quick-action flow.
+ */
+const VENUE_TYPE_OSM_TAGS: Record<string, Array<[string, string]>> = {
+  mini_golf: [['leisure', 'miniature_golf']],
+  bowling: [['leisure', 'bowling_alley']],
+  arcade: [['leisure', 'amusement_arcade']],
+  escape_room: [['leisure', 'escape_game']],
+  climbing: [['leisure', 'climbing'], ['sport', 'climbing']],
+  swimming: [['leisure', 'swimming_pool'], ['leisure', 'water_park']],
+  spa_wellness: [['leisure', 'spa'], ['amenity', 'spa']],
+  museum: [['tourism', 'museum']],
+  gallery: [['tourism', 'gallery']],
+  theater_venue: [['amenity', 'theatre']],
+  cinema: [['amenity', 'cinema']],
+  concert_hall: [['amenity', 'concert_hall']],
+  karaoke: [['amenity', 'karaoke_box']],
+  comedy_club: [['amenity', 'theatre']],
+  live_music: [['amenity', 'concert_hall'], ['amenity', 'nightclub']],
+};
+
 const CUISINE_TO_OSM: Record<string, string[]> = {
   'Italian': ['italian', 'pizza'],
   'Pizza': ['pizza'],
@@ -100,6 +123,7 @@ function buildOverpassQuery(
   limit: number,
   categoryId: SituationalCategoryId | null,
   secondaryCategoryId: SituationalCategoryId | null,
+  extraVenueTypes: string[] = [],
 ): string {
   const r = Math.min(radius, 25000);
 
@@ -121,10 +145,19 @@ function buildOverpassQuery(
     }
   }
 
+  // User-selected niche venue types (mini_golf, bowling, museum, ...) — these
+  // come from the Preferences wizard and must be queried regardless of which
+  // (if any) situational quick-action is active.
+  for (const vt of extraVenueTypes) {
+    for (const tag of VENUE_TYPE_OSM_TAGS[vt] ?? []) {
+      activeCategoryTags.set(`${tag[0]}=${tag[1]}`, tag);
+    }
+  }
+
   // When NO category is active, keep the legacy "broad culture+nightlife"
   // baseline so generic searches still surface a museum or club nearby.
   const fallbackSelectors: Array<[string, string]> =
-    categoryId || secondaryCategoryId
+    categoryId || secondaryCategoryId || extraVenueTypes.length > 0
       ? []
       : [
           ['amenity', 'theatre'],
@@ -357,8 +390,9 @@ export async function searchVenuesOverpass(
   limit: number = 40,
   categoryId: SituationalCategoryId | null = null,
   secondaryCategoryId: SituationalCategoryId | null = null,
+  extraVenueTypes: string[] = [],
 ): Promise<OverpassSearchResult> {
-  console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters, categoryId, secondaryCategoryId });
+  console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters, categoryId, secondaryCategoryId, extraVenueTypes });
 
   const query = buildOverpassQuery(
     lat,
@@ -367,6 +401,7 @@ export async function searchVenuesOverpass(
     Math.min(limit * 2, 80),
     categoryId,
     secondaryCategoryId,
+    extraVenueTypes,
   );
   const data = await fetchWithMirrorRotation(query);
 

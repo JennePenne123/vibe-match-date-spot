@@ -1186,6 +1186,13 @@ async function getVenuesFromOverpass(
     const { searchVenuesOverpass } = await import('@/services/overpassSearchService');
     const baseRadius = (userPrefs.max_distance || 25) * 1000;
     const radiusMeters = Math.round(baseRadius * radiusMultiplier);
+    // Combine user-selected venue types and activity preferences so Overpass
+    // queries the right OSM tags (e.g. mini_golf → leisure=miniature_golf),
+    // independent of any active situational quick-action.
+    const extraVenueTypes = [
+      ...((userPrefs as any)?.preferred_venue_types || []),
+      ...((userPrefs as any)?.preferred_activities || []),
+    ];
     const result = await searchVenuesOverpass(
       userLocation.latitude,
       userLocation.longitude,
@@ -1194,6 +1201,7 @@ async function getVenuesFromOverpass(
       limit,
       situationalCategoryId ?? null,
       secondaryCategoryId ?? null,
+      extraVenueTypes,
     );
     
     const venues = result.venues || [];
