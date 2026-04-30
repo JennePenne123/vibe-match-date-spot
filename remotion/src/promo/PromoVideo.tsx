@@ -1,4 +1,4 @@
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, Audio, staticFile } from "remotion";
 import { TransitionSeries, linearTiming } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import { SceneHook } from "./SceneHook";
@@ -11,6 +11,10 @@ import { SceneCTA } from "./SceneCTA";
 export const PromoVideo = () => {
   return (
     <AbsoluteFill style={{ background: "#0F172A" }}>
+      {/* Background trap beat — full duration */}
+      <Audio src={staticFile("audio/beat.mp3")} volume={0.55} />
+      {/* German voiceover — starts ~0.3s in */}
+      <Audio src={staticFile("audio/voice.mp3")} volume={1.1} startFrom={0} />
       <TransitionSeries>
         <TransitionSeries.Sequence durationInFrames={45}>
           <SceneHook />
