@@ -300,10 +300,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       }
 
+      const situationalCategoryId =
+        (typeof window !== 'undefined'
+          ? (window.sessionStorage.getItem('hioutz-situational-category') as 'food' | 'culture' | 'activity' | 'nightlife' | null)
+          : null) || null;
+      const secondaryCategoryId =
+        (typeof window !== 'undefined'
+          ? (window.sessionStorage.getItem('hioutz-situational-secondary') as 'food' | 'culture' | 'activity' | 'nightlife' | null)
+          : null) || null;
+
       console.log('Generating recommendations with:', {
         cuisines: appState.selectedCuisines,
         vibes: appState.selectedVibes,
         area: appState.selectedArea,
+        situationalCategoryId,
+        secondaryCategoryId,
         location
       });
 
@@ -312,7 +323,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (user && location?.latitude && location?.longitude) {
         try {
           const { getAIVenueRecommendations } = await import('@/services/aiVenueService');
-          const recommendations = await getAIVenueRecommendations(user.id, undefined, 6, location, appState.selectedArea);
+          const recommendations = await getAIVenueRecommendations(
+            user.id,
+            undefined,
+            6,
+            location,
+            appState.selectedArea,
+            undefined,
+            undefined,
+            situationalCategoryId,
+            secondaryCategoryId,
+          );
           venues = recommendations.map(recommendationToVenue);
           console.log(`✅ AI venue pipeline returned ${venues.length} venues`);
         } catch (aiError) {

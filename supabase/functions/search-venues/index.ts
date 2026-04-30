@@ -40,7 +40,15 @@ serve(async (req) => {
     const validLatitude = parseFloat(latitude);
     const validLongitude = parseFloat(longitude);
     const validRadius = Math.min(Math.max(parseInt(radius) || 5000, 1000), 50000); // Limit radius between 1km-50km
-    const validTypes = Array.isArray(types) ? types.slice(0, 5) : ['restaurant']; // Limit to 5 types max
+    const rawTypes = Array.isArray(types) ? types.slice(0, 8).map((t) => String(t)) : ['restaurant'];
+    const placeTypeMap: Record<string, string> = {
+      mini_golf: 'amusement_park', bowling: 'bowling_alley', arcade: 'amusement_park', escape_room: 'amusement_park',
+      climbing: 'gym', swimming: 'swimming_pool', spa_wellness: 'spa', museum: 'museum', gallery: 'art_gallery',
+      theater_venue: 'movie_theater', cinema: 'movie_theater', concert_hall: 'night_club', karaoke: 'night_club',
+      comedy_club: 'night_club', active: 'amusement_park', cultural_act: 'museum', nightlife_act: 'night_club', cocktails: 'bar',
+    };
+    const validTypes = rawTypes.map((t) => placeTypeMap[t] || t).filter(Boolean).slice(0, 5); // Limit to 5 types max
+    const typeKeywords = rawTypes.filter((t) => t !== 'restaurant' && t !== 'point_of_interest').map((t) => t.replace(/_/g, ' '));
     const validMinRating = Math.min(Math.max(parseFloat(minRating) || 3.0, 1.0), 5.0);
     
     // Validate coordinates
@@ -104,6 +112,7 @@ serve(async (req) => {
     if (sanitizedCuisines && sanitizedCuisines.length > 0) {
       keywordParts.push(...sanitizedCuisines);
     }
+    keywordParts.push(...typeKeywords);
     if (validTypes.length > 1) {
       keywordParts.push(...validTypes.slice(1).map((t: string) => t.replace(/_/g, ' ')));
     }
@@ -127,12 +136,12 @@ serve(async (req) => {
     const fieldMaskHeader = fieldMaskParts.join(',');
 
     let endpoint: string;
-    let requestBody: Record<string, unknown>;
+    let placesRequestBody: Record<string, unknown>;
 
     if (useTextSearch) {
       // Text Search: best for cuisine/keyword queries
       endpoint = 'https://places.googleapis.com/v1/places:searchText';
-      requestBody = {
+      placesRequestBody = {
         textQuery: `${keywordParts.join(' ')} ${primaryType}`.trim(),
         languageCode: 'de',
         maxResultCount: 20,
@@ -143,11 +152,11 @@ serve(async (req) => {
           },
         },
       };
-      console.log('🔍 SEARCH VENUES: Using Text Search with query:', requestBody.textQuery);
+      console.log('🔍 SEARCH VENUES: Using Text Search with query:', placesRequestBody.textQuery);
     } else {
       // Nearby Search: type-only filter
       endpoint = 'https://places.googleapis.com/v1/places:searchNearby';
-      requestBody = {
+      placesRequestBody = {
         includedTypes: [primaryType],
         maxResultCount: 20,
         languageCode: 'de',
@@ -174,7 +183,7 @@ serve(async (req) => {
         'X-Goog-FieldMask': fieldMaskHeader,
         'User-Agent': 'HiOutz-App/1.0',
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify(placesRequestBody),
     });
 
     const requestDuration = Date.now() - startTime;
