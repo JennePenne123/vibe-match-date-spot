@@ -24,15 +24,14 @@ const composition = await selectComposition({
   puppeteerInstance: browser,
 });
 
+// Render video-only; audio muxed afterwards with system ffmpeg (no libfdk_aac available)
 await renderMedia({
   composition,
   serveUrl: bundled,
   codec: "h264",
-  outputLocation: "/mnt/documents/HiOutz_Waitlist_Promo.mp4",
+  outputLocation: "/tmp/promo-video-only.mp4",
   puppeteerInstance: browser,
-  audioCodec: "aac",
-  audioBitrate: "192k",
-  enforceAudioTrack: true,
+  muted: true,
   concurrency: 1,
 });
 
