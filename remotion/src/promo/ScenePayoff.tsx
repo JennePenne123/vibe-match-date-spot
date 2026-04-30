@@ -103,11 +103,12 @@ const PayoffMoment: React.FC<{
 
       {/* Giant emoji */}
       <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        position: "absolute", top: 200, left: 0, right: 0, bottom: 600,
         display: "flex", justifyContent: "center", alignItems: "center",
         transform: `scale(${emojiScale}) rotate(${emojiRotate}deg)`,
+        opacity: 0.95,
       }}>
-        <Emoji char={emoji} size={480} style={{ filter: "drop-shadow(0 20px 60px rgba(0,0,0,0.8))" }} />
+        <Emoji char={emoji} size={420} style={{ filter: "drop-shadow(0 20px 60px rgba(0,0,0,0.8))" }} />
       </div>
 
       {/* Big text */}
@@ -118,10 +119,9 @@ const PayoffMoment: React.FC<{
         transform: `scale(${textScale})`,
       }}>
         <div style={{
-          fontFamily, fontSize: 130, fontWeight: 900,
+          fontFamily, fontSize: 140, fontWeight: 900,
           color: "white", letterSpacing: -3, lineHeight: 1,
-          textShadow: `0 0 40px ${accent}, 0 10px 30px rgba(0,0,0,0.8)`,
-          WebkitTextStroke: `3px ${accent}`,
+          textShadow: `0 0 40px ${accent}, 0 0 80px ${accent}, 0 10px 30px rgba(0,0,0,0.9)`,
         }}>
           {big}
         </div>
