@@ -1276,7 +1276,8 @@ async function getVenuesFromGooglePlaces(
       venueTypes: (userPrefs as any).preferred_venue_types || [],
       activities: (userPrefs as any).preferred_activities || [],
       radius: fixedPrefs.max_distance * 1609,
-      limit
+      limit,
+      forceRefresh: (((userPrefs as any).preferred_venue_types || []).length > 0) || (((userPrefs as any).preferred_activities || []).length > 0),
     };
 
     let searchResult = null;
