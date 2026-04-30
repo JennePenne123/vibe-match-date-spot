@@ -3,6 +3,8 @@ project_id = "dfjwubatslzblagthbdw"
 [functions]
   [functions.ai-concierge]
     verify_jwt = false
+  [functions.promo-audio-gen]
+    verify_jwt = false
   [functions.ai-quick-tip]
     verify_jwt = true
   [functions.ai-venue-recommendations]
