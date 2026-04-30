@@ -865,7 +865,13 @@ async function getVenuesGooglePrimaryHybrid(
     `🎯 Smart Hybrid → Google PRIMARY (${reason}); enriching with Radar+Overpass in parallel`,
   );
 
-  const timeoutMs = (API_CONFIG as any).googlePrimaryTimeoutMs ?? 7000;
+  // Non-food intents (activity/culture/nightlife) benefit massively from
+  // Google's richer venue metadata for things like bowling alleys, museums
+  // and clubs. Give Google more breathing room and a larger result set
+  // so it can dominate the merge.
+  const baseTimeout = (API_CONFIG as any).googlePrimaryTimeoutMs ?? 7000;
+  const timeoutMs = isNonFoodMode ? Math.max(baseTimeout, 12000) : baseTimeout;
+  const googleLimit = isNonFoodMode ? Math.max(limit, 30) : limit;
 
   // Track timeout for Smart Hybrid telemetry
   let googleTimedOut = false;
@@ -874,7 +880,7 @@ async function getVenuesGooglePrimaryHybrid(
   // Fire all three in parallel — Google with hard timeout
   const promises: Promise<any[]>[] = [
     Promise.race<any[]>([
-      getVenuesFromGooglePlaces(userId, limit, userLocation).catch((err) => {
+      getVenuesFromGooglePlaces(userId, googleLimit, userLocation).catch((err) => {
         console.warn('⚠️ Google primary failed:', err instanceof Error ? err.message : err);
         return [] as any[];
       }),
@@ -911,6 +917,12 @@ async function getVenuesGooglePrimaryHybrid(
   console.log(
     `🔀 SMART HYBRID MERGE: Google=${googleVenues.length}, Radar=${radarVenues.length}, Overpass=${osmVenues.length}`,
   );
+
+  // Tag source so downstream scoring can prefer Google for activity intents
+  // (Google has the best metadata for bowling/cinema/mini-golf/etc.).
+  for (const v of googleVenues) (v as any)._source = 'google';
+  for (const v of radarVenues) (v as any)._source = (v as any)._source ?? 'radar';
+  for (const v of osmVenues) (v as any)._source = (v as any)._source ?? 'overpass';
 
   // Google as primary (richest metadata), then enrich/extend with Radar + Overpass
   let venues: any[] = googleVenues;
