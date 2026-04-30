@@ -278,6 +278,20 @@ export const getAIVenueRecommendations = async (
       const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
       const situationalBoost = getSituationalBoost(situationalCat, venue, secondaryCat);
 
+      // ── Source Quality Boost ──
+      // For non-food intents (Aktivität/Kultur/Nightlife) Google Places hat
+      // deutlich reichere Metadaten (Fotos, Bewertungen, Öffnungszeiten,
+      // korrekte Kategorien) als OSM/Radar. Wir boosten Google-Venues
+      // bei diesen Intents leicht, damit sie im Ranking gewinnen.
+      let sourceBoost = 1.0;
+      if (situationalCat && situationalCat.id !== 'food') {
+        const src = (venue as any)._source;
+        if (src === 'google') sourceBoost = 1.18;
+        else if (src === 'radar') sourceBoost = 1.0;
+        else if (src === 'overpass') sourceBoost = 0.92;
+      }
+
+
       // ── Proximity Boost (district / user location) ──
       // Strongly prioritise venues within walking distance, decay to 1.0 at
       // ~3 km, then a soft penalty out to 15 km. This is multiplicative so it
@@ -298,7 +312,7 @@ export const getAIVenueRecommendations = async (
         else proximityBoost = 0.72;                            // weit weg
       }
 
-      const finalScore = Math.max(5, Math.min(98, rawScore * situationalBoost * proximityBoost));
+      const finalScore = Math.max(5, Math.min(98, rawScore * situationalBoost * proximityBoost * sourceBoost));
 
       // Generate reasoning based on actual matches
       const matchReasons: string[] = [];
