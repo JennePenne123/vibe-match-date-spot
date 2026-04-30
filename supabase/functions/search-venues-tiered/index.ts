@@ -66,7 +66,7 @@ async function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise
 }
 
 async function callTier(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   fnName: string,
   body: Record<string, unknown>,
   timeoutMs: number,
