@@ -1,5 +1,6 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 import { loadFont } from "@remotion/google-fonts/Inter";
+import { Emoji } from "./Emoji";
 
 const { fontFamily } = loadFont("normal", { weights: ["400", "700", "900"] });
 
@@ -37,11 +38,10 @@ export const SceneHook = () => {
       <div style={{
         position: "absolute", top: 380, left: 0, right: 0,
         textAlign: "center",
-        fontSize: 180,
         opacity: emojiOpacity,
         transform: `translateY(${emojiY}px)`,
       }}>
-        😪
+        <Emoji char="😪" size={180} />
       </div>
 
       {/* Knall-Text */}

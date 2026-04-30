@@ -1,5 +1,6 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 import { loadFont } from "@remotion/google-fonts/Inter";
+import { Emoji } from "./Emoji";
 
 const { fontFamily } = loadFont("normal", { weights: ["400", "600", "700", "900"] });
 
@@ -153,8 +154,9 @@ export const SceneCTA = () => {
             marginBottom: 12,
             letterSpacing: 2,
             textTransform: "uppercase",
+            display: "flex", justifyContent: "center", alignItems: "center", gap: 10,
           }}>
-            🔥 Founder-Access
+            <Emoji char="🔥" size={28} /> Founder-Access
           </div>
           <div style={{
             fontFamily, fontSize: 84, fontWeight: 900,

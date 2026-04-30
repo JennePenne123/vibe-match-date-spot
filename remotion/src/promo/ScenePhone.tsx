@@ -1,5 +1,6 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 import { loadFont } from "@remotion/google-fonts/Inter";
+import { Emoji } from "./Emoji";
 
 const { fontFamily } = loadFont("normal", { weights: ["400", "600", "700", "900"] });
 
@@ -98,7 +99,9 @@ export const ScenePhone = () => {
                 transform: tile.active ? `scale(${tapPulse})` : "scale(1)",
                 boxShadow: tile.active ? `0 0 ${30 * tapGlow}px rgba(13,148,136,${0.6 * tapGlow})` : "none",
               }}>
-                <div style={{ fontSize: 56, marginBottom: 8 }}>{tile.e}</div>
+                <div style={{ marginBottom: 8 }}>
+                  <Emoji char={tile.e} size={56} />
+                </div>
                 <div style={{
                   fontFamily, fontSize: 22, fontWeight: 700,
                   color: "white",
@@ -141,7 +144,7 @@ export const ScenePhone = () => {
             boxShadow: `0 20px 60px rgba(0,0,0,0.6), 0 0 40px ${card.color}40`,
             display: "flex", alignItems: "center", gap: 20,
           }}>
-            <div style={{ fontSize: 72 }}>{card.emoji}</div>
+            <Emoji char={card.emoji} size={72} />
             <div style={{ flex: 1 }}>
               <div style={{
                 fontFamily, fontSize: 32, fontWeight: 900,

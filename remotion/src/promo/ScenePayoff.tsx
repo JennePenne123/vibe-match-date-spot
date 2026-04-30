@@ -1,5 +1,6 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, Sequence } from "remotion";
 import { loadFont } from "@remotion/google-fonts/Inter";
+import { Emoji } from "./Emoji";
 
 const { fontFamily } = loadFont("normal", { weights: ["400", "700", "900"] });
 
@@ -106,9 +107,7 @@ const PayoffMoment: React.FC<{
         display: "flex", justifyContent: "center", alignItems: "center",
         transform: `scale(${emojiScale}) rotate(${emojiRotate}deg)`,
       }}>
-        <div style={{ fontSize: 480, filter: "drop-shadow(0 20px 60px rgba(0,0,0,0.8))" }}>
-          {emoji}
-        </div>
+        <Emoji char={emoji} size={480} style={{ filter: "drop-shadow(0 20px 60px rgba(0,0,0,0.8))" }} />
       </div>
 
       {/* Big text */}
