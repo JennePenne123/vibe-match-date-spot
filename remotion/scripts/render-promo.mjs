@@ -30,7 +30,9 @@ await renderMedia({
   codec: "h264",
   outputLocation: "/mnt/documents/HiOutz_Waitlist_Promo.mp4",
   puppeteerInstance: browser,
-  muted: true,
+  muted: false,
+  enforceAudioTrack: true,
+  audioCodec: "aac",
   concurrency: 1,
 });
 
