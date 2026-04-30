@@ -72,7 +72,7 @@ async function callTier(
   timeoutMs: number,
 ): Promise<{ venues: any[]; error?: string }> {
   try {
-    const { data, error } = await withTimeout(
+    const { data, error } = await withTimeout<any>(
       supabase.functions.invoke(fnName, { body }),
       timeoutMs,
       fnName,
