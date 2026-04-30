@@ -213,7 +213,7 @@ serve(async (req) => {
       radius: payload.radius ?? 5000,
       cuisines: hasNonFoodIntent ? [] : (payload.cuisines ?? []),
       originalCuisines: hasNonFoodIntent ? [] : (payload.cuisines ?? []),
-      types: hasNonFoodIntent ? ["point_of_interest", ...venueTypes, ...activities] : ["restaurant"],
+      types: hasNonFoodIntent ? [...venueTypes, ...activities] : ["restaurant"],
       // Field mask hint (Standard tier) – consumed by search-venues if it switches to Places API New
       fieldMask: "essentials+pro",
     };
