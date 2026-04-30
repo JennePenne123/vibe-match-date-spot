@@ -277,7 +277,28 @@ export const getAIVenueRecommendations = async (
       const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
       const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
       const situationalBoost = getSituationalBoost(situationalCat, venue, secondaryCat);
-      const finalScore = Math.max(5, Math.min(98, rawScore * situationalBoost));
+
+      // ── Proximity Boost (district / user location) ──
+      // Strongly prioritise venues within walking distance, decay to 1.0 at
+      // ~3 km, then a soft penalty out to 15 km. This is multiplicative so it
+      // composes cleanly with the situational boost.
+      const venueLat = venue.latitude ?? venue.lat ?? venue.geometry?.location?.lat;
+      const venueLng = venue.longitude ?? venue.lng ?? venue.geometry?.location?.lng;
+      let proximityBoost = 1.0;
+      let proximityKm: number | null = null;
+      if (userLocation?.latitude && userLocation?.longitude && venueLat && venueLng) {
+        proximityKm = calculateGeoDistance(userLocation.latitude, userLocation.longitude, venueLat, venueLng);
+        if (proximityKm <= 0.5) proximityBoost = 1.30;        // unmittelbare Nähe
+        else if (proximityKm <= 1) proximityBoost = 1.22;     // im Viertel
+        else if (proximityKm <= 2) proximityBoost = 1.14;     // Stadtteil
+        else if (proximityKm <= 3) proximityBoost = 1.07;     // Nachbarviertel
+        else if (proximityKm <= 5) proximityBoost = 1.0;      // neutral
+        else if (proximityKm <= 8) proximityBoost = 0.92;
+        else if (proximityKm <= 12) proximityBoost = 0.82;
+        else proximityBoost = 0.72;                            // weit weg
+      }
+
+      const finalScore = Math.max(5, Math.min(98, rawScore * situationalBoost * proximityBoost));
 
       // Generate reasoning based on actual matches
       const matchReasons: string[] = [];
@@ -322,6 +343,10 @@ export const getAIVenueRecommendations = async (
       if (weatherResult.reason) matchReasons.push(weatherResult.reason);
       if (explorationResult.reason) matchReasons.push(explorationResult.reason);
       if (distanceResult.reason) matchReasons.push(distanceResult.reason);
+      if (proximityKm !== null) {
+        if (proximityKm <= 1) matchReasons.push(`Direkt um die Ecke (${proximityKm < 1 ? Math.round(proximityKm * 1000) + 'm' : proximityKm.toFixed(1) + 'km'})`);
+        else if (proximityKm <= 3) matchReasons.push(`Im erweiterten Viertel (${proximityKm.toFixed(1)}km)`);
+      }
       if (repeatResult.visitCount > 0) matchReasons.push(`Bereits ${repeatResult.visitCount}x besucht`);
       // New signal reasons (#15-#17)
       const photoVibeLabel = getPhotoVibeLabel(photoVibeResult.matchedVibes);
