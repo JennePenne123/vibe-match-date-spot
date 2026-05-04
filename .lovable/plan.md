@@ -123,7 +123,7 @@
 - [ ] Projekt in Lovable auf **Publish** klicken
 
 ### ⚠️ Wichtig (sollte vor Launch)
-- [ ] Sentry Test-Event verifizieren + `SentryTestTrigger` Komponente entfernen
+- [ ] Sentry Test-Event in Produktion einmal verifizieren (SentryTestTrigger-Komponente bereits entfernt ✅)
 - [ ] ITMR Legal Erstberatung durchführen
 - [ ] DSFA (Datenschutz-Folgenabschätzung) prüfen
 - [ ] Rate Limiting & API Quotas validieren (Foursquare, Google Places, Lovable AI)
