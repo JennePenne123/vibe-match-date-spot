@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Shield } from 'lucide-react';
+import { COMPANY } from '@/config/companyInfo';
 
 /**
  * Partner-Datenschutzerklärung – DSGVO-konform
@@ -26,7 +27,7 @@ export default function PartnerPrivacy() {
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <p className="text-muted-foreground text-xs">
-            Stand: März 2026 · H!Outz GmbH (i.&nbsp;Gr.)
+            Stand: März 2026 · {COMPANY.legalName}
           </p>
 
           <h2>1. Verantwortlicher</h2>
@@ -34,10 +35,10 @@ export default function PartnerPrivacy() {
             Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:
           </p>
           <p className="text-muted-foreground">
-            H!Outz GmbH (i.&nbsp;Gr.)<br />
-            [Straße und Hausnummer]<br />
-            [PLZ] [Ort], Deutschland<br />
-            E-Mail: datenschutz@hioutz.app
+            {COMPANY.legalName}<br />
+            {COMPANY.street}<br />
+            {COMPANY.zip} {COMPANY.city}, {COMPANY.country}<br />
+            E-Mail: {COMPANY.privacyEmail}
           </p>
           <p className="text-muted-foreground">
             Diese Datenschutzerklärung gilt speziell für Venue-Partner, die die Partner-Plattform

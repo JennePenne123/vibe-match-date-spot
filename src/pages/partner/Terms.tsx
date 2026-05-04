@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText } from 'lucide-react';
+import { COMPANY, COMPANY_ADDRESS_INLINE } from '@/config/companyInfo';
 
 /**
  * Partner-AGB – Allgemeine Geschäftsbedingungen für Venue-Partner
@@ -27,13 +28,13 @@ export default function PartnerTerms() {
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <p className="text-muted-foreground text-xs">
-            Stand: März 2026 · H!Outz GmbH (i.&nbsp;Gr.)
+            Stand: März 2026 · {COMPANY.legalName}
           </p>
 
           <h2>§ 1 Geltungsbereich</h2>
           <p className="text-muted-foreground">
             (1) Diese Allgemeinen Geschäftsbedingungen (nachfolgend „Partner-AGB") regeln das Vertragsverhältnis
-            zwischen der H!Outz GmbH (i.&nbsp;Gr.), [Adresse] (nachfolgend „Betreiber" oder „wir")
+            zwischen der {COMPANY.legalName}, {COMPANY_ADDRESS_INLINE} (nachfolgend „Betreiber" oder „wir")
             und dem Venue-Partner (nachfolgend „Partner") hinsichtlich der Nutzung der Partner-Plattform
             der App „H!Outz" (nachfolgend „Plattform").
           </p>
