@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { COMPANY } from "@/config/companyInfo";
 
 export default function Widerrufsformular() {
   const navigate = useNavigate();
@@ -24,11 +25,13 @@ export default function Widerrufsformular() {
           <div className="p-5 rounded-xl bg-muted/30 border border-border/50 space-y-3">
             <p className="text-muted-foreground">An:</p>
             <p className="font-medium">
-              H!Outz GmbH (i.&nbsp;Gr.)
+              {COMPANY.legalName}
               <br />
-              [Adresse]
+              {COMPANY.street}
               <br />
-              E-Mail: support@hioutz.app
+              {COMPANY.zip} {COMPANY.city}
+              <br />
+              E-Mail: {COMPANY.supportEmail}
             </p>
           </div>
 
