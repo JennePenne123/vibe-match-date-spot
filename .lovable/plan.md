@@ -118,7 +118,6 @@
 ### 🚨 Blocker (zwingend vor Launch)
 - [ ] UG-Gründung abschließen
 - [ ] Firmendaten in `src/config/companyInfo.ts` ersetzen (eine Datei → updated AGB / Datenschutz / Impressum / Widerruf / Partner-AGB / Partner-Privacy automatisch)
-- [ ] Google OAuth → Produktions-Credentials (hioutz.app Origins + Redirect URIs) + in Supabase eintragen
 - [ ] Supabase Site URL + Redirect URLs final auf https://hioutz.app verifizieren
 - [ ] Projekt in Lovable auf **Publish** klicken
 
@@ -138,7 +137,8 @@
 - [x] Security-Hardening: pg_graphql Extension entfernt (nur REST in Nutzung)
 
 ### 📱 Post-Launch (optional)
-- [ ] Apple OAuth → Apple Developer Program ($99/Jahr) + Konfiguration
+- [ ] **Native Launch Voraussetzung:** Google OAuth Produktions-Credentials (hioutz.app + Capacitor Custom Scheme) + in Supabase eintragen
+- [ ] **Native Launch Voraussetzung:** Apple OAuth → Apple Developer Program ($99/Jahr) + Services ID + Key (.p8) in Supabase
 - [ ] Native Mobile App (Capacitor: iOS/Android Build, Permissions, Push Certs)
 - [ ] App Store Screenshots
 - [ ] Stripe-Integration (Monetarisierung)
