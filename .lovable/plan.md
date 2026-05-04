@@ -117,7 +117,7 @@
 
 ### 🚨 Blocker (zwingend vor Launch)
 - [ ] UG-Gründung abschließen
-- [ ] Platzhalter in AGB, Datenschutz, Impressum, Widerrufsformular ersetzen (Firma, Adresse, HRB, Geschäftsführer, USt-ID)
+- [ ] Firmendaten in `src/config/companyInfo.ts` ersetzen (eine Datei → updated AGB / Datenschutz / Impressum / Widerruf / Partner-AGB / Partner-Privacy automatisch)
 - [ ] Google OAuth → Produktions-Credentials (hioutz.app Origins + Redirect URIs) + in Supabase eintragen
 - [ ] Supabase Site URL + Redirect URLs final auf https://hioutz.app verifizieren
 - [ ] Projekt in Lovable auf **Publish** klicken

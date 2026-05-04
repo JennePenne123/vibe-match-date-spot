@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Building2 } from 'lucide-react';
+import { COMPANY } from '@/config/companyInfo';
 
 export default function Impressum() {
   const navigate = useNavigate();
@@ -23,37 +24,37 @@ export default function Impressum() {
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
           <h2>Angaben gemäß § 5 DDG</h2>
           <p className="text-muted-foreground">
-            H!Outz GmbH (i.&nbsp;Gr.)<br />
-            [Straße und Hausnummer]<br />
-            [PLZ] [Ort]<br />
-            Deutschland
+            {COMPANY.legalName}<br />
+            {COMPANY.street}<br />
+            {COMPANY.zip} {COMPANY.city}<br />
+            {COMPANY.country}
           </p>
 
           <h3>Vertreten durch</h3>
-          <p className="text-muted-foreground">[Geschäftsführer / Inhaber]</p>
+          <p className="text-muted-foreground">{COMPANY.ceo}</p>
 
           <h3>Kontakt</h3>
           <p className="text-muted-foreground">
-            Telefon: [Telefonnummer]<br />
-            E-Mail: kontakt@hioutz.app
+            Telefon: {COMPANY.phone}<br />
+            E-Mail: {COMPANY.contactEmail}
           </p>
 
           <h3>Handelsregister</h3>
           <p className="text-muted-foreground">
-            Registergericht: [Amtsgericht]<br />
-            Registernummer: [HRB-Nummer]
+            Registergericht: {COMPANY.registerCourt}<br />
+            Registernummer: {COMPANY.registerNumber}
           </p>
 
           <h3>Umsatzsteuer-ID</h3>
           <p className="text-muted-foreground">
             Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG:<br />
-            [USt-IdNr.]
+            {COMPANY.vatId}
           </p>
 
           <h3>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
           <p className="text-muted-foreground">
-            [Name]<br />
-            [Adresse]
+            {COMPANY.contentResponsibleName}<br />
+            {COMPANY.contentResponsibleAddress}
           </p>
 
           <h3>EU-Streitschlichtung</h3>

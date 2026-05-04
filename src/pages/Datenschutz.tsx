@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Shield } from 'lucide-react';
+import { COMPANY } from '@/config/companyInfo';
 
 export default function Datenschutz() {
   const navigate = useNavigate();
@@ -30,10 +31,10 @@ export default function Datenschutz() {
             Datenschutz-Grundverordnung (DSGVO) ist:
           </p>
           <p className="text-muted-foreground">
-             H!Outz GmbH (i.&nbsp;Gr.)<br />
-             [Straße und Hausnummer]<br />
-             [PLZ] [Ort], Deutschland<br />
-             E-Mail: datenschutz@hioutz.app
+            {COMPANY.legalName}<br />
+            {COMPANY.street}<br />
+            {COMPANY.zip} {COMPANY.city}, {COMPANY.country}<br />
+            E-Mail: {COMPANY.privacyEmail}
           </p>
 
           <h2>2. Rechtsgrundlagen der Verarbeitung</h2>
