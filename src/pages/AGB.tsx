@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Scale } from 'lucide-react';
+import { COMPANY, COMPANY_ADDRESS_INLINE } from '@/config/companyInfo';
 
 export default function AGB() {
   const navigate = useNavigate();
@@ -21,12 +22,12 @@ export default function AGB() {
         </div>
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
-          <p className="text-muted-foreground text-xs">Stand: März 2026 · H!Outz GmbH (i.&nbsp;Gr.)</p>
+          <p className="text-muted-foreground text-xs">Stand: März 2026 · {COMPANY.legalName}</p>
 
           <h2>§ 1 Geltungsbereich</h2>
           <p className="text-muted-foreground">
             (1) Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der mobilen Anwendung „H!Outz"
-            (nachfolgend „App"), betrieben von H!Outz GmbH (i.&nbsp;Gr.), [Adresse] (nachfolgend „Anbieter").
+            (nachfolgend „App"), betrieben von {COMPANY.legalName}, {COMPANY_ADDRESS_INLINE} (nachfolgend „Anbieter").
           </p>
           <p className="text-muted-foreground">
             (2) Abweichende Bedingungen des Nutzers werden nicht anerkannt, es sei denn, der Anbieter stimmt
@@ -157,8 +158,8 @@ export default function AGB() {
             diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses.
           </p>
           <p className="text-muted-foreground">
-              Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (H!Outz GmbH (i.&nbsp;Gr.), [Adresse],
-              E-Mail: support@hioutz.app) mittels einer eindeutigen Erklärung (z.&nbsp;B. per E-Mail) über Ihren
+              Um Ihr Widerrufsrecht auszuüben, müssen Sie uns ({COMPANY.legalName}, {COMPANY_ADDRESS_INLINE},
+              E-Mail: {COMPANY.supportEmail}) mittels einer eindeutigen Erklärung (z.&nbsp;B. per E-Mail) über Ihren
               Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das{' '}
               <a href="/widerrufsformular" target="_blank" className="text-primary underline hover:text-primary/80">
                 Muster-Widerrufsformular
