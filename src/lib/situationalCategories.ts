@@ -197,7 +197,7 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     descKey: 'home.situational.nightlife.desc',
     emoji: '🌃',
     gradient: 'from-pink-500/20 via-fuchsia-500/10 to-transparent',
-    boostVenueTypes: ['comedy_club', 'karaoke'],
+    boostVenueTypes: ['bar', 'pub', 'nightclub', 'night_club', 'cocktail_bar', 'wine_bar', 'beer_garden', 'comedy_club', 'karaoke'],
     boostActivities: ['nightlife_act', 'cocktails'],
     boostKeywords: [
       // Clubs / dance
@@ -235,6 +235,85 @@ export function getSituationalCategory(id: string | null | undefined): Situation
   return SITUATIONAL_CATEGORIES.find(c => c.id === id) ?? null;
 }
 
+const FOOD_CUISINES = new Set([
+  'italian','pizza','pizzeria','burger','burgers','hamburger','hamburgers','sushi','japanese','indian','thai',
+  'chinese','asian','mexican','french','german','spanish','greek','turkish','korean',
+  'vietnamese','american','mediterranean','seafood','steakhouse','steak','bbq',
+  'kebab','döner','doner','falafel','ramen','noodles','vegan','vegetarian','breakfast',
+  'cafe','café','bakery','bistro','brasserie','restaurant','fast_food','fast food',
+  'ice_cream','ice cream','dessert','brunch','sandwich','coffee','coffee_shop',
+  'lebanese','ethiopian','african','peruvian','argentinian','arabic','arabian',
+  'middle_eastern','middle eastern','fusion','organic','fish','pasta',
+  'pho','dim_sum','dim sum','tapas','curry','biryani','tagine','food','meal_takeaway','meal_delivery',
+]);
+
+const FOOD_TAGS = new Set([
+  ...FOOD_CUISINES,
+  'hamburger_restaurant','burger_restaurant','restaurant','food','fast_food','meal_takeaway','meal_delivery',
+  'cafe','café','bakery','diner','eatery','snack_bar','food_beverage','food-beverage',
+]);
+
+const FOOD_NAME_KEYWORDS = [
+  'burger','hamburger','pizza','pizzeria','sushi','restaurant','ristorante','trattoria','imbiss',
+  'kebab','döner','doner','grill','steakhouse','steak house','sandwich','ramen','noodle','bakery',
+  'bäckerei','cafe','café','coffee','ice cream','eis','bistro','brasserie','diner','food truck',
+];
+
+const NON_FOOD_STRUCTURE_TAGS = new Set([
+  'bar','pub','nightclub','night_club','cocktail_bar','wine_bar','beer_garden','karaoke','comedy_club',
+  'museum','art_gallery','gallery','theater_venue','theatre','movie_theater','cinema','concert_hall',
+  'bowling','bowling_alley','mini_golf','amusement_park','arcade','escape_room','gym','spa','swimming_pool',
+]);
+
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const containsWholeTerm = (text: string, term: string): boolean => {
+  const normalizedTerm = term.toLowerCase().trim();
+  if (!normalizedTerm) return false;
+  const re = new RegExp(`(?:^|[^a-z0-9äöüßáéíóúñ])${escapeRegex(normalizedTerm)}(?:$|[^a-z0-9äöüßáéíóúñ])`, 'i');
+  return re.test(text);
+};
+
+type SituationalVenueLike = {
+  name?: string | null;
+  cuisine_type?: string | null;
+  cuisineType?: string | null;
+  description?: string | null;
+  tags?: string[] | null;
+  types?: string[] | null;
+  venue_type?: string | null;
+  activities?: string[] | null;
+};
+
+export function isPureFoodVenue(venue: SituationalVenueLike): boolean {
+  const cuisine = (venue.cuisine_type ?? venue.cuisineType ?? '').toLowerCase().trim();
+  const tags = [
+    ...(venue.tags ?? []),
+    ...(venue.types ?? []),
+    venue.venue_type ?? '',
+  ].map(t => (t ?? '').toString().trim().toLowerCase()).filter(Boolean);
+  const cuisineParts = cuisine.split(/[;,/|]+/).map(part => part.trim()).filter(Boolean);
+  const text = [venue.name ?? '', venue.description ?? '', cuisine].join(' ').toLowerCase();
+  const genericFoodTags = new Set(['restaurant', 'food', 'meal_takeaway', 'meal_delivery']);
+  const hasNonFoodStructure = tags.some(tag => NON_FOOD_STRUCTURE_TAGS.has(tag));
+
+  if (cuisineParts.some(part =>
+    (FOOD_CUISINES.has(part) && !(genericFoodTags.has(part) && hasNonFoodStructure)) ||
+    FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(part, keyword)),
+  )) {
+    return true;
+  }
+
+  if (tags.some(tag => {
+    if (genericFoodTags.has(tag) && hasNonFoodStructure) return false;
+    return FOOD_TAGS.has(tag) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(tag.replace(/_/g, ' '), keyword));
+  })) {
+    return true;
+  }
+
+  return FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(text, keyword));
+}
+
 /**
  * Hard category filter — when the user explicitly picks a non-food intent
  * ("Kultur", "Aktivität", "Nightlife"), pure restaurants/cafés should be
@@ -253,8 +332,10 @@ export function passesSituationalHardFilter(
   venue: {
     name?: string | null;
     cuisine_type?: string | null;
+    cuisineType?: string | null;
     description?: string | null;
     tags?: string[] | null;
+    types?: string[] | null;
     nominatim_match_name?: string | null;
     address?: string | null;
     venue_type?: string | null;
@@ -272,9 +353,9 @@ export function passesSituationalHardFilter(
   // are intentionally NOT enough — otherwise "Burger Lounge" sneaks past the
   // nightlife filter just because of the word "lounge".
   const tagSet = new Set(
-    (venue.tags ?? []).map(t => (t ?? '').toString().trim().toLowerCase()),
+    [...(venue.tags ?? []), ...(venue.types ?? [])].map(t => (t ?? '').toString().trim().toLowerCase()),
   );
-  const cuisine = (venue.cuisine_type ?? '').toLowerCase().trim();
+  const cuisine = (venue.cuisine_type ?? venue.cuisineType ?? '').toLowerCase().trim();
   const venueType = (venue.venue_type ?? '').toLowerCase().trim();
   const activities = ((venue.activities ?? []) as string[])
     .map(a => (a ?? '').toString().toLowerCase().trim());
@@ -293,6 +374,8 @@ export function passesSituationalHardFilter(
     return false;
   };
 
+  if (isPureFoodVenue(venue)) return false;
+
   const primaryStruct = category.id !== 'food' ? matchesStructurally(category) : false;
   const secondaryStruct = secondary && secondary.id !== 'food'
     ? matchesStructurally(secondary)
@@ -300,27 +383,7 @@ export function passesSituationalHardFilter(
 
   if (primaryStruct || secondaryStruct) return true;
 
-  // No structural match → drop pure-gastro venues outright for non-food intent.
-  const FOOD_CUISINES = new Set([
-    'italian','pizza','pizzeria','burger','burgers','sushi','japanese','indian','thai',
-    'chinese','asian','mexican','french','german','spanish','greek','turkish','korean',
-    'vietnamese','american','mediterranean','seafood','steakhouse','steak','bbq',
-    'kebab','döner','doner','falafel','ramen','noodles','vegan','vegetarian','breakfast',
-    'cafe','café','bakery','bistro','brasserie','restaurant','fast_food','fast food',
-    'ice_cream','ice cream','dessert','brunch','sandwich','coffee','coffee_shop',
-    'lebanese','ethiopian','african','peruvian','argentinian','arabic','arabian',
-    'middle_eastern','middle eastern','fusion','organic','fish','seafood','pasta',
-    'pho','dim_sum','dim sum','tapas','curry','biryani','tagine',
-  ]);
-  if (cuisine && FOOD_CUISINES.has(cuisine)) return false;
-  // Also drop when only signal is generic restaurant tag
-  if (tagSet.has('restaurant') || tagSet.has('cafe') || tagSet.has('café') || tagSet.has('bakery') || tagSet.has('fast_food')) {
-    return false;
-  }
-
-  // Otherwise fall back to soft check (no clear category — could be a multipurpose venue).
-  const boost = getSituationalBoost(category, venue, secondary ?? null);
-  return boost >= 1;
+  return false;
 }
 
 /**

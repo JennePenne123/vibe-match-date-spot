@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   getSituationalCategory,
+  isPureFoodVenue,
   passesSituationalHardFilter,
 } from './situationalCategories';
 
@@ -49,6 +50,25 @@ describe('passesSituationalHardFilter — non-food intent strictness', () => {
           name: 'Sky Bar',
           cuisine_type: 'bar',
           tags: ['bar', 'cocktails'],
+        }),
+      ).toBe(true);
+    });
+
+    it('drops burger venues even when they also carry bar/nightlife tags', () => {
+      expect(
+        passesSituationalHardFilter(nightlife, {
+          name: 'Hansa Burger',
+          cuisine_type: 'bar',
+          tags: ['bar', 'restaurant', 'hamburger_restaurant'],
+        }),
+      ).toBe(false);
+    });
+
+    it('keeps a bar that has a generic restaurant tag but no food signal', () => {
+      expect(
+        passesSituationalHardFilter(nightlife, {
+          name: 'Cinema Bar',
+          tags: ['bar', 'restaurant'],
         }),
       ).toBe(true);
     });
@@ -173,6 +193,27 @@ describe('passesSituationalHardFilter — non-food intent strictness', () => {
           cuisine_type: 'burger',
         }),
       ).toBe(true);
+    });
+  });
+
+  describe('pure food detection', () => {
+    it('recognizes Google hamburger restaurant types as pure food', () => {
+      expect(
+        isPureFoodVenue({
+          name: 'Hansa Burger',
+          cuisineType: 'American',
+          types: ['restaurant', 'hamburger_restaurant', 'point_of_interest'],
+        }),
+      ).toBe(true);
+    });
+
+    it('does not classify a normal bar with a generic restaurant tag as pure food', () => {
+      expect(
+        isPureFoodVenue({
+          name: 'The Cinema Bar',
+          tags: ['bar', 'restaurant'],
+        }),
+      ).toBe(false);
     });
   });
 

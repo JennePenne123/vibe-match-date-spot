@@ -140,27 +140,11 @@ export const getAIVenueRecommendations = async (
       if (primaryCat && primaryCat.id !== 'food') {
         const before = venues.length;
         const filtered = venues.filter(v => passesSituationalHardFilter(primaryCat, v, secondaryCat));
-        // Safety net: never collapse to fewer than 3 candidates — if the
-        // hard filter wipes everything (e.g. very small town), fall back to
-        // soft-boost mode so the user still sees something.
-        if (filtered.length >= 3) {
-          venues = filtered;
-          console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
-          // Clear any previous sparse flag — we have a healthy set
-          try { sessionStorage.removeItem('hioutz-situational-sparse'); } catch {}
-        } else {
-          console.warn(`⚠️ SITUATIONAL HARD FILTER (${primaryCat.id}) would leave only ${filtered.length} venues — falling back to soft boost`);
-          // Surface to the UI so we can show a "thin data" banner with CTA
-          try {
-            sessionStorage.setItem(
-              'hioutz-situational-sparse',
-              JSON.stringify({
-                categoryId: primaryCat.id,
-                matchedCount: filtered.length,
-                ts: Date.now(),
-              }),
-            );
-          } catch {}
+        venues = filtered;
+        console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
+        try { sessionStorage.removeItem('hioutz-situational-sparse'); } catch {}
+        if (filtered.length === 0) {
+          throw new NoSituationalMatchError(primaryCat.id);
         }
 
         // ── Re-score for non-food intent ──
@@ -427,14 +411,12 @@ export const getAIVenueRecommendations = async (
     const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
     if (situationalCat && situationalCat.id !== 'food') {
       const before = deduped.length;
-      deduped = deduped.filter(rec => {
-        const haystack = [
-          rec.venue_name ?? '',
-          rec.cuisine_type ?? '',
-          ...(rec.amenities ?? []),
-        ].join(' ').toLowerCase();
-        return situationalCat.boostKeywords.some(kw => haystack.includes(kw));
-      });
+      const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
+      deduped = deduped.filter(rec => passesSituationalHardFilter(situationalCat, {
+        name: rec.venue_name,
+        cuisine_type: rec.cuisine_type,
+        tags: rec.amenities,
+      }, secondaryCat));
       console.log(`🎯 SITUATIONAL FILTER (${situationalCat.id}): ${before} → ${deduped.length} venues`);
       if (deduped.length === 0) {
         // Bubble up so useAIAnalysis can show a friendly hint (radius / try other category)
@@ -579,7 +561,9 @@ const getVenuesFromMultipleSources = async (
       cachePriceRange,
       cacheVibes,
       cacheActivities,
-      cacheVenueTypes
+      cacheVenueTypes,
+      situationalCategoryId ?? null,
+      secondaryCategoryId ?? null,
     );
     if (cachedVenues && cachedVenues.length > 0) {
       console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
@@ -656,7 +640,9 @@ const getVenuesFromMultipleSources = async (
       cachePriceRange,
       cacheVibes,
       cacheActivities,
-      cacheVenueTypes
+      cacheVenueTypes,
+      situationalCategoryId ?? null,
+      secondaryCategoryId ?? null,
     );
   }
   
