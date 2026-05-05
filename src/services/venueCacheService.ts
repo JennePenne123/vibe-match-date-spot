@@ -16,8 +16,8 @@ interface CacheStats {
   size: number;
 }
 
-const CACHE_KEY_PREFIX = 'hioutz-venue-cache-v2_';
-const CACHE_STATS_KEY = 'hioutz-cache-stats-v2';
+const CACHE_KEY_PREFIX = 'hioutz-venue-cache-v3_';
+const CACHE_STATS_KEY = 'hioutz-cache-stats-v3';
 // Smart Hybrid uses Google as primary which costs ~$17/1000 calls.
 // 24 h TTL keeps the hit-rate high without serving stale opening hours.
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
@@ -34,7 +34,9 @@ const generateCacheKey = (
   priceRange?: string[],
   vibes?: string[],
   activities?: string[],
-  venueTypes?: string[]
+  venueTypes?: string[],
+  situationalCategoryId?: string | null,
+  secondaryCategoryId?: string | null,
 ): string => {
   const roundedLat = roundCoordinate(lat);
   const roundedLng = roundCoordinate(lng);
@@ -47,11 +49,14 @@ const generateCacheKey = (
   const vibeStr = norm(vibes);
   const actStr = norm(activities);
   const typeStr = norm(venueTypes);
+  const intentStr = [situationalCategoryId, secondaryCategoryId]
+    .map((s) => (s || '').trim().toLowerCase())
+    .join(':');
   // Activities + venue_types only contribute to the key when present so we
   // stay backward-compatible with cache entries written by older builds.
   const extra = actStr || typeStr ? `_${actStr}_${typeStr}` : '';
 
-  return `${CACHE_KEY_PREFIX}${roundedLat}_${roundedLng}_${cuisineStr}_${priceStr}_${vibeStr}${extra}`;
+  return `${CACHE_KEY_PREFIX}${roundedLat}_${roundedLng}_${cuisineStr}_${priceStr}_${vibeStr}${extra}_${intentStr}`;
 };
 
 // Get all cache keys from localStorage
