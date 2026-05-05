@@ -304,7 +304,10 @@ export function isPureFoodVenue(venue: SituationalVenueLike): boolean {
     return true;
   }
 
-  if (tags.some(tag => (FOOD_TAGS.has(tag) && !genericFoodTags.has(tag)) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(tag.replace(/_/g, ' '), keyword)))) {
+  if (tags.some(tag => {
+    if (genericFoodTags.has(tag) && hasNonFoodStructure) return false;
+    return FOOD_TAGS.has(tag) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(tag.replace(/_/g, ' '), keyword));
+  })) {
     return true;
   }
 
