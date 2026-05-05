@@ -268,6 +268,39 @@ const containsWholeTerm = (text: string, term: string): boolean => {
   return re.test(text);
 };
 
+type SituationalVenueLike = {
+  name?: string | null;
+  cuisine_type?: string | null;
+  cuisineType?: string | null;
+  description?: string | null;
+  tags?: string[] | null;
+  types?: string[] | null;
+  venue_type?: string | null;
+  activities?: string[] | null;
+};
+
+export function isPureFoodVenue(venue: SituationalVenueLike): boolean {
+  const cuisine = (venue.cuisine_type ?? venue.cuisineType ?? '').toLowerCase().trim();
+  const tags = [
+    ...(venue.tags ?? []),
+    ...(venue.types ?? []),
+    venue.venue_type ?? '',
+  ].map(t => (t ?? '').toString().trim().toLowerCase()).filter(Boolean);
+  const tagSet = new Set(tags);
+  const cuisineParts = cuisine.split(/[;,/|]+/).map(part => part.trim()).filter(Boolean);
+  const text = [venue.name ?? '', venue.description ?? '', cuisine, ...tags].join(' ').toLowerCase();
+
+  if (cuisineParts.some(part => FOOD_CUISINES.has(part) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(part, keyword)))) {
+    return true;
+  }
+
+  if (tags.some(tag => FOOD_TAGS.has(tag) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(tag.replace(/_/g, ' '), keyword)))) {
+    return true;
+  }
+
+  return FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(text, keyword));
+}
+
 /**
  * Hard category filter — when the user explicitly picks a non-food intent
  * ("Kultur", "Aktivität", "Nightlife"), pure restaurants/cafés should be
