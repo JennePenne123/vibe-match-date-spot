@@ -20,7 +20,7 @@ import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringU
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
-import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
+import { getSituationalCategory, getSituationalBoost, isPureFoodVenue, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
 
 /**
  * Sentinel error thrown when a non-food situational category produced zero
@@ -140,27 +140,11 @@ export const getAIVenueRecommendations = async (
       if (primaryCat && primaryCat.id !== 'food') {
         const before = venues.length;
         const filtered = venues.filter(v => passesSituationalHardFilter(primaryCat, v, secondaryCat));
-        // Safety net: never collapse to fewer than 3 candidates — if the
-        // hard filter wipes everything (e.g. very small town), fall back to
-        // soft-boost mode so the user still sees something.
-        if (filtered.length >= 3) {
-          venues = filtered;
-          console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
-          // Clear any previous sparse flag — we have a healthy set
-          try { sessionStorage.removeItem('hioutz-situational-sparse'); } catch {}
-        } else {
-          console.warn(`⚠️ SITUATIONAL HARD FILTER (${primaryCat.id}) would leave only ${filtered.length} venues — falling back to soft boost`);
-          // Surface to the UI so we can show a "thin data" banner with CTA
-          try {
-            sessionStorage.setItem(
-              'hioutz-situational-sparse',
-              JSON.stringify({
-                categoryId: primaryCat.id,
-                matchedCount: filtered.length,
-                ts: Date.now(),
-              }),
-            );
-          } catch {}
+        venues = filtered;
+        console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
+        try { sessionStorage.removeItem('hioutz-situational-sparse'); } catch {}
+        if (filtered.length === 0) {
+          throw new NoSituationalMatchError(primaryCat.id);
         }
 
         // ── Re-score for non-food intent ──
