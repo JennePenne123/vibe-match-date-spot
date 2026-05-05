@@ -235,6 +235,39 @@ export function getSituationalCategory(id: string | null | undefined): Situation
   return SITUATIONAL_CATEGORIES.find(c => c.id === id) ?? null;
 }
 
+const FOOD_CUISINES = new Set([
+  'italian','pizza','pizzeria','burger','burgers','hamburger','hamburgers','sushi','japanese','indian','thai',
+  'chinese','asian','mexican','french','german','spanish','greek','turkish','korean',
+  'vietnamese','american','mediterranean','seafood','steakhouse','steak','bbq',
+  'kebab','döner','doner','falafel','ramen','noodles','vegan','vegetarian','breakfast',
+  'cafe','café','bakery','bistro','brasserie','restaurant','fast_food','fast food',
+  'ice_cream','ice cream','dessert','brunch','sandwich','coffee','coffee_shop',
+  'lebanese','ethiopian','african','peruvian','argentinian','arabic','arabian',
+  'middle_eastern','middle eastern','fusion','organic','fish','pasta',
+  'pho','dim_sum','dim sum','tapas','curry','biryani','tagine','food','meal_takeaway','meal_delivery',
+]);
+
+const FOOD_TAGS = new Set([
+  ...FOOD_CUISINES,
+  'hamburger_restaurant','burger_restaurant','restaurant','food','fast_food','meal_takeaway','meal_delivery',
+  'cafe','café','bakery','diner','eatery','snack_bar','food_beverage','food-beverage',
+]);
+
+const FOOD_NAME_KEYWORDS = [
+  'burger','hamburger','pizza','pizzeria','sushi','restaurant','ristorante','trattoria','imbiss',
+  'kebab','döner','doner','grill','steakhouse','steak house','sandwich','ramen','noodle','bakery',
+  'bäckerei','cafe','café','coffee','ice cream','eis','bistro','brasserie','diner','food truck',
+];
+
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const containsWholeTerm = (text: string, term: string): boolean => {
+  const normalizedTerm = term.toLowerCase().trim();
+  if (!normalizedTerm) return false;
+  const re = new RegExp(`(?:^|[^a-z0-9äöüßáéíóúñ])${escapeRegex(normalizedTerm)}(?:$|[^a-z0-9äöüßáéíóúñ])`, 'i');
+  return re.test(text);
+};
+
 /**
  * Hard category filter — when the user explicitly picks a non-food intent
  * ("Kultur", "Aktivität", "Nightlife"), pure restaurants/cafés should be
