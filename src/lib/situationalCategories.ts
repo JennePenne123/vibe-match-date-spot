@@ -319,8 +319,10 @@ export function passesSituationalHardFilter(
   venue: {
     name?: string | null;
     cuisine_type?: string | null;
+    cuisineType?: string | null;
     description?: string | null;
     tags?: string[] | null;
+    types?: string[] | null;
     nominatim_match_name?: string | null;
     address?: string | null;
     venue_type?: string | null;
@@ -338,12 +340,14 @@ export function passesSituationalHardFilter(
   // are intentionally NOT enough — otherwise "Burger Lounge" sneaks past the
   // nightlife filter just because of the word "lounge".
   const tagSet = new Set(
-    (venue.tags ?? []).map(t => (t ?? '').toString().trim().toLowerCase()),
+    [...(venue.tags ?? []), ...(venue.types ?? [])].map(t => (t ?? '').toString().trim().toLowerCase()),
   );
-  const cuisine = (venue.cuisine_type ?? '').toLowerCase().trim();
+  const cuisine = (venue.cuisine_type ?? venue.cuisineType ?? '').toLowerCase().trim();
   const venueType = (venue.venue_type ?? '').toLowerCase().trim();
   const activities = ((venue.activities ?? []) as string[])
     .map(a => (a ?? '').toString().toLowerCase().trim());
+
+  if (isPureFoodVenue(venue)) return false;
 
   const matchesStructurally = (cat: SituationalCategory): boolean => {
     const vts = cat.boostVenueTypes.map(t => t.toLowerCase());
@@ -365,24 +369,6 @@ export function passesSituationalHardFilter(
     : false;
 
   if (primaryStruct || secondaryStruct) return true;
-
-  // No structural match → drop pure-gastro venues outright for non-food intent.
-  const FOOD_CUISINES = new Set([
-    'italian','pizza','pizzeria','burger','burgers','sushi','japanese','indian','thai',
-    'chinese','asian','mexican','french','german','spanish','greek','turkish','korean',
-    'vietnamese','american','mediterranean','seafood','steakhouse','steak','bbq',
-    'kebab','döner','doner','falafel','ramen','noodles','vegan','vegetarian','breakfast',
-    'cafe','café','bakery','bistro','brasserie','restaurant','fast_food','fast food',
-    'ice_cream','ice cream','dessert','brunch','sandwich','coffee','coffee_shop',
-    'lebanese','ethiopian','african','peruvian','argentinian','arabic','arabian',
-    'middle_eastern','middle eastern','fusion','organic','fish','seafood','pasta',
-    'pho','dim_sum','dim sum','tapas','curry','biryani','tagine',
-  ]);
-  if (cuisine && FOOD_CUISINES.has(cuisine)) return false;
-  // Also drop when only signal is generic restaurant tag
-  if (tagSet.has('restaurant') || tagSet.has('cafe') || tagSet.has('café') || tagSet.has('bakery') || tagSet.has('fast_food')) {
-    return false;
-  }
 
   // Otherwise fall back to soft check (no clear category — could be a multipurpose venue).
   const boost = getSituationalBoost(category, venue, secondary ?? null);
