@@ -894,7 +894,7 @@ async function getVenuesGooglePrimaryHybrid(
   // Fire all three in parallel — Google with hard timeout
   const promises: Promise<any[]>[] = [
     Promise.race<any[]>([
-      getVenuesFromGooglePlaces(userId, googleLimit, userLocation).catch((err) => {
+      getVenuesFromGooglePlaces(userId, googleLimit, userLocation, situationalCategoryId, secondaryCategoryId).catch((err) => {
         console.warn('⚠️ Google primary failed:', err instanceof Error ? err.message : err);
         return [] as any[];
       }),
