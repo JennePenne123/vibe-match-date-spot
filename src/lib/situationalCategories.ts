@@ -257,6 +257,8 @@ export function passesSituationalHardFilter(
     tags?: string[] | null;
     nominatim_match_name?: string | null;
     address?: string | null;
+    venue_type?: string | null;
+    activities?: string[] | null;
   },
   secondary?: SituationalCategory | null,
 ): boolean {
@@ -264,10 +266,59 @@ export function passesSituationalHardFilter(
   if (!category) return true;
   if (category.id === 'food' && (!secondary || secondary.id === 'food')) return true;
 
-  // Compute boost; if it's >= 1 (matches primary or secondary, or neutral
-  // with no off-category signal), keep the venue. The 0.7 factor returned by
-  // getSituationalBoost only fires when the venue clearly belongs to a
-  // different bucket — exactly the venues we want to drop here.
+  // Strict structural match: a venue passes a non-food intent ONLY if its
+  // structured fields (venue_type, activities, exact tag entry, or cuisine_type
+  // mapped to the category) match. Free-text keyword matches in name/description
+  // are intentionally NOT enough — otherwise "Burger Lounge" sneaks past the
+  // nightlife filter just because of the word "lounge".
+  const tagSet = new Set(
+    (venue.tags ?? []).map(t => (t ?? '').toString().trim().toLowerCase()),
+  );
+  const cuisine = (venue.cuisine_type ?? '').toLowerCase().trim();
+  const venueType = (venue.venue_type ?? '').toLowerCase().trim();
+  const activities = ((venue.activities ?? []) as string[])
+    .map(a => (a ?? '').toString().toLowerCase().trim());
+
+  const matchesStructurally = (cat: SituationalCategory): boolean => {
+    const vts = cat.boostVenueTypes.map(t => t.toLowerCase());
+    if (vts.includes(venueType)) return true;
+    if (vts.some(t => tagSet.has(t))) return true;
+    const acts = cat.boostActivities.map(a => a.toLowerCase());
+    if (acts.some(a => activities.includes(a) || tagSet.has(a))) return true;
+    // Exact tag entry matches a category keyword
+    if (cat.boostKeywords.some(k => tagSet.has(k.toLowerCase()))) return true;
+    // cuisine_type itself is a category keyword (e.g. cuisine='bar' for nightlife,
+    // cuisine='museum' for culture)
+    if (cuisine && cat.boostKeywords.some(k => k.toLowerCase() === cuisine)) return true;
+    return false;
+  };
+
+  const primaryStruct = category.id !== 'food' ? matchesStructurally(category) : false;
+  const secondaryStruct = secondary && secondary.id !== 'food'
+    ? matchesStructurally(secondary)
+    : false;
+
+  if (primaryStruct || secondaryStruct) return true;
+
+  // No structural match → drop pure-gastro venues outright for non-food intent.
+  const FOOD_CUISINES = new Set([
+    'italian','pizza','pizzeria','burger','burgers','sushi','japanese','indian','thai',
+    'chinese','asian','mexican','french','german','spanish','greek','turkish','korean',
+    'vietnamese','american','mediterranean','seafood','steakhouse','steak','bbq',
+    'kebab','döner','doner','falafel','ramen','noodles','vegan','vegetarian','breakfast',
+    'cafe','café','bakery','bistro','brasserie','restaurant','fast_food','fast food',
+    'ice_cream','ice cream','dessert','brunch','sandwich','coffee','coffee_shop',
+    'lebanese','ethiopian','african','peruvian','argentinian','arabic','arabian',
+    'middle_eastern','middle eastern','fusion','organic','fish','seafood','pasta',
+    'pho','dim_sum','dim sum','tapas','curry','biryani','tagine',
+  ]);
+  if (cuisine && FOOD_CUISINES.has(cuisine)) return false;
+  // Also drop when only signal is generic restaurant tag
+  if (tagSet.has('restaurant') || tagSet.has('cafe') || tagSet.has('café') || tagSet.has('bakery') || tagSet.has('fast_food')) {
+    return false;
+  }
+
+  // Otherwise fall back to soft check (no clear category — could be a multipurpose venue).
   const boost = getSituationalBoost(category, venue, secondary ?? null);
   return boost >= 1;
 }
