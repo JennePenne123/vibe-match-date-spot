@@ -286,7 +286,6 @@ export function isPureFoodVenue(venue: SituationalVenueLike): boolean {
     ...(venue.types ?? []),
     venue.venue_type ?? '',
   ].map(t => (t ?? '').toString().trim().toLowerCase()).filter(Boolean);
-  const tagSet = new Set(tags);
   const cuisineParts = cuisine.split(/[;,/|]+/).map(part => part.trim()).filter(Boolean);
   const text = [venue.name ?? '', venue.description ?? '', cuisine].join(' ').toLowerCase();
   const genericFoodTags = new Set(['restaurant', 'food', 'meal_takeaway', 'meal_delivery']);
@@ -347,8 +346,6 @@ export function passesSituationalHardFilter(
   const venueType = (venue.venue_type ?? '').toLowerCase().trim();
   const activities = ((venue.activities ?? []) as string[])
     .map(a => (a ?? '').toString().toLowerCase().trim());
-
-  if (isPureFoodVenue(venue)) return false;
 
   const matchesStructurally = (cat: SituationalCategory): boolean => {
     const vts = cat.boostVenueTypes.map(t => t.toLowerCase());
