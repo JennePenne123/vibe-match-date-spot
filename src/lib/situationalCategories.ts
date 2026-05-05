@@ -259,6 +259,12 @@ const FOOD_NAME_KEYWORDS = [
   'bäckerei','cafe','café','coffee','ice cream','eis','bistro','brasserie','diner','food truck',
 ];
 
+const NON_FOOD_STRUCTURE_TAGS = new Set([
+  'bar','pub','nightclub','night_club','cocktail_bar','wine_bar','beer_garden','karaoke','comedy_club',
+  'museum','art_gallery','gallery','theater_venue','theatre','movie_theater','cinema','concert_hall',
+  'bowling','bowling_alley','mini_golf','amusement_park','arcade','escape_room','gym','spa','swimming_pool',
+]);
+
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const containsWholeTerm = (text: string, term: string): boolean => {
@@ -289,8 +295,12 @@ export function isPureFoodVenue(venue: SituationalVenueLike): boolean {
   const cuisineParts = cuisine.split(/[;,/|]+/).map(part => part.trim()).filter(Boolean);
   const text = [venue.name ?? '', venue.description ?? '', cuisine].join(' ').toLowerCase();
   const genericFoodTags = new Set(['restaurant', 'food', 'meal_takeaway', 'meal_delivery']);
+  const hasNonFoodStructure = tags.some(tag => NON_FOOD_STRUCTURE_TAGS.has(tag));
 
-  if (cuisineParts.some(part => FOOD_CUISINES.has(part) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(part, keyword)))) {
+  if (cuisineParts.some(part =>
+    (FOOD_CUISINES.has(part) && !(genericFoodTags.has(part) && hasNonFoodStructure)) ||
+    FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(part, keyword)),
+  )) {
     return true;
   }
 
