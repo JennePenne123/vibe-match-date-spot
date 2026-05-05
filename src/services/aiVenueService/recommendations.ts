@@ -894,7 +894,7 @@ async function getVenuesGooglePrimaryHybrid(
   // Fire all three in parallel — Google with hard timeout
   const promises: Promise<any[]>[] = [
     Promise.race<any[]>([
-      getVenuesFromGooglePlaces(userId, googleLimit, userLocation).catch((err) => {
+      getVenuesFromGooglePlaces(userId, googleLimit, userLocation, situationalCategoryId, secondaryCategoryId).catch((err) => {
         console.warn('⚠️ Google primary failed:', err instanceof Error ? err.message : err);
         return [] as any[];
       }),
@@ -1000,7 +1000,7 @@ async function getVenuesParallel(
   }
   
   if (API_CONFIG.useGooglePlaces) {
-    promises.push(getVenuesFromGooglePlaces(userId, limit, userLocation).catch(() => []));
+    promises.push(getVenuesFromGooglePlaces(userId, limit, userLocation, situationalCategoryId, secondaryCategoryId).catch(() => []));
   }
   
   const results = await Promise.all(promises);
@@ -1315,7 +1315,9 @@ async function getVenuesFromOverpass(
 async function getVenuesFromGooglePlaces(
   userId: string, 
   limit: number, 
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   // Tiered orchestrator: Google Places → Foursquare → Overpass with 3-day search cache
   const timer = apiUsageService.createTimer('google_places', '/search-venues-tiered');
@@ -1349,15 +1351,39 @@ async function getVenuesFromGooglePlaces(
     }
 
     const { latitude, longitude } = userLocation;
+    // When a situational quick-action is active (Kultur/Aktivität/Nightlife),
+    // inject its OSM venue types + activities so Google Places searches for
+    // clubs/bars/museums instead of restaurants. Without this, even with
+    // intent=nightlife, Google would only see preferred_cuisines and return
+    // burger places.
+    const sitCat = getSituationalCategory(situationalCategoryId ?? null);
+    const secCat = getSituationalCategory(secondaryCategoryId ?? null);
+    const situationalVenueTypes = [
+      ...(sitCat?.boostVenueTypes ?? []),
+      ...(sitCat?.boostActivities ?? []),
+      ...(secCat?.boostVenueTypes ?? []),
+      ...(secCat?.boostActivities ?? []),
+    ];
+    const isNonFood = !!sitCat && sitCat.id !== 'food';
+    const mergedVenueTypes = Array.from(new Set([
+      ...((userPrefs as any).preferred_venue_types || []),
+      ...situationalVenueTypes,
+    ]));
+    const mergedActivities = Array.from(new Set([
+      ...((userPrefs as any).preferred_activities || []),
+      ...situationalVenueTypes,
+    ]));
     const requestPayload = {
       latitude,
       longitude,
-      cuisines: fixedPrefs.preferred_cuisines,
-      venueTypes: (userPrefs as any).preferred_venue_types || [],
-      activities: (userPrefs as any).preferred_activities || [],
+      // For non-food intents we drop cuisines entirely — otherwise the edge
+      // function biases toward restaurants matching e.g. "Italian".
+      cuisines: isNonFood ? [] : fixedPrefs.preferred_cuisines,
+      venueTypes: mergedVenueTypes,
+      activities: mergedActivities,
       radius: fixedPrefs.max_distance * 1609,
       limit,
-      forceRefresh: (((userPrefs as any).preferred_venue_types || []).length > 0) || (((userPrefs as any).preferred_activities || []).length > 0),
+      forceRefresh: mergedVenueTypes.length > 0 || mergedActivities.length > 0 || isNonFood,
     };
 
     let searchResult = null;
