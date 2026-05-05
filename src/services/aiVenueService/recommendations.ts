@@ -561,7 +561,9 @@ const getVenuesFromMultipleSources = async (
       cachePriceRange,
       cacheVibes,
       cacheActivities,
-      cacheVenueTypes
+      cacheVenueTypes,
+      situationalCategoryId ?? null,
+      secondaryCategoryId ?? null,
     );
     if (cachedVenues && cachedVenues.length > 0) {
       console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
@@ -638,7 +640,9 @@ const getVenuesFromMultipleSources = async (
       cachePriceRange,
       cacheVibes,
       cacheActivities,
-      cacheVenueTypes
+      cacheVenueTypes,
+      situationalCategoryId ?? null,
+      secondaryCategoryId ?? null,
     );
   }
   
