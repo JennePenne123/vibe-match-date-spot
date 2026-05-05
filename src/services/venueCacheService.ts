@@ -132,10 +132,12 @@ export const venueCacheService = {
     priceRange?: string[],
     vibes?: string[],
     activities?: string[],
-    venueTypes?: string[]
+    venueTypes?: string[],
+    situationalCategoryId?: string | null,
+    secondaryCategoryId?: string | null,
   ): any[] | null {
     try {
-      const key = generateCacheKey(lat, lng, cuisines, priceRange, vibes, activities, venueTypes);
+      const key = generateCacheKey(lat, lng, cuisines, priceRange, vibes, activities, venueTypes, situationalCategoryId, secondaryCategoryId);
       const cached = localStorage.getItem(key);
       
       if (!cached) {
@@ -173,13 +175,15 @@ export const venueCacheService = {
     priceRange?: string[],
     vibes?: string[],
     activities?: string[],
-    venueTypes?: string[]
+    venueTypes?: string[],
+    situationalCategoryId?: string | null,
+    secondaryCategoryId?: string | null,
   ): void {
     try {
       // Evict old entries if needed
       evictOldestEntries();
       
-      const key = generateCacheKey(lat, lng, cuisines, priceRange, vibes, activities, venueTypes);
+      const key = generateCacheKey(lat, lng, cuisines, priceRange, vibes, activities, venueTypes, situationalCategoryId, secondaryCategoryId);
       const data: CachedVenueSearch = {
         venues,
         timestamp: Date.now(),
