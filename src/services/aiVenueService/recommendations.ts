@@ -1315,7 +1315,9 @@ async function getVenuesFromOverpass(
 async function getVenuesFromGooglePlaces(
   userId: string, 
   limit: number, 
-  userLocation?: { latitude: number; longitude: number; address?: string }
+  userLocation?: { latitude: number; longitude: number; address?: string },
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) {
   // Tiered orchestrator: Google Places → Foursquare → Overpass with 3-day search cache
   const timer = apiUsageService.createTimer('google_places', '/search-venues-tiered');
