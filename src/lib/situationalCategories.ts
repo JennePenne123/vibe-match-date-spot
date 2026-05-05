@@ -197,7 +197,7 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
     descKey: 'home.situational.nightlife.desc',
     emoji: '🌃',
     gradient: 'from-pink-500/20 via-fuchsia-500/10 to-transparent',
-    boostVenueTypes: ['comedy_club', 'karaoke'],
+    boostVenueTypes: ['bar', 'pub', 'nightclub', 'night_club', 'cocktail_bar', 'wine_bar', 'beer_garden', 'comedy_club', 'karaoke'],
     boostActivities: ['nightlife_act', 'cocktails'],
     boostKeywords: [
       // Clubs / dance
@@ -288,13 +288,14 @@ export function isPureFoodVenue(venue: SituationalVenueLike): boolean {
   ].map(t => (t ?? '').toString().trim().toLowerCase()).filter(Boolean);
   const tagSet = new Set(tags);
   const cuisineParts = cuisine.split(/[;,/|]+/).map(part => part.trim()).filter(Boolean);
-  const text = [venue.name ?? '', venue.description ?? '', cuisine, ...tags].join(' ').toLowerCase();
+  const text = [venue.name ?? '', venue.description ?? '', cuisine].join(' ').toLowerCase();
+  const genericFoodTags = new Set(['restaurant', 'food', 'meal_takeaway', 'meal_delivery']);
 
   if (cuisineParts.some(part => FOOD_CUISINES.has(part) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(part, keyword)))) {
     return true;
   }
 
-  if (tags.some(tag => FOOD_TAGS.has(tag) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(tag.replace(/_/g, ' '), keyword)))) {
+  if (tags.some(tag => (FOOD_TAGS.has(tag) && !genericFoodTags.has(tag)) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(tag.replace(/_/g, ' '), keyword)))) {
     return true;
   }
 
@@ -363,6 +364,8 @@ export function passesSituationalHardFilter(
     return false;
   };
 
+  if (isPureFoodVenue(venue)) return false;
+
   const primaryStruct = category.id !== 'food' ? matchesStructurally(category) : false;
   const secondaryStruct = secondary && secondary.id !== 'food'
     ? matchesStructurally(secondary)
@@ -370,9 +373,7 @@ export function passesSituationalHardFilter(
 
   if (primaryStruct || secondaryStruct) return true;
 
-  // Otherwise fall back to soft check (no clear category — could be a multipurpose venue).
-  const boost = getSituationalBoost(category, venue, secondary ?? null);
-  return boost >= 1;
+  return false;
 }
 
 /**
