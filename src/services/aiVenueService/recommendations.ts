@@ -411,14 +411,12 @@ export const getAIVenueRecommendations = async (
     const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
     if (situationalCat && situationalCat.id !== 'food') {
       const before = deduped.length;
-      deduped = deduped.filter(rec => {
-        const haystack = [
-          rec.venue_name ?? '',
-          rec.cuisine_type ?? '',
-          ...(rec.amenities ?? []),
-        ].join(' ').toLowerCase();
-        return situationalCat.boostKeywords.some(kw => haystack.includes(kw));
-      });
+      const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
+      deduped = deduped.filter(rec => passesSituationalHardFilter(situationalCat, {
+        name: rec.venue_name,
+        cuisine_type: rec.cuisine_type,
+        tags: rec.amenities,
+      }, secondaryCat));
       console.log(`🎯 SITUATIONAL FILTER (${situationalCat.id}): ${before} → ${deduped.length} venues`);
       if (deduped.length === 0) {
         // Bubble up so useAIAnalysis can show a friendly hint (radius / try other category)
