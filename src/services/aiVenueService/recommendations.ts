@@ -20,7 +20,7 @@ import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringU
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
-import { getSituationalCategory, getSituationalBoost, isPureFoodVenue, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
+import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
 
 /**
  * Sentinel error thrown when a non-food situational category produced zero
