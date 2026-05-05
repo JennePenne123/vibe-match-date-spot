@@ -1000,7 +1000,7 @@ async function getVenuesParallel(
   }
   
   if (API_CONFIG.useGooglePlaces) {
-    promises.push(getVenuesFromGooglePlaces(userId, limit, userLocation).catch(() => []));
+    promises.push(getVenuesFromGooglePlaces(userId, limit, userLocation, situationalCategoryId, secondaryCategoryId).catch(() => []));
   }
   
   const results = await Promise.all(promises);
