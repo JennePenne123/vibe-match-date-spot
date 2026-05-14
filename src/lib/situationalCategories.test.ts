@@ -207,6 +207,27 @@ describe('passesSituationalHardFilter — non-food intent strictness', () => {
       ).toBe(true);
     });
 
+    it('recognizes Google cuisine-specific *_restaurant types as pure food', () => {
+      for (const type of ['american_restaurant', 'pizza_restaurant', 'sushi_restaurant', 'thai_restaurant']) {
+        expect(
+          isPureFoodVenue({
+            name: 'Google Place',
+            types: ['restaurant', type, 'point_of_interest'],
+          }),
+        ).toBe(true);
+      }
+    });
+
+    it('recognizes common burger chains even when Google cuisineType falls back to Restaurant', () => {
+      expect(
+        isPureFoodVenue({
+          name: 'Five Guys Hamburg',
+          cuisineType: 'Restaurant',
+          types: ['restaurant', 'point_of_interest'],
+        }),
+      ).toBe(true);
+    });
+
     it('does not classify a normal bar with a generic restaurant tag as pure food', () => {
       expect(
         isPureFoodVenue({
