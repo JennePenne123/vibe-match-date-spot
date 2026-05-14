@@ -21,6 +21,11 @@ import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
 import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
+import {
+  beginSituationalFilterRequest,
+  endSituationalFilterRequest,
+  recordSituationalFilter,
+} from './situationalFilterAnalytics';
 
 /**
  * Sentinel error thrown when a non-food situational category produced zero
@@ -66,6 +71,7 @@ const filterSituationalVenues = <T extends Record<string, any>>(
   }, secondaryCat));
 
   console.log(`🎯 SITUATIONAL SOURCE FILTER (${primaryCat.id}/${sourceLabel}): ${venues.length} → ${filtered.length}`);
+  recordSituationalFilter(sourceLabel, venues.length, filtered.length);
   return filtered;
 };
 
@@ -110,6 +116,11 @@ export const getAIVenueRecommendations = async (
   situationalCategoryId?: SituationalCategoryId | null,
   secondaryCategoryId?: SituationalCategoryId | null,
 ): Promise<AIVenueRecommendation[]> => {
+  const filterReportId = beginSituationalFilterRequest(
+    situationalCategoryId ?? null,
+    secondaryCategoryId ?? null,
+    { userId, partnerId, limit, hasLocation: !!userLocation },
+  );
   try {
     // Get venues using hybrid multi-source strategy
     let venues = [];
@@ -515,6 +526,8 @@ export const getAIVenueRecommendations = async (
     if (error instanceof NoSituationalMatchError) throw error;
     console.error('Failed to get venue recommendations:', error);
     throw new Error(error instanceof Error ? error.message : 'Failed to get venue recommendations');
+  } finally {
+    endSituationalFilterRequest(filterReportId);
   }
 };
 
