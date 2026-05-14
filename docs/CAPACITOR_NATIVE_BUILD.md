@@ -2,6 +2,24 @@
 
 > **Status:** Capacitor 6 ist konfiguriert (`capacitor.config.ts`). Native Builds laufen nicht in Lovable, sondern lokal in **Xcode** (iOS) bzw. **Android Studio** (Android).
 
+---
+
+## Wer behebt was? — Der Update-Workflow
+
+| Problem | Wer fixt | Dein Schritt danach |
+|---------|----------|---------------------|
+| UI-Bug, Layout-Problem, Text falsch | **Ich (Lovable)** | `npm run build && npx cap sync` |
+| API-Fehler, Auth-Probleme, Datenbank-RLS | **Ich (Lovable)** | `npm run build && npx cap sync` |
+| Edge Function crashed / 500er | **Ich (Lovable)** | Kein lokaler Build nötig (Backend deployt automatisch) |
+| App startet nicht / weißer Bildschirm | **Du (lokal)** | Siehe Troubleshooting unten |
+| Build-Fehler in Xcode / Android Studio | **Du (lokal)** | Build-Tools, Signing, Dependencies prüfen |
+| Native Plugin Crash (Kamera, GPS, Push) | **Du (lokal)** | Native Logs in Xcode/Android Studio prüfen |
+| App Store / Play Store Ablehnung | **Du (lokal)** | Guidelines prüfen, Screenshots neu erstellen |
+
+**Wichtig:** Ich bearbeite nur den Web-Code (React, TypeScript, Edge Functions, DB). Alles, was in Xcode oder Android Studio passiert, musst du lokal machen.
+
+---
+
 ## Voraussetzungen
 - **macOS** mit Xcode 15+ (für iOS)
 - **Android Studio** Iguana+ (für Android)
@@ -89,6 +107,36 @@ npx cap run ios
 npx cap run android
 ```
 
+## Update-Zyklus nach einem Fix von Lovable
+
+```text
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  1. Ich fixe    │ ──► │  2. Du pullest  │ ──► │  3. Build &     │
+│     im Chat     │     │     git pull    │     │     Sync        │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                                                        │
+┌─────────────────┐     ┌─────────────────┐              │
+│  5. Testen auf  │ ◄── │  4. In Xcode/   │ ◄──────────┘
+│     Gerät       │     │   Android Studio│
+└─────────────────┘     └─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│  6. Bei Native  │
+│     Problemen:  │
+│     Logs an mich│
+│     (nur Web)   │
+└─────────────────┘
+```
+
+**Schritt-für-Schritt:**
+1. Ich bearbeite den Code in Lovable
+2. Du holst dir die Änderungen: `git pull`
+3. Du baust den Web-Code neu: `npm run build`
+4. Du syncst in die native Plattform: `npx cap sync`
+5. Du startest die App in Xcode / Android Studio oder auf dem Gerät
+6. **Nur Web-Logs** (Console, Netzwerk) kannst du mir schicken — native Crash-Logs musst du selbst in Xcode/Android Studio lesen
+
 ## Production-Build Checkliste
 
 - [ ] `server.url` in `capacitor.config.ts` entfernt/auskommentiert
@@ -100,13 +148,59 @@ npx cap run android
 - [ ] iOS: Signing & Capabilities → Push Notifications + Sign In with Apple aktiviert
 - [ ] Android: `keystore` erstellt und in `android/app/build.gradle` referenziert
 
+---
+
 ## Troubleshooting
 
-**"App lädt weißen Bildschirm"** → `server.url` in `capacitor.config.ts` zeigt evtl. ins Leere. Auskommentieren und neu bauen.
+### App lädt weißen Bildschirm
+→ `server.url` in `capacitor.config.ts` zeigt evtl. ins Leere. Auskommentieren und neu bauen.
 
-**"OAuth Redirect schlägt fehl"** → Native OAuth braucht Custom URL Scheme (z. B. `hioutz://`). Im Supabase Dashboard zusätzlich zu `https://hioutz.app/home` auch `hioutz://home` als Redirect URL hinterlegen.
+### OAuth Redirect schlägt fehl
+→ Native OAuth braucht Custom URL Scheme (z. B. `hioutz://`). Im Supabase Dashboard zusätzlich zu `https://hioutz.app/home` auch `hioutz://home` als Redirect URL hinterlegen.
 
-**"Kamera/Location permission denied"** → Permission-Strings (siehe oben) fehlen oder App muss in System-Settings manuell freigegeben werden.
+### Kamera / Location Permission denied
+→ Permission-Strings (siehe oben) fehlen oder App muss in System-Settings manuell freigegeben werden.
+
+### iOS Build-Fehler "Signing required"
+→ Xcode → Project → Signing & Capabilities → Team auswählen. Apple Developer Account nötig.
+
+### Android Build-Fehler "Keystore error"
+→ `android/app/build.gradle` prüfen oder neuen Keystore erstellen:
+```bash
+keytool -genkey -v -keystore hioutz.keystore -alias hioutz -keyalg RSA -keysize 2048 -validity 10000
+```
+
+### Fehler nur auf einem Gerät, nicht im Simulator
+→ Wahrscheinlich ein **nativer** Fehler (nicht Web-Code). Prüfe:
+- iOS: Xcode → Window → Devices and Simulators → Device Logs
+- Android: Android Studio → Logcat
+
+### Wie finde ich heraus, ob es ein Web- oder Native-Fehler ist?
+- Öffne die **Safari DevTools** (iOS) oder **Chrome DevTools** (Android) für die WebView
+- Siehst du Console-Errors? → **Web-Fehler** → schick mir einen Screenshot der Console
+- Startet die App gar nicht / stürzt sofort ab? → **Native-Fehler** → Xcode/Android Studio Logs prüfen
+
+---
+
+## Was du mir schicken kannst (Web-Fehler)
+
+Wenn ein Fehler in der App auftritt, kannst du mir folgendes schicken:
+- Screenshot der **Safari/Chrome DevTools Console**
+- Screenshot der **Network-Tab** (bei API-Fehlern)
+- Beschreibung: Was hast du getippt/getippt? Welcher Screen?
+
+**Was ich damit machen kann:**
+- Code fixen (React, TypeScript, CSS)
+- Edge Function anpassen
+- Datenbank-Policy korrigieren
+- Auth-Flow debuggen
+
+**Was ich NICHT damit machen kann:**
+- Xcode-Build-Fehler beheben
+- App Store Review-Probleme lösen
+- Native Plugin-Bugs fixen (z. B. Kamera-Plugin crash)
+
+---
 
 ## Weitere Ressourcen
 - [Capacitor Docs](https://capacitorjs.com/docs)
