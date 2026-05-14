@@ -247,6 +247,9 @@ const App = () => (
                     
                     {/* Debug route */}
                     <Route path="/debug" element={<LazyPage><Debug /></LazyPage>} />
+
+                    {/* Hidden admin entry — not linked anywhere, noindex */}
+                    <Route path="/control" element={<LazyPageNoLayout><Control /></LazyPageNoLayout>} />
                     
                     {/* Partner Routes */}
                     <Route path="/partner" element={<LazyPage><PartnerDashboard /></LazyPage>} />
