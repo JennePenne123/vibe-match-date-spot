@@ -36,6 +36,39 @@ export class NoSituationalMatchError extends Error {
   }
 }
 
+const getActiveSituationalCategory = (
+  primaryId?: SituationalCategoryId | null,
+  secondaryId?: SituationalCategoryId | null,
+) => {
+  const primaryCat = getSituationalCategory(primaryId ?? null);
+  const secondaryCat = getSituationalCategory(secondaryId ?? null);
+  return { primaryCat, secondaryCat, isNonFood: !!primaryCat && primaryCat.id !== 'food' };
+};
+
+const filterSituationalVenues = <T extends Record<string, any>>(
+  venues: T[],
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
+  sourceLabel: string = 'venues',
+): T[] => {
+  const { primaryCat, secondaryCat, isNonFood } = getActiveSituationalCategory(situationalCategoryId, secondaryCategoryId);
+  if (!isNonFood || !primaryCat) return venues;
+
+  const filtered = venues.filter(v => passesSituationalHardFilter(primaryCat, {
+    name: v.name ?? v.venue_name,
+    cuisine_type: v.cuisine_type ?? v.cuisineType,
+    cuisineType: v.cuisineType,
+    description: v.description ?? v.ai_reasoning,
+    tags: v.tags ?? v.amenities,
+    types: v.types,
+    venue_type: v.venue_type,
+    activities: v.activities,
+  }, secondaryCat));
+
+  console.log(`🎯 SITUATIONAL SOURCE FILTER (${primaryCat.id}/${sourceLabel}): ${venues.length} → ${filtered.length}`);
+  return filtered;
+};
+
 export interface AIVenueRecommendation {
   venue_id: string;
   venue_name: string;
@@ -135,11 +168,10 @@ export const getAIVenueRecommendations = async (
     // drop pure gastro venues from the candidate set. A soft boost is not
     // enough because there are always 100× more restaurants than museums.
     {
-      const primaryCat = getSituationalCategory(situationalCategoryId ?? null);
-      const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
-      if (primaryCat && primaryCat.id !== 'food') {
+      const { primaryCat, secondaryCat, isNonFood } = getActiveSituationalCategory(situationalCategoryId, secondaryCategoryId);
+      if (isNonFood && primaryCat) {
         const before = venues.length;
-        const filtered = venues.filter(v => passesSituationalHardFilter(primaryCat, v, secondaryCat));
+        const filtered = filterSituationalVenues(venues, situationalCategoryId, secondaryCategoryId, 'candidate-set');
         venues = filtered;
         console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
         try { sessionStorage.removeItem('hioutz-situational-sparse'); } catch {}
@@ -408,10 +440,9 @@ export const getAIVenueRecommendations = async (
     // / description / cuisine signal a match. This is the user's explicit
     // intent for this session and we should not show restaurants when they
     // asked for culture or activities.
-    const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
-    if (situationalCat && situationalCat.id !== 'food') {
+    const { primaryCat: situationalCat, secondaryCat, isNonFood } = getActiveSituationalCategory(situationalCategoryId, secondaryCategoryId);
+    if (isNonFood && situationalCat) {
       const before = deduped.length;
-      const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
       deduped = deduped.filter(rec => passesSituationalHardFilter(situationalCat, {
         name: rec.venue_name,
         cuisine_type: rec.cuisine_type,
@@ -566,22 +597,27 @@ const getVenuesFromMultipleSources = async (
       secondaryCategoryId ?? null,
     );
     if (cachedVenues && cachedVenues.length > 0) {
-      console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
+      const cacheSafeVenues = filterSituationalVenues(cachedVenues, situationalCategoryId, secondaryCategoryId, 'cache');
+      if (cacheSafeVenues.length === 0 && isNonFoodMode) {
+        console.log('[VenueSearch] ⚠️ Ignoring cache because no venues match non-food intent');
+      } else {
+        console.log('[VenueSearch] 🎯 Using cached venues:', cacheSafeVenues.length);
       
-      await apiUsageService.logApiCall({
-        api_name: 'venue_cache',
-        endpoint: '/cached-search',
-        user_id: userId,
-        response_status: 200,
-        cache_hit: true,
-        estimated_cost: 0,
-        request_metadata: { 
-          venueCount: cachedVenues.length,
-          location: `${userLocation.latitude.toFixed(4)},${userLocation.longitude.toFixed(4)}`
-        }
-      });
+        await apiUsageService.logApiCall({
+          api_name: 'venue_cache',
+          endpoint: '/cached-search',
+          user_id: userId,
+          response_status: 200,
+          cache_hit: true,
+          estimated_cost: 0,
+          request_metadata: { 
+            venueCount: cacheSafeVenues.length,
+            location: `${userLocation.latitude.toFixed(4)},${userLocation.longitude.toFixed(4)}`
+          }
+        });
       
-      return cachedVenues;
+        return cacheSafeVenues;
+      }
     }
   }
 
@@ -1411,7 +1447,7 @@ async function getVenuesFromGooglePlaces(
     
     if (!searchResult) {
       const locationFilteredVenues = await getLocationFilteredDatabaseVenues(
-        latitude, longitude, fixedPrefs.max_distance, fixedPrefs.preferred_cuisines
+        latitude, longitude, fixedPrefs.max_distance, isNonFood ? [] : fixedPrefs.preferred_cuisines, situationalCategoryId, secondaryCategoryId
       );
       if (locationFilteredVenues.length > 0) return locationFilteredVenues;
       throw new Error('No venues found');
@@ -1420,12 +1456,13 @@ async function getVenuesFromGooglePlaces(
     const venues = searchResult?.venues || [];
     if (venues.length === 0) {
       const locationFilteredVenues = await getLocationFilteredDatabaseVenues(
-        latitude, longitude, fixedPrefs.max_distance, fixedPrefs.preferred_cuisines
+        latitude, longitude, fixedPrefs.max_distance, isNonFood ? [] : fixedPrefs.preferred_cuisines, situationalCategoryId, secondaryCategoryId
       );
       return locationFilteredVenues;
     }
 
-    return await transformAndSaveVenues(venues.slice(0, limit));
+    const transformedVenues = await transformAndSaveVenues(venues.slice(0, limit));
+    return filterSituationalVenues(transformedVenues, situationalCategoryId, secondaryCategoryId, 'google-transformed');
   } catch (error) {
     throw error;
   }
@@ -1554,7 +1591,9 @@ const getLocationFilteredDatabaseVenues = async (
   latitude: number, 
   longitude: number, 
   maxDistance: number, 
-  preferredCuisines: string[]
+  preferredCuisines: string[],
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) => {
   const { data: dbVenues, error: dbError } = await supabase
     .from('venues')
@@ -1572,8 +1611,9 @@ const getLocationFilteredDatabaseVenues = async (
       return withinDistance && matchesCuisine;
     });
     
-    if (filteredVenues.length > 0) {
-      return filteredVenues.map(venue => ({
+    const safeVenues = filterSituationalVenues(filteredVenues, situationalCategoryId, secondaryCategoryId, 'database-fallback');
+    if (safeVenues.length > 0) {
+      return safeVenues.map(venue => ({
         id: venue.id,
         name: venue.name,
         address: venue.address,

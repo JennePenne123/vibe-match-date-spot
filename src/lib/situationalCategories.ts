@@ -251,12 +251,17 @@ const FOOD_TAGS = new Set([
   ...FOOD_CUISINES,
   'hamburger_restaurant','burger_restaurant','restaurant','food','fast_food','meal_takeaway','meal_delivery',
   'cafe','café','bakery','diner','eatery','snack_bar','food_beverage','food-beverage',
+  'american_restaurant','barbecue_restaurant','bbq_restaurant','brunch_restaurant','chinese_restaurant',
+  'fast_food_restaurant','fine_dining_restaurant','greek_restaurant','indian_restaurant','italian_restaurant',
+  'japanese_restaurant','korean_restaurant','mexican_restaurant','pizza_restaurant','ramen_restaurant',
+  'seafood_restaurant','steak_house','sushi_restaurant','thai_restaurant','vegan_restaurant','vegetarian_restaurant',
 ]);
 
 const FOOD_NAME_KEYWORDS = [
   'burger','hamburger','pizza','pizzeria','sushi','restaurant','ristorante','trattoria','imbiss',
   'kebab','döner','doner','grill','steakhouse','steak house','sandwich','ramen','noodle','bakery',
   'bäckerei','cafe','café','coffee','ice cream','eis','bistro','brasserie','diner','food truck',
+  'five guys','mcdonald','mcdonalds','mcdonald’s','burger king','kfc','subway','wendy',
 ];
 
 const NON_FOOD_STRUCTURE_TAGS = new Set([
@@ -297,16 +302,16 @@ export function isPureFoodVenue(venue: SituationalVenueLike): boolean {
   const genericFoodTags = new Set(['restaurant', 'food', 'meal_takeaway', 'meal_delivery']);
   const hasNonFoodStructure = tags.some(tag => NON_FOOD_STRUCTURE_TAGS.has(tag));
 
-  if (cuisineParts.some(part =>
-    (FOOD_CUISINES.has(part) && !(genericFoodTags.has(part) && hasNonFoodStructure)) ||
-    FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(part, keyword)),
-  )) {
+  if (cuisineParts.some(part => {
+    if (genericFoodTags.has(part) && hasNonFoodStructure) return false;
+    return FOOD_CUISINES.has(part) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(part, keyword));
+  })) {
     return true;
   }
 
   if (tags.some(tag => {
     if (genericFoodTags.has(tag) && hasNonFoodStructure) return false;
-    return FOOD_TAGS.has(tag) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(tag.replace(/_/g, ' '), keyword));
+    return FOOD_TAGS.has(tag) || tag.endsWith('_restaurant') || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(tag.replace(/_/g, ' '), keyword));
   })) {
     return true;
   }

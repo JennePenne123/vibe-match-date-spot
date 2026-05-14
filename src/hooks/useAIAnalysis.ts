@@ -231,11 +231,16 @@ export const useAIAnalysis = () => {
           venue_id: v.venue_id,
           venue_name: v.venue_name,
           ai_score: v.ai_score,
-          reasoning: v.reasoning,
-          address: v.address,
+          reasoning: v.ai_reasoning,
+          ai_reasoning: v.ai_reasoning,
+          venue_address: v.venue_address,
+          address: v.venue_address,
           cuisine_type: v.cuisine_type,
-          price_range: v.price_range,
-          rating: v.rating
+          price_range: v.priceRange,
+          priceRange: v.priceRange,
+          rating: v.rating,
+          amenities: v.amenities,
+          tags: v.amenities,
         }));
         
         await supabase

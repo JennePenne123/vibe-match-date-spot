@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSessionRealtime } from '@/hooks/useSessionRealtime';
 import { useAIAnalysis } from '@/hooks/useAIAnalysis';
 import { AIVenueRecommendation } from '@/services/aiVenueService/recommendations';
+import { getSituationalCategory, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
 
 interface DatePlanningSession {
   id: string;
@@ -288,7 +289,22 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
             }
           }
           
-          setSessionVenueRecommendations(transformedVenues);
+          const primaryId = typeof window !== 'undefined'
+            ? (window.sessionStorage.getItem('hioutz-situational-category') as SituationalCategoryId | null)
+            : null;
+          const secondaryId = typeof window !== 'undefined'
+            ? (window.sessionStorage.getItem('hioutz-situational-secondary') as SituationalCategoryId | null)
+            : null;
+          const primaryCat = getSituationalCategory(primaryId);
+          const secondaryCat = getSituationalCategory(secondaryId);
+          const safeVenues = primaryCat && primaryCat.id !== 'food'
+            ? transformedVenues.filter(venue => passesSituationalHardFilter(primaryCat, {
+                name: venue.venue_name,
+                cuisine_type: venue.cuisine_type,
+                tags: venue.amenities,
+              }, secondaryCat))
+            : transformedVenues;
+          setSessionVenueRecommendations(safeVenues);
         } catch (error) {
           console.error('SESSION: Error transforming venue data:', error);
           setSessionVenueRecommendations([]);
