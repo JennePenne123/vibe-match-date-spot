@@ -1447,7 +1447,7 @@ async function getVenuesFromGooglePlaces(
     
     if (!searchResult) {
       const locationFilteredVenues = await getLocationFilteredDatabaseVenues(
-        latitude, longitude, fixedPrefs.max_distance, fixedPrefs.preferred_cuisines
+        latitude, longitude, fixedPrefs.max_distance, isNonFood ? [] : fixedPrefs.preferred_cuisines, situationalCategoryId, secondaryCategoryId
       );
       if (locationFilteredVenues.length > 0) return locationFilteredVenues;
       throw new Error('No venues found');
@@ -1456,12 +1456,13 @@ async function getVenuesFromGooglePlaces(
     const venues = searchResult?.venues || [];
     if (venues.length === 0) {
       const locationFilteredVenues = await getLocationFilteredDatabaseVenues(
-        latitude, longitude, fixedPrefs.max_distance, fixedPrefs.preferred_cuisines
+        latitude, longitude, fixedPrefs.max_distance, isNonFood ? [] : fixedPrefs.preferred_cuisines, situationalCategoryId, secondaryCategoryId
       );
       return locationFilteredVenues;
     }
 
-    return await transformAndSaveVenues(venues.slice(0, limit));
+    const transformedVenues = await transformAndSaveVenues(venues.slice(0, limit));
+    return filterSituationalVenues(transformedVenues, situationalCategoryId, secondaryCategoryId, 'google-transformed');
   } catch (error) {
     throw error;
   }
