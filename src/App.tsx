@@ -140,6 +140,7 @@ const AdminCostMonitoring = lazy(() => import("./pages/admin/CostMonitoring"));
 
 // Demo/debug routes – lazy loaded
 const Debug = lazy(() => import("./pages/Debug"));
+const Control = lazy(() => import("./pages/Control"));
 const ShareholderReport = lazy(() => import("./pages/ShareholderReport"));
 const AIVenueCardDemo = lazy(() => import("./pages/AIVenueCardDemo"));
 const PremiumDesignSystemDemo = lazy(() => import("./pages/PremiumDesignSystemDemo"));
@@ -246,6 +247,9 @@ const App = () => (
                     
                     {/* Debug route */}
                     <Route path="/debug" element={<LazyPage><Debug /></LazyPage>} />
+
+                    {/* Hidden admin entry — not linked anywhere, noindex */}
+                    <Route path="/control" element={<LazyPageNoLayout><Control /></LazyPageNoLayout>} />
                     
                     {/* Partner Routes */}
                     <Route path="/partner" element={<LazyPage><PartnerDashboard /></LazyPage>} />
