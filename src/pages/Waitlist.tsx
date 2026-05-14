@@ -55,6 +55,11 @@ export default function Waitlist() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
+      <SEO
+        title="Warteliste – H!Outz früher entdecken"
+        description="Trag dich in die H!Outz Warteliste ein und erhalte als eine:r der Ersten Zugang zur KI-gestützten Date-Planung."
+        path="/waitlist"
+      />
       {/* Ambient background effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-primary/15 blur-[120px]" />
