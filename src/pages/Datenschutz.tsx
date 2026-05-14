@@ -2,12 +2,18 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { COMPANY } from '@/config/companyInfo';
+import { SEO } from '@/components/SEO';
 
 export default function Datenschutz() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Datenschutzerklärung – H!Outz"
+        description="Wie H!Outz personenbezogene Daten verarbeitet, schützt und welche Rechte Nutzer:innen haben."
+        path="/datenschutz"
+      />
       <div className="max-w-2xl mx-auto">
         <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b border-border/50 px-4 py-3">
           <div className="flex items-center gap-3">
