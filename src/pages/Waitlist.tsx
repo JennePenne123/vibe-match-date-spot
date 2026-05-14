@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
 import hioutzLogo from '@/assets/hioutz-logo.png';
+import { SEO } from '@/components/SEO';
 
 export default function Waitlist() {
   const [name, setName] = useState('');
