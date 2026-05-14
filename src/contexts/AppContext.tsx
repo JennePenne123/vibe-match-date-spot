@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { AIVenueRecommendation } from '@/services/aiVenueService';
 import { filterBlockedVenues } from '@/services/aiVenueService/venueBlocklist';
+import { getSituationalCategory, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
 
 interface UserLocation {
   latitude: number;
@@ -119,7 +120,9 @@ const applyVenueFilters = (venues: Venue[], selectedCuisines: string[], selected
 const fetchFallbackVenues = async (
   selectedCuisines: string[],
   selectedVibes: string[],
-  userLocation?: { latitude: number; longitude: number }
+  userLocation?: { latitude: number; longitude: number },
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ): Promise<Venue[]> => {
   let query = supabase
     .from('venues')
@@ -141,8 +144,13 @@ const fetchFallbackVenues = async (
   const { data, error } = await query.limit(100);
   if (error) throw error;
 
-  const filtered = filterBlockedVenues((data || []) as Venue[]);
-  return applyVenueFilters(filtered, selectedCuisines, selectedVibes);
+  const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
+  const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
+  const blockedFiltered = filterBlockedVenues((data || []) as Venue[]);
+  const intentFiltered = situationalCat && situationalCat.id !== 'food'
+    ? blockedFiltered.filter(venue => passesSituationalHardFilter(situationalCat, venue, secondaryCat))
+    : blockedFiltered;
+  return applyVenueFilters(intentFiltered, selectedCuisines, selectedVibes);
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
