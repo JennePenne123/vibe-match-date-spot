@@ -302,10 +302,10 @@ export function isPureFoodVenue(venue: SituationalVenueLike): boolean {
   const genericFoodTags = new Set(['restaurant', 'food', 'meal_takeaway', 'meal_delivery']);
   const hasNonFoodStructure = tags.some(tag => NON_FOOD_STRUCTURE_TAGS.has(tag));
 
-  if (cuisineParts.some(part =>
-    (FOOD_CUISINES.has(part) && !(genericFoodTags.has(part) && hasNonFoodStructure)) ||
-    FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(part, keyword)),
-  )) {
+  if (cuisineParts.some(part => {
+    if (genericFoodTags.has(part) && hasNonFoodStructure) return false;
+    return FOOD_CUISINES.has(part) || FOOD_NAME_KEYWORDS.some(keyword => containsWholeTerm(part, keyword));
+  })) {
     return true;
   }
 
