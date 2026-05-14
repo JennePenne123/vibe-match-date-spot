@@ -1591,7 +1591,9 @@ const getLocationFilteredDatabaseVenues = async (
   latitude: number, 
   longitude: number, 
   maxDistance: number, 
-  preferredCuisines: string[]
+  preferredCuisines: string[],
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
 ) => {
   const { data: dbVenues, error: dbError } = await supabase
     .from('venues')
@@ -1609,8 +1611,9 @@ const getLocationFilteredDatabaseVenues = async (
       return withinDistance && matchesCuisine;
     });
     
-    if (filteredVenues.length > 0) {
-      return filteredVenues.map(venue => ({
+    const safeVenues = filterSituationalVenues(filteredVenues, situationalCategoryId, secondaryCategoryId, 'database-fallback');
+    if (safeVenues.length > 0) {
+      return safeVenues.map(venue => ({
         id: venue.id,
         name: venue.name,
         address: venue.address,
