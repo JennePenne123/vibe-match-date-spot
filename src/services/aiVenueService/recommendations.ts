@@ -168,11 +168,10 @@ export const getAIVenueRecommendations = async (
     // drop pure gastro venues from the candidate set. A soft boost is not
     // enough because there are always 100× more restaurants than museums.
     {
-      const primaryCat = getSituationalCategory(situationalCategoryId ?? null);
-      const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
-      if (primaryCat && primaryCat.id !== 'food') {
+      const { primaryCat, secondaryCat, isNonFood } = getActiveSituationalCategory(situationalCategoryId, secondaryCategoryId);
+      if (isNonFood && primaryCat) {
         const before = venues.length;
-        const filtered = venues.filter(v => passesSituationalHardFilter(primaryCat, v, secondaryCat));
+        const filtered = filterSituationalVenues(venues, situationalCategoryId, secondaryCategoryId, 'candidate-set');
         venues = filtered;
         console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
         try { sessionStorage.removeItem('hioutz-situational-sparse'); } catch {}
@@ -441,10 +440,9 @@ export const getAIVenueRecommendations = async (
     // / description / cuisine signal a match. This is the user's explicit
     // intent for this session and we should not show restaurants when they
     // asked for culture or activities.
-    const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
-    if (situationalCat && situationalCat.id !== 'food') {
+    const { primaryCat: situationalCat, secondaryCat, isNonFood } = getActiveSituationalCategory(situationalCategoryId, secondaryCategoryId);
+    if (isNonFood && situationalCat) {
       const before = deduped.length;
-      const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
       deduped = deduped.filter(rec => passesSituationalHardFilter(situationalCat, {
         name: rec.venue_name,
         cuisine_type: rec.cuisine_type,
