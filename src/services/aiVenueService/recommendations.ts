@@ -597,22 +597,27 @@ const getVenuesFromMultipleSources = async (
       secondaryCategoryId ?? null,
     );
     if (cachedVenues && cachedVenues.length > 0) {
-      console.log('[VenueSearch] 🎯 Using cached venues:', cachedVenues.length);
+      const cacheSafeVenues = filterSituationalVenues(cachedVenues, situationalCategoryId, secondaryCategoryId, 'cache');
+      if (cacheSafeVenues.length === 0 && isNonFoodMode) {
+        console.log('[VenueSearch] ⚠️ Ignoring cache because no venues match non-food intent');
+      } else {
+        console.log('[VenueSearch] 🎯 Using cached venues:', cacheSafeVenues.length);
       
-      await apiUsageService.logApiCall({
-        api_name: 'venue_cache',
-        endpoint: '/cached-search',
-        user_id: userId,
-        response_status: 200,
-        cache_hit: true,
-        estimated_cost: 0,
-        request_metadata: { 
-          venueCount: cachedVenues.length,
-          location: `${userLocation.latitude.toFixed(4)},${userLocation.longitude.toFixed(4)}`
-        }
-      });
+        await apiUsageService.logApiCall({
+          api_name: 'venue_cache',
+          endpoint: '/cached-search',
+          user_id: userId,
+          response_status: 200,
+          cache_hit: true,
+          estimated_cost: 0,
+          request_metadata: { 
+            venueCount: cacheSafeVenues.length,
+            location: `${userLocation.latitude.toFixed(4)},${userLocation.longitude.toFixed(4)}`
+          }
+        });
       
-      return cachedVenues;
+        return cacheSafeVenues;
+      }
     }
   }
 
