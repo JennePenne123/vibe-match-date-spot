@@ -1,0 +1,19 @@
+# H!Outz
+
+> KI-gestützte Date-Planung mit personalisierten Venue-Empfehlungen für Paare, Freundesgruppen und Singles.
+
+H!Outz ist eine progressive Web-App, die mithilfe von künstlicher Intelligenz, expliziten Vorlieben und impliziten Signalen passende Restaurants, Bars, Clubs, Aktivitäten und Kulturorte vorschlägt. Die App unterstützt Solo-, Paar- und Gruppenplanung, integriert Partner-Venues mit exklusiven Vouchern und ist für den deutschsprachigen Markt (Deutschland, Österreich, Schweiz) optimiert.
+
+## Pages
+
+- [Startseite](/): Produktübersicht, Features und Login.
+- [Warteliste](/waitlist): Frühzugang zur App sichern.
+- [Onboarding](/welcome): Geführter Einstieg mit Präferenz-Wizard.
+- [Mood Check-in](/mood): Tages-Stimmung für bessere Empfehlungen.
+
+## Legal
+
+- [Impressum](/impressum): Anbieterkennzeichnung gemäß § 5 DDG.
+- [Datenschutzerklärung](/datenschutz): Informationen zur Verarbeitung personenbezogener Daten.
+- [AGB](/agb): Allgemeine Geschäftsbedingungen.
+- [Widerrufsformular](/widerrufsformular): Muster-Widerruf für kostenpflichtige Leistungen.
