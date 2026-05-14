@@ -4,6 +4,7 @@ import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { getCompatibilityScore, CompatibilityScore } from '@/services/aiMatchingService';
 import { getAIVenueRecommendations } from '@/services/aiVenueService';
 import { NoSituationalMatchError } from '@/services/aiVenueService/recommendations';
+import { getSituationalCategory, passesSituationalHardFilter } from '@/lib/situationalCategories';
 import { supabase } from '@/integrations/supabase/client';
 import { getLocationFallback } from '@/utils/locationFallback';
 import type { DateOccasion } from '@/services/aiVenueService/occasionScoring';
@@ -231,11 +232,16 @@ export const useAIAnalysis = () => {
           venue_id: v.venue_id,
           venue_name: v.venue_name,
           ai_score: v.ai_score,
-          reasoning: v.reasoning,
-          address: v.address,
+          reasoning: v.ai_reasoning,
+          ai_reasoning: v.ai_reasoning,
+          venue_address: v.venue_address,
+          address: v.venue_address,
           cuisine_type: v.cuisine_type,
-          price_range: v.price_range,
-          rating: v.rating
+          price_range: v.priceRange,
+          priceRange: v.priceRange,
+          rating: v.rating,
+          amenities: v.amenities,
+          tags: v.amenities,
         }));
         
         await supabase
