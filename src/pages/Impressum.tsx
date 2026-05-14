@@ -2,12 +2,33 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Building2 } from 'lucide-react';
 import { COMPANY } from '@/config/companyInfo';
+import { SEO } from '@/components/SEO';
 
 export default function Impressum() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Impressum – H!Outz"
+        description="Anbieterkennzeichnung und Kontaktdaten der H!Outz GmbH gemäß § 5 DDG."
+        path="/impressum"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: COMPANY.legalName,
+          url: 'https://hioutz.app',
+          email: COMPANY.contactEmail,
+          telephone: COMPANY.phone,
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: COMPANY.street,
+            postalCode: COMPANY.zip,
+            addressLocality: COMPANY.city,
+            addressCountry: COMPANY.country,
+          },
+        }}
+      />
       <div className="max-w-2xl mx-auto">
         <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b border-border/50 px-4 py-3">
           <div className="flex items-center gap-3">

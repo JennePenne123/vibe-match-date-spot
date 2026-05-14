@@ -10,6 +10,7 @@ import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import AnimatedCounter from '@/components/landing/AnimatedCounter';
 import { motion } from 'framer-motion';
+import { SEO } from '@/components/SEO';
 export default function LandingDemo() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -58,6 +59,11 @@ export default function LandingDemo() {
   };
 
   return <main id="main-content" className="min-h-screen bg-background overflow-x-hidden">
+      <SEO
+        title="H!Outz – KI-gestützte Date-Planung"
+        description="H!Outz hilft dir, das perfekte Date zu planen – mit KI-gestützten Venue-Empfehlungen, die eure Vorlieben kennen."
+        path="/"
+      />
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${isScrolled ? 'bg-background/90 backdrop-blur-lg border-b border-border/40 shadow-gentle-sm' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
