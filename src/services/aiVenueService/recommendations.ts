@@ -20,7 +20,7 @@ import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringU
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
-import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
+import { getSituationalCategory, getSituationalBoost, isPureFoodVenue, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
 
 /**
  * Sentinel error thrown when a non-food situational category produced zero
@@ -35,6 +35,39 @@ export class NoSituationalMatchError extends Error {
     this.categoryId = categoryId;
   }
 }
+
+const getActiveSituationalCategory = (
+  primaryId?: SituationalCategoryId | null,
+  secondaryId?: SituationalCategoryId | null,
+) => {
+  const primaryCat = getSituationalCategory(primaryId ?? null);
+  const secondaryCat = getSituationalCategory(secondaryId ?? null);
+  return { primaryCat, secondaryCat, isNonFood: !!primaryCat && primaryCat.id !== 'food' };
+};
+
+const filterSituationalVenues = <T extends Record<string, any>>(
+  venues: T[],
+  situationalCategoryId?: SituationalCategoryId | null,
+  secondaryCategoryId?: SituationalCategoryId | null,
+  sourceLabel: string = 'venues',
+): T[] => {
+  const { primaryCat, secondaryCat, isNonFood } = getActiveSituationalCategory(situationalCategoryId, secondaryCategoryId);
+  if (!isNonFood || !primaryCat) return venues;
+
+  const filtered = venues.filter(v => passesSituationalHardFilter(primaryCat, {
+    name: v.name ?? v.venue_name,
+    cuisine_type: v.cuisine_type ?? v.cuisineType,
+    cuisineType: v.cuisineType,
+    description: v.description ?? v.ai_reasoning,
+    tags: v.tags ?? v.amenities,
+    types: v.types,
+    venue_type: v.venue_type,
+    activities: v.activities,
+  }, secondaryCat));
+
+  console.log(`🎯 SITUATIONAL SOURCE FILTER (${primaryCat.id}/${sourceLabel}): ${venues.length} → ${filtered.length}`);
+  return filtered;
+};
 
 export interface AIVenueRecommendation {
   venue_id: string;
