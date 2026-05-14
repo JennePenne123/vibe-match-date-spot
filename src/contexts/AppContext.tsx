@@ -354,7 +354,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         venues = await fetchFallbackVenues(
           appState.selectedCuisines,
           appState.selectedVibes,
-          location ? { latitude: location.latitude, longitude: location.longitude } : undefined
+          location ? { latitude: location.latitude, longitude: location.longitude } : undefined,
+          situationalCategoryId,
+          secondaryCategoryId,
         );
       }
 
