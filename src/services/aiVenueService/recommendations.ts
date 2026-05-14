@@ -21,6 +21,11 @@ import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
 import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
+import {
+  beginSituationalFilterRequest,
+  endSituationalFilterRequest,
+  recordSituationalFilter,
+} from './situationalFilterAnalytics';
 
 /**
  * Sentinel error thrown when a non-food situational category produced zero
@@ -66,6 +71,7 @@ const filterSituationalVenues = <T extends Record<string, any>>(
   }, secondaryCat));
 
   console.log(`🎯 SITUATIONAL SOURCE FILTER (${primaryCat.id}/${sourceLabel}): ${venues.length} → ${filtered.length}`);
+  recordSituationalFilter(sourceLabel, venues.length, filtered.length);
   return filtered;
 };
 
