@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Building2 } from 'lucide-react';
 import { COMPANY } from '@/config/companyInfo';
 import { SEO } from '@/components/SEO';
-import { COMPANY_ADDRESS_INLINE } from '@/config/companyInfo';
 
 export default function Impressum() {
   const navigate = useNavigate();
