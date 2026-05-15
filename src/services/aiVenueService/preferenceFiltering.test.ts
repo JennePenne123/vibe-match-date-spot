@@ -135,7 +135,9 @@ describe('preferenceFiltering', () => {
     it('should give low scores to venues with no preference match', async () => {
       mockSingle.mockResolvedValue({
         data: {
-          preferred_cuisines: ['Thai'],
+          // Hawaiian shares no cuisine group with Italian/French/Japanese/Vegan,
+          // so the related-cuisine floor (e.g. asian: thai↔japanese) does not kick in.
+          preferred_cuisines: ['Hawaiian'],
           preferred_price_range: ['$$$$'],
           preferred_vibes: ['outdoor'],
           dietary_restrictions: []
