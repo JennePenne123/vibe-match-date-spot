@@ -577,6 +577,24 @@ const Preferences = () => {
   ];
 
   const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), 2));
+
+  // Keep step in sync with the URL so browser/gesture back navigates step-by-step
+  // (instead of unmounting the wizard and wiping form state).
+  useEffect(() => {
+    const urlStep = parseInt(searchParams.get('step') || '0', 10);
+    const clamped = Math.min(Math.max(urlStep, 0), 2);
+    if (clamped !== step) setStep(clamped);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const goToStep = (next: number) => {
+    const clamped = Math.min(Math.max(next, 0), 2);
+    setStep(clamped);
+    const params = new URLSearchParams(searchParams);
+    params.set('step', String(clamped));
+    setSearchParams(params); // pushes history → browser back returns to previous step
+  };
+
   // Resolve the adaptive wizard config from the active situational category.
   // Drives which sections are visible and what the "main picker" shows.
   const cfg = getCategoryWizardConfig(situationalCategory?.id ?? null);
@@ -607,7 +625,7 @@ const Preferences = () => {
         {/* Header */}
         <div className="p-4 pt-12 bg-card shadow-sm sticky top-0 z-10 space-y-3">
           <div className="flex items-center gap-3">
-            <Button onClick={() => canGoBack ? setStep(s => s - 1) : navigate(-1)} variant="ghost" size="icon" className="text-muted-foreground flex-shrink-0">
+            <Button onClick={() => canGoBack ? goToStep(step - 1) : navigate(-1)} variant="ghost" size="icon" className="text-muted-foreground flex-shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div className="flex-1 text-center">
@@ -627,7 +645,7 @@ const Preferences = () => {
           {/* Navigation buttons */}
           <div className="flex gap-2 pt-1">
             {canGoNext ? (
-              <Button onClick={() => setStep(s => s + 1)} className="flex-1 h-10 font-semibold text-sm">
+              <Button onClick={() => goToStep(step + 1)} className="flex-1 h-10 font-semibold text-sm">
                 {t('home.wizardNext')} <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             ) : (
