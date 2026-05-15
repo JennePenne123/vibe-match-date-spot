@@ -341,9 +341,28 @@ const Preferences = () => {
     setLocationError('');
     if (!navigator.geolocation) { setLocationError(t('preferences.locationNotSupported')); setIsLocating(false); return; }
     try {
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
-      });
+      // Pre-check permission so we fail fast in iframes without geolocation allow-list
+      try {
+        const perm = await (navigator as any).permissions?.query?.({ name: 'geolocation' as PermissionName });
+        if (perm?.state === 'denied') {
+          throw new Error('denied');
+        }
+      } catch { /* permissions API not available — continue */ }
+
+      // Hard race: some embeds (Lovable preview iframe without allow="geolocation")
+      // never invoke success or error callbacks, leaving the spinner stuck.
+      const position = await Promise.race<GeolocationPosition>([
+        new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: false,
+            timeout: 8000,
+            maximumAge: 300000,
+          });
+        }),
+        new Promise<GeolocationPosition>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 9000)
+        ),
+      ]);
       setHomeLatitude(position.coords.latitude);
       setHomeLongitude(position.coords.longitude);
       try {
