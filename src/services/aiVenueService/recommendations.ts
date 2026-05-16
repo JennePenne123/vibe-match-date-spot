@@ -406,7 +406,14 @@ export const getAIVenueRecommendations = async (
       const firstPhotoUrl = photosArray.length > 0 
         ? (typeof photosArray[0] === 'string' ? photosArray[0] : photosArray[0]?.url)
         : undefined;
-      const bestImage = venue.image_url || venue.image || firstPhotoUrl;
+      const bestImage = venue.image_url || venue.image || firstPhotoUrl
+        || getVenueFallbackImage({
+          id: cleanVenueId,
+          name: venue.name,
+          cuisine_type: venue.cuisine_type,
+          tags: venue.tags,
+          description: venue.description,
+        });
 
       const recommendation: AIVenueRecommendation = {
         venue_id: cleanVenueId,
@@ -1633,7 +1640,7 @@ const getLocationFilteredDatabaseVenues = async (
         cuisine_type: venue.cuisine_type,
         price_range: venue.price_range || '$$',
         rating: venue.rating || 4.2,
-        image_url: venue.image_url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+        image_url: venue.image_url || getVenueFallbackImage(venue),
         tags: venue.tags || ['Restaurant'],
         phone: venue.phone,
         website: venue.website,
