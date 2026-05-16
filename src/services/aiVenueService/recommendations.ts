@@ -17,6 +17,7 @@ import { getSeasonalScoreModifier, getSeasonalLabel } from './seasonalScoring';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
+import { getVenueFallbackImage } from '@/utils/venueImageFallback';
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
