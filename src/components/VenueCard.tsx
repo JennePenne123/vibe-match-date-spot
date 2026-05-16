@@ -9,6 +9,7 @@ import { Heart, Star, MapPin, Zap, Navigation, Clock } from 'lucide-react';
 import { Venue } from '@/types';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
+import { getVenueFallbackImage } from '@/utils/venueImageFallback';
 import { useBreakpoint } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import VerifiedBadge from '@/components/partner/VerifiedBadge';
@@ -36,20 +37,26 @@ const VenueCard = ({
   const { isDesktop } = useBreakpoint();
 
   const { t } = useTranslation();
-  const venueImage = venue.image_url || venue.image;
+  const fallbackImage = getVenueFallbackImage({
+    id: venue.id,
+    name: venue.name,
+    cuisine_type: venue.cuisine_type,
+  });
+  const hasRealImage = !!(venue.image_url || venue.image);
+  const venueImage = venue.image_url || venue.image || fallbackImage;
   const venueLocation = formatVenueAddress(venue);
   const venuePriceRange = venue.price_range || venue.priceRange;
   const venueNeighborhood = extractNeighborhood(venue.address);
   
   // Process venue photos for gallery
-  const venuePhotos = venue.photos && venue.photos.length > 0 
-    ? venue.photos 
+  const venuePhotos = venue.photos && venue.photos.length > 0
+    ? venue.photos
     : [{
-        url: venueImage || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+        url: venueImage,
         width: 400,
         height: 300,
-        attribution: venue.photos?.length ? 'Google Photos' : 'Stock Photo',
-        isGooglePhoto: venue.photos?.length > 0
+        attribution: hasRealImage ? 'Google Photos' : 'Unsplash',
+        isGooglePhoto: hasRealImage,
       }];
 
   // Auto-detect variant based on screen size if not explicitly set
