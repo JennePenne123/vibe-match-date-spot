@@ -23,6 +23,7 @@ import {
   Zap
 } from 'lucide-react';
 import { AIVenueRecommendation } from '@/services/aiVenueService/recommendations';
+import { getVenueFallbackImage } from '@/utils/venueImageFallback';
 import { type FeedbackType } from '@/services/feedbackService';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
