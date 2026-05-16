@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ExternalLink, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VenuePhoto {
@@ -107,18 +107,36 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
           </div>
         )}
 
-        {/* Google Photos badge */}
-        {currentPhoto.isGooglePhoto && (
-          <div className="absolute top-2 left-2 bg-background/90 px-2 py-1 rounded text-xs flex items-center gap-1">
-            <img 
-              src="https://developers.google.com/static/maps/images/google_on_white.png" 
-              alt="Google" 
-              className="w-3 h-3"
-              loading="lazy"
-            />
-            <span className="text-muted-foreground">Photos</span>
-          </div>
-        )}
+        {/* Photo source badge — always visible */}
+        <div
+          className={`absolute top-2 left-2 px-2 py-1 rounded-full text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm ${
+            currentPhoto.isGooglePhoto
+              ? 'bg-background/90 text-foreground border border-border/50'
+              : 'bg-muted/90 text-muted-foreground border border-border/50'
+          }`}
+          title={
+            currentPhoto.isGooglePhoto
+              ? `Google Places Foto${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
+              : `Stock-Bild (Fallback)${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
+          }
+        >
+          {currentPhoto.isGooglePhoto ? (
+            <>
+              <img
+                src="https://developers.google.com/static/maps/images/google_on_white.png"
+                alt="Google"
+                className="w-3 h-3"
+                loading="lazy"
+              />
+              <span>Google Photo</span>
+            </>
+          ) : (
+            <>
+              <ImageIcon className="w-3 h-3" />
+              <span>Stock</span>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Thumbnail strip */}
@@ -146,12 +164,14 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
       )}
 
       {/* Attribution */}
-      {currentPhoto.attribution && (
-        <div className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
-          <ExternalLink className="w-3 h-3" />
-          <span>Photo by {currentPhoto.attribution}</span>
-        </div>
-      )}
+      <div className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
+        <ExternalLink className="w-3 h-3" />
+        <span>
+          {currentPhoto.isGooglePhoto
+            ? `Foto via Google Places${currentPhoto.attribution ? ` · ${currentPhoto.attribution}` : ''}`
+            : `Stock-Foto${currentPhoto.attribution && currentPhoto.attribution !== 'Stock Photo' ? ` · ${currentPhoto.attribution}` : ' · Unsplash'}`}
+        </span>
+      </div>
     </div>
   );
 };
