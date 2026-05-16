@@ -528,6 +528,25 @@ export const getAIVenueRecommendations = async (
       console.warn(`⚠️ QUALITY WARNING: Only ${qualifiedTop3.length}/3 venues passed the 80% quality gate`);
     }
 
+    // Fire-and-forget: enrich top venues that have a google_place_id with real Google photos.
+    // Updates DB so subsequent sessions show real imagery instead of category fallbacks.
+    try {
+      const toEnrich = diverseRecommendations
+        .slice(0, 10)
+        .filter((r: any) => {
+          const hasRealImage = r.venue_image && !r.venue_image.includes('unsplash.com');
+          // Only enrich UUID-like ids (DB rows). Skip overpass/foursquare composite ids.
+          const looksLikeUuid = typeof r.venue_id === 'string' && /^[0-9a-f-]{36}$/i.test(r.venue_id);
+          return looksLikeUuid && !hasRealImage;
+        })
+        .map((r: any) => r.venue_id);
+      if (toEnrich.length > 0) {
+        void supabase.functions.invoke('enrich-venue-photos', {
+          body: { venue_ids: toEnrich },
+        }).catch(() => { /* silent */ });
+      }
+    } catch { /* never block on enrichment */ }
+
     return validateRecommendations(diverseRecommendations);
   } catch (error) {
     // Preserve typed errors so callers (e.g. useAIAnalysis) can react to them.
