@@ -91,7 +91,11 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   const processedPhotos = venue_photos && venue_photos.length > 0 
     ? venue_photos 
     : [{
-        url: venue_image || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+        url: venue_image || getVenueFallbackImage({
+          id: venue_id,
+          name: venue_name,
+          cuisine_type,
+        }),
         width: 400,
         height: 300,
         attribution: venue_photos?.length ? 'Google Photos' : 'Stock Photo',
