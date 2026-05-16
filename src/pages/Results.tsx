@@ -81,7 +81,12 @@ const Results = () => {
         venue_id: venue.id,
         venue_name: venue.name,
         venue_address: venue.address || '',
-        venue_image: venue.image_url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+        venue_image: venue.image_url || getVenueFallbackImage({
+          id: venue.id,
+          name: venue.name,
+          cuisine_type: venue.cuisine_type,
+          tags: venue.tags,
+        }),
         ai_score: (venue as any).matchScore ? (venue as any).matchScore / 100 : 0.5,
         match_factors: {
           cuisine_match: true,
