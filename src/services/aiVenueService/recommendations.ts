@@ -17,6 +17,7 @@ import { getSeasonalScoreModifier, getSeasonalLabel } from './seasonalScoring';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
+import { getVenueFallbackImage } from '@/utils/venueImageFallback';
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
@@ -406,7 +407,14 @@ export const getAIVenueRecommendations = async (
       const firstPhotoUrl = photosArray.length > 0 
         ? (typeof photosArray[0] === 'string' ? photosArray[0] : photosArray[0]?.url)
         : undefined;
-      const bestImage = venue.image_url || venue.image || firstPhotoUrl;
+      const bestImage = venue.image_url || venue.image || firstPhotoUrl
+        || getVenueFallbackImage({
+          id: cleanVenueId,
+          name: venue.name,
+          cuisine_type: venue.cuisine_type,
+          tags: venue.tags,
+          description: venue.description,
+        });
 
       const recommendation: AIVenueRecommendation = {
         venue_id: cleanVenueId,
@@ -519,6 +527,25 @@ export const getAIVenueRecommendations = async (
     if (qualifiedTop3.length < 3) {
       console.warn(`⚠️ QUALITY WARNING: Only ${qualifiedTop3.length}/3 venues passed the 80% quality gate`);
     }
+
+    // Fire-and-forget: enrich top venues that have a google_place_id with real Google photos.
+    // Updates DB so subsequent sessions show real imagery instead of category fallbacks.
+    try {
+      const toEnrich = diverseRecommendations
+        .slice(0, 10)
+        .filter((r: any) => {
+          const hasRealImage = r.venue_image && !r.venue_image.includes('unsplash.com');
+          // Only enrich UUID-like ids (DB rows). Skip overpass/foursquare composite ids.
+          const looksLikeUuid = typeof r.venue_id === 'string' && /^[0-9a-f-]{36}$/i.test(r.venue_id);
+          return looksLikeUuid && !hasRealImage;
+        })
+        .map((r: any) => r.venue_id);
+      if (toEnrich.length > 0) {
+        void supabase.functions.invoke('enrich-venue-photos', {
+          body: { venue_ids: toEnrich },
+        }).catch(() => { /* silent */ });
+      }
+    } catch { /* never block on enrichment */ }
 
     return validateRecommendations(diverseRecommendations);
   } catch (error) {
@@ -1633,7 +1660,7 @@ const getLocationFilteredDatabaseVenues = async (
         cuisine_type: venue.cuisine_type,
         price_range: venue.price_range || '$$',
         rating: venue.rating || 4.2,
-        image_url: venue.image_url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+        image_url: venue.image_url || getVenueFallbackImage(venue),
         tags: venue.tags || ['Restaurant'],
         phone: venue.phone,
         website: venue.website,
