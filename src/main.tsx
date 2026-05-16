@@ -37,6 +37,7 @@ ric(
   () => {
     import('./services/sentryService').then(m => m.initSentry())
     import('./services/errorMonitoringService').then(m => m.initErrorMonitoring())
+    import('./services/formalIssueMonitor').then(m => m.initFormalIssueMonitor())
   },
   { timeout: 3000 }
 )
