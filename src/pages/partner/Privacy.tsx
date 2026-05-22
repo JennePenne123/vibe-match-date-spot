@@ -5,7 +5,7 @@ import { COMPANY } from '@/config/companyInfo';
 
 /**
  * Partner-Datenschutzerklärung – DSGVO-konform
- * Rechtsform: H!Outz GmbH (i. Gr.)
+ * Rechtsform: H!Outz (Einzelunternehmen)
  */
 export default function PartnerPrivacy() {
   const navigate = useNavigate();
