@@ -22,6 +22,7 @@ import { PushTestWidget } from '@/components/admin/PushTestWidget';
 import { OAuthDiagnosticsWidget } from '@/components/admin/OAuthDiagnosticsWidget';
 import { RateLimitMonitorWidget } from '@/components/admin/RateLimitMonitorWidget';
 import { LegalPlaceholderAuditWidget } from '@/components/admin/LegalPlaceholderAuditWidget';
+import { DbBackupWidget } from '@/components/admin/DbBackupWidget';
 
 type TimeRange = '24h' | '7d' | '30d';
 
@@ -217,6 +218,7 @@ const SystemHealth: React.FC = () => {
           <TabsTrigger value="ratemon">Rate-Monitor</TabsTrigger>
           <TabsTrigger value="oauth">OAuth</TabsTrigger>
           <TabsTrigger value="legal">Rechtstexte</TabsTrigger>
+          <TabsTrigger value="backups">Backups</TabsTrigger>
         </TabsList>
 
         {/* Errors */}
@@ -395,6 +397,10 @@ const SystemHealth: React.FC = () => {
 
         <TabsContent value="cron" className="mt-4">
           <CronJobsWidget />
+        </TabsContent>
+
+        <TabsContent value="backups" className="mt-4">
+          <DbBackupWidget />
         </TabsContent>
 
         <TabsContent value="push" className="mt-4">
