@@ -25,6 +25,8 @@ project_id = "dfjwubatslzblagthbdw"
     verify_jwt = false
   [functions.refresh-google-venues]
     verify_jwt = false
+  [functions.weekly-db-backup]
+    verify_jwt = false
   [functions.generate-invitation-message]
     verify_jwt = true
   [functions.get-ai-insights]
