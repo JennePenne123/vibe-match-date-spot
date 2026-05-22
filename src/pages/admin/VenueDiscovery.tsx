@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useToast } from '@/hooks/use-toast'
-import { Loader2, MapPin, Sparkles } from 'lucide-react'
+import { Loader2, MapPin, Sparkles, RefreshCw } from 'lucide-react'
 
 type CategoryId = 'culture' | 'activity' | 'nightlife'
 
@@ -39,6 +39,8 @@ const VenueDiscovery: React.FC = () => {
   })
   const [running, setRunning] = useState(false)
   const [result, setResult] = useState<RunResult | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const [refreshResult, setRefreshResult] = useState<any>(null)
 
   const selectedCategories = useMemo(
     () => (Object.entries(categories).filter(([, v]) => v).map(([k]) => k) as CategoryId[]),
@@ -88,6 +90,27 @@ const VenueDiscovery: React.FC = () => {
       toast({ title: 'Backfill fehlgeschlagen', description: msg, variant: 'destructive' })
     } finally {
       setRunning(false)
+    }
+  }
+
+  const runGoogleRefresh = async () => {
+    setRefreshing(true)
+    setRefreshResult(null)
+    try {
+      const { data, error } = await supabase.functions.invoke('refresh-google-venues', {
+        body: { refreshLimit: 200, discoveryLimit: 30 },
+      })
+      if (error) throw error
+      setRefreshResult(data)
+      toast({
+        title: 'Google-Refresh fertig',
+        description: `${data?.refreshed ?? 0} aktualisiert · ${data?.inserted ?? 0} neu`,
+      })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      toast({ title: 'Refresh fehlgeschlagen', description: msg, variant: 'destructive' })
+    } finally {
+      setRefreshing(false)
     }
   }
 
@@ -186,6 +209,50 @@ const VenueDiscovery: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 text-primary" />
+            Google Places Monatsupdate
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Aktualisiert bestehende Google-Venues (älter als 25 Tage) und sucht in aktiven
+            Clustern nach neuen Lokalitäten. Läuft automatisch am 1. jedes Monats – hier
+            kannst du manuell anstoßen.
+          </p>
+          <Button onClick={runGoogleRefresh} disabled={refreshing} className="w-full md:w-auto">
+            {refreshing ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Aktualisiere…</>
+            ) : (
+              <><RefreshCw className="w-4 h-4 mr-2" /> Jetzt aktualisieren</>
+            )}
+          </Button>
+
+          {refreshResult && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+              <div className="rounded-lg border border-border/50 p-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Aktualisiert</div>
+                <div className="mt-1 text-lg font-semibold">{refreshResult.refreshed ?? 0}</div>
+              </div>
+              <div className="rounded-lg border border-border/50 p-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Neu entdeckt</div>
+                <div className="mt-1 text-lg font-semibold">{refreshResult.inserted ?? 0}</div>
+              </div>
+              <div className="rounded-lg border border-border/50 p-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Cluster</div>
+                <div className="mt-1 text-lg font-semibold">{refreshResult.clusters ?? 0}</div>
+              </div>
+              <div className="rounded-lg border border-border/50 p-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Fehler</div>
+                <div className="mt-1 text-lg font-semibold">{refreshResult.refresh_failed ?? 0}</div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
