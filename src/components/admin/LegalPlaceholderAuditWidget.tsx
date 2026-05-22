@@ -106,7 +106,7 @@ export const LegalPlaceholderAuditWidget: React.FC = () => {
           </CardTitle>
           <CardDescription>
             Findet alle <code className="text-xs">[Platzhalter]</code> in AGB, Datenschutz &amp; Impressum.
-            Nach UG-Gründung ersetzen, bevor öffentlich gelaunched wird.
+            Vor Go-Live ersetzen, bevor öffentlich gelaunched wird.
           </CardDescription>
         </CardHeader>
         <CardContent>

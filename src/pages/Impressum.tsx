@@ -11,7 +11,7 @@ export default function Impressum() {
     <div className="min-h-screen bg-background">
       <SEO
         title="Impressum – H!Outz"
-        description="Anbieterkennzeichnung und Kontaktdaten der H!Outz GmbH gemäß § 5 DDG."
+        description="Anbieterkennzeichnung und Kontaktdaten von H!Outz gemäß § 5 DDG."
         path="/impressum"
         jsonLd={{
           '@context': 'https://schema.org',

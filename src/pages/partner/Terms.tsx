@@ -5,7 +5,7 @@ import { COMPANY, COMPANY_ADDRESS_INLINE } from '@/config/companyInfo';
 
 /**
  * Partner-AGB – Allgemeine Geschäftsbedingungen für Venue-Partner
- * Rechtsform: H!Outz GmbH (i. Gr.)
+ * Rechtsform: H!Outz (Einzelunternehmen)
  * Anwendbares Recht: Deutsches Recht / EU-Recht
  */
 export default function PartnerTerms() {
