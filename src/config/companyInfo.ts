@@ -1,16 +1,16 @@
 /**
  * Zentrale Firmendaten für alle Rechtstexte (Impressum, AGB, Datenschutz, Widerrufsformular).
  *
- * ⚠️ NACH UG-GRÜNDUNG: Hier alle Platzhalter mit "TODO:" durch die echten Daten ersetzen.
+ * ⚠️ VOR GO-LIVE: Hier alle Platzhalter mit "TODO:" durch die echten Daten ersetzen.
  * Dann sind Impressum, AGB, Datenschutz, Widerrufsformular & Partner-Texte automatisch aktuell.
  */
 export const COMPANY = {
-  legalName: 'H!Outz GmbH (i.\u00a0Gr.)', // TODO: nach Eintrag ins HR auf "H!Outz GmbH" ändern
+  legalName: 'H!Outz (Einzelunternehmen)', // TODO: nach Firmengründung auf "H!Outz [Rechtsform]" ändern
   street: '[Straße und Hausnummer]', // TODO
   zip: '[PLZ]', // TODO
   city: '[Ort]', // TODO
   country: 'Deutschland',
-  ceo: '[Geschäftsführer / Inhaber]', // TODO
+  ceo: '[Inhaber]', // TODO
   contentResponsibleName: '[Name]', // TODO § 18 Abs. 2 MStV
   contentResponsibleAddress: '[Adresse]', // TODO § 18 Abs. 2 MStV
   phone: '[Telefonnummer]', // TODO
