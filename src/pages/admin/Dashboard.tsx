@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck, ShieldAlert, Database, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import WaitlistSignupsWidget from '@/components/admin/WaitlistSignupsWidget';
 
 interface PlatformStats {
   totalUsers: number;
@@ -108,6 +109,9 @@ const AdminDashboard: React.FC = () => {
 
       {/* Data Quality */}
       <DataQualityCard />
+
+      {/* Waitlist Signups */}
+      <WaitlistSignupsWidget />
 
       {/* Recent activity */}
       <RecentActivity />
