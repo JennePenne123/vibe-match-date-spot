@@ -23,7 +23,10 @@
     "no": "Nein",
     "unlimited": "Unbegrenzt",
     "creating": "Erstelle...",
-    "noMinimum": "Kein Minimum"
+    "noMinimum": "Kein Minimum",
+    "dismiss": "Ausblenden",
+    "friend": "Freund",
+    "notAvailable": "Nicht verfügbar"
   },
   "nav": {
     "home": "Home",
@@ -33,7 +36,8 @@
     "myFriends": "Meine Freunde",
     "invitations": "Einladungen",
     "myVenues": "Meine Venues",
-    "navigation": "Navigation"
+    "navigation": "Navigation",
+    "groupDates": "Gruppen-Dates"
   },
   "chats": {
     "empty": "Noch keine Unterhaltungen. Plane etwas und starte den Chat!",
@@ -141,7 +145,9 @@
       "t_food": "Lust auf was Neues? Probiere eine unbekannte Küche",
       "t_entertainment": "Live-Musik macht jeden Abend unvergesslich",
       "t_outdoor2": "Natur tanken — Parks & Gärten sind unterschätzt"
-    }
+    },
+    "feedbackImpactTitle": "Dein Feedback wirkt",
+    "feedbackImpactDesc": "Jede Bewertung verbessert deine nächsten Empfehlungen."
   },
   "landing": {
     "features": "Funktionen",
@@ -270,7 +276,8 @@
     "freshSession": "Neue Sitzung erstellt",
     "freshSessionDesc": "Starte mit sauberen Vorlieben...",
     "to": "An:",
-    "from": "Von:"
+    "from": "Von:",
+    "noProposalsDesc": "Plane dein erstes Date und sieh hier deine Vorschläge."
   },
   "ratings": {
     "pendingRatings": "Ausstehende Bewertungen",
@@ -337,7 +344,8 @@
     "radius": "Radius",
     "nearYou": "In deiner Nähe",
     "noResults": "Keine Venues gefunden",
-    "tryOtherCity": "Versuche eine andere Stadt oder erweitere die Filter"
+    "tryOtherCity": "Versuche eine andere Stadt oder erweitere die Filter",
+    "openNow": "Jetzt geöffnet"
   },
   "myVenuesPage": {
     "title": "Meine Venues",
@@ -559,7 +567,15 @@
     "secondaryCategoryTitle": "Danach noch …?",
     "secondaryCategorySubtitle": "Optional: Eine zweite Kategorie kombinieren",
     "secondaryCategoryClear": "Entfernen",
-    "secondaryCategoryActive": "Plus"
+    "secondaryCategoryActive": "Plus",
+    "stepContext": "Kontext",
+    "stepContextDesc": "Anlass, Stimmung und Zeit",
+    "stepPractical": "Praktisches",
+    "stepPracticalDesc": "Standort, Distanz und Budget",
+    "stepTaste": "Geschmack",
+    "stepTasteDesc": "Küchen und Vorlieben",
+    "maxDistance": "Maximale Entfernung",
+    "useCurrentLocation": "Aktuellen Standort verwenden"
   },
   "notFound": {
     "title": "404",
@@ -644,7 +660,31 @@
     "aiProfilingExplanation": "Wir nutzen Künstliche Intelligenz, um dir passende Date-Locations vorzuschlagen. Dazu analysieren wir deine Präferenzen, vergangene Bewertungen und dein Nutzungsverhalten (z. B. welche Orte du favorisierst).",
     "aiProfilingRight": "Du hast das Recht, einer solchen automatisierten Verarbeitung jederzeit zu widersprechen.",
     "aiProfilingLearnMore": "Mehr dazu in unserer Datenschutzerklärung",
-    "aiProfilingOnboarding": "Wir nutzen KI, um dir personalisierte Date-Ideen vorzuschlagen. Mehr in unserer"
+    "aiProfilingOnboarding": "Wir nutzen KI, um dir personalisierte Date-Ideen vorzuschlagen. Mehr in unserer",
+    "support": "Support",
+    "supportDesc": "Wir helfen dir gerne weiter",
+    "contactSupport": "Support kontaktieren",
+    "supportEmailHint": "Antwort innerhalb von 24 Stunden",
+    "faq1Question": "Wie funktioniert das KI-Matching?",
+    "faq1Answer": "Unsere KI lernt aus deinen Vorlieben und Bewertungen und schlägt dir passende Locations vor.",
+    "faq2Question": "Wie kann ich Freunde einladen?",
+    "faq2Answer": "Im Freunde-Bereich findest du deinen persönlichen Einladungscode.",
+    "faq3Question": "Wie löse ich einen Voucher ein?",
+    "faq3Answer": "Zeige dem Personal vor Ort den QR-Code aus deiner App.",
+    "faq4Question": "Wie kann ich mein Konto löschen?",
+    "faq4Answer": "Nutze die Option „Konto löschen\" unten in den Einstellungen.",
+    "deleteCheckboxLabel": "Ich verstehe, dass diese Aktion unwiderruflich ist",
+    "privacyPolicy": "Datenschutzerklärung",
+    "privacyTracking": "Tracking & Personalisierung",
+    "privacyTrackingDesc": "Steuere, ob deine Interaktionen für bessere Empfehlungen genutzt werden.",
+    "implicitTracking": "Implizites Tracking",
+    "trackingEnabled": "Aktiviert",
+    "trackingDisabled": "Deaktiviert",
+    "trackingInfo": "Wenn aktiviert, lernen wir aus Klicks, Verweildauer und Favoriten.",
+    "trackingActivated": "Tracking aktiviert",
+    "trackingActivatedDesc": "Empfehlungen werden jetzt stärker personalisiert.",
+    "trackingDeactivated": "Tracking deaktiviert",
+    "trackingDeactivatedDesc": "Wir nutzen ab sofort weniger Signale für die Personalisierung."
   },
   "partner": {
     "dashboard": "Partner-Dashboard",
@@ -858,6 +898,162 @@
       "yourVenue": "Dein Venue",
       "visits": "Besuche",
       "noRatings": "Keine Bewertungen"
+    },
+    "avgRating": "Ø Bewertung",
+    "avgRatingDesc": "Durchschnitt aller Venues",
+    "comparison": {
+      "title": "Venue-Vergleich",
+      "subtitle": "Vergleiche Leistung deiner Venues",
+      "addVenue": "Venue hinzufügen",
+      "bestRated": "Bestbewertet",
+      "topPerformer": "Top-Performer",
+      "redemptions": "Einlösungen",
+      "details": "Details",
+      "noVenues": "Noch keine Venues zum Vergleichen"
+    },
+    "lock": {
+      "title": "Verifizierung erforderlich",
+      "description": "Schließe die Verifizierung ab, um diesen Bereich zu nutzen.",
+      "verifyNow": "Jetzt verifizieren"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "viewAll": "Alle anzeigen",
+      "empty": "Keine neuen Benachrichtigungen",
+      "expiring": "Voucher läuft bald ab",
+      "feedback": "Neues Feedback",
+      "redemption": "Voucher eingelöst",
+      "milestone": "Meilenstein erreicht",
+      "pageTitle": "Benachrichtigungen",
+      "pageDesc": "Alle Updates zu deinen Venues",
+      "filterAll": "Alle",
+      "filterExpiring": "Ablaufend",
+      "filterFeedback": "Feedback",
+      "filterRedemptions": "Einlösungen",
+      "markAllRead": "Alle gelesen",
+      "noResults": "Keine Benachrichtigungen für diesen Filter"
+    },
+    "onboarding": {
+      "title": "Partner-Setup",
+      "progress": "Fortschritt",
+      "allDone": "Alles erledigt!",
+      "allDoneDesc": "Dein Partner-Account ist vollständig eingerichtet.",
+      "profileTitle": "Profil vervollständigen",
+      "profileDesc": "Geschäftsdaten hinzufügen",
+      "profileDetail": "Name, Adresse und Kontakt",
+      "profileAction": "Profil bearbeiten",
+      "venueTitle": "Erstes Venue anlegen",
+      "venueDesc": "Lege ein Venue an oder beanspruche eins",
+      "venueDetail": "Damit Gäste dich finden",
+      "venueAction": "Venue anlegen",
+      "voucherTitle": "Ersten Voucher erstellen",
+      "voucherDesc": "Locke neue Gäste mit Angeboten",
+      "voucherDetail": "Rabatte oder Aktionen",
+      "voucherAction": "Voucher erstellen"
+    },
+    "performance": {
+      "title": "Venue-Leistung",
+      "compare": "Vergleichen"
+    },
+    "profile": {
+      "title": "Partner-Profil",
+      "subtitle": "Verwalte deine Geschäftsdaten",
+      "businessInfo": "Geschäftsinformationen",
+      "businessName": "Firmenname",
+      "contactPerson": "Ansprechpartner",
+      "contact": "Kontakt",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "website": "Website",
+      "address": "Adresse",
+      "street": "Straße & Hausnummer",
+      "postalCode": "PLZ",
+      "city": "Stadt",
+      "country": "Land",
+      "taxId": "Steuernummer / USt-IdNr.",
+      "description": "Beschreibung",
+      "descPlaceholder": "Kurzbeschreibung deines Unternehmens",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "savedDesc": "Profil wurde aktualisiert.",
+      "error": "Fehler",
+      "errorDesc": "Speichern fehlgeschlagen. Bitte versuche es erneut.",
+      "editButton": "Profil bearbeiten"
+    },
+    "support": {
+      "title": "Support",
+      "email": "E-Mail-Support",
+      "phone": "Telefon-Support",
+      "hint": "Antwort innerhalb von 24 Stunden"
+    },
+    "termsReaccept": {
+      "title": "Aktualisierte Bedingungen",
+      "description": "Wir haben unsere AGB und Datenschutzerklärung aktualisiert. Bitte stimme erneut zu, um fortzufahren.",
+      "agreeTerms": "Ich akzeptiere die",
+      "agreeTermsSuffix": ".",
+      "termsLink": "AGB",
+      "agreePrivacy": "Ich akzeptiere die",
+      "agreePrivacySuffix": ".",
+      "privacyLink": "Datenschutzerklärung",
+      "acceptButton": "Bestätigen",
+      "success": "Vielen Dank — Bedingungen akzeptiert.",
+      "error": "Speichern fehlgeschlagen. Bitte erneut versuchen."
+    },
+    "venues": {
+      "title": "Meine Venues",
+      "subtitle": "Verwalte deine Standorte",
+      "empty": "Noch keine Venues",
+      "emptyDesc": "Lege dein erstes Venue an oder beanspruche ein bestehendes.",
+      "addFirst": "Erstes Venue anlegen",
+      "addVenue": "Venue hinzufügen",
+      "addVenueDesc": "Suche ein bestehendes Venue oder lege ein neues an.",
+      "manage": "Verwalten",
+      "active": "Aktiv",
+      "pending": "Ausstehend",
+      "statusActive": "Aktiv",
+      "statusPending": "Ausstehend",
+      "noCoords": "Koordinaten fehlen",
+      "searchExisting": "Bestehendes Venue suchen",
+      "searchPlaceholder": "Name oder Adresse...",
+      "noResults": "Keine Ergebnisse",
+      "createInstead": "Stattdessen neues Venue anlegen",
+      "createNew": "Neues Venue anlegen",
+      "createVenue": "Venue erstellen",
+      "claim": "Beanspruchen",
+      "requested": "Anfrage gesendet",
+      "requestedDesc": "Wir prüfen deine Anfrage in Kürze.",
+      "created": "Venue erstellt",
+      "createdDesc": "Dein Venue wurde angelegt.",
+      "alreadyClaimed": "Bereits beansprucht",
+      "alreadyClaimedDesc": "Dieses Venue gehört bereits einem anderen Partner.",
+      "name": "Name",
+      "address": "Adresse",
+      "phone": "Telefon",
+      "website": "Website",
+      "cuisine": "Küche / Kategorie",
+      "priceRange": "Preisniveau",
+      "description": "Beschreibung"
+    },
+    "verification": {
+      "title": "Verifizierung",
+      "desc": "Verifiziere dein Geschäft, um alle Partner-Funktionen freizuschalten.",
+      "country": "Land",
+      "vatEuHint": "EU-USt-IdNr. (z. B. DE123456789)",
+      "vatNonEuHint": "Lokale Steuer-/Handelsregisternummer",
+      "localHint": "Steuernummer aus deinem Land",
+      "verify": "Verifizieren",
+      "startBtn": "Verifizierung starten",
+      "verified": "Verifiziert",
+      "success": "Verifizierung erfolgreich",
+      "successDesc": "Dein Konto ist nun voll freigeschaltet.",
+      "failed": "Verifizierung fehlgeschlagen",
+      "failedDesc": "Bitte prüfe deine Eingaben und versuche es erneut.",
+      "pendingTitle": "Prüfung läuft",
+      "pendingReview": "In Prüfung",
+      "pendingDesc": "Wir prüfen deine Daten — das dauert in der Regel weniger als 24 Stunden.",
+      "expired": "Abgelaufen",
+      "expiredDesc": "Bitte verifiziere dich erneut.",
+      "daysLeft": "{{count}} Tage übrig"
     }
   },
   "rating": {
@@ -1108,7 +1304,11 @@
     "durationHint": "Wähle zuerst die Dauer, um alle Optionen zu sehen",
     "noVenueSelected": "Kein Venue ausgewählt",
     "noVenueHint": "Bitte geh zurück und wähle ein Venue.",
-    "backToVenues": "Zurück zur Venue-Auswahl"
+    "backToVenues": "Zurück zur Venue-Auswahl",
+    "changeLocation": "Standort ändern",
+    "enterAddress": "Adresse eingeben",
+    "useGPS": "GPS verwenden",
+    "yourLocation": "Dein Standort"
   },
   "tutorial": {
     "skip": "Überspringen",
@@ -1155,7 +1355,8 @@
     "emailSubject": "Komm zu H!Outz – Entdecke tolle Spots!",
     "emailBody": "Hey! Ich nutze H!Outz um coole Spots für jeden Anlass zu entdecken — solo, zu zweit oder in der Gruppe. Komm dazu: {{link}}",
     "shareText": "Hey! Ich nutze H!Outz um coole Spots zu entdecken. Komm dazu: {{link}}",
-    "shareTextShort": "Hey! Ich nutze H!Outz um coole Spots zu entdecken. Komm dazu!"
+    "shareTextShort": "Hey! Ich nutze H!Outz um coole Spots zu entdecken. Komm dazu!",
+    "email": "Per E-Mail teilen"
   },
   "auth": {
     "welcomeBack": "Willkommen zurück",
@@ -1360,7 +1561,8 @@
     "personalization": "KI-Personalisierung",
     "basedOn_one": "Basierend auf {{count}} Erlebnis",
     "basedOn_other": "Basierend auf {{count}} Erlebnissen",
-    "aiLabel": "KI:"
+    "aiLabel": "KI:",
+    "basedOn": "Basierend auf {{count}} Interaktionen"
   },
   "aiConcierge": {
     "brandName": "Concierge",
@@ -1377,5 +1579,66 @@
     "typeExperience": "💜 Erlebnis",
     "typeRecommendation": "📍 Empfehlung",
     "footer": "Entdecke mehr auf hioutz.app"
+  },
+  "admin": {
+    "dashboardTitle": "Admin Dashboard",
+    "dashboardSubtitle": "Übersicht & Verwaltung",
+    "totalUsers": "Nutzer gesamt",
+    "totalDates": "Dates gesamt",
+    "totalVouchers": "Vouchers gesamt",
+    "activeDates": "Aktive Dates",
+    "completedDates": "Abgeschlossene Dates",
+    "pendingPartners": "Ausstehende Partner",
+    "verifiedPartners": "Verifizierte Partner",
+    "voucherRedemptions": "Voucher-Einlösungen",
+    "apiCalls": "API-Aufrufe",
+    "apiCost": "API-Kosten",
+    "recentActivity": "Letzte Aktivität",
+    "noActivity": "Keine Aktivität",
+    "searchUsers": "Nutzer suchen...",
+    "usersTitle": "Nutzer",
+    "usersSubtitle": "Alle registrierten Nutzer",
+    "usersCount": "{{count}} Nutzer",
+    "errorsTitle": "Fehler-Monitoring",
+    "errorsSubtitle": "Aktuelle System- und Anwendungsfehler"
+  },
+  "adminNav": {
+    "adminPortal": "Admin-Portal",
+    "dashboard": "Dashboard",
+    "users": "Nutzer",
+    "analytics": "Analytics",
+    "apiCosts": "API-Kosten",
+    "errorMonitoring": "Fehler-Monitoring",
+    "systemHealth": "System-Status",
+    "moderation": "Moderation",
+    "reports": "Berichte",
+    "team": "Team",
+    "venueDiscovery": "Venue Discovery",
+    "backToApp": "Zurück zur App",
+    "overviewLabel": "Übersicht",
+    "moderationLabel": "Moderation"
+  },
+  "partnerNav": {
+    "partnerPortal": "Partner-Portal",
+    "dashboard": "Dashboard",
+    "venues": "Venues",
+    "vouchers": "Vouchers",
+    "staff": "Team",
+    "scanner": "Scanner",
+    "reports": "Berichte",
+    "cityRankings": "Stadt-Rankings",
+    "networkMap": "Netzwerk-Karte",
+    "qrCode": "QR-Code",
+    "profile": "Profil",
+    "backToApp": "Zurück zur App",
+    "mainLabel": "Hauptbereich",
+    "analyticsLabel": "Analytics",
+    "settingsLabel": "Einstellungen"
+  },
+  "rewards": {
+    "title": "Belohnungen",
+    "yourCoins": "Deine Coins",
+    "vouchers": "Vouchers",
+    "premium": "Premium"
   }
 }
