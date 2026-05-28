@@ -20,6 +20,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { validateReferralCode, processReferralSignup } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
 import { hasMoodToday } from '@/utils/moodStorage';
+import { OAuthErrorDetails, OAuthErrorInfo } from '@/components/auth/OAuthErrorDetails';
 
 // Google icon SVG component
 const GoogleIcon = () => (
@@ -55,6 +56,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
   const [error, setError] = useState('');
+  const [oauthError, setOauthError] = useState<OAuthErrorInfo | null>(null);
   const [agbAccepted, setAgbAccepted] = useState(false);
   const [datenschutzAccepted, setDatenschutzAccepted] = useState(false);
   
@@ -138,6 +140,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
 
   const handleGoogleSignIn = async () => {
     setError('');
+    setOauthError(null);
     setGoogleLoading(true);
 
     // Store referral code before OAuth redirect
@@ -148,18 +151,27 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     try {
       const { error: oauthError } = await signInWithGoogle();
       if (oauthError) {
-        setError(getOAuthErrorMessage(oauthError));
+        setOauthError({
+          provider: 'google',
+          message: oauthError?.message || getOAuthErrorMessage(oauthError),
+          raw: oauthError,
+        });
         setGoogleLoading(false);
       }
       // Note: On success, page will redirect to Google
     } catch (err) {
-      setError(t('auth.googleError'));
+      setOauthError({
+        provider: 'google',
+        message: err instanceof Error ? err.message : t('auth.googleError'),
+        raw: err,
+      });
       setGoogleLoading(false);
     }
   };
 
   const handleAppleSignIn = async () => {
     setError('');
+    setOauthError(null);
     setAppleLoading(true);
 
     // Store referral code before OAuth redirect
@@ -170,12 +182,20 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     try {
       const { error: oauthError } = await signInWithApple();
       if (oauthError) {
-        setError(getOAuthErrorMessage(oauthError));
+        setOauthError({
+          provider: 'apple',
+          message: oauthError?.message || getOAuthErrorMessage(oauthError),
+          raw: oauthError,
+        });
         setAppleLoading(false);
       }
       // Note: On success, page will redirect to Apple
     } catch (err) {
-      setError(t('auth.appleError'));
+      setOauthError({
+        provider: 'apple',
+        message: err instanceof Error ? err.message : t('auth.appleError'),
+        raw: err,
+      });
       setAppleLoading(false);
     }
   };
@@ -498,6 +518,10 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
                     <p className="text-sm text-destructive text-center">{error}</p>
                   </div>
+                )}
+
+                {oauthError && (
+                  <OAuthErrorDetails info={oauthError} />
                 )}
 
                 <Button

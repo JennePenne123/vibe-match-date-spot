@@ -1185,7 +1185,19 @@
     "signUpFailed": "Failed to sign up",
     "acceptTerms": "Please accept the terms and privacy policy.",
     "venueOwner": "Venue owner?",
-    "becomePartner": "Become a partner"
+    "becomePartner": "Become a partner",
+    "oauthError": {
+      "title": "{{provider}} sign-in failed",
+      "provider": "Provider",
+      "currentOrigin": "Current origin",
+      "redirectUri": "Expected redirect URI",
+      "callbackUrl": "Supabase callback URL",
+      "hint": "Check that the redirect URI in Google Cloud Console and the Site/Redirect URLs in Supabase match the values above exactly.",
+      "supabaseUrlConfig": "Supabase URL configuration",
+      "googleConsole": "Google Cloud Console",
+      "copy": "Copy",
+      "copied": "Copied to clipboard"
+    }
   },
   "venue": {
     "open": "Open",

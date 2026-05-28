@@ -1191,7 +1191,19 @@
     "signUpFailed": "Registrierung fehlgeschlagen",
     "acceptTerms": "Bitte akzeptiere die AGB und Datenschutzerklärung.",
     "venueOwner": "Venue-Besitzer?",
-    "becomePartner": "Werde jetzt Partner"
+    "becomePartner": "Werde jetzt Partner",
+    "oauthError": {
+      "title": "{{provider}}-Anmeldung fehlgeschlagen",
+      "provider": "Provider",
+      "currentOrigin": "Aktuelle Origin",
+      "redirectUri": "Erwartete Redirect-URI",
+      "callbackUrl": "Supabase Callback-URL",
+      "hint": "Prüfe, ob die Redirect-URI in der Google Cloud Console und die Site-/Redirect-URLs in Supabase exakt mit den Werten oben übereinstimmen.",
+      "supabaseUrlConfig": "Supabase URL-Konfiguration",
+      "googleConsole": "Google Cloud Console",
+      "copy": "Kopieren",
+      "copied": "In Zwischenablage kopiert"
+    }
   },
   "venue": {
     "open": "Geöffnet",
