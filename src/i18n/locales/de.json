@@ -1409,6 +1409,32 @@
       "googleConsole": "Google Cloud Console",
       "copy": "Kopieren",
       "copied": "In Zwischenablage kopiert"
+    },
+    "forgot": {
+      "link": "Passwort vergessen?",
+      "title": "Passwort zurücksetzen",
+      "subtitle": "Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen.",
+      "sentSubtitle": "E-Mail gesendet!",
+      "sentTo": "Wir haben einen Link zum Zurücksetzen an {{email}} gesendet. Prüfe auch deinen Spam-Ordner.",
+      "sendLink": "Link senden",
+      "sending": "Senden...",
+      "backToLogin": "Zurück zur Anmeldung",
+      "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein."
+    },
+    "reset": {
+      "title": "Neues Passwort",
+      "subtitle": "Lege ein neues Passwort für dein Konto fest.",
+      "newPassword": "Neues Passwort",
+      "newPasswordPlaceholder": "Neues Passwort eingeben",
+      "confirmPassword": "Passwort bestätigen",
+      "confirmPasswordPlaceholder": "Passwort wiederholen",
+      "save": "Passwort speichern",
+      "saving": "Speichern...",
+      "tooShort": "Das Passwort muss mindestens 6 Zeichen lang sein.",
+      "mismatch": "Die Passwörter stimmen nicht überein.",
+      "successTitle": "Passwort aktualisiert!",
+      "successDesc": "Du wirst weitergeleitet...",
+      "invalidLink": "Dieser Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an."
     }
   },
   "venue": {
