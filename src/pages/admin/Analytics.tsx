@@ -16,6 +16,7 @@ import { Users, TrendingUp, Calendar, Activity, RefreshCw } from 'lucide-react';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
 import OnboardingFunnelWidget from '@/components/admin/OnboardingFunnelWidget';
+import RetentionWidget from '@/components/admin/RetentionWidget';
 
 const COLORS = [
   'hsl(var(--primary))',
