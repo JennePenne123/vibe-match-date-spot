@@ -7,21 +7,41 @@ import { useReferral } from '@/hooks/useReferral';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Search, UserPlus, Mail, MessageCircle, Send, Share2, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Search, UserPlus, Mail, MessageCircle, Send, Share2, Copy, Check, X, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import FriendCard from '@/components/FriendCard';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getInitials } from '@/lib/utils';
 
 const MyFriends = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { friends } = useFriends();
+  const { friends, pendingRequests, acceptFriendRequest, declineFriendRequest } = useFriends();
   const { referralLink, copyReferralLink } = useReferral();
   const [searchTerm, setSearchTerm] = useState('');
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
   const filteredFriends = friends.filter(friend => friend.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const handleAccept = async (friendshipId: string, friendName: string) => {
+    const success = await acceptFriendRequest(friendshipId);
+    if (success) {
+      toast({ title: t('myFriends.requestAccepted'), description: t('myFriends.nowFriendsWith', { name: friendName }) });
+    } else {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    }
+  };
+
+  const handleDecline = async (friendshipId: string) => {
+    const success = await declineFriendRequest(friendshipId);
+    if (success) {
+      toast({ title: t('myFriends.requestDeclined') });
+    } else {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    }
+  };
 
   const handleMessage = (friendId: string, friendName: string) => {
     toast({ title: t('myFriends.messageSent'), description: t('myFriends.startConversation', { name: friendName }) });
@@ -123,9 +143,50 @@ const MyFriends = () => {
               </CardContent>
             </Card>
           </div>
+          {/* Incoming friend requests */}
+          {pendingRequests.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-foreground">{t('myFriends.friendRequests')}</h2>
+              {pendingRequests.map((req) => (
+                <Card key={req.friendship_id} className="bg-card/80 backdrop-blur-sm border-primary/30">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <Avatar className="w-12 h-12 border-2 border-primary/30">
+                      <AvatarImage src={req.avatar_url} alt={req.name} referrerPolicy="no-referrer" />
+                      <AvatarFallback className="bg-primary/20 text-primary font-medium">{getInitials(req.name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground truncate">{req.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{t('myFriends.wantsToConnect')}</p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <Button onClick={() => handleAccept(req.friendship_id!, req.name)} size="icon" className="h-9 w-9 bg-gradient-primary text-primary-foreground" aria-label={t('myFriends.accept')}>
+                        <Check className="w-4 h-4" />
+                      </Button>
+                      <Button onClick={() => handleDecline(req.friendship_id!)} size="icon" variant="outline" className="h-9 w-9" aria-label={t('myFriends.decline')}>
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-foreground">{t('myFriends.yourFriends')}</h2>
-            {filteredFriends.map((friend) => <FriendCard key={friend.id} friend={friend} onMessage={handleMessage} onInvite={handleInviteDate} />)}
+            {filteredFriends.length === 0 ? (
+              <Card className="bg-card/50 border-dashed border-2 border-border">
+                <CardContent className="py-8 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-3">
+                    <Users className="w-7 h-7 text-primary" />
+                  </div>
+                  <p className="text-sm font-medium text-foreground mb-1">{t('myFriends.noFriendsYet')}</p>
+                  <p className="text-xs text-muted-foreground">{t('myFriends.noFriendsYetDesc')}</p>
+                </CardContent>
+              </Card>
+            ) : (
+              filteredFriends.map((friend) => <FriendCard key={friend.id} friend={friend} onMessage={handleMessage} onInvite={handleInviteDate} />)
+            )}
           </div>
 
           {/* Invite Section */}
