@@ -1526,6 +1526,32 @@
       "googleConsole": "Google Cloud Console",
       "copy": "Copiar",
       "copied": "Copiado al portapapeles"
+    },
+    "forgot": {
+      "link": "¿Olvidaste tu contraseña?",
+      "title": "Restablecer contraseña",
+      "subtitle": "Introduce tu correo y te enviaremos un enlace para restablecerla.",
+      "sentSubtitle": "¡Correo enviado!",
+      "sentTo": "Enviamos un enlace de restablecimiento a {{email}}. Revisa también tu carpeta de spam.",
+      "sendLink": "Enviar enlace",
+      "sending": "Enviando...",
+      "backToLogin": "Volver a iniciar sesión",
+      "invalidEmail": "Introduce una dirección de correo válida."
+    },
+    "reset": {
+      "title": "Nueva contraseña",
+      "subtitle": "Establece una nueva contraseña para tu cuenta.",
+      "newPassword": "Nueva contraseña",
+      "newPasswordPlaceholder": "Introduce la nueva contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Repite la contraseña",
+      "save": "Guardar contraseña",
+      "saving": "Guardando...",
+      "tooShort": "La contraseña debe tener al menos 6 caracteres.",
+      "mismatch": "Las contraseñas no coinciden.",
+      "successTitle": "¡Contraseña actualizada!",
+      "successDesc": "Redirigiendo...",
+      "invalidLink": "Este enlace no es válido o ha caducado. Solicita uno nuevo."
     }
   },
   "venue": {

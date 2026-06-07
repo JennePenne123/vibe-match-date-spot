@@ -1409,6 +1409,32 @@
       "googleConsole": "Google Cloud Console",
       "copy": "Copy",
       "copied": "Copied to clipboard"
+    },
+    "forgot": {
+      "link": "Forgot password?",
+      "title": "Reset password",
+      "subtitle": "Enter your email and we will send you a reset link.",
+      "sentSubtitle": "Email sent!",
+      "sentTo": "We sent a reset link to {{email}}. Please also check your spam folder.",
+      "sendLink": "Send link",
+      "sending": "Sending...",
+      "backToLogin": "Back to sign in",
+      "invalidEmail": "Please enter a valid email address."
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Set a new password for your account.",
+      "newPassword": "New password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Repeat password",
+      "save": "Save password",
+      "saving": "Saving...",
+      "tooShort": "Password must be at least 6 characters.",
+      "mismatch": "Passwords do not match.",
+      "successTitle": "Password updated!",
+      "successDesc": "Redirecting...",
+      "invalidLink": "This link is invalid or expired. Please request a new one."
     }
   },
   "venue": {

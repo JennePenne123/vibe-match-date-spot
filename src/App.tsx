@@ -99,6 +99,7 @@ const GroupDates = lazy(() => import("./pages/GroupDates"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Waitlist = lazy(() => import("./pages/Waitlist"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const AIRecommendations = lazy(() => import("./pages/AIRecommendations"));
 const SmartDatePlanning = lazy(() => import("./pages/SmartDatePlanning"));
 const AIInsights = lazy(() => import("./pages/AIInsights"));
@@ -215,6 +216,7 @@ const App = () => (
                     <Route path="/welcome" element={<LazyPageNoLayout><Onboarding /></LazyPageNoLayout>} />
                     <Route path="/mood" element={<LazyPageNoLayout><MoodCheckIn /></LazyPageNoLayout>} />
                     <Route path="/waitlist" element={<LazyPageNoLayout><Waitlist /></LazyPageNoLayout>} />
+                    <Route path="/reset-password" element={<LazyPageNoLayout><ResetPassword /></LazyPageNoLayout>} />
                     <Route path="/auth" element={<Navigate to="/?auth=required" replace />} />
                     <Route path="/register-login" element={<Navigate to="/?auth=required" replace />} />
                     

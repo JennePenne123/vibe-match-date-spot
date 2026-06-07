@@ -59,6 +59,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const [oauthError, setOauthError] = useState<OAuthErrorInfo | null>(null);
   const [agbAccepted, setAgbAccepted] = useState(false);
   const [datenschutzAccepted, setDatenschutzAccepted] = useState(false);
+  const [isForgot, setIsForgot] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   
   const { signIn, signUp, signInWithGoogle, signInWithApple, user } = useAuth();
   const navigate = useNavigate();
@@ -318,6 +320,129 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
 
   const isOAuthLoading = googleLoading || appleLoading;
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!sanitizedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitizedEmail)) {
+      setError(t('auth.forgot.invalidEmail'));
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(sanitizedEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (resetError) {
+        setError(resetError.message);
+      } else {
+        setResetSent(true);
+      }
+    } catch (err) {
+      setError(t('auth.genericError'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openForgot = () => {
+    setIsForgot(true);
+    setResetSent(false);
+    setError('');
+    setPassword('');
+  };
+
+  const closeForgot = () => {
+    setIsForgot(false);
+    setResetSent(false);
+    setError('');
+  };
+
+  if (isForgot) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden border-border/50 bg-background/95 backdrop-blur-xl">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
+            <div className="relative p-6 sm:p-8">
+              <DialogHeader className="space-y-3 text-center">
+                <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  {t('auth.forgot.title')}
+                </DialogTitle>
+                <DialogDescription className="text-base text-muted-foreground">
+                  {resetSent ? t('auth.forgot.sentSubtitle') : t('auth.forgot.subtitle')}
+                </DialogDescription>
+              </DialogHeader>
+
+              {resetSent ? (
+                <div className="mt-8 space-y-6">
+                  <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 text-center">
+                    <p className="text-sm text-foreground">{t('auth.forgot.sentTo', { email })}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={closeForgot}
+                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity"
+                  >
+                    {t('auth.forgot.backToLogin')}
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotPassword} className="mt-8 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="forgot-email" className="text-foreground font-medium">
+                      {t('auth.email')}
+                    </Label>
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder={t('auth.enterEmail')}
+                      autoComplete="email"
+                      className="h-12 bg-background/50 border-border/50 focus:border-primary transition-colors"
+                      disabled={loading}
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                      <p className="text-sm text-destructive text-center">{error}</p>
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        {t('auth.forgot.sending')}
+                      </>
+                    ) : (
+                      t('auth.forgot.sendLink')
+                    )}
+                  </Button>
+
+                  <button
+                    type="button"
+                    onClick={closeForgot}
+                    disabled={loading}
+                    className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                  >
+                    {t('auth.forgot.backToLogin')}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden border-border/50 bg-background/95 backdrop-blur-xl">
@@ -443,6 +568,19 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     <p className="text-sm text-destructive">{errors.password}</p>
                   )}
                 </div>
+
+                {isLogin && (
+                  <div className="text-right -mt-1">
+                    <button
+                      type="button"
+                      onClick={openForgot}
+                      disabled={loading || isOAuthLoading}
+                      className="text-sm text-primary hover:text-primary/80 font-medium transition-colors disabled:opacity-50"
+                    >
+                      {t('auth.forgot.link')}
+                    </button>
+                  </div>
+                )}
 
                 {/* Referral Code Field - Only for Signup */}
                 {!isLogin && (
