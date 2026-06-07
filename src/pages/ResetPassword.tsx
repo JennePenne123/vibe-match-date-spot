@@ -80,7 +80,7 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <SEO title={t('auth.reset.title')} description={t('auth.reset.subtitle')} />
+      <SEO title={t('auth.reset.title')} description={t('auth.reset.subtitle')} path="/reset-password" />
       <div className="w-full max-w-md">
         <div className="relative rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
