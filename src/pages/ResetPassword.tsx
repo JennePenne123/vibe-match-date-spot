@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, CheckCircle2, KeyRound } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import SEO from '@/components/SEO';
+import { SEO } from '@/components/SEO';
 
 const ResetPassword = () => {
   const { t } = useTranslation();
