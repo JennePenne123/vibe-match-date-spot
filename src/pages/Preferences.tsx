@@ -205,6 +205,7 @@ const Preferences = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === 'true';
   const initialStep = parseInt(searchParams.get('step') || '0', 10);
+  const focusLocation = searchParams.get('focus') === 'location';
   const { t } = useTranslation();
   const { updateCuisines, updateVibes, updateUserLocation } = useApp();
   const { user } = useAuth();
