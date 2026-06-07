@@ -205,6 +205,7 @@ const Preferences = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const isOnboarding = searchParams.get('onboarding') === 'true';
   const initialStep = parseInt(searchParams.get('step') || '0', 10);
+  const focusLocation = searchParams.get('focus') === 'location';
   const { t } = useTranslation();
   const { updateCuisines, updateVibes, updateUserLocation } = useApp();
   const { user } = useAuth();
@@ -732,7 +733,7 @@ const Preferences = () => {
               )}
 
               {has('location') && (
-              <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0}>
+              <AccordionSection title={t('preferences.homeLocation') || 'Standort'} icon={<MapPin className="w-5 h-5 text-emerald-500" />} selectedCount={homeLatitude ? 1 : 0} defaultOpen={focusLocation}>
                 <div className="space-y-3">
                   <Button onClick={useCurrentLocation} disabled={isLocating} variant="outline" className="w-full h-11 border-primary/30 text-primary text-sm">
                     {isLocating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.gettingLocation')}</> : <><Navigation className="w-4 h-4 mr-2" />{t('preferences.useCurrentLocation')}</>}
