@@ -99,6 +99,7 @@ const GroupDates = lazy(() => import("./pages/GroupDates"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Waitlist = lazy(() => import("./pages/Waitlist"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const AIRecommendations = lazy(() => import("./pages/AIRecommendations"));
 const SmartDatePlanning = lazy(() => import("./pages/SmartDatePlanning"));
 const AIInsights = lazy(() => import("./pages/AIInsights"));
