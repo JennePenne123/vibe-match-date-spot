@@ -16,6 +16,7 @@ import { Users, TrendingUp, Calendar, Activity, RefreshCw } from 'lucide-react';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { de } from 'date-fns/locale';
 import OnboardingFunnelWidget from '@/components/admin/OnboardingFunnelWidget';
+import RetentionWidget from '@/components/admin/RetentionWidget';
 
 const COLORS = [
   'hsl(var(--primary))',
@@ -197,6 +198,7 @@ const AdminAnalytics: React.FC = () => {
       <Tabs defaultValue="growth" className="w-full">
         <TabsList className="bg-muted/50">
           <TabsTrigger value="growth">Nutzerwachstum</TabsTrigger>
+          <TabsTrigger value="retention">Retention</TabsTrigger>
           <TabsTrigger value="dates">Date-Aktivität</TabsTrigger>
           <TabsTrigger value="api">API-Nutzung</TabsTrigger>
           <TabsTrigger value="funnel">Onboarding</TabsTrigger>
@@ -225,6 +227,11 @@ const AdminAnalytics: React.FC = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Retention & activation */}
+        <TabsContent value="retention" className="mt-4">
+          <RetentionWidget daysBack={daysBack} />
         </TabsContent>
 
         {/* Date activity */}
