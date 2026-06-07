@@ -569,6 +569,19 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   )}
                 </div>
 
+                {isLogin && (
+                  <div className="text-right -mt-1">
+                    <button
+                      type="button"
+                      onClick={openForgot}
+                      disabled={loading || isOAuthLoading}
+                      className="text-sm text-primary hover:text-primary/80 font-medium transition-colors disabled:opacity-50"
+                    >
+                      {t('auth.forgot.link')}
+                    </button>
+                  </div>
+                )}
+
                 {/* Referral Code Field - Only for Signup */}
                 {!isLogin && (
                   <div className="space-y-2">
