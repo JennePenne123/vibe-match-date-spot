@@ -7,6 +7,7 @@ import { Friend } from '@/types';
 export const useFriends = () => {
   const { user } = useAuth();
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchFriends = async () => {
@@ -27,7 +28,7 @@ export const useFriends = () => {
           friend:profiles_safe!friend_id(id, name, avatar_url)
         `)
         .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
-        .eq('status', 'accepted');
+        .in('status', ['accepted', 'pending']);
 
       if (error) {
         console.error('Error fetching friends:', error);
@@ -35,40 +36,44 @@ export const useFriends = () => {
       }
 
       // Transform the data to get the friend's profile and deduplicate
-      const friendsMap = new Map();
-      
+      const friendsMap = new Map<string, Friend>();
+      const requestsMap = new Map<string, Friend>();
+
       data?.forEach(friendship => {
         const isCurrentUserSender = friendship.user_id === user.id;
         const friendProfile = isCurrentUserSender ? friendship.friend : friendship.user;
-        
+
         // Handle the case where friendProfile might be an array
         const profile = Array.isArray(friendProfile) ? friendProfile[0] : friendProfile;
-        
+
         // Skip if profile is null (e.g. deleted user)
         if (!profile || !profile.id) return;
 
-        // Only add if we haven't seen this friend before
-        if (!friendsMap.has(profile.id)) {
-          friendsMap.set(profile.id, {
-            id: profile.id,
-            name: profile.name,
-            email: '', // Email is no longer fetched for friend profiles (privacy)
-            avatar_url: profile.avatar_url,
-            friendship_status: friendship.status as 'pending' | 'accepted' | 'declined' | 'blocked',
-            friendship_id: friendship.id,
-            // Add some default UI properties
-            status: 'offline',
-            lastSeen: 'Last seen recently',
-            mutualFriends: 0,
-            joinedDate: '1 month ago',
-            isInvited: false
-          });
+        const entry: Friend = {
+          id: profile.id,
+          name: profile.name,
+          email: '', // Email is no longer fetched for friend profiles (privacy)
+          avatar_url: profile.avatar_url,
+          friendship_status: friendship.status as 'pending' | 'accepted' | 'declined' | 'blocked',
+          friendship_id: friendship.id,
+          // Add some default UI properties
+          status: 'offline',
+          lastSeen: 'Last seen recently',
+          mutualFriends: 0,
+          joinedDate: '1 month ago',
+          isInvited: false,
+        };
+
+        if (friendship.status === 'accepted') {
+          if (!friendsMap.has(profile.id)) friendsMap.set(profile.id, entry);
+        } else if (friendship.status === 'pending' && !isCurrentUserSender) {
+          // Only incoming requests (where the current user is the recipient)
+          if (!requestsMap.has(profile.id)) requestsMap.set(profile.id, entry);
         }
       });
-      
-      const friendsList: Friend[] = Array.from(friendsMap.values());
 
-      setFriends(friendsList);
+      setFriends(Array.from(friendsMap.values()));
+      setPendingRequests(Array.from(requestsMap.values()));
     } catch (error) {
       console.error('Error fetching friends:', error);
     } finally {
@@ -146,15 +151,58 @@ export const useFriends = () => {
     }
   };
 
+  const acceptFriendRequest = async (friendshipId: string) => {
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .update({ status: 'accepted', updated_at: new Date().toISOString() })
+        .eq('id', friendshipId);
+
+      if (error) {
+        console.error('Error accepting friend request:', error);
+        return false;
+      }
+
+      await fetchFriends();
+      return true;
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      return false;
+    }
+  };
+
+  const declineFriendRequest = async (friendshipId: string) => {
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .update({ status: 'declined', updated_at: new Date().toISOString() })
+        .eq('id', friendshipId);
+
+      if (error) {
+        console.error('Error declining friend request:', error);
+        return false;
+      }
+
+      setPendingRequests(prev => prev.filter(req => req.friendship_id !== friendshipId));
+      return true;
+    } catch (error) {
+      console.error('Error declining friend request:', error);
+      return false;
+    }
+  };
+
   useEffect(() => {
     fetchFriends();
   }, [user]);
 
   return {
     friends,
+    pendingRequests,
     loading,
     sendFriendRequest,
     removeFriend,
+    acceptFriendRequest,
+    declineFriendRequest,
     fetchFriends
   };
 };
