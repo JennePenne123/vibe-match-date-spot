@@ -229,9 +229,13 @@ const AdminAnalytics: React.FC = () => {
           </Card>
         </TabsContent>
 
+        {/* Retention & activation */}
+        <TabsContent value="retention" className="mt-4">
+          <RetentionWidget daysBack={daysBack} />
+        </TabsContent>
+
         {/* Date activity */}
         <TabsContent value="dates" className="mt-4 space-y-6">
-        {/* placeholder */}
           <Card className="bg-card/80 backdrop-blur border-border/40">
             <CardHeader>
               <CardTitle className="text-lg">Date-Aktivität über Zeit</CardTitle>
