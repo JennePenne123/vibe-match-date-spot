@@ -307,7 +307,16 @@
     "linkCopied": "¡Enlace copiado!",
     "copyLink": "Copiar enlace",
     "copied": "¡Copiado!",
-    "shareInvite": "Compartir invitación"
+    "shareInvite": "Compartir invitación",
+    "friendRequests": "Solicitudes de amistad",
+    "wantsToConnect": "quiere conectar contigo",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "requestAccepted": "Solicitud aceptada",
+    "nowFriendsWith": "Ahora eres amigo de {{name}}",
+    "requestDeclined": "Solicitud rechazada",
+    "noFriendsYet": "Aún no tienes amigos",
+    "noFriendsYetDesc": "Invita a amigos para planear citas juntos"
   },
   "friends": {
     "inviteFriends": "Invitar Amigos",
