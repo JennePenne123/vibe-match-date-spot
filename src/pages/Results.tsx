@@ -162,7 +162,7 @@ const Results = () => {
               )}
               <Button 
                 variant="outline" 
-                onClick={() => navigate('/preferences?step=1')}
+                onClick={() => navigate('/preferences?step=2&focus=location')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 {t('results.changeLocation')}
