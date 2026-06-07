@@ -198,6 +198,7 @@ const AdminAnalytics: React.FC = () => {
       <Tabs defaultValue="growth" className="w-full">
         <TabsList className="bg-muted/50">
           <TabsTrigger value="growth">Nutzerwachstum</TabsTrigger>
+          <TabsTrigger value="retention">Retention</TabsTrigger>
           <TabsTrigger value="dates">Date-Aktivität</TabsTrigger>
           <TabsTrigger value="api">API-Nutzung</TabsTrigger>
           <TabsTrigger value="funnel">Onboarding</TabsTrigger>
