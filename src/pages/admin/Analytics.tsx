@@ -231,6 +231,7 @@ const AdminAnalytics: React.FC = () => {
 
         {/* Date activity */}
         <TabsContent value="dates" className="mt-4 space-y-6">
+        {/* placeholder */}
           <Card className="bg-card/80 backdrop-blur border-border/40">
             <CardHeader>
               <CardTitle className="text-lg">Date-Aktivität über Zeit</CardTitle>
