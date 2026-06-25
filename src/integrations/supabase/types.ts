@@ -2142,24 +2142,18 @@ export type Database = {
       profiles_safe: {
         Row: {
           avatar_url: string | null
-          created_at: string | null
           id: string | null
           name: string | null
-          updated_at: string | null
         }
         Insert: {
           avatar_url?: string | null
-          created_at?: string | null
           id?: string | null
           name?: string | null
-          updated_at?: string | null
         }
         Update: {
           avatar_url?: string | null
-          created_at?: string | null
           id?: string | null
           name?: string | null
-          updated_at?: string | null
         }
         Relationships: []
       }
