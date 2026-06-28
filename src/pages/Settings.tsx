@@ -292,15 +292,15 @@ const Settings = () => {
               <form onSubmit={handlePasswordChange} className="space-y-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="current-password" className="text-sm text-foreground">{t('settings.currentPassword')}</Label>
-                  <Input id="current-password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" placeholder="••••••••" required className="bg-background/50 border-border/50" />
+                  <PasswordInput id="current-password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" placeholder="••••••••" required className="bg-background/50 border-border/50" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="new-password" className="text-sm text-foreground">{t('settings.newPassword')}</Label>
-                  <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} autoComplete="new-password" placeholder="••••••••" required minLength={6} className="bg-background/50 border-border/50" />
+                  <PasswordInput id="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} autoComplete="new-password" placeholder="••••••••" required minLength={6} className="bg-background/50 border-border/50" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="confirm-password" className="text-sm text-foreground">{t('settings.confirmPassword')}</Label>
-                  <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" placeholder="••••••••" required minLength={6} className="bg-background/50 border-border/50" />
+                  <PasswordInput id="confirm-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" placeholder="••••••••" required minLength={6} className="bg-background/50 border-border/50" />
                 </div>
                 <Button type="submit" disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                   {passwordLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : passwordSuccess ? <Check className="w-4 h-4 mr-2" /> : null}
