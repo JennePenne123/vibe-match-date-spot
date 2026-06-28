@@ -554,9 +554,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   <Label htmlFor="password" className="text-foreground font-medium">
                     {t('auth.password')}
                   </Label>
-                  <Input
+                  <PasswordInput
                     id="password"
-                    type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={t('auth.enterPassword')}

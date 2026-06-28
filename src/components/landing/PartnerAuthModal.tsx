@@ -140,9 +140,8 @@ export function PartnerAuthModal({ isOpen, onClose }: PartnerAuthModalProps) {
                 <Label htmlFor="partner-password" className="text-foreground font-medium">
                   {t('partnerAuth.password')}
                 </Label>
-                <Input
+                <PasswordInput
                   id="partner-password"
-                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t('partnerAuth.passwordPlaceholder')}
