@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { useInputValidation, validationRules } from '@/hooks/useInputValidation';
 import { sanitizeName, sanitizeEmail } from '@/utils/inputSanitization';
@@ -554,9 +555,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   <Label htmlFor="password" className="text-foreground font-medium">
                     {t('auth.password')}
                   </Label>
-                  <Input
+                  <PasswordInput
                     id="password"
-                    type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={t('auth.enterPassword')}
