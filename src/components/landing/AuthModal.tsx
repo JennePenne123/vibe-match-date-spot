@@ -93,28 +93,9 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     }
   }, [referralCode]);
 
-  // Handle pending referral after OAuth callback
-  useEffect(() => {
-    const processPendingReferral = async () => {
-      const pendingReferral = localStorage.getItem('pendingReferralCode');
-      if (pendingReferral && user) {
-        try {
-          const success = await processReferralSignup(pendingReferral, user.id);
-          if (success) {
-            toast({
-              title: t('auth.welcomeBonus'),
-              description: t('auth.welcomeBonusDesc'),
-            });
-          }
-        } catch (err) {
-          console.error('Failed to process pending referral:', err);
-        } finally {
-          localStorage.removeItem('pendingReferralCode');
-        }
-      }
-    };
-    processPendingReferral();
-  }, [user, toast]);
+  // Referral processing (points + friendship linking) is handled globally by
+  // usePendingReferral once the user is authenticated. Here we only persist the
+  // code so it survives the signup / OAuth redirect.
 
   // Dynamic validation config based on mode
   const validationConfig = useMemo(() => {
