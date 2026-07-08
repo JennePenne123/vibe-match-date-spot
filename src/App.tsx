@@ -208,6 +208,7 @@ const App = () => (
                 <GeoPrivacyBanner />
                 <PushNotificationPrompt />
                 <AppUsageTracker />
+                <PendingReferralHandler />
                 <ErrorBoundary level="page">
                   <Routes>
                     {/* Public routes without layout */}
