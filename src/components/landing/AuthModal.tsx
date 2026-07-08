@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Loader2, Gift, Store } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { validateReferralCode, processReferralSignup } from '@/services/referralService';
+import { validateReferralCode } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
 import { hasMoodToday } from '@/utils/moodStorage';
 import { OAuthErrorDetails, OAuthErrorInfo } from '@/components/auth/OAuthErrorDetails';
