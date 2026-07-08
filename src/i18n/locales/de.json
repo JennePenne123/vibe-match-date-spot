@@ -1317,7 +1317,9 @@
     "changeLocation": "Standort ändern",
     "enterAddress": "Adresse eingeben",
     "useGPS": "GPS verwenden",
-    "yourLocation": "Dein Standort"
+    "yourLocation": "Dein Standort",
+    "noFriendsYet": "Noch keine Freunde hier",
+    "noFriendsYetDesc": "Lade jemanden ein, um gemeinsam ein Date zu planen."
   },
   "tutorial": {
     "skip": "Überspringen",
