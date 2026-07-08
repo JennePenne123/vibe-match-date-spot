@@ -238,6 +238,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({
           success: true,
+          friendLinked: true,
           referrerPoints: REFERRAL_POINTS.REFERRER_SIGNUP,
           refereePoints: REFERRAL_POINTS.REFEREE_SIGNUP,
           badgesUnlocked: newBadges.filter(b => !(currentReferrerPoints?.badges || []).includes(b)),
