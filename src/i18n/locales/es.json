@@ -1317,7 +1317,9 @@
     "changeLocation": "Cambiar ubicación",
     "enterAddress": "Introduce la dirección",
     "useGPS": "Usar GPS",
-    "yourLocation": "Tu ubicación"
+    "yourLocation": "Tu ubicación",
+    "noFriendsYet": "Aún no hay amigos aquí",
+    "noFriendsYetDesc": "Invita a alguien para planear una cita juntos."
   },
   "privacyBanner": {
     "titleGdpr": "🇪🇺 Aviso de Privacidad (RGPD)",
