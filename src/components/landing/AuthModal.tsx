@@ -250,6 +250,11 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
           }
         }
       } else {
+        // Persist a valid referral code so the global handler links the
+        // friendship + awards points once the account is authenticated.
+        if (referralCode && referralValid) {
+          localStorage.setItem('pendingReferralCode', referralCode);
+        }
         const { user: signedUpUser, error: signUpError } = await signUp(
           sanitizedEmail,
           password,
@@ -263,20 +268,6 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
         }
 
         if (signedUpUser) {
-          // Process referral if valid code was provided
-          if (referralCode && referralValid) {
-            try {
-              const success = await processReferralSignup(referralCode, signedUpUser.id);
-              if (success) {
-                toast({
-                  title: t('auth.welcomeBonus'),
-                  description: t('auth.welcomeBonusDesc'),
-                });
-              }
-            } catch (err) {
-              console.error('Failed to process referral:', err);
-            }
-          }
           onClose();
           navigate(hasMoodToday() ? '/home' : '/mood');
         }
