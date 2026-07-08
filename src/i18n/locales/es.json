@@ -1677,5 +1677,9 @@
     "yourCoins": "Tus monedas",
     "vouchers": "Vales",
     "premium": "Premium"
+  },
+  "referral": {
+    "friendLinkedTitle": "Conexión establecida",
+    "friendLinkedDesc": "Te has conectado con tu amigo: ahora os encontraréis en la lista de amigos y al planear citas."
   }
 }

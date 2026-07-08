@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Loader2, Gift, Store } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { validateReferralCode, processReferralSignup } from '@/services/referralService';
+import { validateReferralCode } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
 import { hasMoodToday } from '@/utils/moodStorage';
 import { OAuthErrorDetails, OAuthErrorInfo } from '@/components/auth/OAuthErrorDetails';
@@ -93,28 +93,9 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     }
   }, [referralCode]);
 
-  // Handle pending referral after OAuth callback
-  useEffect(() => {
-    const processPendingReferral = async () => {
-      const pendingReferral = localStorage.getItem('pendingReferralCode');
-      if (pendingReferral && user) {
-        try {
-          const success = await processReferralSignup(pendingReferral, user.id);
-          if (success) {
-            toast({
-              title: t('auth.welcomeBonus'),
-              description: t('auth.welcomeBonusDesc'),
-            });
-          }
-        } catch (err) {
-          console.error('Failed to process pending referral:', err);
-        } finally {
-          localStorage.removeItem('pendingReferralCode');
-        }
-      }
-    };
-    processPendingReferral();
-  }, [user, toast]);
+  // Referral processing (points + friendship linking) is handled globally by
+  // usePendingReferral once the user is authenticated. Here we only persist the
+  // code so it survives the signup / OAuth redirect.
 
   // Dynamic validation config based on mode
   const validationConfig = useMemo(() => {
@@ -269,6 +250,11 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
           }
         }
       } else {
+        // Persist a valid referral code so the global handler links the
+        // friendship + awards points once the account is authenticated.
+        if (referralCode && referralValid) {
+          localStorage.setItem('pendingReferralCode', referralCode);
+        }
         const { user: signedUpUser, error: signUpError } = await signUp(
           sanitizedEmail,
           password,
@@ -282,20 +268,6 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
         }
 
         if (signedUpUser) {
-          // Process referral if valid code was provided
-          if (referralCode && referralValid) {
-            try {
-              const success = await processReferralSignup(referralCode, signedUpUser.id);
-              if (success) {
-                toast({
-                  title: t('auth.welcomeBonus'),
-                  description: t('auth.welcomeBonusDesc'),
-                });
-              }
-            } catch (err) {
-              console.error('Failed to process referral:', err);
-            }
-          }
           onClose();
           navigate(hasMoodToday() ? '/home' : '/mood');
         }

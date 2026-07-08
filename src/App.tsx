@@ -23,6 +23,7 @@ import NotificationSystem from "./components/NotificationSystem";
 import PushNotificationPrompt from "./components/PushNotificationPrompt";
 import OfflineBanner from "./components/OfflineBanner";
 import GeoPrivacyBanner from "./components/GeoPrivacyBanner";
+import PendingReferralHandler from "./components/PendingReferralHandler";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { useAppUsageTracking } from "./hooks/useImplicitSignals";
@@ -207,6 +208,7 @@ const App = () => (
                 <GeoPrivacyBanner />
                 <PushNotificationPrompt />
                 <AppUsageTracker />
+                <PendingReferralHandler />
                 <ErrorBoundary level="page">
                   <Routes>
                     {/* Public routes without layout */}

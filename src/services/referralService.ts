@@ -95,17 +95,30 @@ export const validateReferralCode = async (code: string): Promise<{ valid: boole
   }
 };
 
-export const processReferralSignup = async (referralCode: string, refereeId: string): Promise<boolean> => {
+export interface ReferralSignupResult {
+  success: boolean;
+  friendLinked?: boolean;
+  alreadyProcessed?: boolean;
+}
+
+export const processReferralSignup = async (
+  referralCode: string,
+  refereeId: string
+): Promise<ReferralSignupResult> => {
   try {
     const { data, error } = await supabase.functions.invoke('process-referral', {
       body: { action: 'process_signup', referralCode, refereeId },
     });
 
     if (error) throw error;
-    return data?.success || false;
+    return {
+      success: !!data?.success,
+      friendLinked: !!data?.friendLinked,
+      alreadyProcessed: !!data?.alreadyProcessed,
+    };
   } catch (error) {
     console.error('Error processing referral signup:', error);
-    return false;
+    return { success: false };
   }
 };
 

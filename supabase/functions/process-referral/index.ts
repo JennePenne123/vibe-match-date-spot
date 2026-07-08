@@ -119,6 +119,57 @@ Deno.serve(async (req) => {
 
       const referrerId = referrerPoints.user_id
 
+      // Guard against self-referral (e.g. user opening their own invite link)
+      if (referrerId === refereeId) {
+        console.log('Self-referral ignored')
+        return new Response(
+          JSON.stringify({ success: false, message: 'Cannot refer yourself' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Ensure an accepted friendship exists between referrer and referee.
+      // A single row (matched in both directions) is enough for both users
+      // to see each other in the friends list / partner selection flow.
+      const { data: existingFriendship } = await supabase
+        .from('friendships')
+        .select('id, status')
+        .or(`and(user_id.eq.${referrerId},friend_id.eq.${refereeId}),and(user_id.eq.${refereeId},friend_id.eq.${referrerId})`)
+        .maybeSingle()
+
+      if (!existingFriendship) {
+        const { error: friendshipError } = await supabase
+          .from('friendships')
+          .insert({ user_id: referrerId, friend_id: refereeId, status: 'accepted' })
+        if (friendshipError) {
+          console.error('Error creating friendship from referral:', friendshipError)
+        } else {
+          console.log('Accepted friendship created from referral link')
+        }
+      } else if (existingFriendship.status !== 'accepted') {
+        await supabase
+          .from('friendships')
+          .update({ status: 'accepted', updated_at: new Date().toISOString() })
+          .eq('id', existingFriendship.id)
+        console.log('Existing friendship upgraded to accepted from referral link')
+      }
+
+      // Idempotency: if this referee was already referred, don't create a
+      // duplicate referral or re-award points — the friendship is now linked.
+      const { data: alreadyReferred } = await supabase
+        .from('referrals')
+        .select('id')
+        .eq('referee_id', refereeId)
+        .maybeSingle()
+
+      if (alreadyReferred) {
+        console.log('Referral already exists for referee, friendship ensured')
+        return new Response(
+          JSON.stringify({ success: true, friendLinked: true, alreadyProcessed: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
       // Create referral record
       const { error: createError } = await supabase
         .from('referrals')
@@ -187,6 +238,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({
           success: true,
+          friendLinked: true,
           referrerPoints: REFERRAL_POINTS.REFERRER_SIGNUP,
           refereePoints: REFERRAL_POINTS.REFEREE_SIGNUP,
           badgesUnlocked: newBadges.filter(b => !(currentReferrerPoints?.badges || []).includes(b)),
