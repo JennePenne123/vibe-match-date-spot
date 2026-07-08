@@ -1677,5 +1677,9 @@
     "yourCoins": "Deine Coins",
     "vouchers": "Vouchers",
     "premium": "Premium"
+  },
+  "referral": {
+    "friendLinkedTitle": "Verbindung hergestellt",
+    "friendLinkedDesc": "Du wurdest mit deinem Freund verbunden – ihr findet euch jetzt in der Freundesliste und im Date-Planen."
   }
 }
