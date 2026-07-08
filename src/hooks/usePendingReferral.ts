@@ -5,14 +5,25 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 
 const STORAGE_KEY = 'hioutz-pending-referral';
+// Legacy key still written by AuthModal before an OAuth redirect.
+const LEGACY_KEY = 'pendingReferralCode';
 // Referral codes are 8-char uppercase hex (see generate_user_referral_code)
 const CODE_REGEX = /^[A-Za-z0-9]{6,12}$/;
 
 const readCode = (): string | null => {
   try {
-    return localStorage.getItem(STORAGE_KEY);
+    return localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_KEY);
   } catch {
     return null;
+  }
+};
+
+const clearCodes = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LEGACY_KEY);
+  } catch {
+    /* ignore */
   }
 };
 
@@ -27,19 +38,15 @@ export const usePendingReferral = () => {
   const { t } = useTranslation();
   const processingRef = useRef(false);
 
-  // 1) Capture ?ref= from the URL as early as possible and clean the URL.
+  // 1) Capture ?ref= from the URL as early as possible so it survives
+  //    navigation and OAuth redirects. The param is left in the URL so the
+  //    auth modal can still prefill / validate the code.
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('ref');
       if (code && CODE_REGEX.test(code)) {
         localStorage.setItem(STORAGE_KEY, code.toUpperCase());
-      }
-      if (params.has('ref')) {
-        params.delete('ref');
-        const search = params.toString();
-        const newUrl = window.location.pathname + (search ? `?${search}` : '') + window.location.hash;
-        window.history.replaceState({}, '', newUrl);
       }
     } catch {
       /* ignore */
@@ -65,11 +72,7 @@ export const usePendingReferral = () => {
       } catch (err) {
         console.error('Pending referral processing failed:', err);
       } finally {
-        try {
-          localStorage.removeItem(STORAGE_KEY);
-        } catch {
-          /* ignore */
-        }
+        clearCodes();
         processingRef.current = false;
       }
     })();
