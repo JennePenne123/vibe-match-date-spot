@@ -7,6 +7,7 @@ import { Toggle } from '@/components/ui/toggle';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Users, ArrowRight, Loader2, User, UsersIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import InviteFriendsSection from '@/components/InviteFriendsSection';
 
 interface Friend {
   id: string;
@@ -53,6 +54,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
     : selectedPartnerIds.length > 0 && selectedPartnerIds.length <= maxGroupSize;
 
   const selectedCount = selectedPartnerIds.length;
+  const hasFriends = friends.length > 0;
 
   return (
     <Card variant="elegant" className="border-sage-200/40 dark:border-sage-800/30">
@@ -91,7 +93,12 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
             ? t('datePlanning.selectFriend') 
             : t('datePlanning.selectGroupFriends', { count: selectedCount })}
         </div>
-        {dateMode === 'single' ? (
+        {!hasFriends ? (
+          <div className="text-center p-5 bg-muted/30 rounded-lg border-2 border-dashed border-muted">
+            <h3 className="text-base font-medium text-foreground mb-1">{t('datePlanning.noFriendsYet')}</h3>
+            <p className="text-sm text-muted-foreground">{t('datePlanning.noFriendsYetDesc')}</p>
+          </div>
+        ) : dateMode === 'single' ? (
           <Select value={selectedPartnerId} onValueChange={onPartnerChange}>
             <SelectTrigger className="h-11">
               <SelectValue placeholder={t('datePlanning.chooseFriend')} />
@@ -127,7 +134,10 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
             </div>
           </div>
         )}
-        
+
+        <InviteFriendsSection />
+
+        {hasFriends && (
         <Button 
           onClick={onContinue}
           disabled={!isValidSelection || loading}
@@ -146,6 +156,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
             </>
           )}
         </Button>
+        )}
       </CardContent>
     </Card>
   );
