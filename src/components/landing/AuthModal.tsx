@@ -456,16 +456,15 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={handleAppleSignIn}
-                  disabled={loading || isOAuthLoading}
-                  className="w-full h-12 bg-black dark:bg-white text-white dark:text-black hover:opacity-90 border-0 font-medium"
+                  disabled
+                  aria-disabled="true"
+                  className="relative w-full h-12 bg-muted text-muted-foreground border-border font-medium opacity-70 cursor-not-allowed"
                 >
-                  {appleLoading ? (
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  ) : (
-                    <AppleIcon />
-                  )}
+                  <AppleIcon />
                   {t('auth.continueWithApple')}
+                  <span className="ml-2 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
+                    {t('auth.comingSoon')}
+                  </span>
                 </Button>
               </div>
 
