@@ -114,6 +114,9 @@ const AdminDashboard: React.FC = () => {
       {/* Waitlist Signups */}
       <WaitlistSignupsWidget />
 
+      {/* Support Tickets */}
+      <SupportTicketsWidget />
+
       {/* Recent activity */}
       <RecentActivity />
     </div>
