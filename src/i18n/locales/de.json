@@ -1682,5 +1682,13 @@
   "referral": {
     "friendLinkedTitle": "Verbindung hergestellt",
     "friendLinkedDesc": "Du wurdest mit deinem Freund verbunden – ihr findet euch jetzt in der Freundesliste und im Date-Planen."
+  },
+  "offlineBanner": {
+    "offline": "Du bist offline",
+    "limited": "Einige Funktionen sind eingeschränkt. Aktionen, die Internet benötigen, sind vorübergehend deaktiviert.",
+    "reconnected": "Du bist wieder online!",
+    "retry": "Erneut versuchen",
+    "actionDisabledTitle": "Keine Verbindung",
+    "actionDisabled": "Diese Aktion benötigt eine Internetverbindung."
   }
 }

@@ -1682,5 +1682,13 @@
   "referral": {
     "friendLinkedTitle": "Connected",
     "friendLinkedDesc": "You've been connected with your friend — you'll now find each other in your friends list and date planning."
+  },
+  "offlineBanner": {
+    "offline": "You're offline",
+    "limited": "Some features are limited. Actions that need the internet are temporarily disabled.",
+    "reconnected": "You're back online!",
+    "retry": "Retry",
+    "actionDisabledTitle": "No connection",
+    "actionDisabled": "This action requires an internet connection."
   }
 }
