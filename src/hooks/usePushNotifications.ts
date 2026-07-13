@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { isLovablePreviewEnvironment } from '@/utils/runtimeEnvironment';
+import { getServiceWorkerRegistration } from '@/pwa/registerServiceWorker';
 
 // VAPID public key from environment
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
@@ -88,25 +89,12 @@ export function usePushNotifications() {
     }
 
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      await registration.update();
-
-      if (registration.waiting) {
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      // The Workbox service worker is registered by the guarded PWA wrapper.
+      // Reuse the active registration instead of registering a second worker.
+      const registration = await getServiceWorkerRegistration();
+      if (!registration) {
+        throw new Error('Service Worker not available');
       }
-
-      registration.addEventListener('updatefound', () => {
-        const installingWorker = registration.installing;
-        if (!installingWorker) return;
-
-        installingWorker.addEventListener('statechange', () => {
-          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            installingWorker.postMessage({ type: 'SKIP_WAITING' });
-          }
-        });
-      });
-
-      console.log('Service Worker registered:', registration);
       return registration;
     } catch (error) {
       console.error('Service Worker registration failed:', error);
