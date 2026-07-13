@@ -36,8 +36,10 @@ async function persist(issue: FormalIssue): Promise<void> {
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
+    // Skip for logged-out users: anon has no privileges on error_logs (avoids 401).
+    if (!user) return;
     await supabase.from('error_logs' as never).insert({
-      user_id: user?.id || null,
+      user_id: user.id,
       error_type: 'ui_error',
       error_message: `[formal_issue:${issue.kind}] ${issue.message}`.slice(0, 2000),
       route: window.location.pathname,
