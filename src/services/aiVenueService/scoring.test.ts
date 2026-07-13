@@ -490,13 +490,18 @@ describe('scoring', () => {
       });
 
       it('should add confidence boost for high accuracy learning', async () => {
-        setupMocks(mockUserPrefs, mockVenue);
+        // Use a partially-matching venue so the base score stays below the 98 cap
+        // and the confidence boost produces an observable difference.
+        const partialVenue = { ...mockVenue, cuisine_type: 'Thai', tags: [], price_range: '$$$$', rating: 3.2 };
+        setupMocks(mockUserPrefs, partialVenue);
         mockGetUserLearnedWeights.mockResolvedValue(mockLearnedWeights);
         mockGetConfidenceBoost.mockReturnValue(0.1); // 10% boost
 
         const scoreWithBoost = await calculateVenueAIScore('venue-123', 'user-123');
 
         // Reset and test without boost
+        setupMocks(mockUserPrefs, partialVenue);
+        mockGetUserLearnedWeights.mockResolvedValue(mockLearnedWeights);
         mockGetConfidenceBoost.mockReturnValue(0);
         const scoreWithoutBoost = await calculateVenueAIScore('venue-123', 'user-123');
 
