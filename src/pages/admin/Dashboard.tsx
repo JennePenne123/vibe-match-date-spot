@@ -9,6 +9,7 @@ import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck,
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import WaitlistSignupsWidget from '@/components/admin/WaitlistSignupsWidget';
+import SupportTicketsWidget from '@/components/admin/SupportTicketsWidget';
 
 interface PlatformStats {
   totalUsers: number;
@@ -112,6 +113,9 @@ const AdminDashboard: React.FC = () => {
 
       {/* Waitlist Signups */}
       <WaitlistSignupsWidget />
+
+      {/* Support Tickets */}
+      <SupportTicketsWidget />
 
       {/* Recent activity */}
       <RecentActivity />

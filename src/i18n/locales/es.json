@@ -1691,5 +1691,32 @@
     "actionDisabledTitle": "Sin conexión",
     "actionDisabled": "Esta acción requiere una conexión a internet.",
     "friendsUnavailable": "Tu lista de amigos no se puede cargar sin conexión. Vuelve a conectarte a internet."
+  },
+  "support": {
+    "ticket": {
+      "title": "Ticket de soporte",
+      "desc": "Describe tu solicitud: nos encargaremos de ello.",
+      "openButton": "Crear ticket",
+      "categoryLabel": "Categoría",
+      "subjectLabel": "Asunto",
+      "subjectPlaceholder": "Resumen breve",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Describe tu solicitud con el mayor detalle posible …",
+      "submit": "Enviar ticket",
+      "validationTitle": "Por favor, rellena todos los campos",
+      "validationDesc": "El asunto y el mensaje no pueden estar vacíos.",
+      "errorTitle": "No se pudo enviar el ticket",
+      "successTitle": "Ticket enviado",
+      "successDesc": "Te responderemos lo antes posible.",
+      "categories": {
+        "general": "General",
+        "bug": "Error",
+        "account": "Cuenta",
+        "payment": "Pago",
+        "partner": "Socio",
+        "feature": "Solicitud de función",
+        "other": "Otro"
+      }
+    }
   }
 }

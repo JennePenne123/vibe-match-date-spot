@@ -26,6 +26,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import LanguageSelector from '@/components/LanguageSelector';
+import SupportTicketDialog from '@/components/support/SupportTicketDialog';
 
 const TRACKING_OPT_OUT_KEY = 'hioutz_tracking_opt_out';
 
@@ -484,6 +485,7 @@ const Settings = () => {
                 <p className="text-xs text-muted-foreground">
                   {t('settings.supportEmailHint', 'Keine passende Antwort gefunden? Schreib uns direkt:')}
                 </p>
+                <SupportTicketDialog />
                 <Button
                   variant="outline"
                   className="w-full border-border text-foreground hover:bg-accent/50"

@@ -1691,5 +1691,32 @@
     "actionDisabledTitle": "Keine Verbindung",
     "actionDisabled": "Diese Aktion benötigt eine Internetverbindung.",
     "friendsUnavailable": "Freundesliste kann offline nicht geladen werden. Bitte verbinde dich mit dem Internet."
+  },
+  "support": {
+    "ticket": {
+      "title": "Support-Ticket",
+      "desc": "Beschreibe dein Anliegen – wir kümmern uns darum.",
+      "openButton": "Ticket erstellen",
+      "categoryLabel": "Kategorie",
+      "subjectLabel": "Betreff",
+      "subjectPlaceholder": "Kurze Zusammenfassung",
+      "messageLabel": "Nachricht",
+      "messagePlaceholder": "Beschreibe dein Anliegen möglichst genau …",
+      "submit": "Ticket senden",
+      "validationTitle": "Bitte alle Felder ausfüllen",
+      "validationDesc": "Betreff und Nachricht dürfen nicht leer sein.",
+      "errorTitle": "Ticket konnte nicht gesendet werden",
+      "successTitle": "Ticket gesendet",
+      "successDesc": "Wir melden uns so schnell wie möglich bei dir.",
+      "categories": {
+        "general": "Allgemein",
+        "bug": "Bug / Fehler",
+        "account": "Konto",
+        "payment": "Zahlung",
+        "partner": "Partner",
+        "feature": "Feature-Wunsch",
+        "other": "Sonstiges"
+      }
+    }
   }
 }
