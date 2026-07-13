@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { OfflineGuardButton } from '@/components/OfflineGuardButton';
 import { Input } from '@/components/ui/input';
 import { bowlChopsticks } from '@lucide/lab';
 
@@ -650,9 +651,9 @@ const Preferences = () => {
                 {t('home.wizardNext')} <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             ) : (
-              <Button onClick={handleSave} disabled={isSaving} className="flex-1 h-10 font-semibold text-sm">
+              <OfflineGuardButton onClick={handleSave} disabled={isSaving} className="flex-1 h-10 font-semibold text-sm">
                 {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.saving')}</> : <><Save className="w-4 h-4 mr-2" />{t('preferences.findDates') || 'Speichern & weiter'}</>}
-              </Button>
+              </OfflineGuardButton>
             )}
           </div>
         </div>
