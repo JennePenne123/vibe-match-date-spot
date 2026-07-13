@@ -165,20 +165,35 @@ export function usePushNotifications() {
       const authKey = subscriptionJSON.keys?.auth || '';
       const p256dhKey = subscriptionJSON.keys?.p256dh || '';
 
-      // Save to database
-      const { error } = await supabase.from('push_subscriptions').upsert({
-        user_id: user.id,
-        endpoint,
-        auth_key: authKey,
-        p256dh_key: p256dhKey,
-        user_agent: navigator.userAgent,
-        last_used_at: new Date().toISOString(),
-      }, {
-        onConflict: 'user_id,endpoint',
-      });
+      // Save to database using select -> update/insert (upsert is unreliable under RLS)
+      const { data: existing } = await supabase
+        .from('push_subscriptions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('endpoint', endpoint)
+        .maybeSingle();
 
-      if (error) {
-        throw error;
+      if (existing) {
+        const { error } = await supabase
+          .from('push_subscriptions')
+          .update({
+            auth_key: authKey,
+            p256dh_key: p256dhKey,
+            user_agent: navigator.userAgent,
+            last_used_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('push_subscriptions').insert({
+          user_id: user.id,
+          endpoint,
+          auth_key: authKey,
+          p256dh_key: p256dhKey,
+          user_agent: navigator.userAgent,
+          last_used_at: new Date().toISOString(),
+        });
+        if (error) throw error;
       }
 
       setState(prev => ({ 
