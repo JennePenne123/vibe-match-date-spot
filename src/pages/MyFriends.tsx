@@ -162,12 +162,12 @@ const MyFriends = () => {
                       <p className="text-xs text-muted-foreground truncate">{t('myFriends.wantsToConnect')}</p>
                     </div>
                     <div className="flex gap-2 shrink-0">
-                      <Button onClick={() => handleAccept(req.friendship_id!, req.name)} size="icon" className="h-9 w-9 bg-gradient-primary text-primary-foreground" aria-label={t('myFriends.accept')}>
+                      <OfflineGuardButton onClick={() => handleAccept(req.friendship_id!, req.name)} size="icon" className="h-9 w-9 bg-gradient-primary text-primary-foreground" aria-label={t('myFriends.accept')}>
                         <Check className="w-4 h-4" />
-                      </Button>
-                      <Button onClick={() => handleDecline(req.friendship_id!)} size="icon" variant="outline" className="h-9 w-9" aria-label={t('myFriends.decline')}>
+                      </OfflineGuardButton>
+                      <OfflineGuardButton onClick={() => handleDecline(req.friendship_id!)} size="icon" variant="outline" className="h-9 w-9" aria-label={t('myFriends.decline')}>
                         <X className="w-4 h-4" />
-                      </Button>
+                      </OfflineGuardButton>
                     </div>
                   </CardContent>
                 </Card>
