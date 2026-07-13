@@ -19,7 +19,6 @@ import DurationPicker from './preferences/DurationPicker';
 import QuickStartTemplates from './preferences/QuickStartTemplates';
 import DateTimePicker from './preferences/DateTimePicker';
 import OccasionPicker from './preferences/OccasionPicker';
-import MoodPicker from './preferences/MoodPicker';
 import PriorityPicker from './preferences/PriorityPicker';
 import { WaitingForPartner, AIAnalysisOverlay, RedirectingOverlay, SoloAIStatus } from './preferences/CollaborativeOverlays';
 
