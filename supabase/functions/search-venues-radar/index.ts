@@ -124,6 +124,26 @@ async function reverseGeocode(lat: number, lon: number): Promise<string> {
   }
 }
 
+// Reverse-geocode via Radar (same API key/product we already use for search).
+// Unlike Nominatim, Radar allows parallel requests, so we can resolve all
+// visible venues synchronously before returning the response.
+async function radarReverseGeocode(lat: number, lon: number, apiKey: string): Promise<string> {
+  try {
+    const resp = await fetch(
+      `https://api.radar.io/v1/geocode/reverse?coordinates=${lat},${lon}`,
+      { headers: { 'Authorization': apiKey, 'Accept': 'application/json' } }
+    );
+    if (!resp.ok) return '';
+    const data = await resp.json();
+    const first = data.addresses?.[0];
+    if (!first) return '';
+    return buildRadarAddress(first);
+  } catch (e) {
+    console.warn('⚠️ Radar reverse-geocode failed:', e);
+    return '';
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
