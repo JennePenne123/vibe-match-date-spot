@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 
 let SENTRY_DSN: string = import.meta.env.VITE_SENTRY_DSN ?? '';
+let sentryInitialized = false;
 
 async function fetchDsnFromBackend(): Promise<string> {
   try {
@@ -14,6 +15,11 @@ async function fetchDsnFromBackend(): Promise<string> {
 }
 
 export async function initSentry(): Promise<void> {
+  // Guard against double initialization (HMR, StrictMode double-invoke, races):
+  // a second Sentry.init() spawns a second Session Replay instance, which is
+  // unsupported and throws at runtime.
+  if (sentryInitialized) return;
+
   if (!SENTRY_DSN) {
     SENTRY_DSN = await fetchDsnFromBackend();
   }
@@ -24,6 +30,8 @@ export async function initSentry(): Promise<void> {
     }
     return;
   }
+
+  sentryInitialized = true;
 
   Sentry.init({
     dsn: SENTRY_DSN,
