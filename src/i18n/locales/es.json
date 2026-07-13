@@ -1689,6 +1689,7 @@
     "reconnected": "¡Has vuelto a estar en línea!",
     "retry": "Reintentar",
     "actionDisabledTitle": "Sin conexión",
-    "actionDisabled": "Esta acción requiere una conexión a internet."
+    "actionDisabled": "Esta acción requiere una conexión a internet.",
+    "friendsUnavailable": "Tu lista de amigos no se puede cargar sin conexión. Vuelve a conectarte a internet."
   }
 }

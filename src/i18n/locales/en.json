@@ -1689,6 +1689,7 @@
     "reconnected": "You're back online!",
     "retry": "Retry",
     "actionDisabledTitle": "No connection",
-    "actionDisabled": "This action requires an internet connection."
+    "actionDisabled": "This action requires an internet connection.",
+    "friendsUnavailable": "Your friends list can't load while offline. Please reconnect to the internet."
   }
 }

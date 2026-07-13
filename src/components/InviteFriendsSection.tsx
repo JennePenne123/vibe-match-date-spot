@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
 import { UserPlus, Mail, MessageCircle, Send, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { OfflineGuardButton } from '@/components/OfflineGuardButton';
 import { useReferral } from '@/hooks/useReferral';
 
 const InviteFriendsSection: React.FC = () => {
@@ -51,14 +52,14 @@ const InviteFriendsSection: React.FC = () => {
           <Mail className="w-3.5 h-3.5" />
           E-Mail
         </Button>
-        <Button variant="outline" size="sm" onClick={handleInviteWhatsApp} className="gap-1.5 text-xs text-green-600 border-green-200 hover:bg-green-50 dark:text-green-400 dark:border-green-800 dark:hover:bg-green-900/20">
+        <OfflineGuardButton variant="outline" size="sm" onClick={handleInviteWhatsApp} className="gap-1.5 text-xs text-green-600 border-green-200 hover:bg-green-50 dark:text-green-400 dark:border-green-800 dark:hover:bg-green-900/20">
           <MessageCircle className="w-3.5 h-3.5" />
           WhatsApp
-        </Button>
-        <Button variant="outline" size="sm" onClick={handleInviteTelegram} className="gap-1.5 text-xs text-blue-500 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/20">
+        </OfflineGuardButton>
+        <OfflineGuardButton variant="outline" size="sm" onClick={handleInviteTelegram} className="gap-1.5 text-xs text-blue-500 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/20">
           <Send className="w-3.5 h-3.5" />
           Telegram
-        </Button>
+        </OfflineGuardButton>
         <Button variant="outline" size="sm" onClick={handleCopyLink} className="gap-1.5 text-xs">
           {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
           {copied ? t('myFriends.copied') : t('myFriends.copyLink')}

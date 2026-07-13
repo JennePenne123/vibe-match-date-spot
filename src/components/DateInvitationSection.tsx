@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { OfflineGuardButton } from '@/components/OfflineGuardButton';
 import InviteFriendsSection from '@/components/InviteFriendsSection';
 
 const DateInvitationSection: React.FC = () => {
@@ -153,7 +154,7 @@ const DateInvitationSection: React.FC = () => {
           <p className="text-sm text-muted-foreground mb-4">
             {t('invitationsSection.emptyDesc')}
           </p>
-          <Button 
+          <OfflineGuardButton 
             onClick={handleRefresh}
             variant="outline"
             size="sm"
@@ -161,7 +162,7 @@ const DateInvitationSection: React.FC = () => {
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
             {t('invitationsSection.refresh')}
-          </Button>
+          </OfflineGuardButton>
         </div>
         <InviteFriendsSection />
       </div>
@@ -197,14 +198,14 @@ const DateInvitationSection: React.FC = () => {
           <Badge variant="secondary" className="text-xs">
             {t('invitationsSection.total', { count: invitations.length })}
           </Badge>
-          <Button 
+          <OfflineGuardButton 
             onClick={handleRefresh}
             variant="ghost"
             size="sm"
             disabled={isRefreshing}
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </Button>
+          </OfflineGuardButton>
         </div>
       </div>
       

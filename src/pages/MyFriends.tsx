@@ -5,9 +5,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useFriends } from '@/hooks/useFriends';
 import { useReferral } from '@/hooks/useReferral';
 import { Button } from '@/components/ui/button';
+import { OfflineGuardButton } from '@/components/OfflineGuardButton';
+import { useOnlineStatusContext } from '@/contexts/OnlineStatusContext';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Search, UserPlus, Mail, MessageCircle, Send, Share2, Copy, Check, X, Users } from 'lucide-react';
+import { ArrowLeft, Search, UserPlus, Mail, MessageCircle, Send, Share2, Copy, Check, X, Users, WifiOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import FriendCard from '@/components/FriendCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,6 +21,7 @@ const MyFriends = () => {
   const { user } = useAuth();
   const { friends, pendingRequests, acceptFriendRequest, declineFriendRequest } = useFriends();
   const { referralLink, copyReferralLink } = useReferral();
+  const { isOnline } = useOnlineStatusContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
@@ -159,12 +162,12 @@ const MyFriends = () => {
                       <p className="text-xs text-muted-foreground truncate">{t('myFriends.wantsToConnect')}</p>
                     </div>
                     <div className="flex gap-2 shrink-0">
-                      <Button onClick={() => handleAccept(req.friendship_id!, req.name)} size="icon" className="h-9 w-9 bg-gradient-primary text-primary-foreground" aria-label={t('myFriends.accept')}>
+                      <OfflineGuardButton onClick={() => handleAccept(req.friendship_id!, req.name)} size="icon" className="h-9 w-9 bg-gradient-primary text-primary-foreground" aria-label={t('myFriends.accept')}>
                         <Check className="w-4 h-4" />
-                      </Button>
-                      <Button onClick={() => handleDecline(req.friendship_id!)} size="icon" variant="outline" className="h-9 w-9" aria-label={t('myFriends.decline')}>
+                      </OfflineGuardButton>
+                      <OfflineGuardButton onClick={() => handleDecline(req.friendship_id!)} size="icon" variant="outline" className="h-9 w-9" aria-label={t('myFriends.decline')}>
                         <X className="w-4 h-4" />
-                      </Button>
+                      </OfflineGuardButton>
                     </div>
                   </CardContent>
                 </Card>
@@ -174,7 +177,14 @@ const MyFriends = () => {
 
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-foreground">{t('myFriends.yourFriends')}</h2>
-            {filteredFriends.length === 0 ? (
+            {!isOnline && friends.length === 0 ? (
+              <Card className="bg-destructive/10 border-destructive/30">
+                <CardContent className="py-6 text-center">
+                  <WifiOff className="w-7 h-7 text-destructive mx-auto mb-2" />
+                  <p className="text-sm font-medium text-foreground">{t('offlineBanner.friendsUnavailable')}</p>
+                </CardContent>
+              </Card>
+            ) : filteredFriends.length === 0 ? (
               <Card className="bg-card/50 border-dashed border-2 border-border">
                 <CardContent className="py-8 text-center">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-3">
