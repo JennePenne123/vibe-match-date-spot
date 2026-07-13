@@ -9,6 +9,7 @@ import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck,
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import WaitlistSignupsWidget from '@/components/admin/WaitlistSignupsWidget';
+import SupportTicketsWidget from '@/components/admin/SupportTicketsWidget';
 
 interface PlatformStats {
   totalUsers: number;
