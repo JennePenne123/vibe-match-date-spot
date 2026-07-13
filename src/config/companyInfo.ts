@@ -1,25 +1,25 @@
 /**
  * Zentrale Firmendaten für alle Rechtstexte (Impressum, AGB, Datenschutz, Widerrufsformular).
  *
- * ⚠️ VOR GO-LIVE: Hier alle Platzhalter mit "TODO:" durch die echten Daten ersetzen.
- * Dann sind Impressum, AGB, Datenschutz, Widerrufsformular & Partner-Texte automatisch aktuell.
+ * ⚠️ VOR GO-LIVE: Platzhalter mit „wird nach Unternehmensgründung ergänzt“
+ * sowie Telefonnummer/USt-IdNr. durch echte Daten ersetzen.
  */
 export const COMPANY = {
-  legalName: 'H!Outz (Einzelunternehmen)', // TODO: nach Firmengründung auf "H!Outz [Rechtsform]" ändern
-  street: '[Straße und Hausnummer]', // TODO
-  zip: '[PLZ]', // TODO
-  city: '[Ort]', // TODO
+  legalName: 'H!Outz (Einzelunternehmen)',
+  street: 'Hellbrookkamp 16',
+  zip: '22177',
+  city: 'Hamburg',
   country: 'Deutschland',
-  ceo: '[Inhaber]', // TODO
-  contentResponsibleName: '[Name]', // TODO § 18 Abs. 2 MStV
-  contentResponsibleAddress: '[Adresse]', // TODO § 18 Abs. 2 MStV
-  phone: '[Telefonnummer]', // TODO
+  ceo: 'Lennart Mützelburg',
+  contentResponsibleName: 'Lennart Mützelburg', // § 18 Abs. 2 MStV
+  contentResponsibleAddress: 'Hellbrookkamp 16, 22177 Hamburg',
+  phone: '[wird nach Unternehmensgründung ergänzt]',
   contactEmail: 'kontakt@hioutz.app',
   supportEmail: 'support@hioutz.app',
   privacyEmail: 'datenschutz@hioutz.app',
-  registerCourt: '[Amtsgericht]', // TODO
-  registerNumber: '[HRB-Nummer]', // TODO
-  vatId: '[USt-IdNr.]', // TODO
+  registerCourt: '[nicht zutreffend für Einzelunternehmen]',
+  registerNumber: '[nicht zutreffend für Einzelunternehmen]',
+  vatId: '[wird nach Unternehmensgründung ergänzt]',
 } as const;
 
 /** Einzeilige Adresse für Inline-Verwendung in Fließtexten (AGB, Widerrufsbelehrung). */
