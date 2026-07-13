@@ -1638,7 +1638,19 @@
     "usersSubtitle": "All registered users",
     "usersCount": "{{count}} users",
     "errorsTitle": "Error Monitoring",
-    "errorsSubtitle": "Current system and application errors"
+    "errorsSubtitle": "Current system and application errors",
+    "venuePhotoBackfill": "Load real venue photos",
+    "venuePhotoBackfillDesc": "Matches cached venues without a Google reference by name and location against Google Places and loads real photos. Consumes Google API quota.",
+    "backfillRunning": "Running… please keep this window open",
+    "backfillMatched": "Matched",
+    "backfillUpdated": "With photo",
+    "backfillSkipped": "Skipped",
+    "backfillRemaining": "Remaining",
+    "backfillRunBatch": "One batch ({{n}})",
+    "backfillRunAll": "Load all",
+    "backfillError": "Error loading photos",
+    "backfillBatchDone": "{{updated}} venues updated with real photos",
+    "backfillAllDone": "Photo loading complete"
   },
   "adminNav": {
     "adminPortal": "Admin Portal",

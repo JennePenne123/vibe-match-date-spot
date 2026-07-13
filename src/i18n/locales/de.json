@@ -1638,7 +1638,19 @@
     "usersSubtitle": "Alle registrierten Nutzer",
     "usersCount": "{{count}} Nutzer",
     "errorsTitle": "Fehler-Monitoring",
-    "errorsSubtitle": "Aktuelle System- und Anwendungsfehler"
+    "errorsSubtitle": "Aktuelle System- und Anwendungsfehler",
+    "venuePhotoBackfill": "Echte Venue-Fotos nachladen",
+    "venuePhotoBackfillDesc": "Gleicht gecachte Venues ohne Google-Zuordnung per Name und Standort mit Google Places ab und lädt echte Fotos. Verbraucht Google-API-Kontingent.",
+    "backfillRunning": "Läuft… bitte Fenster geöffnet lassen",
+    "backfillMatched": "Zugeordnet",
+    "backfillUpdated": "Mit Foto",
+    "backfillSkipped": "Übersprungen",
+    "backfillRemaining": "Verbleibend",
+    "backfillRunBatch": "Ein Batch ({{n}})",
+    "backfillRunAll": "Alle nachladen",
+    "backfillError": "Fehler beim Nachladen der Fotos",
+    "backfillBatchDone": "{{updated}} Venues mit echten Fotos aktualisiert",
+    "backfillAllDone": "Foto-Nachladen abgeschlossen"
   },
   "adminNav": {
     "adminPortal": "Admin-Portal",
