@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import WaitlistSignupsWidget from '@/components/admin/WaitlistSignupsWidget';
 import SupportTicketsWidget from '@/components/admin/SupportTicketsWidget';
+import VenuePhotoBackfillWidget from '@/components/admin/VenuePhotoBackfillWidget';
 
 interface PlatformStats {
   totalUsers: number;
@@ -116,6 +117,9 @@ const AdminDashboard: React.FC = () => {
 
       {/* Support Tickets */}
       <SupportTicketsWidget />
+
+      {/* Venue photo backfill */}
+      <VenuePhotoBackfillWidget />
 
       {/* Recent activity */}
       <RecentActivity />
