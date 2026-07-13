@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import App from './App.tsx'
 import './i18n'
 import './index.css' // boot
+import { registerServiceWorker } from './pwa/registerServiceWorker'
 
 const normalizeInitialPath = () => {
   if (typeof window === 'undefined') {
@@ -49,3 +50,6 @@ createRoot(document.getElementById('root')!).render(
     </HelmetProvider>
   </AppBootSignal>
 )
+
+// Register the PWA service worker (guarded: no dev/preview/iframe).
+registerServiceWorker()
