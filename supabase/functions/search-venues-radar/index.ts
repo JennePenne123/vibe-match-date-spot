@@ -358,10 +358,27 @@ serve(async (req) => {
         };
       });
 
-    // Synthesize a placeholder address from coordinates so the UI never shows
-    // "no address". Real reverse-geocoding happens asynchronously below and
-    // backfills the DB for next time — we never block the user on Nominatim
-    // (which costs ~1.1s per venue and can balloon to 50s for 45 venues).
+    // Resolve real street addresses SYNCHRONOUSLY via Radar (parallel, ~150ms
+    // each) for every venue Radar didn't already return an address for. Radar
+    // permits concurrent requests, so all venues resolve at once — the user
+    // sees real addresses on first load, never raw coordinates.
+    const needsAddress = (v: any) =>
+      (!v.address || v.address.trim() === '' || v.address.trim() === ',') &&
+      v.latitude && v.longitude;
+
+    const toResolve = venues.filter(needsAddress);
+    if (toResolve.length > 0) {
+      console.log(`📍 RADAR: Reverse-geocoding ${toResolve.length} venues via Radar`);
+      await Promise.allSettled(
+        toResolve.map(async (venue: any) => {
+          const addr = await radarReverseGeocode(venue.latitude, venue.longitude, radarApiKey);
+          if (addr) venue.address = addr;
+        })
+      );
+    }
+
+    // Last-resort placeholder for anything Radar couldn't resolve — Nominatim
+    // background job (below) will backfill these for next time.
     for (const venue of venues) {
       if ((!venue.address || venue.address.trim() === '' || venue.address.trim() === ',') && venue.latitude && venue.longitude) {
         venue.address = `${venue.latitude.toFixed(4)}, ${venue.longitude.toFixed(4)}`;
