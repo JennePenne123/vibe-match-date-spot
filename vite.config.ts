@@ -31,6 +31,7 @@ export default defineConfig(({ mode }) => ({
         "icon-512.png",
         "app-icon.png",
         "placeholder.svg",
+        "offline.html",
       ],
       workbox: {
         cacheId: "hioutz",
@@ -38,23 +39,14 @@ export default defineConfig(({ mode }) => ({
         importScripts: ["/sw-push.js"],
         // Precache the built app shell + hashed assets.
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
-        // Serve index.html for client-side routes, but never for OAuth callbacks.
-        navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/~oauth/, /^\/auth\/v1/],
+        // Navigation + offline fallback are handled in sw-push.js (imported
+        // above) so we can serve /offline.html as a last resort. Disable
+        // Workbox's own navigate route to avoid a double-respondWith conflict.
+        navigateFallback: null,
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
         runtimeCaching: [
-          {
-            // HTML navigations: always try network first so UI updates ship immediately.
-            urlPattern: ({ request }) => request.mode === "navigate",
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "hioutz-html",
-              networkTimeoutSeconds: 5,
-              expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 },
-            },
-          },
           {
             // Google Fonts stylesheets.
             urlPattern: ({ url }) => url.origin === "https://fonts.googleapis.com",
