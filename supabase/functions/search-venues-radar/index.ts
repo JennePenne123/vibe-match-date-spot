@@ -124,6 +124,26 @@ async function reverseGeocode(lat: number, lon: number): Promise<string> {
   }
 }
 
+// Reverse-geocode via Radar (same API key/product we already use for search).
+// Unlike Nominatim, Radar allows parallel requests, so we can resolve all
+// visible venues synchronously before returning the response.
+async function radarReverseGeocode(lat: number, lon: number, apiKey: string): Promise<string> {
+  try {
+    const resp = await fetch(
+      `https://api.radar.io/v1/geocode/reverse?coordinates=${lat},${lon}`,
+      { headers: { 'Authorization': apiKey, 'Accept': 'application/json' } }
+    );
+    if (!resp.ok) return '';
+    const data = await resp.json();
+    const first = data.addresses?.[0];
+    if (!first) return '';
+    return buildRadarAddress(first);
+  } catch (e) {
+    console.warn('⚠️ Radar reverse-geocode failed:', e);
+    return '';
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -338,10 +358,27 @@ serve(async (req) => {
         };
       });
 
-    // Synthesize a placeholder address from coordinates so the UI never shows
-    // "no address". Real reverse-geocoding happens asynchronously below and
-    // backfills the DB for next time — we never block the user on Nominatim
-    // (which costs ~1.1s per venue and can balloon to 50s for 45 venues).
+    // Resolve real street addresses SYNCHRONOUSLY via Radar (parallel, ~150ms
+    // each) for every venue Radar didn't already return an address for. Radar
+    // permits concurrent requests, so all venues resolve at once — the user
+    // sees real addresses on first load, never raw coordinates.
+    const needsAddress = (v: any) =>
+      (!v.address || v.address.trim() === '' || v.address.trim() === ',') &&
+      v.latitude && v.longitude;
+
+    const toResolve = venues.filter(needsAddress);
+    if (toResolve.length > 0) {
+      console.log(`📍 RADAR: Reverse-geocoding ${toResolve.length} venues via Radar`);
+      await Promise.allSettled(
+        toResolve.map(async (venue: any) => {
+          const addr = await radarReverseGeocode(venue.latitude, venue.longitude, radarApiKey);
+          if (addr) venue.address = addr;
+        })
+      );
+    }
+
+    // Last-resort placeholder for anything Radar couldn't resolve — Nominatim
+    // background job (below) will backfill these for next time.
     for (const venue of venues) {
       if ((!venue.address || venue.address.trim() === '' || venue.address.trim() === ',') && venue.latitude && venue.longitude) {
         venue.address = `${venue.latitude.toFixed(4)}, ${venue.longitude.toFixed(4)}`;
