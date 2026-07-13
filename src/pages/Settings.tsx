@@ -26,6 +26,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import LanguageSelector from '@/components/LanguageSelector';
+import SupportTicketDialog from '@/components/support/SupportTicketDialog';
 
 const TRACKING_OPT_OUT_KEY = 'hioutz_tracking_opt_out';
 
