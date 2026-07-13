@@ -485,6 +485,7 @@ const Settings = () => {
                 <p className="text-xs text-muted-foreground">
                   {t('settings.supportEmailHint', 'Keine passende Antwort gefunden? Schreib uns direkt:')}
                 </p>
+                <SupportTicketDialog />
                 <Button
                   variant="outline"
                   className="w-full border-border text-foreground hover:bg-accent/50"
