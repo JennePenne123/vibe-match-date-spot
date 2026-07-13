@@ -27,55 +27,9 @@ import PendingReferralHandler from "./components/PendingReferralHandler";
 import AppLayout from "./components/AppLayout";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { useAppUsageTracking } from "./hooks/useImplicitSignals";
-import { isLovablePreviewEnvironment } from "./utils/runtimeEnvironment";
 
 function AppUsageTracker() {
   useAppUsageTracking();
-  return null;
-}
-
-function ServiceWorkerCacheReset() {
-  useEffect(() => {
-    // Skip entirely in Lovable preview – sw.js is not served there
-    if (isLovablePreviewEnvironment()) {
-      return;
-    }
-
-    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('caches' in window)) {
-      return;
-    }
-
-    const RESET_KEY = 'hioutz-sw-reset-v3';
-
-    const resetCaches = async () => {
-      if (sessionStorage.getItem(RESET_KEY) === 'done') return;
-      sessionStorage.setItem(RESET_KEY, 'done');
-
-      try {
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(
-          registrations.map(async (registration) => {
-            await registration.update().catch(() => undefined);
-            registration.waiting?.postMessage({ type: 'CLEAR_CACHE' });
-            registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
-            registration.active?.postMessage({ type: 'CLEAR_CACHE' });
-          })
-        );
-
-        const cacheNames = await caches.keys();
-        await Promise.all(
-          cacheNames
-            .filter((cacheName) => cacheName.startsWith('hioutz-'))
-            .map((cacheName) => caches.delete(cacheName))
-        );
-      } catch (error) {
-        console.error('Failed to reset service worker cache:', error);
-      }
-    };
-
-    void resetCaches();
-  }, []);
-
   return null;
 }
 
