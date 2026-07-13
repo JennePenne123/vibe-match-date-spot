@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { OfflineGuardButton } from '@/components/OfflineGuardButton';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, User, CheckCircle, XCircle, Play } from 'lucide-react';
 import EmptyState from '@/components/EmptyState';
@@ -125,19 +126,19 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({ onProposalAccepte
                   {proposal.message && <p className="text-sm text-muted-foreground italic break-words">"{proposal.message}"</p>}
                   {proposal.recipient_id === user?.id && (
                     <div className={`${isMobile ? 'flex-col space-y-2' : 'flex gap-2'} pt-2`}>
-                      <Button onClick={() => handleAcceptProposal(proposal)} disabled={loading} className={`${isMobile ? 'w-full min-h-[44px]' : 'flex-1'}`} size={isMobile ? 'default' : 'sm'}>
+                      <OfflineGuardButton onClick={() => handleAcceptProposal(proposal)} disabled={loading} className={`${isMobile ? 'w-full min-h-[44px]' : 'flex-1'}`} size={isMobile ? 'default' : 'sm'}>
                         <CheckCircle className="h-4 w-4 mr-2" />{isMobile ? t('proposals.accept') : t('proposals.acceptStartPlanning')}
-                      </Button>
-                      <Button onClick={() => handleDeclineProposal(proposal.id)} disabled={loading} variant="outline" className={`${isMobile ? 'w-full min-h-[44px]' : 'flex-1'}`} size={isMobile ? 'default' : 'sm'}>
+                      </OfflineGuardButton>
+                      <OfflineGuardButton onClick={() => handleDeclineProposal(proposal.id)} disabled={loading} variant="outline" className={`${isMobile ? 'w-full min-h-[44px]' : 'flex-1'}`} size={isMobile ? 'default' : 'sm'}>
                         <XCircle className="h-4 w-4 mr-2" />{t('proposals.decline')}
-                      </Button>
+                      </OfflineGuardButton>
                     </div>
                   )}
                   {proposal.proposer_id === user?.id && (
                     <div className="pt-2">
-                      <Button onClick={() => handleCancelProposal(proposal.id)} disabled={loading} variant="destructive" className={`${isMobile ? 'w-full min-h-[44px]' : 'w-full'}`} size={isMobile ? 'default' : 'sm'}>
+                      <OfflineGuardButton onClick={() => handleCancelProposal(proposal.id)} disabled={loading} variant="destructive" className={`${isMobile ? 'w-full min-h-[44px]' : 'w-full'}`} size={isMobile ? 'default' : 'sm'}>
                         <XCircle className="h-4 w-4 mr-2" />{t('proposals.cancelProposal')}
-                      </Button>
+                      </OfflineGuardButton>
                     </div>
                   )}
                 </CardContent>
@@ -159,7 +160,7 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({ onProposalAccepte
                   {proposal.message && <p className="text-sm text-muted-foreground italic break-words">"{proposal.message}"</p>}
                   {proposal.planning_session_id && (
                     <div className="pt-2">
-                      <Button onClick={async () => {
+                      <OfflineGuardButton onClick={async () => {
                         const partnerId = proposal.proposer_id === user?.id ? proposal.recipient_id : proposal.proposer_id;
                         try {
                           const newSession = await createPlanningSession(partnerId, undefined, 'collaborative', true);
@@ -173,7 +174,7 @@ const DateProposalsList: React.FC<DateProposalsListProps> = ({ onProposalAccepte
                         }
                       }} className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full min-h-[44px]' : 'w-full'}`} size={isMobile ? 'default' : 'sm'}>
                         <Play className="h-4 w-4 mr-2" />{t('proposals.startAIPlanning')}
-                      </Button>
+                      </OfflineGuardButton>
                     </div>
                   )}
                 </CardContent>
