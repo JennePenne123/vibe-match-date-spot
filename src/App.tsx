@@ -157,6 +157,7 @@ const App = () => (
           <ScrollToTop />
           <AuthProvider>
             <AppProvider>
+              <OnlineStatusProvider>
               <NotificationSystem>
                 <OfflineBanner />
                 <GeoPrivacyBanner />
