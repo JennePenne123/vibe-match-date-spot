@@ -1638,7 +1638,19 @@
     "usersSubtitle": "Todos los usuarios registrados",
     "usersCount": "{{count}} usuarios",
     "errorsTitle": "Monitorización de errores",
-    "errorsSubtitle": "Errores actuales del sistema y la aplicación"
+    "errorsSubtitle": "Errores actuales del sistema y la aplicación",
+    "venuePhotoBackfill": "Cargar fotos reales de locales",
+    "venuePhotoBackfillDesc": "Compara los locales en caché sin referencia de Google por nombre y ubicación con Google Places y carga fotos reales. Consume cuota de la API de Google.",
+    "backfillRunning": "En ejecución… mantén esta ventana abierta",
+    "backfillMatched": "Coincidentes",
+    "backfillUpdated": "Con foto",
+    "backfillSkipped": "Omitidos",
+    "backfillRemaining": "Restantes",
+    "backfillRunBatch": "Un lote ({{n}})",
+    "backfillRunAll": "Cargar todo",
+    "backfillError": "Error al cargar las fotos",
+    "backfillBatchDone": "{{updated}} locales actualizados con fotos reales",
+    "backfillAllDone": "Carga de fotos completada"
   },
   "adminNav": {
     "adminPortal": "Portal de Admin",
