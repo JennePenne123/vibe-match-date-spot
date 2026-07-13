@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { OfflineGuardButton } from '@/components/OfflineGuardButton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageCircle, Calendar, Check, X } from 'lucide-react';
 import { Friend } from '@/types';
@@ -65,9 +66,9 @@ const FriendCard = ({ friend, variant = 'default', onMessage, onInvite, onToggle
                   </Button>
                 )}
                 {onInvite && (
-                  <Button onClick={() => onInvite(friend.id, friend.name)} size="sm" variant="default" className="flex-1">
+                  <OfflineGuardButton onClick={() => onInvite(friend.id, friend.name)} size="sm" variant="default" className="flex-1">
                     <Calendar className="w-4 h-4 mr-1" />{t('friends.invite')}
-                  </Button>
+                  </OfflineGuardButton>
                 )}
               </div>
             )}
