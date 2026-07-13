@@ -89,6 +89,10 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   const formattedAddress = formatVenueAddress(recommendation);
   const venueNeighborhood = neighborhood || extractNeighborhood(venue_address);
 
+  // Prefer a real neighborhood/address; if none is available (backend is still
+  // reverse-geocoding), fall back to the distance so we never show raw coords.
+  const locationLabel = venueNeighborhood || formattedAddress || distance || '';
+
   const processedPhotos = venue_photos && venue_photos.length > 0 
     ? venue_photos 
     : [{
@@ -211,12 +215,14 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
               {venue_name}
             </Heading>
             
-            <div className="flex items-center mt-1">
-              <MapPin className="w-4 h-4 mr-1 flex-shrink-0 text-muted-foreground" />
-              <Text size="sm" className="text-muted-foreground truncate">
-                {venueNeighborhood || formattedAddress}
-              </Text>
-            </div>
+            {locationLabel && (
+              <div className="flex items-center mt-1">
+                <MapPin className="w-4 h-4 mr-1 flex-shrink-0 text-muted-foreground" />
+                <Text size="sm" className="text-muted-foreground truncate">
+                  {locationLabel}
+                </Text>
+              </div>
+            )}
 
             {/* Travel time info */}
             {travelInfo && (travelInfo.driving || travelInfo.walking) && (

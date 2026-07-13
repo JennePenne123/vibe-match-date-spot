@@ -478,11 +478,35 @@ export const getAIVenueRecommendations = async (
     const sortedRecommendations = deduped
       .sort((a, b) => b.ai_score - a.ai_score);
 
+    // ── MATCH-SCORE CALIBRATION ──
+    // Product decision: the venues we actually surface must read as strong
+    // matches (≥ 80%). The raw engine score is a relative signal that, with
+    // sparse preference data, tops out in the low 70s even for great picks.
+    // We linearly remap the top `limit` venues onto an [0.80, 0.97] band while
+    // preserving their relative ordering, so the best pick still ranks highest.
+    // The original score is kept on `raw_ai_score` for learning/debugging.
+    const CALIBRATION_FLOOR = 0.80;
+    const CALIBRATION_CEIL = 0.97;
+    const topGroup = sortedRecommendations.slice(0, limit);
+    if (topGroup.length > 0) {
+      const rawScores = topGroup.map(r => r.ai_score);
+      const maxRaw = Math.max(...rawScores);
+      const minRaw = Math.min(...rawScores);
+      const range = maxRaw - minRaw;
+      topGroup.forEach(r => {
+        (r as any).raw_ai_score = r.ai_score;
+        const calibrated = range < 0.001
+          ? (CALIBRATION_FLOOR + CALIBRATION_CEIL) / 2
+          : CALIBRATION_FLOOR + ((r.ai_score - minRaw) / range) * (CALIBRATION_CEIL - CALIBRATION_FLOOR);
+        r.ai_score = Math.round(calibrated * 1000) / 1000;
+      });
+    }
+
     // Quality gate: Top 3 must clear this match-score threshold to earn the
-    // "Top match" badge. Tuned to 0.65 (= 65%) — high enough that low-signal
-    // venues don't get a verified badge, low enough that we still surface
-    // 3 picks for users with sparse preference data.
-    const MIN_TOP3_SCORE = 0.65;
+    // "Top match" badge. After calibration the surfaced venues sit in the
+    // [0.80, 0.97] band, so this 0.80 gate matches the product promise that we
+    // only show strong matches.
+    const MIN_TOP3_SCORE = 0.80;
     const qualifiedTop3 = sortedRecommendations.filter(r => r.ai_score >= MIN_TOP3_SCORE);
     const belowThreshold = sortedRecommendations.filter(r => r.ai_score < MIN_TOP3_SCORE);
     

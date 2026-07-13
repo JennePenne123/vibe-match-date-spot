@@ -3,6 +3,17 @@
  */
 
 /**
+ * Detects whether a string is just a pair of coordinates (e.g. "53.5972, 10.0709").
+ * These are placeholder addresses produced by the search backends before the
+ * background reverse-geocoder fills in a real street address. We must never
+ * show raw coordinates to the user.
+ */
+export function isCoordinateString(value?: string | null): boolean {
+  if (!value) return false;
+  return /^-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+$/.test(value.trim());
+}
+
+/**
  * Formats a venue address for display, ensuring it's never empty
  */
 export function formatVenueAddress(venue: any): string {
@@ -14,6 +25,12 @@ export function formatVenueAddress(venue: any): string {
   }
   
   let cleanAddress = address.trim();
+
+  // Never surface raw coordinates as an "address" — treat them as missing so
+  // the card falls back to neighborhood/distance instead.
+  if (isCoordinateString(cleanAddress)) {
+    return getCoordinateFallback(venue.latitude, venue.longitude);
+  }
   
   // Detect bad address patterns:
   // 1. Address equals the venue name (OSM import artifact)
@@ -49,6 +66,9 @@ export function formatVenueAddress(venue: any): string {
  */
 export function extractNeighborhood(address: string): string | undefined {
   if (!address) return undefined;
+
+  // A coordinate placeholder has no meaningful neighborhood.
+  if (isCoordinateString(address)) return undefined;
   
   const parts = address.split(',').map(part => part.trim());
   
@@ -59,7 +79,7 @@ export function extractNeighborhood(address: string): string | undefined {
     const potentialNeighborhood = parts[1];
     
     // Skip if it looks like a postal code or country
-    if (/^\d+$/.test(potentialNeighborhood) || potentialNeighborhood.length < 3) {
+    if (/^[\d.]+$/.test(potentialNeighborhood) || potentialNeighborhood.length < 3) {
       return parts[2] || undefined;
     }
     
@@ -108,8 +128,8 @@ export function validateVenueAddress(venue: any): boolean {
  * Gets a fallback address based on coordinates
  */
 export function getCoordinateFallback(latitude?: number, longitude?: number): string {
-  if (latitude && longitude) {
-    return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-  }
-  return 'Location not available';
+  // We intentionally do NOT return raw coordinates here — showing lat/lon to a
+  // user is confusing. Return an empty string so the caller can fall back to a
+  // friendlier label (neighborhood or distance).
+  return '';
 }
