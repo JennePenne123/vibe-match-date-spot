@@ -3,6 +3,7 @@ import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { OfflineGuardButton } from '@/components/OfflineGuardButton';
 import { Clock, MapPin, Check, X, DollarSign, Calendar, Info, MessageCircle, XCircle, Navigation, PartyPopper, Timer } from 'lucide-react';
 import ShareDateButton from '@/components/ShareDateButton';
 import { DateRatingPrompt } from '@/components/DateRatingPrompt';
@@ -205,21 +206,21 @@ const DateInviteCardDetails = ({
         {/* Pending Actions */}
         {direction === 'received' && status === 'pending' && onAccept && onDecline && (
           <div className="flex gap-2 mt-4">
-            <Button 
+            <OfflineGuardButton 
               onClick={onAccept} 
               className="flex-1 h-12 rounded-xl [background:var(--gradient-success)] hover:[background:var(--gradient-success-hover)] text-white border-0 text-base font-semibold"
             >
               <Check className="w-5 h-5 mr-2" />
               Annehmen
-            </Button>
-            <Button 
+            </OfflineGuardButton>
+            <OfflineGuardButton 
               onClick={onDecline} 
               variant="outline" 
               className="flex-1 h-12 rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5 text-base font-semibold"
             >
               <X className="w-5 h-5 mr-2" />
               Ablehnen
-            </Button>
+            </OfflineGuardButton>
           </div>
         )}
         
@@ -316,14 +317,14 @@ const DateInviteCardDetails = ({
             )}
             
             {hasCancel && (
-              <Button 
+              <OfflineGuardButton 
                 onClick={onOpenCancelDialog}
                 variant="ghost" 
                 className="w-full text-destructive/70 hover:text-destructive hover:bg-destructive/5 text-sm"
               >
                 <XCircle className="w-4 h-4 mr-2" />
                 Date absagen
-              </Button>
+              </OfflineGuardButton>
             )}
           </div>
         )}
