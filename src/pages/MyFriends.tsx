@@ -177,7 +177,14 @@ const MyFriends = () => {
 
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-foreground">{t('myFriends.yourFriends')}</h2>
-            {filteredFriends.length === 0 ? (
+            {!isOnline && friends.length === 0 ? (
+              <Card className="bg-destructive/10 border-destructive/30">
+                <CardContent className="py-6 text-center">
+                  <WifiOff className="w-7 h-7 text-destructive mx-auto mb-2" />
+                  <p className="text-sm font-medium text-foreground">{t('offlineBanner.friendsUnavailable')}</p>
+                </CardContent>
+              </Card>
+            ) : filteredFriends.length === 0 ? (
               <Card className="bg-card/50 border-dashed border-2 border-border">
                 <CardContent className="py-8 text-center">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-3">
