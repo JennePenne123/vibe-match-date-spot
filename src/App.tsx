@@ -22,6 +22,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationSystem from "./components/NotificationSystem";
 import PushNotificationPrompt from "./components/PushNotificationPrompt";
 import OfflineBanner from "./components/OfflineBanner";
+import { OnlineStatusProvider } from "./contexts/OnlineStatusContext";
 import GeoPrivacyBanner from "./components/GeoPrivacyBanner";
 import PendingReferralHandler from "./components/PendingReferralHandler";
 import AppLayout from "./components/AppLayout";
