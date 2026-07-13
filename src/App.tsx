@@ -256,6 +256,7 @@ const App = () => (
                   </Routes>
                 </ErrorBoundary>
               </NotificationSystem>
+              </OnlineStatusProvider>
             </AppProvider>
           </AuthProvider>
         </BrowserRouter>
