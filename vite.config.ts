@@ -41,8 +41,8 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
         // Navigation + offline fallback are handled in sw-push.js (imported
         // above) so we can serve /offline.html as a last resort. Disable
-        // Workbox's own navigate route to avoid a double-respondWith conflict.
-        navigateFallback: null,
+        // Workbox's own navigate route to avoid a double-respondWith conflict
+        // (no `navigateFallback` = no Workbox NavigationRoute).
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
