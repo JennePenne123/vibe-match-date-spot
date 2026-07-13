@@ -72,6 +72,26 @@ const SupportTicketDialog: React.FC<SupportTicketDialogProps> = ({ trigger }) =>
       return;
     }
 
+    // Fire-and-forget: notify the support inbox about the new ticket.
+    // Never block the user flow or surface errors — the ticket is already saved.
+    supabase.functions
+      .invoke('send-transactional-email', {
+        body: {
+          templateName: 'support-ticket-notification',
+          templateData: {
+            category,
+            subject: trimmedSubject.slice(0, 200),
+            message: trimmedMessage.slice(0, 4000),
+            contactEmail: user.email ?? null,
+            createdAt: new Date().toLocaleString('de-DE', {
+              day: '2-digit', month: '2-digit', year: 'numeric',
+              hour: '2-digit', minute: '2-digit',
+            }),
+          },
+        },
+      })
+      .catch((err) => console.error('Support notification email failed:', err));
+
     toast({
       title: t('support.ticket.successTitle', 'Ticket gesendet'),
       description: t('support.ticket.successDesc', 'Wir melden uns so schnell wie möglich bei dir.'),
