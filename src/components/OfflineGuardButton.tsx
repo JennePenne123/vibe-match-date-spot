@@ -9,18 +9,20 @@ import { cn } from '@/lib/utils';
  * itself while offline and shows a small offline indicator icon.
  */
 export const OfflineGuardButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, disabled, onClick, className, ...props }, ref) => {
+  ({ children, disabled, onClick, className, size, ...props }, ref) => {
     const { isOffline } = useOfflineGuard();
+    const showIcon = isOffline && size !== 'icon';
 
     return (
       <Button
         ref={ref}
         onClick={onClick}
         disabled={disabled || isOffline}
+        size={size}
         className={cn(className)}
         {...props}
       >
-        {isOffline && <WifiOff className="w-4 h-4 mr-2 shrink-0" aria-hidden />}
+        {showIcon && <WifiOff className="w-4 h-4 mr-2 shrink-0" aria-hidden />}
         {children}
       </Button>
     );
