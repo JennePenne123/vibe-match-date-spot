@@ -651,9 +651,9 @@ const Preferences = () => {
                 {t('home.wizardNext')} <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             ) : (
-              <Button onClick={handleSave} disabled={isSaving} className="flex-1 h-10 font-semibold text-sm">
+              <OfflineGuardButton onClick={handleSave} disabled={isSaving} className="flex-1 h-10 font-semibold text-sm">
                 {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('preferences.saving')}</> : <><Save className="w-4 h-4 mr-2" />{t('preferences.findDates') || 'Speichern & weiter'}</>}
-              </Button>
+              </OfflineGuardButton>
             )}
           </div>
         </div>
