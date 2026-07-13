@@ -1691,5 +1691,32 @@
     "actionDisabledTitle": "No connection",
     "actionDisabled": "This action requires an internet connection.",
     "friendsUnavailable": "Your friends list can't load while offline. Please reconnect to the internet."
+  },
+  "support": {
+    "ticket": {
+      "title": "Support Ticket",
+      "desc": "Describe your issue – we'll take care of it.",
+      "openButton": "Create ticket",
+      "categoryLabel": "Category",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Short summary",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Describe your issue in as much detail as possible …",
+      "submit": "Send ticket",
+      "validationTitle": "Please fill in all fields",
+      "validationDesc": "Subject and message cannot be empty.",
+      "errorTitle": "Ticket could not be sent",
+      "successTitle": "Ticket sent",
+      "successDesc": "We'll get back to you as soon as possible.",
+      "categories": {
+        "general": "General",
+        "bug": "Bug / Error",
+        "account": "Account",
+        "payment": "Payment",
+        "partner": "Partner",
+        "feature": "Feature request",
+        "other": "Other"
+      }
+    }
   }
 }
