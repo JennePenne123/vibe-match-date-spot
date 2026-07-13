@@ -49,8 +49,13 @@ async function logError(payload: ErrorLogPayload): Promise<void> {
 
     const { data: { user } } = await supabase.auth.getUser();
 
+    // Anonymous users have no privileges on error_logs (RLS is restricted to
+    // authenticated). Skip the DB insert for logged-out users — Sentry above
+    // still captures the error — to avoid noisy 401 responses.
+    if (!user) return;
+
     const { error: dbError } = await supabase.from('error_logs' as any).insert({
-      user_id: user?.id || null,
+      user_id: user.id,
       error_type: payload.error_type,
       error_message: payload.error_message.slice(0, 2000),
       error_stack: payload.error_stack?.slice(0, 5000) || null,
