@@ -19,7 +19,7 @@ export default function Impressum() {
           name: COMPANY.legalName,
           url: 'https://hioutz.app',
           email: COMPANY.contactEmail,
-          telephone: COMPANY.phone,
+          ...(COMPANY.phone ? { telephone: COMPANY.phone } : {}),
           address: {
             '@type': 'PostalAddress',
             streetAddress: COMPANY.street,
@@ -56,7 +56,12 @@ export default function Impressum() {
 
           <h3>Kontakt</h3>
           <p className="text-muted-foreground">
-            Telefon: {COMPANY.phone}<br />
+            {COMPANY.phone && (
+              <>
+                Telefon: {COMPANY.phone}
+                <br />
+              </>
+            )}
             E-Mail: {COMPANY.contactEmail}
           </p>
 

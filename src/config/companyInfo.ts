@@ -2,7 +2,8 @@
  * Zentrale Firmendaten für alle Rechtstexte (Impressum, AGB, Datenschutz, Widerrufsformular).
  *
  * ℹ️ Einzelunternehmen: Handelsregisterangaben entfallen.
- * Telefonnummer und USt-IdNr. werden nach Unternehmensgründung ergänzt.
+ * USt-IdNr. wird nach Unternehmensgründung ergänzt.
+ * Telefonische Erreichbarkeit ist vorerst nicht vorgesehen; Kontakt ausschließlich per E-Mail.
  */
 export const COMPANY = {
   legalName: 'H!Outz (Einzelunternehmen)',
@@ -13,7 +14,7 @@ export const COMPANY = {
   ceo: 'Lennart Mützelburg',
   contentResponsibleName: 'Lennart Mützelburg', // § 18 Abs. 2 MStV
   contentResponsibleAddress: 'Hellbrookkamp 16, 22177 Hamburg',
-  phone: 'wird nach Unternehmensgründung ergänzt',
+  phone: '',
   contactEmail: 'kontakt@hioutz.app',
   supportEmail: 'support@hioutz.app',
   privacyEmail: 'datenschutz@hioutz.app',
