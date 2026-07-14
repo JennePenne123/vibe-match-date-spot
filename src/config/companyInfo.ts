@@ -15,7 +15,7 @@ export const COMPANY = {
   contentResponsibleName: 'Lennart Mützelburg', // § 18 Abs. 2 MStV
   contentResponsibleAddress: 'Hellbrookkamp 16, 22177 Hamburg',
   phone: '',
-  contactEmail: 'kontakt@hioutz.app',
+  contactEmail: 'support@hioutz.app',
   supportEmail: 'support@hioutz.app',
   privacyEmail: 'datenschutz@hioutz.app',
   registerCourt: 'nicht zutreffend für Einzelunternehmen',

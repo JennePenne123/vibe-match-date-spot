@@ -116,11 +116,6 @@ export default function Impressum() {
             bzw. Erstellers.
           </p>
 
-          <div className="mt-8 p-4 rounded-lg bg-muted/30 border border-border/50">
-            <p className="text-xs text-muted-foreground italic">
-              ⚠️ Platzhalter in eckigen Klammern müssen durch die tatsächlichen Unternehmensdaten ersetzt werden.
-            </p>
-          </div>
         </div>
       </div>
     </div>
