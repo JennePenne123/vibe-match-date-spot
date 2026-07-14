@@ -64,6 +64,7 @@ const Impressum = lazy(() => import("./pages/Impressum"));
 const Datenschutz = lazy(() => import("./pages/Datenschutz"));
 const AGB = lazy(() => import("./pages/AGB"));
 const Widerrufsformular = lazy(() => import("./pages/Widerrufsformular"));
+const Kontakt = lazy(() => import("./pages/Kontakt"));
 
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
@@ -203,6 +204,7 @@ const App = () => (
                     <Route path="/agb" element={<LazyPageNoLayout><AGB /></LazyPageNoLayout>} />
                     <Route path="/widerrufsformular" element={<LazyPageNoLayout><Widerrufsformular /></LazyPageNoLayout>} />
                     <Route path="/unsubscribe" element={<LazyPageNoLayout><Unsubscribe /></LazyPageNoLayout>} />
+                    <Route path="/kontakt" element={<LazyPageNoLayout><Kontakt /></LazyPageNoLayout>} />
                     
                     {/* Debug route */}
                     <Route path="/debug" element={<LazyPage><Debug /></LazyPage>} />

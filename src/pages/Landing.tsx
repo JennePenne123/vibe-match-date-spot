@@ -289,6 +289,7 @@ export default function LandingDemo() {
               <Link to="/impressum" className="hover:text-foreground transition-colors">{t('landing.footerLinks.imprint')}</Link>
               <Link to="/datenschutz" className="hover:text-foreground transition-colors">{t('landing.footerLinks.privacy')}</Link>
               <Link to="/agb" className="hover:text-foreground transition-colors">{t('landing.footerLinks.terms')}</Link>
+              <Link to="/kontakt" className="hover:text-foreground transition-colors">{t('landing.footerLinks.contact')}</Link>
             </div>
             <p className="text-sm text-muted-foreground">{t('landing.footer')}</p>
           </div>
