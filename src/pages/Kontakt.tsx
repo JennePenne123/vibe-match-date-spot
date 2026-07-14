@@ -72,7 +72,10 @@ export default function Kontakt() {
               {t('contact.addressHeading', 'Postanschrift')}
             </h2>
             <p className="text-muted-foreground whitespace-pre-line">
-              {COMPANY.legalName}\n{COMPANY.street}\n{COMPANY.zip} {COMPANY.city}\n{COMPANY.country}
+              {COMPANY.legalName}{"\n"}
+              {COMPANY.street}{"\n"}
+              {COMPANY.zip} {COMPANY.city}{"\n"}
+              {COMPANY.country}
             </p>
           </div>
 
