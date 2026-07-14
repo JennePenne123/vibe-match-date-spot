@@ -193,7 +193,8 @@
     "footerLinks": {
       "imprint": "Impressum",
       "privacy": "Datenschutz",
-      "terms": "AGB"
+      "terms": "AGB",
+      "contact": "Kontakt"
     }
   },
   "onboarding": {
@@ -693,7 +694,8 @@
     "trackingActivated": "Tracking aktiviert",
     "trackingActivatedDesc": "Empfehlungen werden jetzt stärker personalisiert.",
     "trackingDeactivated": "Tracking deaktiviert",
-    "trackingDeactivatedDesc": "Wir nutzen ab sofort weniger Signale für die Personalisierung."
+    "trackingDeactivatedDesc": "Wir nutzen ab sofort weniger Signale für die Personalisierung.",
+    "contact": "Kontakt"
   },
   "partner": {
     "dashboard": "Partner-Dashboard",
@@ -1730,5 +1732,15 @@
         "other": "Sonstiges"
       }
     }
+  },
+  "contact": {
+    "metaTitle": "Kontakt – H!Outz",
+    "metaDescription": "Kontaktiere H!Outz per E-Mail. Wir helfen dir bei Fragen, Feedback oder Support-Anliegen.",
+    "title": "Kontakt",
+    "intro": "Hast du Fragen, Feedback oder ein Anliegen? Schreib uns – wir melden uns so schnell wie möglich zurück.",
+    "emailHeading": "E-Mail",
+    "emailDescription": "Unsere allgemeine Kontakt- und Support-Adresse:",
+    "addressHeading": "Postanschrift",
+    "responseHint": "Antwortzeiten: In der Regel innerhalb von 48 Stunden."
   }
 }
