@@ -432,8 +432,7 @@ export default function Datenschutz() {
             <p className="text-xs text-muted-foreground italic">
               ⚠️ Hinweis: Diese Datenschutzerklärung wurde mit größter Sorgfalt erstellt, ersetzt aber keine
               individuelle Rechtsberatung. Bitte lasse sie vor Veröffentlichung von einem spezialisierten
-              Datenschutz-Anwalt prüfen. Platzhalter in eckigen Klammern müssen durch die tatsächlichen
-              Unternehmensdaten ersetzt werden.
+              Datenschutz-Anwalt prüfen.
             </p>
           </div>
         </div>
