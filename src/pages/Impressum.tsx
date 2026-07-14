@@ -56,7 +56,12 @@ export default function Impressum() {
 
           <h3>Kontakt</h3>
           <p className="text-muted-foreground">
-            Telefon: {COMPANY.phone}<br />
+            {COMPANY.phone && (
+              <>
+                Telefon: {COMPANY.phone}
+                <br />
+              </>
+            )}
             E-Mail: {COMPANY.contactEmail}
           </p>
 
