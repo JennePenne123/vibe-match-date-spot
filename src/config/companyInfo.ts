@@ -1,8 +1,8 @@
 /**
  * Zentrale Firmendaten für alle Rechtstexte (Impressum, AGB, Datenschutz, Widerrufsformular).
  *
- * ⚠️ VOR GO-LIVE: Platzhalter mit „wird nach Unternehmensgründung ergänzt“
- * sowie Telefonnummer/USt-IdNr. durch echte Daten ersetzen.
+ * ℹ️ Einzelunternehmen: Handelsregisterangaben entfallen.
+ * Telefonnummer und USt-IdNr. werden nach Unternehmensgründung ergänzt.
  */
 export const COMPANY = {
   legalName: 'H!Outz (Einzelunternehmen)',
@@ -13,13 +13,13 @@ export const COMPANY = {
   ceo: 'Lennart Mützelburg',
   contentResponsibleName: 'Lennart Mützelburg', // § 18 Abs. 2 MStV
   contentResponsibleAddress: 'Hellbrookkamp 16, 22177 Hamburg',
-  phone: '[wird nach Unternehmensgründung ergänzt]',
+  phone: 'wird nach Unternehmensgründung ergänzt',
   contactEmail: 'kontakt@hioutz.app',
   supportEmail: 'support@hioutz.app',
   privacyEmail: 'datenschutz@hioutz.app',
-  registerCourt: '[nicht zutreffend für Einzelunternehmen]',
-  registerNumber: '[nicht zutreffend für Einzelunternehmen]',
-  vatId: '[wird nach Unternehmensgründung ergänzt]',
+  registerCourt: 'nicht zutreffend für Einzelunternehmen',
+  registerNumber: 'nicht zutreffend für Einzelunternehmen',
+  vatId: 'wird nach Unternehmensgründung ergänzt',
 } as const;
 
 /** Einzeilige Adresse für Inline-Verwendung in Fließtexten (AGB, Widerrufsbelehrung). */
