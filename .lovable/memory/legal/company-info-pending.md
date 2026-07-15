@@ -9,7 +9,7 @@ type: reference
 - Rechtsform: Einzelunternehmen
 - Inhaber: Lennart Mützelburg
 - Adresse: Hellbrookkamp 16, 22177 Hamburg
-- E-Mail: kontakt@hioutz.app
+- E-Mail: support@hioutz.app (allgemeine Kontakt- und Support-Adresse)
 
 ## Platzhalter-Status
 
