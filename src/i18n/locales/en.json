@@ -1526,6 +1526,11 @@
     "required": "Required",
     "openInSettings": "Cookie settings",
     "openInSettingsDesc": "Manage categories for cookies and tracking",
+    "resetConsent": "Reset cookie consent",
+    "resetConsentDesc": "Deletes all locally stored consent. The banner will appear again.",
+    "resetConsentConfirmTitle": "Reset your consent?",
+    "resetConsentConfirmDesc": "Your current selection will be deleted. The cookie banner will appear again so you can decide anew.",
+    "resetConsentToast": "Consent reset",
     "categories": {
       "necessary": {
         "title": "Necessary",

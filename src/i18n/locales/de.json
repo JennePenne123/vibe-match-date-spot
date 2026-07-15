@@ -1526,6 +1526,11 @@
     "required": "Erforderlich",
     "openInSettings": "Cookie-Einstellungen",
     "openInSettingsDesc": "Kategorien für Cookies und Tracking verwalten",
+    "resetConsent": "Cookie-Einwilligung zurücksetzen",
+    "resetConsentDesc": "Löscht alle lokal gespeicherten Einwilligungen. Der Banner erscheint erneut.",
+    "resetConsentConfirmTitle": "Einwilligung wirklich zurücksetzen?",
+    "resetConsentConfirmDesc": "Deine aktuelle Auswahl wird gelöscht. Beim nächsten Aufruf erscheint der Cookie-Banner erneut, damit du neu entscheiden kannst.",
+    "resetConsentToast": "Einwilligung zurückgesetzt",
     "categories": {
       "necessary": {
         "title": "Notwendig",
