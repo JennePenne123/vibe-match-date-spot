@@ -21,12 +21,13 @@ import {
 } from '@/components/ui/accordion';
 import { 
   ArrowLeft, Lock, Trash2, Shield, Loader2, Check, PauseCircle, 
-  Bell, Mail, Download, ExternalLink, FileText, Scale, HelpCircle, MessageCircle, Brain
+  Bell, Mail, Download, ExternalLink, FileText, Scale, HelpCircle, MessageCircle, Brain, Cookie
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import LanguageSelector from '@/components/LanguageSelector';
 import SupportTicketDialog from '@/components/support/SupportTicketDialog';
+import { openCookieSettings } from '@/lib/cookieConsent';
 
 const TRACKING_OPT_OUT_KEY = 'hioutz_tracking_opt_out';
 
@@ -380,6 +381,25 @@ const Settings = () => {
                   {t('settings.privacyPolicy', 'Datenschutzerklärung')}
                 </button>
               </p>
+              <Separator />
+              <button
+                type="button"
+                onClick={openCookieSettings}
+                className="flex items-center justify-between w-full text-left group"
+              >
+                <div className="flex items-center gap-3">
+                  <Cookie className="w-4 h-4 text-primary shrink-0" />
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-medium text-foreground">
+                      {t('privacyBanner.openInSettings', 'Cookie-Einstellungen')}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('privacyBanner.openInSettingsDesc', 'Kategorien für Cookies und Tracking verwalten')}
+                    </p>
+                  </div>
+                </div>
+                <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+              </button>
             </CardContent>
           </Card>
 

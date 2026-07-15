@@ -1516,7 +1516,34 @@
     "textOther": "We respect your privacy. No tracking cookies are used. Our AI recommendations are based on your preferences – you can adjust this anytime in your settings. <link>Privacy Policy</link>",
     "accept": "Got it",
     "doNotSell": "Do Not Sell My Data",
-    "learnMore": "Learn more"
+    "learnMore": "Learn more",
+    "acceptAll": "Accept all",
+    "rejectAll": "Only necessary",
+    "settings": "Settings",
+    "settingsTitle": "Cookie settings",
+    "settingsDesc": "Choose which categories you allow. You can change your selection anytime under Settings → Privacy.",
+    "saveSelection": "Save selection",
+    "required": "Required",
+    "openInSettings": "Cookie settings",
+    "openInSettingsDesc": "Manage categories for cookies and tracking",
+    "categories": {
+      "necessary": {
+        "title": "Necessary",
+        "desc": "Required to run the app: login session, security, language, consent storage."
+      },
+      "preferences": {
+        "title": "Preferences",
+        "desc": "Stores your in-app settings like location, filters and onboarding progress for a better experience."
+      },
+      "analytics": {
+        "title": "Analytics",
+        "desc": "Anonymous usage statistics (e.g. Sentry performance) so we can find bugs and improve the app."
+      },
+      "marketing": {
+        "title": "Marketing",
+        "desc": "Personalized recommendations, referral tracking and campaign measurement."
+      }
+    }
   },
   "aiLearning": {
     "title": "AI Learning",
