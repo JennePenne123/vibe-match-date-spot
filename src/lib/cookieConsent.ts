@@ -50,6 +50,13 @@ export function saveConsent(
 
 export function clearConsent() {
   localStorage.removeItem(CONSENT_STORAGE_KEY);
+  // Legacy keys from earlier consent versions
+  try {
+    localStorage.removeItem('hioutz-privacy-consent-v1');
+    localStorage.removeItem('hioutz_tracking_opt_out');
+  } catch {
+    // ignore
+  }
   window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: null }));
 }
 
