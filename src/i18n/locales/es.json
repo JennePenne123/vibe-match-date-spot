@@ -1336,7 +1336,34 @@
     "textOther": "Respetamos tu privacidad. No se usan cookies de seguimiento. Nuestras recomendaciones de IA se basan en tus preferencias – puedes ajustarlas en cualquier momento. <link>Política de Privacidad</link>",
     "accept": "Entendido",
     "doNotSell": "No vender mis datos",
-    "learnMore": "Más información"
+    "learnMore": "Más información",
+    "acceptAll": "Aceptar todo",
+    "rejectAll": "Solo necesarias",
+    "settings": "Configuración",
+    "settingsTitle": "Configuración de cookies",
+    "settingsDesc": "Elige qué categorías permites. Puedes cambiar tu selección en cualquier momento en Ajustes → Privacidad.",
+    "saveSelection": "Guardar selección",
+    "required": "Obligatorio",
+    "openInSettings": "Configuración de cookies",
+    "openInSettingsDesc": "Gestiona las categorías de cookies y seguimiento",
+    "categories": {
+      "necessary": {
+        "title": "Necesarias",
+        "desc": "Requeridas para el funcionamiento: sesión, seguridad, idioma y almacenamiento del consentimiento."
+      },
+      "preferences": {
+        "title": "Preferencias",
+        "desc": "Guarda tus ajustes como ubicación, filtros y progreso de onboarding para una mejor experiencia."
+      },
+      "analytics": {
+        "title": "Analítica",
+        "desc": "Estadísticas anónimas (p. ej. Sentry) para detectar errores y mejorar la app."
+      },
+      "marketing": {
+        "title": "Marketing",
+        "desc": "Recomendaciones personalizadas, seguimiento de referidos y medición de campañas."
+      }
+    }
   },
   "tutorial": {
     "skip": "Omitir",
