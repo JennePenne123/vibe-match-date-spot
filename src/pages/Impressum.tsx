@@ -51,7 +51,7 @@ export default function Impressum() {
             {COMPANY.country}
           </p>
 
-          <h3>Vertreten durch</h3>
+          <h3>Inhaber</h3>
           <p className="text-muted-foreground">{COMPANY.ceo}</p>
 
           <h3>Kontakt</h3>
@@ -62,7 +62,10 @@ export default function Impressum() {
                 <br />
               </>
             )}
-            E-Mail: {COMPANY.contactEmail}
+            E-Mail:{' '}
+            <a href={`mailto:${COMPANY.contactEmail}`} className="text-primary hover:underline underline-offset-4">
+              {COMPANY.contactEmail}
+            </a>
           </p>
 
           <h3>Handelsregister</h3>
