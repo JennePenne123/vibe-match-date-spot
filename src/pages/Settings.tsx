@@ -27,7 +27,7 @@ import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import LanguageSelector from '@/components/LanguageSelector';
 import SupportTicketDialog from '@/components/support/SupportTicketDialog';
-import { openCookieSettings } from '@/lib/cookieConsent';
+import { openCookieSettings, clearConsent } from '@/lib/cookieConsent';
 
 const TRACKING_OPT_OUT_KEY = 'hioutz_tracking_opt_out';
 
@@ -400,6 +400,50 @@ const Settings = () => {
                 </div>
                 <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
               </button>
+              <Separator />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center justify-between w-full text-left group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Trash2 className="w-4 h-4 text-destructive shrink-0" />
+                      <div className="space-y-0.5">
+                        <p className="text-sm font-medium text-foreground">
+                          {t('privacyBanner.resetConsent', 'Cookie-Einwilligung zurücksetzen')}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {t('privacyBanner.resetConsentDesc', 'Löscht alle lokal gespeicherten Einwilligungen. Der Banner erscheint erneut.')}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {t('privacyBanner.resetConsentConfirmTitle', 'Einwilligung wirklich zurücksetzen?')}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t('privacyBanner.resetConsentConfirmDesc', 'Deine aktuelle Auswahl wird gelöscht. Beim nächsten Aufruf erscheint der Cookie-Banner erneut, damit du neu entscheiden kannst.')}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t('common.cancel', 'Abbrechen')}</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        clearConsent();
+                        toast({
+                          title: t('privacyBanner.resetConsentToast', 'Einwilligung zurückgesetzt'),
+                        });
+                      }}
+                    >
+                      {t('privacyBanner.resetConsent', 'Zurücksetzen')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardContent>
           </Card>
 
