@@ -1346,6 +1346,11 @@
     "required": "Obligatorio",
     "openInSettings": "Configuración de cookies",
     "openInSettingsDesc": "Gestiona las categorías de cookies y seguimiento",
+    "resetConsent": "Restablecer consentimiento de cookies",
+    "resetConsentDesc": "Elimina todos los consentimientos guardados localmente. El banner volverá a aparecer.",
+    "resetConsentConfirmTitle": "¿Restablecer tu consentimiento?",
+    "resetConsentConfirmDesc": "Tu selección actual se eliminará. El banner de cookies aparecerá de nuevo para que puedas decidir otra vez.",
+    "resetConsentToast": "Consentimiento restablecido",
     "categories": {
       "necessary": {
         "title": "Necesarias",
