@@ -21,12 +21,13 @@ import {
 } from '@/components/ui/accordion';
 import { 
   ArrowLeft, Lock, Trash2, Shield, Loader2, Check, PauseCircle, 
-  Bell, Mail, Download, ExternalLink, FileText, Scale, HelpCircle, MessageCircle, Brain
+  Bell, Mail, Download, ExternalLink, FileText, Scale, HelpCircle, MessageCircle, Brain, Cookie
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import LanguageSelector from '@/components/LanguageSelector';
 import SupportTicketDialog from '@/components/support/SupportTicketDialog';
+import { openCookieSettings } from '@/lib/cookieConsent';
 
 const TRACKING_OPT_OUT_KEY = 'hioutz_tracking_opt_out';
 
