@@ -249,7 +249,7 @@ export default function Datenschutz() {
             <li><strong>Transparenz:</strong> Sie können Ihre aktuellen KI-Gewichtungen und die Lernhistorie jederzeit in Ihrem Profil einsehen</li>
             <li><strong>Zurücksetzen:</strong> Sie können die gesamte KI-Lernhistorie in den Einstellungen zurücksetzen – die KI beginnt dann wieder „bei null"</li>
             <li><strong>Implizite Signale deaktivieren:</strong> In den Einstellungen können Sie die Erfassung impliziter Nutzungssignale jederzeit deaktivieren (Opt-out)</li>
-            <li><strong>Widerspruchsrecht:</strong> Sie können der KI-gestützten Verarbeitung jederzeit widersprechen unter datenschutz@hioutz.app</li>
+            <li><strong>Widerspruchsrecht:</strong> Sie können der KI-gestützten Verarbeitung jederzeit widersprechen unter {COMPANY.contactEmail}</li>
             <li><strong>Datenauskunft:</strong> Sie können eine vollständige Auskunft über Ihre gespeicherten Präferenz-Vektoren und Lernhistorie anfordern</li>
           </ul>
 
@@ -392,7 +392,7 @@ export default function Datenschutz() {
           <p className="text-muted-foreground">
             Die zuständige Aufsichtsbehörde ist der Landesbeauftragte für Datenschutz und Informationsfreiheit
             des jeweiligen Bundeslandes. Sie erreichen uns unter:{' '}
-            <a href="mailto:datenschutz@hioutz.app" className="text-primary">datenschutz@hioutz.app</a>.
+            <a href={`mailto:${COMPANY.contactEmail}`} className="text-primary">{COMPANY.contactEmail}</a>.
           </p>
 
           <h2>12. Datenlöschung und Datenexport</h2>

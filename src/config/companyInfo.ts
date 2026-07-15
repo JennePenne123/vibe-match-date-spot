@@ -17,7 +17,7 @@ export const COMPANY = {
   phone: '',
   contactEmail: 'support@hioutz.app',
   supportEmail: 'support@hioutz.app',
-  privacyEmail: 'datenschutz@hioutz.app',
+  privacyEmail: 'support@hioutz.app',
   registerCourt: 'nicht zutreffend für Einzelunternehmen',
   registerNumber: 'nicht zutreffend für Einzelunternehmen',
   vatId: 'wird nach Unternehmensgründung ergänzt',

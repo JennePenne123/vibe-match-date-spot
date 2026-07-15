@@ -230,7 +230,7 @@ export default function PartnerPrivacy() {
           <p className="text-muted-foreground">
             Zuständige Aufsichtsbehörde ist der Landesbeauftragte für Datenschutz und Informationsfreiheit
             des jeweiligen Bundeslandes. Anfragen richten Sie bitte an:{' '}
-            <a href="mailto:datenschutz@hioutz.app" className="text-primary">datenschutz@hioutz.app</a>.
+            <a href={`mailto:${COMPANY.contactEmail}`} className="text-primary">{COMPANY.contactEmail}</a>.
           </p>
 
           <h2>10. Cookies und lokale Speicherung</h2>
@@ -273,7 +273,7 @@ export default function PartnerPrivacy() {
           </ul>
           <p className="text-muted-foreground">
             Der AVV ist auf Anfrage unter{' '}
-            <a href="mailto:datenschutz@hioutz.app" className="text-primary">datenschutz@hioutz.app</a>{' '}
+            <a href={`mailto:${COMPANY.contactEmail}`} className="text-primary">{COMPANY.contactEmail}</a>{' '}
             erhältlich.
           </p>
 
@@ -291,8 +291,7 @@ export default function PartnerPrivacy() {
           <div className="mt-8 p-4 rounded-lg bg-muted/30 border border-border/50">
             <p className="text-xs text-muted-foreground italic">
               ⚠️ Hinweis: Diese Datenschutzerklärung wurde mit größter Sorgfalt erstellt, ersetzt aber keine
-              individuelle Rechtsberatung. Platzhalter in eckigen Klammern müssen durch die tatsächlichen
-              Unternehmensdaten ersetzt werden. Bitte vor Veröffentlichung von einem Datenschutzbeauftragten
+              individuelle Rechtsberatung. Bitte vor Veröffentlichung von einem Datenschutzbeauftragten
               oder Rechtsanwalt prüfen lassen.
             </p>
           </div>
