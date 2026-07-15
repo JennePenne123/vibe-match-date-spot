@@ -1516,7 +1516,34 @@
     "textOther": "Wir respektieren deine Privatsphäre. Es werden keine Tracking-Cookies verwendet. Unsere KI-Empfehlungen basieren auf deinen Präferenzen – du kannst dies jederzeit in den Einstellungen anpassen. <link>Datenschutzerklärung</link>",
     "accept": "Verstanden",
     "doNotSell": "Meine Daten nicht verkaufen",
-    "learnMore": "Mehr erfahren"
+    "learnMore": "Mehr erfahren",
+    "acceptAll": "Alle akzeptieren",
+    "rejectAll": "Nur notwendige",
+    "settings": "Einstellungen",
+    "settingsTitle": "Cookie-Einstellungen",
+    "settingsDesc": "Wähle, welche Kategorien du zulässt. Deine Auswahl kannst du jederzeit unter Einstellungen → Datenschutz ändern.",
+    "saveSelection": "Auswahl speichern",
+    "required": "Erforderlich",
+    "openInSettings": "Cookie-Einstellungen",
+    "openInSettingsDesc": "Kategorien für Cookies und Tracking verwalten",
+    "categories": {
+      "necessary": {
+        "title": "Notwendig",
+        "desc": "Für den Betrieb der App erforderlich: Login-Sitzung, Sicherheit, Sprachwahl, Consent-Speicherung."
+      },
+      "preferences": {
+        "title": "Präferenzen",
+        "desc": "Speichern deiner App-Einstellungen wie Standort, Filter und Onboarding-Fortschritt für ein besseres Erlebnis."
+      },
+      "analytics": {
+        "title": "Analyse",
+        "desc": "Anonyme Nutzungsstatistiken (z. B. Sentry Performance), damit wir Fehler finden und die App verbessern können."
+      },
+      "marketing": {
+        "title": "Marketing",
+        "desc": "Personalisierte Empfehlungen, Referral-Tracking und Kampagnen-Messung."
+      }
+    }
   },
   "aiLearning": {
     "title": "KI-Lernfortschritt",
