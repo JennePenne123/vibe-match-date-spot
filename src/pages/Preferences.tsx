@@ -668,10 +668,6 @@ const Preferences = () => {
                 <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
               </AccordionSection>
 
-              <AccordionSection title="Stimmung" icon={<SmilePlus className="w-5 h-5 text-primary" />} selectedCount={selectedMood ? 1 : 0} defaultOpen>
-                <MoodPicker selectedMood={selectedMood} onSelectMood={setSelectedMood} />
-              </AccordionSection>
-
               <AccordionSection title="Prioritäten" icon={<SlidersHorizontal className="w-5 h-5 text-primary" />} selectedCount={Object.values(priorityWeights).filter(v => v !== 1.0).length}>
                 <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
               </AccordionSection>
