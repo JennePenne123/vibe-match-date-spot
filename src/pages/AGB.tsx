@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Scale } from 'lucide-react';
 import { COMPANY, COMPANY_ADDRESS_INLINE } from '@/config/companyInfo';
+import { LEGAL_VERSIONS, formatLegalDate } from '@/config/legalVersions';
 
 export default function AGB() {
   const navigate = useNavigate();
@@ -22,7 +23,9 @@ export default function AGB() {
         </div>
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
-          <p className="text-muted-foreground text-xs">Stand: Juli 2026 · {COMPANY.legalName}</p>
+          <p className="text-muted-foreground text-xs">
+            Version {LEGAL_VERSIONS.agb.version} · Stand: {formatLegalDate(LEGAL_VERSIONS.agb.date)} · {COMPANY.legalName}
+          </p>
 
           <h2>§ 1 Geltungsbereich</h2>
           <p className="text-muted-foreground">
