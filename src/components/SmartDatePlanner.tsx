@@ -51,6 +51,31 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     triggerAIAnalysisManually,
   } = state;
 
+  // Derive invitation statuses for the friend selection view
+  const invitedFriendIds = useMemo(() => {
+    const ids: string[] = [];
+    if (groupPlanning.groupMembers?.length) {
+      groupPlanning.groupMembers
+        .filter((m: any) => m.role !== 'creator' && m.invitation_status === 'pending')
+        .forEach((m: any) => ids.push(m.user_id));
+    }
+    if (collaborativeSession && !collaborativeSession.both_preferences_complete) {
+      const partnerId = isUserInitiator ? collaborativeSession.partner_id : collaborativeSession.initiator_id;
+      if (partnerId && !ids.includes(partnerId)) ids.push(partnerId);
+    }
+    return ids;
+  }, [groupPlanning.groupMembers, collaborativeSession, isUserInitiator]);
+
+  const acceptedFriendIds = useMemo(() => {
+    const ids: string[] = [];
+    if (groupPlanning.groupMembers?.length) {
+      groupPlanning.groupMembers
+        .filter((m: any) => m.role !== 'creator' && m.invitation_status === 'accepted')
+        .forEach((m: any) => ids.push(m.user_id));
+    }
+    return ids;
+  }, [groupPlanning.groupMembers]);
+
   const sessionPartner = useMemo(() => {
     if (!collaborativeSession || !allFriends.length) return null;
     const partnerId = isUserInitiator ? collaborativeSession.partner_id : collaborativeSession.initiator_id;
@@ -240,6 +265,8 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                       selectedPartnerIds={selectedPartnerIds}
                       dateMode={dateMode === 'group' ? 'group' : 'single'}
                       loading={loading}
+                      invitedFriendIds={invitedFriendIds}
+                      acceptedFriendIds={acceptedFriendIds}
                       onPartnerChange={(id) => setSelectedPartnerId(id)}
                       onPartnerIdsChange={setSelectedPartnerIds}
                       onDateModeChange={(m) => setDateMode(m)}
