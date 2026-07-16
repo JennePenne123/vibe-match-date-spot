@@ -1221,6 +1221,8 @@
     "continue": "Weiter",
     "planGroupDate": "Gruppen-Date planen ({{count}})",
     "creatingSession": "Planungssitzung wird erstellt...",
+    "requestSent": "Anfrage verschickt",
+    "waitingForPartnerPrefs": "Warte auf Präferenzen von {{name}}. Sobald sie eingetragen sind, empfehlen wir Venues für alle.",
     "single": "Einzeln",
     "group": "Gruppe",
     "howDoYouWantToDate": "Wie möchtest du daten?",

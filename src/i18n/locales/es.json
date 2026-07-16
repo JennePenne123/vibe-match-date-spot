@@ -1221,6 +1221,8 @@
     "continue": "Continuar",
     "planGroupDate": "Planear Cita Grupal ({{count}})",
     "creatingSession": "Creando sesión de planificación...",
+    "requestSent": "Solicitud enviada",
+    "waitingForPartnerPrefs": "Esperando a que {{name}} configure sus preferencias. Recomendaremos lugares para todos en cuanto estén listos.",
     "single": "Individual",
     "group": "Grupo",
     "howDoYouWantToDate": "¿Cómo quieres salir?",

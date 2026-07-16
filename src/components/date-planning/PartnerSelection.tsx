@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Toggle } from '@/components/ui/toggle';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Users, ArrowRight, Loader2, User, UsersIcon } from 'lucide-react';
+import { Users, ArrowRight, Loader2, User, UsersIcon, CheckCircle2, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import InviteFriendsSection from '@/components/InviteFriendsSection';
 
@@ -20,6 +20,8 @@ interface PartnerSelectionProps {
   selectedPartnerIds: string[];
   dateMode: 'single' | 'group';
   loading: boolean;
+  invitedFriendIds?: string[];
+  acceptedFriendIds?: string[];
   onPartnerChange: (partnerId: string) => void;
   onPartnerIdsChange: (partnerIds: string[]) => void;
   onDateModeChange: (mode: 'single' | 'group') => void;
@@ -32,12 +34,37 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
   selectedPartnerIds,
   dateMode,
   loading,
+  invitedFriendIds = [],
+  acceptedFriendIds = [],
   onPartnerChange,
   onPartnerIdsChange,
   onDateModeChange,
   onContinue
 }) => {
   const { t } = useTranslation();
+
+  const statusFor = (id: string): 'accepted' | 'pending' | null => {
+    if (acceptedFriendIds.includes(id)) return 'accepted';
+    if (invitedFriendIds.includes(id)) return 'pending';
+    return null;
+  };
+
+  const StatusBadge: React.FC<{ status: 'accepted' | 'pending' }> = ({ status }) => (
+    status === 'accepted' ? (
+      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400">
+        <CheckCircle2 className="h-3 w-3" />
+        {t('datePlanning.accepted', 'Angenommen')}
+      </span>
+    ) : (
+      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
+        <Clock className="h-3 w-3" />
+        {t('datePlanning.requestSent', 'Anfrage verschickt')}
+      </span>
+    )
+  );
+
+  const selectedSingleFriend = friends.find(f => f.id === selectedPartnerId);
+  const selectedSingleStatus = selectedSingleFriend ? statusFor(selectedSingleFriend.id) : null;
 
   const handlePartnerToggle = (friendId: string, checked: boolean) => {
     if (checked) {
@@ -99,22 +126,43 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
             <p className="text-sm text-muted-foreground">{t('datePlanning.noFriendsYetDesc')}</p>
           </div>
         ) : dateMode === 'single' ? (
+          <>
           <Select value={selectedPartnerId} onValueChange={onPartnerChange}>
             <SelectTrigger className="h-11">
               <SelectValue placeholder={t('datePlanning.chooseFriend')} />
             </SelectTrigger>
             <SelectContent>
-              {friends.map((friend) => (
-                <SelectItem key={friend.id} value={friend.id}>
-                  {friend.name}
-                </SelectItem>
-              ))}
+              {friends.map((friend) => {
+                const s = statusFor(friend.id);
+                return (
+                  <SelectItem key={friend.id} value={friend.id}>
+                    <span className="inline-flex items-center">
+                      {friend.name}
+                      {s && <StatusBadge status={s} />}
+                    </span>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
+          {selectedSingleFriend && selectedSingleStatus && (
+            <div className="mt-2 flex items-center text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">{selectedSingleFriend.name}</span>
+              <StatusBadge status={selectedSingleStatus} />
+            </div>
+          )}
+          {selectedSingleFriend && selectedSingleStatus === 'pending' && (
+            <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+              {t('datePlanning.waitingForPartnerPrefs', { name: selectedSingleFriend.name })}
+            </p>
+          )}
+          </>
         ) : (
           <div className="space-y-3">
             <div className="grid gap-3 max-h-48 overflow-y-auto pr-2">
-              {friends.map((friend) => (
+              {friends.map((friend) => {
+                const s = statusFor(friend.id);
+                return (
                 <div key={friend.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-sage-50/50 dark:hover:bg-sage-900/10 transition-colors border border-transparent hover:border-sage-200/50 dark:hover:border-sage-800/30">
                   <Checkbox
                     id={friend.id}
@@ -125,13 +173,20 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
                   />
                   <label 
                     htmlFor={friend.id} 
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1 flex items-center"
                   >
                     {friend.name}
+                    {s && <StatusBadge status={s} />}
                   </label>
                 </div>
-              ))}
+                );
+              })}
             </div>
+            {invitedFriendIds.length > 0 && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {t('datePlanning.waitingForPartnerPrefs', { name: friends.find(f => invitedFriendIds.includes(f.id))?.name || '' })}
+              </p>
+            )}
           </div>
         )}
 
