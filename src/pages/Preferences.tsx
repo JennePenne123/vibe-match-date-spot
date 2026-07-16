@@ -24,10 +24,10 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import OccasionPicker from '@/components/date-planning/preferences/OccasionPicker';
-import MoodPicker from '@/components/date-planning/preferences/MoodPicker';
+import { getTodayMood } from '@/utils/moodStorage';
 import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 import type { DateOccasion } from '@/components/date-planning/preferences/preferencesData';
-import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
+import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
@@ -294,7 +294,7 @@ const Preferences = () => {
   const [locationError, setLocationError] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
-  const [selectedMood, setSelectedMood] = useState<DailyMood | null>(null);
+  const [selectedMood, setSelectedMood] = useState<DailyMood | null>(() => getTodayMood());
   const [priorityWeights, setPriorityWeights] = useState<PriorityWeights>({ ...DEFAULT_PRIORITY_WEIGHTS });
 
   useEffect(() => {
@@ -666,10 +666,6 @@ const Preferences = () => {
             <>
               <AccordionSection title="Anlass" icon={<Sparkles className="w-5 h-5 text-primary" />} selectedCount={selectedOccasion ? 1 : 0} defaultOpen>
                 <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
-              </AccordionSection>
-
-              <AccordionSection title="Stimmung" icon={<SmilePlus className="w-5 h-5 text-primary" />} selectedCount={selectedMood ? 1 : 0} defaultOpen>
-                <MoodPicker selectedMood={selectedMood} onSelectMood={setSelectedMood} />
               </AccordionSection>
 
               <AccordionSection title="Prioritäten" icon={<SlidersHorizontal className="w-5 h-5 text-primary" />} selectedCount={Object.values(priorityWeights).filter(v => v !== 1.0).length}>
