@@ -1221,6 +1221,8 @@
     "continue": "Continue",
     "planGroupDate": "Plan Group Date ({{count}})",
     "creatingSession": "Creating planning session...",
+    "requestSent": "Request sent",
+    "waitingForPartnerPrefs": "Waiting for {{name}} to set their preferences. Venues will be recommended for everyone once they're in.",
     "single": "Single",
     "group": "Group",
     "howDoYouWantToDate": "How do you want to date?",
