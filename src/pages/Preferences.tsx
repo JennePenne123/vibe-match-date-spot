@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import OccasionPicker from '@/components/date-planning/preferences/OccasionPicker';
-import MoodPicker from '@/components/date-planning/preferences/MoodPicker';
+import { getTodayMood } from '@/utils/moodStorage';
 import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 import type { DateOccasion } from '@/components/date-planning/preferences/preferencesData';
 import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
@@ -294,7 +294,7 @@ const Preferences = () => {
   const [locationError, setLocationError] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
-  const [selectedMood, setSelectedMood] = useState<DailyMood | null>(null);
+  const [selectedMood, setSelectedMood] = useState<DailyMood | null>(() => getTodayMood());
   const [priorityWeights, setPriorityWeights] = useState<PriorityWeights>({ ...DEFAULT_PRIORITY_WEIGHTS });
 
   useEffect(() => {
