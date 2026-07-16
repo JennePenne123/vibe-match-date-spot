@@ -1,6 +1,8 @@
 
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import i18n from '@/i18n';
 
 interface DatePlanningSession {
   id: string;
@@ -34,6 +36,8 @@ export const useSessionRealtime = (
     console.log('Setting up session realtime subscription for session:', currentSession.id, 'with channel:', channelName);
     
     let isSubscribed = true; // Flag to prevent updates after unmount
+    let previousBothComplete = currentSession.both_preferences_complete === true;
+    let notified = previousBothComplete;
     
     const channel = supabase
       .channel(channelName)
@@ -64,6 +68,42 @@ export const useSessionRealtime = (
             if (updatedSession.ai_compatibility_score && onCompatibilityUpdate && typeof onCompatibilityUpdate === 'function') {
               onCompatibilityUpdate(updatedSession.ai_compatibility_score);
             }
+
+            // In-app notification when both participants finished preferences
+            if (!notified && updatedSession.both_preferences_complete === true && !previousBothComplete) {
+              notified = true;
+              const t = i18n.t.bind(i18n);
+              toast.success(t('datePlanning.allPrefsReadyTitle'), {
+                description: t('datePlanning.allPrefsReadyDesc'),
+                duration: 6000,
+              });
+
+              // Best-effort push to the counterpart participant
+              void (async () => {
+                try {
+                  const { data: userData } = await supabase.auth.getUser();
+                  const uid = userData?.user?.id;
+                  if (!uid) return;
+                  const counterpartId =
+                    uid === updatedSession.initiator_id
+                      ? updatedSession.partner_id
+                      : updatedSession.initiator_id;
+                  if (!counterpartId || counterpartId === uid) return;
+                  await supabase.functions.invoke('send-push-notification', {
+                    body: {
+                      userId: counterpartId,
+                      title: t('datePlanning.allPrefsReadyTitle'),
+                      body: t('datePlanning.allPrefsReadyDesc'),
+                      url: `/smart-date-planning?sessionId=${updatedSession.id}`,
+                      type: 'invitation_accepted',
+                    },
+                  });
+                } catch (err) {
+                  console.warn('Push notification for prefs-complete failed (non-fatal):', err);
+                }
+              })();
+            }
+            previousBothComplete = updatedSession.both_preferences_complete === true;
           } catch (error) {
             console.error('Error handling real-time session update:', error);
           }

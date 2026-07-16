@@ -1223,6 +1223,8 @@
     "creatingSession": "Creando sesión de planificación...",
     "requestSent": "Solicitud enviada",
     "waitingForPartnerPrefs": "Esperando a que {{name}} configure sus preferencias. Recomendaremos lugares para todos en cuanto estén listos.",
+    "allPrefsReadyTitle": "¡Todas las preferencias están listas!",
+    "allPrefsReadyDesc": "Hemos desbloqueado las recomendaciones de lugares para todos.",
     "single": "Individual",
     "group": "Grupo",
     "howDoYouWantToDate": "¿Cómo quieres salir?",
