@@ -28,7 +28,7 @@ export default function Datenschutz() {
         </div>
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
-          <p className="text-muted-foreground text-xs">Stand: März 2026</p>
+          <p className="text-muted-foreground text-xs">Stand: Juli 2026</p>
 
           <h2>1. Datenschutz auf einen Blick</h2>
           <p className="text-muted-foreground">
@@ -94,7 +94,9 @@ export default function Datenschutz() {
 
           <h3>3.3 Anmeldung über Apple</h3>
           <p className="text-muted-foreground">
-            Sie können sich mit Ihrem Apple-Konto anmelden („Sign in with Apple"). Dabei wird ein OAuth-2.0-Verfahren
+            <strong>Hinweis:</strong> „Sign in with Apple" ist derzeit noch nicht aktiv und wird nach Abschluss
+            der Apple-Developer-Freischaltung ergänzt. Sobald verfügbar, können Sie sich mit Ihrem Apple-Konto
+            anmelden. Dabei wird ein OAuth-2.0-Verfahren
             durchgeführt. Wir erhalten von Apple:
           </p>
           <ul className="text-muted-foreground">
@@ -421,7 +423,22 @@ export default function Datenschutz() {
             Personen unter 16 Jahren dürfen die App nur mit Einwilligung eines Erziehungsberechtigten nutzen.
           </p>
 
-          <h2>15. Änderungen dieser Datenschutzerklärung</h2>
+          <h2>15. Cookies und Consent-Management</h2>
+          <p className="text-muted-foreground">
+            H!Outz verwendet ausschließlich technisch notwendige Speichermechanismen (localStorage, IndexedDB)
+            für den Betrieb der App (z.&nbsp;B. Login-Session, Spracheinstellung, Cache). Nicht notwendige
+            Kategorien (Präferenzen, Analytics, Marketing) werden nur nach Ihrer aktiven Einwilligung über
+            unser Cookie-Banner aktiviert (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO, § 25 Abs.&nbsp;1 TDDDG).
+          </p>
+          <p className="text-muted-foreground">
+            Ihre Einwilligung wird versioniert lokal gespeichert (Schlüssel <code>hioutz-cookie-consent-v2</code>)
+            und kann jederzeit widerrufen oder angepasst werden über{' '}
+            <strong>Einstellungen → Datenschutz &amp; Tracking → Cookie-Einstellungen</strong>. Über den Button
+            „Cookie-Einwilligung zurücksetzen" können Sie sämtliche gespeicherten Einwilligungen vollständig
+            entfernen; beim nächsten Aufruf erscheint das Banner erneut.
+          </p>
+
+          <h2>16. Änderungen dieser Datenschutzerklärung</h2>
           <p className="text-muted-foreground">
             Wir behalten uns vor, diese Datenschutzerklärung anzupassen, um sie stets den aktuellen rechtlichen
             Anforderungen anzupassen. Die jeweils aktuelle Fassung gilt bei Ihrem nächsten Besuch.
@@ -430,9 +447,9 @@ export default function Datenschutz() {
 
           <div className="mt-8 p-4 rounded-lg bg-muted/30 border border-border/50">
             <p className="text-xs text-muted-foreground italic">
-              ⚠️ Hinweis: Diese Datenschutzerklärung wurde mit größter Sorgfalt erstellt, ersetzt aber keine
-              individuelle Rechtsberatung. Bitte lasse sie vor Veröffentlichung von einem spezialisierten
-              Datenschutz-Anwalt prüfen.
+              Hinweis: Diese Datenschutzerklärung wurde mit größter Sorgfalt erstellt und wird laufend
+              an den technischen Stand der App angepasst. Sie ersetzt keine individuelle Rechtsberatung –
+              eine abschließende Prüfung durch eine:n Datenschutz-Anwält:in wird empfohlen.
             </p>
           </div>
         </div>

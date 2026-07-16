@@ -22,7 +22,7 @@ export default function AGB() {
         </div>
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
-          <p className="text-muted-foreground text-xs">Stand: März 2026 · {COMPANY.legalName}</p>
+          <p className="text-muted-foreground text-xs">Stand: Juli 2026 · {COMPANY.legalName}</p>
 
           <h2>§ 1 Geltungsbereich</h2>
           <p className="text-muted-foreground">
@@ -55,10 +55,11 @@ export default function AGB() {
           <h2>§ 3 Registrierung und Nutzerkonto</h2>
           <p className="text-muted-foreground">
             (1) Für die Nutzung der App ist eine Registrierung erforderlich. Diese kann per E-Mail und Passwort
-            oder über die Dienste Dritter (Google, Apple) erfolgen.
+            oder über den Dienst Google erfolgen. Die Anmeldung mit Apple („Sign in with Apple") ist derzeit
+            in Vorbereitung und wird nach Freischaltung ergänzt.
           </p>
           <p className="text-muted-foreground">
-            (2) Bei der Registrierung über Google oder Apple gelten zusätzlich die Nutzungsbedingungen und
+            (2) Bei der Registrierung über Drittanbieter (z.&nbsp;B. Google) gelten zusätzlich die Nutzungsbedingungen und
             Datenschutzrichtlinien des jeweiligen Anbieters.
           </p>
           <p className="text-muted-foreground">
@@ -223,9 +224,9 @@ export default function AGB() {
 
           <div className="mt-8 p-4 rounded-lg bg-muted/30 border border-border/50">
             <p className="text-xs text-muted-foreground italic">
-              ⚠️ Hinweis: Diese AGB wurden mit größter Sorgfalt erstellt, ersetzten aber keine individuelle
-              Rechtsberatung. Platzhalter in eckigen Klammern müssen durch die tatsächlichen Unternehmensdaten
-              ersetzt werden. Bitte vor Veröffentlichung von einem Rechtsanwalt prüfen lassen.
+              Hinweis: Diese AGB wurden mit größter Sorgfalt erstellt und mit den aktuellen Unternehmensdaten
+              gepflegt, ersetzen jedoch keine individuelle Rechtsberatung. Eine abschließende Prüfung durch eine
+              spezialisierte Rechtsanwaltskanzlei wird empfohlen.
             </p>
           </div>
         </div>
