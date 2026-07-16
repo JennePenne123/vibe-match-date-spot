@@ -1223,6 +1223,8 @@
     "creatingSession": "Creating planning session...",
     "requestSent": "Request sent",
     "waitingForPartnerPrefs": "Waiting for {{name}} to set their preferences. Venues will be recommended for everyone once they're in.",
+    "allPrefsReadyTitle": "All preferences are in!",
+    "allPrefsReadyDesc": "Your venue recommendations are now unlocked for everyone.",
     "single": "Single",
     "group": "Group",
     "howDoYouWantToDate": "How do you want to date?",
