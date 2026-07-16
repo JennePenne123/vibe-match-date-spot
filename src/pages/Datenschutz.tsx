@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { COMPANY } from '@/config/companyInfo';
 import { SEO } from '@/components/SEO';
+import { LEGAL_VERSIONS, formatLegalDate } from '@/config/legalVersions';
 
 export default function Datenschutz() {
   const navigate = useNavigate();
@@ -28,7 +29,9 @@ export default function Datenschutz() {
         </div>
 
         <div className="px-4 py-6 prose prose-sm dark:prose-invert max-w-none">
-          <p className="text-muted-foreground text-xs">Stand: Juli 2026</p>
+          <p className="text-muted-foreground text-xs">
+            Version {LEGAL_VERSIONS.datenschutz.version} · Stand: {formatLegalDate(LEGAL_VERSIONS.datenschutz.date)}
+          </p>
 
           <h2>1. Datenschutz auf einen Blick</h2>
           <p className="text-muted-foreground">
