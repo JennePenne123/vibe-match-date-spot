@@ -73,8 +73,8 @@ export const useSessionRealtime = (
             if (!notified && updatedSession.both_preferences_complete === true && !previousBothComplete) {
               notified = true;
               const t = i18n.t.bind(i18n);
-              toast.success(t('planning.allPrefsReadyTitle'), {
-                description: t('planning.allPrefsReadyDesc'),
+              toast.success(t('datePlanning.allPrefsReadyTitle'), {
+                description: t('datePlanning.allPrefsReadyDesc'),
                 duration: 6000,
               });
 
@@ -92,8 +92,8 @@ export const useSessionRealtime = (
                   await supabase.functions.invoke('send-push-notification', {
                     body: {
                       userId: counterpartId,
-                      title: t('planning.allPrefsReadyTitle'),
-                      body: t('planning.allPrefsReadyDesc'),
+                      title: t('datePlanning.allPrefsReadyTitle'),
+                      body: t('datePlanning.allPrefsReadyDesc'),
                       url: `/smart-date-planning?sessionId=${updatedSession.id}`,
                       type: 'invitation_accepted',
                     },
