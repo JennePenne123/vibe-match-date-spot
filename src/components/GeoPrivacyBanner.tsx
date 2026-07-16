@@ -19,6 +19,7 @@ import {
   getStoredConsent,
   saveConsent,
 } from '@/lib/cookieConsent';
+import { LEGAL_VERSIONS, formatLegalDate } from '@/config/legalVersions';
 
 type PrivacyRegion = 'eu' | 'us-ca' | 'us' | 'br' | 'uk' | 'other';
 
@@ -149,6 +150,9 @@ export default function GeoPrivacyBanner() {
                     {t('privacyBanner.learnMore')}
                   </a>
                 </div>
+                <p className="text-[10px] text-muted-foreground/70 pt-1">
+                  {t('privacyBanner.version', 'Consent-Version')} {LEGAL_VERSIONS.cookieConsent.version} · {formatLegalDate(LEGAL_VERSIONS.cookieConsent.date)}
+                </p>
               </div>
             </div>
           </div>
@@ -210,6 +214,9 @@ export default function GeoPrivacyBanner() {
               {t('privacyBanner.acceptAll', 'Alle akzeptieren')}
             </Button>
           </DialogFooter>
+          <p className="text-[10px] text-muted-foreground/70 text-center pt-2">
+            {t('privacyBanner.version', 'Consent-Version')} {LEGAL_VERSIONS.cookieConsent.version} · {formatLegalDate(LEGAL_VERSIONS.cookieConsent.date)}
+          </p>
         </DialogContent>
       </Dialog>
     </>
