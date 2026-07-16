@@ -404,6 +404,12 @@ export default function Datenschutz() {
             Bei der Kontolöschung werden sämtliche personenbezogenen Daten innerhalb von 30 Tagen
             unwiderruflich gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
           </p>
+          <p className="text-muted-foreground">
+            Zentraler Anlaufpunkt für alle DSGVO-Anfragen (Auskunft, Datenexport, Löschung):{' '}
+            <a href="/dsgvo-anfragen" className="text-primary underline underline-offset-4">
+              /dsgvo-anfragen
+            </a>.
+          </p>
 
           <h2>13. Datensicherheit</h2>
           <p className="text-muted-foreground">

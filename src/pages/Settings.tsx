@@ -600,6 +600,7 @@ const Settings = () => {
                 { href: '/widerrufsformular', label: 'Widerrufsformular' },
                 { href: '/impressum', label: t('settings.imprint') },
                 { href: '/kontakt', label: t('settings.contact') },
+                { href: '/dsgvo-anfragen', label: t('dsgvoRequests.title', 'DSGVO-Anfragen') },
               ].map(({ href, label }) => (
                 <a key={href} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between py-2 px-1 rounded-md hover:bg-accent/50 transition-colors group">
                   <div className="flex items-center gap-2">

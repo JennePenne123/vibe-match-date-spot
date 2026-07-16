@@ -65,6 +65,7 @@ const Datenschutz = lazy(() => import("./pages/Datenschutz"));
 const AGB = lazy(() => import("./pages/AGB"));
 const Widerrufsformular = lazy(() => import("./pages/Widerrufsformular"));
 const Kontakt = lazy(() => import("./pages/Kontakt"));
+const DsgvoRequests = lazy(() => import("./pages/DsgvoRequests"));
 
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
@@ -205,6 +206,7 @@ const App = () => (
                     <Route path="/widerrufsformular" element={<LazyPageNoLayout><Widerrufsformular /></LazyPageNoLayout>} />
                     <Route path="/unsubscribe" element={<LazyPageNoLayout><Unsubscribe /></LazyPageNoLayout>} />
                     <Route path="/kontakt" element={<LazyPageNoLayout><Kontakt /></LazyPageNoLayout>} />
+                    <Route path="/dsgvo-anfragen" element={<LazyPageNoLayout><DsgvoRequests /></LazyPageNoLayout>} />
                     
                     {/* Debug route */}
                     <Route path="/debug" element={<LazyPage><Debug /></LazyPage>} />
