@@ -1223,6 +1223,8 @@
     "creatingSession": "Planungssitzung wird erstellt...",
     "requestSent": "Anfrage verschickt",
     "waitingForPartnerPrefs": "Warte auf Präferenzen von {{name}}. Sobald sie eingetragen sind, empfehlen wir Venues für alle.",
+    "allPrefsReadyTitle": "Alle Präferenzen sind da!",
+    "allPrefsReadyDesc": "Wir haben eure Venue-Empfehlungen jetzt freigeschaltet.",
     "single": "Einzeln",
     "group": "Gruppe",
     "howDoYouWantToDate": "Wie möchtest du daten?",
