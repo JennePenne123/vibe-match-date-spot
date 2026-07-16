@@ -27,7 +27,7 @@ import OccasionPicker from '@/components/date-planning/preferences/OccasionPicke
 import { getTodayMood } from '@/utils/moodStorage';
 import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 import type { DateOccasion } from '@/components/date-planning/preferences/preferencesData';
-import { Sparkles, SlidersHorizontal, SmilePlus } from 'lucide-react';
+import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
