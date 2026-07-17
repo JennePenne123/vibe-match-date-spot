@@ -22,6 +22,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationSystem from "./components/NotificationSystem";
 import PushNotificationPrompt from "./components/PushNotificationPrompt";
 import OfflineBanner from "./components/OfflineBanner";
+import PullToRefresh from "./components/PullToRefresh";
 import { OnlineStatusProvider } from "./contexts/OnlineStatusContext";
 import GeoPrivacyBanner from "./components/GeoPrivacyBanner";
 import PendingReferralHandler from "./components/PendingReferralHandler";
@@ -162,6 +163,7 @@ const App = () => (
               <OnlineStatusProvider>
               <NotificationSystem>
                 <OfflineBanner />
+                <PullToRefresh />
                 <GeoPrivacyBanner />
                 <PushNotificationPrompt />
                 <AppUsageTracker />
