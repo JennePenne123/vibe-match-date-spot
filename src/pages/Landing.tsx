@@ -3,13 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Users, Heart, ArrowRight, Menu, X, Zap, Shield, Star } from 'lucide-react';
-import hioutzLogo from '@/assets/hioutz-logo.webp';
+const hioutzLogo = '/hioutz-logo.webp';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthModal } from '@/components/landing/AuthModal';
 import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import AnimatedCounter from '@/components/landing/AnimatedCounter';
-import { motion } from 'framer-motion';
 import { SEO } from '@/components/SEO';
 export default function LandingDemo() {
   const navigate = useNavigate();
@@ -104,10 +103,7 @@ export default function LandingDemo() {
         <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-accent/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-36 text-center">
           <div className="space-y-10">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
+            <div
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 backdrop-blur-sm">
                 <Zap className="w-4 h-4" />
@@ -117,35 +113,26 @@ export default function LandingDemo() {
                 <span className="block text-foreground">{t('landing.heroTitle1')}</span>
                 <span className="block bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent mt-2">{t('landing.heroTitle2')}</span>
               </h1>
-            </motion.div>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+            </div>
+            <p
               className="text-lg sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
             >
               {t('landing.heroSubtitle')}
               <span className="block mt-2">{t('landing.heroSubtitle2')}</span>
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+            </p>
+            <div
               className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-10"
             >
               <Button onClick={() => setIsAuthModalOpen(true)} size="xl" className="text-lg px-10 py-7 shadow-gentle-lg hover:shadow-gentle-xl transition-all duration-400 w-full sm:w-auto group">
                 {t('landing.beginJourney')} <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
               </Button>
               <Button onClick={() => scrollToSection(featuresRef)} variant="outline" size="xl" className="text-lg px-10 py-7 w-full sm:w-auto">{t('landing.learnMore')}</Button>
-            </motion.div>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+            </div>
+            <p
               className="text-sm text-muted-foreground pt-4"
             >
               {t('landing.noCreditCard')}
-            </motion.p>
+            </p>
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
@@ -202,12 +189,8 @@ export default function LandingDemo() {
               { icon: Shield, gradient: 'bg-gradient-secondary', title: t('landing.feature2Title'), desc: t('landing.feature2Desc'), delay: 0.1 },
               { icon: Heart, gradient: 'from-primary to-accent', title: t('landing.feature3Title'), desc: t('landing.feature3Desc'), delay: 0.2 },
             ].map((feature, i) => (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.5, delay: feature.delay }}
               >
                 <Card variant="wellness" className="group cursor-pointer h-full">
                   <div className="p-6 md:p-10 space-y-5">
@@ -218,7 +201,7 @@ export default function LandingDemo() {
                     <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
                   </div>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
