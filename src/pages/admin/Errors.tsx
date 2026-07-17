@@ -214,6 +214,11 @@ const AdminErrors: React.FC = () => {
                             <Badge variant="secondary" className="text-xs">
                               {err.error_type}
                             </Badge>
+                            {err.resolved && (
+                              <Badge variant="outline" className="text-xs bg-green-500/20 text-green-400 border-green-500/30">
+                                behoben
+                              </Badge>
+                            )}
                             {err.route && (
                               <span className="text-xs text-muted-foreground font-mono">{err.route}</span>
                             )}
@@ -237,17 +242,45 @@ const AdminErrors: React.FC = () => {
                           <p className="text-xs text-muted-foreground mt-2">
                             {new Date(err.created_at).toLocaleString('de-DE')}
                           </p>
+                          {err.resolved && err.resolution_note && (
+                            <div className="mt-2 p-2 rounded bg-green-500/5 border border-green-500/20">
+                              <p className="text-xs text-green-400 font-medium mb-0.5">Notiz</p>
+                              <p className="text-xs text-muted-foreground whitespace-pre-wrap">{err.resolution_note}</p>
+                            </div>
+                          )}
                         </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="shrink-0 gap-1.5"
-                          onClick={() => copyFixPrompt(err)}
-                          title="Fix-Prompt in Zwischenablage kopieren"
-                        >
-                          <Wand2 className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Fix this error</span>
-                        </Button>
+                        <div className="shrink-0 flex flex-col gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={() => copyFixPrompt(err)}
+                            title="Fix-Prompt in Zwischenablage kopieren"
+                          >
+                            <Wand2 className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Fix this error</span>
+                          </Button>
+                          {err.resolved ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="gap-1.5 text-muted-foreground"
+                              onClick={() => reopen(err)}
+                            >
+                              Wieder öffnen
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="gap-1.5 border-green-500/30 text-green-400 hover:bg-green-500/10"
+                              onClick={() => openResolve(err)}
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">Behoben</span>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -264,6 +297,35 @@ const AdminErrors: React.FC = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      <Dialog open={!!resolveTarget} onOpenChange={(o) => !o && setResolveTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Fehler als behoben markieren</DialogTitle>
+            <DialogDescription className="break-all">
+              {resolveTarget?.error_message}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm text-muted-foreground">Notiz (optional)</label>
+            <Textarea
+              placeholder="Was wurde gemacht? z.B. Fix in Commit …, Ursache war …"
+              value={resolveNote}
+              onChange={(e) => setResolveNote(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setResolveTarget(null)} disabled={resolving}>
+              Abbrechen
+            </Button>
+            <Button onClick={submitResolve} disabled={resolving} className="gap-1.5">
+              <CheckCircle2 className="w-4 h-4" />
+              Als behoben markieren
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
