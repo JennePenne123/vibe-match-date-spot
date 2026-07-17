@@ -828,8 +828,10 @@ export type Database = {
           error_type: string
           id: string
           metadata: Json | null
+          resolution_note: string | null
           resolved: boolean
           resolved_at: string | null
+          resolved_by: string | null
           route: string | null
           severity: string
           user_agent: string | null
@@ -843,8 +845,10 @@ export type Database = {
           error_type?: string
           id?: string
           metadata?: Json | null
+          resolution_note?: string | null
           resolved?: boolean
           resolved_at?: string | null
+          resolved_by?: string | null
           route?: string | null
           severity?: string
           user_agent?: string | null
@@ -858,8 +862,10 @@ export type Database = {
           error_type?: string
           id?: string
           metadata?: Json | null
+          resolution_note?: string | null
           resolved?: boolean
           resolved_at?: string | null
+          resolved_by?: string | null
           route?: string | null
           severity?: string
           user_agent?: string | null

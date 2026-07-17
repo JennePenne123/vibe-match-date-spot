@@ -1,0 +1,1 @@
+ALTER TABLE public.error_logs ADD COLUMN IF NOT EXISTS resolution_note text; ALTER TABLE public.error_logs ADD COLUMN IF NOT EXISTS resolved_by uuid;
