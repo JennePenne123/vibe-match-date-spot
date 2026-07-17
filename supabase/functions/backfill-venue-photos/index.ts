@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
           headers: {
             'Content-Type': 'application/json',
             'X-Goog-Api-Key': apiKey,
-            'X-Goog-FieldMask': 'places.id,places.photos,places.location,places.displayName',
+            'X-Goog-FieldMask': 'places.id,places.photos,places.location,places.displayName,places.formattedAddress,places.shortFormattedAddress',
           },
           body: JSON.stringify({
             textQuery,
@@ -159,6 +159,10 @@ Deno.serve(async (req) => {
         if (photos.length > 0) {
           updatePayload.photos = photos;
           updatePayload.image_url = photos[0].url;
+        }
+        const googleAddr = place.shortFormattedAddress || place.formattedAddress;
+        if (googleAddr && typeof googleAddr === 'string' && googleAddr.trim().length > 0) {
+          updatePayload.address = googleAddr;
         }
 
         const { error: updateErr } = await admin
