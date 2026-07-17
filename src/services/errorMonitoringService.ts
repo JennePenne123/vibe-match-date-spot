@@ -34,7 +34,21 @@ function isDuplicate(message: string): boolean {
 
 async function logError(payload: ErrorLogPayload): Promise<void> {
   try {
-    if (isDuplicate(payload.error_message)) return;
+    // Guard: some callers pass undefined/non-string values (e.g. from
+    // unknown thrown values). Normalise to a safe string before use.
+    const rawMessage = payload.error_message;
+    const safeMessage =
+      typeof rawMessage === 'string' && rawMessage.length > 0
+        ? rawMessage
+        : (() => {
+            try {
+              return JSON.stringify(rawMessage) ?? 'Unknown error';
+            } catch {
+              return 'Unknown error';
+            }
+          })();
+    payload = { ...payload, error_message: safeMessage };
+    if (isDuplicate(safeMessage)) return;
 
     // Forward to Sentry
     const error = new Error(payload.error_message);
