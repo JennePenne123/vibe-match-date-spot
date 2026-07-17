@@ -10,13 +10,19 @@ import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Bug, Wifi, Gauge, Clock, AlertCircle, Wand2, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, Bug, Wifi, Gauge, Clock, AlertCircle, Wand2, CheckCircle2, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 
 type ErrorType = 'js_error' | 'api_error' | 'ui_error' | 'performance' | 'all';
+type StatusFilter = 'all' | 'open' | 'resolved';
+type DateRange = 'all' | '24h' | '7d' | '30d';
 
 const severityColors: Record<string, string> = {
   critical: 'bg-red-500/20 text-red-400 border-red-500/30',
@@ -35,6 +41,10 @@ const typeIcons: Record<string, React.ReactNode> = {
 const AdminErrors: React.FC = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<ErrorType>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
+  const [dateRange, setDateRange] = useState<DateRange>('7d');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
   const [resolveTarget, setResolveTarget] = useState<any | null>(null);
   const [resolveNote, setResolveNote] = useState('');
@@ -109,17 +119,41 @@ const AdminErrors: React.FC = () => {
     }
   };
 
+  // Debounce search input
+  React.useEffect(() => {
+    const h = setTimeout(() => setSearchTerm(searchInput.trim()), 300);
+    return () => clearTimeout(h);
+  }, [searchInput]);
+
+  const rangeSince = (r: DateRange): string | null => {
+    const now = Date.now();
+    if (r === '24h') return new Date(now - 24 * 3600 * 1000).toISOString();
+    if (r === '7d') return new Date(now - 7 * 24 * 3600 * 1000).toISOString();
+    if (r === '30d') return new Date(now - 30 * 24 * 3600 * 1000).toISOString();
+    return null;
+  };
+
   const { data: errors, isLoading } = useQuery({
-    queryKey: ['admin-error-logs', activeTab],
+    queryKey: ['admin-error-logs', activeTab, statusFilter, dateRange, searchTerm],
     queryFn: async () => {
-      let query = supabase
+      let query: any = supabase
         .from('error_logs' as any)
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(100);
+        .limit(200);
 
-      if (activeTab !== 'all') {
-        query = query.eq('error_type', activeTab);
+      if (activeTab !== 'all') query = query.eq('error_type', activeTab);
+      if (statusFilter === 'open') query = query.eq('resolved', false);
+      if (statusFilter === 'resolved') query = query.eq('resolved', true);
+
+      const since = rangeSince(dateRange);
+      if (since) query = query.gte('created_at', since);
+
+      if (searchTerm) {
+        const esc = searchTerm.replace(/[%,]/g, ' ');
+        query = query.or(
+          `error_message.ilike.%${esc}%,route.ilike.%${esc}%,component_name.ilike.%${esc}%`
+        );
       }
 
       const { data, error } = await query;
@@ -190,6 +224,67 @@ const AdminErrors: React.FC = () => {
           <TabsTrigger value="ui_error">UI</TabsTrigger>
           <TabsTrigger value="performance">Perf</TabsTrigger>
         </TabsList>
+
+        {/* Filters */}
+        <div className="mt-4 flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1 min-w-0">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Suche in Message, Route, Component…"
+              className="pl-9 pr-9"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                aria-label="Suche leeren"
+                onClick={() => setSearchInput('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+            <SelectTrigger className="w-full sm:w-[150px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle Status</SelectItem>
+              <SelectItem value="open">Offen</SelectItem>
+              <SelectItem value="resolved">Behoben</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={dateRange} onValueChange={(v) => setDateRange(v as DateRange)}>
+            <SelectTrigger className="w-full sm:w-[150px]">
+              <SelectValue placeholder="Zeitraum" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="24h">Letzte 24h</SelectItem>
+              <SelectItem value="7d">Letzte 7 Tage</SelectItem>
+              <SelectItem value="30d">Letzte 30 Tage</SelectItem>
+              <SelectItem value="all">Alle</SelectItem>
+            </SelectContent>
+          </Select>
+          {(statusFilter !== 'all' || dateRange !== '7d' || searchTerm) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setStatusFilter('all');
+                setDateRange('all');
+                setSearchInput('');
+              }}
+            >
+              Zurücksetzen
+            </Button>
+          )}
+        </div>
+
+        <div className="mt-2 text-xs text-muted-foreground">
+          {isLoading ? 'Lade…' : `${errors?.length ?? 0} Treffer`}
+        </div>
 
         <TabsContent value={activeTab} className="mt-4">
           {isLoading ? (
