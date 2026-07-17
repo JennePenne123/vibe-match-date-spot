@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 
 const THRESHOLD = 70;
 const MAX_PULL = 120;
@@ -14,6 +15,43 @@ const PullToRefresh: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef<number | null>(null);
   const active = useRef(false);
+  const queryClient = useQueryClient();
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Expose a shared AbortController that feature code can opt into via
+  // `signal: (window as any).__hioutzRefreshSignal`. Pull-to-refresh aborts
+  // it before triggering fresh fetches, so in-flight requests don't race
+  // with the new ones and cause duplicate state updates.
+  useEffect(() => {
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+    (window as unknown as { __hioutzRefreshSignal?: AbortSignal }).__hioutzRefreshSignal = ctrl.signal;
+    return () => {
+      ctrl.abort();
+    };
+  }, []);
+
+  const triggerRefresh = async () => {
+    // 1. Abort any in-flight requests wired to the shared signal.
+    abortRef.current?.abort();
+    const nextCtrl = new AbortController();
+    abortRef.current = nextCtrl;
+    (window as unknown as { __hioutzRefreshSignal?: AbortSignal }).__hioutzRefreshSignal = nextCtrl.signal;
+
+    // 2. Cancel and invalidate all React Query queries so nothing lingers.
+    try {
+      await queryClient.cancelQueries();
+      await queryClient.invalidateQueries();
+    } catch {
+      // ignore
+    }
+
+    // 3. Reset UI after a short beat so the spinner is visible.
+    setTimeout(() => {
+      setRefreshing(false);
+      setPull(0);
+    }, 400);
+  };
 
   useEffect(() => {
     const onTouchStart = (e: TouchEvent) => {
@@ -47,10 +85,8 @@ const PullToRefresh: React.FC = () => {
       if (pull >= THRESHOLD) {
         setRefreshing(true);
         setPull(THRESHOLD);
-        // Give the spinner a moment to render before reload
-        setTimeout(() => {
-          window.location.reload();
-        }, 250);
+        // Cancel in-flight requests + refetch queries instead of full reload
+        void triggerRefresh();
       } else {
         setPull(0);
       }
