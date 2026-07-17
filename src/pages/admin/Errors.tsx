@@ -5,10 +5,12 @@ import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Bug, Wifi, Gauge, Clock, AlertCircle } from 'lucide-react';
+import { AlertTriangle, Bug, Wifi, Gauge, Clock, AlertCircle, Wand2 } from 'lucide-react';
 
 type ErrorType = 'js_error' | 'api_error' | 'ui_error' | 'performance' | 'all';
 
@@ -29,6 +31,32 @@ const typeIcons: Record<string, React.ReactNode> = {
 const AdminErrors: React.FC = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<ErrorType>('all');
+
+  const copyFixPrompt = async (err: any) => {
+    const prompt = [
+      `Fix this error in the H!Outz app:`,
+      ``,
+      `**Type:** ${err.error_type}`,
+      `**Severity:** ${err.severity}`,
+      `**Message:** ${err.error_message}`,
+      err.route ? `**Route:** ${err.route}` : null,
+      err.component_name ? `**Component:** ${err.component_name}` : null,
+      err.user_agent ? `**User-Agent:** ${err.user_agent}` : null,
+      `**Occurred:** ${new Date(err.created_at).toISOString()}`,
+      err.error_stack ? `\n**Stack Trace:**\n\`\`\`\n${err.error_stack}\n\`\`\`` : null,
+      err.metadata ? `\n**Metadata:**\n\`\`\`json\n${JSON.stringify(err.metadata, null, 2)}\n\`\`\`` : null,
+      ``,
+      `Please diagnose the root cause and implement a fix.`,
+    ].filter(Boolean).join('\n');
+    try {
+      await navigator.clipboard.writeText(prompt);
+      toast.success('Fix-Prompt in Zwischenablage kopiert', {
+        description: 'Füge ihn in den Lovable-Chat ein.',
+      });
+    } catch {
+      toast.error('Kopieren fehlgeschlagen');
+    }
+  };
 
   const { data: errors, isLoading } = useQuery({
     queryKey: ['admin-error-logs', activeTab],
@@ -127,7 +155,7 @@ const AdminErrors: React.FC = () => {
                         <div className="mt-0.5">
                           {typeIcons[err.error_type] || <Bug className="w-4 h-4" />}
                         </div>
-                        <div className="flex-1 min-w-0">
+                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
                             <Badge variant="outline" className={`text-xs ${severityColors[err.severity] || ''}`}>
                               {err.severity}
@@ -159,6 +187,16 @@ const AdminErrors: React.FC = () => {
                             {new Date(err.created_at).toLocaleString('de-DE')}
                           </p>
                         </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="shrink-0 gap-1.5"
+                          onClick={() => copyFixPrompt(err)}
+                          title="Fix-Prompt in Zwischenablage kopieren"
+                        >
+                          <Wand2 className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Fix this error</span>
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
