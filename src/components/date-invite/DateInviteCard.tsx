@@ -62,6 +62,7 @@ const DateInviteCard = ({
               onOpen={() => setIsOpen(true)}
               onAccept={onAccept ? handleAccept : undefined}
               onDecline={onDecline ? handleDecline : undefined}
+              onCancel={onCancel ? () => setCancelDialogOpen(true) : undefined}
             />
           </div>
         </DialogTrigger>
