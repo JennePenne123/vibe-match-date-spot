@@ -1,0 +1,69 @@
+name: Supabase Security Scan
+
+# Runs the Supabase database linter on every push / PR that touches
+# migrations or policies, plus once per day. Fails the build when the
+# linter reports an ERROR-level finding (missing RLS, security definer
+# view, exposed sensitive columns, …). WARN-level findings are printed
+# but do not fail the run.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   SUPABASE_ACCESS_TOKEN   Personal access token (Supabase dashboard → Account → Access Tokens)
+#   SUPABASE_PROJECT_REF    dfjwubatslzblagthbdw
+#   SUPABASE_DB_PASSWORD    DB password for the project
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/config.toml"
+      - ".github/workflows/security-scan.yml"
+  pull_request:
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/config.toml"
+  schedule:
+    - cron: "0 6 * * *" # daily 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: supabase db lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase link \
+            --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}" \
+            --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Run linter (fail on ERROR)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -o pipefail
+          supabase db lint --linked --level warning | tee lint.txt
+          if grep -Eiq '^\s*level:\s*error|\berror\b' lint.txt; then
+            echo "::error::Supabase linter reported ERROR-level findings"
+            exit 1
+          fi
+
+      - name: Upload linter report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-lint-report
+          path: lint.txt
+          retention-days: 30
