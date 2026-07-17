@@ -89,6 +89,8 @@ describe.skipIf(!ONLINE)("User RPC authorization (cross-user access)", () => {
     const { error } = await anonClient.rpc("award_user_points", {
       target_user_id: ARBITRARY_UUID,
       points_to_add: 100,
+      new_badges: null,
+      xp_to_add: 0,
     });
     expectUnauthorized(error, "award_user_points");
   });
