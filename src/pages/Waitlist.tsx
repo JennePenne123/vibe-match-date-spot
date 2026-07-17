@@ -7,7 +7,7 @@ import { Zap, Heart, CheckCircle, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
-import hioutzLogo from '@/assets/hioutz-logo.png';
+import hioutzLogo from '@/assets/hioutz-logo.webp';
 import { SEO } from '@/components/SEO';
 
 export default function Waitlist() {
