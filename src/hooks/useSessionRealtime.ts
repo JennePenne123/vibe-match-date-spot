@@ -31,8 +31,9 @@ export const useSessionRealtime = (
   useEffect(() => {
     if (!currentSession) return;
 
-    // Create unique channel name to prevent conflicts with collaborative session
-    const channelName = `${currentSession.initiator_id}:session-realtime-${currentSession.id}`;
+    // Create unique channel name to prevent conflicts (and StrictMode double-mount)
+    const uniqueSuffix = Math.random().toString(36).slice(2, 8);
+    const channelName = `${currentSession.initiator_id}:session-realtime-${currentSession.id}-${uniqueSuffix}`;
     console.log('Setting up session realtime subscription for session:', currentSession.id, 'with channel:', channelName);
     
     let isSubscribed = true; // Flag to prevent updates after unmount
