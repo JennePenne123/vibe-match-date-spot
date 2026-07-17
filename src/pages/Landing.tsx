@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Users, Heart, ArrowRight, Menu, X, Zap, Shield, Star } from 'lucide-react';
-import hioutzLogo from '@/assets/hioutz-logo.webp';
+const hioutzLogo = '/hioutz-logo.webp';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthModal } from '@/components/landing/AuthModal';
 import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
