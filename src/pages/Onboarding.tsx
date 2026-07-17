@@ -13,7 +13,7 @@ import FoodVibeQuickPick from '@/components/onboarding/FoodVibeQuickPick';
 import VenueSwipeCards, { type VenueSwipeData, deriveSwipePreferences } from '@/components/onboarding/VenueSwipeCards';
 import ReferralInspiration, { type AdoptedPreferences } from '@/components/onboarding/ReferralInspiration';
 
-import onboarding1 from '@/assets/onboarding-1.png';
+import onboarding1 from '@/assets/onboarding-1.webp';
 import { trackFunnelStep, ONBOARDING_FUNNEL_STEPS } from '@/services/funnelAnalyticsService';
 
 // Reduced from 6 → 4 steps. Removed: Personality, RelationshipGoal, Scenarios
