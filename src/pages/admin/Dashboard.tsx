@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import WaitlistSignupsWidget from '@/components/admin/WaitlistSignupsWidget';
 import SupportTicketsWidget from '@/components/admin/SupportTicketsWidget';
 import VenuePhotoBackfillWidget from '@/components/admin/VenuePhotoBackfillWidget';
+import VenueAddressBackfillWidget from '@/components/admin/VenueAddressBackfillWidget';
 
 interface PlatformStats {
   totalUsers: number;
@@ -120,6 +121,9 @@ const AdminDashboard: React.FC = () => {
 
       {/* Venue photo backfill */}
       <VenuePhotoBackfillWidget />
+
+      {/* Venue address correction */}
+      <VenueAddressBackfillWidget />
 
       {/* Recent activity */}
       <RecentActivity />
