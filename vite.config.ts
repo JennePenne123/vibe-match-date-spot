@@ -37,8 +37,10 @@ export default defineConfig(({ mode }) => ({
         cacheId: "hioutz",
         // Pull in push-notification handling (kept separate from the app shell cache).
         importScripts: ["/sw-push.js"],
-        // Precache the built app shell + hashed assets.
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
+        // Precache only the lightweight app/offline shell. Large JS route chunks
+        // are cached on first real use via runtimeCaching so the first visit is
+        // not slowed down by downloading the whole application in the background.
+        globPatterns: ["**/*.{html,ico,png,svg,webp}"],
         // Navigation + offline fallback are handled in sw-push.js (imported
         // above) so we can serve /offline.html as a last resort. Disable
         // Workbox's own navigate route to avoid a double-respondWith conflict
@@ -73,6 +75,17 @@ export default defineConfig(({ mode }) => ({
               cacheableResponse: { statuses: [0, 200] },
             },
           },
+          {
+            // JS/CSS chunks: cache only after they are actually needed.
+            urlPattern: ({ request }) =>
+              request.destination === "script" || request.destination === "style",
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "hioutz-app-assets",
+              expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
         ],
       },
     }),
@@ -80,38 +93,6 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          // React core
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/') || id.includes('node_modules/react-router')) {
-            return 'vendor-react';
-          }
-          // Radix UI primitives
-          if (id.includes('node_modules/@radix-ui/')) {
-            return 'vendor-radix';
-          }
-          // Supabase
-          if (id.includes('node_modules/@supabase/')) {
-            return 'vendor-supabase';
-          }
-          // i18n
-          if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
-            return 'vendor-i18n';
-          }
-          // Sentry
-          if (id.includes('node_modules/@sentry/')) {
-            return 'vendor-sentry';
-          }
-          // Tanstack query
-          if (id.includes('node_modules/@tanstack/')) {
-            return 'vendor-query';
-          }
-        },
-      },
     },
   },
 }));
