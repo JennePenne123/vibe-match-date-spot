@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
 
 interface AnimatedCounterProps {
   target: number;
@@ -18,7 +17,25 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
 }) => {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-50px' });
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setIsInView(true);
+            io.disconnect();
+          }
+        });
+      },
+      { rootMargin: '-50px' }
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!isInView) return;
@@ -44,15 +61,9 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   }, [isInView, target, duration]);
 
   return (
-    <motion.span
-      ref={ref}
-      initial={{ opacity: 0, y: 10 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5 }}
-      className="tabular-nums"
-    >
+    <span ref={ref} className="tabular-nums">
       {prefix}{decimals > 0 ? count.toFixed(decimals) : Math.round(count)}{suffix}
-    </motion.span>
+    </span>
   );
 };
 
