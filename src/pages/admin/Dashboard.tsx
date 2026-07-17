@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import WaitlistSignupsWidget from '@/components/admin/WaitlistSignupsWidget';
 import SupportTicketsWidget from '@/components/admin/SupportTicketsWidget';
 import VenuePhotoBackfillWidget from '@/components/admin/VenuePhotoBackfillWidget';
+import VenueAddressBackfillWidget from '@/components/admin/VenueAddressBackfillWidget';
 
 interface PlatformStats {
   totalUsers: number;
