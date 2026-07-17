@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +10,11 @@ import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Bug, Wifi, Gauge, Clock, AlertCircle, Wand2 } from 'lucide-react';
+import { AlertTriangle, Bug, Wifi, Gauge, Clock, AlertCircle, Wand2, CheckCircle2 } from 'lucide-react';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 
 type ErrorType = 'js_error' | 'api_error' | 'ui_error' | 'performance' | 'all';
 
@@ -31,6 +35,53 @@ const typeIcons: Record<string, React.ReactNode> = {
 const AdminErrors: React.FC = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<ErrorType>('all');
+  const queryClient = useQueryClient();
+  const [resolveTarget, setResolveTarget] = useState<any | null>(null);
+  const [resolveNote, setResolveNote] = useState('');
+  const [resolving, setResolving] = useState(false);
+
+  const openResolve = (err: any) => {
+    setResolveTarget(err);
+    setResolveNote(err.resolution_note || '');
+  };
+
+  const submitResolve = async () => {
+    if (!resolveTarget) return;
+    setResolving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from('error_logs' as any)
+      .update({
+        resolved: true,
+        resolved_at: new Date().toISOString(),
+        resolved_by: user?.id ?? null,
+        resolution_note: resolveNote.trim() || null,
+      } as any)
+      .eq('id', resolveTarget.id);
+    setResolving(false);
+    if (error) {
+      toast.error('Konnte nicht als behoben markiert werden', { description: error.message });
+      return;
+    }
+    toast.success('Als behoben markiert');
+    setResolveTarget(null);
+    setResolveNote('');
+    queryClient.invalidateQueries({ queryKey: ['admin-error-logs'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-error-stats'] });
+  };
+
+  const reopen = async (err: any) => {
+    const { error } = await supabase
+      .from('error_logs' as any)
+      .update({ resolved: false, resolved_at: null, resolved_by: null } as any)
+      .eq('id', err.id);
+    if (error) {
+      toast.error('Fehler', { description: error.message });
+      return;
+    }
+    toast.success('Wieder geöffnet');
+    queryClient.invalidateQueries({ queryKey: ['admin-error-logs'] });
+  };
 
   const copyFixPrompt = async (err: any) => {
     const prompt = [
