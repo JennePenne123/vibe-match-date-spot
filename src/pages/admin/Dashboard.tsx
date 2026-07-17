@@ -122,6 +122,9 @@ const AdminDashboard: React.FC = () => {
       {/* Venue photo backfill */}
       <VenuePhotoBackfillWidget />
 
+      {/* Venue address correction */}
+      <VenueAddressBackfillWidget />
+
       {/* Recent activity */}
       <RecentActivity />
     </div>
