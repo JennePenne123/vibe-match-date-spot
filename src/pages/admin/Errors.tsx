@@ -10,13 +10,19 @@ import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Bug, Wifi, Gauge, Clock, AlertCircle, Wand2, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, Bug, Wifi, Gauge, Clock, AlertCircle, Wand2, CheckCircle2, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 
 type ErrorType = 'js_error' | 'api_error' | 'ui_error' | 'performance' | 'all';
+type StatusFilter = 'all' | 'open' | 'resolved';
+type DateRange = 'all' | '24h' | '7d' | '30d';
 
 const severityColors: Record<string, string> = {
   critical: 'bg-red-500/20 text-red-400 border-red-500/30',
@@ -35,6 +41,10 @@ const typeIcons: Record<string, React.ReactNode> = {
 const AdminErrors: React.FC = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<ErrorType>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
+  const [dateRange, setDateRange] = useState<DateRange>('7d');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
   const [resolveTarget, setResolveTarget] = useState<any | null>(null);
   const [resolveNote, setResolveNote] = useState('');
@@ -109,17 +119,41 @@ const AdminErrors: React.FC = () => {
     }
   };
 
+  // Debounce search input
+  React.useEffect(() => {
+    const h = setTimeout(() => setSearchTerm(searchInput.trim()), 300);
+    return () => clearTimeout(h);
+  }, [searchInput]);
+
+  const rangeSince = (r: DateRange): string | null => {
+    const now = Date.now();
+    if (r === '24h') return new Date(now - 24 * 3600 * 1000).toISOString();
+    if (r === '7d') return new Date(now - 7 * 24 * 3600 * 1000).toISOString();
+    if (r === '30d') return new Date(now - 30 * 24 * 3600 * 1000).toISOString();
+    return null;
+  };
+
   const { data: errors, isLoading } = useQuery({
-    queryKey: ['admin-error-logs', activeTab],
+    queryKey: ['admin-error-logs', activeTab, statusFilter, dateRange, searchTerm],
     queryFn: async () => {
-      let query = supabase
+      let query: any = supabase
         .from('error_logs' as any)
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(100);
+        .limit(200);
 
-      if (activeTab !== 'all') {
-        query = query.eq('error_type', activeTab);
+      if (activeTab !== 'all') query = query.eq('error_type', activeTab);
+      if (statusFilter === 'open') query = query.eq('resolved', false);
+      if (statusFilter === 'resolved') query = query.eq('resolved', true);
+
+      const since = rangeSince(dateRange);
+      if (since) query = query.gte('created_at', since);
+
+      if (searchTerm) {
+        const esc = searchTerm.replace(/[%,]/g, ' ');
+        query = query.or(
+          `error_message.ilike.%${esc}%,route.ilike.%${esc}%,component_name.ilike.%${esc}%`
+        );
       }
 
       const { data, error } = await query;
