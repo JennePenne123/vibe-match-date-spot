@@ -15,6 +15,7 @@ interface DateInviteCardPreviewProps {
   onOpen: () => void;
   onAccept?: () => void;
   onDecline?: () => void;
+  onCancel?: () => void;
 }
 
 const DateInviteCardPreview = ({
@@ -24,7 +25,8 @@ const DateInviteCardPreview = ({
   isPending,
   onOpen,
   onAccept,
-  onDecline
+  onDecline,
+  onCancel
 }: DateInviteCardPreviewProps) => {
   const { isMobile } = useBreakpoint();
   const StatusIcon = statusConfig.icon;
@@ -142,6 +144,24 @@ const DateInviteCardPreview = ({
               >
                 <X className={`${isMobile ? 'w-4 h-4 mr-2' : 'w-3.5 h-3.5 mr-1.5'}`} />
                 Decline
+              </Button>
+            </div>
+          )}
+
+          {/* Cancel action for sent pending invitations */}
+          {direction === 'sent' && isPending && onCancel && (
+            <div className="pt-2">
+              <Button
+                size={isMobile ? 'default' : 'sm'}
+                variant="outline"
+                onClick={e => {
+                  e.stopPropagation();
+                  onCancel();
+                }}
+                className={`border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-300 dark:hover:border-red-700 ${isMobile ? 'w-full min-h-[44px] text-base' : 'w-full h-9 text-sm'}`}
+              >
+                <X className={`${isMobile ? 'w-4 h-4 mr-2' : 'w-3.5 h-3.5 mr-1.5'}`} />
+                Einladung zurückziehen
               </Button>
             </div>
           )}
