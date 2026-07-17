@@ -9,7 +9,6 @@ import { AuthModal } from '@/components/landing/AuthModal';
 import { PartnerAuthModal } from '@/components/landing/PartnerAuthModal';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import AnimatedCounter from '@/components/landing/AnimatedCounter';
-import { motion } from 'framer-motion';
 import { SEO } from '@/components/SEO';
 export default function LandingDemo() {
   const navigate = useNavigate();
