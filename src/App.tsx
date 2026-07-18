@@ -180,6 +180,7 @@ const App = () => (
                     <Route path="/waitlist" element={<LazyPageNoLayout><Waitlist /></LazyPageNoLayout>} />
                     <Route path="/reset-password" element={<LazyPageNoLayout><ResetPassword /></LazyPageNoLayout>} />
                     <Route path="/auth" element={<Navigate to="/?auth=required" replace />} />
+                    <Route path="/auth/callback" element={<LazyPageNoLayout><AuthCallback /></LazyPageNoLayout>} />
                     <Route path="/register-login" element={<Navigate to="/?auth=required" replace />} />
                     
                     {/* Protected routes with responsive layout */}
