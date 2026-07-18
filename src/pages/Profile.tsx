@@ -98,20 +98,11 @@ const Profile = () => {
           <ActivityFeed />
 
           {!pointsLoading && points && <PointsCard totalPoints={points.total_points} lifetimeXp={points.lifetime_xp ?? points.total_points} level={points.level} streakCount={points.streak_count} />}
-          <Collapsible>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
-                <span className="flex items-center gap-2 font-semibold">
-                  <Award className="h-5 w-5 text-primary" />
-                  {t('profile.achievements', 'Achievements')}
-                </span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              {!pointsLoading && points && <BadgesCard badges={Array.isArray(points.badges) ? points.badges : []} />}
-            </CollapsibleContent>
-          </Collapsible>
+
+          {/* Badges-Übersicht direkt sichtbar, damit „First User" und weitere Badges auf einen Blick zu sehen sind */}
+          {!pointsLoading && points && (
+            <BadgesCard badges={Array.isArray(points.badges) ? points.badges.filter((b: string) => !b.startsWith('_')) : []} />
+          )}
 
           <Collapsible>
             <CollapsibleTrigger asChild>
