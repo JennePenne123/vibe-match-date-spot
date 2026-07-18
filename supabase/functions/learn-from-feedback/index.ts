@@ -12,11 +12,13 @@ const corsHeaders = {
  * Early ratings have MORE impact (exploration), later ratings less (exploitation).
  */
 function getLearningRate(totalRatings: number): number {
-  if (totalRatings <= 2) return 0.35;   // First 2 ratings: very aggressive learning
-  if (totalRatings <= 5) return 0.25;   // Next 3: aggressive learning
-  if (totalRatings <= 10) return 0.15;  // Building confidence
-  if (totalRatings <= 20) return 0.10;  // Settling phase
-  return 0.05;                           // Stable: fine-tuning only
+  // Slower, deeper learning: smaller step sizes, longer exploration phase.
+  // Preferences shift gradually over many ratings instead of after 1–2.
+  if (totalRatings <= 3) return 0.15;   // Cold start: careful nudges
+  if (totalRatings <= 8) return 0.10;   // Early phase: still exploring
+  if (totalRatings <= 20) return 0.06;  // Building deeper confidence
+  if (totalRatings <= 40) return 0.04;  // Settling — deep signal accumulation
+  return 0.025;                          // Stable: fine-tuning only
 }
 
 /**
@@ -25,12 +27,12 @@ function getLearningRate(totalRatings: number): number {
  */
 function getRatingIntensity(rating: number): number {
   switch (rating) {
-    case 5: return 1.4;  // Strong positive signal
-    case 4: return 1.0;  // Standard positive
+    case 5: return 1.2;  // Strong positive signal (softened)
+    case 4: return 0.9;  // Standard positive
     case 3: return 0.0;  // Neutral → no learning
-    case 2: return 1.0;  // Standard negative
-    case 1: return 1.4;  // Strong negative signal
-    default: return 0.5;
+    case 2: return 0.9;  // Standard negative
+    case 1: return 1.2;  // Strong negative signal (softened)
+    default: return 0.4;
   }
 }
 
@@ -175,7 +177,7 @@ serve(async (req) => {
       .select('actual_rating, created_at, predicted_factors')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-      .limit(50);
+      .limit(100);
 
     const totalRatings = (existingVector?.total_ratings || 0) + 1;
     const successfulPredictions = (existingVector?.successful_predictions || 0) + 
