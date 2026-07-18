@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { verifyUserAuth, unauthorizedResponse } from '../_shared/auth-guards.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,6 +20,12 @@ const corsHeaders = {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
+  }
+
+  const auth = await verifyUserAuth(req);
+  if (!auth) {
+    console.warn('[enrich-venue-photos] Unauthorized invocation');
+    return unauthorizedResponse(corsHeaders);
   }
 
   try {

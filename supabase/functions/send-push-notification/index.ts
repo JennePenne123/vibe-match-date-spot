@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { checkRateLimitWithLogging, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
+import { isCronAuthorized, verifyUserAuth, unauthorizedResponse } from '../_shared/auth-guards.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -103,6 +104,14 @@ async function sendWebPush(
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Allow either a valid cron/service invocation or an authenticated user.
+  const cronOk = isCronAuthorized(req);
+  const auth = cronOk ? null : await verifyUserAuth(req);
+  if (!cronOk && !auth) {
+    console.warn('[send-push-notification] Unauthorized invocation');
+    return unauthorizedResponse(corsHeaders);
   }
 
   const identifier = getRateLimitIdentifier(req);

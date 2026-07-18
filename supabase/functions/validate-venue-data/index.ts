@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { requireCronOrAdmin, unauthorizedResponse } from "../_shared/auth-guards.ts";
 
 const NOMINATIM_BASE = "https://nominatim.openstreetmap.org";
 const USER_AGENT = "HiOutz/1.0 (venue-validation)";
@@ -213,6 +214,11 @@ function compareFuzzy(a: string, b: string): number {
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+
+  if (!(await requireCronOrAdmin(req))) {
+    console.warn('[validate-venue-data] Unauthorized invocation');
+    return unauthorizedResponse(corsHeaders);
   }
 
   try {

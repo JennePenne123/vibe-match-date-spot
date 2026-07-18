@@ -7,6 +7,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from "../_shared/rate-limiter.ts";
+import { verifyUserAuth, unauthorizedResponse } from "../_shared/auth-guards.ts";
 
 /**
  * Tiered Venue Search Orchestrator
@@ -140,6 +141,12 @@ async function enrichWithNominatim(venues: any[]): Promise<{ enrichedCount: numb
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+
+  const auth = await verifyUserAuth(req);
+  if (!auth) {
+    console.warn('[search-venues-tiered] Unauthorized invocation');
+    return unauthorizedResponse(corsHeaders);
   }
 
   const identifier = getRateLimitIdentifier(req);
