@@ -19,6 +19,8 @@ interface ActivityItem {
 }
 
 const DISMISSED_KEY = 'hioutz-dismissed-activities';
+const AUTO_DISMISS_DAYS = 7;
+const AUTO_DISMISS_MS = AUTO_DISMISS_DAYS * 24 * 60 * 60 * 1000;
 
 const getDismissedIds = (): string[] => {
   try {
@@ -72,11 +74,14 @@ const ActivityFeed: React.FC = () => {
 
         const dismissedIds = getDismissedIds();
         const items: ActivityItem[] = [];
+        const now = Date.now();
+        const isFresh = (ts: string) => now - new Date(ts).getTime() < AUTO_DISMISS_MS;
 
         invitationsRes.data?.forEach((inv) => {
           const isSender = inv.sender_id === user.id;
           const id = `inv-${inv.id}`;
           if (dismissedIds.includes(id)) return;
+          if (!isFresh(inv.created_at)) return;
           items.push({
             id,
             type: isSender ? 'date_sent' : 'date_received',
@@ -93,6 +98,7 @@ const ActivityFeed: React.FC = () => {
         feedbackRes.data?.forEach((fb) => {
           const id = `fb-${fb.id}`;
           if (dismissedIds.includes(id)) return;
+          if (!isFresh(fb.created_at)) return;
           items.push({
             id,
             type: 'feedback',
@@ -107,6 +113,7 @@ const ActivityFeed: React.FC = () => {
         friendsRes.data?.forEach((f) => {
           const id = `fr-${f.id}`;
           if (dismissedIds.includes(id)) return;
+          if (!isFresh(f.created_at)) return;
           items.push({
             id,
             type: 'friend',

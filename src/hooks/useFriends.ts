@@ -8,6 +8,7 @@ export const useFriends = () => {
   const { user } = useAuth();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [pendingRequests, setPendingRequests] = useState<Friend[]>([]);
+  const [outgoingRequests, setOutgoingRequests] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchFriends = async () => {
@@ -50,6 +51,7 @@ export const useFriends = () => {
       // Transform the data to get the friend's profile and deduplicate
       const friendsMap = new Map<string, Friend>();
       const requestsMap = new Map<string, Friend>();
+      const outgoingMap = new Map<string, Friend>();
 
       data?.forEach(friendship => {
         const isCurrentUserSender = friendship.user_id === user.id;
@@ -77,11 +79,15 @@ export const useFriends = () => {
         } else if (friendship.status === 'pending' && !isCurrentUserSender) {
           // Only incoming requests (where the current user is the recipient)
           if (!requestsMap.has(profile.id)) requestsMap.set(profile.id, entry);
+        } else if (friendship.status === 'pending' && isCurrentUserSender) {
+          // Outgoing requests waiting for the recipient to accept
+          if (!outgoingMap.has(profile.id)) outgoingMap.set(profile.id, entry);
         }
       });
 
       setFriends(Array.from(friendsMap.values()));
       setPendingRequests(Array.from(requestsMap.values()));
+      setOutgoingRequests(Array.from(outgoingMap.values()));
     } catch (error) {
       console.error('Error fetching friends:', error);
     } finally {
@@ -152,9 +158,31 @@ export const useFriends = () => {
 
       // Update local state
       setFriends(prev => prev.filter(friend => friend.friendship_id !== friendshipId));
+      setOutgoingRequests(prev => prev.filter(req => req.friendship_id !== friendshipId));
+      setPendingRequests(prev => prev.filter(req => req.friendship_id !== friendshipId));
       return true;
     } catch (error) {
       console.error('Error removing friend:', error);
+      return false;
+    }
+  };
+
+  const cancelFriendRequest = async (friendshipId: string) => {
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .delete()
+        .eq('id', friendshipId);
+
+      if (error) {
+        console.error('Error cancelling friend request:', error);
+        return false;
+      }
+
+      setOutgoingRequests(prev => prev.filter(req => req.friendship_id !== friendshipId));
+      return true;
+    } catch (error) {
+      console.error('Error cancelling friend request:', error);
       return false;
     }
   };
@@ -206,9 +234,11 @@ export const useFriends = () => {
   return {
     friends,
     pendingRequests,
+    outgoingRequests,
     loading,
     sendFriendRequest,
     removeFriend,
+    cancelFriendRequest,
     acceptFriendRequest,
     declineFriendRequest,
     fetchFriends
