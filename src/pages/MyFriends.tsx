@@ -19,7 +19,7 @@ const MyFriends = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { friends, pendingRequests, acceptFriendRequest, declineFriendRequest } = useFriends();
+  const { friends, pendingRequests, outgoingRequests, acceptFriendRequest, declineFriendRequest, cancelFriendRequest } = useFriends();
   const { referralLink, copyReferralLink } = useReferral();
   const { isOnline } = useOnlineStatusContext();
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,6 +41,18 @@ const MyFriends = () => {
     const success = await declineFriendRequest(friendshipId);
     if (success) {
       toast({ title: t('myFriends.requestDeclined') });
+    } else {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    }
+  };
+
+  const handleCancelOutgoing = async (friendshipId: string, friendName: string) => {
+    const success = await cancelFriendRequest(friendshipId);
+    if (success) {
+      toast({
+        title: t('myFriends.requestWithdrawn', 'Anfrage zurückgezogen'),
+        description: t('myFriends.requestWithdrawnDesc', { name: friendName, defaultValue: `Deine Anfrage an ${friendName} wurde entfernt.` }),
+      });
     } else {
       toast({ title: t('common.error'), variant: 'destructive' });
     }
@@ -169,6 +181,40 @@ const MyFriends = () => {
                         <X className="w-4 h-4" />
                       </OfflineGuardButton>
                     </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Outgoing friend requests */}
+          {outgoingRequests.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-foreground">
+                {t('myFriends.sentRequests', 'Gesendete Anfragen')}
+              </h2>
+              {outgoingRequests.map((req) => (
+                <Card key={req.friendship_id} className="bg-card/80 backdrop-blur-sm border-border">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <Avatar className="w-12 h-12 border-2 border-border">
+                      <AvatarImage src={req.avatar_url} alt={req.name} referrerPolicy="no-referrer" />
+                      <AvatarFallback className="bg-muted text-muted-foreground font-medium">{getInitials(req.name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground truncate">{req.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {t('myFriends.requestSent', 'Anfrage versendet')}
+                      </p>
+                    </div>
+                    <OfflineGuardButton
+                      onClick={() => handleCancelOutgoing(req.friendship_id!, req.name)}
+                      size="sm"
+                      variant="outline"
+                      className="shrink-0"
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      {t('myFriends.withdrawRequest', 'Zurückziehen')}
+                    </OfflineGuardButton>
                   </CardContent>
                 </Card>
               ))}
