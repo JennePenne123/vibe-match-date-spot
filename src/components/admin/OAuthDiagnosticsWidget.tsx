@@ -10,8 +10,8 @@ const SUPABASE_PROJECT_REF = 'dfjwubatslzblagthbdw';
 const PROD_DOMAIN = 'https://hioutz.app';
 
 const REDIRECT_URLS = [
-  `${PROD_DOMAIN}/home`,
   `${PROD_DOMAIN}/auth/callback`,
+  `${PROD_DOMAIN}/home`,
   `https://${SUPABASE_PROJECT_REF}.supabase.co/auth/v1/callback`,
 ];
 

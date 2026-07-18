@@ -67,6 +67,7 @@ const AGB = lazy(() => import("./pages/AGB"));
 const Widerrufsformular = lazy(() => import("./pages/Widerrufsformular"));
 const Kontakt = lazy(() => import("./pages/Kontakt"));
 const DsgvoRequests = lazy(() => import("./pages/DsgvoRequests"));
+const AuthCallback = lazy(() => import("./pages/auth/Callback"));
 
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
@@ -179,6 +180,7 @@ const App = () => (
                     <Route path="/waitlist" element={<LazyPageNoLayout><Waitlist /></LazyPageNoLayout>} />
                     <Route path="/reset-password" element={<LazyPageNoLayout><ResetPassword /></LazyPageNoLayout>} />
                     <Route path="/auth" element={<Navigate to="/?auth=required" replace />} />
+                    <Route path="/auth/callback" element={<LazyPageNoLayout><AuthCallback /></LazyPageNoLayout>} />
                     <Route path="/register-login" element={<Navigate to="/?auth=required" replace />} />
                     
                     {/* Protected routes with responsive layout */}
