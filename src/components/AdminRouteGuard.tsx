@@ -30,7 +30,7 @@ const AdminRouteGuard: React.FC<AdminRouteGuardProps> = ({ children }) => {
         return;
       }
 
-      const { data, error } = await supabase.rpc('verify_admin_access');
+      const { data, error } = await (supabase.rpc as any)('verify_admin_access');
       if (cancelled) return;
       if (error || data !== true) {
         setState('denied');
