@@ -16,17 +16,9 @@ export const useFriends = () => {
     setLoading(true);
     try {
       // Get accepted friendships where user is either the sender or recipient
-      // Note: We exclude email from friend profiles for privacy
       const { data, error } = await supabase
         .from('friendships')
-        .select(`
-          id,
-          status,
-          user_id,
-          friend_id,
-          user:profiles_safe!user_id(id, name, avatar_url),
-          friend:profiles_safe!friend_id(id, name, avatar_url)
-        `)
+        .select('id, status, user_id, friend_id')
         .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
         .in('status', ['accepted', 'pending']);
 
@@ -35,19 +27,35 @@ export const useFriends = () => {
         return;
       }
 
+      // Collect the other-user ids and fetch their public profile info separately.
+      // This avoids relying on PostgREST FK embedding for the profiles_safe view,
+      // which can silently drop rows if the schema cache lost the relationship.
+      const otherIds = Array.from(new Set(
+        (data || []).map(f => (f.user_id === user.id ? f.friend_id : f.user_id))
+      ));
+
+      let profilesById = new Map<string, { id: string; name: string | null; avatar_url: string | null }>();
+      if (otherIds.length > 0) {
+        const { data: profs, error: profErr } = await supabase
+          .from('profiles_safe')
+          .select('id, name, avatar_url')
+          .in('id', otherIds);
+        if (profErr) {
+          console.error('Error fetching friend profiles:', profErr);
+        } else {
+          profs?.forEach(p => profilesById.set(p.id, p as any));
+        }
+      }
+
       // Transform the data to get the friend's profile and deduplicate
       const friendsMap = new Map<string, Friend>();
       const requestsMap = new Map<string, Friend>();
 
       data?.forEach(friendship => {
         const isCurrentUserSender = friendship.user_id === user.id;
-        const friendProfile = isCurrentUserSender ? friendship.friend : friendship.user;
-
-        // Handle the case where friendProfile might be an array
-        const profile = Array.isArray(friendProfile) ? friendProfile[0] : friendProfile;
-
-        // Skip if profile is null (e.g. deleted user)
-        if (!profile || !profile.id) return;
+        const otherId = isCurrentUserSender ? friendship.friend_id : friendship.user_id;
+        const profile = profilesById.get(otherId) || { id: otherId, name: 'Freund', avatar_url: null };
+        if (!profile.id) return;
 
         const entry: Friend = {
           id: profile.id,
