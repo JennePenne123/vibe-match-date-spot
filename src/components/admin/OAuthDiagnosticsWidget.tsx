@@ -9,10 +9,13 @@ import { useToast } from '@/hooks/use-toast';
 const SUPABASE_PROJECT_REF = 'dfjwubatslzblagthbdw';
 const PROD_DOMAIN = 'https://hioutz.app';
 
-const REDIRECT_URLS = [
+const SUPABASE_CALLBACK_URL = `https://${SUPABASE_PROJECT_REF}.supabase.co/auth/v1/callback`;
+
+const GOOGLE_REDIRECT_URLS = [SUPABASE_CALLBACK_URL];
+
+const SUPABASE_REDIRECT_URLS = [
   `${PROD_DOMAIN}/auth/callback`,
-  `${PROD_DOMAIN}/home`,
-  `https://${SUPABASE_PROJECT_REF}.supabase.co/auth/v1/callback`,
+  `${PROD_DOMAIN}/**`,
 ];
 
 const JS_ORIGINS = [
@@ -83,7 +86,7 @@ export const OAuthDiagnosticsWidget: React.FC = () => {
           </div>
           <div>
             <div className="text-sm font-medium mb-2">Authorized Redirect URIs</div>
-            {REDIRECT_URLS.map(url => (
+            {GOOGLE_REDIRECT_URLS.map(url => (
               <div key={url} className="flex items-center justify-between bg-muted/50 rounded px-3 py-2 mb-1">
                 <code className="text-xs break-all">{url}</code>
                 <Button size="sm" variant="ghost" onClick={() => copy(url)}>
@@ -91,6 +94,9 @@ export const OAuthDiagnosticsWidget: React.FC = () => {
                 </Button>
               </div>
             ))}
+            <p className="text-xs text-muted-foreground mt-2">
+              In Google gehört nur der Supabase Callback hier hinein. <code>{PROD_DOMAIN}/auth/callback</code> gehört in Supabase, nicht in Google.
+            </p>
           </div>
           <Button asChild variant="outline" size="sm">
             <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">
@@ -122,7 +128,12 @@ export const OAuthDiagnosticsWidget: React.FC = () => {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription className="text-sm">
-          <strong>Site URL &amp; Redirect URLs in Supabase:</strong> Müssen in <em>Authentication → URL Configuration</em> auf <code>{PROD_DOMAIN}</code> gesetzt sein, sonst Login-Loop.
+          <strong>Supabase Site URL:</strong> <code>{PROD_DOMAIN}</code>. <strong>Supabase Redirect URLs:</strong>{' '}
+          {SUPABASE_REDIRECT_URLS.map((url, index) => (
+            <React.Fragment key={url}>
+              <code>{url}</code>{index < SUPABASE_REDIRECT_URLS.length - 1 ? ', ' : ''}
+            </React.Fragment>
+          ))}
         </AlertDescription>
       </Alert>
 

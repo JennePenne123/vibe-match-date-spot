@@ -34,8 +34,20 @@ const AuthCallback: React.FC = () => {
         }
 
         if (code) {
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
+          const { data: existing } = await supabase.auth.getSession();
+          if (existing.session?.user) {
+            if (!cancelled) navigate('/home', { replace: true });
+            return;
+          }
+
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError && !cancelled) {
+            const { data: recovered } = await supabase.auth.getSession();
+            if (recovered.session?.user) {
+              navigate('/home', { replace: true });
+              return;
+            }
+
             console.error('OAuth exchange failed:', exchangeError);
             setError(exchangeError.message);
             setTimeout(() => navigate('/?auth=required', { replace: true }), 2000);
