@@ -8,6 +8,33 @@ import { supabase } from '@/integrations/supabase/client';
 type BadgeChecker = (userId: string) => Promise<boolean>;
 
 const checkers: Record<string, BadgeChecker> = {
+  // ── Special: First 15 users (excludes founders/admins) ──
+  first_user: async (userId) => {
+    const EXCLUDED = [
+      'muetze-burg@web.de',
+      'info@janwiechmann.de',
+      'janwiechmann@hotmail.com',
+      'tschinnenburg@t-online.de',
+    ];
+    const { data: me } = await supabase
+      .from('profiles')
+      .select('email, created_at')
+      .eq('id', userId)
+      .maybeSingle();
+    if (!me || EXCLUDED.includes((me.email || '').toLowerCase())) return false;
+
+    const { data: earlier } = await supabase
+      .from('profiles')
+      .select('email, created_at')
+      .lte('created_at', me.created_at)
+      .order('created_at', { ascending: true })
+      .limit(50);
+    const rank = (earlier || [])
+      .filter((p) => !EXCLUDED.includes((p.email || '').toLowerCase()))
+      .findIndex((p) => p.created_at === me.created_at);
+    return rank >= 0 && rank < 15;
+  },
+
   // ── Rating badges ──
   first_reviewer: async (userId) => {
     const { count } = await supabase

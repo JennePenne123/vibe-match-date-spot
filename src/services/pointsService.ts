@@ -251,6 +251,15 @@ export const BADGE_DEFINITIONS: Record<string, {
     requirement: '1 Date bewerten',
     category: 'rating',
   },
+  'first_user': {
+    name: 'First User',
+    description: 'Einer der ersten 15 Nutzer von H!Outz',
+    lucideIcon: 'rocket',
+    color: 'text-orange-500',
+    bg: 'bg-orange-500/15',
+    requirement: 'Unter den ersten 15 Nutzern',
+    category: 'engagement',
+  },
   'speed_demon': {
     name: 'Speed Demon',
     description: 'Innerhalb von 24 Stunden bewertet',
