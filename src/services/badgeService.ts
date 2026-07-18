@@ -15,6 +15,7 @@ const checkers: Record<string, BadgeChecker> = {
       'info@janwiechmann.de',
       'janwiechmann@hotmail.com',
       'tschinnenburg@t-online.de',
+      'jennepenne123@gmail.com',
     ];
     const { data: me } = await supabase
       .from('profiles')
