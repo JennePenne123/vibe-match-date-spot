@@ -46,13 +46,11 @@ export async function verifyUserAuth(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
-    const { data: roleRow } = await admin
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .eq('role', 'admin')
-      .maybeSingle();
-    isAdmin = !!roleRow;
+    const [{ data: roleRow }, { data: teamRow }] = await Promise.all([
+      admin.from('user_roles').select('role').eq('user_id', userId).eq('role', 'admin').maybeSingle(),
+      admin.from('admin_team').select('user_id').eq('user_id', userId).maybeSingle(),
+    ]);
+    isAdmin = !!roleRow || !!teamRow;
   } catch {
     isAdmin = false;
   }
