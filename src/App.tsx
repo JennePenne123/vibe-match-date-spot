@@ -67,6 +67,7 @@ const AGB = lazy(() => import("./pages/AGB"));
 const Widerrufsformular = lazy(() => import("./pages/Widerrufsformular"));
 const Kontakt = lazy(() => import("./pages/Kontakt"));
 const DsgvoRequests = lazy(() => import("./pages/DsgvoRequests"));
+const AuthCallback = lazy(() => import("./pages/auth/Callback"));
 
 // Partner routes – lazy loaded
 const PartnerDashboard = lazy(() => import("./pages/partner/Dashboard"));
