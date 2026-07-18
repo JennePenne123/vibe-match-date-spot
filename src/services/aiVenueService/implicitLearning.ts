@@ -135,7 +135,9 @@ export const applyImplicitLearning = async (userId: string): Promise<boolean> =>
       cuisine: 1.0, vibe: 1.0, price: 1.0, time: 1.0, rating: 1.0
     };
 
-    const IMPLICIT_LR = 0.03; // Very small — implicit signals should nudge, not override
+    // Slower, deeper implicit learning: smaller nudges, but signals accumulate
+    // across more sessions before shifting the preference vector meaningfully.
+    const IMPLICIT_LR = 0.015; // Halved — accumulates depth over many sessions
 
     // If user engages heavily with specific cuisines, boost cuisine weight
     const topCuisineStrength = Math.max(...Object.values(insights.cuisineBoost), 0);
