@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
  * OAuth callback landing page.
  *
- * Supabase's `detectSessionInUrl: true` parses either the hash-fragment
- * (`#access_token=...`) or the PKCE `?code=...` query param automatically.
- * We wait for either the session to appear OR an error, then route.
+ * Supabase's `detectSessionInUrl: true` parses the provider redirect URL and
+ * persists the session on client initialization. This component must not call
+ * `exchangeCodeForSession` manually, otherwise the OAuth code/code-verifier can
+ * be consumed twice and users get dropped back to the login screen.
  *
  * This page is intentionally minimal — no auth guards, no redirects
  * from other hooks — so the OAuth token exchange can complete cleanly
@@ -20,61 +22,56 @@ const AuthCallback: React.FC = () => {
   useEffect(() => {
     let cancelled = false;
 
+    const showErrorAndReturn = (message: string) => {
+      if (cancelled) return;
+      setError(message);
+      window.setTimeout(() => {
+        if (!cancelled) navigate('/?auth=required', { replace: true });
+      }, 2500);
+    };
+
     const finish = async () => {
+      const url = new URL(window.location.href);
+      const errParam = url.searchParams.get('error_description') || url.searchParams.get('error');
+
+      if (errParam) {
+        showErrorAndReturn(errParam);
+        return;
+      }
+
+      const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+        if (cancelled) return;
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+          navigate('/home', { replace: true });
+        }
+      });
+
       try {
-        // If PKCE code is present, exchange it explicitly.
-        const url = new URL(window.location.href);
-        const code = url.searchParams.get('code');
-        const errParam = url.searchParams.get('error_description') || url.searchParams.get('error');
+        // Wait until Supabase has finished its own URL/session initialization.
+        for (let i = 0; i < 40; i++) {
+          const { data, error: sessionError } = await supabase.auth.getSession();
 
-        if (errParam) {
-          setError(errParam);
-          setTimeout(() => navigate('/?auth=required', { replace: true }), 2000);
-          return;
-        }
+          if (cancelled) return;
 
-        if (code) {
-          const { data: existing } = await supabase.auth.getSession();
-          if (existing.session?.user) {
-            if (!cancelled) navigate('/home', { replace: true });
+          if (sessionError) {
+            throw sessionError;
+          }
+
+          if (data.session?.user) {
+            navigate('/home', { replace: true });
             return;
           }
 
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          if (exchangeError && !cancelled) {
-            const { data: recovered } = await supabase.auth.getSession();
-            if (recovered.session?.user) {
-              navigate('/home', { replace: true });
-              return;
-            }
-
-            console.error('OAuth exchange failed:', exchangeError);
-            setError(exchangeError.message);
-            setTimeout(() => navigate('/?auth=required', { replace: true }), 2000);
-            return;
-          }
+          await new Promise(r => window.setTimeout(r, 150));
         }
 
-        // Give detectSessionInUrl a moment to process the hash fragment.
-        for (let i = 0; i < 20; i++) {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session?.user) {
-            if (!cancelled) navigate('/home', { replace: true });
-            return;
-          }
-          await new Promise(r => setTimeout(r, 150));
-        }
-
-        if (!cancelled) {
-          setError('Session konnte nicht hergestellt werden. Bitte erneut versuchen.');
-          setTimeout(() => navigate('/?auth=required', { replace: true }), 2000);
-        }
-      } catch (err: any) {
-        console.error('Auth callback error:', err);
-        if (!cancelled) {
-          setError(err?.message ?? 'Unbekannter Fehler');
-          setTimeout(() => navigate('/?auth=required', { replace: true }), 2000);
-        }
+        showErrorAndReturn('Session konnte nicht hergestellt werden. Bitte erneut versuchen.');
+      } catch (err) {
+        const authError = err as AuthError | Error;
+        console.error('Auth callback error:', authError);
+        showErrorAndReturn(authError?.message ?? 'Unbekannter Fehler');
+      } finally {
+        listener.subscription.unsubscribe();
       }
     };
 
