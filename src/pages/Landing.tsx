@@ -18,16 +18,34 @@ export default function LandingDemo() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
+  const [authErrorInfo, setAuthErrorInfo] = useState<Record<string, string> | null>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const howItWorksRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const authParam = searchParams.get('auth');
-    const oauthError = searchParams.get('error') || searchParams.get('error_description');
+    // Collect OAuth errors from both query string AND hash fragment (Supabase often uses #)
+    const collected: Record<string, string> = {};
+    ['error', 'error_code', 'error_description', 'provider', 'message'].forEach((k) => {
+      const v = searchParams.get(k);
+      if (v) collected[k] = v;
+    });
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      ['error', 'error_code', 'error_description', 'provider', 'message'].forEach((k) => {
+        const v = hash.get(k);
+        if (v) collected[k] = v;
+      });
+    }
+    const hasError = Object.keys(collected).length > 0;
+    if (hasError) setAuthErrorInfo(collected);
 
-    if (authParam === 'required' || oauthError) {
+    if (authParam === 'required' || hasError) {
       setIsAuthModalOpen(true);
       setSearchParams({}, { replace: true });
+      if (typeof window !== 'undefined' && window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
     } else if (authParam === 'partner') {
       setIsPartnerModalOpen(true);
       setSearchParams({}, { replace: true });
@@ -65,6 +83,28 @@ export default function LandingDemo() {
         description="H!Outz hilft dir, das perfekte Date zu planen – mit KI-gestützten Venue-Empfehlungen, die eure Vorlieben kennen."
         path="/"
       />
+      {authErrorInfo && (
+        <div
+          role="alert"
+          className="fixed top-0 left-0 right-0 z-[100] bg-destructive text-destructive-foreground px-4 py-3 shadow-lg"
+        >
+          <div className="max-w-4xl mx-auto flex items-start justify-between gap-4">
+            <div className="text-sm space-y-1">
+              <div className="font-semibold">Anmeldung fehlgeschlagen</div>
+              <ul className="text-xs opacity-95 space-y-0.5 break-all">
+                {Object.entries(authErrorInfo).map(([k, v]) => (
+                  <li key={k}><span className="font-mono opacity-80">{k}:</span> {v}</li>
+                ))}
+              </ul>
+            </div>
+            <button
+              onClick={() => setAuthErrorInfo(null)}
+              className="text-destructive-foreground/80 hover:text-destructive-foreground text-lg leading-none"
+              aria-label="Schließen"
+            >×</button>
+          </div>
+        </div>
+      )}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${isScrolled ? 'bg-background/90 backdrop-blur-lg border-b border-border/40 shadow-gentle-sm' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
