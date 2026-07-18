@@ -32,7 +32,7 @@ const anonClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
  * Kept in sync with src/components/AdminRouteGuard.tsx.
  */
 async function resolveAdminGuard(
-  client: ReturnType<typeof createClient>,
+  client: any,
 ): Promise<"allowed" | "denied"> {
   const { data: userData, error: userErr } = await client.auth.getUser();
   if (userErr || !userData?.user) return "denied";
