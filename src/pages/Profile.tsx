@@ -5,7 +5,7 @@ import { useFirstUseNudge } from '@/hooks/useFirstUseNudge';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronDown, Award, Gift, Brain } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Award, Gift, Brain, ShieldCheck } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import ProfileHeader from '@/components/ProfileHeader';
 import ProfileStats from '@/components/ProfileStats';
@@ -20,6 +20,7 @@ import { ThemeSettingsCard } from '@/components/profile/ThemeSettingsCard';
 import { PremiumWalletCard } from '@/components/profile/PremiumWalletCard';
 import ActivityFeed from '@/components/profile/ActivityFeed';
 import { useUserPoints } from '@/hooks/useUserPoints';
+import { useAdminRole, ADMIN_ROLE_LABELS } from '@/hooks/useAdminRole';
 import { checkAndAwardProfileComplete } from '@/services/profileCompletionService';
 
 const Profile = () => {
@@ -27,6 +28,7 @@ const Profile = () => {
   const { t } = useTranslation();
   const { user, updateUser, logout, loading, refreshProfile } = useAuth();
   const { points, loading: pointsLoading } = useUserPoints();
+  const { adminRole, loading: adminLoading } = useAdminRole();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
@@ -142,6 +144,22 @@ const Profile = () => {
           </Collapsible>
 
           <LeaderboardCard />
+
+          {!adminLoading && adminRole && (
+            <Button
+              onClick={() => navigate('/admin')}
+              variant="outline"
+              className="w-full justify-between px-4 py-3 h-auto border-primary/40 bg-primary/5 hover:bg-primary/10"
+            >
+              <span className="flex items-center gap-2 font-semibold">
+                <ShieldCheck className="h-5 w-5 text-primary" />
+                {t('profile.adminArea', 'Admin-Bereich')}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {ADMIN_ROLE_LABELS[adminRole]}
+              </span>
+            </Button>
+          )}
 
           <ProfileActions onLogout={logout} />
         </div>
