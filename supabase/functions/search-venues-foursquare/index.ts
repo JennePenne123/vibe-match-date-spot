@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 import { checkRateLimitWithLogging, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
+import { verifyUserAuth, unauthorizedResponse } from '../_shared/auth-guards.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -61,6 +62,12 @@ const ACTIVITY_TO_FSQ: Record<string, string[]> = {
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  const auth = await verifyUserAuth(req);
+  if (!auth) {
+    console.warn('[search-venues-foursquare] Unauthorized invocation');
+    return unauthorizedResponse(corsHeaders);
   }
 
   // Rate limiting with logging for external API functions
