@@ -96,4 +96,47 @@ describe("/admin route – server-side access control", () => {
       await userClient.auth.signOut().catch(() => {});
     }
   }, 30_000);
+
+  it("admin sessions are allowed through the guard (no redirect)", async () => {
+    // We cannot sign in as a real admin in CI without leaking credentials,
+    // so we build a fake client that behaves like Supabase would for an
+    // authenticated admin: getUser() returns a user, and verify_admin_access
+    // RPC returns `true`. This is the exact contract AdminRouteGuard depends
+    // on — if this ever regresses, admins would be locked out of /admin.
+    const adminClient = {
+      auth: {
+        getUser: async () => ({
+          data: { user: { id: "00000000-0000-0000-0000-0000000000ad" } },
+          error: null,
+        }),
+      },
+      rpc: async (fn: string) => {
+        if (fn !== "verify_admin_access") {
+          return { data: null, error: new Error(`unexpected rpc: ${fn}`) };
+        }
+        return { data: true, error: null };
+      },
+    };
+
+    const result = await resolveAdminGuard(adminClient);
+    expect(result).toBe("allowed");
+  });
+
+  it("guard denies when RPC returns anything other than strict true", async () => {
+    // Defensive: a truthy-but-not-true response (e.g. object, string) must
+    // NOT be treated as admin access.
+    for (const bogus of [null, undefined, false, 0, "true", 1, {}]) {
+      const client = {
+        auth: {
+          getUser: async () => ({
+            data: { user: { id: "00000000-0000-0000-0000-000000000001" } },
+            error: null,
+          }),
+        },
+        rpc: async () => ({ data: bogus, error: null }),
+      };
+      const result = await resolveAdminGuard(client);
+      expect(result, `bogus RPC payload ${JSON.stringify(bogus)}`).toBe("denied");
+    }
+  });
 });
