@@ -23,7 +23,9 @@ export default function LandingDemo() {
 
   useEffect(() => {
     const authParam = searchParams.get('auth');
-    if (authParam === 'required') {
+    const oauthError = searchParams.get('error') || searchParams.get('error_description');
+
+    if (authParam === 'required' || oauthError) {
       setIsAuthModalOpen(true);
       setSearchParams({}, { replace: true });
     } else if (authParam === 'partner') {
