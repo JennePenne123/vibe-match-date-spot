@@ -1,12 +1,19 @@
+import { requireCronOrAdmin, unauthorizedResponse } from "../_shared/auth-guards.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 // One-shot generator for promo video assets (voiceover + music).
-// Returns base64 mp3. No auth - intentionally throwaway.
+// Restricted to admin users / cron secret to prevent ElevenLabs budget abuse.
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  if (!(await requireCronOrAdmin(req))) {
+    console.warn('[promo-audio-gen] Unauthorized invocation');
+    return unauthorizedResponse(corsHeaders);
+  }
 
   const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
   if (!ELEVENLABS_API_KEY) {
