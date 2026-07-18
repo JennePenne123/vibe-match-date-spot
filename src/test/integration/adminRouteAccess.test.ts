@@ -16,6 +16,8 @@
  */
 import { describe, it, expect } from "vitest";
 import { createClient } from "@supabase/supabase-js";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const SUPABASE_URL =
   process.env.VITE_SUPABASE_URL ?? "https://dfjwubatslzblagthbdw.supabase.co";
@@ -138,5 +140,46 @@ describe("/admin route – server-side access control", () => {
       const result = await resolveAdminGuard(client);
       expect(result, `bogus RPC payload ${JSON.stringify(bogus)}`).toBe("denied");
     }
+  });
+
+  describe("hard refresh on /admin without admin role", () => {
+    // A hard refresh throws away all in-memory React state and remounts the
+    // guard from scratch. Each mount MUST re-run the server check — never
+    // rely on cached client state. We simulate this by creating a fresh
+    // Supabase client (no persisted session, no shared state) on every
+    // iteration and asserting the guard blocks each time.
+
+    it("blocks on every fresh mount (10 consecutive hard refreshes)", async () => {
+      for (let i = 0; i < 10; i++) {
+        const freshClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: { persistSession: false, autoRefreshToken: false, storageKey: `hr-${i}` },
+        });
+        const result = await resolveAdminGuard(freshClient);
+        expect(result, `hard refresh #${i + 1}`).toBe("denied");
+      }
+    }, 30_000);
+
+    it("redirect target in AdminRouteGuard is /home (source-code contract)", () => {
+      // The E2E behavior we promise the user is "redirect to /home".
+      // If someone changes the target without updating this test, the
+      // contract breaks silently. Pin the target here.
+      const src = readFileSync(
+        resolve(process.cwd(), "src/components/AdminRouteGuard.tsx"),
+        "utf8",
+      );
+      expect(src).toMatch(/<Navigate\s+to=["']\/home["']\s+replace\s*\/>/);
+    });
+
+    it("guard does not leak admin access via a stale cached RPC result", async () => {
+      // Two sequential mounts on the same client instance — the second call
+      // must still hit the server and get `false`, never a cached `true`.
+      const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      const first = await resolveAdminGuard(client);
+      const second = await resolveAdminGuard(client);
+      expect(first).toBe("denied");
+      expect(second).toBe("denied");
+    });
   });
 });
