@@ -59,3 +59,13 @@ export async function verifyUserAuth(
 
   return { userId, isAdmin, token };
 }
+
+/**
+ * Allow either a valid CRON_SECRET header or an authenticated admin user.
+ * Returns true when the caller is authorized.
+ */
+export async function requireCronOrAdmin(req: Request): Promise<boolean> {
+  if (isCronAuthorized(req)) return true;
+  const auth = await verifyUserAuth(req);
+  return !!auth?.isAdmin;
+}
