@@ -260,15 +260,6 @@ export const BADGE_DEFINITIONS: Record<string, {
     requirement: 'Unter den ersten 15 Nutzern',
     category: 'engagement',
   },
-  '_first_reviewer_placeholder': {
-    name: 'First Steps',
-    description: 'Deine erste Date-Bewertung abgegeben',
-    lucideIcon: 'star',
-    color: 'text-yellow-500',
-    bg: 'bg-yellow-500/15',
-    requirement: '1 Date bewerten',
-    category: 'rating',
-  },
   'speed_demon': {
     name: 'Speed Demon',
     description: 'Innerhalb von 24 Stunden bewertet',
