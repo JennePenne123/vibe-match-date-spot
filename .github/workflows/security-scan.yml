@@ -1,10 +1,17 @@
 name: Supabase Security Scan
 
-# Runs the Supabase database linter on every push / PR that touches
-# migrations or policies, plus once per day. Fails the build when the
-# linter reports an ERROR-level finding (missing RLS, security definer
-# view, exposed sensitive columns, …). WARN-level findings are printed
-# but do not fail the run.
+# Runs the Supabase database linter + dependency audit:
+#   - on every push / PR that touches migrations or policies
+#   - after every successful deploy (deployment_status → success)
+#   - once per day (cron)
+#   - manually via workflow_dispatch
+#
+# Fails the build when:
+#   - the linter reports an ERROR-level finding, OR
+#   - a NEW finding appears vs. the tracked baseline (.security/lint-baseline.txt),
+#   - or `bun audit` reports a high/critical vulnerability.
+# WARN-level findings that already exist in the baseline are printed but
+# do not fail the run.
 #
 # Required repo secrets (Settings → Secrets and variables → Actions):
 #   SUPABASE_ACCESS_TOKEN   Personal access token (Supabase dashboard → Account → Access Tokens)
@@ -18,10 +25,18 @@ on:
       - "supabase/migrations/**"
       - "supabase/config.toml"
       - ".github/workflows/security-scan.yml"
+      - ".security/lint-baseline.txt"
+      - "package.json"
+      - "bun.lock"
+      - "bun.lockb"
   pull_request:
     paths:
       - "supabase/migrations/**"
       - "supabase/config.toml"
+      - "package.json"
+      - "bun.lock"
+      - "bun.lockb"
+  deployment_status:
   schedule:
     - cron: "0 6 * * *" # daily 06:00 UTC
   workflow_dispatch:
@@ -30,6 +45,10 @@ jobs:
   lint:
     name: supabase db lint
     runs-on: ubuntu-latest
+    # For deployment_status events, only run when the deploy succeeded.
+    if: >-
+      github.event_name != 'deployment_status' ||
+      github.event.deployment_status.state == 'success'
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -48,16 +67,38 @@ jobs:
             --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}" \
             --password "$SUPABASE_DB_PASSWORD"
 
-      - name: Run linter (fail on ERROR)
+      - name: Run linter (fail on ERROR or NEW findings)
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           set -o pipefail
           supabase db lint --linked --level warning | tee lint.txt
+
+          # Fail immediately on ERROR-level findings.
           if grep -Eiq '^\s*level:\s*error|\berror\b' lint.txt; then
             echo "::error::Supabase linter reported ERROR-level findings"
             exit 1
+          fi
+
+          # Diff against baseline to catch NEW findings (post-deploy regressions).
+          mkdir -p .security
+          BASELINE=".security/lint-baseline.txt"
+          # Normalize: strip volatile fields (timestamps, oids) and sort.
+          grep -E '^\s*(name|level|description):' lint.txt | sort -u > lint.normalized.txt
+          if [ -f "$BASELINE" ]; then
+            sort -u "$BASELINE" > baseline.normalized.txt
+            NEW=$(comm -23 lint.normalized.txt baseline.normalized.txt || true)
+            if [ -n "$NEW" ]; then
+              echo "::error::New Supabase security findings detected (not in baseline):"
+              echo "$NEW"
+              echo "If intentional, refresh .security/lint-baseline.txt and commit."
+              exit 1
+            fi
+            echo "No new findings vs. baseline."
+          else
+            echo "::warning::No baseline at $BASELINE — creating one from current run (upload as artifact)."
+            cp lint.normalized.txt "$BASELINE"
           fi
 
       - name: Upload linter report
@@ -65,5 +106,32 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: supabase-lint-report
-          path: lint.txt
+          path: |
+            lint.txt
+            lint.normalized.txt
+            .security/lint-baseline.txt
+          retention-days: 30
+
+  deps:
+    name: dependency audit (bun)
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name != 'deployment_status' ||
+      github.event.deployment_status.state == 'success'
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: bun audit (fail on high/critical)
+        run: |
+          set -o pipefail
+          bun audit --prod --audit-level=high | tee audit.txt
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bun-audit-report
+          path: audit.txt
           retention-days: 30
