@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { isCronAuthorized, unauthorizedResponse } from '../_shared/auth-guards.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,6 +9,11 @@ const corsHeaders = {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  if (!isCronAuthorized(req)) {
+    console.warn('[cleanup-implicit-signals] Unauthorized invocation');
+    return unauthorizedResponse(corsHeaders);
   }
 
   try {
