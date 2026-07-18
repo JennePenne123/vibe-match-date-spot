@@ -68,7 +68,7 @@ export const signInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/home`,
+        redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -87,7 +87,7 @@ export const signInWithApple = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'apple',
       options: {
-        redirectTo: `${window.location.origin}/home`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     return { data, error };
