@@ -21,7 +21,7 @@ export const OAuthErrorDetails: React.FC<Props> = ({ info }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const expectedRedirect = `${origin}/home`;
+  const appCallbackUrl = `${origin}/auth/callback`;
 
   const copy = (value: string) => {
     navigator.clipboard.writeText(value);
@@ -62,7 +62,7 @@ export const OAuthErrorDetails: React.FC<Props> = ({ info }) => {
       <div className="rounded-md bg-background/60 px-3 py-2">
         <Row label={t('auth.oauthError.provider')} value={info.provider} />
         <Row label={t('auth.oauthError.currentOrigin')} value={origin || '—'} />
-        <Row label={t('auth.oauthError.redirectUri')} value={expectedRedirect} />
+        <Row label={t('auth.oauthError.redirectUri')} value={appCallbackUrl} />
         <Row label={t('auth.oauthError.callbackUrl')} value={SUPABASE_CALLBACK_URL} />
       </div>
 
