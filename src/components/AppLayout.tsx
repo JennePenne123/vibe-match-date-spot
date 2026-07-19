@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { Menu } from 'lucide-react'
 import hioutzLogo from '@/assets/hioutz-logo.webp'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 const AIConcierge = lazy(() => import('@/components/AIConcierge'))
 
 // Tab order for directional slide
@@ -41,7 +42,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const isHomePage = location.pathname === '/' || location.pathname === '/index' || location.pathname === '/home'
 
-  const concierge = isHomePage ? (
+  const { enabled: conciergeEnabled } = useFeatureFlag('ai_concierge')
+  const concierge = isHomePage && conciergeEnabled ? (
     <Suspense fallback={null}>
       <AIConcierge />
     </Suspense>
