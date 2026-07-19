@@ -227,7 +227,7 @@ export default function LandingDemo() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {[
-              { icon: Zap, gradient: 'bg-gradient-primary', title: t('landing.feature1Title'), desc: t('landing.feature1Desc'), delay: 0 },
+              { icon: Zap, gradient: 'bg-gradient-to-br from-secondary to-accent', title: t('landing.feature1Title'), desc: t('landing.feature1Desc'), delay: 0 },
               { icon: Shield, gradient: 'bg-gradient-secondary', title: t('landing.feature2Title'), desc: t('landing.feature2Desc'), delay: 0.1 },
               { icon: Heart, gradient: 'bg-gradient-to-br from-primary to-accent', title: t('landing.feature3Title'), desc: t('landing.feature3Desc'), delay: 0.2 },
             ].map((feature, i) => (
