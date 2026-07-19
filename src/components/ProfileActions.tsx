@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Settings, Heart, MapPin, ChevronRight, RotateCcw } from 'lucide-react';
+import { useFriends } from '@/hooks/useFriends';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getInitials } from '@/lib/utils';
 
 interface ProfileActionsProps {
   onLogout: () => void;
@@ -12,6 +15,8 @@ interface ProfileActionsProps {
 const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { friends, loading } = useFriends();
+  const previewFriends = friends.slice(0, 5);
 
   const quickLinks = [
     { icon: Heart, label: t('menu.myInvitations', 'Meine Einladungen'), path: '/invitations', color: 'text-rose-500', bg: 'bg-rose-500/10' },
@@ -42,17 +47,69 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
       {/* Friends */}
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground text-base">
-            <Users className="w-5 h-5" />
-            {t('profile.friendsList')}
+          <CardTitle className="flex items-center justify-between text-foreground text-base">
+            <span className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              {t('profile.friendsList')}
+              {friends.length > 0 && (
+                <span className="text-xs text-muted-foreground font-normal">({friends.length})</span>
+              )}
+            </span>
+            {friends.length > 0 && (
+              <button
+                onClick={() => navigate('/my-friends')}
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                {t('common.viewAll', 'Alle anzeigen')}
+              </button>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-6 text-muted-foreground">
-            <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p>{t('profile.noFriendsYet')}</p>
-            <Button onClick={() => navigate('/my-friends')} variant="outline" className="mt-3 border-border text-foreground hover:bg-accent/50">{t('profile.addFriends')}</Button>
-          </div>
+          {loading ? (
+            <div className="flex gap-3 py-2">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="w-12 h-12 rounded-full bg-muted animate-pulse" />
+              ))}
+            </div>
+          ) : previewFriends.length === 0 ? (
+            <div className="text-center py-6 text-muted-foreground">
+              <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+              <p>{t('profile.noFriendsYet')}</p>
+              <Button onClick={() => navigate('/my-friends')} variant="outline" className="mt-3 border-border text-foreground hover:bg-accent/50">{t('profile.addFriends')}</Button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {previewFriends.map((friend) => (
+                <button
+                  key={friend.id}
+                  onClick={() => navigate('/my-friends')}
+                  className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-all text-left"
+                >
+                  <Avatar className="w-10 h-10 border-2 border-primary/30">
+                    <AvatarImage src={friend.avatar_url} alt={friend.name} referrerPolicy="no-referrer" />
+                    <AvatarFallback className="bg-primary/20 text-primary text-sm">
+                      {getInitials(friend.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="flex-1 text-sm font-medium text-foreground truncate">
+                    {friend.name}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+                </button>
+              ))}
+              {friends.length > previewFriends.length && (
+                <Button
+                  onClick={() => navigate('/my-friends')}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full text-primary hover:bg-primary/10 mt-1"
+                >
+                  +{friends.length - previewFriends.length} {t('common.more', 'weitere')}
+                </Button>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
