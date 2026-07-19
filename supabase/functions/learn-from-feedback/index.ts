@@ -436,7 +436,12 @@ serve(async (req) => {
         predictionError: predictionError?.toFixed(1) || null
       },
       weightChanges,
-      newWeights,
+      newWeights: finalWeights,
+      batching: {
+        flushed,
+        pendingSignals: flushed ? 0 : (existingVector ? ((existingVector.learning_data as any)?.pending_signals?.length || 0) + 1 : 1),
+        batchThreshold,
+      },
       explorationStats
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
