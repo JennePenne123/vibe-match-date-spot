@@ -357,11 +357,17 @@ serve(async (req) => {
       });
     }
 
-    // Determine batch threshold + agreement requirement based on maturity
-    let batchThreshold = 3;
-    let minAgreement = 0.6;
-    if (totalRatings > 30) { batchThreshold = 5; minAgreement = 0.7; }
-    else if (totalRatings > 10) { batchThreshold = 4; minAgreement = 0.65; }
+    // Determine batch threshold + agreement requirement based on maturity.
+    // All values are runtime-tunable via FEEDBACK_* env vars (see top of file).
+    let batchThreshold = FEEDBACK_CONFIG.batch.cold;
+    let minAgreement = FEEDBACK_CONFIG.agreement.cold;
+    if (totalRatings > FEEDBACK_CONFIG.phase.warmMax) {
+      batchThreshold = FEEDBACK_CONFIG.batch.mature;
+      minAgreement = FEEDBACK_CONFIG.agreement.mature;
+    } else if (totalRatings > FEEDBACK_CONFIG.phase.coldMax) {
+      batchThreshold = FEEDBACK_CONFIG.batch.warm;
+      minAgreement = FEEDBACK_CONFIG.agreement.warm;
+    }
 
     // Compute signal agreement (share of successes vs failures — must lean one way)
     let flushed = false;
@@ -375,7 +381,7 @@ serve(async (req) => {
         ? Math.max(successes, failures) / decisive
         : 0;
 
-      if (agreement >= minAgreement && decisive >= Math.ceil(batchThreshold * 0.6)) {
+      if (agreement >= minAgreement && decisive >= Math.ceil(batchThreshold * FEEDBACK_CONFIG.decisiveRatio)) {
         // Flush: average the accumulated deltas and apply once
         const flushScale = 1 / pendingSignals.length;
         for (const key of Object.keys(pendingDeltas)) {
