@@ -8,6 +8,45 @@ const corsHeaders = {
 };
 
 /**
+ * Runtime-tunable batching config for staggered feedback training.
+ * Override any of these via Edge Function secrets — no redeploy of logic required.
+ *
+ *   FEEDBACK_BATCH_COLD          (default 3)     signals needed while totalRatings ≤ COLD_MAX
+ *   FEEDBACK_BATCH_WARM          (default 4)     signals needed while totalRatings ≤ WARM_MAX
+ *   FEEDBACK_BATCH_MATURE        (default 5)     signals needed above WARM_MAX
+ *   FEEDBACK_AGREEMENT_COLD      (default 0.60)  min share of decisive signals leaning one way
+ *   FEEDBACK_AGREEMENT_WARM      (default 0.65)
+ *   FEEDBACK_AGREEMENT_MATURE    (default 0.70)
+ *   FEEDBACK_COLD_MAX_RATINGS    (default 10)    upper bound of "cold" phase
+ *   FEEDBACK_WARM_MAX_RATINGS    (default 30)    upper bound of "warm" phase
+ *   FEEDBACK_DECISIVE_RATIO      (default 0.60)  fraction of batch that must be non-neutral to flush
+ */
+function num(name: string, fallback: number): number {
+  const raw = Deno.env.get(name);
+  if (!raw) return fallback;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+const FEEDBACK_CONFIG = {
+  batch: {
+    cold: num('FEEDBACK_BATCH_COLD', 3),
+    warm: num('FEEDBACK_BATCH_WARM', 4),
+    mature: num('FEEDBACK_BATCH_MATURE', 5),
+  },
+  agreement: {
+    cold: num('FEEDBACK_AGREEMENT_COLD', 0.60),
+    warm: num('FEEDBACK_AGREEMENT_WARM', 0.65),
+    mature: num('FEEDBACK_AGREEMENT_MATURE', 0.70),
+  },
+  phase: {
+    coldMax: num('FEEDBACK_COLD_MAX_RATINGS', 10),
+    warmMax: num('FEEDBACK_WARM_MAX_RATINGS', 30),
+  },
+  decisiveRatio: num('FEEDBACK_DECISIVE_RATIO', 0.60),
+};
+
+/**
  * Calculates adaptive learning rate based on rating count.
  * Early ratings have MORE impact (exploration), later ratings less (exploitation).
  */
