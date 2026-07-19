@@ -229,7 +229,7 @@ export default function LandingDemo() {
             {[
               { icon: Zap, gradient: 'bg-gradient-primary', title: t('landing.feature1Title'), desc: t('landing.feature1Desc'), delay: 0 },
               { icon: Shield, gradient: 'bg-gradient-secondary', title: t('landing.feature2Title'), desc: t('landing.feature2Desc'), delay: 0.1 },
-              { icon: Heart, gradient: 'from-primary to-accent', title: t('landing.feature3Title'), desc: t('landing.feature3Desc'), delay: 0.2 },
+              { icon: Heart, gradient: 'bg-gradient-to-br from-primary to-accent', title: t('landing.feature3Title'), desc: t('landing.feature3Desc'), delay: 0.2 },
             ].map((feature, i) => (
               <div
                 key={i}
