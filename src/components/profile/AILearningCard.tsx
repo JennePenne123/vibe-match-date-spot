@@ -115,6 +115,7 @@ const AILearningCard: React.FC = () => {
             {insights.featureWeights && (
               <div className="space-y-2 pt-2 border-t border-border/50">
                 <div className="text-sm font-medium">{t('aiLearning.learnedPreferences')}</div>
+                <p className="text-xs text-muted-foreground">{t('aiLearning.learningFactorHint')}</p>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(insights.featureWeights)
                     .filter(([key]) => key !== 'distance')
