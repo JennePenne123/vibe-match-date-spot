@@ -286,14 +286,94 @@ serve(async (req) => {
     }
 
     const weightChanges: Record<string, string> = {};
+
+    // --- STAGGERED / BATCHED FEEDBACK TRAINING ---
+    // Rather than committing every rating directly to feature_weights, we
+    // accumulate proposed deltas in learning_data.pending_deltas and only
+    // flush to the live weights once we have enough consistent signal.
+    //
+    //   • Cold start (≤10 ratings): batch of 3, min 60% signal agreement
+    //   • Warm (11-30):              batch of 4, min 65% agreement
+    //   • Mature (>30):              batch of 5, min 70% agreement
+    //
+    // This prevents the AI from over-correcting on a single outlier rating
+    // while still guaranteeing steady, deeper adaptation over time.
+    const learningMeta = (existingVector?.learning_data as Record<string, any>) || {};
+    const pendingDeltas: Record<string, number> = { ...(learningMeta.pending_deltas || {}) };
+    const pendingSignals: Array<{ rating: number; success: boolean; ts: string }> =
+      Array.isArray(learningMeta.pending_signals) ? [...learningMeta.pending_signals] : [];
+
+    // Accumulate this rating's proposed delta per feature
     for (const key of Object.keys(newWeights)) {
-      const old = (oldWeights[key] || 1.0);
-      const diff = newWeights[key] - old;
-      if (Math.abs(diff) > 0.001) {
-        weightChanges[key] = `${old.toFixed(2)} → ${newWeights[key].toFixed(2)} (${diff > 0 ? '+' : ''}${diff.toFixed(2)})`;
+      const delta = newWeights[key] - (oldWeights[key] || 1.0);
+      if (Math.abs(delta) > 0.001) {
+        pendingDeltas[key] = (pendingDeltas[key] || 0) + delta;
       }
     }
-    console.log('⚖️ Weight changes:', weightChanges);
+    if (intensity > 0) {
+      pendingSignals.push({
+        rating: actualRating || 3,
+        success: !!isSuccess,
+        ts: new Date().toISOString(),
+      });
+    }
+
+    // Determine batch threshold + agreement requirement based on maturity
+    let batchThreshold = 3;
+    let minAgreement = 0.6;
+    if (totalRatings > 30) { batchThreshold = 5; minAgreement = 0.7; }
+    else if (totalRatings > 10) { batchThreshold = 4; minAgreement = 0.65; }
+
+    // Compute signal agreement (share of successes vs failures — must lean one way)
+    let flushed = false;
+    let committedWeights = { ...oldWeights };
+
+    if (pendingSignals.length >= batchThreshold) {
+      const successes = pendingSignals.filter(s => s.success).length;
+      const failures = pendingSignals.filter(s => !s.success && s.rating <= 2).length;
+      const decisive = successes + failures;
+      const agreement = decisive > 0
+        ? Math.max(successes, failures) / decisive
+        : 0;
+
+      if (agreement >= minAgreement && decisive >= Math.ceil(batchThreshold * 0.6)) {
+        // Flush: average the accumulated deltas and apply once
+        const flushScale = 1 / pendingSignals.length;
+        for (const key of Object.keys(pendingDeltas)) {
+          const averaged = pendingDeltas[key] * flushScale;
+          committedWeights[key] = Math.max(0.3, Math.min(2.5,
+            (oldWeights[key] || 1.0) + averaged
+          ));
+        }
+        flushed = true;
+        console.log(`✅ Batch flushed: ${pendingSignals.length} signals, agreement=${(agreement * 100).toFixed(0)}%`);
+      } else {
+        // Not enough agreement — keep accumulating, but decay stale signals
+        console.log(`⏸️ Batch inconclusive: ${pendingSignals.length} signals, agreement=${(agreement * 100).toFixed(0)}% (needed ${minAgreement * 100}%)`);
+      }
+    } else {
+      console.log(`📥 Batching feedback: ${pendingSignals.length}/${batchThreshold} signals collected`);
+    }
+
+    const finalWeights = flushed ? committedWeights : oldWeights;
+
+    for (const key of Object.keys(finalWeights)) {
+      const old = (oldWeights[key] || 1.0);
+      const diff = finalWeights[key] - old;
+      if (Math.abs(diff) > 0.001) {
+        weightChanges[key] = `${old.toFixed(2)} → ${finalWeights[key].toFixed(2)} (${diff > 0 ? '+' : ''}${diff.toFixed(2)})`;
+      }
+    }
+    console.log('⚖️ Weight changes:', weightChanges, flushed ? '(committed)' : '(pending)');
+
+    // Persist state: on flush, reset pending buffers; otherwise keep them
+    const nextLearningMeta = {
+      ...learningMeta,
+      pending_deltas: flushed ? {} : pendingDeltas,
+      pending_signals: flushed ? [] : pendingSignals,
+      last_flush_at: flushed ? new Date().toISOString() : (learningMeta.last_flush_at || null),
+      batch_threshold: batchThreshold,
+    };
 
     // Upsert preference vectors
     const { error: vectorError } = await supabase
@@ -303,7 +383,8 @@ serve(async (req) => {
         total_ratings: totalRatings,
         successful_predictions: successfulPredictions,
         ai_accuracy: aiAccuracy,
-        feature_weights: newWeights,
+        feature_weights: finalWeights,
+        learning_data: nextLearningMeta,
         last_updated: new Date().toISOString()
       }, { onConflict: 'user_id' });
 
@@ -355,7 +436,12 @@ serve(async (req) => {
         predictionError: predictionError?.toFixed(1) || null
       },
       weightChanges,
-      newWeights,
+      newWeights: finalWeights,
+      batching: {
+        flushed,
+        pendingSignals: flushed ? 0 : (existingVector ? ((existingVector.learning_data as any)?.pending_signals?.length || 0) + 1 : 1),
+        batchThreshold,
+      },
       explorationStats
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
