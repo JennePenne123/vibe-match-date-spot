@@ -1,0 +1,1 @@
+INSERT INTO public.feature_flags (flag_key, enabled, metadata) VALUES ('ai_concierge', false, '{"note":"Deaktiviert pre-launch, Reaktivierung post-launch geplant"}'::jsonb) ON CONFLICT (flag_key) DO UPDATE SET enabled = false, metadata = EXCLUDED.metadata;
