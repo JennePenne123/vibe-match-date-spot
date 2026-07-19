@@ -1565,6 +1565,7 @@
     "confidenceHigh": "high",
     "aiInsights": "AI Insights",
     "learnedPreferences": "Learned Preferences",
+    "learningFactorHint": "Learning factor (1.00x = neutral, >1.00x = preferred, <1.00x = avoided)",
     "viewDetails": "View Detailed Insights",
     "emptyState": "Rate your experiences to help the AI learn your preferences!",
     "charts": {
