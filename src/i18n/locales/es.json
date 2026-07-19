@@ -1433,6 +1433,7 @@
     "confidenceHigh": "alta",
     "aiInsights": "Insights de la IA",
     "learnedPreferences": "Preferencias aprendidas",
+    "learningFactorHint": "Factor de aprendizaje (1.00x = neutral, >1.00x = preferido, <1.00x = evitado)",
     "viewDetails": "Ver insights detallados",
     "emptyState": "¡Valora tus experiencias para que la IA aprenda tus preferencias!",
     "charts": {

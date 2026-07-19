@@ -1565,6 +1565,7 @@
     "confidenceHigh": "hoch",
     "aiInsights": "KI-Erkenntnisse",
     "learnedPreferences": "Gelernte Vorlieben",
+    "learningFactorHint": "Lernfaktor (1.00x = neutral, >1.00x = bevorzugt, <1.00x = gemieden)",
     "viewDetails": "Detaillierte Insights ansehen",
     "emptyState": "Bewerte deine Erlebnisse, damit die KI deine Vorlieben lernt!",
     "charts": {
