@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { hasCompletedPreferenceSetup } from '@/utils/preferenceCompletion';
 
 /**
  * OAuth callback landing page.
@@ -47,18 +48,33 @@ const AuthCallback: React.FC = () => {
         return;
       }
 
-      const routeForUser = (user: { created_at?: string; last_sign_in_at?: string }) => {
-        const created = user.created_at ? new Date(user.created_at).getTime() : 0;
-        const lastSignIn = user.last_sign_in_at ? new Date(user.last_sign_in_at).getTime() : 0;
-        // First-time OAuth sign-in: created_at ≈ last_sign_in_at (within 60s)
-        const isFirstLogin = created > 0 && (lastSignIn === 0 || Math.abs(lastSignIn - created) < 60_000);
-        navigate(isFirstLogin ? '/welcome' : '/home', { replace: true });
+      const routeForUser = async (user: { id: string }) => {
+        // Route to onboarding only when the user's preference setup is still empty.
+        // This covers first-time Google sign-ins AND any returning user who never
+        // finished onboarding — completed users always go straight to /home.
+        try {
+          const { data } = await supabase
+            .from('user_preferences')
+            .select(
+              'preferred_cuisines, preferred_vibes, preferred_times, preferred_price_range, ' +
+              'preferred_activities, preferred_entertainment, preferred_venue_types, ' +
+              'preferred_duration, dietary_restrictions, accessibility_needs, ' +
+              'home_address, home_latitude, home_longitude, personality_traits, relationship_goal'
+            )
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          const completed = hasCompletedPreferenceSetup(data as any);
+          navigate(completed ? '/home' : '/welcome', { replace: true });
+        } catch {
+          navigate('/home', { replace: true });
+        }
       };
 
       const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
         if (cancelled) return;
         if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
-          routeForUser(session.user);
+          void routeForUser(session.user);
         }
       });
 
@@ -74,7 +90,7 @@ const AuthCallback: React.FC = () => {
           }
 
           if (data.session?.user) {
-            routeForUser(data.session.user);
+            await routeForUser(data.session.user);
             return;
           }
 
