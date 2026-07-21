@@ -1429,7 +1429,7 @@
       "copied": "In Zwischenablage kopiert",
       "fixTitle": "Automatische Diagnose: redirect_uri_mismatch",
       "fixStep1": "Öffne in der Google Cloud Console deinen OAuth-Client (Web application).",
-      "fixStep2": "Trage unter „Authorized redirect URIs" exakt diese URL ein:",
+      "fixStep2": "Trage unter „Authorized redirect URIs“ exakt diese URL ein:",
       "fixStep3": "Speichern, 1–2 Minuten warten, dann erneut mit Google anmelden.",
       "openGoogleCredentials": "Google Cloud Credentials öffnen"
     },
