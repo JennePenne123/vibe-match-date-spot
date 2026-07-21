@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, Copy, ExternalLink } from 'lucide-react';
+import { AlertCircle, Copy, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
@@ -22,6 +22,12 @@ export const OAuthErrorDetails: React.FC<Props> = ({ info }) => {
   const { toast } = useToast();
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const appCallbackUrl = `${origin}/auth/callback`;
+
+  const rawMessage = (info.message || '').toLowerCase();
+  const isRedirectMismatch =
+    rawMessage.includes('redirect_uri_mismatch') ||
+    rawMessage.includes('redirect uri mismatch') ||
+    rawMessage.includes('redirect_uri') && rawMessage.includes('mismatch');
 
   const copy = (value: string) => {
     navigator.clipboard.writeText(value);
@@ -58,6 +64,47 @@ export const OAuthErrorDetails: React.FC<Props> = ({ info }) => {
           <p className="text-xs text-destructive/90 break-words mt-0.5">{info.message}</p>
         </div>
       </div>
+
+      {isRedirectMismatch && (
+        <div className="rounded-md border border-primary/40 bg-primary/10 p-3 space-y-2">
+          <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            {t('auth.oauthError.fixTitle')}
+          </p>
+          <ol className="text-xs text-foreground/90 list-decimal ml-4 space-y-1">
+            <li>{t('auth.oauthError.fixStep1')}</li>
+            <li>
+              {t('auth.oauthError.fixStep2')}
+              <div className="mt-1 flex items-center gap-1.5">
+                <code className="flex-1 min-w-0 text-[11px] break-all bg-background/70 px-2 py-1 rounded">
+                  {SUPABASE_CALLBACK_URL}
+                </code>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  className="h-7 text-xs shrink-0"
+                  onClick={() => copy(SUPABASE_CALLBACK_URL)}
+                >
+                  <Copy className="h-3 w-3 mr-1" />
+                  {t('auth.oauthError.copy')}
+                </Button>
+              </div>
+            </li>
+            <li>{t('auth.oauthError.fixStep3')}</li>
+          </ol>
+          <Button asChild size="sm" className="h-8 text-xs w-full">
+            <a
+              href="https://console.cloud.google.com/apis/credentials"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLink className="h-3 w-3 mr-1" />
+              {t('auth.oauthError.openGoogleCredentials')}
+            </a>
+          </Button>
+        </div>
+      )}
 
       <div className="rounded-md bg-background/60 px-3 py-2">
         <Row label={t('auth.oauthError.provider')} value={info.provider} />

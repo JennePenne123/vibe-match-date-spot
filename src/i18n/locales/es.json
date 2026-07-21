@@ -1576,7 +1576,12 @@
       "supabaseUrlConfig": "Configuración URL de Supabase",
       "googleConsole": "Google Cloud Console",
       "copy": "Copiar",
-      "copied": "Copiado al portapapeles"
+      "copied": "Copiado al portapapeles",
+      "fixTitle": "Diagnóstico automático: redirect_uri_mismatch",
+      "fixStep1": "Abre tu cliente OAuth (Web application) en Google Cloud Console.",
+      "fixStep2": "Añade exactamente esta URL en \"Authorized redirect URIs\":",
+      "fixStep3": "Guarda, espera 1–2 minutos y vuelve a intentar el inicio de sesión con Google.",
+      "openGoogleCredentials": "Abrir Google Cloud Credentials"
     },
     "forgot": {
       "link": "¿Olvidaste tu contraseña?",
