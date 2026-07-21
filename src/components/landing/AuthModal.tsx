@@ -122,6 +122,27 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     }
   }, [user, navigate, onClose]);
 
+  // Restore an OAuth error persisted by the /auth/callback page after a
+  // redirect_uri_mismatch or other provider-side failure. This lets us show
+  // the diagnostic + guided-fix banner even though the failure happened on
+  // a different route.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('hioutz-oauth-error');
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { provider?: string; message?: string; ts?: number };
+      if (parsed?.message) {
+        setOauthError({
+          provider: (parsed.provider === 'apple' ? 'apple' : 'google'),
+          message: parsed.message,
+        });
+      }
+      sessionStorage.removeItem('hioutz-oauth-error');
+    } catch {
+      /* ignore parse errors */
+    }
+  }, []);
+
   const handleGoogleSignIn = async () => {
     setError('');
     setOauthError(null);
