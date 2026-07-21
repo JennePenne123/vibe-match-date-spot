@@ -47,10 +47,18 @@ const AuthCallback: React.FC = () => {
         return;
       }
 
+      const routeForUser = (user: { created_at?: string; last_sign_in_at?: string }) => {
+        const created = user.created_at ? new Date(user.created_at).getTime() : 0;
+        const lastSignIn = user.last_sign_in_at ? new Date(user.last_sign_in_at).getTime() : 0;
+        // First-time OAuth sign-in: created_at ≈ last_sign_in_at (within 60s)
+        const isFirstLogin = created > 0 && (lastSignIn === 0 || Math.abs(lastSignIn - created) < 60_000);
+        navigate(isFirstLogin ? '/welcome' : '/home', { replace: true });
+      };
+
       const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
         if (cancelled) return;
         if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
-          navigate('/home', { replace: true });
+          routeForUser(session.user);
         }
       });
 
@@ -66,7 +74,7 @@ const AuthCallback: React.FC = () => {
           }
 
           if (data.session?.user) {
-            navigate('/home', { replace: true });
+            routeForUser(data.session.user);
             return;
           }
 
