@@ -25,6 +25,14 @@ const AuthCallback: React.FC = () => {
     const showErrorAndReturn = (message: string) => {
       if (cancelled) return;
       setError(message);
+      try {
+        sessionStorage.setItem(
+          'hioutz-oauth-error',
+          JSON.stringify({ provider: 'google', message, ts: Date.now() })
+        );
+      } catch {
+        /* ignore storage errors */
+      }
       window.setTimeout(() => {
         if (!cancelled) navigate('/?auth=required', { replace: true });
       }, 2500);
