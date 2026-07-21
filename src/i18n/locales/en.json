@@ -1426,7 +1426,12 @@
       "supabaseUrlConfig": "Supabase URL configuration",
       "googleConsole": "Google Cloud Console",
       "copy": "Copy",
-      "copied": "Copied to clipboard"
+      "copied": "Copied to clipboard",
+      "fixTitle": "Automatic diagnosis: redirect_uri_mismatch",
+      "fixStep1": "Open your OAuth client (Web application) in Google Cloud Console.",
+      "fixStep2": "Add this exact URL under \"Authorized redirect URIs\":",
+      "fixStep3": "Save, wait 1–2 minutes, then retry Google sign-in.",
+      "openGoogleCredentials": "Open Google Cloud Credentials"
     },
     "forgot": {
       "link": "Forgot password?",
