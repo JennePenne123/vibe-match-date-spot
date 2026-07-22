@@ -5,7 +5,8 @@ import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck, ShieldAlert, Database, Loader2 } from 'lucide-react';
+import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck, ShieldAlert, Database, Loader2, ScrollText } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import WaitlistSignupsWidget from '@/components/admin/WaitlistSignupsWidget';
@@ -124,6 +125,24 @@ const AdminDashboard: React.FC = () => {
 
       {/* Venue address correction */}
       <VenueAddressBackfillWidget />
+
+      {/* Security & audit shortcut */}
+      <Card className="bg-card/80 backdrop-blur border-border/40">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <ScrollText className="w-5 h-5 text-primary" />
+            Sicherheit & Audit
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/admin/audit-log">Audit-Log ansehen</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/admin/mfa-setup">2FA neu einrichten</Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Recent activity */}
       <RecentActivity />
