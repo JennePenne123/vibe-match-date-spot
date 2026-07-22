@@ -96,6 +96,9 @@ const AdminModeration = lazy(() => import("./pages/admin/Moderation"));
 const AdminSystemHealth = lazy(() => import("./pages/admin/SystemHealth"));
 const AdminErrors = lazy(() => import("./pages/admin/Errors"));
 const AdminTeam = lazy(() => import("./pages/admin/Team"));
+const AdminMfaSetup = lazy(() => import("./pages/admin/MfaSetup"));
+const AdminMfaChallenge = lazy(() => import("./pages/admin/MfaChallenge"));
+const AdminAuditLog = lazy(() => import("./pages/admin/AuditLog"));
 const AdminVenueDiscovery = lazy(() => import("./pages/admin/VenueDiscovery"));
 const AdminCostMonitoring = lazy(() => import("./pages/admin/CostMonitoring"));
 
