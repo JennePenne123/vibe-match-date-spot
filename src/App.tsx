@@ -255,6 +255,9 @@ const App = () => (
                     <Route path="/admin/team" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canManageTeam"><AdminTeam /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
                     <Route path="/admin/venue-discovery" element={<LazyPage><AdminRouteGuard><AdminVenueDiscovery /></AdminRouteGuard></LazyPage>} />
                     <Route path="/admin/costs" element={<LazyPage><AdminRouteGuard><AdminPermissionGuard permission="canViewSystemHealth"><AdminCostMonitoring /></AdminPermissionGuard></AdminRouteGuard></LazyPage>} />
+                    <Route path="/admin/mfa-setup" element={<LazyPage><AdminMfaSetup /></LazyPage>} />
+                    <Route path="/admin/mfa-challenge" element={<LazyPage><AdminMfaChallenge /></LazyPage>} />
+                    <Route path="/admin/audit-log" element={<LazyPage><AdminRouteGuard><AdminAuditLog /></AdminRouteGuard></LazyPage>} />
                     
                     {/* Demo routes */}
                     <Route path="/demo/ai-venue-card" element={<LazyPageNoLayout><AIVenueCardDemo /></LazyPageNoLayout>} />
