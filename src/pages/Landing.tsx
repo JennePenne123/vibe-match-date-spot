@@ -272,7 +272,7 @@ export default function LandingDemo() {
                 <h3 className="text-3xl lg:text-4xl font-semibold text-foreground">{t('landing.step2Title')}</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">{t('landing.step2Desc')}</p>
               </div>
-              <div className="order-1"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-secondary rounded-xl flex items-center justify-center"><img src={hioutzLogo} alt="H!Outz" className="h-16 w-auto opacity-70" loading="lazy" /></div></Card></div>
+              <div className="order-1"><Card variant="elegant" className="p-4 md:p-10"><div className="aspect-video bg-gradient-secondary rounded-xl flex items-center justify-center"><Heart className="w-20 h-20 text-white/70" /></div></Card></div>
             </div>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center scroll-animate opacity-0">
               <div className="order-2 lg:order-1 space-y-6">
