@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          id: string
+          ip_hash: string | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       admin_team: {
         Row: {
           admin_role: string
@@ -2381,6 +2420,15 @@ export type Database = {
         Returns: undefined
       }
       is_admin_owner: { Args: { _user_id: string }; Returns: boolean }
+      log_admin_action: {
+        Args: {
+          _action: string
+          _metadata?: Json
+          _resource_id?: string
+          _resource_type?: string
+        }
+        Returns: string
+      }
       reset_user_preferences_to_default: {
         Args: { target_user_id: string }
         Returns: boolean
@@ -2406,6 +2454,7 @@ export type Database = {
         Returns: boolean
       }
       verify_admin_access: { Args: never; Returns: boolean }
+      verify_admin_access_mfa: { Args: never; Returns: Json }
     }
     Enums: {
       app_role: "regular" | "venue_partner" | "admin"
