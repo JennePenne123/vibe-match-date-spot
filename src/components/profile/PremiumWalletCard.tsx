@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Wallet, Ticket, Clock, XCircle, CheckCircle2, Percent, Gift, ChevronRight, Sparkles, Loader2, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { VoucherQRDetail } from './VoucherQRDetail';
+
 
 interface WalletVoucher {
   id: string;
