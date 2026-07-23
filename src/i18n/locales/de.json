@@ -1813,5 +1813,10 @@
     "deleteSuccess": "Löschung eingeleitet",
     "deleteSuccessDesc": "Alle deine Daten werden gemäß Art. 17 DSGVO gelöscht.",
     "complaintNotice": "Du hast außerdem das Recht auf Beschwerde bei einer Datenschutz-Aufsichtsbehörde (Art. 77 DSGVO)."
+  },
+  "wallet": {
+    "title": "Meine Wallet",
+    "comingSoon": "Bald verfügbar"
   }
 }
+

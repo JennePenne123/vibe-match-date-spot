@@ -1813,5 +1813,10 @@
     "deleteSuccess": "Deletion initiated",
     "deleteSuccessDesc": "All your data will be deleted in accordance with Art. 17 GDPR.",
     "complaintNotice": "You also have the right to lodge a complaint with a supervisory authority (Art. 77 GDPR)."
+  },
+  "wallet": {
+    "title": "My Wallet",
+    "comingSoon": "Coming soon"
   }
 }
+
