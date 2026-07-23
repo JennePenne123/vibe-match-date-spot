@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Wallet, Ticket, Clock, XCircle, CheckCircle2, Percent, Gift, ChevronRight, Sparkles, Loader2, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { VoucherQRDetail } from './VoucherQRDetail';
+
 
 interface WalletVoucher {
   id: string;
@@ -195,6 +197,7 @@ function EmptyState({ tab }: { tab: WalletTab }) {
 }
 
 export function PremiumWalletCard() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<WalletTab>('active');
   const [direction, setDirection] = useState(0);
   const [selectedVoucher, setSelectedVoucher] = useState<WalletVoucher | null>(null);
@@ -202,6 +205,7 @@ export function PremiumWalletCard() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const tabOrder: WalletTab[] = ['active', 'expiring', 'redeemed', 'expired'];
+
 
   const fetchWalletVouchers = useCallback(async () => {
     if (!user) return;
@@ -317,13 +321,17 @@ export function PremiumWalletCard() {
             <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10">
               <Wallet className="h-4 w-4 text-primary" />
             </div>
-            Meine Wallet
+            {t('wallet.title', 'Meine Wallet')}
+            <Badge variant="outline" className="text-[10px] px-2 py-0 h-5 border-primary/30 text-primary bg-primary/5">
+              {t('wallet.comingSoon', 'Bald verfügbar')}
+            </Badge>
           </CardTitle>
           <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={fetchWalletVouchers} disabled={loading}>
             <RefreshCw className={cn("h-3.5 w-3.5 text-muted-foreground", loading && "animate-spin")} />
           </Button>
         </div>
       </CardHeader>
+
 
       <CardContent className="pt-0">
         {loading ? (

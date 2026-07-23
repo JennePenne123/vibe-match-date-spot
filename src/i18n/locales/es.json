@@ -1813,5 +1813,10 @@
     "deleteSuccess": "Eliminación iniciada",
     "deleteSuccessDesc": "Todos tus datos serán eliminados conforme al Art. 17 RGPD.",
     "complaintNotice": "También tienes derecho a presentar una reclamación ante una autoridad de control (Art. 77 RGPD)."
+  },
+  "wallet": {
+    "title": "Mi Wallet",
+    "comingSoon": "Próximamente"
   }
 }
+
