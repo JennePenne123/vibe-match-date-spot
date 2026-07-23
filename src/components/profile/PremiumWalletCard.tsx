@@ -321,13 +321,17 @@ export function PremiumWalletCard() {
             <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10">
               <Wallet className="h-4 w-4 text-primary" />
             </div>
-            Meine Wallet
+            {t('wallet.title', 'Meine Wallet')}
+            <Badge variant="outline" className="text-[10px] px-2 py-0 h-5 border-primary/30 text-primary bg-primary/5">
+              {t('wallet.comingSoon', 'Bald verfügbar')}
+            </Badge>
           </CardTitle>
           <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={fetchWalletVouchers} disabled={loading}>
             <RefreshCw className={cn("h-3.5 w-3.5 text-muted-foreground", loading && "animate-spin")} />
           </Button>
         </div>
       </CardHeader>
+
 
       <CardContent className="pt-0">
         {loading ? (
