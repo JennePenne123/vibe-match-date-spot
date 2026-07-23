@@ -7,7 +7,6 @@ H!Outz ist eine progressive Web-App, die mithilfe von künstlicher Intelligenz, 
 ## Pages
 
 - [Startseite](/): Produktübersicht, Features und Login.
-- [Warteliste](/waitlist): Frühzugang zur App sichern.
 - [Onboarding](/welcome): Geführter Einstieg mit Präferenz-Wizard.
 - [Mood Check-in](/mood): Tages-Stimmung für bessere Empfehlungen.
 

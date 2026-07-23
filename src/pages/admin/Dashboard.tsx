@@ -9,7 +9,6 @@ import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck,
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
-import WaitlistSignupsWidget from '@/components/admin/WaitlistSignupsWidget';
 import SupportTicketsWidget from '@/components/admin/SupportTicketsWidget';
 import VenuePhotoBackfillWidget from '@/components/admin/VenuePhotoBackfillWidget';
 import VenueAddressBackfillWidget from '@/components/admin/VenueAddressBackfillWidget';
@@ -113,9 +112,6 @@ const AdminDashboard: React.FC = () => {
 
       {/* Data Quality */}
       <DataQualityCard />
-
-      {/* Waitlist Signups */}
-      <WaitlistSignupsWidget />
 
       {/* Support Tickets */}
       <SupportTicketsWidget />
