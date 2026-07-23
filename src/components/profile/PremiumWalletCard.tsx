@@ -197,6 +197,7 @@ function EmptyState({ tab }: { tab: WalletTab }) {
 }
 
 export function PremiumWalletCard() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<WalletTab>('active');
   const [direction, setDirection] = useState(0);
   const [selectedVoucher, setSelectedVoucher] = useState<WalletVoucher | null>(null);
@@ -204,6 +205,7 @@ export function PremiumWalletCard() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const tabOrder: WalletTab[] = ['active', 'expiring', 'redeemed', 'expired'];
+
 
   const fetchWalletVouchers = useCallback(async () => {
     if (!user) return;
