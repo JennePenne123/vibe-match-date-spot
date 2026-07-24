@@ -19,6 +19,7 @@ import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
 import { ThemeSettingsCard } from '@/components/profile/ThemeSettingsCard';
 import { PremiumWalletCard } from '@/components/profile/PremiumWalletCard';
 import ActivityFeed from '@/components/profile/ActivityFeed';
+import SafeComponent from '@/components/SafeComponent';
 import { useUserPoints } from '@/hooks/useUserPoints';
 import { useAdminRole, ADMIN_ROLE_LABELS } from '@/hooks/useAdminRole';
 import { checkAndAwardProfileComplete } from '@/services/profileCompletionService';
@@ -87,21 +88,27 @@ const Profile = () => {
         {/* Content cards */}
         <div className="px-4 pb-6 -mt-4 space-y-4 relative z-10">
           {/* AI Progress – shows how well AI knows the user */}
-          <AIProgressIndicator variant="compact" />
-          
-          {/* Premium Wallet – first for immediate overview */}
-          <PremiumWalletCard />
-          
-          <ProfileStats />
-          
-          {/* Activity Feed */}
-          <ActivityFeed />
+          <SafeComponent componentName="AIProgressIndicator"><AIProgressIndicator variant="compact" /></SafeComponent>
 
-          {!pointsLoading && points && <PointsCard totalPoints={points.total_points} lifetimeXp={points.lifetime_xp ?? points.total_points} level={points.level} streakCount={points.streak_count} />}
+          {/* Premium Wallet – first for immediate overview */}
+          <SafeComponent componentName="PremiumWalletCard"><PremiumWalletCard /></SafeComponent>
+
+          <SafeComponent componentName="ProfileStats"><ProfileStats /></SafeComponent>
+
+          {/* Activity Feed */}
+          <SafeComponent componentName="ActivityFeed"><ActivityFeed /></SafeComponent>
+
+          {!pointsLoading && points && (
+            <SafeComponent componentName="PointsCard">
+              <PointsCard totalPoints={points.total_points} lifetimeXp={points.lifetime_xp ?? points.total_points} level={points.level} streakCount={points.streak_count} />
+            </SafeComponent>
+          )}
 
           {/* Badges-Übersicht direkt sichtbar, damit „First User" und weitere Badges auf einen Blick zu sehen sind */}
           {!pointsLoading && points && (
-            <BadgesCard badges={Array.isArray(points.badges) ? points.badges.filter((b: string) => !b.startsWith('_')) : []} />
+            <SafeComponent componentName="BadgesCard">
+              <BadgesCard badges={Array.isArray(points.badges) ? points.badges.filter((b: string) => !b.startsWith('_')) : []} />
+            </SafeComponent>
           )}
 
           <Collapsible>
@@ -134,7 +141,7 @@ const Profile = () => {
             </CollapsibleContent>
           </Collapsible>
 
-          <LeaderboardCard />
+          <SafeComponent componentName="LeaderboardCard"><LeaderboardCard /></SafeComponent>
 
           {!adminLoading && adminRole && (
             <Button
@@ -152,7 +159,7 @@ const Profile = () => {
             </Button>
           )}
 
-          <ProfileActions onLogout={logout} />
+          <SafeComponent componentName="ProfileActions"><ProfileActions onLogout={logout} /></SafeComponent>
         </div>
       </div>
     </div>
