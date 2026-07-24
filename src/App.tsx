@@ -185,7 +185,7 @@ const App = () => (
                 <PushNotificationPrompt />
                 <AppUsageTracker />
                 <PendingReferralHandler />
-                <ErrorBoundary level="page">
+                <RoutedErrorBoundary>
                   <Routes>
                     {/* Public routes without layout */}
                     <Route path="/" element={<LazyPageNoLayout><Landing /></LazyPageNoLayout>} />
@@ -280,7 +280,7 @@ const App = () => (
                     <Route path="/shareholder-report" element={<LazyPageNoLayout><ShareholderReport /></LazyPageNoLayout>} />
                     <Route path="*" element={<LazyPageNoLayout><NotFound /></LazyPageNoLayout>} />
                   </Routes>
-                </ErrorBoundary>
+                </RoutedErrorBoundary>
               </NotificationSystem>
               </OnlineStatusProvider>
             </AppProvider>
