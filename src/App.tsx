@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { DEFAULT_STALE_TIME, DEFAULT_GC_TIME } from "@/config/queryConfig";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -12,6 +12,20 @@ function ScrollToTop() {
     window.scrollTo(0, 0);
   }, [pathname]);
   return null;
+}
+
+/**
+ * Wraps the app routes in the page-level ErrorBoundary and resets it
+ * whenever the pathname changes, so a broken page never sticks its
+ * fallback across a navigation (e.g. after pressing "Back").
+ */
+function RoutedErrorBoundary({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+  return (
+    <ErrorBoundary level="page" resetKey={pathname}>
+      {children}
+    </ErrorBoundary>
+  );
 }
 import { ThemeProvider } from "next-themes";
 import AdminRouteGuard from "./components/AdminRouteGuard";
@@ -171,7 +185,7 @@ const App = () => (
                 <PushNotificationPrompt />
                 <AppUsageTracker />
                 <PendingReferralHandler />
-                <ErrorBoundary level="page">
+                <RoutedErrorBoundary>
                   <Routes>
                     {/* Public routes without layout */}
                     <Route path="/" element={<LazyPageNoLayout><Landing /></LazyPageNoLayout>} />
@@ -266,7 +280,7 @@ const App = () => (
                     <Route path="/shareholder-report" element={<LazyPageNoLayout><ShareholderReport /></LazyPageNoLayout>} />
                     <Route path="*" element={<LazyPageNoLayout><NotFound /></LazyPageNoLayout>} />
                   </Routes>
-                </ErrorBoundary>
+                </RoutedErrorBoundary>
               </NotificationSystem>
               </OnlineStatusProvider>
             </AppProvider>

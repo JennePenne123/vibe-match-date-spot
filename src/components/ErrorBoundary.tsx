@@ -11,6 +11,12 @@ interface Props {
   onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
   level?: 'app' | 'page' | 'component';
   silent?: boolean;
+  /**
+   * When this key changes, the boundary resets its error state.
+   * Typically the current pathname so navigating away from a broken
+   * route clears the error instead of showing the fallback forever.
+   */
+  resetKey?: string | number;
 }
 
 interface State {
@@ -33,6 +39,15 @@ class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (
+      this.state.hasError &&
+      prevProps.resetKey !== this.props.resetKey
+    ) {
+      this.setState({ hasError: false, error: null, errorInfo: null });
+    }
+  }
+
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Error caught by boundary:', error);
     this.setState({ error, errorInfo });
@@ -44,12 +59,29 @@ class ErrorBoundary extends Component<Props, State> {
       .catch(() => undefined);
   }
 
+  handleReset = () => {
+    this.setState({ hasError: false, error: null, errorInfo: null });
+  };
+
   handleRetry = () => {
+    // Full reload as a last resort — used by the app-level fallback.
     window.location.reload();
   };
 
   handleGoHome = () => {
     window.location.href = '/';
+  };
+
+  handleGoBack = () => {
+    // Clear the error first so the previous route can render again
+    // instead of the boundary sticking on its fallback.
+    this.setState({ hasError: false, error: null, errorInfo: null }, () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/';
+      }
+    });
   };
 
   render() {
@@ -118,11 +150,11 @@ class ErrorBoundary extends Component<Props, State> {
               <AlertDescription className="mt-2">
                 This page encountered an error. Please try refreshing or go back.
                 <div className="mt-4 space-x-2">
-                  <Button onClick={this.handleRetry} size="sm" variant="outline">
+                  <Button onClick={this.handleReset} size="sm" variant="outline">
                     <RefreshCw className="w-3 h-3 mr-1" />
                     Retry
                   </Button>
-                  <Button onClick={() => window.history.back()} size="sm" variant="outline">
+                  <Button onClick={this.handleGoBack} size="sm" variant="outline">
                     Go Back
                   </Button>
                 </div>
