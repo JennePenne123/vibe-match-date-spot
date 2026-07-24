@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { DEFAULT_STALE_TIME, DEFAULT_GC_TIME } from "@/config/queryConfig";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -19,7 +19,7 @@ function ScrollToTop() {
  * whenever the pathname changes, so a broken page never sticks its
  * fallback across a navigation (e.g. after pressing "Back").
  */
-function RoutedErrorBoundary({ children }: { children: React.ReactNode }) {
+function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   return (
     <ErrorBoundary level="page" resetKey={pathname}>
