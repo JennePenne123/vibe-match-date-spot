@@ -13,6 +13,20 @@ function ScrollToTop() {
   }, [pathname]);
   return null;
 }
+
+/**
+ * Wraps the app routes in the page-level ErrorBoundary and resets it
+ * whenever the pathname changes, so a broken page never sticks its
+ * fallback across a navigation (e.g. after pressing "Back").
+ */
+function RoutedErrorBoundary({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  return (
+    <ErrorBoundary level="page" resetKey={pathname}>
+      {children}
+    </ErrorBoundary>
+  );
+}
 import { ThemeProvider } from "next-themes";
 import AdminRouteGuard from "./components/AdminRouteGuard";
 import { AdminPermissionGuard } from "./components/admin/AdminPermissionGuard";
