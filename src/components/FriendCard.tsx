@@ -42,10 +42,10 @@ const FriendCard = ({ friend, variant = 'default', onMessage, onInvite, onToggle
   }
 
   return (
-    <Card className="bg-card/80 backdrop-blur-sm border-border/50 shadow-sm hover:shadow-glow-md hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300">
+    <Card className="bg-card/80 backdrop-blur-sm border-border/50 shadow-sm hover:shadow-glow-md hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
-          <div className="relative">
+          <div className="relative shrink-0">
             <Avatar className="w-14 h-14 border-2 border-primary/30 ring-2 ring-primary/10">
               <AvatarImage src={friend.avatar_url} alt={friend.name} referrerPolicy="no-referrer" />
               <AvatarFallback className="bg-primary/20 text-primary font-medium">{getInitials(friend.name)}</AvatarFallback>
@@ -59,15 +59,17 @@ const FriendCard = ({ friend, variant = 'default', onMessage, onInvite, onToggle
             {friend.lastSeen && <Text size="sm" className="text-muted-foreground mb-1">{friend.lastSeen}</Text>}
             {friend.mutualFriends !== undefined && <Text size="xs" className="text-muted-foreground">{t('myFriends.mutualFriends', { count: friend.mutualFriends })}</Text>}
             {showActions && (
-              <div className="flex gap-2 mt-3">
+              <div className="flex items-center gap-2 mt-3 min-w-0">
                 {onMessage && (
-                  <Button onClick={() => onMessage(friend.id, friend.name)} size="sm" variant="outline" className="flex-1 border-border text-foreground hover:bg-white/10">
-                    <MessageCircle className="w-4 h-4 mr-1" />{t('myFriends.message')}
+                  <Button onClick={() => onMessage(friend.id, friend.name)} size="sm" variant="outline" className="flex-1 min-w-0 rounded-full border-border text-foreground hover:bg-white/10">
+                    <MessageCircle className="w-4 h-4 shrink-0" />
+                    <span className="truncate">{t('myFriends.message')}</span>
                   </Button>
                 )}
                 {onInvite && (
-                  <OfflineGuardButton onClick={() => onInvite(friend.id, friend.name)} size="sm" variant="default" className="flex-1">
-                    <Calendar className="w-4 h-4 mr-1" />{t('friends.invite')}
+                  <OfflineGuardButton onClick={() => onInvite(friend.id, friend.name)} size="sm" variant="default" className="flex-1 min-w-0 rounded-full">
+                    <Calendar className="w-4 h-4 shrink-0" />
+                    <span className="truncate">{t('friends.invite')}</span>
                   </OfflineGuardButton>
                 )}
               </div>
