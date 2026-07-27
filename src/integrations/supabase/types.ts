@@ -1571,6 +1571,7 @@ export type Database = {
           last_review_date: string | null
           level: number
           lifetime_xp: number
+          notified_badges: Json
           premium_until: string | null
           referral_code: string | null
           referral_count: number
@@ -1587,6 +1588,7 @@ export type Database = {
           last_review_date?: string | null
           level?: number
           lifetime_xp?: number
+          notified_badges?: Json
           premium_until?: string | null
           referral_code?: string | null
           referral_count?: number
@@ -1603,6 +1605,7 @@ export type Database = {
           last_review_date?: string | null
           level?: number
           lifetime_xp?: number
+          notified_badges?: Json
           premium_until?: string | null
           referral_code?: string | null
           referral_count?: number
