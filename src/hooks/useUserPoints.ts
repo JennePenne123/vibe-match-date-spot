@@ -7,6 +7,10 @@ import { icons, Award } from 'lucide-react';
 
 const SEEN_BADGES_KEY = 'seen_badges';
 
+// Module-level guard so multiple hook instances (Profile + ProfileStats +
+// PointsIndicator on the same page) don't each fire the same badge toast.
+const toastedThisSession = new Set<string>();
+
 const getSeenBadges = (userId: string): string[] => {
   try {
     const raw = localStorage.getItem(`${SEEN_BADGES_KEY}_${userId}`);
@@ -67,11 +71,14 @@ export const useUserPoints = () => {
     // Filter out internal markers like _profile_complete_awarded
     const visibleBadges = currentBadges.filter(b => !b.startsWith('_'));
     const seen = getSeenBadges(user.id);
-    const newBadges = visibleBadges.filter(b => !seen.includes(b));
+    const newBadges = visibleBadges.filter(
+      b => !seen.includes(b) && !toastedThisSession.has(`${user.id}:${b}`)
+    );
 
     if (newBadges.length > 0) {
-      // Mark all as seen immediately
+      // Mark all as seen immediately (persisted + session)
       setSeenBadges(user.id, visibleBadges);
+      visibleBadges.forEach(b => toastedThisSession.add(`${user.id}:${b}`));
 
       // Show toasts with a slight delay between each (max 3)
       newBadges.slice(0, 3).forEach((badgeId, index) => {
