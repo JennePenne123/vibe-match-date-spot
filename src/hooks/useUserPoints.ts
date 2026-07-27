@@ -5,23 +5,27 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { icons, Award } from 'lucide-react';
 
-const SEEN_BADGES_KEY = 'seen_badges';
-
 // Module-level guard so multiple hook instances (Profile + ProfileStats +
 // PointsIndicator on the same page) don't each fire the same badge toast.
 const toastedThisSession = new Set<string>();
 
-const getSeenBadges = (userId: string): string[] => {
-  try {
-    const raw = localStorage.getItem(`${SEEN_BADGES_KEY}_${userId}`);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+const fetchNotifiedBadges = async (userId: string): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from('user_points')
+    .select('notified_badges')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error || !data) return [];
+  const raw = (data as any).notified_badges;
+  return Array.isArray(raw) ? (raw as string[]) : [];
 };
 
-const setSeenBadges = (userId: string, badges: string[]) => {
-  localStorage.setItem(`${SEEN_BADGES_KEY}_${userId}`, JSON.stringify(badges));
+const persistNotifiedBadges = async (userId: string, badges: string[]): Promise<void> => {
+  const { error } = await supabase
+    .from('user_points')
+    .update({ notified_badges: badges as any })
+    .eq('user_id', userId);
+  if (error) console.warn('Failed to persist notified_badges:', error);
 };
 
 export const useUserPoints = () => {
@@ -63,22 +67,22 @@ export const useUserPoints = () => {
     }
   }, [user?.id]);
 
-  const showNewBadgeToasts = (userPoints: UserPoints) => {
+  const showNewBadgeToasts = async (userPoints: UserPoints) => {
     if (!user || hasCheckedBadges.current) return;
     hasCheckedBadges.current = true;
 
     const currentBadges = (userPoints.badges as string[]) ?? [];
     // Filter out internal markers like _profile_complete_awarded
     const visibleBadges = currentBadges.filter(b => !b.startsWith('_'));
-    const seen = getSeenBadges(user.id);
+    const seen = await fetchNotifiedBadges(user.id);
     const newBadges = visibleBadges.filter(
       b => !seen.includes(b) && !toastedThisSession.has(`${user.id}:${b}`)
     );
 
     if (newBadges.length > 0) {
-      // Mark all as seen immediately (persisted + session)
-      setSeenBadges(user.id, visibleBadges);
+      // Mark all as seen immediately (server-side + session guard)
       visibleBadges.forEach(b => toastedThisSession.add(`${user.id}:${b}`));
+      await persistNotifiedBadges(user.id, visibleBadges);
 
       // Show toasts with a slight delay between each (max 3)
       newBadges.slice(0, 3).forEach((badgeId, index) => {
@@ -115,9 +119,9 @@ export const useUserPoints = () => {
           });
         }, 3 * 1500);
       }
-    } else {
-      // Keep seen list in sync
-      setSeenBadges(user.id, visibleBadges);
+    } else if (visibleBadges.length !== seen.length) {
+      // Keep server list in sync (e.g., badges removed by admin)
+      await persistNotifiedBadges(user.id, visibleBadges);
     }
   };
 
