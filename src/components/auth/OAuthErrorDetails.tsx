@@ -3,9 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { AlertCircle, Copy, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-
-const SUPABASE_PROJECT_REF = 'dfjwubatslzblagthbdw';
-const SUPABASE_CALLBACK_URL = `https://${SUPABASE_PROJECT_REF}.supabase.co/auth/v1/callback`;
+import { GoogleAuthSetupCheck } from './GoogleAuthSetupCheck';
+import {
+  classifyOAuthError,
+  SUPABASE_CALLBACK_URL,
+  SUPABASE_PROJECT_REF,
+} from '@/utils/googleAuthCheck';
 
 export interface OAuthErrorInfo {
   provider: 'google' | 'apple';
@@ -23,11 +26,15 @@ export const OAuthErrorDetails: React.FC<Props> = ({ info }) => {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const appCallbackUrl = `${origin}/auth/callback`;
 
-  const rawMessage = (info.message || '').toLowerCase();
-  const isRedirectMismatch =
-    rawMessage.includes('redirect_uri_mismatch') ||
-    rawMessage.includes('redirect uri mismatch') ||
-    rawMessage.includes('redirect_uri') && rawMessage.includes('mismatch');
+  const code = classifyOAuthError(info.message);
+  const isRedirectMismatch = code === 'redirect_uri_mismatch';
+  const hintKey = `auth.oauthError.hints.${code}`;
+  const autoRunSetupCheck =
+    code === 'redirect_uri_mismatch' ||
+    code === 'provider_disabled' ||
+    code === 'invalid_client' ||
+    code === 'session_missing' ||
+    code === 'unknown';
 
   const copy = (value: string) => {
     navigator.clipboard.writeText(value);
@@ -114,8 +121,12 @@ export const OAuthErrorDetails: React.FC<Props> = ({ info }) => {
       </div>
 
       <p className="text-[11px] text-muted-foreground leading-relaxed">
-        {t('auth.oauthError.hint')}
+        {t(hintKey, { defaultValue: t('auth.oauthError.hint') })}
       </p>
+
+      {info.provider === 'google' && (
+        <GoogleAuthSetupCheck autoRun={autoRunSetupCheck} />
+      )}
 
       <div className="flex flex-wrap gap-2">
         <Button asChild size="sm" variant="outline" className="h-8 text-xs">
