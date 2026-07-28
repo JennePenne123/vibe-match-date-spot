@@ -1582,6 +1582,33 @@
       "fixStep2": "Añade exactamente esta URL en \"Authorized redirect URIs\":",
       "fixStep3": "Guarda, espera 1–2 minutos y vuelve a intentar el inicio de sesión con Google.",
       "openGoogleCredentials": "Abrir Google Cloud Credentials"
+      ,
+      "hints": {
+        "redirect_uri_mismatch": "El redirect URI en Google Cloud no coincide con esta app. Añade exactamente la URL mostrada abajo en \"Authorized redirect URIs\".",
+        "provider_disabled": "El proveedor de Google está desactivado en Supabase. Actívalo en Authentication → Providers → Google.",
+        "invalid_client": "El Client ID o Secret en Supabase no coinciden con el cliente OAuth de Google. Vuelve a introducirlos desde Google Cloud → Credentials.",
+        "access_denied": "Cancelaste o denegaste el acceso en Google. Inténtalo de nuevo y confirma el permiso.",
+        "popup_blocked": "Tu navegador bloqueó la ventana emergente. Permite los pop-ups para este sitio e inténtalo de nuevo.",
+        "third_party_cookies": "Tu navegador bloquea cookies de terceros. Permítelas para este sitio (Safari: desactiva \"Prevenir seguimiento entre sitios\") o usa otro navegador.",
+        "network": "Error de red durante el inicio de sesión. Comprueba tu conexión e inténtalo de nuevo.",
+        "session_missing": "No se creó ninguna sesión tras el redirect de Google. Suele deberse a una Redirect URL faltante en Supabase o a cookies bloqueadas.",
+        "unknown": "Error OAuth desconocido. La comprobación de configuración de abajo revisa las causas más comunes."
+      },
+      "setup": "Ejecutar comprobación"
+    },
+    "setupCheck": {
+      "title": "Comprobación de configuración de Google",
+      "description": "Revisa los problemas OAuth más comunes.",
+      "run": "Ejecutar",
+      "running": "Comprobando…",
+      "expected": "URLs esperadas",
+      "openSupabase": "Abrir Supabase",
+      "openGoogle": "Abrir Google Cloud",
+      "origin": "Origin autorizado",
+      "callbackRoute": "/auth/callback accesible",
+      "supabaseAuth": "Supabase Auth accesible",
+      "googleProvider": "Proveedor Google responde",
+      "thirdPartyCookies": "Cookies/Storage del navegador"
     },
     "forgot": {
       "link": "¿Olvidaste tu contraseña?",

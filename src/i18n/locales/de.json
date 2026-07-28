@@ -1432,6 +1432,33 @@
       "fixStep2": "Trage unter „Authorized redirect URIs“ exakt diese URL ein:",
       "fixStep3": "Speichern, 1–2 Minuten warten, dann erneut mit Google anmelden.",
       "openGoogleCredentials": "Google Cloud Credentials öffnen"
+      ,
+      "hints": {
+        "redirect_uri_mismatch": "Die Redirect-URI in Google Cloud stimmt nicht mit dieser App überein. Trage die unten angezeigte URL exakt in „Authorized redirect URIs“ ein.",
+        "provider_disabled": "Der Google-Provider ist in Supabase nicht aktiviert. Aktiviere ihn im Supabase-Dashboard unter Authentication → Providers → Google.",
+        "invalid_client": "Client ID oder Client Secret in Supabase stimmen nicht mit dem Google-OAuth-Client überein. Trage die Werte aus Google Cloud → Credentials neu ein.",
+        "access_denied": "Du hast die Freigabe bei Google abgebrochen oder abgelehnt. Versuche es noch einmal und bestätige den Zugriff.",
+        "popup_blocked": "Dein Browser hat das Login-Popup blockiert. Erlaube Pop-ups für diese Seite und versuche es erneut.",
+        "third_party_cookies": "Dein Browser blockiert Third-Party-Cookies. Erlaube sie für diese Seite (Safari: „Cross-Site-Tracking verhindern“ deaktivieren) oder nutze einen anderen Browser.",
+        "network": "Netzwerkfehler während der Anmeldung. Prüfe deine Verbindung und versuche es erneut.",
+        "session_missing": "Nach dem Google-Redirect wurde keine gültige Sitzung erstellt. Meistens liegt es an einer fehlenden Redirect-URL in Supabase oder blockierten Cookies.",
+        "unknown": "Unbekannter OAuth-Fehler. Der Setup-Check unten prüft die häufigsten Ursachen."
+      },
+      "setup": "Setup-Check ausführen"
+    },
+    "setupCheck": {
+      "title": "Google-Login Setup-Check",
+      "description": "Prüft die häufigsten OAuth-Probleme.",
+      "run": "Prüfung starten",
+      "running": "Prüfe …",
+      "expected": "Erwartete URLs",
+      "openSupabase": "Supabase öffnen",
+      "openGoogle": "Google Cloud öffnen",
+      "origin": "Origin whitelisted",
+      "callbackRoute": "/auth/callback erreichbar",
+      "supabaseAuth": "Supabase Auth erreichbar",
+      "googleProvider": "Google-Provider antwortet",
+      "thirdPartyCookies": "Browser-Cookies/Storage"
     },
     "forgot": {
       "link": "Passwort vergessen?",

@@ -1432,6 +1432,33 @@
       "fixStep2": "Add this exact URL under \"Authorized redirect URIs\":",
       "fixStep3": "Save, wait 1–2 minutes, then retry Google sign-in.",
       "openGoogleCredentials": "Open Google Cloud Credentials"
+      ,
+      "hints": {
+        "redirect_uri_mismatch": "The redirect URI in Google Cloud does not match this app. Add the URL shown below to \"Authorized redirect URIs\" exactly.",
+        "provider_disabled": "The Google provider is disabled in Supabase. Enable it in the Supabase dashboard under Authentication → Providers → Google.",
+        "invalid_client": "Client ID or secret in Supabase do not match the Google OAuth client. Re-enter the values from Google Cloud → Credentials.",
+        "access_denied": "You cancelled or denied access at Google. Try again and confirm the permission.",
+        "popup_blocked": "Your browser blocked the sign-in popup. Allow pop-ups for this site and try again.",
+        "third_party_cookies": "Your browser is blocking third-party cookies. Allow them for this site (Safari: turn off \"Prevent cross-site tracking\") or use a different browser.",
+        "network": "Network error during sign-in. Check your connection and try again.",
+        "session_missing": "No session was created after the Google redirect. Usually caused by a missing Redirect URL in Supabase or blocked cookies.",
+        "unknown": "Unknown OAuth error. The setup check below verifies the most common causes."
+      },
+      "setup": "Run setup check"
+    },
+    "setupCheck": {
+      "title": "Google sign-in setup check",
+      "description": "Checks the most common OAuth issues.",
+      "run": "Run check",
+      "running": "Checking…",
+      "expected": "Expected URLs",
+      "openSupabase": "Open Supabase",
+      "openGoogle": "Open Google Cloud",
+      "origin": "Origin whitelisted",
+      "callbackRoute": "/auth/callback reachable",
+      "supabaseAuth": "Supabase Auth reachable",
+      "googleProvider": "Google provider responds",
+      "thirdPartyCookies": "Browser cookies/storage"
     },
     "forgot": {
       "link": "Forgot password?",

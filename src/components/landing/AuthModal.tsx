@@ -22,6 +22,7 @@ import { validateReferralCode } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
 import { hasMoodToday } from '@/utils/moodStorage';
 import { OAuthErrorDetails, OAuthErrorInfo } from '@/components/auth/OAuthErrorDetails';
+import { GoogleAuthSetupCheck } from '@/components/auth/GoogleAuthSetupCheck';
 
 // Google icon SVG component
 const GoogleIcon = () => (
@@ -473,6 +474,10 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   )}
                   {t('auth.continueWithGoogle')}
                 </Button>
+
+                {/* Manual Google setup diagnostics — collapsed by default,
+                    auto-expands when an OAuth error occurs. */}
+                <GoogleAuthSetupCheck autoRun={false} />
 
                 <Button
                   type="button"
