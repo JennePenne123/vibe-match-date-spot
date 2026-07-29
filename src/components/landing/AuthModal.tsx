@@ -255,17 +255,18 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
         }
 
         if (signedInUser) {
-          // Check user role for proper routing
-          const { data: roleData } = await supabase
+          // Check user roles for proper routing (users can have multiple roles)
+          const { data: rolesData } = await supabase
             .from('user_roles')
             .select('role')
-            .eq('user_id', signedInUser.id)
-            .maybeSingle();
+            .eq('user_id', signedInUser.id);
+
+          const roles = (rolesData ?? []).map((r) => r.role as string);
 
           onClose();
-          
-          // Route partners/admins to partner dashboard
-          if (roleData?.role === 'venue_partner' || roleData?.role === 'admin') {
+
+          // Route partners/admins to partner dashboard (priority: admin > venue_partner > regular)
+          if (roles.includes('admin') || roles.includes('venue_partner')) {
             navigate('/partner');
           } else {
             navigate(hasMoodToday() ? '/home' : '/mood');
