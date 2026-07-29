@@ -72,7 +72,11 @@ export async function writePlacesCache(
   venues: any[],
   ttlMs: number = PLACES_CACHE_TTL_MS,
 ): Promise<void> {
-  if (!supabase || !venues.length) return;
+  if (!supabase) {
+    console.warn("[places-cache] no service client — skipping write");
+    return;
+  }
+  if (!venues.length) return;
   try {
     const { error } = await supabase
       .from("venue_search_cache")
