@@ -28,7 +28,7 @@ export async function buildPlacesCacheKey(
   const hex = Array.from(new Uint8Array(digest))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
-  return `google_places:${hex}`;
+  return `gplaces:${hex}`;
 }
 
 export async function readPlacesCache(
@@ -83,7 +83,7 @@ export async function writePlacesCache(
       .upsert(
         {
           cache_key: cacheKey,
-          cache_type: "google_places",
+          cache_type: "search",
           source: "google_places",
           payload: venues,
           result_count: venues.length,
