@@ -15,6 +15,7 @@ import { getPhotoVibeScoreModifier, getPhotoVibeLabel } from './photoVibeScoring
 import { getPairFriendlyScoreModifier, getPairFriendlyLabel } from './pairFriendlyScoring';
 import { getSeasonalScoreModifier, getSeasonalLabel } from './seasonalScoring';
 import { supabase } from '@/integrations/supabase/client';
+import { dedupeVenueSearch } from '@/services/venueSearchDedupe';
 import { validateLocation } from '@/utils/locationValidation';
 import { calculateStringSimilarity, calculateGeoDistance } from '@/utils/stringUtils';
 import { getVenueFallbackImage } from '@/utils/venueImageFallback';
