@@ -44,10 +44,13 @@ serve(async (req) => {
     const placeTypeMap: Record<string, string> = {
       mini_golf: 'amusement_park', bowling: 'bowling_alley', arcade: 'amusement_park', escape_room: 'amusement_park',
       climbing: 'gym', swimming: 'swimming_pool', spa_wellness: 'spa', museum: 'museum', gallery: 'art_gallery',
-      theater_venue: 'movie_theater', cinema: 'movie_theater', concert_hall: 'night_club', karaoke: 'night_club',
+      theater_venue: 'performing_arts_theater', theater: 'performing_arts_theater', cinema: 'movie_theater',
+      concert_hall: 'concert_hall', karaoke: 'karaoke',
       comedy_club: 'night_club', active: 'amusement_park', cultural_act: 'museum', nightlife_act: 'night_club', cocktails: 'bar',
     };
-    const validTypes = rawTypes.map((t) => placeTypeMap[t] || t).filter(Boolean).slice(0, 5); // Limit to 5 types max
+    const validTypes = Array.from(
+      new Set(rawTypes.map((t) => placeTypeMap[t] || t).filter(Boolean)),
+    ).slice(0, 5); // Deduplicate, limit to 5 types max
     const typeKeywords = rawTypes.filter((t) => t !== 'restaurant' && t !== 'point_of_interest').map((t) => t.replace(/_/g, ' '));
     // Google Place types (New API) we accept for non-food intents. Anything
     // else (e.g. "dining", "cocktails") is dropped from includedTypes and only
