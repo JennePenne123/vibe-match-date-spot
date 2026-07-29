@@ -36,6 +36,9 @@ const ProfileHeader = ({
   level = 1, totalPoints = 0, premiumUntil
 }: ProfileHeaderProps) => {
   const { t } = useTranslation();
+  // Guard against null values passed explicitly (default params only apply for undefined)
+  const safeLevel = typeof level === 'number' && !Number.isNaN(level) ? level : 1;
+  const safeTotalPoints = typeof totalPoints === 'number' && !Number.isNaN(totalPoints) ? totalPoints : 0;
   const avatarUrl = getUserAvatar(user);
   const [imgError, setImgError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -139,10 +142,10 @@ const ProfileHeader = ({
               </div>
               <div className="flex items-center justify-center gap-2 flex-wrap">
                 <Badge variant="secondary" className="bg-primary/15 text-primary border-primary/20 px-3 py-1 text-xs font-semibold">
-                  Level {level}
+                  Level {safeLevel}
                 </Badge>
                 <Badge variant="secondary" className="bg-accent/15 text-accent border-accent/20 px-3 py-1 text-xs">
-                  {totalPoints.toLocaleString()} pts
+                  {safeTotalPoints.toLocaleString()} pts
                 </Badge>
                 {memberSince && (
                   <Badge variant="outline" className="border-border/50 text-muted-foreground px-3 py-1 text-xs">
