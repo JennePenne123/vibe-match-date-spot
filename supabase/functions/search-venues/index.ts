@@ -392,6 +392,31 @@ function determineCuisineType(place: any, preferredCuisines: string[]): string {
     }
   }
   
+  // Non-gastro categories (must match CATEGORY_CUISINE_TYPES on the client so
+  // culture / activity / nightlife filters and the DB fallback recognise them).
+  const NON_FOOD_LABELS: Record<string, string> = {
+    museum: 'Museum',
+    art_gallery: 'Gallery',
+    performing_arts_theater: 'Theater',
+    movie_theater: 'Cinema',
+    concert_hall: 'Concert Hall',
+    cultural_center: 'Arts Centre',
+    historical_landmark: 'Historic',
+    bowling_alley: 'Bowling',
+    amusement_center: 'Arcade',
+    amusement_park: 'Arcade',
+    ice_skating_rink: 'Ice Rink',
+    swimming_pool: 'Swimming',
+    spa: 'Spa & Wellness',
+    night_club: 'Nightclub',
+    casino: 'Casino',
+    comedy_club: 'Nightclub',
+    bar: 'Bar',
+  };
+  for (const t of types) {
+    if (NON_FOOD_LABELS[t]) return NON_FOOD_LABELS[t];
+  }
+
   if (types.includes('meal_takeaway')) return 'Schnellimbiss';
   if (types.includes('bakery')) return 'Bäckerei';
   if (types.includes('cafe')) return 'Café';
