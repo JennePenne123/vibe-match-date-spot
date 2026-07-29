@@ -1,5 +1,5 @@
 import { calculateVenueAIScore, calculateConfidenceLevel } from './scoring';
-import { getActiveVenues, getStoredAIScore } from './fetching';
+import { getActiveVenues, getActiveVenuesByCategory, getStoredAIScore } from './fetching';
 import { filterVenuesByPreferences, filterVenuesByCollaborativePreferences, AREA_VIBE_MAP, type SessionPriorityWeights } from './preferenceFiltering';
 import { calculateDistanceFromLocation } from './helperFunctions';
 import { getRealtimeContextScore } from './contextScoring';
@@ -183,7 +183,25 @@ export const getAIVenueRecommendations = async (
       const { primaryCat, secondaryCat, isNonFood } = getActiveSituationalCategory(situationalCategoryId, secondaryCategoryId);
       if (isNonFood && primaryCat) {
         const before = venues.length;
-        const filtered = filterSituationalVenues(venues, situationalCategoryId, secondaryCategoryId, 'candidate-set');
+        let filtered = filterSituationalVenues(venues, situationalCategoryId, secondaryCategoryId, 'candidate-set');
+
+        // Last-resort fallback: the live sources returned no on-intent venues
+        // (Overpass mirrors down, sparse area, cache miss). Pull previously
+        // imported culture / activity / nightlife venues straight from the DB
+        // so the user gets Theater, Kino, Museum & Co. instead of an error.
+        if (filtered.length === 0) {
+          const dbCategoryVenues = await getActiveVenuesByCategory(
+            primaryCat.id,
+            40,
+            userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined,
+          );
+          if (dbCategoryVenues.length > 0) {
+            const scored = await filterVenuesByPreferences(userId, dbCategoryVenues, selectedArea, priorityWeights);
+            filtered = filterSituationalVenues(scored, situationalCategoryId, secondaryCategoryId, 'db-fallback');
+            console.log(`🗂️ SITUATIONAL DB FALLBACK (${primaryCat.id}): ${filtered.length} venues`);
+          }
+        }
+
         venues = filtered;
         console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
         try { sessionStorage.removeItem('hioutz-situational-sparse'); } catch {}
