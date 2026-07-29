@@ -66,15 +66,15 @@ export async function readPlacesCache(
   }
 }
 
-export function writePlacesCache(
+export async function writePlacesCache(
   supabase: SupabaseClient | null,
   cacheKey: string,
   venues: any[],
   ttlMs: number = PLACES_CACHE_TTL_MS,
-): void {
+): Promise<void> {
   if (!supabase || !venues.length) return;
   try {
-    supabase
+    await supabase
       .from("venue_search_cache")
       .upsert(
         {
@@ -86,8 +86,7 @@ export function writePlacesCache(
           expires_at: new Date(Date.now() + ttlMs).toISOString(),
         },
         { onConflict: "cache_key" },
-      )
-      .then(() => {});
+      );
   } catch (err) {
     console.warn("[places-cache] write failed:", err instanceof Error ? err.message : err);
   }

@@ -360,7 +360,7 @@ serve(async (req) => {
     console.log('✅ SEARCH VENUES: Successfully processed', venues.length, 'venues');
 
     // Persist for subsequent identical searches (24 h TTL)
-    writePlacesCache(cacheClient, cacheKey, venues);
+    await writePlacesCache(cacheClient, cacheKey, venues);
 
     return Response.json({
       success: true,
