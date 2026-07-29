@@ -127,13 +127,24 @@ function buildOverpassQuery(
 ): string {
   const r = Math.min(radius, 25000);
 
-  // Always include the food baseline — even in non-food modes a restaurant or
-  // bar near a museum is useful as a follow-up suggestion.
-  const baseSelectors: Array<[string, string]> = [
-    ['amenity', 'restaurant'],
-    ['amenity', 'cafe'],
-    ['amenity', 'bar'],
-  ];
+  // A non-food intent is active when the primary/secondary quick-action is
+  // culture/activity/nightlife, or when the user picked niche venue types.
+  const nonFoodActive =
+    [categoryId, secondaryCategoryId].some((id) => !!id && id !== 'food') ||
+    extraVenueTypes.length > 0;
+
+  // Food baseline. In non-food mode it is INTENTIONALLY dropped: Overpass
+  // returns elements ordered by id (not by selector) and caps the response at
+  // `limit`. In a city centre restaurants outnumber museums/theatres ~20:1, so
+  // keeping the baseline floods the budget with food venues and the downstream
+  // situational hard filter is left with (almost) nothing.
+  const baseSelectors: Array<[string, string]> = nonFoodActive
+    ? []
+    : [
+        ['amenity', 'restaurant'],
+        ['amenity', 'cafe'],
+        ['amenity', 'bar'],
+      ];
 
   // Active categories (primary + optional secondary) get their full OSM tag
   // set queried as both node and way. Deduplicated so the OR doesn't repeat.
