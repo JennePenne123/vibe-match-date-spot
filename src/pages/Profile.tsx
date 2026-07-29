@@ -65,23 +65,25 @@ const Profile = () => {
         </div>
 
         {/* Premium Header */}
-        <ProfileHeader 
-          user={user} 
-          displayName={displayName} 
-          displayEmail={displayEmail} 
-          isEditing={isEditing} 
-          editedName={editedName} 
-          editedEmail={editedEmail} 
-          onEditedNameChange={setEditedName} 
-          onEditedEmailChange={setEditedEmail} 
-          onEditToggle={() => setIsEditing(!isEditing)} 
-          onSave={handleSave} 
-          onCancel={handleCancel} 
-           onAvatarUpdate={refreshProfile}
-           level={points?.level}
-           totalPoints={points?.total_points}
-           premiumUntil={(points as any)?.premium_until}
-         />
+        <SafeComponent componentName="ProfileHeader">
+          <ProfileHeader 
+            user={user} 
+            displayName={displayName} 
+            displayEmail={displayEmail} 
+            isEditing={isEditing} 
+            editedName={editedName} 
+            editedEmail={editedEmail} 
+            onEditedNameChange={setEditedName} 
+            onEditedEmailChange={setEditedEmail} 
+            onEditToggle={() => setIsEditing(!isEditing)} 
+            onSave={handleSave} 
+            onCancel={handleCancel} 
+            onAvatarUpdate={refreshProfile}
+            level={points?.level ?? 1}
+            totalPoints={points?.total_points ?? 0}
+            premiumUntil={(points as any)?.premium_until}
+          />
+        </SafeComponent>
 
         <ProfileNudge />
 
