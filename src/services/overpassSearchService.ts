@@ -127,13 +127,25 @@ function buildOverpassQuery(
 ): string {
   const r = Math.min(radius, 25000);
 
-  // Always include the food baseline — even in non-food modes a restaurant or
-  // bar near a museum is useful as a follow-up suggestion.
-  const baseSelectors: Array<[string, string]> = [
-    ['amenity', 'restaurant'],
-    ['amenity', 'cafe'],
-    ['amenity', 'bar'],
-  ];
+  // A non-food intent is only active when the user explicitly picked a
+  // culture / activity / nightlife quick-action. Preference-based venue types
+  // alone must NOT drop the food baseline (the user may still want dinner).
+  const nonFoodActive = [categoryId, secondaryCategoryId].some(
+    (id) => !!id && id !== 'food',
+  );
+
+  // Food baseline. In non-food mode it is INTENTIONALLY dropped: Overpass
+  // returns elements ordered by id (not by selector) and caps the response at
+  // `limit`. In a city centre restaurants outnumber museums/theatres ~20:1, so
+  // keeping the baseline floods the budget with food venues and the downstream
+  // situational hard filter is left with (almost) nothing.
+  const baseSelectors: Array<[string, string]> = nonFoodActive
+    ? []
+    : [
+        ['amenity', 'restaurant'],
+        ['amenity', 'cafe'],
+        ['amenity', 'bar'],
+      ];
 
   // Active categories (primary + optional secondary) get their full OSM tag
   // set queried as both node and way. Deduplicated so the OR doesn't repeat.
@@ -394,11 +406,15 @@ export async function searchVenuesOverpass(
 ): Promise<OverpassSearchResult> {
   console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters, categoryId, secondaryCategoryId, extraVenueTypes });
 
+  const nonFoodIntent = [categoryId, secondaryCategoryId].some(
+    (id) => !!id && id !== 'food',
+  );
+
   const query = buildOverpassQuery(
     lat,
     lng,
     radiusMeters,
-    Math.min(limit * 2, 80),
+    nonFoodIntent ? Math.min(limit * 4, 200) : Math.min(limit * 2, 80),
     categoryId,
     secondaryCategoryId,
     extraVenueTypes,
@@ -444,6 +460,15 @@ export async function searchVenuesOverpass(
     if (foodAfter >= 3 || filteredFood.length === filtered.length) {
       matched = filteredFood;
     }
+  }
+
+  // In non-food mode, make sure culture / activity / nightlife venues survive
+  // the `slice(0, limit)` even if a few food venues slipped into the result.
+  if (nonFoodIntent) {
+    matched = [
+      ...matched.filter((el: any) => !isFoodVenue(el)),
+      ...matched.filter((el: any) => isFoodVenue(el)),
+    ];
   }
 
   const venues = matched.slice(0, limit).map((el: any) => {
