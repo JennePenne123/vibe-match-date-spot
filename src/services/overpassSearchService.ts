@@ -405,11 +405,15 @@ export async function searchVenuesOverpass(
 ): Promise<OverpassSearchResult> {
   console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters, categoryId, secondaryCategoryId, extraVenueTypes });
 
+  const nonFoodIntent =
+    [categoryId, secondaryCategoryId].some((id) => !!id && id !== 'food') ||
+    extraVenueTypes.length > 0;
+
   const query = buildOverpassQuery(
     lat,
     lng,
     radiusMeters,
-    Math.min(limit * 2, 80),
+    nonFoodIntent ? Math.min(limit * 4, 200) : Math.min(limit * 2, 80),
     categoryId,
     secondaryCategoryId,
     extraVenueTypes,
@@ -455,6 +459,15 @@ export async function searchVenuesOverpass(
     if (foodAfter >= 3 || filteredFood.length === filtered.length) {
       matched = filteredFood;
     }
+  }
+
+  // In non-food mode, make sure culture / activity / nightlife venues survive
+  // the `slice(0, limit)` even if a few food venues slipped into the result.
+  if (nonFoodIntent) {
+    matched = [
+      ...matched.filter((el: any) => !isFoodVenue(el)),
+      ...matched.filter((el: any) => isFoodVenue(el)),
+    ];
   }
 
   const venues = matched.slice(0, limit).map((el: any) => {
