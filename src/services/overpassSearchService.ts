@@ -406,9 +406,9 @@ export async function searchVenuesOverpass(
 ): Promise<OverpassSearchResult> {
   console.log('🗺️ OVERPASS CLIENT: Searching venues at', { lat, lng, radiusMeters, categoryId, secondaryCategoryId, extraVenueTypes });
 
-  const nonFoodIntent =
-    [categoryId, secondaryCategoryId].some((id) => !!id && id !== 'food') ||
-    extraVenueTypes.length > 0;
+  const nonFoodIntent = [categoryId, secondaryCategoryId].some(
+    (id) => !!id && id !== 'food',
+  );
 
   const query = buildOverpassQuery(
     lat,
