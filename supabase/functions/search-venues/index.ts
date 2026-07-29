@@ -49,6 +49,20 @@ serve(async (req) => {
     };
     const validTypes = rawTypes.map((t) => placeTypeMap[t] || t).filter(Boolean).slice(0, 5); // Limit to 5 types max
     const typeKeywords = rawTypes.filter((t) => t !== 'restaurant' && t !== 'point_of_interest').map((t) => t.replace(/_/g, ' '));
+    // Google Place types (New API) we accept for non-food intents. Anything
+    // else (e.g. "dining", "cocktails") is dropped from includedTypes and only
+    // used as a keyword.
+    const GOOGLE_NON_FOOD_TYPES = new Set([
+      'museum', 'art_gallery', 'movie_theater', 'performing_arts_theater', 'night_club',
+      'bowling_alley', 'amusement_park', 'amusement_center', 'spa', 'swimming_pool',
+      'gym', 'tourist_attraction', 'zoo', 'aquarium', 'park', 'casino', 'bar',
+      'cultural_center', 'historical_landmark', 'concert_hall', 'comedy_club', 'ice_skating_rink',
+    ]);
+    // Non-food intent: caller sent explicit non-restaurant types and no cuisines.
+    const nonFoodTypes = validTypes.filter((t) => GOOGLE_NON_FOOD_TYPES.has(t));
+    const nonFoodIntent = nonFoodTypes.length > 0 &&
+      !validTypes.includes('restaurant') &&
+      (!Array.isArray(originalCuisines) || originalCuisines.length === 0);
     const validMinRating = Math.min(Math.max(parseFloat(minRating) || 3.0, 1.0), 5.0);
     
     // Validate coordinates
@@ -116,7 +130,10 @@ serve(async (req) => {
     if (validTypes.length > 1) {
       keywordParts.push(...validTypes.slice(1).map((t: string) => t.replace(/_/g, ' ')));
     }
-    const useTextSearch = keywordParts.length > 0;
+    // For non-food intents a keyword text search produces a meaningless query
+    // soup ("museum art gallery movie theater museum"). Google's Nearby Search
+    // supports multiple includedTypes, which returns fresh, precise results.
+    const useTextSearch = keywordParts.length > 0 && !nonFoodIntent;
 
     // Field mask cost optimization (New API uses comma-separated field paths)
     const photoLimit = fieldMask === 'essentials' ? 1 : fieldMask === 'full' ? 5 : 3;
@@ -157,7 +174,7 @@ serve(async (req) => {
       // Nearby Search: type-only filter
       endpoint = 'https://places.googleapis.com/v1/places:searchNearby';
       placesRequestBody = {
-        includedTypes: [primaryType],
+        includedTypes: nonFoodIntent ? nonFoodTypes.slice(0, 5) : [primaryType],
         maxResultCount: 20,
         languageCode: 'de',
         locationRestriction: {
@@ -167,7 +184,7 @@ serve(async (req) => {
           },
         },
       };
-      console.log('🔍 SEARCH VENUES: Using Nearby Search for type:', primaryType);
+      console.log('🔍 SEARCH VENUES: Using Nearby Search for types:', placesRequestBody.includedTypes);
     }
 
     // 5. Make Google Places API (New) Call
