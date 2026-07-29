@@ -1,6 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 import { checkRateLimitWithLogging, getRateLimitIdentifier, rateLimitResponse, RATE_LIMITS } from '../_shared/rate-limiter.ts';
+import {
+  buildPlacesCacheKey,
+  getServiceClient,
+  readPlacesCache,
+  writePlacesCache,
+} from '../_shared/places-cache.ts';
 
 serve(async (req) => {
   console.log('🔍 SEARCH VENUES: ===== FUNCTION START =====');
@@ -33,7 +39,8 @@ serve(async (req) => {
       radius = 5000,
       types = ['restaurant'],
       minRating = 3.0,
-      fieldMask = 'essentials+pro' // 'essentials' | 'essentials+pro' | 'full'
+      fieldMask = 'essentials+pro', // 'essentials' | 'essentials+pro' | 'full'
+      forceRefresh = false,
     } = requestBody;
 
     // Input validation and sanitization
@@ -190,7 +197,31 @@ serve(async (req) => {
       console.log('🔍 SEARCH VENUES: Using Nearby Search for types:', placesRequestBody.includedTypes);
     }
 
-    // 5. Make Google Places API (New) Call
+    // 5. Cache lookup — identical upstream requests are served from Postgres
+    const cacheClient = getServiceClient();
+    const cacheKey = await buildPlacesCacheKey(endpoint, placesRequestBody, fieldMaskHeader);
+
+    if (!forceRefresh) {
+      const cached = await readPlacesCache(cacheClient, cacheKey);
+      if (cached && cached.venues.length > 0) {
+        console.log(`⚡ SEARCH VENUES: Cache hit (${cached.venues.length} venues, age ${Math.round(cached.ageMs / 1000)}s)`);
+        return Response.json({
+          success: true,
+          venues: cached.venues,
+          cached: true,
+          metadata: {
+            total_found: cached.venues.length,
+            search_location: `${validLatitude}, ${validLongitude}`,
+            search_radius: validRadius,
+            search_cuisines: sanitizedCuisines,
+            cache_age_ms: cached.ageMs,
+            response_time_ms: 0,
+          },
+        }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+    }
+
+    // 6. Make Google Places API (New) Call
     console.log('📡 SEARCH VENUES: Making API request to', endpoint);
     const startTime = Date.now();
 
@@ -327,10 +358,14 @@ serve(async (req) => {
     }
 
     console.log('✅ SEARCH VENUES: Successfully processed', venues.length, 'venues');
-    
+
+    // Persist for subsequent identical searches (24 h TTL)
+    await writePlacesCache(cacheClient, cacheKey, venues);
+
     return Response.json({
       success: true,
       venues: venues,
+      cached: false,
         metadata: {
           total_found: places.length,
           search_location: `${validLatitude}, ${validLongitude}`,
