@@ -127,11 +127,12 @@ function buildOverpassQuery(
 ): string {
   const r = Math.min(radius, 25000);
 
-  // A non-food intent is active when the primary/secondary quick-action is
-  // culture/activity/nightlife, or when the user picked niche venue types.
-  const nonFoodActive =
-    [categoryId, secondaryCategoryId].some((id) => !!id && id !== 'food') ||
-    extraVenueTypes.length > 0;
+  // A non-food intent is only active when the user explicitly picked a
+  // culture / activity / nightlife quick-action. Preference-based venue types
+  // alone must NOT drop the food baseline (the user may still want dinner).
+  const nonFoodActive = [categoryId, secondaryCategoryId].some(
+    (id) => !!id && id !== 'food',
+  );
 
   // Food baseline. In non-food mode it is INTENTIONALLY dropped: Overpass
   // returns elements ordered by id (not by selector) and caps the response at
