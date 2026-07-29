@@ -78,9 +78,9 @@ class ErrorBoundary extends Component<Props, State> {
     this.setState({ hasError: false, error: null, errorInfo: null }, () => {
       if (window.history.length > 1) {
         window.history.back();
-      } else {
-        window.location.href = '/';
       }
+      // If there is no previous entry we simply clear the error and stay put,
+      // instead of jumping the user to the home page unexpectedly.
     });
   };
 
