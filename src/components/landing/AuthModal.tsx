@@ -703,7 +703,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     type="button"
                     onClick={() => {
                       onClose();
-                      onOpenPartner();
+                      navigate('/partner/onboarding');
                     }}
                     disabled={loading || isOAuthLoading}
                     className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
@@ -711,6 +711,17 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     <Store className="w-4 h-4" />
                     <span>Venue-Besitzer?</span>
                     <span className="text-primary font-semibold">Werde jetzt Partner</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenPartner();
+                    }}
+                    disabled={loading || isOAuthLoading}
+                    className="w-full text-center py-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                  >
+                    {t('landing.partnerLogin', 'Bereits Partner? Login')}
                   </button>
                 </div>
               )}
