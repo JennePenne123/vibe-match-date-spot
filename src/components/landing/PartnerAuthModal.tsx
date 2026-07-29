@@ -104,7 +104,7 @@ export function PartnerAuthModal({ isOpen, onClose }: PartnerAuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden border-border/50 bg-background/95 backdrop-blur-xl">
+      <DialogContent className="sm:max-w-[480px] p-0 max-h-[90vh] overflow-y-auto overscroll-contain border-border/50 bg-background/95 backdrop-blur-xl">
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-amber-500/10 pointer-events-none" />
           
