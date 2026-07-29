@@ -1487,16 +1487,22 @@ async function getVenuesFromGooglePlaces(
       activities: mergedActivities,
       radius: fixedPrefs.max_distance * 1609,
       limit,
-      forceRefresh: mergedVenueTypes.length > 0 || mergedActivities.length > 0 || isNonFood,
+      // The tiered cache key already contains cuisines, venueTypes and
+      // activities, so a bypass is only needed on an explicit user refresh.
+      forceRefresh: false,
     };
 
     let searchResult = null;
     
     try {
-      const result = await Promise.race([
-        supabase.functions.invoke('search-venues-tiered', { body: requestPayload }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 20000))
-      ]) as any;
+      // Deduplicate identical searches that are already in flight within the
+      // same session (e.g. parallel components mounting at once).
+      const result = await dedupeVenueSearch(requestPayload, () =>
+        Promise.race([
+          supabase.functions.invoke('search-venues-tiered', { body: requestPayload }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 20000)),
+        ]) as Promise<any>,
+      );
       
       if (result?.error) throw new Error(result.error.message);
       searchResult = result?.data;
