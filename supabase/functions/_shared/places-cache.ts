@@ -74,7 +74,7 @@ export async function writePlacesCache(
 ): Promise<void> {
   if (!supabase || !venues.length) return;
   try {
-    await supabase
+    const { error } = await supabase
       .from("venue_search_cache")
       .upsert(
         {
@@ -87,6 +87,11 @@ export async function writePlacesCache(
         },
         { onConflict: "cache_key" },
       );
+    if (error) {
+      console.warn("[places-cache] write rejected:", error.message);
+    } else {
+      console.log(`[places-cache] stored ${venues.length} venues for ${cacheKey}`);
+    }
   } catch (err) {
     console.warn("[places-cache] write failed:", err instanceof Error ? err.message : err);
   }
