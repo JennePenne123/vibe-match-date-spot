@@ -356,7 +356,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   if (isForgot) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[480px] p-0 max-h-[90vh] overflow-y-auto overscroll-contain border-border/50 bg-background/95 backdrop-blur-xl">
+        <DialogContent className="sm:max-w-[480px] p-0 max-h-[90vh] max-h-[90dvh] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] border-border/50 bg-background/95 backdrop-blur-xl">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
             <div className="relative p-6 sm:p-8">
@@ -440,7 +440,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[480px] p-0 max-h-[90vh] overflow-y-auto overscroll-contain border-border/50 bg-background/95 backdrop-blur-xl">
+      <DialogContent className="sm:max-w-[480px] p-0 max-h-[90vh] max-h-[90dvh] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] border-border/50 bg-background/95 backdrop-blur-xl">
         <div className="relative">
           {/* Gradient background */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
