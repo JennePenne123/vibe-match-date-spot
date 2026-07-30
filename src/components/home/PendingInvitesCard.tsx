@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Mail, Check, X, UserPlus, CalendarHeart, Clock } from 'lucide-react';
+import { Mail, Check, X, UserPlus, CalendarHeart, Clock, RefreshCw } from 'lucide-react';
 import { useInvitations } from '@/hooks/useInvitations';
 import { useFriends } from '@/hooks/useFriends';
 
@@ -18,8 +18,38 @@ import { useFriends } from '@/hooks/useFriends';
 const PendingInvitesCard: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { invitations, acceptInvitation, declineInvitation, cancelInvitation } = useInvitations();
-  const { pendingRequests, acceptFriendRequest, declineFriendRequest } = useFriends();
+  const { invitations, acceptInvitation, declineInvitation, cancelInvitation, fetchInvitations } = useInvitations();
+  const { pendingRequests, acceptFriendRequest, declineFriendRequest, fetchFriends } = useFriends();
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const refresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([fetchInvitations(), fetchFriends()]);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchInvitations, fetchFriends]);
+
+  // React to global pull-to-refresh
+  React.useEffect(() => {
+    const handler = () => { void refresh(); };
+    window.addEventListener('hioutz-refresh', handler);
+    return () => window.removeEventListener('hioutz-refresh', handler);
+  }, [refresh]);
+
+  // Refresh when the app comes back to the foreground
+  React.useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void refresh();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, [refresh]);
 
   const pendingReceived = React.useMemo(
     () => (invitations || []).filter(inv => inv.direction === 'received' && inv.status === 'pending'),
@@ -42,6 +72,16 @@ const PendingInvitesCard: React.FC = () => {
           <Mail className="h-5 w-5 text-primary" />
           {t('home.pendingInvitesTitle')}
           <Badge variant="secondary" className="ml-auto">{total}</Badge>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-7 w-7 shrink-0"
+            aria-label={t('common.refresh', 'Aktualisieren')}
+            disabled={refreshing}
+            onClick={() => void refresh()}
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2 pt-0">
