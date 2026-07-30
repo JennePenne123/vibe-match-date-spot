@@ -105,6 +105,7 @@ export interface AIVenueRecommendation {
   amenities?: string[];
   latitude?: number;
   longitude?: number;
+  website?: string;
 }
 
 export const getAIVenueRecommendations = async (
@@ -461,7 +462,8 @@ export const getAIVenueRecommendations = async (
         cuisine_type: venue.cuisine_type || venue.cuisineType,
         amenities: venue.tags || [],
         latitude: venue.latitude ?? venue.lat ?? venue.geometry?.location?.lat,
-        longitude: venue.longitude ?? venue.lng ?? venue.geometry?.location?.lng
+        longitude: venue.longitude ?? venue.lng ?? venue.geometry?.location?.lng,
+        website: venue.website || venue.websiteUri || undefined
       };
 
       if (typeof recommendation.venue_id === 'string' && recommendation.venue_id.trim()) {
