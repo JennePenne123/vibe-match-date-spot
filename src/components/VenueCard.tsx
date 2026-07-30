@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Star, MapPin, Zap, Navigation, Clock } from 'lucide-react';
+import { Heart, Star, MapPin, Zap, Navigation, Clock, Globe } from 'lucide-react';
 import { Venue } from '@/types';
 import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import { formatVenueAddress, extractNeighborhood } from '@/utils/addressHelpers';
@@ -352,12 +352,28 @@ const VenueCard = ({
         </div>
 
         {showActions && (
-          <Button
-            onClick={() => navigate(`/venue/${venue.id}`)}
-            className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:opacity-90 shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300"
-          >
-            View Details
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => navigate(`/venue/${venue.id}`)}
+              className="flex-1 bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:opacity-90 shadow-glow-primary/30 hover:shadow-glow-primary/50 transition-all duration-300"
+            >
+              {t('venue.viewDetails', 'View Details')}
+            </Button>
+            {venue.website && (
+              <Button
+                variant="outline"
+                className="shrink-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(venue.website!, '_blank', 'noopener,noreferrer');
+                }}
+                aria-label={t('venue.visitWebsite')}
+                title={t('venue.visitWebsite')}
+              >
+                <Globe className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </div>

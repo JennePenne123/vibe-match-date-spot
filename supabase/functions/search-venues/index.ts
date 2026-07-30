@@ -164,6 +164,9 @@ serve(async (req) => {
       'places.photos',
     ];
     if (includeOpeningHours) fieldMaskParts.push('places.regularOpeningHours');
+    if (fieldMask !== 'essentials') {
+      fieldMaskParts.push('places.websiteUri', 'places.nationalPhoneNumber');
+    }
     const fieldMaskHeader = fieldMaskParts.join(',');
 
     let endpoint: string;
@@ -339,8 +342,8 @@ serve(async (req) => {
             cuisineType: determineCuisineType({ name: placeName, types: place.types }, sanitizedCuisines),
             tags: place.types || ['restaurant'],
             openNow: includeOpeningHours ? place.regularOpeningHours?.openNow : undefined,
-            phone: null,
-            website: null,
+            phone: place.nationalPhoneNumber || null,
+            website: place.websiteUri || null,
             description: `${placeName} in ${formattedAddr || 'der Nähe'}`,
           };
 

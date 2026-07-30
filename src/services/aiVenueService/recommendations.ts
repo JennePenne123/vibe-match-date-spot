@@ -105,6 +105,7 @@ export interface AIVenueRecommendation {
   amenities?: string[];
   latitude?: number;
   longitude?: number;
+  website?: string;
 }
 
 export const getAIVenueRecommendations = async (
@@ -461,7 +462,8 @@ export const getAIVenueRecommendations = async (
         cuisine_type: venue.cuisine_type || venue.cuisineType,
         amenities: venue.tags || [],
         latitude: venue.latitude ?? venue.lat ?? venue.geometry?.location?.lat,
-        longitude: venue.longitude ?? venue.lng ?? venue.geometry?.location?.lng
+        longitude: venue.longitude ?? venue.lng ?? venue.geometry?.location?.lng,
+        website: venue.website || venue.websiteUri || undefined
       };
 
       if (typeof recommendation.venue_id === 'string' && recommendation.venue_id.trim()) {
@@ -1623,6 +1625,15 @@ async function transformAndSaveVenues(venues: any[]): Promise<any[]> {
         if (!insertError && newVenue) venueId = newVenue.id;
       }
 
+      // Keep stored venues enriched: backfill website/phone when Google now
+      // returns data we didn't have on first import.
+      if (existingVenue && (venue.website || venue.phone)) {
+        const patch: Record<string, unknown> = {};
+        if (venue.website) patch.website = venue.website;
+        if (venue.phone) patch.phone = venue.phone;
+        await supabase.from('venues').update(patch).eq('id', existingVenue.id);
+      }
+
       const finalVenueId = venue.placeId || venueId || `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
       transformedVenues.push({
@@ -1643,6 +1654,8 @@ async function transformAndSaveVenues(venues: any[]): Promise<any[]> {
         latitude: venue.latitude,
         longitude: venue.longitude,
         openNow: venue.openNow,
+        website: venue.website,
+        phone: venue.phone,
         opening_hours: venue.openNow ? ['Open now'] : ['Hours not available']
       });
     } catch {
