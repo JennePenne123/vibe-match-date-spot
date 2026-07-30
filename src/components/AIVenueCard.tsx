@@ -20,7 +20,8 @@ import {
   PersonStanding,
   ShieldCheck,
   TrendingUp,
-  Zap
+  Zap,
+  Globe
 } from 'lucide-react';
 import { AIVenueRecommendation } from '@/services/aiVenueService/recommendations';
 import { getVenueFallbackImage } from '@/utils/venueImageFallback';
@@ -83,7 +84,8 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
     priceRange,
     rating,
     cuisine_type,
-    amenities
+    amenities,
+    website
   } = recommendation;
 
   const formattedAddress = formatVenueAddress(recommendation);
@@ -381,14 +383,31 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
             </Button>
           </div>
 
-          {/* Select Button */}
-          <Button
-            onClick={() => onSelect(venue_id)}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-            size="default"
-          >
-            Venue auswählen
-          </Button>
+          {/* Actions */}
+          <div className="flex gap-2">
+            <Button
+              onClick={() => onSelect(venue_id)}
+              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+              size="default"
+            >
+              Venue auswählen
+            </Button>
+            {website && (
+              <Button
+                variant="outline"
+                size="default"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(website, '_blank', 'noopener,noreferrer');
+                }}
+                aria-label={`Website von ${venue_name} öffnen`}
+                title="Website öffnen"
+                className="shrink-0"
+              >
+                <Globe className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </motion.div>
