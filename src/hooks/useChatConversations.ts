@@ -133,7 +133,7 @@ export const useChatConversations = () => {
       channelRef.current = null;
     }
 
-    const channelName = `${user.id}:chat-updates-${Date.now()}`;
+    const channelName = `${user.id}:chat-updates-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const channel = supabase
       .channel(channelName)
       .on(

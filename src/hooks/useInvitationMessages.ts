@@ -132,7 +132,7 @@ export const useInvitationMessages = (invitationId: string) => {
       return;
     }
 
-    const channelName = `${userId}:invitation_messages-${invitationId}`;
+    const channelName = `${userId}:invitation_messages-${invitationId}-${Math.random().toString(36).substring(2, 9)}`;
     console.log('🔌 Setting up real-time channel:', channelName);
 
     // Create a promise to track subscription completion

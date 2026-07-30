@@ -45,7 +45,7 @@ export const useUserPoints = () => {
       // Several profile widgets can use this hook in the same render. Date.now()
       // alone can then produce the same channel name and Supabase returns the
       // same channel instance, which throws when subscribe() is called twice.
-      const channelName = `${user.id}:user-points-${Date.now()}-${++pointsChannelSequence}`;
+      const channelName = `${user.id}:user-points-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
       const channel = supabase
         .channel(channelName)
         .on(
