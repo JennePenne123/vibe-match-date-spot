@@ -1013,10 +1013,16 @@ async function getVenuesGooglePrimaryHybrid(
     ]),
   ];
 
-  if (API_CONFIG.useRadar) {
+  // Radar is a restaurant-first index. For non-food intents its results are
+  // pure noise: they flood the merge (45 restaurants vs. a handful of museums)
+  // and push the Google culture/activity venues out of the 30-venue cap before
+  // the hard filter even runs. Skip it entirely in non-food mode.
+  if (API_CONFIG.useRadar && !isNonFoodMode) {
     promises.push(
       getVenuesFromRadar(userId, limit, userLocation, radiusMultiplier).catch(() => []),
     );
+  } else if (isNonFoodMode) {
+    promises.push(Promise.resolve([] as any[]));
   }
   if (API_CONFIG.useOverpass) {
     promises.push(
@@ -1043,10 +1049,19 @@ async function getVenuesGooglePrimaryHybrid(
   for (const v of radarVenues) (v as any)._source = (v as any)._source ?? 'radar';
   for (const v of osmVenues) (v as any)._source = (v as any)._source ?? 'overpass';
 
-  // Google as primary (richest metadata), then enrich/extend with Radar + Overpass
+  // Google as primary (richest metadata), then enrich/extend with Radar + Overpass.
+  // In non-food mode the enrichment sources are pre-filtered so restaurants can
+  // never consume the merge cap ahead of matching culture/activity venues.
+  const enrichRadar = isNonFoodMode
+    ? filterSituationalVenues(radarVenues, situationalCategoryId, secondaryCategoryId, 'radar-enrich')
+    : radarVenues;
+  const enrichOsm = isNonFoodMode
+    ? filterSituationalVenues(osmVenues, situationalCategoryId, secondaryCategoryId, 'overpass-enrich')
+    : osmVenues;
+
   let venues: any[] = googleVenues;
-  venues = mergeAndDeduplicateVenues(venues, radarVenues);
-  venues = mergeAndDeduplicateVenues(venues, osmVenues);
+  venues = mergeAndDeduplicateVenues(venues, enrichRadar);
+  venues = mergeAndDeduplicateVenues(venues, enrichOsm);
 
   // Safety net: if Google returned nothing (timeout/quota), Radar+Overpass
   // already populated the merge — no extra fallback needed.
