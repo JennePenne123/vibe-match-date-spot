@@ -7,7 +7,10 @@ export type VenueSearchStrategy = 'radar-overpass' | 'overpass-only' | 'parallel
 
 export const API_CONFIG = {
   // API toggles
-  useRadar: true,          // Primary search (100K free calls/month)
+  // Radar deaktiviert (2026-07-30): Google Places (New) ist Primary, Overpass
+  // der kostenlose Fallback. Radar füllte das Merge-Limit mit Restaurants und
+  // verdrängte Kultur-/Aktivitäts-Venues. Flag bleibt für schnellen Rollback.
+  useRadar: false,         // Deaktiviert – Rollback: auf true setzen
   useOverpass: true,       // Secondary search (OpenStreetMap, completely free)
   useGooglePlaces: true,   // Fallback for niche venue types
   useTripAdvisor: true,    // Enrichment: TripAdvisor reviews
