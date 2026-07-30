@@ -95,7 +95,9 @@ const Profile = () => {
           {/* Premium Wallet – first for immediate overview */}
           <SafeComponent componentName="PremiumWalletCard"><PremiumWalletCard /></SafeComponent>
 
-          <SafeComponent componentName="ProfileStats"><ProfileStats /></SafeComponent>
+          <SafeComponent componentName="ProfileStats">
+            <ProfileStats points={points} pointsLoading={pointsLoading} />
+          </SafeComponent>
 
           {/* Activity Feed */}
           <SafeComponent componentName="ActivityFeed"><ActivityFeed /></SafeComponent>
