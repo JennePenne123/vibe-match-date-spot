@@ -54,7 +54,9 @@ function buildCacheKey(p: SearchPayload): string {
   const cuisines = [...(p.cuisines ?? [])].sort().join(",");
   const types = [...(p.venueTypes ?? [])].sort().join(",");
   const acts = [...(p.activities ?? [])].sort().join(",");
-  return `search:${lat}:${lng}:${radius}:${cuisines}|${types}|${acts}`;
+  // v2 invalidates broad mixed-category cache entries created before
+  // situational searches were scoped to their active category.
+  return `search:v2:${lat}:${lng}:${radius}:${cuisines}|${types}|${acts}`;
 }
 
 async function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {

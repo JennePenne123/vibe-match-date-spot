@@ -1470,14 +1470,23 @@ async function getVenuesFromGooglePlaces(
       ...(secCat?.boostActivities ?? []),
     ];
     const isNonFood = !!sitCat && sitCat.id !== 'food';
-    const mergedVenueTypes = Array.from(new Set([
-      ...((userPrefs as any).preferred_venue_types || []),
-      ...situationalVenueTypes,
-    ]));
-    const mergedActivities = Array.from(new Set([
-      ...((userPrefs as any).preferred_activities || []),
-      ...situationalVenueTypes,
-    ]));
+    // A situational category is the user's explicit intent for this search.
+    // Do not mix globally saved venue/activity preferences into non-food
+    // requests: a culture request otherwise becomes a broad union containing
+    // nightlife/activity types, and Google's 20 result slots can be exhausted
+    // before a cinema or theatre is returned.
+    const mergedVenueTypes = Array.from(new Set(isNonFood
+      ? situationalVenueTypes
+      : [
+          ...((userPrefs as any).preferred_venue_types || []),
+          ...situationalVenueTypes,
+        ]));
+    const mergedActivities = Array.from(new Set(isNonFood
+      ? (sitCat?.boostActivities ?? [])
+      : [
+          ...((userPrefs as any).preferred_activities || []),
+          ...situationalVenueTypes,
+        ]));
     const requestPayload = {
       latitude,
       longitude,
