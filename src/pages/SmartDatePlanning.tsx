@@ -3,8 +3,6 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import SmartDatePlanner from '@/components/SmartDatePlanner';
-import { FirstUseNudge } from '@/components/FirstUseNudge';
-import { useFirstUseNudge } from '@/hooks/useFirstUseNudge';
 import { useSessionManagement } from '@/hooks/useSessionManagement';
 import HomeHeader from '@/components/HomeHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
