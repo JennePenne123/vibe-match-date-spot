@@ -46,6 +46,9 @@ const PullToRefresh: React.FC = () => {
       // ignore
     }
 
+    // 2b. Notify non-React-Query data sources (manual fetch hooks) to reload.
+    window.dispatchEvent(new CustomEvent('hioutz-refresh'));
+
     // 3. Reset UI after a short beat so the spinner is visible.
     setTimeout(() => {
       setRefreshing(false);
