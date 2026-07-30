@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Users, ArrowRight, MapPin, Calendar, Heart, Zap, Loader2, Lightbulb, Star, Compass } from 'lucide-react';
 import { motion } from 'framer-motion';
 import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
+import PendingInvitesCard from '@/components/home/PendingInvitesCard';
 import AIConfidenceBanner from '@/components/home/AIConfidenceBanner';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
 import LocationPermissionBanner from '@/components/home/LocationPermissionBanner';
@@ -154,6 +155,11 @@ const HomeContent: React.FC = () => {
 
         {/* Location permission banner — only shown if no home location set */}
         <LocationPermissionBanner />
+
+        {/* Open invitations — friend requests + date invites, directly actionable */}
+        <ErrorBoundary level="component" fallback={null}>
+          <PendingInvitesCard />
+        </ErrorBoundary>
 
         {/* AI Confidence Banner */}
         <AIConfidenceBanner />
