@@ -1625,6 +1625,15 @@ async function transformAndSaveVenues(venues: any[]): Promise<any[]> {
         if (!insertError && newVenue) venueId = newVenue.id;
       }
 
+      // Keep stored venues enriched: backfill website/phone when Google now
+      // returns data we didn't have on first import.
+      if (existingVenue && (venue.website || venue.phone)) {
+        const patch: Record<string, unknown> = {};
+        if (venue.website) patch.website = venue.website;
+        if (venue.phone) patch.phone = venue.phone;
+        await supabase.from('venues').update(patch).eq('id', existingVenue.id);
+      }
+
       const finalVenueId = venue.placeId || venueId || `venue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
       transformedVenues.push({
