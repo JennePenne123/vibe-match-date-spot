@@ -1645,6 +1645,8 @@ async function transformAndSaveVenues(venues: any[]): Promise<any[]> {
         latitude: venue.latitude,
         longitude: venue.longitude,
         openNow: venue.openNow,
+        website: venue.website,
+        phone: venue.phone,
         opening_hours: venue.openNow ? ['Open now'] : ['Hours not available']
       });
     } catch {
