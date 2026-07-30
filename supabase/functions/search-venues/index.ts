@@ -47,17 +47,18 @@ serve(async (req) => {
     const validLatitude = parseFloat(latitude);
     const validLongitude = parseFloat(longitude);
     const validRadius = Math.min(Math.max(parseInt(radius) || 5000, 1000), 50000); // Limit radius between 1km-50km
-    const rawTypes = Array.isArray(types) ? types.slice(0, 8).map((t) => String(t)) : ['restaurant'];
+    const rawTypes = Array.isArray(types) ? types.slice(0, 16).map((t) => String(t)) : ['restaurant'];
     const placeTypeMap: Record<string, string> = {
       mini_golf: 'amusement_park', bowling: 'bowling_alley', arcade: 'amusement_park', escape_room: 'amusement_park',
       climbing: 'gym', swimming: 'swimming_pool', spa_wellness: 'spa', museum: 'museum', gallery: 'art_gallery',
       theater_venue: 'performing_arts_theater', theater: 'performing_arts_theater', cinema: 'movie_theater',
       concert_hall: 'concert_hall', karaoke: 'karaoke',
+      cultural_event: 'cultural_center',
       comedy_club: 'night_club', active: 'amusement_park', cultural_act: 'museum', nightlife_act: 'night_club', cocktails: 'bar',
     };
     const validTypes = Array.from(
       new Set(rawTypes.map((t) => placeTypeMap[t] || t).filter(Boolean)),
-    ).slice(0, 5); // Deduplicate, limit to 5 types max
+    );
     const typeKeywords = rawTypes.filter((t) => t !== 'restaurant' && t !== 'point_of_interest').map((t) => t.replace(/_/g, ' '));
     // Google Place types (New API) we accept for non-food intents. Anything
     // else (e.g. "dining", "cocktails") is dropped from includedTypes and only
@@ -69,7 +70,10 @@ serve(async (req) => {
       'cultural_center', 'historical_landmark', 'concert_hall', 'comedy_club', 'ice_skating_rink',
     ]);
     // Non-food intent: caller sent explicit non-restaurant types and no cuisines.
-    const nonFoodTypes = validTypes.filter((t) => GOOGLE_NON_FOOD_TYPES.has(t));
+    // Filter unsupported aliases before applying the five-type API limit.
+    // Previously values such as `cinema` or `cocktail_bar` occupied these
+    // slots, pushing `movie_theater` / `performing_arts_theater` out entirely.
+    const nonFoodTypes = validTypes.filter((t) => GOOGLE_NON_FOOD_TYPES.has(t)).slice(0, 5);
     const nonFoodIntent = nonFoodTypes.length > 0 &&
       !validTypes.includes('restaurant') &&
       (!Array.isArray(originalCuisines) || originalCuisines.length === 0);
