@@ -147,7 +147,14 @@
       "t_outdoor2": "Get out in nature — parks & gardens are underrated"
     },
     "feedbackImpactTitle": "Your feedback matters",
-    "feedbackImpactDesc": "Every rating improves your next recommendations."
+    "feedbackImpactDesc": "Every rating improves your next recommendations.",
+    "pendingInvitesTitle": "Pending invitations",
+    "pendingInvitesFriend": "Friend request",
+    "pendingInvitesDateReceived": "Date invitation",
+    "pendingInvitesDateSent": "Request sent",
+    "pendingInvitesAccept": "Accept",
+    "pendingInvitesDecline": "Decline",
+    "pendingInvitesViewAll": "View all"
   },
   "landing": {
     "features": "Features",
@@ -1431,8 +1438,7 @@
       "fixStep1": "Open your OAuth client (Web application) in Google Cloud Console.",
       "fixStep2": "Add this exact URL under \"Authorized redirect URIs\":",
       "fixStep3": "Save, wait 1–2 minutes, then retry Google sign-in.",
-      "openGoogleCredentials": "Open Google Cloud Credentials"
-      ,
+      "openGoogleCredentials": "Open Google Cloud Credentials",
       "hints": {
         "redirect_uri_mismatch": "The redirect URI in Google Cloud does not match this app. Add the URL shown below to \"Authorized redirect URIs\" exactly.",
         "provider_disabled": "The Google provider is disabled in Supabase. Enable it in the Supabase dashboard under Authentication → Providers → Google.",
@@ -1846,4 +1852,3 @@
     "comingSoon": "Coming soon"
   }
 }
-
