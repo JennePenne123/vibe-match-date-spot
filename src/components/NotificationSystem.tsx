@@ -19,7 +19,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({ children }) => 
   useEffect(() => {
     if (!user) return;
 
-    const channelSuffix = Date.now();
+    const channelSuffix = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     // Listen for invitation responses (for senders)
     const senderChannel = supabase

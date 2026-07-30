@@ -22,7 +22,7 @@ export const useRealtimeInvitations = ({ onInvitationReceived, onInvitationUpdat
     }
 
     // Create a unique channel name to prevent conflicts
-    const channelName = `${user.id}:date-invitations-${Date.now()}`;
+    const channelName = `${user.id}:date-invitations-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     
     // Create a channel for real-time updates with server-side filters
     const channel = supabase

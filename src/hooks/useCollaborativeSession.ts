@@ -169,7 +169,7 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
   useEffect(() => {
     if (!sessionId || !session) return;
     
-    const channelName = `${user?.id}:collab-session-${sessionId}`;
+    const channelName = `${user?.id}:collab-session-${sessionId}-${Math.random().toString(36).substring(2, 9)}`;
     let isActive = true;
     
     const channel = supabase

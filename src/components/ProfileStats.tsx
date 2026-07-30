@@ -1,13 +1,17 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, Trophy, Star, TrendingUp } from 'lucide-react';
-import { useUserPoints } from '@/hooks/useUserPoints';
 import { useFriends } from '@/hooks/useFriends';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { UserPoints } from '@/services/pointsService';
 
-const ProfileStats = () => {
+interface ProfileStatsProps {
+  points: UserPoints | null;
+  pointsLoading: boolean;
+}
+
+const ProfileStats = ({ points, pointsLoading }: ProfileStatsProps) => {
   const { t } = useTranslation();
-  const { points, loading: pointsLoading } = useUserPoints();
   const { friends } = useFriends();
 
   const totalPoints = points?.total_points || 0;

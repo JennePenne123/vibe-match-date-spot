@@ -7,6 +7,8 @@ import {
   type ReferralStats,
 } from '@/services/referralService';
 
+let referralChannelSequence = 0;
+
 export const useReferral = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState<ReferralStats | null>(null);
@@ -41,8 +43,9 @@ export const useReferral = () => {
   useEffect(() => {
     if (!user) return;
 
+    const channelName = `${user.id}:referrals-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const channel = supabase
-      .channel(`${user.id}:referrals-${Date.now()}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {

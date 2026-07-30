@@ -8,6 +8,7 @@ import { icons, Award } from 'lucide-react';
 // Module-level guard so multiple hook instances (Profile + ProfileStats +
 // PointsIndicator on the same page) don't each fire the same badge toast.
 const toastedThisSession = new Set<string>();
+let pointsChannelSequence = 0;
 
 const fetchNotifiedBadges = async (userId: string): Promise<string[]> => {
   const { data, error } = await supabase
@@ -41,8 +42,12 @@ export const useUserPoints = () => {
       hasCheckedBadges.current = false;
       loadPoints();
       
+      // Several profile widgets can use this hook in the same render. Date.now()
+      // alone can then produce the same channel name and Supabase returns the
+      // same channel instance, which throws when subscribe() is called twice.
+      const channelName = `${user.id}:user-points-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
       const channel = supabase
-        .channel(`${user.id}:user-points-${Date.now()}`)
+        .channel(channelName)
         .on(
           'postgres_changes',
           {
