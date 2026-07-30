@@ -150,8 +150,6 @@ const HomeContent: React.FC = () => {
     <main className="px-4 py-5 md:px-6 lg:px-8">
       <div className={isMobile ? 'max-w-md mx-auto space-y-5' : 'max-w-7xl mx-auto space-y-6'}>
 
-        {/* First-Use Nudge for Home */}
-        <HomeNudge />
 
         {/* Location permission banner — only shown if no home location set */}
         <LocationPermissionBanner />
@@ -358,15 +356,6 @@ const HomeContent: React.FC = () => {
 
       </div>
     </main>
-  );
-};
-
-const HomeNudge = () => {
-  const { visible, dismiss } = useFirstUseNudge('home-concierge');
-  return (
-    <FirstUseNudge visible={visible} onDismiss={dismiss}>
-      <strong>Tipp:</strong> Tippe unten rechts auf ✨ für deinen KI-Concierge — er kennt deine Vorlieben!
-    </FirstUseNudge>
   );
 };
 
