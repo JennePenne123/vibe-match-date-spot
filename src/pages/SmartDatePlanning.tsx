@@ -170,7 +170,6 @@ const SmartDatePlanning: React.FC = () => {
             />
           )}
           
-          <DatePlanningNudge />
           <ErrorBoundary level="component" silent={true}>
             <SmartDatePlanner
               sessionId={sessionId ?? ''}
@@ -181,17 +180,6 @@ const SmartDatePlanning: React.FC = () => {
         </div>
       </div>
     </ErrorBoundary>
-  );
-};
-
-const DatePlanningNudge = () => {
-  const { visible, dismiss } = useFirstUseNudge('planning-concierge');
-  return (
-    <div className="px-4">
-      <FirstUseNudge visible={visible} onDismiss={dismiss}>
-        <strong>Wusstest du?</strong> Der ✨ Concierge hilft dir mit Ideen basierend auf deinen Vorlieben!
-      </FirstUseNudge>
-    </div>
   );
 };
 
