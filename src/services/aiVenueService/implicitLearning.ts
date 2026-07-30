@@ -122,14 +122,24 @@ export const analyzeImplicitSignals = async (userId: string): Promise<ImplicitIn
  */
 export const applyImplicitLearning = async (userId: string): Promise<boolean> => {
   try {
-    const insights = await analyzeImplicitSignals(userId);
-    if (!insights) return false;
-
     const { data: existing } = await supabase
       .from('user_preference_vectors')
       .select('feature_weights, learning_data')
       .eq('user_id', userId)
       .single();
+
+    // Throttle: implicit learning should be slow & deep — at most once per 24h
+    const lastApplied = (existing?.learning_data as Record<string, any>)?.implicit_last_applied;
+    if (lastApplied) {
+      const hoursSince = (Date.now() - new Date(lastApplied).getTime()) / 36e5;
+      if (hoursSince < 24) {
+        console.log('⏳ IMPLICIT LEARNING: Skipped (last applied', hoursSince.toFixed(1), 'h ago)');
+        return false;
+      }
+    }
+
+    const insights = await analyzeImplicitSignals(userId);
+    if (!insights) return false;
 
     const currentWeights = (existing?.feature_weights as Record<string, number>) || {
       cuisine: 1.0, vibe: 1.0, price: 1.0, time: 1.0, rating: 1.0
