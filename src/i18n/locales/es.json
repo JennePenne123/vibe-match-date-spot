@@ -147,7 +147,14 @@
       "t_outdoor2": "Conecta con la naturaleza — parques y jardines son infravalorados"
     },
     "feedbackImpactTitle": "Tu opinión cuenta",
-    "feedbackImpactDesc": "Cada valoración mejora tus próximas recomendaciones."
+    "feedbackImpactDesc": "Cada valoración mejora tus próximas recomendaciones.",
+    "pendingInvitesTitle": "Invitaciones pendientes",
+    "pendingInvitesFriend": "Solicitud de amistad",
+    "pendingInvitesDateReceived": "Invitación a cita",
+    "pendingInvitesDateSent": "Solicitud enviada",
+    "pendingInvitesAccept": "Aceptar",
+    "pendingInvitesDecline": "Rechazar",
+    "pendingInvitesViewAll": "Ver todo"
   },
   "landing": {
     "features": "Funciones",
@@ -1581,8 +1588,7 @@
       "fixStep1": "Abre tu cliente OAuth (Web application) en Google Cloud Console.",
       "fixStep2": "Añade exactamente esta URL en \"Authorized redirect URIs\":",
       "fixStep3": "Guarda, espera 1–2 minutos y vuelve a intentar el inicio de sesión con Google.",
-      "openGoogleCredentials": "Abrir Google Cloud Credentials"
-      ,
+      "openGoogleCredentials": "Abrir Google Cloud Credentials",
       "hints": {
         "redirect_uri_mismatch": "El redirect URI en Google Cloud no coincide con esta app. Añade exactamente la URL mostrada abajo en \"Authorized redirect URIs\".",
         "provider_disabled": "El proveedor de Google está desactivado en Supabase. Actívalo en Authentication → Providers → Google.",
@@ -1846,4 +1852,3 @@
     "comingSoon": "Próximamente"
   }
 }
-

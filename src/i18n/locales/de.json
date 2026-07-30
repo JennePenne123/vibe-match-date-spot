@@ -147,7 +147,14 @@
       "t_outdoor2": "Natur tanken — Parks & Gärten sind unterschätzt"
     },
     "feedbackImpactTitle": "Dein Feedback wirkt",
-    "feedbackImpactDesc": "Jede Bewertung verbessert deine nächsten Empfehlungen."
+    "feedbackImpactDesc": "Jede Bewertung verbessert deine nächsten Empfehlungen.",
+    "pendingInvitesTitle": "Offene Einladungen",
+    "pendingInvitesFriend": "Freundschaftsanfrage",
+    "pendingInvitesDateReceived": "Date-Einladung",
+    "pendingInvitesDateSent": "Anfrage verschickt",
+    "pendingInvitesAccept": "Annehmen",
+    "pendingInvitesDecline": "Ablehnen",
+    "pendingInvitesViewAll": "Alle ansehen"
   },
   "landing": {
     "features": "Funktionen",
@@ -1431,8 +1438,7 @@
       "fixStep1": "Öffne in der Google Cloud Console deinen OAuth-Client (Web application).",
       "fixStep2": "Trage unter „Authorized redirect URIs“ exakt diese URL ein:",
       "fixStep3": "Speichern, 1–2 Minuten warten, dann erneut mit Google anmelden.",
-      "openGoogleCredentials": "Google Cloud Credentials öffnen"
-      ,
+      "openGoogleCredentials": "Google Cloud Credentials öffnen",
       "hints": {
         "redirect_uri_mismatch": "Die Redirect-URI in Google Cloud stimmt nicht mit dieser App überein. Trage die unten angezeigte URL exakt in „Authorized redirect URIs“ ein.",
         "provider_disabled": "Der Google-Provider ist in Supabase nicht aktiviert. Aktiviere ihn im Supabase-Dashboard unter Authentication → Providers → Google.",
@@ -1846,4 +1852,3 @@
     "comingSoon": "Bald verfügbar"
   }
 }
-
