@@ -330,7 +330,15 @@
     "nowFriendsWith": "You are now friends with {{name}}",
     "requestDeclined": "Request declined",
     "noFriendsYet": "No friends yet",
-    "noFriendsYetDesc": "Invite friends to plan dates together"
+    "noFriendsYetDesc": "Invite friends to plan dates together",
+    "bulkInviteTitle": "Invite several at once",
+    "bulkInvitePlaceholder": "anna@mail.com, ben@mail.com ...",
+    "bulkInviteValid": "{{count}} valid",
+    "bulkInviteInvalid": "{{count}} invalid",
+    "bulkInviteMax": "Max. {{count}} per invite",
+    "bulkInviteSend": "Invite all",
+    "bulkInviteCopy": "Copy list + text",
+    "bulkInviteSent": "Invite prepared for {{count}} contacts"
   },
   "friends": {
     "inviteFriends": "Invite Friends",
