@@ -115,6 +115,7 @@ const VenueDetail = () => {
 
   const handleDirections = () => {
     // Always use venue name + address as destination for accuracy
+    // Always use venue name + address as destination for accuracy
     const destination = encodeURIComponent(
       [appVenue.name, displayAddress].filter(Boolean).join(', ')
     );
