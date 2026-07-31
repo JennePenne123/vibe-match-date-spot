@@ -152,13 +152,11 @@ export default function JoinGroup() {
           )}
 
           {state === 'error' && (
-            <div className="text-center space-y-3">
-              <XCircle className="w-10 h-10 mx-auto text-destructive" />
-              <p className="text-sm text-muted-foreground">{message}</p>
-              <Button variant="outline" className="w-full" onClick={() => { clearGroupToken(); navigate('/home'); }}>
-                Zur Startseite
-              </Button>
-            </div>
+            <InviteErrorState
+              kind={errorKind}
+              detail={errorDetail}
+              onRetry={errorKind === 'failed' ? () => setReloadKey(k => k + 1) : undefined}
+            />
           )}
         </CardContent>
       </Card>
