@@ -28,6 +28,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import LanguageSelector from '@/components/LanguageSelector';
 import SupportTicketDialog from '@/components/support/SupportTicketDialog';
 import { openCookieSettings, clearConsent } from '@/lib/cookieConsent';
+import { PasskeyManager } from '@/components/auth/PasskeyManager';
 
 const TRACKING_OPT_OUT_KEY = 'hioutz_tracking_opt_out';
 
@@ -311,6 +312,9 @@ const Settings = () => {
               </form>
             </CardContent>
           </Card>
+
+          {/* Passkeys */}
+          <PasskeyManager />
 
           {/* Notifications */}
           <Card className="bg-card border-border">

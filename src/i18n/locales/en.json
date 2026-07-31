@@ -1894,5 +1894,25 @@
   "wallet": {
     "title": "My Wallet",
     "comingSoon": "Coming soon"
+  },
+  "passkey": {
+    "title": "Passkeys",
+    "description": "Sign in without a password using Face ID, Touch ID or your device PIN.",
+    "add": "Add passkey",
+    "added": "Passkey added",
+    "addedDesc": "You can now sign in without a password.",
+    "addFailed": "Could not add passkey",
+    "alreadyRegistered": "This passkey is already registered.",
+    "delete": "Delete passkey",
+    "deleted": "Passkey deleted",
+    "deleteFailed": "Deletion failed",
+    "empty": "No passkey saved yet.",
+    "notSupported": "Your browser does not support passkeys.",
+    "createdAt": "Created on {{date}}",
+    "lastUsed": "last used {{date}}",
+    "signInWithPasskey": "Sign in with passkey",
+    "signInFailed": "Passkey sign-in failed.",
+    "unknownCredential": "This passkey is not registered.",
+    "privacyHint": "Biometric data never leaves your device. We only store the public key."
   }
 }

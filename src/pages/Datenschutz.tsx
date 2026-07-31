@@ -127,6 +127,48 @@ export default function Datenschutz() {
             niemals übertragen.
           </p>
 
+          <h3>3.5 Anmeldung mit Passkeys (WebAuthn/FIDO2)</h3>
+          <p className="text-muted-foreground">
+            Sie können optional einen oder mehrere „Passkeys" einrichten, um sich ohne Passwort anzumelden.
+            Passkeys basieren auf dem offenen WebAuthn-/FIDO2-Standard und arbeiten mit einem
+            Schlüsselpaar: Der <strong>private Schlüssel verbleibt ausschließlich auf Ihrem Endgerät</strong>
+            {' '}bzw. in dessen sicherem Speicher (z.&nbsp;B. Secure Enclave, TPM) oder – falls von Ihnen aktiviert –
+            im Schlüsselbund Ihres Geräteanbieters (z.&nbsp;B. Apple iCloud-Schlüsselbund, Google Passwortmanager).
+          </p>
+          <p className="text-muted-foreground">
+            <strong>Keine Verarbeitung biometrischer Daten durch uns:</strong> Wenn Sie den Passkey per Face ID,
+            Touch ID, Fingerabdruck oder Geräte-PIN freigeben, findet diese Prüfung ausschließlich lokal auf
+            Ihrem Gerät statt. Biometrische Merkmale werden zu keinem Zeitpunkt an uns übertragen, von uns
+            gespeichert oder verarbeitet. Eine Verarbeitung besonderer Kategorien personenbezogener Daten nach
+            Art.&nbsp;9 DSGVO durch uns findet damit nicht statt.
+          </p>
+          <p className="text-muted-foreground">
+            <strong>Von uns gespeicherte Daten:</strong> öffentlicher Schlüssel, eine zufällige Schlüssel-Kennung
+            (Credential-ID), ein Signaturzähler, die unterstützten Übertragungswege (z.&nbsp;B. „internal", „usb"),
+            eine von Ihnen vergebene bzw. automatisch erzeugte Gerätebezeichnung sowie Erstellungs- und letzter
+            Nutzungszeitpunkt. Zusätzlich speichern wir kurzlebige Einmal-Zufallswerte („Challenges"), die nach
+            spätestens 5&nbsp;Minuten bzw. unmittelbar nach Verwendung gelöscht werden.
+          </p>
+          <p className="text-muted-foreground">
+            <strong>Zweck und Rechtsgrundlage:</strong> sichere, passwortlose Authentifizierung und Schutz vor
+            Phishing und Kontoübernahmen. Rechtsgrundlage ist Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO
+            (Vertragserfüllung – Bereitstellung des Nutzerkontos) sowie Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO
+            (berechtigtes Interesse an Kontosicherheit). Die Einrichtung eines Passkeys ist freiwillig; die
+            Anmeldung per E-Mail/Passwort oder Google bleibt weiterhin möglich.
+          </p>
+          <p className="text-muted-foreground">
+            <strong>Speicherdauer und Löschung:</strong> Passkey-Daten werden gespeichert, bis Sie den jeweiligen
+            Passkey in den Einstellungen löschen oder Ihr Konto löschen. Das Löschen in H!Outz entfernt den bei
+            uns gespeicherten öffentlichen Schlüssel; den lokalen Passkey auf Ihrem Gerät bzw. in Ihrem
+            Geräte-Schlüsselbund müssen Sie zusätzlich dort entfernen.
+          </p>
+          <p className="text-muted-foreground">
+            <strong>Hinweis zu Sync-Passkeys:</strong> Wenn Sie Passkeys über einen Cloud-Schlüsselbund
+            synchronisieren, gelten hierfür ergänzend die Datenschutzbestimmungen des jeweiligen Anbieters
+            (Apple, Google, Microsoft oder Ihres Passwortmanagers). Auf diese Synchronisierung haben wir keinen
+            Einfluss.
+          </p>
+
           <h2>4. Präferenzen und Nutzungsdaten</h2>
           <h3>4.1 Explizite Präferenzen</h3>
           <p className="text-muted-foreground">
