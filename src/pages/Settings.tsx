@@ -313,12 +313,14 @@ const Settings = () => {
             </CardContent>
           </Card>
 
+          {/* Passkeys */}
+          <PasskeyManager />
+
           {/* Notifications */}
           <Card className="bg-card border-border">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base text-foreground">
                 <Bell className="w-4 h-4 text-primary" />
-
                 {t('settings.notifications')}
               </CardTitle>
               <CardDescription className="text-xs">{t('settings.notificationsDesc')}</CardDescription>
