@@ -11,6 +11,14 @@ import {
 import { getTodayMoodFromStorage } from '@/components/date-planning/preferences/MoodPicker';
 import { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 import type { DailyMood } from '@/utils/moodStorage';
+import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
+import type { SituationalCategoryId } from '@/lib/situationalCategories';
+
+const readSituationalCategory = (): SituationalCategoryId | null => {
+  if (typeof window === 'undefined') return null;
+  const raw = window.sessionStorage.getItem('hioutz-situational-category');
+  return (raw as SituationalCategoryId | null) || null;
+};
 
 interface UsePreferencesStateProps {
   sessionId: string;
@@ -47,6 +55,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
 
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+  const [selectedVenueTypes, setSelectedVenueTypes] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState<string[]>([]);
   const [selectedTimePreferences, setSelectedTimePreferences] = useState<string[]>([]);
@@ -69,6 +78,16 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
 
   const [openSections, setOpenSections] = useState<string[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // ── Situational category (Home quick-action) ─────────────────────
+  const [categoryId, setCategoryId] = useState<SituationalCategoryId | null>(() => readSituationalCategory());
+  const categoryConfig = getCategoryWizardConfig(categoryId);
+  const isFoodCategory = !categoryId || categoryId === 'food';
+
+  const clearCategory = useCallback(() => {
+    try { window.sessionStorage.removeItem('hioutz-situational-category'); } catch { /* ignore */ }
+    setCategoryId(null);
+  }, []);
 
   // ── Derived ──────────────────────────────────────────────────────
   const durationModel = durationModels.find(d => d.id === selectedDuration);
@@ -102,7 +121,11 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         const { data, error } = await supabase.from('user_preferences').select('*').eq('user_id', user.id).single();
         if (error || !data) { setOnboardingLoaded(true); setFlowState('customize'); return; }
         const has = (arr: any) => arr && arr.length > 0;
-        if (has(data.preferred_cuisines) || has(data.preferred_vibes) || has(data.preferred_price_range) || has(data.preferred_times)) {
+        const allowedTypes = categoryConfig.mainPickerItems.map(i => i.id);
+        const storedTypes: string[] = ((data as any).preferred_venue_types || []).filter((t: string) => allowedTypes.includes(t));
+        if (!isFoodCategory && storedTypes.length > 0) setSelectedVenueTypes(storedTypes);
+
+        if (isFoodCategory && (has(data.preferred_cuisines) || has(data.preferred_vibes) || has(data.preferred_price_range) || has(data.preferred_times))) {
           setOnboardingPrefs({
             preferred_cuisines: data.preferred_cuisines || [],
             preferred_vibes: data.preferred_vibes || [],
@@ -112,6 +135,14 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
             dietary_restrictions: data.dietary_restrictions || [],
           });
         } else {
+          // Non-food categories skip the cuisine confirmation screen entirely —
+          // showing food preferences there is irrelevant and confusing.
+          if (!isFoodCategory) {
+            setSelectedVibes(data.preferred_vibes || []);
+            setSelectedPriceRange(data.preferred_price_range || []);
+            setSelectedTimePreferences(data.preferred_times || []);
+            setMaxDistance(data.max_distance || 15);
+          }
           setFlowState('customize');
         }
         setOnboardingLoaded(true);
@@ -120,7 +151,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         setFlowState('customize');
       }
     })();
-  }, [user?.id]);
+  }, [user?.id, isFoodCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Prefill from proposal date
   useEffect(() => {
@@ -183,6 +214,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
   }, []);
 
   const toggleCuisine = useCallback((id: string) => toggle(id, setSelectedCuisines), [toggle]);
+  const toggleVenueType = useCallback((id: string) => toggle(id, setSelectedVenueTypes), [toggle]);
   const toggleVibe = useCallback((id: string) => toggle(id, setSelectedVibes), [toggle]);
   const togglePrice = useCallback((id: string) => toggle(id, setSelectedPriceRange), [toggle]);
   const toggleTime = useCallback((id: string) => toggle(id, setSelectedTimePreferences), [toggle]);
@@ -272,7 +304,8 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         preferred_price_range: selectedPriceRange, preferred_times: selectedTimePreferences,
         max_distance: maxDistance, dietary_restrictions: selectedDietary,
         updated_at: new Date().toISOString(),
-      };
+        ...(isFoodCategory ? {} : { preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null }),
+      } as any;
 
       const { data: existing } = await supabase.from('user_preferences').select('id').eq('user_id', uid).maybeSingle();
       const mutation = existing
@@ -306,7 +339,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         preferred_date: selectedDate, preferred_time: selectedTime,
         occasion: selectedOccasion,
         priority_weights: priorityWeights,
-      });
+      } as any);
       setHasSubmitted(true);
     } catch (error) {
       console.error('Error saving preferences:', error);
@@ -314,7 +347,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, selectedCuisines, selectedVibes, selectedPriceRange, selectedTimePreferences, maxDistance, selectedDietary, selectedDate, selectedTime, selectedOccasion, priorityWeights, planningMode, sessionId, collaborativeSession, partnerName, onPreferencesComplete]);
+  }, [user?.id, selectedCuisines, selectedVenueTypes, isFoodCategory, selectedVibes, selectedPriceRange, selectedTimePreferences, maxDistance, selectedDietary, selectedDate, selectedTime, selectedOccasion, priorityWeights, planningMode, sessionId, collaborativeSession, partnerName, onPreferencesComplete]);
 
   return {
     // State
@@ -326,6 +359,9 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     selectedMood, setSelectedMood,
     priorityWeights, setPriorityWeights,
     autoNavigating, timeoutTriggered, openSections,
+    // Category-adaptive
+    categoryId, categoryConfig, isFoodCategory, clearCategory,
+    selectedVenueTypes, toggleVenueType,
     // Derived
     durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,
     // Handlers

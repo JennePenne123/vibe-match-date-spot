@@ -15,6 +15,17 @@ import {
 } from './preferences/preferencesData';
 import { ChipGrid, Section } from './preferences/PreferenceChip';
 import PreferencesConfirmScreen from './preferences/PreferencesConfirmScreen';
+import SituationalActiveBanner from './preferences/SituationalActiveBanner';
+import { getSituationalCategory } from '@/lib/situationalCategories';
+
+const VENUE_TYPE_EMOJI: Record<string, string> = {
+  museum: '🏛️', gallery: '🖼️', theater_venue: '🎭', cinema: '🎬',
+  concert_hall: '🎼', cultural_event: '🎪',
+  bowling: '🎳', mini_golf: '⛳', escape_room: '🔐', arcade: '🕹️',
+  climbing: '🧗', spa_wellness: '💆',
+  cocktail_bar: '🍸', pub: '🍺', nightclub: '🪩', live_music: '🎸',
+  karaoke: '🎤', comedy_club: '😂',
+};
 import DurationPicker from './preferences/DurationPicker';
 import QuickStartTemplates from './preferences/QuickStartTemplates';
 import DateTimePicker from './preferences/DateTimePicker';
@@ -97,6 +108,12 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     user,
   } = state;
 
+  const { categoryId, categoryConfig, isFoodCategory, clearCategory, selectedVenueTypes, toggleVenueType } = state;
+  const activeCategory = getSituationalCategory(categoryId);
+  const venueTypeItems = categoryConfig.mainPickerItems.map(i => ({
+    id: i.id, name: i.nameKey, emoji: VENUE_TYPE_EMOJI[i.id] || '✨',
+  }));
+
   // ── Loading ──────────────────────────────────────────────────────
   if (!onboardingLoaded) {
     return (
@@ -106,8 +123,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     );
   }
 
-  // ── Confirm screen ──────────────────────────────────────────────
-  if (flowState === 'confirm' && onboardingPrefs) {
+  // ── Confirm screen (food only — cuisines are irrelevant for other categories) ──
+  if (flowState === 'confirm' && onboardingPrefs && isFoodCategory) {
     return (
       <PreferencesConfirmScreen
         onboardingPrefs={onboardingPrefs}
@@ -200,6 +217,11 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         {/* Location — always visible so users can set an exact address */}
         {locationSection}
 
+        {/* Active situational category */}
+        {activeCategory && !isFoodCategory && (
+          <SituationalActiveBanner category={activeCategory} onClear={clearCategory} />
+        )}
+
         {/* Duration */}
         <DurationPicker selectedDuration={selectedDuration} onSelectDuration={selectDuration} />
 
@@ -218,21 +240,30 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         )}
         {selectedDuration && (
           <>
-            <QuickStartTemplates
+            {isFoodCategory && <QuickStartTemplates
               templates={filteredTemplates}
               learnedTemplate={learnedTemplate}
               isTemplateActive={isTemplateActive}
               onApplyTemplate={applyTemplate}
               onApplyLearnedTemplate={applyTemplate}
-            />
+            />}
 
             {/* Accordion Sections */}
             <div className="space-y-2">
-              <Section id="cuisine" icon={<span className="text-sm">🍽️</span>} title={t('datePlanning.cuisine')}
-                summary={summaryText(selectedCuisines, cuisines, t)} count={selectedCuisines.length}
-                open={openSections.includes('cuisine')} onToggle={() => toggleSection('cuisine')}>
-                <ChipGrid items={cuisines} selected={selectedCuisines} onToggle={toggleCuisine} />
-              </Section>
+              {isFoodCategory ? (
+                <Section id="cuisine" icon={<span className="text-sm">🍽️</span>} title={t('datePlanning.cuisine')}
+                  summary={summaryText(selectedCuisines, cuisines, t)} count={selectedCuisines.length}
+                  open={openSections.includes('cuisine')} onToggle={() => toggleSection('cuisine')}>
+                  <ChipGrid items={cuisines} selected={selectedCuisines} onToggle={toggleCuisine} />
+                </Section>
+              ) : (
+                <Section id="venueTypes" icon={<span className="text-sm">{activeCategory?.emoji || '🎯'}</span>}
+                  title={t(categoryConfig.mainPickerTitleKey)}
+                  summary={summaryText(selectedVenueTypes, venueTypeItems, t)} count={selectedVenueTypes.length}
+                  open={openSections.includes('venueTypes')} onToggle={() => toggleSection('venueTypes')}>
+                  <ChipGrid items={venueTypeItems} selected={selectedVenueTypes} onToggle={toggleVenueType} />
+                </Section>
+              )}
 
               <Section id="vibes" icon={<span className="text-sm">✨</span>} title={t('datePlanning.vibe')}
                 summary={summaryText(selectedVibes, allVibes, t)} count={selectedVibes.length}
@@ -268,10 +299,10 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                       <span>50 km</span>
                     </div>
                   </div>
-                  <div>
+                  {isFoodCategory && <div>
                     <p className="text-sm font-medium mb-2">{t('datePlanning.dietaryRestrictions')}</p>
                     <ChipGrid items={dietaryRequirements} selected={selectedDietary} onToggle={toggleDietary} />
-                  </div>
+                  </div>}
                 </div>
               </Section>
             </div>
@@ -288,7 +319,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         />
 
         {/* Selection summary */}
-        {(selectedCuisines.length > 0 || selectedVibes.length > 0) && (
+        {((isFoodCategory ? selectedCuisines.length : selectedVenueTypes.length) > 0 || selectedVibes.length > 0) && (
           <div className="bg-muted/50 rounded-lg p-3 space-y-2 border border-border">
             <p className="text-xs font-medium text-muted-foreground">{t('datePlanning.yourSelection')}</p>
             <div className="flex flex-wrap gap-1.5">
@@ -297,8 +328,17 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                   {durationModels.find(d => d.id === selectedDuration)?.emoji} {t(durationModels.find(d => d.id === selectedDuration)?.title || '')}
                 </Badge>
               )}
-              {selectedCuisines.slice(0, 3).map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {t(cuisines.find(x => x.id === c)?.name || c)}</Badge>)}
-              {selectedCuisines.length > 3 && <Badge variant="outline" className="text-xs">+{selectedCuisines.length - 3}</Badge>}
+              {isFoodCategory ? (
+                <>
+                  {selectedCuisines.slice(0, 3).map(c => <Badge key={c} variant="outline" className="text-xs">{cuisines.find(x => x.id === c)?.emoji} {t(cuisines.find(x => x.id === c)?.name || c)}</Badge>)}
+                  {selectedCuisines.length > 3 && <Badge variant="outline" className="text-xs">+{selectedCuisines.length - 3}</Badge>}
+                </>
+              ) : (
+                <>
+                  {selectedVenueTypes.slice(0, 3).map(v => <Badge key={v} variant="outline" className="text-xs">{VENUE_TYPE_EMOJI[v] || '✨'} {t(venueTypeItems.find(x => x.id === v)?.name || v)}</Badge>)}
+                  {selectedVenueTypes.length > 3 && <Badge variant="outline" className="text-xs">+{selectedVenueTypes.length - 3}</Badge>}
+                </>
+              )}
               {selectedVibes.slice(0, 3).map(v => <Badge key={v} variant="outline" className="text-xs">{allVibes.find(x => x.id === v)?.emoji} {t(allVibes.find(x => x.id === v)?.name || v)}</Badge>)}
               {selectedVibes.length > 3 && <Badge variant="outline" className="text-xs">+{selectedVibes.length - 3}</Badge>}
             </div>
