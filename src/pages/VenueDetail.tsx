@@ -284,20 +284,18 @@ const VenueDetail = () => {
                   <span className="text-muted-foreground">{appVenue.phone}</span>
                 </div>
               )}
-              {appVenue.website && (
-                <div className="flex items-center gap-3">
-                  <Globe className="w-5 h-5 text-muted-foreground" />
-                  <a 
-                    href={appVenue.website} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline flex items-center gap-1"
-                  >
-                    Visit Website
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              )}
+              <div className="flex items-center gap-3">
+                <Globe className="w-5 h-5 text-muted-foreground" />
+                <a
+                  href={appVenue.website || googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline flex items-center gap-1"
+                >
+                  {appVenue.website ? t('venue.visitWebsite') : t('venue.viewOnGoogleMaps')}
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
               {appVenue.openingHours && appVenue.openingHours.length > 0 && (
                 <div className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-muted-foreground mt-0.5" />
@@ -325,14 +323,23 @@ const VenueDetail = () => {
               >
                 {t('venue.getDirections')}
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="h-12"
-                onClick={appVenue.website ? visitWebsite : (appVenue.phone ? callVenue : undefined)}
-                disabled={!appVenue.website && !appVenue.phone}
+                onClick={visitWebsite}
               >
-                {appVenue.website ? t('venue.visitWebsite') : (appVenue.phone ? t('venue.callNow') : t('venue.noWebsite'))}
+                {appVenue.website ? t('venue.visitWebsite') : t('venue.viewOnGoogleMaps')}
               </Button>
+            </div>
+            {appVenue.phone && (
+              <Button
+                variant="outline"
+                className="h-12 w-full"
+                onClick={callVenue}
+              >
+                {t('venue.callNow')}
+              </Button>
+            )}
             </div>
           </div>
         </div>
