@@ -1353,7 +1353,12 @@
     "useGPS": "Usar GPS",
     "yourLocation": "Tu ubicación",
     "noFriendsYet": "Aún no hay amigos aquí",
-    "noFriendsYetDesc": "Invita a alguien para planear una cita juntos."
+    "noFriendsYetDesc": "Invita a alguien para planear una cita juntos.",
+    "searchFriends": "Buscar amigos...",
+    "filterAll": "Todos",
+    "filterFriends": "Amigo",
+    "requestOpen": "Solicitud abierta",
+    "noFriendsMatch": "Sin resultados"
   },
   "privacyBanner": {
     "titleGdpr": "🇪🇺 Aviso de Privacidad (RGPD)",

@@ -1353,7 +1353,12 @@
     "useGPS": "GPS verwenden",
     "yourLocation": "Dein Standort",
     "noFriendsYet": "Noch keine Freunde hier",
-    "noFriendsYetDesc": "Lade jemanden ein, um gemeinsam ein Date zu planen."
+    "noFriendsYetDesc": "Lade jemanden ein, um gemeinsam ein Date zu planen.",
+    "searchFriends": "Freunde suchen...",
+    "filterAll": "Alle",
+    "filterFriends": "Freund",
+    "requestOpen": "Anfrage offen",
+    "noFriendsMatch": "Keine Treffer"
   },
   "tutorial": {
     "skip": "Überspringen",
