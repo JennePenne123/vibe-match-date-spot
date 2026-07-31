@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Mail, MessageCircle, Send, Copy, Check, Users, X } from 'lucide-react';
+import { UserPlus, Mail, MessageCircle, Send, Copy, Check, Users, X, QrCode } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +31,7 @@ const InviteFriendsSection: React.FC<InviteFriendsSectionProps> = ({
   const [copied, setCopied] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkInput, setBulkInput] = useState('');
+  const [qrOpen, setQrOpen] = useState(false);
 
   const EMAIL_RE = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]{2,}$/;
   const parsed = React.useMemo(() => {
@@ -126,6 +128,27 @@ const InviteFriendsSection: React.FC<InviteFriendsSectionProps> = ({
         </Button>
       </div>
 
+      <Button
+        variant={qrOpen ? 'wellness' : 'outline'}
+        size="sm"
+        onClick={() => setQrOpen(o => !o)}
+        className="mt-2 w-full gap-1.5 text-xs"
+      >
+        <QrCode className="w-3.5 h-3.5 shrink-0" />
+        <span className="truncate">{t('myFriends.qrInviteTitle', 'QR-Code zum Beitreten')}</span>
+      </Button>
+
+      {qrOpen && (
+        <div className="mt-2 flex flex-col items-center gap-2 rounded-lg border border-border/50 bg-background/60 p-4">
+          <div className="rounded-lg bg-white p-3">
+            <QRCodeSVG value={inviteLink} size={168} level="M" />
+          </div>
+          <p className="text-center text-[11px] text-muted-foreground">
+            {t('myFriends.qrInviteHint', 'Einfach scannen lassen – deine Freunde landen direkt in der Gruppe.')}
+          </p>
+        </div>
+      )}
+
       <div className="mt-3 border-t border-border/50 pt-3">
         <Button
           variant="ghost"
@@ -206,12 +229,11 @@ const InviteFriendsSection: React.FC<InviteFriendsSectionProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                disabled={parsed.valid.length === 0}
-                onClick={handleCopyBulkText}
+                onClick={() => setQrOpen(true)}
                 className="gap-1.5 text-xs min-w-0 px-2"
               >
-                <Copy className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">{t('myFriends.bulkInviteCopy', 'Liste + Text kopieren')}</span>
+                <QrCode className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{t('myFriends.qrInviteShow', 'QR-Code zeigen')}</span>
               </Button>
             </div>
           </div>
