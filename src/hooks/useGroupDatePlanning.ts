@@ -22,6 +22,7 @@ export interface DateGroup {
   proposed_date: string | null;
   max_members: number;
   status: string;
+  invite_token?: string | null;
   group_compatibility_score: number;
   merged_preferences: any;
   created_at: string;
