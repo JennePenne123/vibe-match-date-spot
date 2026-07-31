@@ -566,6 +566,7 @@ export type Database = {
           creator_id: string
           group_compatibility_score: number | null
           id: string
+          invite_token: string | null
           max_members: number
           merged_preferences: Json | null
           name: string
@@ -580,6 +581,7 @@ export type Database = {
           creator_id: string
           group_compatibility_score?: number | null
           id?: string
+          invite_token?: string | null
           max_members?: number
           merged_preferences?: Json | null
           name: string
@@ -594,6 +596,7 @@ export type Database = {
           creator_id?: string
           group_compatibility_score?: number | null
           id?: string
+          invite_token?: string | null
           max_members?: number
           merged_preferences?: Json | null
           name?: string
@@ -2379,6 +2382,7 @@ export type Database = {
         }[]
       }
       get_friend_preferences: { Args: { _friend_id: string }; Returns: Json }
+      get_group_invite_preview: { Args: { _token: string }; Returns: Json }
       get_retention_metrics: { Args: { days_back?: number }; Returns: Json }
       has_role: {
         Args: {
@@ -2402,6 +2406,7 @@ export type Database = {
         Returns: undefined
       }
       is_admin_owner: { Args: { _user_id: string }; Returns: boolean }
+      join_group_via_invite: { Args: { _token: string }; Returns: Json }
       log_admin_action: {
         Args: {
           _action: string

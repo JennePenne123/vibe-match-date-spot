@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, Plus, MessageCircle, Calendar } from 'lucide-react';
+import { Users, Plus, MessageCircle, Calendar, ScanLine, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { useAuth } from '@/contexts/AuthContext';
 import { useGroupDatePlanning, DateGroup } from '@/hooks/useGroupDatePlanning';
 import GroupChatPanel from '@/components/GroupChatPanel';
+import GroupQRScanner from '@/components/group-date/GroupQRScanner';
+import GroupInviteQRDialog from '@/components/group-date/GroupInviteQRDialog';
 import FairnessBadge from '@/components/group-date/FairnessBadge';
 import VetoFeedbackBanner from '@/components/group-date/VetoFeedbackBanner';
 import { formatDistanceToNow } from 'date-fns';
@@ -46,6 +48,8 @@ const GroupDates: React.FC = () => {
   const { getUserGroups, loading } = useGroupDatePlanning();
   const [groups, setGroups] = useState<DateGroup[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [qrGroup, setQrGroup] = useState<DateGroup | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -85,10 +89,16 @@ const GroupDates: React.FC = () => {
           <h1 className="text-2xl font-bold text-foreground">
             {t('nav.groupDates', 'Gruppen-Dates')}
           </h1>
-          <Button size="sm" onClick={() => navigate('/plan-date')} className="gap-1.5">
-            <Plus className="w-4 h-4" />
-            Neu
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => setScannerOpen(true)} className="gap-1.5">
+              <ScanLine className="w-4 h-4" />
+              Scannen
+            </Button>
+            <Button size="sm" onClick={() => navigate('/plan-date')} className="gap-1.5">
+              <Plus className="w-4 h-4" />
+              Neu
+            </Button>
+          </div>
         </div>
 
         {/* Veto Feedback Banner – shows when groups have active veto filters */}
@@ -120,6 +130,10 @@ const GroupDates: React.FC = () => {
             <Button onClick={() => navigate('/plan-date')} className="gap-2">
               <Plus className="w-4 h-4" />
               {t('groupDates.createGroup', 'Gruppen-Plan erstellen')}
+            </Button>
+            <Button variant="outline" onClick={() => setScannerOpen(true)} className="mt-2 gap-2">
+              <ScanLine className="w-4 h-4" />
+              QR-Code scannen
             </Button>
           </div>
         ) : (
@@ -167,6 +181,15 @@ const GroupDates: React.FC = () => {
                       </div>
                       <div className="flex flex-col items-end gap-1.5 shrink-0">
                         <Badge variant={status.variant}>{status.label}</Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs gap-1"
+                          onClick={(e) => { e.stopPropagation(); setQrGroup(group); }}
+                        >
+                          <QrCode className="w-3 h-3" />
+                          QR
+                        </Button>
                         <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
                           <MessageCircle className="w-3 h-3" />
                           Chat
@@ -193,6 +216,14 @@ const GroupDates: React.FC = () => {
           {selectedGroupId && <GroupChatPanel groupId={selectedGroupId} />}
         </SheetContent>
       </Sheet>
+
+      <GroupQRScanner open={scannerOpen} onOpenChange={setScannerOpen} />
+      <GroupInviteQRDialog
+        open={!!qrGroup}
+        onOpenChange={(open) => !open && setQrGroup(null)}
+        groupName={qrGroup?.name || 'Gruppe'}
+        inviteToken={qrGroup?.invite_token}
+      />
     </div>
   );
 };
