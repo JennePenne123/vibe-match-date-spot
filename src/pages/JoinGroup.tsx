@@ -126,7 +126,7 @@ export default function JoinGroup() {
               <Button className="w-full" onClick={handleJoin} disabled={joining}>
                 {joining ? 'Trete bei …' : 'Gruppe beitreten'}
               </Button>
-              <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate('/home')}>
+              <Button variant="ghost" size="sm" className="w-full" onClick={() => { clearGroupToken(); navigate('/home'); }}>
                 Abbrechen
               </Button>
             </div>
