@@ -136,7 +136,11 @@ const VenueDetail = () => {
   const visitWebsite = () => {
     if (appVenue.website) {
       window.open(appVenue.website, '_blank');
+      return;
     }
+    // Fallback: no stored website → open the venue's Google Maps entry,
+    // which always lists the official site / contact details.
+    window.open(googleMapsUrl, '_blank');
   };
 
   return (
