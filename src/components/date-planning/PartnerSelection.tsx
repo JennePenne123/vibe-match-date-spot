@@ -200,15 +200,17 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
         ) : dateMode === 'single' ? (
           <>
           <div className="space-y-2 mb-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('datePlanning.searchFriends', 'Freunde suchen...')}
-                className="pl-9 h-10"
-              />
-            </div>
+            {friends.length >= 8 && (
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t('datePlanning.searchFriends', 'Freunde suchen...')}
+                  className="pl-9 h-10"
+                />
+              </div>
+            )}
             <div className="flex flex-wrap gap-1.5">
               {filterOptions.map(o => (
                 <button
@@ -267,15 +269,17 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
         ) : (
           <div className="space-y-3">
             <div className="space-y-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder={t('datePlanning.searchFriends', 'Freunde suchen...')}
-                  className="pl-9 h-10"
-                />
-              </div>
+              {friends.length >= 8 && (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder={t('datePlanning.searchFriends', 'Freunde suchen...')}
+                    className="pl-9 h-10"
+                  />
+                </div>
+              )}
               <div className="flex flex-wrap gap-1.5">
                 {filterOptions.map(o => (
                   <button
