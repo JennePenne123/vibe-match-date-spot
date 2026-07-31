@@ -166,6 +166,14 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     }
   }, []);
 
+  // Toggling the checkbox off wipes the stored credentials immediately
+  const handleRememberMeChange = (checked: boolean) => {
+    setRememberMe(checked);
+    if (!checked) {
+      void clearRememberedEmail();
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     setError('');
     setOauthError(null);
