@@ -4,16 +4,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Copy, QrCode } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { buildGroupJoinLink } from '@/lib/groupInviteLink';
 
 interface GroupInviteQRDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   groupName: string;
   inviteToken?: string | null;
-}
-
-export function buildGroupJoinLink(token: string) {
-  return `${window.location.origin}/join-group?token=${encodeURIComponent(token)}`;
 }
 
 const GroupInviteQRDialog: React.FC<GroupInviteQRDialogProps> = ({ open, onOpenChange, groupName, inviteToken }) => {
