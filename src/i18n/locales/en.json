@@ -1180,7 +1180,24 @@
     "aiMatchesDescShared": "your shared",
     "premiumVoucherTitle": "Premium: Exclusive vouchers for your Top 3 matches",
     "premiumVoucherDesc": "As a Premium member, get discount vouchers for the 3 highest-rated venues.",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "compromise": {
+      "title": "How the AI compromise was formed",
+      "titleSolo": "How results were filtered",
+      "kindCuisines": "Cuisines",
+      "kindVenueTypes": "Venue types",
+      "strategyShared": "shared selection",
+      "strategySharedDesc": "Your picks overlapped – the AI only uses options everyone chose.",
+      "strategyUnion": "union",
+      "strategyUnionDesc": "No overlap – so nobody misses out, the AI keeps everyone's picks.",
+      "strategySingle": "one person's pick",
+      "strategySingleDesc": "Only one person made a selection here, so it applies.",
+      "picks": "You: {{you}} · Partner: {{partner}}",
+      "noPick": "no selection",
+      "vetoTitle": "Veto rules",
+      "vetoDesc": "Cuisines excluded by any participant are hard-filtered for everyone.",
+      "vetoOnly": "Veto rules applied"
+    }
   },
   "invitationsSection": {
     "title": "Date Invitations",

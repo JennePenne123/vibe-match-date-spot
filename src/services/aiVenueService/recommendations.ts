@@ -14,6 +14,7 @@ import { getDistanceToleranceScore } from './distanceLearning';
 import { getPhotoVibeScoreModifier, getPhotoVibeLabel } from './photoVibeScoring';
 import { getPairFriendlyScoreModifier, getPairFriendlyLabel } from './pairFriendlyScoring';
 import { getSeasonalScoreModifier, getSeasonalLabel } from './seasonalScoring';
+import { combineWithStrategy, storeGroupCompromise, type CompromiseGroup } from './groupCompromise';
 import { supabase } from '@/integrations/supabase/client';
 import { dedupeVenueSearch } from '@/services/venueSearchDedupe';
 import { validateLocation } from '@/utils/locationValidation';
@@ -269,12 +270,17 @@ export const getAIVenueRecommendations = async (
      * 1. Both picked something → use the intersection ("beide wollen es").
      * 2. No overlap → use the union, so nobody's wish is dropped entirely.
      * 3. Only one side picked → that side decides.
+     * Every decision is recorded so the results list can explain it.
      */
-    const combineSelections = (a: string[], b: string[]): string[] => {
-      if (!a.length) return b;
-      if (!b.length) return a;
-      const shared = a.filter(x => b.includes(x));
-      return shared.length ? shared : [...new Set([...a, ...b])];
+    const compromiseGroups: CompromiseGroup[] = [];
+    const combineSelections = (
+      a: string[],
+      b: string[],
+      kind: CompromiseGroup['kind'],
+    ): string[] => {
+      const { applied, strategy } = combineWithStrategy(a, b);
+      compromiseGroups.push({ kind, strategy, applied, userPicks: a, partnerPicks: b });
+      return applied;
     };
 
     // Apply negative preference filter: hard-exclude cuisines blocked by
@@ -328,6 +334,7 @@ export const getAIVenueRecommendations = async (
           partnerPrefs
             ? getNarrowedVenueTypes(primaryCat.id, secondaryCat?.id ?? null, (partnerPrefs as any)?.preferred_venue_types)
             : [],
+          'venueTypes',
         );
         venues = applyVenueTypeNarrowing(venues, narrowedTypes, 'candidate-set');
 
@@ -373,10 +380,18 @@ export const getAIVenueRecommendations = async (
           partnerPrefs
             ? getNarrowedCuisines(primaryCat?.id ?? 'food', (partnerPrefs as any)?.preferred_cuisines)
             : [],
+          'cuisines',
         ).filter(c => !excludedCuisines.map(e => e.toLowerCase()).includes(c));
         venues = applyCuisineNarrowing(venues, narrowedCuisines, 'candidate-set');
       }
     }
+
+    // Make the compromise explainable in the results list
+    storeGroupCompromise({
+      collaborative: Boolean(partnerId),
+      groups: compromiseGroups.filter(g => g.strategy !== 'none'),
+      vetoed: excludedCuisines,
+    });
 
     // Build recommendations using the preferenceScore from filtering + local scoring
     for (const venue of venues) {
