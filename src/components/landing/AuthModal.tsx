@@ -478,9 +478,9 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   {t('auth.continueWithGoogle')}
                 </Button>
 
-                {/* Manual Google setup diagnostics — collapsed by default,
-                    auto-expands when an OAuth error occurs. */}
-                <GoogleAuthSetupCheck autoRun={false} />
+                {/* Google setup diagnostics — admin only, so regular users
+                    aren't confronted with technical config during login. */}
+                {adminRole && <GoogleAuthSetupCheck autoRun={false} />}
 
                 <Button
                   type="button"
