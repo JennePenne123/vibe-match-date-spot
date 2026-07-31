@@ -94,15 +94,6 @@ const InviteFriendsSection: React.FC<InviteFriendsSectionProps> = ({
     });
   };
 
-  const handleCopyBulkText = async () => {
-    try {
-      await navigator.clipboard.writeText(`${parsed.valid.join(', ')}\n\n${inviteText}`);
-      toast({ title: t('myFriends.linkCopied') });
-    } catch {
-      toast({ title: t('common.error'), variant: 'destructive' });
-    }
-  };
-
   return (
     <div className="bg-muted/30 rounded-lg border border-border/50 p-4">
       <div className="flex items-center gap-2 mb-3">
