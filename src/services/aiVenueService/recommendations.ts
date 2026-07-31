@@ -252,8 +252,37 @@ export const getAIVenueRecommendations = async (
       .eq('user_id', userId)
       .single();
 
-    // Apply negative preference filter: hard-exclude cuisines the user blocked
-    const excludedCuisines: string[] = (userPrefs as any)?.excluded_cuisines || [];
+    // ── Collaborative: load the partner's preferences too, so every hard
+    // filter below is computed as a compromise for ALL participants. ──
+    let partnerPrefs: any = null;
+    if (partnerId) {
+      const { data } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', partnerId)
+        .maybeSingle();
+      partnerPrefs = data;
+    }
+
+    /**
+     * Compromise strategy for explicit picks (venue types / cuisines):
+     * 1. Both picked something → use the intersection ("beide wollen es").
+     * 2. No overlap → use the union, so nobody's wish is dropped entirely.
+     * 3. Only one side picked → that side decides.
+     */
+    const combineSelections = (a: string[], b: string[]): string[] => {
+      if (!a.length) return b;
+      if (!b.length) return a;
+      const shared = a.filter(x => b.includes(x));
+      return shared.length ? shared : [...new Set([...a, ...b])];
+    };
+
+    // Apply negative preference filter: hard-exclude cuisines blocked by
+    // ANY participant (veto logic).
+    const excludedCuisines: string[] = [...new Set([
+      ...(((userPrefs as any)?.excluded_cuisines || []) as string[]),
+      ...(((partnerPrefs as any)?.excluded_cuisines || []) as string[]),
+    ])];
     if (excludedCuisines.length > 0) {
       venues = venues.filter(v => {
         const vCuisine = (v.cuisine_type || '').toLowerCase();
@@ -292,10 +321,13 @@ export const getAIVenueRecommendations = async (
         console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
 
         // ── Explicit sub-type narrowing (e.g. only "Kinos" inside Kultur) ──
-        const narrowedTypes = getNarrowedVenueTypes(
-          primaryCat.id,
-          secondaryCat?.id ?? null,
-          (userPrefs as any)?.preferred_venue_types,
+        // In a collaborative session this is the compromise across all
+        // participants (shared picks first, otherwise the union).
+        const narrowedTypes = combineSelections(
+          getNarrowedVenueTypes(primaryCat.id, secondaryCat?.id ?? null, (userPrefs as any)?.preferred_venue_types),
+          partnerPrefs
+            ? getNarrowedVenueTypes(primaryCat.id, secondaryCat?.id ?? null, (partnerPrefs as any)?.preferred_venue_types)
+            : [],
         );
         venues = applyVenueTypeNarrowing(venues, narrowedTypes, 'candidate-set');
 
@@ -336,10 +368,12 @@ export const getAIVenueRecommendations = async (
 
       // ── Food: explicit cuisine narrowing is a hard filter too ──
       if (!isNonFood) {
-        const narrowedCuisines = getNarrowedCuisines(
-          primaryCat?.id ?? 'food',
-          (userPrefs as any)?.preferred_cuisines,
-        );
+        const narrowedCuisines = combineSelections(
+          getNarrowedCuisines(primaryCat?.id ?? 'food', (userPrefs as any)?.preferred_cuisines),
+          partnerPrefs
+            ? getNarrowedCuisines(primaryCat?.id ?? 'food', (partnerPrefs as any)?.preferred_cuisines)
+            : [],
+        ).filter(c => !excludedCuisines.map(e => e.toLowerCase()).includes(c));
         venues = applyCuisineNarrowing(venues, narrowedCuisines, 'candidate-set');
       }
     }
