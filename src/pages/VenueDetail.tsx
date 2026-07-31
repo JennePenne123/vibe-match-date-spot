@@ -24,6 +24,9 @@ const VenueDetail = () => {
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
+  const [resolvedWebsite, setResolvedWebsite] = useState<string | null>(null);
+  const [resolvedPhone, setResolvedPhone] = useState<string | null>(null);
+  const [websiteLoading, setWebsiteLoading] = useState(false);
 
   const venue = appState.venues.find(v => v.id === id);
 
@@ -72,6 +75,37 @@ const VenueDetail = () => {
     }
   }, [sourceVenue]);
 
+  // Resolve the real website via Google Places when none is stored
+  useEffect(() => {
+    if (!sourceVenue || sourceVenue.website || resolvedWebsite || websiteLoading) return;
+    let cancelled = false;
+    setWebsiteLoading(true);
+    supabase.functions
+      .invoke('resolve-venue-website', {
+        body: {
+          venueId: sourceVenue.id,
+          placeId: sourceVenue.google_place_id || sourceVenue.placeId || null,
+          name: sourceVenue.name,
+          address: sourceVenue.address || '',
+          latitude: sourceVenue.latitude,
+          longitude: sourceVenue.longitude,
+        },
+      })
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (data?.website) setResolvedWebsite(data.website);
+        if (data?.phone) setResolvedPhone(data.phone);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setWebsiteLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceVenue?.id]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -102,6 +136,8 @@ const VenueDetail = () => {
   const appVenue = venueToAppVenue(sourceVenue, appState.userLocation?.latitude, appState.userLocation?.longitude);
   // Use resolved address if available, otherwise format the existing one
   const displayAddress = resolvedAddress || formatVenueAddress(appVenue);
+  const websiteUrl = appVenue.website || resolvedWebsite;
+  const phoneNumber = appVenue.phone || resolvedPhone;
 
   const shareCardData: ShareCardData = {
     type: 'venue',
