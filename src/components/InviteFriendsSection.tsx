@@ -8,7 +8,22 @@ import { Badge } from '@/components/ui/badge';
 import { OfflineGuardButton } from '@/components/OfflineGuardButton';
 import { useReferral } from '@/hooks/useReferral';
 
-const InviteFriendsSection: React.FC = () => {
+interface QuickFriend {
+  id: string;
+  name?: string | null;
+}
+
+interface InviteFriendsSectionProps {
+  friends?: QuickFriend[];
+  selectedFriendIds?: string[];
+  onToggleFriend?: (friendId: string) => void;
+}
+
+const InviteFriendsSection: React.FC<InviteFriendsSectionProps> = ({
+  friends = [],
+  selectedFriendIds = [],
+  onToggleFriend,
+}) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { referralLink, copyReferralLink } = useReferral();
@@ -149,26 +164,54 @@ const InviteFriendsSection: React.FC = () => {
                 </span>
               )}
             </div>
+            {onToggleFriend && friends.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[11px] text-muted-foreground">
+                  {t('myFriends.bulkPickFromList', 'Oder direkt aus deiner Freundesliste wählen')}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {friends.map(f => {
+                    const active = selectedFriendIds.includes(f.id);
+                    return (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => onToggleFriend(f.id)}
+                        className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] transition-colors ${
+                          active
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'border-border/60 text-muted-foreground hover:bg-muted/50'
+                        }`}
+                      >
+                        {active && <Check className="w-3 h-3 shrink-0" />}
+                        <span className="max-w-[110px] truncate">{f.name || t('myFriends.friend', 'Freund')}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant="wellness"
                 size="sm"
                 disabled={parsed.valid.length === 0}
                 onClick={handleBulkInvite}
-                className="gap-1.5 text-xs"
+                className="gap-1.5 text-xs min-w-0 px-2"
               >
-                <Mail className="w-3.5 h-3.5" />
-                {t('myFriends.bulkInviteSend', 'Alle einladen')}
+                <Mail className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{t('myFriends.bulkInviteSend', 'Alle einladen')}</span>
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 disabled={parsed.valid.length === 0}
                 onClick={handleCopyBulkText}
-                className="gap-1.5 text-xs"
+                className="gap-1.5 text-xs min-w-0 px-2"
               >
-                <Copy className="w-3.5 h-3.5" />
-                {t('myFriends.bulkInviteCopy', 'Liste + Text kopieren')}
+                <Copy className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{t('myFriends.bulkInviteCopy', 'Liste + Text kopieren')}</span>
               </Button>
             </div>
           </div>
