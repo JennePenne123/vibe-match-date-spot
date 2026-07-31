@@ -13,6 +13,8 @@ import { AIVenueRecommendation } from '@/services/aiVenueService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenueVouchers } from '@/hooks/useVenueVouchers';
 import { getSituationalCategory } from '@/lib/situationalCategories';
+import GroupCompromiseCard from '@/components/results/GroupCompromiseCard';
+import { readGroupCompromise, type GroupCompromiseInfo } from '@/services/aiVenueService/groupCompromise';
 import { motion } from 'framer-motion';
 
 // Skeleton loader for venue cards
@@ -41,12 +43,14 @@ const Results = () => {
   // Read active situational category from session storage
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [sparseInfo, setSparseInfo] = useState<{ categoryId: string; matchedCount: number } | null>(null);
+  const [compromiseInfo, setCompromiseInfo] = useState<GroupCompromiseInfo | null>(null);
   
   useEffect(() => {
     const stored = sessionStorage.getItem('hioutz-situational-category');
     if (stored) {
       setActiveCategory(stored);
     }
+    setCompromiseInfo(readGroupCompromise());
     const sparseRaw = sessionStorage.getItem('hioutz-situational-sparse');
     if (sparseRaw) {
       try {
@@ -252,6 +256,9 @@ const Results = () => {
             userLocation={appState.userLocation}
             className="mb-4"
           />
+
+          {/* How the AI formed the group compromise */}
+          {compromiseInfo && <GroupCompromiseCard info={compromiseInfo} className="mb-4" />}
 
           {/* Sparse-data warning banner */}
           {sparseInfo && (
