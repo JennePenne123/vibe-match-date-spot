@@ -333,6 +333,15 @@ export const getAIVenueRecommendations = async (
           return v;
         });
       }
+
+      // ── Food: explicit cuisine narrowing is a hard filter too ──
+      if (!isNonFood) {
+        const narrowedCuisines = getNarrowedCuisines(
+          primaryCat?.id ?? 'food',
+          (userPrefs as any)?.preferred_cuisines,
+        );
+        venues = applyCuisineNarrowing(venues, narrowedCuisines, 'candidate-set');
+      }
     }
 
     // Build recommendations using the preferenceScore from filtering + local scoring
