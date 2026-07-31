@@ -561,6 +561,23 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     {t('auth.comingSoon')}
                   </span>
                 </Button>
+
+                {isLogin && passkeyAvailable && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handlePasskeySignIn}
+                    disabled={loading || isOAuthLoading || passkeyLoading}
+                    className="w-full h-12 bg-card hover:bg-muted border-border text-foreground font-medium"
+                  >
+                    {passkeyLoading ? (
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : (
+                      <KeyRound className="mr-2 h-5 w-5 text-primary" />
+                    )}
+                    {t('passkey.signInWithPasskey')}
+                  </Button>
+                )}
               </div>
 
               {/* Divider */}
