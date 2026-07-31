@@ -70,11 +70,25 @@ export default function AGB() {
             vertraulich zu behandeln. Jede Nutzung des Kontos wird dem Kontoinhaber zugerechnet.
           </p>
           <p className="text-muted-foreground">
-            (4) Die Nutzung ist ab 16 Jahren gestattet. Minderjährige unter 16 Jahren benötigen die
+            (4) Ergänzend kann der Nutzer die passwortlose Anmeldung mit Passkeys (WebAuthn/FIDO2) aktivieren.
+            Ein Passkey ist ein gleichwertiges Authentifizierungsmittel und ersetzt bei der Anmeldung die
+            Eingabe von E-Mail und Passwort. Der private Schlüssel verbleibt auf dem Endgerät des Nutzers bzw.
+            in dessen Geräte-Schlüsselbund; der Nutzer ist für die Absicherung seiner Endgeräte (Bildschirmsperre,
+            Biometrie, Geräte-PIN) und seines Geräte- bzw. Cloud-Kontos selbst verantwortlich. Anmeldungen über
+            einen registrierten Passkey werden dem Kontoinhaber zugerechnet.
+          </p>
+          <p className="text-muted-foreground">
+            (5) Der Nutzer kann eingerichtete Passkeys jederzeit in den Einstellungen löschen. Bei Verlust oder
+            Weitergabe eines Endgeräts ist der zugehörige Passkey unverzüglich zu entfernen. Der Anbieter
+            übernimmt keine Haftung für Schäden, die aus einer unzureichenden Absicherung des Endgeräts oder aus
+            der Weitergabe von Zugangsmitteln resultieren.
+          </p>
+          <p className="text-muted-foreground">
+            (6) Die Nutzung ist ab 16 Jahren gestattet. Minderjährige unter 16 Jahren benötigen die
             Einwilligung eines Erziehungsberechtigten.
           </p>
           <p className="text-muted-foreground">
-            (5) Der Anbieter behält sich das Recht vor, Nutzerkonten bei Verstoß gegen diese AGB zu sperren
+            (7) Der Anbieter behält sich das Recht vor, Nutzerkonten bei Verstoß gegen diese AGB zu sperren
             oder zu löschen.
           </p>
 
