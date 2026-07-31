@@ -1914,5 +1914,33 @@
     "signInFailed": "Passkey sign-in failed.",
     "unknownCredential": "This passkey is not registered.",
     "privacyHint": "Biometric data never leaves your device. We only store the public key."
+  },
+  "recoveryCodes": {
+    "title": "Backup codes",
+    "description": "One-time codes for emergencies if you can no longer use a passkey or your password.",
+    "empty": "You haven't created any backup codes yet.",
+    "remaining": "{{count}} of {{total}} codes still usable.",
+    "lowWarning": "Almost all backup codes are used up. Generate new ones now.",
+    "generate": "Create backup codes",
+    "regenerate": "Create new codes",
+    "generated": "Backup codes created",
+    "generatedDesc": "Store them safely — they are shown only once.",
+    "generateFailed": "Could not create codes",
+    "showOnce": "These codes are shown only now. Each code works exactly once.",
+    "copy": "Copy",
+    "copied": "Codes copied",
+    "download": "Download",
+    "fileHeader": "H!Outz backup codes – each code can be used once. Keep them safe!",
+    "hint": "Creating new codes invalidates all previous ones.",
+    "useBackupCode": "Locked out? Sign in with a backup code",
+    "loginTitle": "Sign in with backup code",
+    "loginDescription": "Enter your email address and an unused backup code.",
+    "codeLabel": "Backup code",
+    "loginSubmit": "Sign in",
+    "loginHint": "After signing in, create new backup codes and add a passkey.",
+    "invalidCode": "This backup code is invalid or already used.",
+    "loginFailed": "Sign-in failed. Please try again.",
+    "loginSuccess": "Signed in",
+    "loginSuccessDesc": "{{count}} backup codes remaining."
   }
 }

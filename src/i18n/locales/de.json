@@ -1914,5 +1914,33 @@
     "signInFailed": "Anmeldung mit Passkey fehlgeschlagen.",
     "unknownCredential": "Dieser Passkey ist nicht registriert.",
     "privacyHint": "Biometrische Daten verlassen dein Gerät nicht. Wir speichern nur den öffentlichen Schlüssel."
+  },
+  "recoveryCodes": {
+    "title": "Backup-Codes",
+    "description": "Einmal-Codes für den Notfall, falls du keinen Passkey und kein Passwort mehr nutzen kannst.",
+    "empty": "Du hast noch keine Backup-Codes erstellt.",
+    "remaining": "{{count}} von {{total}} Codes noch nutzbar.",
+    "lowWarning": "Fast alle Backup-Codes sind verbraucht. Erstelle jetzt neue Codes.",
+    "generate": "Backup-Codes erstellen",
+    "regenerate": "Neue Codes erstellen",
+    "generated": "Backup-Codes erstellt",
+    "generatedDesc": "Bewahre die Codes sicher auf – sie werden nur einmal angezeigt.",
+    "generateFailed": "Codes konnten nicht erstellt werden",
+    "showOnce": "Diese Codes werden nur jetzt angezeigt. Jeder Code funktioniert genau einmal.",
+    "copy": "Kopieren",
+    "copied": "Codes kopiert",
+    "download": "Herunterladen",
+    "fileHeader": "H!Outz Backup-Codes – jeder Code ist einmal nutzbar. Sicher aufbewahren!",
+    "hint": "Beim Erstellen neuer Codes werden alle bisherigen Codes ungültig.",
+    "useBackupCode": "Kein Zugriff mehr? Mit Backup-Code anmelden",
+    "loginTitle": "Mit Backup-Code anmelden",
+    "loginDescription": "Gib deine E-Mail-Adresse und einen unbenutzten Backup-Code ein.",
+    "codeLabel": "Backup-Code",
+    "loginSubmit": "Anmelden",
+    "loginHint": "Nach der Anmeldung solltest du neue Backup-Codes erstellen und einen Passkey hinzufügen.",
+    "invalidCode": "Dieser Backup-Code ist ungültig oder wurde bereits verwendet.",
+    "loginFailed": "Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
+    "loginSuccess": "Angemeldet",
+    "loginSuccessDesc": "Noch {{count}} Backup-Codes übrig."
   }
 }

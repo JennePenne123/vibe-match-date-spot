@@ -1914,5 +1914,33 @@
     "signInFailed": "Error al iniciar sesión con passkey.",
     "unknownCredential": "Esta passkey no está registrada.",
     "privacyHint": "Los datos biométricos nunca salen de tu dispositivo. Solo guardamos la clave pública."
+  },
+  "recoveryCodes": {
+    "title": "Códigos de respaldo",
+    "description": "Códigos de un solo uso por si ya no puedes usar una passkey ni tu contraseña.",
+    "empty": "Aún no has creado códigos de respaldo.",
+    "remaining": "{{count}} de {{total}} códigos disponibles.",
+    "lowWarning": "Casi todos los códigos están usados. Genera nuevos ahora.",
+    "generate": "Crear códigos de respaldo",
+    "regenerate": "Crear códigos nuevos",
+    "generated": "Códigos creados",
+    "generatedDesc": "Guárdalos en un lugar seguro: solo se muestran una vez.",
+    "generateFailed": "No se pudieron crear los códigos",
+    "showOnce": "Estos códigos solo se muestran ahora. Cada código funciona una sola vez.",
+    "copy": "Copiar",
+    "copied": "Códigos copiados",
+    "download": "Descargar",
+    "fileHeader": "Códigos de respaldo de H!Outz: cada código se puede usar una vez. ¡Guárdalos bien!",
+    "hint": "Al crear códigos nuevos, los anteriores dejan de ser válidos.",
+    "useBackupCode": "¿Sin acceso? Inicia sesión con un código de respaldo",
+    "loginTitle": "Iniciar sesión con código de respaldo",
+    "loginDescription": "Introduce tu correo electrónico y un código de respaldo sin usar.",
+    "codeLabel": "Código de respaldo",
+    "loginSubmit": "Iniciar sesión",
+    "loginHint": "Después de iniciar sesión, crea nuevos códigos y añade una passkey.",
+    "invalidCode": "Este código no es válido o ya se ha usado.",
+    "loginFailed": "Error al iniciar sesión. Inténtalo de nuevo.",
+    "loginSuccess": "Sesión iniciada",
+    "loginSuccessDesc": "Quedan {{count}} códigos de respaldo."
   }
 }
