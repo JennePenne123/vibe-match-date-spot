@@ -1533,7 +1533,8 @@
       "successTitle": "Password updated!",
       "successDesc": "Redirecting...",
       "invalidLink": "This link is invalid or expired. Please request a new one."
-    }
+    },
+    "rememberMe": "Remember me"
   },
   "venue": {
     "open": "Open",

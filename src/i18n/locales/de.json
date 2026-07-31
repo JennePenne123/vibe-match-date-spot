@@ -1533,7 +1533,8 @@
       "successTitle": "Passwort aktualisiert!",
       "successDesc": "Du wirst weitergeleitet...",
       "invalidLink": "Dieser Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an."
-    }
+    },
+    "rememberMe": "Anmeldedaten merken"
   },
   "venue": {
     "open": "Geöffnet",

@@ -64,6 +64,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const [datenschutzAccepted, setDatenschutzAccepted] = useState(false);
   const [isForgot, setIsForgot] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   
   const { signIn, signUp, signInWithGoogle, signInWithApple, user } = useAuth();
   const navigate = useNavigate();
@@ -71,6 +72,19 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { isAdmin: isServerAdmin, loading: adminCheckLoading } = useServerAdminAccess();
+
+  // Restore remembered login email
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('hioutz-remembered-email');
+      if (saved) {
+        setEmail(saved);
+        setRememberMe(true);
+      }
+    } catch {
+      /* ignore storage errors */
+    }
+  }, []);
 
   // Check for referral code in URL
   useEffect(() => {
@@ -248,6 +262,15 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
 
     try {
       if (isLogin) {
+        try {
+          if (rememberMe) {
+            localStorage.setItem('hioutz-remembered-email', sanitizedEmail);
+          } else {
+            localStorage.removeItem('hioutz-remembered-email');
+          }
+        } catch {
+          /* ignore storage errors */
+        }
         const { user: signedInUser, error: signInError } = await signIn(sanitizedEmail, password);
         
         if (signInError) {
@@ -570,7 +593,18 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                 </div>
 
                 {isLogin && (
-                  <div className="text-right -mt-1">
+                  <div className="flex items-center justify-between gap-3 -mt-1">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="rememberMe"
+                        checked={rememberMe}
+                        onCheckedChange={(checked) => setRememberMe(checked === true)}
+                        disabled={loading || isOAuthLoading}
+                      />
+                      <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
+                        {t('auth.rememberMe')}
+                      </label>
+                    </div>
                     <button
                       type="button"
                       onClick={openForgot}
