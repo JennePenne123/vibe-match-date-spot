@@ -226,8 +226,8 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
             <SelectTrigger className="h-11">
               <SelectValue placeholder={t('datePlanning.chooseFriend')} />
             </SelectTrigger>
-            <SelectContent>
-              {filteredFriends.map((friend) => {
+            <SelectContent className="max-h-64">
+              {visibleFriends.map((friend) => {
                 const s = statusFor(friend.id);
                 return (
                   <SelectItem key={friend.id} value={friend.id}>
@@ -238,6 +238,15 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
                   </SelectItem>
                 );
               })}
+              {hasMore && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); setVisibleCount(c => c + PAGE_SIZE); }}
+                  className="w-full text-xs py-2 text-primary hover:underline"
+                >
+                  {t('datePlanning.loadMoreFriends', 'Mehr laden')} ({filteredFriends.length - visibleCount})
+                </button>
+              )}
             </SelectContent>
           </Select>
           {filteredFriends.length === 0 && (
