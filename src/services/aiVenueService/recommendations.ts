@@ -14,6 +14,7 @@ import { getDistanceToleranceScore } from './distanceLearning';
 import { getPhotoVibeScoreModifier, getPhotoVibeLabel } from './photoVibeScoring';
 import { getPairFriendlyScoreModifier, getPairFriendlyLabel } from './pairFriendlyScoring';
 import { getSeasonalScoreModifier, getSeasonalLabel } from './seasonalScoring';
+import { combineWithStrategy, storeGroupCompromise, type CompromiseGroup } from './groupCompromise';
 import { supabase } from '@/integrations/supabase/client';
 import { dedupeVenueSearch } from '@/services/venueSearchDedupe';
 import { validateLocation } from '@/utils/locationValidation';
