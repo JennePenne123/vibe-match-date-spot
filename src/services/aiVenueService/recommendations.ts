@@ -22,7 +22,8 @@ import { getVenueFallbackImage } from '@/utils/venueImageFallback';
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
-import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, type SituationalCategoryId } from '@/lib/situationalCategories';
+import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, matchesSelectedVenueTypes, type SituationalCategoryId } from '@/lib/situationalCategories';
+import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
 import {
   beginSituationalFilterRequest,
   endSituationalFilterRequest,
@@ -50,6 +51,52 @@ const getActiveSituationalCategory = (
   const primaryCat = getSituationalCategory(primaryId ?? null);
   const secondaryCat = getSituationalCategory(secondaryId ?? null);
   return { primaryCat, secondaryCat, isNonFood: !!primaryCat && primaryCat.id !== 'food' };
+};
+
+/**
+ * When the user explicitly narrows a non-food category in the wizard (e.g.
+ * picks only "Kinos" inside Kultur), we must honour that as a hard sub-type
+ * filter. Returns the selected ids only when they are a real subset of the
+ * category's own picker items — otherwise there is nothing to narrow.
+ */
+export const getNarrowedVenueTypes = (
+  primaryId: SituationalCategoryId | null | undefined,
+  secondaryId: SituationalCategoryId | null | undefined,
+  preferredVenueTypes: string[] | null | undefined,
+): string[] => {
+  const selected = (preferredVenueTypes || []).map(t => t.toLowerCase());
+  if (!selected.length || !primaryId || primaryId === 'food') return [];
+
+  const universe = [primaryId, secondaryId]
+    .filter((id): id is SituationalCategoryId => !!id && id !== 'food')
+    .flatMap(id => getCategoryWizardConfig(id).mainPickerItems.map(i => i.id));
+  if (!universe.length) return [];
+
+  const narrowed = universe.filter(id => selected.includes(id));
+  // Nothing picked in this category, or everything picked → no narrowing.
+  if (!narrowed.length || narrowed.length === universe.length) return [];
+  return narrowed;
+};
+
+const applyVenueTypeNarrowing = <T extends Record<string, any>>(
+  venues: T[],
+  narrowedTypes: string[],
+  label: string,
+): T[] => {
+  if (!narrowedTypes.length) return venues;
+  const filtered = venues.filter(v => matchesSelectedVenueTypes(narrowedTypes, {
+    name: v.name ?? v.venue_name,
+    cuisine_type: v.cuisine_type ?? v.cuisineType,
+    cuisineType: v.cuisineType,
+    description: v.description,
+    tags: v.tags ?? v.amenities,
+    types: v.types,
+    venue_type: v.venue_type,
+    activities: v.activities,
+  }));
+  console.log(`🎯 VENUE-TYPE NARROWING (${narrowedTypes.join(',')}/${label}): ${venues.length} → ${filtered.length}`);
+  // Never return an empty set just because the narrowing was too strict.
+  return filtered.length > 0 ? filtered : venues;
 };
 
 const filterSituationalVenues = <T extends Record<string, any>>(
