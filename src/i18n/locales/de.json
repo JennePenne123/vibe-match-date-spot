@@ -1894,5 +1894,25 @@
   "wallet": {
     "title": "Meine Wallet",
     "comingSoon": "Bald verfügbar"
+  },
+  "passkey": {
+    "title": "Passkeys",
+    "description": "Melde dich ohne Passwort mit Face ID, Touch ID oder deiner Geräte-PIN an.",
+    "add": "Passkey hinzufügen",
+    "added": "Passkey hinzugefügt",
+    "addedDesc": "Du kannst dich jetzt ohne Passwort anmelden.",
+    "addFailed": "Passkey konnte nicht hinzugefügt werden",
+    "alreadyRegistered": "Dieser Passkey ist bereits registriert.",
+    "delete": "Passkey löschen",
+    "deleted": "Passkey gelöscht",
+    "deleteFailed": "Löschen fehlgeschlagen",
+    "empty": "Noch kein Passkey hinterlegt.",
+    "notSupported": "Dein Browser unterstützt keine Passkeys.",
+    "createdAt": "Erstellt am {{date}}",
+    "lastUsed": "zuletzt genutzt {{date}}",
+    "signInWithPasskey": "Mit Passkey anmelden",
+    "signInFailed": "Anmeldung mit Passkey fehlgeschlagen.",
+    "unknownCredential": "Dieser Passkey ist nicht registriert.",
+    "privacyHint": "Biometrische Daten verlassen dein Gerät nicht. Wir speichern nur den öffentlichen Schlüssel."
   }
 }
