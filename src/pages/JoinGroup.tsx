@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, CheckCircle, XCircle, LogIn } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { clearGroupToken, readGroupToken, storeGroupToken } from '@/lib/groupInviteLink';
 
 interface Preview {
   found: boolean;
@@ -22,7 +23,7 @@ export default function JoinGroup() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const token = searchParams.get('token');
+  const token = searchParams.get('token') || readGroupToken();
 
   const [state, setState] = useState<'loading' | 'auth_required' | 'preview' | 'success' | 'error'>('loading');
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -37,10 +38,11 @@ export default function JoinGroup() {
       return;
     }
     if (!user) {
-      sessionStorage.setItem('hioutz-pending-group-token', token);
+      storeGroupToken(token);
       setState('auth_required');
       return;
     }
+    storeGroupToken(token);
 
     const load = async () => {
       const { data, error } = await supabase.rpc('get_group_invite_preview' as never, { _token: token } as never);
@@ -80,7 +82,7 @@ export default function JoinGroup() {
       setState('error');
       return;
     }
-    sessionStorage.removeItem('hioutz-pending-group-token');
+    clearGroupToken();
     setState('success');
     setTimeout(() => navigate('/group-dates'), 1200);
   }, [token, navigate]);
@@ -142,7 +144,7 @@ export default function JoinGroup() {
             <div className="text-center space-y-3">
               <XCircle className="w-10 h-10 mx-auto text-destructive" />
               <p className="text-sm text-muted-foreground">{message}</p>
-              <Button variant="outline" className="w-full" onClick={() => navigate('/home')}>
+              <Button variant="outline" className="w-full" onClick={() => { clearGroupToken(); navigate('/home'); }}>
                 Zur Startseite
               </Button>
             </div>
