@@ -343,6 +343,7 @@ const VenueDetail = () => {
           </div>
         </div>
       </div>
+    </div>
   );
 };
 
