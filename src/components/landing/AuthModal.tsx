@@ -23,7 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import { hasMoodToday } from '@/utils/moodStorage';
 import { OAuthErrorDetails, OAuthErrorInfo } from '@/components/auth/OAuthErrorDetails';
 import { GoogleAuthSetupCheck } from '@/components/auth/GoogleAuthSetupCheck';
-import { useAdminRole } from '@/hooks/useAdminRole';
+import { useServerAdminAccess } from '@/hooks/useServerAdminAccess';
 
 // Google icon SVG component
 const GoogleIcon = () => (
@@ -70,7 +70,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const { adminRole } = useAdminRole();
+  const { isAdmin: isServerAdmin, loading: adminCheckLoading } = useServerAdminAccess();
 
   // Check for referral code in URL
   useEffect(() => {
@@ -480,7 +480,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
 
                 {/* Google setup diagnostics — admin only, so regular users
                     aren't confronted with technical config during login. */}
-                {adminRole && <GoogleAuthSetupCheck autoRun={false} />}
+                {!adminCheckLoading && isServerAdmin && <GoogleAuthSetupCheck autoRun={false} />}
 
                 <Button
                   type="button"
