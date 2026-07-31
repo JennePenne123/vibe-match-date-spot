@@ -80,11 +80,23 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   }, [groupPlanning.groupMembers]);
 
   const sessionPartner = useMemo(() => {
+    return sessionPartnerInner();
+    function sessionPartnerInner() {
     if (!collaborativeSession || !allFriends.length) return null;
     const partnerId = isUserInitiator ? collaborativeSession.partner_id : collaborativeSession.initiator_id;
     const partner = allFriends.find(f => f.id === partnerId);
     return partner ? { id: partner.id, name: partner.name } : null;
+    }
   }, [collaborativeSession, allFriends, isUserInitiator]);
+
+  // Freundesliste inkl. offener (ausgehender) Anfragen für die Partnerauswahl
+  const selectableFriends = useMemo(() => {
+    const map = new Map<string, { id: string; name: string }>();
+    [...(allFriends || []), ...(outgoingRequests || [])].forEach(f => {
+      if (f?.id && !map.has(f.id)) map.set(f.id, { id: f.id, name: f.name || 'Freund' });
+    });
+    return Array.from(map.values());
+  }, [allFriends, outgoingRequests]);
 
   const effectivePreselectedFriend = sessionPartner ?? preselectedFriend;
 
