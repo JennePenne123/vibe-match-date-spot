@@ -173,14 +173,14 @@ const VenueDetail = () => {
   };
 
   const callVenue = () => {
-    if (appVenue.phone) {
-      window.open(`tel:${appVenue.phone}`);
+    if (phoneNumber) {
+      window.open(`tel:${phoneNumber}`);
     }
   };
 
   const visitWebsite = () => {
-    if (appVenue.website) {
-      window.open(appVenue.website, '_blank');
+    if (websiteUrl) {
+      window.open(websiteUrl, '_blank');
       return;
     }
     // Fallback: no stored website → open the venue's Google Maps entry,
