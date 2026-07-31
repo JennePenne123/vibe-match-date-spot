@@ -169,6 +169,19 @@ export default function Datenschutz() {
             Einfluss.
           </p>
 
+          <h3>3.6 Backup-Codes zur Kontowiederherstellung</h3>
+          <p className="text-muted-foreground">
+            Ergänzend können Sie Einmal-Backup-Codes erzeugen, mit denen Sie sich anmelden können, falls Sie
+            keinen Passkey und kein Passwort mehr nutzen können. Die Codes werden bei der Erzeugung einmalig
+            angezeigt und auf unseren Servern <strong>ausschließlich als kryptografischer Hash</strong>
+            {' '}(SHA-256, an Ihre Nutzerkennung gebunden) gespeichert – im Klartext sind sie für uns nicht
+            einsehbar oder wiederherstellbar. Gespeichert werden zusätzlich der Erstellungszeitpunkt und, nach
+            Verwendung, der Einlösezeitpunkt. Jeder Code ist genau einmal nutzbar; beim Erzeugen eines neuen
+            Satzes werden alle vorherigen Codes gelöscht. Rechtsgrundlage ist Art.&nbsp;6 Abs.&nbsp;1
+            lit.&nbsp;b und lit.&nbsp;f DSGVO (Vertragserfüllung und Kontosicherheit). Die Daten werden mit
+            Löschung der Codes bzw. Ihres Kontos entfernt.
+          </p>
+
           <h2>4. Präferenzen und Nutzungsdaten</h2>
           <h3>4.1 Explizite Präferenzen</h3>
           <p className="text-muted-foreground">
