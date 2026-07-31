@@ -113,8 +113,16 @@ const VenueDetail = () => {
     matchScore: appVenue.matchScore,
   };
 
+  // Google Maps entry for this venue — used as fallback when no website is stored
+  const googleMapsUrl = appVenue.placeId
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        [appVenue.name, displayAddress].filter(Boolean).join(', ')
+      )}&query_place_id=${appVenue.placeId}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        [appVenue.name, displayAddress].filter(Boolean).join(', ')
+      )}`;
+
   const handleDirections = () => {
-    // Always use venue name + address as destination for accuracy
     // Always use venue name + address as destination for accuracy
     const destination = encodeURIComponent(
       [appVenue.name, displayAddress].filter(Boolean).join(', ')
