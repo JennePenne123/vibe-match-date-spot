@@ -392,6 +392,74 @@ export function passesSituationalHardFilter(
 }
 
 /**
+ * Keyword map for the concrete venue-type ids the user can pick in the
+ * category wizard (e.g. "Kinos" → cinema). Used for a HARD sub-type filter:
+ * if a user explicitly narrows a culture request to cinemas, we must not
+ * return museums just because both belong to the "culture" bucket.
+ */
+export const VENUE_TYPE_KEYWORDS: Record<string, string[]> = {
+  museum: ['museum', 'museums', 'museo', 'musée', 'kunsthalle', 'pinakothek', 'planetarium', 'aquarium', 'ausstellung', 'exhibition'],
+  gallery: ['gallery', 'galleries', 'galerie', 'galería', 'art_gallery', 'kunstgalerie'],
+  theater_venue: ['theater', 'theatre', 'teatro', 'théâtre', 'schauspielhaus', 'kammerspiele', 'staatstheater', 'stadttheater', 'bühne', 'opera', 'oper', 'musical', 'performing_arts_theater'],
+  cinema: ['cinema', 'cinemas', 'kino', 'kinos', 'cine', 'movie_theater', 'movie theater', 'movie theatre', 'multiplex', 'imax', 'programmkino', 'filmpalast', 'lichtspielhaus', 'filmtheater'],
+  concert_hall: ['concert_hall', 'concert hall', 'konzerthaus', 'konzerthalle', 'philharmonie', 'philharmonic', 'symphony', 'orchestra', 'orchester', 'liederhalle', 'musikhalle'],
+  cultural_event: ['festival', 'event', 'kulturzentrum', 'arts centre', 'arts center', 'veranstaltung'],
+  bowling: ['bowling', 'bowling_alley', 'bowling alley', 'kegelbahn', 'kegeln', 'bolera'],
+  mini_golf: ['mini golf', 'minigolf', 'mini_golf', 'miniature_golf', 'adventure golf'],
+  escape_room: ['escape room', 'escape_room', 'escape-room', 'exit game', 'exitgame'],
+  arcade: ['arcade', 'spielhalle', 'game center', 'pinball', 'flipper', 'vr arcade'],
+  climbing: ['climbing', 'klettern', 'kletterhalle', 'bouldering', 'bouldern', 'boulderhalle', 'escalada'],
+  spa_wellness: ['spa', 'wellness', 'sauna', 'therme', 'thermalbad', 'hammam', 'massage'],
+  swimming: ['schwimmbad', 'swimming', 'swimming_pool', 'piscina', 'freibad', 'hallenbad'],
+  cocktail_bar: ['cocktail', 'cocktails', 'cocktail_bar', 'cocktailbar', 'mixology', 'speakeasy', 'lounge'],
+  pub: ['pub', 'pubs', 'irish pub', 'kneipe', 'brewpub', 'beer_garden', 'biergarten', 'bierhalle'],
+  nightclub: ['nightclub', 'night_club', 'night club', 'club', 'discothek', 'diskothek', 'disco', 'discoteca', 'techno'],
+  live_music: ['live music', 'live_music', 'livemusik', 'live-musik', 'music venue', 'jazz', 'jazz club', 'konzert'],
+  karaoke: ['karaoke', 'karaoke bar'],
+  comedy_club: ['comedy', 'comedy_club', 'comedy club', 'kabarett', 'stand-up', 'standup'],
+  bar: ['bar', 'bars', 'weinbar', 'wine_bar', 'whisky bar'],
+  wine_bar: ['wine bar', 'wine_bar', 'weinbar', 'vinothek', 'enoteca'],
+  beer_garden: ['beer garden', 'beer_garden', 'biergarten'],
+};
+
+function venueTypeKeywords(typeId: string): string[] {
+  return VENUE_TYPE_KEYWORDS[typeId] ?? [typeId.toLowerCase().replace(/_/g, ' ')];
+}
+
+/**
+ * Hard sub-type filter. Returns true when the venue matches at least one of
+ * the explicitly selected venue types. Matching is done on structured fields
+ * (tags, types, venue_type, cuisine_type) and on the venue name.
+ */
+export function matchesSelectedVenueTypes(
+  selectedTypes: string[],
+  venue: SituationalVenueLike,
+): boolean {
+  if (!selectedTypes?.length) return true;
+
+  const tags = [
+    ...(venue.tags ?? []),
+    ...(venue.types ?? []),
+    venue.venue_type ?? '',
+    venue.cuisine_type ?? venue.cuisineType ?? '',
+  ]
+    .map(t => (t ?? '').toString().trim().toLowerCase())
+    .filter(Boolean);
+  const tagBlob = tags.join(' ').replace(/_/g, ' ');
+  const name = (venue.name ?? '').toLowerCase();
+
+  return selectedTypes.some(typeId =>
+    venueTypeKeywords(typeId).some(kw => {
+      const k = kw.toLowerCase();
+      const kSpaced = k.replace(/_/g, ' ');
+      if (tags.includes(k)) return true;
+      if (tagBlob.includes(kSpaced)) return true;
+      return containsWholeTerm(name, kSpaced);
+    }),
+  );
+}
+
+/**
  * Compute a multiplicative boost factor (0.6 – 1.35) for a venue based on
  * how well it matches the active situational category.
  *
