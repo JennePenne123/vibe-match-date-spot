@@ -616,7 +616,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     <Checkbox
                       id="rememberMe"
                       checked={rememberMe}
-                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      onCheckedChange={(checked) => handleRememberMeChange(checked === true)}
                       disabled={loading || isOAuthLoading}
                     />
                     <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
