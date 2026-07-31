@@ -305,7 +305,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         max_distance: maxDistance, dietary_restrictions: selectedDietary,
         updated_at: new Date().toISOString(),
         ...(isFoodCategory ? {} : { preferred_venue_types: selectedVenueTypes.length > 0 ? selectedVenueTypes : null }),
-      } as Record<string, unknown>;
+      } as any;
 
       const { data: existing } = await supabase.from('user_preferences').select('id').eq('user_id', uid).maybeSingle();
       const mutation = existing
