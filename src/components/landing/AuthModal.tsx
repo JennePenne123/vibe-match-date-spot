@@ -23,6 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import { hasMoodToday } from '@/utils/moodStorage';
 import { OAuthErrorDetails, OAuthErrorInfo } from '@/components/auth/OAuthErrorDetails';
 import { GoogleAuthSetupCheck } from '@/components/auth/GoogleAuthSetupCheck';
+import { useAdminRole } from '@/hooks/useAdminRole';
 
 // Google icon SVG component
 const GoogleIcon = () => (
