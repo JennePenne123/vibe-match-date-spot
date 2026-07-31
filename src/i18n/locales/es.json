@@ -1671,7 +1671,8 @@
     "callNow": "Llamar ahora",
     "noWebsite": "Sin web",
     "addressNotAvailable": "Dirección no disponible",
-    "moreHours": "+ {{count}} más"
+    "moreHours": "+ {{count}} más",
+    "viewOnGoogleMaps": "Ver en Google Maps"
   },
   "myVenues": {
     "noFavorites": "Aún no tienes locales favoritos",
