@@ -1180,7 +1180,24 @@
     "aiMatchesDescShared": "tus compartidas",
     "premiumVoucherTitle": "Premium: Vouchers exclusivos para tus Top 3",
     "premiumVoucherDesc": "Como miembro Premium, obtén vouchers de descuento para los 3 mejores lugares.",
-    "upgrade": "Mejorar"
+    "upgrade": "Mejorar",
+    "compromise": {
+      "title": "Así se formó el compromiso de la IA",
+      "titleSolo": "Así se filtraron los resultados",
+      "kindCuisines": "Cocinas",
+      "kindVenueTypes": "Tipos de local",
+      "strategyShared": "selección común",
+      "strategySharedDesc": "Vuestras elecciones coinciden: la IA usa solo las opciones elegidas por todos.",
+      "strategyUnion": "unión",
+      "strategyUnionDesc": "Sin coincidencias: para que nadie se quede fuera, la IA mantiene los deseos de todos.",
+      "strategySingle": "elección de una persona",
+      "strategySingleDesc": "Solo una persona hizo una selección aquí, así que se aplica.",
+      "picks": "Tú: {{you}} · Pareja: {{partner}}",
+      "noPick": "sin selección",
+      "vetoTitle": "Reglas de veto",
+      "vetoDesc": "Las cocinas excluidas por cualquier participante se filtran para todos.",
+      "vetoOnly": "Reglas de veto aplicadas"
+    }
   },
   "invitationsSection": {
     "title": "Invitaciones de Cita",

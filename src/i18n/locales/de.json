@@ -1180,7 +1180,24 @@
     "aiMatchesDescShared": "euren gemeinsamen",
     "premiumVoucherTitle": "Premium: Exklusive Voucher für deine Top 3 Matches",
     "premiumVoucherDesc": "Als Premium-Mitglied erhältst du Rabatt-Voucher für die 3 bestbewerteten Venues.",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "compromise": {
+      "title": "So entstand der KI-Kompromiss",
+      "titleSolo": "So wurde gefiltert",
+      "kindCuisines": "Küchen",
+      "kindVenueTypes": "Venue-Typen",
+      "strategyShared": "gemeinsame Auswahl",
+      "strategySharedDesc": "Ihr habt euch überschnitten – die KI nutzt nur die Optionen, die alle gewählt haben.",
+      "strategyUnion": "Vereinigung",
+      "strategyUnionDesc": "Keine Überschneidung – damit niemand leer ausgeht, berücksichtigt die KI die Wünsche aller.",
+      "strategySingle": "Auswahl einer Person",
+      "strategySingleDesc": "Nur eine Person hat hier eine Auswahl getroffen – diese gilt.",
+      "picks": "Du: {{you}} · Partner:in: {{partner}}",
+      "noPick": "keine Auswahl",
+      "vetoTitle": "Veto-Regeln",
+      "vetoDesc": "Von einer Person ausgeschlossene Küchen werden für alle hart herausgefiltert.",
+      "vetoOnly": "Veto-Regeln angewendet"
+    }
   },
   "invitationsSection": {
     "title": "Date-Einladungen",
