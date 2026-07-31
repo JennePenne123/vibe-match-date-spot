@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Toggle } from '@/components/ui/toggle';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Users, ArrowRight, Loader2, User, UsersIcon, CheckCircle2, Clock } from 'lucide-react';
+import { Users, ArrowRight, Loader2, User, UsersIcon, CheckCircle2, Clock, Search, Inbox } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import InviteFriendsSection from '@/components/InviteFriendsSection';
 
@@ -23,6 +24,7 @@ interface PartnerSelectionProps {
   friendsLoading?: boolean;
   invitedFriendIds?: string[];
   acceptedFriendIds?: string[];
+  incomingRequestIds?: string[];
   onPartnerChange: (partnerId: string) => void;
   onPartnerIdsChange: (partnerIds: string[]) => void;
   onDateModeChange: (mode: 'single' | 'group') => void;
@@ -38,6 +40,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
   friendsLoading = false,
   invitedFriendIds = [],
   acceptedFriendIds = [],
+  incomingRequestIds = [],
   onPartnerChange,
   onPartnerIdsChange,
   onDateModeChange,
@@ -45,25 +48,60 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const statusFor = (id: string): 'accepted' | 'pending' | null => {
-    if (acceptedFriendIds.includes(id)) return 'accepted';
+  type FriendStatus = 'accepted' | 'pending' | 'incoming';
+
+  const statusFor = (id: string): FriendStatus | null => {
+    if (incomingRequestIds.includes(id)) return 'incoming';
     if (invitedFriendIds.includes(id)) return 'pending';
+    if (acceptedFriendIds.includes(id)) return 'accepted';
     return null;
   };
 
-  const StatusBadge: React.FC<{ status: 'accepted' | 'pending' }> = ({ status }) => (
-    status === 'accepted' ? (
-      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400">
-        <CheckCircle2 className="h-3 w-3" />
-        {t('datePlanning.accepted', 'Angenommen')}
-      </span>
-    ) : (
+  const StatusBadge: React.FC<{ status: FriendStatus }> = ({ status }) => {
+    if (status === 'accepted') {
+      return (
+        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400">
+          <CheckCircle2 className="h-3 w-3" />
+          {t('datePlanning.accepted', 'Angenommen')}
+        </span>
+      );
+    }
+    if (status === 'incoming') {
+      return (
+        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-600 dark:text-sky-400">
+          <Inbox className="h-3 w-3" />
+          {t('datePlanning.requestOpen', 'Anfrage offen')}
+        </span>
+      );
+    }
+    return (
       <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
         <Clock className="h-3 w-3" />
         {t('datePlanning.requestSent', 'Anfrage verschickt')}
       </span>
-    )
-  );
+    );
+  };
+
+  const [search, setSearch] = React.useState('');
+  const [statusFilter, setStatusFilter] = React.useState<'all' | FriendStatus>('all');
+
+  const filteredFriends = React.useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return friends.filter(f => {
+      const matchesSearch = !q || (f.name || '').toLowerCase().includes(q);
+      if (!matchesSearch) return false;
+      if (statusFilter === 'all') return true;
+      const s = statusFor(f.id) ?? 'accepted';
+      return s === statusFilter;
+    });
+  }, [friends, search, statusFilter, invitedFriendIds, acceptedFriendIds, incomingRequestIds]);
+
+  const filterOptions: { key: 'all' | FriendStatus; label: string }[] = [
+    { key: 'all', label: t('datePlanning.filterAll', 'Alle') },
+    { key: 'accepted', label: t('datePlanning.filterFriends', 'Freund') },
+    { key: 'incoming', label: t('datePlanning.requestOpen', 'Anfrage offen') },
+    { key: 'pending', label: t('datePlanning.requestSent', 'Anfrage verschickt') },
+  ];
 
   const selectedSingleFriend = friends.find(f => f.id === selectedPartnerId);
   const selectedSingleStatus = selectedSingleFriend ? statusFor(selectedSingleFriend.id) : null;
