@@ -335,13 +335,12 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     setIsLogin(!isLogin);
     setName('');
     // Keep a remembered e-mail prefilled across mode switches
-    let remembered = '';
-    try {
-      remembered = localStorage.getItem('hioutz-remembered-email') || '';
-    } catch {
-      /* ignore storage errors */
+    setEmail('');
+    if (rememberMe) {
+      loadRememberedEmail().then((remembered) => {
+        if (remembered) setEmail(remembered);
+      });
     }
-    setEmail(rememberMe ? remembered : '');
     setPassword('');
     setReferralCode('');
     setReferralValid(null);
