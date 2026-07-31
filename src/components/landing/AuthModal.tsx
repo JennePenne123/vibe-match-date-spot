@@ -838,6 +838,11 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
           </div>
         </div>
       </DialogContent>
+      <RecoveryCodeLoginDialog
+        open={recoveryOpen}
+        onOpenChange={setRecoveryOpen}
+        defaultEmail={email}
+      />
     </Dialog>
   );
 }
