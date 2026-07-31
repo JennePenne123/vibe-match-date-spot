@@ -261,16 +261,18 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        try {
-          if (rememberMe) {
-            localStorage.setItem('hioutz-remembered-email', sanitizedEmail);
-          } else {
-            localStorage.removeItem('hioutz-remembered-email');
-          }
-        } catch {
-          /* ignore storage errors */
+      // Persist (or clear) the remembered e-mail for both login and sign-up
+      try {
+        if (rememberMe) {
+          localStorage.setItem('hioutz-remembered-email', sanitizedEmail);
+        } else {
+          localStorage.removeItem('hioutz-remembered-email');
         }
+      } catch {
+        /* ignore storage errors */
+      }
+
+      if (isLogin) {
         const { user: signedInUser, error: signInError } = await signIn(sanitizedEmail, password);
         
         if (signInError) {
