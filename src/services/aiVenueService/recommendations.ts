@@ -22,7 +22,7 @@ import { getVenueFallbackImage } from '@/utils/venueImageFallback';
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
-import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, matchesSelectedVenueTypes, type SituationalCategoryId } from '@/lib/situationalCategories';
+import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, matchesSelectedVenueTypes, matchesSelectedCuisines, CUISINE_KEYWORDS, type SituationalCategoryId } from '@/lib/situationalCategories';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
 import {
   beginSituationalFilterRequest,
@@ -96,6 +96,43 @@ const applyVenueTypeNarrowing = <T extends Record<string, any>>(
   }));
   console.log(`🎯 VENUE-TYPE NARROWING (${narrowedTypes.join(',')}/${label}): ${venues.length} → ${filtered.length}`);
   // Never return an empty set just because the narrowing was too strict.
+  return filtered.length > 0 ? filtered : venues;
+};
+
+/**
+ * FOOD equivalent of `getNarrowedVenueTypes`: when the user picks only a
+ * subset of the cuisine list (e.g. only "Japanisch"), that is a hard filter —
+ * not just a soft preference.
+ */
+export const getNarrowedCuisines = (
+  primaryId: SituationalCategoryId | null | undefined,
+  preferredCuisines: string[] | null | undefined,
+): string[] => {
+  if (primaryId && primaryId !== 'food') return [];
+  const universe = Object.keys(CUISINE_KEYWORDS);
+  const selected = (preferredCuisines || []).map(c => c.toLowerCase());
+  const narrowed = universe.filter(id => selected.includes(id));
+  if (!narrowed.length || narrowed.length === universe.length) return [];
+  return narrowed;
+};
+
+const applyCuisineNarrowing = <T extends Record<string, any>>(
+  venues: T[],
+  narrowedCuisines: string[],
+  label: string,
+): T[] => {
+  if (!narrowedCuisines.length) return venues;
+  const filtered = venues.filter(v => matchesSelectedCuisines(narrowedCuisines, {
+    name: v.name ?? v.venue_name,
+    cuisine_type: v.cuisine_type ?? v.cuisineType,
+    cuisineType: v.cuisineType,
+    description: v.description,
+    tags: v.tags ?? v.amenities,
+    types: v.types,
+    venue_type: v.venue_type,
+    activities: v.activities,
+  }));
+  console.log(`🍽️ CUISINE NARROWING (${narrowedCuisines.join(',')}/${label}): ${venues.length} → ${filtered.length}`);
   return filtered.length > 0 ? filtered : venues;
 };
 
@@ -295,6 +332,15 @@ export const getAIVenueRecommendations = async (
           }
           return v;
         });
+      }
+
+      // ── Food: explicit cuisine narrowing is a hard filter too ──
+      if (!isNonFood) {
+        const narrowedCuisines = getNarrowedCuisines(
+          primaryCat?.id ?? 'food',
+          (userPrefs as any)?.preferred_cuisines,
+        );
+        venues = applyCuisineNarrowing(venues, narrowedCuisines, 'candidate-set');
       }
     }
 

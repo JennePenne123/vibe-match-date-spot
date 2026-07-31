@@ -427,6 +427,59 @@ function venueTypeKeywords(typeId: string): string[] {
 }
 
 /**
+ * Keyword map for the cuisine ids the user can pick in the FOOD wizard.
+ * Used for the same hard sub-type filter as the non-food categories: if a
+ * user explicitly picks only "Japanisch", we must not return burger joints.
+ */
+export const CUISINE_KEYWORDS: Record<string, string[]> = {
+  italian: ['italian', 'italienisch', 'italiana', 'pizza', 'pizzeria', 'pasta', 'trattoria', 'osteria', 'ristorante', 'risotto'],
+  japanese: ['japanese', 'japanisch', 'japonesa', 'sushi', 'sashimi', 'ramen', 'izakaya', 'yakitori', 'teppanyaki', 'donburi'],
+  mexican: ['mexican', 'mexikanisch', 'mexicana', 'taco', 'tacos', 'taqueria', 'burrito', 'quesadilla', 'cantina', 'tex-mex', 'tex mex'],
+  french: ['french', 'französisch', 'francesa', 'brasserie', 'bistro', 'patisserie', 'creperie', 'crêperie', 'boulangerie'],
+  indian: ['indian', 'indisch', 'india', 'curry', 'tandoori', 'biryani', 'masala', 'punjabi', 'dosa'],
+  mediterranean: ['mediterranean', 'mediterran', 'mediterránea', 'greek', 'griechisch', 'griega', 'meze', 'mezze', 'taverna', 'tapas', 'levantine', 'lebanese', 'libanesisch', 'turkish', 'türkisch', 'mezedes'],
+  american: ['american', 'amerikanisch', 'americana', 'burger', 'burgers', 'steakhouse', 'steak house', 'bbq', 'barbecue', 'diner', 'hot dog', 'hotdog', 'wings'],
+  thai: ['thai', 'thailändisch', 'tailandesa', 'pad thai', 'tom yum', 'curry thai'],
+  chinese: ['chinese', 'chinesisch', 'china', 'dim sum', 'dumplings', 'wok', 'szechuan', 'sichuan', 'canton', 'kantonesisch', 'noodle house'],
+  korean: ['korean', 'koreanisch', 'coreana', 'kimchi', 'bibimbap', 'bulgogi', 'korean bbq', 'k-bbq'],
+};
+
+function cuisineKeywords(cuisineId: string): string[] {
+  return CUISINE_KEYWORDS[cuisineId] ?? [cuisineId.toLowerCase().replace(/_/g, ' ')];
+}
+
+/**
+ * Hard cuisine filter for the FOOD category — mirror of
+ * `matchesSelectedVenueTypes` but keyed on cuisines.
+ */
+export function matchesSelectedCuisines(
+  selectedCuisines: string[],
+  venue: SituationalVenueLike,
+): boolean {
+  if (!selectedCuisines?.length) return true;
+
+  const tags = [
+    ...(venue.tags ?? []),
+    ...(venue.types ?? []),
+    venue.venue_type ?? '',
+    venue.cuisine_type ?? venue.cuisineType ?? '',
+  ]
+    .map(t => (t ?? '').toString().trim().toLowerCase())
+    .filter(Boolean);
+  const tagBlob = tags.join(' ').replace(/_/g, ' ');
+  const name = (venue.name ?? '').toLowerCase();
+
+  return selectedCuisines.some(id =>
+    cuisineKeywords(id).some(kw => {
+      const k = kw.toLowerCase().replace(/_/g, ' ');
+      if (tags.includes(k)) return true;
+      if (tagBlob.includes(k)) return true;
+      return containsWholeTerm(name, k);
+    }),
+  );
+}
+
+/**
  * Hard sub-type filter. Returns true when the venue matches at least one of
  * the explicitly selected venue types. Matching is done on structured fields
  * (tags, types, venue_type, cuisine_type) and on the venue name.
