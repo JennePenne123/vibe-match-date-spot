@@ -128,6 +128,7 @@ const VenueDetail = () => {
   };
 
   const callVenue = () => {
+    // eslint-disable-next-line no-empty
     if (appVenue.phone) {
       window.open(`tel:${appVenue.phone}`);
     }
