@@ -339,7 +339,10 @@
     "bulkInviteSend": "Alle einladen",
     "bulkInviteCopy": "Liste + Text kopieren",
     "bulkInviteSent": "Einladung für {{count}} Kontakte vorbereitet",
-    "bulkPickFromList": "Oder direkt aus deiner Freundesliste wählen"
+    "bulkPickFromList": "Oder direkt aus deiner Freundesliste wählen",
+    "qrInviteTitle": "QR-Code zum Beitreten",
+    "qrInviteShow": "QR-Code zeigen",
+    "qrInviteHint": "Einfach scannen lassen – deine Freunde landen direkt in der Gruppe."
   },
   "friends": {
     "inviteFriends": "Freunde einladen",
