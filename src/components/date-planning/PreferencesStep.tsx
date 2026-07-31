@@ -15,6 +15,8 @@ import {
 } from './preferences/preferencesData';
 import { ChipGrid, Section } from './preferences/PreferenceChip';
 import PreferencesConfirmScreen from './preferences/PreferencesConfirmScreen';
+import SituationalActiveBanner from './preferences/SituationalActiveBanner';
+import { getSituationalCategory } from '@/lib/situationalCategories';
 import DurationPicker from './preferences/DurationPicker';
 import QuickStartTemplates from './preferences/QuickStartTemplates';
 import DateTimePicker from './preferences/DateTimePicker';
@@ -97,6 +99,11 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     user,
   } = state;
 
+  const { categoryId, categoryConfig, isFoodCategory, clearCategory, selectedVenueTypes, toggleVenueType } = state;
+  const activeCategory = getSituationalCategory(categoryId);
+  const venueTypeItems = categoryConfig.mainPickerItems.map(i => ({ id: i.id, name: i.nameKey, emoji: '' }));
+  const mainSelection = isFoodCategory ? selectedCuisines : selectedVenueTypes;
+
   // ── Loading ──────────────────────────────────────────────────────
   if (!onboardingLoaded) {
     return (
@@ -106,8 +113,8 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     );
   }
 
-  // ── Confirm screen ──────────────────────────────────────────────
-  if (flowState === 'confirm' && onboardingPrefs) {
+  // ── Confirm screen (food only — cuisines are irrelevant for other categories) ──
+  if (flowState === 'confirm' && onboardingPrefs && isFoodCategory) {
     return (
       <PreferencesConfirmScreen
         onboardingPrefs={onboardingPrefs}
@@ -200,6 +207,11 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         {/* Location — always visible so users can set an exact address */}
         {locationSection}
 
+        {/* Active situational category */}
+        {activeCategory && !isFoodCategory && (
+          <SituationalActiveBanner category={activeCategory} onClear={clearCategory} />
+        )}
+
         {/* Duration */}
         <DurationPicker selectedDuration={selectedDuration} onSelectDuration={selectDuration} />
 
@@ -218,21 +230,30 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         )}
         {selectedDuration && (
           <>
-            <QuickStartTemplates
+            {isFoodCategory && <QuickStartTemplates
               templates={filteredTemplates}
               learnedTemplate={learnedTemplate}
               isTemplateActive={isTemplateActive}
               onApplyTemplate={applyTemplate}
               onApplyLearnedTemplate={applyTemplate}
-            />
+            />}
 
             {/* Accordion Sections */}
             <div className="space-y-2">
-              <Section id="cuisine" icon={<span className="text-sm">🍽️</span>} title={t('datePlanning.cuisine')}
-                summary={summaryText(selectedCuisines, cuisines, t)} count={selectedCuisines.length}
-                open={openSections.includes('cuisine')} onToggle={() => toggleSection('cuisine')}>
-                <ChipGrid items={cuisines} selected={selectedCuisines} onToggle={toggleCuisine} />
-              </Section>
+              {isFoodCategory ? (
+                <Section id="cuisine" icon={<span className="text-sm">🍽️</span>} title={t('datePlanning.cuisine')}
+                  summary={summaryText(selectedCuisines, cuisines, t)} count={selectedCuisines.length}
+                  open={openSections.includes('cuisine')} onToggle={() => toggleSection('cuisine')}>
+                  <ChipGrid items={cuisines} selected={selectedCuisines} onToggle={toggleCuisine} />
+                </Section>
+              ) : (
+                <Section id="venueTypes" icon={<span className="text-sm">{activeCategory?.emoji || '🎯'}</span>}
+                  title={t(categoryConfig.mainPickerTitleKey)}
+                  summary={summaryText(selectedVenueTypes, venueTypeItems, t)} count={selectedVenueTypes.length}
+                  open={openSections.includes('venueTypes')} onToggle={() => toggleSection('venueTypes')}>
+                  <ChipGrid items={venueTypeItems} selected={selectedVenueTypes} onToggle={toggleVenueType} />
+                </Section>
+              )}
 
               <Section id="vibes" icon={<span className="text-sm">✨</span>} title={t('datePlanning.vibe')}
                 summary={summaryText(selectedVibes, allVibes, t)} count={selectedVibes.length}
