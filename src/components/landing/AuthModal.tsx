@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, Gift, Store } from 'lucide-react';
+import { Loader2, Gift, Store, KeyRound } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { validateReferralCode } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
@@ -29,6 +29,7 @@ import {
   loadRememberedEmail,
   clearRememberedEmail,
 } from '@/lib/secureCredentialStore';
+import { passkeysSupported, signInWithPasskey } from '@/lib/passkey';
 
 // Google icon SVG component
 const GoogleIcon = () => (
@@ -70,6 +71,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const [isForgot, setIsForgot] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
+  const passkeyAvailable = useMemo(() => passkeysSupported(), []);
   
   const { signIn, signUp, signInWithGoogle, signInWithApple, user } = useAuth();
   const navigate = useNavigate();
@@ -359,6 +362,27 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   };
 
   const isOAuthLoading = googleLoading || appleLoading;
+
+  const handlePasskeySignIn = async () => {
+    setError('');
+    setOauthError(null);
+    setPasskeyLoading(true);
+    try {
+      await signInWithPasskey();
+      // The auth listener closes the modal and routes the user
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '';
+      if (!/NotAllowed|AbortError|cancel/i.test(message)) {
+        setError(
+          message === 'unknown_credential'
+            ? t('passkey.unknownCredential')
+            : t('passkey.signInFailed')
+        );
+      }
+    } finally {
+      setPasskeyLoading(false);
+    }
+  };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
