@@ -65,6 +65,7 @@ Deno.serve(async (req) => {
       { table: 'api_usage_logs', column: 'user_id' },
       { table: 'user_points', column: 'user_id' },
       { table: 'user_passkeys', column: 'user_id' },
+      { table: 'user_recovery_codes', column: 'user_id' },
       { table: 'user_roles', column: 'user_id' },
       { table: 'profiles', column: 'id' },
     ];
