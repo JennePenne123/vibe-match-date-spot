@@ -263,11 +263,12 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   )}
                   {currentStep === 'select-partner' && (
                     <PartnerSelection
-                      friends={friends}
+                      friends={selectableFriends}
                       selectedPartnerId={selectedPartnerId}
                       selectedPartnerIds={selectedPartnerIds}
                       dateMode={dateMode === 'group' ? 'group' : 'single'}
                       loading={loading}
+                      friendsLoading={friendsLoading}
                       invitedFriendIds={invitedFriendIds}
                       acceptedFriendIds={acceptedFriendIds}
                       onPartnerChange={(id) => setSelectedPartnerId(id)}
