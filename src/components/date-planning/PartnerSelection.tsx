@@ -293,7 +293,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
               {filteredFriends.length === 0 && (
                 <p className="text-xs text-muted-foreground">{t('datePlanning.noFriendsMatch', 'Keine Treffer')}</p>
               )}
-              {filteredFriends.map((friend) => {
+              {visibleFriends.map((friend) => {
                 const s = statusFor(friend.id);
                 return (
                 <div key={friend.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-sage-50/50 dark:hover:bg-sage-900/10 transition-colors border border-transparent hover:border-sage-200/50 dark:hover:border-sage-800/30">
@@ -314,6 +314,12 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
                 </div>
                 );
               })}
+              {hasMore && (
+                <div ref={sentinelRef} className="flex items-center justify-center py-2 text-xs text-muted-foreground gap-2">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  {t('datePlanning.loadingMoreFriends', 'Weitere Freunde laden...')}
+                </div>
+              )}
             </div>
             {invitedFriendIds.length > 0 && (
               <p className="text-xs text-amber-600 dark:text-amber-400">
