@@ -6,9 +6,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, CheckCircle, LogIn } from 'lucide-react';
-import LoadingSpinner from '@/components/LoadingSpinner';
 import { clearGroupToken, readGroupToken, storeGroupToken } from '@/lib/groupInviteLink';
 import InviteErrorState, { type InviteErrorKind } from '@/components/group-date/InviteErrorState';
+import InviteValidationStatus, {
+  type InviteValidationStep,
+  type StepState,
+} from '@/components/group-date/InviteValidationStatus';
 
 interface Preview {
   found: boolean;
@@ -32,6 +35,25 @@ export default function JoinGroup() {
   const [errorDetail, setErrorDetail] = useState<string | undefined>(undefined);
   const [joining, setJoining] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
+  const [steps, setSteps] = useState<Record<InviteValidationStep, StepState>>({
+    auth: 'active',
+    token: 'pending',
+    group: 'pending',
+  });
+  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
+  const [networkError, setNetworkError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(1);
+
+  useEffect(() => {
+    const on = () => { setOnline(true); setReloadKey(k => k + 1); };
+    const off = () => setOnline(false);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => {
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
+    };
+  }, []);
 
   const fail = (kind: InviteErrorKind, detail?: string) => {
     setErrorKind(kind);
@@ -53,14 +75,26 @@ export default function JoinGroup() {
     }
     storeGroupToken(token);
     setState('loading');
+    setNetworkError(null);
+    setSteps({ auth: 'done', token: 'active', group: 'pending' });
 
     const load = async () => {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        setNetworkError('Offline');
+        return;
+      }
       const { data, error } = await supabase.rpc('get_group_invite_preview' as never, { _token: token } as never);
       if (error) {
+        const isNetwork = /fetch|network|timeout|abort/i.test(error.message || '');
+        if (isNetwork) {
+          setNetworkError(error.message);
+          return;
+        }
         fail('failed', error.message);
         return;
       }
       const result = data as unknown as Preview & { reason?: string };
+      setSteps({ auth: 'done', token: 'done', group: 'active' });
       if (!result?.found) {
         clearGroupToken();
         fail(result?.reason === 'expired' ? 'expired' : 'invalid');
@@ -71,10 +105,17 @@ export default function JoinGroup() {
         return;
       }
       setPreview(result);
+      setSteps({ auth: 'done', token: 'done', group: 'done' });
       setState('preview');
     };
     load();
   }, [token, user, authLoading, reloadKey]);
+
+  const retry = useCallback(() => {
+    setAttempt(a => a + 1);
+    setNetworkError(null);
+    setReloadKey(k => k + 1);
+  }, []);
 
   const handleJoin = useCallback(async () => {
     if (!token) return;
@@ -103,7 +144,13 @@ export default function JoinGroup() {
       <Card className="w-full max-w-sm">
         <CardContent className="p-6 space-y-4">
           {state === 'loading' && (
-            <div className="flex justify-center py-6"><LoadingSpinner /></div>
+            <InviteValidationStatus
+              steps={steps}
+              online={online}
+              attempt={attempt}
+              networkError={networkError}
+              onRetry={retry}
+            />
           )}
 
           {state === 'auth_required' && (
