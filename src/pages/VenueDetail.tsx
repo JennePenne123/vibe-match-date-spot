@@ -340,11 +340,9 @@ const VenueDetail = () => {
                 {t('venue.callNow')}
               </Button>
             )}
-            </div>
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
