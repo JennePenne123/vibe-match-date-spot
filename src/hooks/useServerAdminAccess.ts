@@ -31,7 +31,7 @@ export function useServerAdminAccess() {
 
     (async () => {
       try {
-        const { data, error } = await supabase.rpc('verify_admin_access');
+        const { data, error } = await supabase.rpc('verify_admin_access_logged');
         if (!active) return;
         setIsAdmin(!error && data === true);
       } catch {
