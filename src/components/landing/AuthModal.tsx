@@ -592,19 +592,19 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   )}
                 </div>
 
-                {isLogin && (
-                  <div className="flex items-center justify-between gap-3 -mt-1">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id="rememberMe"
-                        checked={rememberMe}
-                        onCheckedChange={(checked) => setRememberMe(checked === true)}
-                        disabled={loading || isOAuthLoading}
-                      />
-                      <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
-                        {t('auth.rememberMe')}
-                      </label>
-                    </div>
+                <div className="flex items-center justify-between gap-3 -mt-1">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="rememberMe"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      disabled={loading || isOAuthLoading}
+                    />
+                    <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
+                      {t('auth.rememberMe')}
+                    </label>
+                  </div>
+                  {isLogin && (
                     <button
                       type="button"
                       onClick={openForgot}
@@ -613,8 +613,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     >
                       {t('auth.forgot.link')}
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Referral Code Field - Only for Signup */}
                 {!isLogin && (
