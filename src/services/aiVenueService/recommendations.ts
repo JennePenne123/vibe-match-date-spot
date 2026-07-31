@@ -253,6 +253,15 @@ export const getAIVenueRecommendations = async (
 
         venues = filtered;
         console.log(`🎭 SITUATIONAL HARD FILTER (${primaryCat.id}): ${before} → ${filtered.length} venues`);
+
+        // ── Explicit sub-type narrowing (e.g. only "Kinos" inside Kultur) ──
+        const narrowedTypes = getNarrowedVenueTypes(
+          primaryCat.id,
+          secondaryCat?.id ?? null,
+          (userPrefs as any)?.preferred_venue_types,
+        );
+        venues = applyVenueTypeNarrowing(venues, narrowedTypes, 'candidate-set');
+
         try { sessionStorage.removeItem('hioutz-situational-sparse'); } catch {}
         if (filtered.length === 0) {
           throw new NoSituationalMatchError(primaryCat.id);
