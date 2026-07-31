@@ -172,12 +172,35 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
           </div>
         ) : dateMode === 'single' ? (
           <>
+          <div className="space-y-2 mb-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('datePlanning.searchFriends', 'Freunde suchen...')}
+                className="pl-9 h-10"
+              />
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {filterOptions.map(o => (
+                <button
+                  key={o.key}
+                  type="button"
+                  onClick={() => setStatusFilter(o.key)}
+                  className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors ${statusFilter === o.key ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted/40 text-muted-foreground border-border/60 hover:bg-muted'}`}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <Select value={selectedPartnerId} onValueChange={onPartnerChange}>
             <SelectTrigger className="h-11">
               <SelectValue placeholder={t('datePlanning.chooseFriend')} />
             </SelectTrigger>
             <SelectContent>
-              {friends.map((friend) => {
+              {filteredFriends.map((friend) => {
                 const s = statusFor(friend.id);
                 return (
                   <SelectItem key={friend.id} value={friend.id}>
@@ -190,6 +213,9 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
               })}
             </SelectContent>
           </Select>
+          {filteredFriends.length === 0 && (
+            <p className="mt-2 text-xs text-muted-foreground">{t('datePlanning.noFriendsMatch', 'Keine Treffer')}</p>
+          )}
           {selectedSingleFriend && selectedSingleStatus && (
             <div className="mt-2 flex items-center text-xs text-muted-foreground">
               <span className="font-medium text-foreground">{selectedSingleFriend.name}</span>
@@ -204,8 +230,34 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
           </>
         ) : (
           <div className="space-y-3">
+            <div className="space-y-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t('datePlanning.searchFriends', 'Freunde suchen...')}
+                  className="pl-9 h-10"
+                />
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {filterOptions.map(o => (
+                  <button
+                    key={o.key}
+                    type="button"
+                    onClick={() => setStatusFilter(o.key)}
+                    className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors ${statusFilter === o.key ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted/40 text-muted-foreground border-border/60 hover:bg-muted'}`}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="grid gap-3 max-h-48 overflow-y-auto pr-2">
-              {friends.map((friend) => {
+              {filteredFriends.length === 0 && (
+                <p className="text-xs text-muted-foreground">{t('datePlanning.noFriendsMatch', 'Keine Treffer')}</p>
+              )}
+              {filteredFriends.map((friend) => {
                 const s = statusFor(friend.id);
                 return (
                 <div key={friend.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-sage-50/50 dark:hover:bg-sage-900/10 transition-colors border border-transparent hover:border-sage-200/50 dark:hover:border-sage-800/30">
