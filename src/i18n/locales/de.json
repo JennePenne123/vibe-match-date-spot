@@ -126,7 +126,11 @@
       "nightlife": {
         "label": "Nightlife & Events",
         "desc": "Clubs, Live-Musik, Pub-Crawls"
-      }
+      },
+      "modeLabel": "Wie planst du?",
+      "modeSolo": "Solo",
+      "modeDuo": "Zu zweit",
+      "modeGroup": "Gruppe"
     },
     "quotes": {
       "q1": "„Das Leben ist zu kurz für mittelmäßige Erlebnisse.\" ✨",

@@ -126,7 +126,11 @@
       "nightlife": {
         "label": "Nightlife & Events",
         "desc": "Clubs, live music, pub crawls"
-      }
+      },
+      "modeLabel": "How are you planning?",
+      "modeSolo": "Solo",
+      "modeDuo": "Duo",
+      "modeGroup": "Group"
     },
     "quotes": {
       "q1": "\"Life's too short for mediocre experiences.\" ✨",
