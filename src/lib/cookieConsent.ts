@@ -21,15 +21,58 @@ export const DEFAULT_CATEGORIES: Record<ConsentCategory, boolean> = {
   marketing: false,
 };
 
-export function getStoredConsent(): CookieConsent | null {
+const COOKIE_NAME = 'hioutz_cookie_consent_v2';
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 12 Monate
+
+function readCookie(): CookieConsent | null {
   try {
-    const raw = localStorage.getItem(CONSENT_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as CookieConsent;
+    const match = document.cookie
+      .split('; ')
+      .find((c) => c.startsWith(`${COOKIE_NAME}=`));
+    if (!match) return null;
+    const parsed = JSON.parse(decodeURIComponent(match.split('=').slice(1).join('='))) as CookieConsent;
     if (parsed.version !== CURRENT_CONSENT_VERSION) return null;
     return parsed;
   } catch {
     return null;
+  }
+}
+
+function writeCookie(consent: CookieConsent) {
+  try {
+    document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(consent))}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+  } catch {
+    // ignore
+  }
+}
+
+function deleteCookie() {
+  try {
+    document.cookie = `${COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+  } catch {
+    // ignore
+  }
+}
+
+export function getStoredConsent(): CookieConsent | null {
+  try {
+    const raw = localStorage.getItem(CONSENT_STORAGE_KEY);
+    if (!raw) {
+      // Fallback: Cookie (überlebt geleerten localStorage / PWA-Neuinstallation)
+      const fromCookie = readCookie();
+      if (fromCookie) {
+        try {
+          localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(fromCookie));
+        } catch { /* ignore */ }
+        return fromCookie;
+      }
+      return null;
+    }
+    const parsed = JSON.parse(raw) as CookieConsent;
+    if (parsed.version !== CURRENT_CONSENT_VERSION) return null;
+    return parsed;
+  } catch {
+    return readCookie();
   }
 }
 
@@ -43,13 +86,17 @@ export function saveConsent(
     region,
     categories: { ...categories, necessary: true },
   };
-  localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(consent));
+  try {
+    localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(consent));
+  } catch { /* ignore */ }
+  writeCookie(consent);
   window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: consent }));
   return consent;
 }
 
 export function clearConsent() {
   localStorage.removeItem(CONSENT_STORAGE_KEY);
+  deleteCookie();
   // Legacy keys from earlier consent versions
   try {
     localStorage.removeItem('hioutz-privacy-consent-v1');
