@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { hasCompletedPreferenceSetup } from '@/utils/preferenceCompletion';
+import { readGroupToken, buildGroupJoinLink } from '@/lib/groupInviteLink';
 
 /**
  * OAuth callback landing page.
@@ -49,6 +50,14 @@ const AuthCallback: React.FC = () => {
       }
 
       const routeForUser = async (user: { id: string }) => {
+        // A pending group-invite deep link always wins: send the user straight
+        // to the join screen after login.
+        const pendingGroupToken = readGroupToken();
+        if (pendingGroupToken) {
+          const url = new URL(buildGroupJoinLink(pendingGroupToken));
+          navigate(`${url.pathname}${url.search}`, { replace: true });
+          return;
+        }
         // Route to onboarding only when the user's preference setup is still empty.
         // This covers first-time Google sign-ins AND any returning user who never
         // finished onboarding — completed users always go straight to /home.
