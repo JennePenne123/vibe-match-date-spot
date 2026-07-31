@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Toggle } from '@/components/ui/toggle';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Users, ArrowRight, Loader2, User, UsersIcon, CheckCircle2, Clock } from 'lucide-react';
+import { Users, ArrowRight, Loader2, User, UsersIcon, CheckCircle2, Clock, Search, Inbox } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import InviteFriendsSection from '@/components/InviteFriendsSection';
 
@@ -23,6 +24,7 @@ interface PartnerSelectionProps {
   friendsLoading?: boolean;
   invitedFriendIds?: string[];
   acceptedFriendIds?: string[];
+  incomingRequestIds?: string[];
   onPartnerChange: (partnerId: string) => void;
   onPartnerIdsChange: (partnerIds: string[]) => void;
   onDateModeChange: (mode: 'single' | 'group') => void;
@@ -38,6 +40,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
   friendsLoading = false,
   invitedFriendIds = [],
   acceptedFriendIds = [],
+  incomingRequestIds = [],
   onPartnerChange,
   onPartnerIdsChange,
   onDateModeChange,
@@ -45,25 +48,60 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const statusFor = (id: string): 'accepted' | 'pending' | null => {
-    if (acceptedFriendIds.includes(id)) return 'accepted';
+  type FriendStatus = 'accepted' | 'pending' | 'incoming';
+
+  const statusFor = (id: string): FriendStatus | null => {
+    if (incomingRequestIds.includes(id)) return 'incoming';
     if (invitedFriendIds.includes(id)) return 'pending';
+    if (acceptedFriendIds.includes(id)) return 'accepted';
     return null;
   };
 
-  const StatusBadge: React.FC<{ status: 'accepted' | 'pending' }> = ({ status }) => (
-    status === 'accepted' ? (
-      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400">
-        <CheckCircle2 className="h-3 w-3" />
-        {t('datePlanning.accepted', 'Angenommen')}
-      </span>
-    ) : (
+  const StatusBadge: React.FC<{ status: FriendStatus }> = ({ status }) => {
+    if (status === 'accepted') {
+      return (
+        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400">
+          <CheckCircle2 className="h-3 w-3" />
+          {t('datePlanning.accepted', 'Angenommen')}
+        </span>
+      );
+    }
+    if (status === 'incoming') {
+      return (
+        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-600 dark:text-sky-400">
+          <Inbox className="h-3 w-3" />
+          {t('datePlanning.requestOpen', 'Anfrage offen')}
+        </span>
+      );
+    }
+    return (
       <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
         <Clock className="h-3 w-3" />
         {t('datePlanning.requestSent', 'Anfrage verschickt')}
       </span>
-    )
-  );
+    );
+  };
+
+  const [search, setSearch] = React.useState('');
+  const [statusFilter, setStatusFilter] = React.useState<'all' | FriendStatus>('all');
+
+  const filteredFriends = React.useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return friends.filter(f => {
+      const matchesSearch = !q || (f.name || '').toLowerCase().includes(q);
+      if (!matchesSearch) return false;
+      if (statusFilter === 'all') return true;
+      const s = statusFor(f.id) ?? 'accepted';
+      return s === statusFilter;
+    });
+  }, [friends, search, statusFilter, invitedFriendIds, acceptedFriendIds, incomingRequestIds]);
+
+  const filterOptions: { key: 'all' | FriendStatus; label: string }[] = [
+    { key: 'all', label: t('datePlanning.filterAll', 'Alle') },
+    { key: 'accepted', label: t('datePlanning.filterFriends', 'Freund') },
+    { key: 'incoming', label: t('datePlanning.requestOpen', 'Anfrage offen') },
+    { key: 'pending', label: t('datePlanning.requestSent', 'Anfrage verschickt') },
+  ];
 
   const selectedSingleFriend = friends.find(f => f.id === selectedPartnerId);
   const selectedSingleStatus = selectedSingleFriend ? statusFor(selectedSingleFriend.id) : null;
@@ -134,12 +172,35 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
           </div>
         ) : dateMode === 'single' ? (
           <>
+          <div className="space-y-2 mb-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('datePlanning.searchFriends', 'Freunde suchen...')}
+                className="pl-9 h-10"
+              />
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {filterOptions.map(o => (
+                <button
+                  key={o.key}
+                  type="button"
+                  onClick={() => setStatusFilter(o.key)}
+                  className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors ${statusFilter === o.key ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted/40 text-muted-foreground border-border/60 hover:bg-muted'}`}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <Select value={selectedPartnerId} onValueChange={onPartnerChange}>
             <SelectTrigger className="h-11">
               <SelectValue placeholder={t('datePlanning.chooseFriend')} />
             </SelectTrigger>
             <SelectContent>
-              {friends.map((friend) => {
+              {filteredFriends.map((friend) => {
                 const s = statusFor(friend.id);
                 return (
                   <SelectItem key={friend.id} value={friend.id}>
@@ -152,6 +213,9 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
               })}
             </SelectContent>
           </Select>
+          {filteredFriends.length === 0 && (
+            <p className="mt-2 text-xs text-muted-foreground">{t('datePlanning.noFriendsMatch', 'Keine Treffer')}</p>
+          )}
           {selectedSingleFriend && selectedSingleStatus && (
             <div className="mt-2 flex items-center text-xs text-muted-foreground">
               <span className="font-medium text-foreground">{selectedSingleFriend.name}</span>
@@ -166,8 +230,34 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
           </>
         ) : (
           <div className="space-y-3">
+            <div className="space-y-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t('datePlanning.searchFriends', 'Freunde suchen...')}
+                  className="pl-9 h-10"
+                />
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {filterOptions.map(o => (
+                  <button
+                    key={o.key}
+                    type="button"
+                    onClick={() => setStatusFilter(o.key)}
+                    className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors ${statusFilter === o.key ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted/40 text-muted-foreground border-border/60 hover:bg-muted'}`}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="grid gap-3 max-h-48 overflow-y-auto pr-2">
-              {friends.map((friend) => {
+              {filteredFriends.length === 0 && (
+                <p className="text-xs text-muted-foreground">{t('datePlanning.noFriendsMatch', 'Keine Treffer')}</p>
+              )}
+              {filteredFriends.map((friend) => {
                 const s = statusFor(friend.id);
                 return (
                 <div key={friend.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-sage-50/50 dark:hover:bg-sage-900/10 transition-colors border border-transparent hover:border-sage-200/50 dark:hover:border-sage-800/30">

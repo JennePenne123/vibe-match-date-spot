@@ -31,7 +31,7 @@ interface SmartDatePlannerProps {
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal, preselectedFriend = null, initialMode = null }) => {
   const { isMobile, isDesktop } = useBreakpoint();
   const { t } = useTranslation();
-  const { friends: allFriends, outgoingRequests, loading: friendsLoading } = useFriends();
+  const { friends: allFriends, outgoingRequests, pendingRequests, loading: friendsLoading } = useFriends();
   const groupPlanning = useGroupDatePlanning();
 
   // Use collaborative session data from the state hook (single instance, no duplicate)
@@ -89,11 +89,13 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
   // Freundesliste inkl. offener (ausgehender) Anfragen für die Partnerauswahl
   const selectableFriends = useMemo(() => {
     const map = new Map<string, { id: string; name: string }>();
-    [...(allFriends || []), ...(outgoingRequests || [])].forEach(f => {
+    [...(allFriends || []), ...(outgoingRequests || []), ...(pendingRequests || [])].forEach(f => {
       if (f?.id && !map.has(f.id)) map.set(f.id, { id: f.id, name: f.name || 'Freund' });
     });
     return Array.from(map.values());
-  }, [allFriends, outgoingRequests]);
+  }, [allFriends, outgoingRequests, pendingRequests]);
+
+  const incomingRequestIds = useMemo(() => (pendingRequests || []).map(r => r.id), [pendingRequests]);
 
   const effectivePreselectedFriend = sessionPartner ?? preselectedFriend;
 
@@ -280,6 +282,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                       friendsLoading={friendsLoading}
                       invitedFriendIds={invitedFriendIds}
                       acceptedFriendIds={acceptedFriendIds}
+                      incomingRequestIds={incomingRequestIds}
                       onPartnerChange={(id) => setSelectedPartnerId(id)}
                       onPartnerIdsChange={setSelectedPartnerIds}
                       onDateModeChange={(m) => setDateMode(m)}
