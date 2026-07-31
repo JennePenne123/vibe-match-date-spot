@@ -261,16 +261,18 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        try {
-          if (rememberMe) {
-            localStorage.setItem('hioutz-remembered-email', sanitizedEmail);
-          } else {
-            localStorage.removeItem('hioutz-remembered-email');
-          }
-        } catch {
-          /* ignore storage errors */
+      // Persist (or clear) the remembered e-mail for both login and sign-up
+      try {
+        if (rememberMe) {
+          localStorage.setItem('hioutz-remembered-email', sanitizedEmail);
+        } else {
+          localStorage.removeItem('hioutz-remembered-email');
         }
+      } catch {
+        /* ignore storage errors */
+      }
+
+      if (isLogin) {
         const { user: signedInUser, error: signInError } = await signIn(sanitizedEmail, password);
         
         if (signInError) {
@@ -329,7 +331,14 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setName('');
-    setEmail('');
+    // Keep a remembered e-mail prefilled across mode switches
+    let remembered = '';
+    try {
+      remembered = localStorage.getItem('hioutz-remembered-email') || '';
+    } catch {
+      /* ignore storage errors */
+    }
+    setEmail(rememberMe ? remembered : '');
     setPassword('');
     setReferralCode('');
     setReferralValid(null);
@@ -592,19 +601,19 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                   )}
                 </div>
 
-                {isLogin && (
-                  <div className="flex items-center justify-between gap-3 -mt-1">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id="rememberMe"
-                        checked={rememberMe}
-                        onCheckedChange={(checked) => setRememberMe(checked === true)}
-                        disabled={loading || isOAuthLoading}
-                      />
-                      <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
-                        {t('auth.rememberMe')}
-                      </label>
-                    </div>
+                <div className="flex items-center justify-between gap-3 -mt-1">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="rememberMe"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      disabled={loading || isOAuthLoading}
+                    />
+                    <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
+                      {t('auth.rememberMe')}
+                    </label>
+                  </div>
+                  {isLogin && (
                     <button
                       type="button"
                       onClick={openForgot}
@@ -613,8 +622,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     >
                       {t('auth.forgot.link')}
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Referral Code Field - Only for Signup */}
                 {!isLogin && (
