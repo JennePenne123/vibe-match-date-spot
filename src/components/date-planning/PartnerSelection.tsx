@@ -103,6 +103,33 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
     { key: 'pending', label: t('datePlanning.requestSent', 'Anfrage verschickt') },
   ];
 
+  const PAGE_SIZE = 20;
+  const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
+  const sentinelRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [search, statusFilter, dateMode]);
+
+  const visibleFriends = React.useMemo(
+    () => filteredFriends.slice(0, visibleCount),
+    [filteredFriends, visibleCount]
+  );
+  const hasMore = filteredFriends.length > visibleCount;
+
+  React.useEffect(() => {
+    if (!hasMore) return;
+    const el = sentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting)) {
+        setVisibleCount(c => c + PAGE_SIZE);
+      }
+    }, { rootMargin: '80px' });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, visibleFriends.length]);
+
   const selectedSingleFriend = friends.find(f => f.id === selectedPartnerId);
   const selectedSingleStatus = selectedSingleFriend ? statusFor(selectedSingleFriend.id) : null;
 
