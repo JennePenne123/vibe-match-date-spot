@@ -330,7 +330,15 @@
     "nowFriendsWith": "Ahora eres amigo de {{name}}",
     "requestDeclined": "Solicitud rechazada",
     "noFriendsYet": "Aún no tienes amigos",
-    "noFriendsYetDesc": "Invita a amigos para planear citas juntos"
+    "noFriendsYetDesc": "Invita a amigos para planear citas juntos",
+    "bulkInviteTitle": "Invitar a varios a la vez",
+    "bulkInvitePlaceholder": "ana@mail.com, ben@mail.com ...",
+    "bulkInviteValid": "{{count}} válidos",
+    "bulkInviteInvalid": "{{count}} inválidos",
+    "bulkInviteMax": "Máx. {{count}} por invitación",
+    "bulkInviteSend": "Invitar a todos",
+    "bulkInviteCopy": "Copiar lista + texto",
+    "bulkInviteSent": "Invitación preparada para {{count}} contactos"
   },
   "friends": {
     "inviteFriends": "Invitar Amigos",
