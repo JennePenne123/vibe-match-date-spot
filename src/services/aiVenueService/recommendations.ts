@@ -1548,8 +1548,15 @@ async function getVenuesFromGooglePlaces(
     // requests: a culture request otherwise becomes a broad union containing
     // nightlife/activity types, and Google's 20 result slots can be exhausted
     // before a cinema or theatre is returned.
+    // If the user explicitly narrowed the category (e.g. only "Kinos"),
+    // search for exactly those types instead of the whole category bucket.
+    const narrowedRequestTypes = getNarrowedVenueTypes(
+      sitCat?.id ?? null,
+      secCat?.id ?? null,
+      (userPrefs as any)?.preferred_venue_types,
+    );
     const mergedVenueTypes = Array.from(new Set(isNonFood
-      ? situationalVenueTypes
+      ? (narrowedRequestTypes.length ? narrowedRequestTypes : situationalVenueTypes)
       : [
           ...((userPrefs as any).preferred_venue_types || []),
           ...situationalVenueTypes,
