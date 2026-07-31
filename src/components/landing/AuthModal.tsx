@@ -30,6 +30,7 @@ import {
   clearRememberedEmail,
 } from '@/lib/secureCredentialStore';
 import { passkeysSupported, signInWithPasskey } from '@/lib/passkey';
+import { RecoveryCodeLoginDialog } from '@/components/auth/RecoveryCodeLoginDialog';
 
 // Google icon SVG component
 const GoogleIcon = () => (
@@ -72,6 +73,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const [resetSent, setResetSent] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [passkeyLoading, setPasskeyLoading] = useState(false);
+  const [recoveryOpen, setRecoveryOpen] = useState(false);
   const passkeyAvailable = useMemo(() => passkeysSupported(), []);
   
   const { signIn, signUp, signInWithGoogle, signInWithApple, user } = useAuth();
@@ -578,6 +580,16 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     {t('passkey.signInWithPasskey')}
                   </Button>
                 )}
+
+                {isLogin && (
+                  <button
+                    type="button"
+                    onClick={() => setRecoveryOpen(true)}
+                    className="w-full text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                  >
+                    {t('recoveryCodes.useBackupCode')}
+                  </button>
+                )}
               </div>
 
               {/* Divider */}
@@ -826,6 +838,11 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
           </div>
         </div>
       </DialogContent>
+      <RecoveryCodeLoginDialog
+        open={recoveryOpen}
+        onOpenChange={setRecoveryOpen}
+        defaultEmail={email}
+      />
     </Dialog>
   );
 }

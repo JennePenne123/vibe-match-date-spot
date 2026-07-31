@@ -5,6 +5,8 @@ project_id = "dfjwubatslzblagthbdw"
     verify_jwt = false
   [functions.passkey]
     verify_jwt = false
+  [functions.recovery-codes]
+    verify_jwt = false
   [functions.promo-audio-gen]
     verify_jwt = false
   [functions.ai-quick-tip]

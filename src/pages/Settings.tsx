@@ -29,6 +29,7 @@ import LanguageSelector from '@/components/LanguageSelector';
 import SupportTicketDialog from '@/components/support/SupportTicketDialog';
 import { openCookieSettings, clearConsent } from '@/lib/cookieConsent';
 import { PasskeyManager } from '@/components/auth/PasskeyManager';
+import { RecoveryCodesManager } from '@/components/auth/RecoveryCodesManager';
 
 const TRACKING_OPT_OUT_KEY = 'hioutz_tracking_opt_out';
 
@@ -315,6 +316,9 @@ const Settings = () => {
 
           {/* Passkeys */}
           <PasskeyManager />
+
+          {/* Backup-Codes */}
+          <RecoveryCodesManager />
 
           {/* Notifications */}
           <Card className="bg-card border-border">

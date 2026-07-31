@@ -84,11 +84,18 @@ export default function AGB() {
             der Weitergabe von Zugangsmitteln resultieren.
           </p>
           <p className="text-muted-foreground">
-            (6) Die Nutzung ist ab 16 Jahren gestattet. Minderjährige unter 16 Jahren benötigen die
+            (6) Der Nutzer kann Einmal-Backup-Codes erzeugen, um sich bei Verlust von Passwort und Passkey
+            anzumelden. Diese Codes sind wie Zugangsdaten zu behandeln, geheim zu halten und sicher zu
+            verwahren. Der Anbieter speichert die Codes nur verschlüsselt (als Hash) und kann sie nicht
+            wiederherstellen; ein Verlust aller Anmeldemittel kann daher zum dauerhaften Verlust des Zugangs
+            führen. Anmeldungen mit einem gültigen Backup-Code werden dem Kontoinhaber zugerechnet.
+          </p>
+          <p className="text-muted-foreground">
+            (7) Die Nutzung ist ab 16 Jahren gestattet. Minderjährige unter 16 Jahren benötigen die
             Einwilligung eines Erziehungsberechtigten.
           </p>
           <p className="text-muted-foreground">
-            (7) Der Anbieter behält sich das Recht vor, Nutzerkonten bei Verstoß gegen diese AGB zu sperren
+            (8) Der Anbieter behält sich das Recht vor, Nutzerkonten bei Verstoß gegen diese AGB zu sperren
             oder zu löschen.
           </p>
 
