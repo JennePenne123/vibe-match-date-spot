@@ -4,6 +4,7 @@ import { Session } from '@supabase/supabase-js';
 import { AppUser } from '@/types/app';
 import { useAuthState } from '@/hooks/useAuthState';
 import { signUpUser, signInUser, signOutUser, signInWithGoogle, signInWithApple } from '@/services/authService';
+import { clearRememberedEmail } from '@/lib/secureCredentialStore';
 import { updateUserProfile, fetchUserProfile } from '@/utils/userProfileHelpers';
 import { inviteFriendById } from '@/services/friendshipService';
 import { clearUserPreferenceFields } from '@/services/sessionCleanupService';
@@ -85,6 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Continue with logout even if cleanup fails
       }
     }
+    // Remove locally stored (encrypted) login credentials on logout
+    await clearRememberedEmail();
     await signOutUser();
   };
 

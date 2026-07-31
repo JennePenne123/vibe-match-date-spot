@@ -166,6 +166,14 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     }
   }, []);
 
+  // Toggling the checkbox off wipes the stored credentials immediately
+  const handleRememberMeChange = (checked: boolean) => {
+    setRememberMe(checked);
+    if (!checked) {
+      void clearRememberedEmail();
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     setError('');
     setOauthError(null);
@@ -608,7 +616,7 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
                     <Checkbox
                       id="rememberMe"
                       checked={rememberMe}
-                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      onCheckedChange={(checked) => handleRememberMeChange(checked === true)}
                       disabled={loading || isOAuthLoading}
                     />
                     <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
