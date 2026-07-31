@@ -31,7 +31,7 @@ interface SmartDatePlannerProps {
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal, preselectedFriend = null, initialMode = null }) => {
   const { isMobile, isDesktop } = useBreakpoint();
   const { t } = useTranslation();
-  const { friends: allFriends } = useFriends();
+  const { friends: allFriends, outgoingRequests, loading: friendsLoading } = useFriends();
   const groupPlanning = useGroupDatePlanning();
 
   // Use collaborative session data from the state hook (single instance, no duplicate)
@@ -65,8 +65,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       const partnerId = isUserInitiator ? collaborativeSession.partner_id : collaborativeSession.initiator_id;
       if (partnerId && !ids.includes(partnerId)) ids.push(partnerId);
     }
+    outgoingRequests?.forEach(r => { if (!ids.includes(r.id)) ids.push(r.id); });
     return ids;
-  }, [groupPlanning.groupMembers, collaborativeSession, isUserInitiator]);
+  }, [groupPlanning.groupMembers, collaborativeSession, isUserInitiator, outgoingRequests]);
 
   const acceptedFriendIds = useMemo(() => {
     const ids: string[] = [];
