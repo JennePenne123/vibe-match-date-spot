@@ -4,6 +4,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScanLine, AlertCircle } from 'lucide-react';
+import { extractGroupToken, storeGroupToken } from '@/lib/groupInviteLink';
 
 interface GroupQRScannerProps {
   open: boolean;
@@ -13,18 +14,7 @@ interface GroupQRScannerProps {
 const ELEMENT_ID = 'hioutz-group-qr-reader';
 
 /** Extract a group invite token from a scanned QR payload. */
-export function extractInviteToken(raw: string): string | null {
-  const value = raw.trim();
-  try {
-    const url = new URL(value);
-    const token = url.searchParams.get('token') || url.searchParams.get('group');
-    if (token) return token;
-  } catch {
-    // not a URL
-  }
-  if (/^[a-f0-9]{12,64}$/i.test(value)) return value;
-  return null;
-}
+export const extractInviteToken = extractGroupToken;
 
 const GroupQRScanner: React.FC<GroupQRScannerProps> = ({ open, onOpenChange }) => {
   const navigate = useNavigate();
@@ -45,12 +35,13 @@ const GroupQRScanner: React.FC<GroupQRScannerProps> = ({ open, onOpenChange }) =
           { fps: 10, qrbox: { width: 220, height: 220 } },
           (decoded) => {
             if (cancelled) return;
-            const token = extractInviteToken(decoded);
+            const token = extractGroupToken(decoded);
             if (!token) {
               setError('Dieser QR-Code gehört nicht zu einer H!Outz-Gruppe.');
               return;
             }
             cancelled = true;
+            storeGroupToken(token);
             onOpenChange(false);
             navigate(`/join-group?token=${encodeURIComponent(token)}`);
           },
