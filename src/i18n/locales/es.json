@@ -126,7 +126,11 @@
       "nightlife": {
         "label": "Vida Nocturna y Eventos",
         "desc": "Clubes, música en vivo, pub crawls"
-      }
+      },
+      "modeLabel": "¿Cómo planeas?",
+      "modeSolo": "Solo",
+      "modeDuo": "En pareja",
+      "modeGroup": "Grupo"
     },
     "quotes": {
       "q1": "\"La vida es demasiado corta para experiencias mediocres.\" ✨",

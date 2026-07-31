@@ -49,6 +49,10 @@ const SmartDatePlanning: React.FC = () => {
   const fromProposal = location.state?.fromProposal ?? searchParams.get('fromProposal') === 'true';
   const planningMode = location.state?.planningMode ?? searchParams.get('planningMode') ?? 'collaborative';
   const preselectedFriend = location.state?.preselectedFriend ?? null;
+  const modeParam = searchParams.get('mode');
+  const initialMode = (modeParam === 'solo' || modeParam === 'single' || modeParam === 'group')
+    ? modeParam
+    : null;
   const isProposalFlow = Boolean(fromProposal && sessionId);
   const hasInvalidProposalState = Boolean(fromProposal && !sessionId);
   
@@ -173,6 +177,7 @@ const SmartDatePlanning: React.FC = () => {
               sessionId={sessionId ?? ''}
               fromProposal={isProposalFlow}
               preselectedFriend={preselectedFriend}
+              initialMode={initialMode}
             />
           </ErrorBoundary>
         </div>

@@ -1,23 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, User, Users, UsersRound } from 'lucide-react';
 import { SITUATIONAL_CATEGORIES, type SituationalCategoryId } from '@/lib/situationalCategories';
 import { cn } from '@/lib/utils';
 
+type PlanMode = 'solo' | 'single' | 'group';
+
+const MODES: { id: PlanMode; icon: React.ElementType; labelKey: string }[] = [
+  { id: 'solo', icon: User, labelKey: 'home.situational.modeSolo' },
+  { id: 'single', icon: Users, labelKey: 'home.situational.modeDuo' },
+  { id: 'group', icon: UsersRound, labelKey: 'home.situational.modeGroup' },
+];
+
 /**
  * Home Quick-Action grid for situational planning.
- * Tapping a card navigates to the preferences flow with the category
- * pre-selected as an ephemeral session filter (NOT persisted to user prefs).
+ * A mode switch (Solo / Duo / Group) decides where the category leads:
+ * solo goes straight to the preferences flow, duo/group open the planner
+ * with the matching step pre-selected. The category stays an ephemeral
+ * session filter (NOT persisted to user prefs).
  */
 const SituationalQuickActions: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [mode, setMode] = useState<PlanMode>('solo');
 
   const handleCategoryClick = (categoryId: SituationalCategoryId) => {
-    navigate(`/preferences?category=${categoryId}`);
+    if (mode === 'solo') {
+      navigate(`/preferences?category=${categoryId}`);
+      return;
+    }
+    try {
+      window.sessionStorage.setItem('hioutz-situational-category', categoryId);
+    } catch {}
+    navigate(`/plan-date?mode=${mode}`);
   };
 
   return (
@@ -38,6 +56,33 @@ const SituationalQuickActions: React.FC = () => {
         <p className="text-xs text-muted-foreground mt-0.5">
           {t('home.situational.sectionSubtitle')}
         </p>
+      </div>
+
+      <div
+        role="radiogroup"
+        aria-label={t('home.situational.modeLabel')}
+        className="flex gap-2 p-1 rounded-2xl bg-muted/40 border border-border/50"
+      >
+        {MODES.map(({ id, icon: Icon, labelKey }) => (
+          <button
+            key={id}
+            type="button"
+            role="radio"
+            aria-checked={mode === id}
+            onClick={() => setMode(id)}
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+            className={cn(
+              'flex-1 flex items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-xs font-medium transition-all duration-200',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+              mode === id
+                ? 'bg-primary/15 text-primary border border-primary/30'
+                : 'text-muted-foreground border border-transparent hover:text-foreground'
+            )}
+          >
+            <Icon className="w-3.5 h-3.5" aria-hidden />
+            <span className="truncate">{t(labelKey)}</span>
+          </button>
+        ))}
       </div>
 
       <div className="grid grid-cols-2 gap-3">

@@ -25,9 +25,10 @@ interface SmartDatePlannerProps {
   sessionId: string;
   fromProposal: boolean;
   preselectedFriend?: { id: string; name: string } | null;
+  initialMode?: 'solo' | 'single' | 'group' | null;
 }
 
-const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal, preselectedFriend = null }) => {
+const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal, preselectedFriend = null, initialMode = null }) => {
   const { isMobile, isDesktop } = useBreakpoint();
   const { t } = useTranslation();
   const { friends: allFriends } = useFriends();
@@ -38,6 +39,7 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     preselectedFriend,
     planningMode: 'collaborative',
     sessionId,
+    initialMode,
   });
 
   // Extract collaborative session data from state (already provided by useCollaborativeSessionState inside)

@@ -11,12 +11,14 @@ interface UseSmartDatePlannerStateProps {
   preselectedFriend?: { id: string; name: string } | null;
   planningMode?: 'collaborative';
   sessionId?: string | null;
+  initialMode?: 'solo' | 'single' | 'group' | null;
 }
 
 export const useSmartDatePlannerState = ({ 
   preselectedFriend, 
   planningMode = 'collaborative',
-  sessionId 
+  sessionId,
+  initialMode = null,
 }: UseSmartDatePlannerStateProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -25,7 +27,7 @@ export const useSmartDatePlannerState = ({
   // Initialize hooks - must be called unconditionally (Rules of Hooks)
   const friendsResult = useFriends();
   const datePlanningState = useDatePlanning(appState.userLocation);
-  const planningStepsState = usePlanningSteps({ preselectedFriend, planningMode });
+  const planningStepsState = usePlanningSteps({ preselectedFriend, planningMode, initialMode });
   
   // Use collaborative session state when sessionId is provided
   const collaborativeState = useCollaborativeSessionState({ 
