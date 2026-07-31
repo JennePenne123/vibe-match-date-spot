@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Clock, Users, RefreshCw, ScanLine, Send, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GroupQRScanner from '@/components/group-date/GroupQRScanner';
+import RequestInviteDialog from '@/components/group-date/RequestInviteDialog';
 
 export type InviteErrorKind = 'missing' | 'invalid' | 'expired' | 'full' | 'closed' | 'failed';
 
@@ -62,11 +63,12 @@ const REQUEST_TEXT =
 const InviteErrorState: React.FC<InviteErrorStateProps> = ({ kind, detail, onRetry }) => {
   const navigate = useNavigate();
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [requestOpen, setRequestOpen] = useState(false);
   const { title, description, hint } = CONTENT[kind];
   const Icon = ICONS[kind];
   const canRetryCode = kind === 'missing' || kind === 'invalid' || kind === 'expired';
 
-  const requestNewCode = async () => {
+  const shareRequest = async () => {
     if (navigator.share) {
       try {
         await navigator.share({ text: REQUEST_TEXT });
@@ -99,9 +101,15 @@ const InviteErrorState: React.FC<InviteErrorStateProps> = ({ kind, detail, onRet
 
       <div className="space-y-2">
         {canRetryCode && (
-          <Button className="w-full gap-2" onClick={requestNewCode}>
+          <Button className="w-full gap-2" onClick={() => setRequestOpen(true)}>
+            <KeyRound className="h-4 w-4" />
+            Neuen Code in der App anfordern
+          </Button>
+        )}
+        {canRetryCode && (
+          <Button variant="outline" className="w-full gap-2" onClick={shareRequest}>
             <Send className="h-4 w-4" />
-            Neuen Code anfordern
+            Per Nachricht anfragen
           </Button>
         )}
         {canRetryCode && (
@@ -123,6 +131,7 @@ const InviteErrorState: React.FC<InviteErrorStateProps> = ({ kind, detail, onRet
       </div>
 
       <GroupQRScanner open={scannerOpen} onOpenChange={setScannerOpen} />
+      <RequestInviteDialog open={requestOpen} onOpenChange={setRequestOpen} />
     </div>
   );
 };
