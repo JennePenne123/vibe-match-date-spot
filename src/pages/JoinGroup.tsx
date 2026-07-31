@@ -5,9 +5,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, CheckCircle, XCircle, LogIn } from 'lucide-react';
+import { Users, CheckCircle, LogIn } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { clearGroupToken, readGroupToken, storeGroupToken } from '@/lib/groupInviteLink';
+import InviteErrorState, { type InviteErrorKind } from '@/components/group-date/InviteErrorState';
 
 interface Preview {
   found: boolean;
@@ -27,14 +28,22 @@ export default function JoinGroup() {
 
   const [state, setState] = useState<'loading' | 'auth_required' | 'preview' | 'success' | 'error'>('loading');
   const [preview, setPreview] = useState<Preview | null>(null);
-  const [message, setMessage] = useState('');
+  const [errorKind, setErrorKind] = useState<InviteErrorKind>('invalid');
+  const [errorDetail, setErrorDetail] = useState<string | undefined>(undefined);
   const [joining, setJoining] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const fail = (kind: InviteErrorKind, detail?: string) => {
+    setErrorKind(kind);
+    setErrorDetail(detail);
+    setState('error');
+  };
 
   useEffect(() => {
     if (authLoading) return;
     if (!token) {
-      setState('error');
-      setMessage('Ungültiger Einladungslink.');
+      clearGroupToken();
+      fail('missing');
       return;
     }
     if (!user) {
@@ -43,25 +52,29 @@ export default function JoinGroup() {
       return;
     }
     storeGroupToken(token);
+    setState('loading');
 
     const load = async () => {
       const { data, error } = await supabase.rpc('get_group_invite_preview' as never, { _token: token } as never);
       if (error) {
-        setState('error');
-        setMessage('Einladung konnte nicht geladen werden.');
+        fail('failed', error.message);
         return;
       }
-      const result = data as unknown as Preview;
+      const result = data as unknown as Preview & { reason?: string };
       if (!result?.found) {
-        setState('error');
-        setMessage('Diese Gruppen-Einladung existiert nicht mehr.');
+        clearGroupToken();
+        fail(result?.reason === 'expired' ? 'expired' : 'invalid');
+        return;
+      }
+      if (result.status && ['completed', 'cancelled', 'closed'].includes(result.status)) {
+        fail('closed');
         return;
       }
       setPreview(result);
       setState('preview');
     };
     load();
-  }, [token, user, authLoading]);
+  }, [token, user, authLoading, reloadKey]);
 
   const handleJoin = useCallback(async () => {
     if (!token) return;
@@ -72,14 +85,12 @@ export default function JoinGroup() {
     const result = data as unknown as { success?: boolean; reason?: string } | null;
     if (error || !result?.success) {
       const reason = result?.reason;
-      setMessage(
-        reason === 'full'
-          ? 'Diese Gruppe ist bereits voll.'
-          : reason === 'closed'
-            ? 'Diese Gruppe nimmt keine neuen Mitglieder mehr auf.'
-            : 'Beitritt fehlgeschlagen. Bitte versuche es erneut.'
-      );
-      setState('error');
+      if (reason === 'full') fail('full');
+      else if (reason === 'closed') fail('closed');
+      else if (reason === 'expired' || reason === 'not_found') {
+        clearGroupToken();
+        fail(reason === 'expired' ? 'expired' : 'invalid');
+      } else fail('failed', error?.message);
       return;
     }
     clearGroupToken();
@@ -141,13 +152,11 @@ export default function JoinGroup() {
           )}
 
           {state === 'error' && (
-            <div className="text-center space-y-3">
-              <XCircle className="w-10 h-10 mx-auto text-destructive" />
-              <p className="text-sm text-muted-foreground">{message}</p>
-              <Button variant="outline" className="w-full" onClick={() => { clearGroupToken(); navigate('/home'); }}>
-                Zur Startseite
-              </Button>
-            </div>
+            <InviteErrorState
+              kind={errorKind}
+              detail={errorDetail}
+              onRetry={errorKind === 'failed' ? () => setReloadKey(k => k + 1) : undefined}
+            />
           )}
         </CardContent>
       </Card>
