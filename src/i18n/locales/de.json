@@ -1521,7 +1521,8 @@
     "callNow": "Jetzt anrufen",
     "noWebsite": "Keine Webseite",
     "addressNotAvailable": "Adresse nicht verfügbar",
-    "moreHours": "+ {{count}} weitere"
+    "moreHours": "+ {{count}} weitere",
+    "viewOnGoogleMaps": "Auf Google Maps ansehen"
   },
   "myVenues": {
     "noFavorites": "Noch keine Lieblings-Venues",
