@@ -31,7 +31,7 @@ interface SmartDatePlannerProps {
 const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProposal, preselectedFriend = null, initialMode = null }) => {
   const { isMobile, isDesktop } = useBreakpoint();
   const { t } = useTranslation();
-  const { friends: allFriends } = useFriends();
+  const { friends: allFriends, outgoingRequests, loading: friendsLoading } = useFriends();
   const groupPlanning = useGroupDatePlanning();
 
   // Use collaborative session data from the state hook (single instance, no duplicate)
@@ -65,8 +65,9 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       const partnerId = isUserInitiator ? collaborativeSession.partner_id : collaborativeSession.initiator_id;
       if (partnerId && !ids.includes(partnerId)) ids.push(partnerId);
     }
+    outgoingRequests?.forEach(r => { if (!ids.includes(r.id)) ids.push(r.id); });
     return ids;
-  }, [groupPlanning.groupMembers, collaborativeSession, isUserInitiator]);
+  }, [groupPlanning.groupMembers, collaborativeSession, isUserInitiator, outgoingRequests]);
 
   const acceptedFriendIds = useMemo(() => {
     const ids: string[] = [];
@@ -84,6 +85,15 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     const partner = allFriends.find(f => f.id === partnerId);
     return partner ? { id: partner.id, name: partner.name } : null;
   }, [collaborativeSession, allFriends, isUserInitiator]);
+
+  // Freundesliste inkl. offener (ausgehender) Anfragen für die Partnerauswahl
+  const selectableFriends = useMemo(() => {
+    const map = new Map<string, { id: string; name: string }>();
+    [...(allFriends || []), ...(outgoingRequests || [])].forEach(f => {
+      if (f?.id && !map.has(f.id)) map.set(f.id, { id: f.id, name: f.name || 'Freund' });
+    });
+    return Array.from(map.values());
+  }, [allFriends, outgoingRequests]);
 
   const effectivePreselectedFriend = sessionPartner ?? preselectedFriend;
 
@@ -262,11 +272,12 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
                   )}
                   {currentStep === 'select-partner' && (
                     <PartnerSelection
-                      friends={friends}
+                      friends={selectableFriends}
                       selectedPartnerId={selectedPartnerId}
                       selectedPartnerIds={selectedPartnerIds}
                       dateMode={dateMode === 'group' ? 'group' : 'single'}
                       loading={loading}
+                      friendsLoading={friendsLoading}
                       invitedFriendIds={invitedFriendIds}
                       acceptedFriendIds={acceptedFriendIds}
                       onPartnerChange={(id) => setSelectedPartnerId(id)}

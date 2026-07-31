@@ -20,6 +20,7 @@ interface PartnerSelectionProps {
   selectedPartnerIds: string[];
   dateMode: 'single' | 'group';
   loading: boolean;
+  friendsLoading?: boolean;
   invitedFriendIds?: string[];
   acceptedFriendIds?: string[];
   onPartnerChange: (partnerId: string) => void;
@@ -34,6 +35,7 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
   selectedPartnerIds,
   dateMode,
   loading,
+  friendsLoading = false,
   invitedFriendIds = [],
   acceptedFriendIds = [],
   onPartnerChange,
@@ -120,7 +122,12 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
             ? t('datePlanning.selectFriend') 
             : t('datePlanning.selectGroupFriends', { count: selectedCount })}
         </div>
-        {!hasFriends ? (
+        {!hasFriends && friendsLoading ? (
+          <div className="flex items-center justify-center p-5 text-sm text-muted-foreground gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {t('common.loading', 'Lädt...')}
+          </div>
+        ) : !hasFriends ? (
           <div className="text-center p-5 bg-muted/30 rounded-lg border-2 border-dashed border-muted">
             <h3 className="text-base font-medium text-foreground mb-1">{t('datePlanning.noFriendsYet')}</h3>
             <p className="text-sm text-muted-foreground">{t('datePlanning.noFriendsYetDesc')}</p>
