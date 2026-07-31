@@ -36,7 +36,7 @@ const GroupCompromiseCard: React.FC<GroupCompromiseCardProps> = ({ info, classNa
   };
 
   const summary = groups.length
-    ? groups.map(g => `${kindLabel(g)}: ${strategyLabel(g)}`).join(' · ')
+    ? groups.map(g => `${kindLabel(g.kind)}: ${strategyLabel(g)}`).join(' · ')
     : t('results.compromise.vetoOnly');
 
   return (
@@ -76,7 +76,7 @@ const GroupCompromiseCard: React.FC<GroupCompromiseCardProps> = ({ info, classNa
           {groups.map((g, i) => (
             <div key={i} className="space-y-1">
               <p className="text-xs font-semibold text-foreground">
-                {kindLabel(g)} — {strategyLabel(g)}
+                {kindLabel(g.kind)} — {strategyLabel(g)}
               </p>
               <p className="text-[11px] text-muted-foreground">{strategyDesc(g)}</p>
               <div className="flex flex-wrap gap-1 pt-0.5">
