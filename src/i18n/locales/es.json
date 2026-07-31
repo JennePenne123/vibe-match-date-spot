@@ -338,7 +338,8 @@
     "bulkInviteMax": "Máx. {{count}} por invitación",
     "bulkInviteSend": "Invitar a todos",
     "bulkInviteCopy": "Copiar lista + texto",
-    "bulkInviteSent": "Invitación preparada para {{count}} contactos"
+    "bulkInviteSent": "Invitación preparada para {{count}} contactos",
+    "bulkPickFromList": "O elige directamente de tu lista de amigos"
   },
   "friends": {
     "inviteFriends": "Invitar Amigos",

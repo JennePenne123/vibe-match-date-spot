@@ -333,7 +333,17 @@ const PartnerSelection: React.FC<PartnerSelectionProps> = ({
           </div>
         )}
 
-        <InviteFriendsSection />
+        <InviteFriendsSection
+          friends={friends}
+          selectedFriendIds={dateMode === 'group' ? selectedPartnerIds : (selectedPartnerId ? [selectedPartnerId] : [])}
+          onToggleFriend={(id) => {
+            if (dateMode === 'group') {
+              handlePartnerToggle(id, !selectedPartnerIds.includes(id));
+            } else {
+              onPartnerChange(selectedPartnerId === id ? '' : id);
+            }
+          }}
+        />
 
         {hasFriends && (
         <Button 
