@@ -2436,6 +2436,7 @@ export type Database = {
         Returns: boolean
       }
       verify_admin_access: { Args: never; Returns: boolean }
+      verify_admin_access_logged: { Args: never; Returns: boolean }
       verify_admin_access_mfa: { Args: never; Returns: Json }
     }
     Enums: {
