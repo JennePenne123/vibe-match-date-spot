@@ -314,23 +314,27 @@ const VenueDetail = () => {
                 <MapPin className="w-5 h-5 text-muted-foreground" />
                 <span className="text-muted-foreground">{displayAddress}</span>
               </div>
-              {appVenue.phone && (
+              {phoneNumber && (
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-muted-foreground">{appVenue.phone}</span>
+                  <span className="text-muted-foreground">{phoneNumber}</span>
                 </div>
               )}
               <div className="flex items-center gap-3">
                 <Globe className="w-5 h-5 text-muted-foreground" />
-                <a
-                  href={appVenue.website || googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline flex items-center gap-1"
-                >
-                  {appVenue.website ? t('venue.visitWebsite') : t('venue.viewOnGoogleMaps')}
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                {websiteLoading && !websiteUrl ? (
+                  <Skeleton className="h-4 w-32" />
+                ) : (
+                  <a
+                    href={websiteUrl || googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline flex items-center gap-1"
+                  >
+                    {websiteUrl ? t('venue.visitWebsite') : t('venue.viewOnGoogleMaps')}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
               </div>
               {appVenue.openingHours && appVenue.openingHours.length > 0 && (
                 <div className="flex items-start gap-3">
