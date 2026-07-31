@@ -71,3 +71,5 @@ project_id = "dfjwubatslzblagthbdw"
     verify_jwt = false
   [functions.get-sentry-config]
     verify_jwt = false
+  [functions.resolve-venue-website]
+    verify_jwt = true

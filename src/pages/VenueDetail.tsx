@@ -24,6 +24,9 @@ const VenueDetail = () => {
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
+  const [resolvedWebsite, setResolvedWebsite] = useState<string | null>(null);
+  const [resolvedPhone, setResolvedPhone] = useState<string | null>(null);
+  const [websiteLoading, setWebsiteLoading] = useState(false);
 
   const venue = appState.venues.find(v => v.id === id);
 
@@ -72,6 +75,37 @@ const VenueDetail = () => {
     }
   }, [sourceVenue]);
 
+  // Resolve the real website via Google Places when none is stored
+  useEffect(() => {
+    if (!sourceVenue || sourceVenue.website || resolvedWebsite || websiteLoading) return;
+    let cancelled = false;
+    setWebsiteLoading(true);
+    supabase.functions
+      .invoke('resolve-venue-website', {
+        body: {
+          venueId: sourceVenue.id,
+          placeId: sourceVenue.google_place_id || sourceVenue.placeId || null,
+          name: sourceVenue.name,
+          address: sourceVenue.address || '',
+          latitude: sourceVenue.latitude,
+          longitude: sourceVenue.longitude,
+        },
+      })
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (data?.website) setResolvedWebsite(data.website);
+        if (data?.phone) setResolvedPhone(data.phone);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setWebsiteLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceVenue?.id]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -102,6 +136,8 @@ const VenueDetail = () => {
   const appVenue = venueToAppVenue(sourceVenue, appState.userLocation?.latitude, appState.userLocation?.longitude);
   // Use resolved address if available, otherwise format the existing one
   const displayAddress = resolvedAddress || formatVenueAddress(appVenue);
+  const websiteUrl = appVenue.website || resolvedWebsite;
+  const phoneNumber = appVenue.phone || resolvedPhone;
 
   const shareCardData: ShareCardData = {
     type: 'venue',
@@ -137,14 +173,14 @@ const VenueDetail = () => {
   };
 
   const callVenue = () => {
-    if (appVenue.phone) {
-      window.open(`tel:${appVenue.phone}`);
+    if (phoneNumber) {
+      window.open(`tel:${phoneNumber}`);
     }
   };
 
   const visitWebsite = () => {
-    if (appVenue.website) {
-      window.open(appVenue.website, '_blank');
+    if (websiteUrl) {
+      window.open(websiteUrl, '_blank');
       return;
     }
     // Fallback: no stored website → open the venue's Google Maps entry,
@@ -278,23 +314,27 @@ const VenueDetail = () => {
                 <MapPin className="w-5 h-5 text-muted-foreground" />
                 <span className="text-muted-foreground">{displayAddress}</span>
               </div>
-              {appVenue.phone && (
+              {phoneNumber && (
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-muted-foreground">{appVenue.phone}</span>
+                  <span className="text-muted-foreground">{phoneNumber}</span>
                 </div>
               )}
               <div className="flex items-center gap-3">
                 <Globe className="w-5 h-5 text-muted-foreground" />
-                <a
-                  href={appVenue.website || googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline flex items-center gap-1"
-                >
-                  {appVenue.website ? t('venue.visitWebsite') : t('venue.viewOnGoogleMaps')}
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                {websiteLoading && !websiteUrl ? (
+                  <Skeleton className="h-4 w-32" />
+                ) : (
+                  <a
+                    href={websiteUrl || googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline flex items-center gap-1"
+                  >
+                    {websiteUrl ? t('venue.visitWebsite') : t('venue.viewOnGoogleMaps')}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
               </div>
               {appVenue.openingHours && appVenue.openingHours.length > 0 && (
                 <div className="flex items-start gap-3">
@@ -327,11 +367,16 @@ const VenueDetail = () => {
                 variant="outline"
                 className="h-12"
                 onClick={visitWebsite}
+                disabled={websiteLoading && !websiteUrl}
               >
-                {appVenue.website ? t('venue.visitWebsite') : t('venue.viewOnGoogleMaps')}
+                {websiteLoading && !websiteUrl
+                  ? '…'
+                  : websiteUrl
+                    ? t('venue.visitWebsite')
+                    : t('venue.viewOnGoogleMaps')}
               </Button>
             </div>
-            {appVenue.phone && (
+            {phoneNumber && (
               <Button
                 variant="outline"
                 className="h-12 w-full"
