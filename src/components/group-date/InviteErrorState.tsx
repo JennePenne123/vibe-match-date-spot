@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Clock, Users, RefreshCw, ScanLine, Send, Home } from 'lucide-react';
+import { AlertCircle, Clock, Users, RefreshCw, ScanLine, Send, Home, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GroupQRScanner from '@/components/group-date/GroupQRScanner';
 import RequestInviteDialog from '@/components/group-date/RequestInviteDialog';
