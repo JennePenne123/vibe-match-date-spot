@@ -154,6 +154,7 @@
 - [ ] Widerrufsformular: Platzhalter ersetzen
 
 ### Features
+- [ ] **Onboarding-Tour verbessern** (interaktive Produkt-Tour statt statischer Steps: Coach-Marks für Home/Plan-Date/Freunde, Skip & "später fortsetzen", Fortschrittsanzeige, i18n DE/EN/ES, Wiederholbar aus den Einstellungen)
 - [ ] Favoriten-Persistenz + KI-Signale (DB-Migration)
 - [ ] Transportdienst-Integration (FREE NOW, MOIA)
 - [ ] Nutzergenerierte Venue-Reviews
