@@ -24,6 +24,11 @@ import { hasMoodToday } from '@/utils/moodStorage';
 import { OAuthErrorDetails, OAuthErrorInfo } from '@/components/auth/OAuthErrorDetails';
 import { GoogleAuthSetupCheck } from '@/components/auth/GoogleAuthSetupCheck';
 import { useServerAdminAccess } from '@/hooks/useServerAdminAccess';
+import {
+  saveRememberedEmail,
+  loadRememberedEmail,
+  clearRememberedEmail,
+} from '@/lib/secureCredentialStore';
 
 // Google icon SVG component
 const GoogleIcon = () => (
@@ -73,17 +78,18 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
   const { t } = useTranslation();
   const { isAdmin: isServerAdmin, loading: adminCheckLoading } = useServerAdminAccess();
 
-  // Restore remembered login email
+  // Restore remembered login email (encrypted at rest)
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('hioutz-remembered-email');
-      if (saved) {
+    let cancelled = false;
+    loadRememberedEmail().then((saved) => {
+      if (!cancelled && saved) {
         setEmail(saved);
         setRememberMe(true);
       }
-    } catch {
-      /* ignore storage errors */
-    }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Check for referral code in URL
@@ -261,15 +267,12 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     setLoading(true);
 
     try {
-      // Persist (or clear) the remembered e-mail for both login and sign-up
-      try {
-        if (rememberMe) {
-          localStorage.setItem('hioutz-remembered-email', sanitizedEmail);
-        } else {
-          localStorage.removeItem('hioutz-remembered-email');
-        }
-      } catch {
-        /* ignore storage errors */
+      // Persist (or clear) the remembered e-mail for both login and sign-up.
+      // Stored AES-GCM encrypted with a non-extractable key in IndexedDB.
+      if (rememberMe) {
+        await saveRememberedEmail(sanitizedEmail);
+      } else {
+        await clearRememberedEmail();
       }
 
       if (isLogin) {
@@ -332,13 +335,12 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
     setIsLogin(!isLogin);
     setName('');
     // Keep a remembered e-mail prefilled across mode switches
-    let remembered = '';
-    try {
-      remembered = localStorage.getItem('hioutz-remembered-email') || '';
-    } catch {
-      /* ignore storage errors */
+    setEmail('');
+    if (rememberMe) {
+      loadRememberedEmail().then((remembered) => {
+        if (remembered) setEmail(remembered);
+      });
     }
-    setEmail(rememberMe ? remembered : '');
     setPassword('');
     setReferralCode('');
     setReferralValid(null);
