@@ -367,11 +367,16 @@ const VenueDetail = () => {
                 variant="outline"
                 className="h-12"
                 onClick={visitWebsite}
+                disabled={websiteLoading && !websiteUrl}
               >
-                {appVenue.website ? t('venue.visitWebsite') : t('venue.viewOnGoogleMaps')}
+                {websiteLoading && !websiteUrl
+                  ? '…'
+                  : websiteUrl
+                    ? t('venue.visitWebsite')
+                    : t('venue.viewOnGoogleMaps')}
               </Button>
             </div>
-            {appVenue.phone && (
+            {phoneNumber && (
               <Button
                 variant="outline"
                 className="h-12 w-full"
