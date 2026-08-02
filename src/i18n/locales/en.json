@@ -721,7 +721,12 @@
     "trackingActivatedDesc": "Recommendations will now be more personalized.",
     "trackingDeactivated": "Tracking deactivated",
     "trackingDeactivatedDesc": "We will use fewer signals for personalization from now on.",
-    "contact": "Contact"
+    "contact": "Contact",
+    "trafficLightNotifications": "Traffic light alerts",
+    "trafficLightNotificationsOn": "You'll be notified when the waiting room light turns orange or green",
+    "trafficLightNotificationsOff": "No alerts when the traffic light changes",
+    "trafficLightNotificationsActivated": "Traffic light alerts enabled",
+    "trafficLightNotificationsDeactivated": "Traffic light alerts disabled"
   },
   "partner": {
     "dashboard": "Partner Dashboard",

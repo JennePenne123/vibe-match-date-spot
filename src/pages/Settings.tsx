@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useTrafficLightNotificationSetting } from '@/hooks/useTrafficLightNotificationSetting';
 import LanguageSelector from '@/components/LanguageSelector';
 import SupportTicketDialog from '@/components/support/SupportTicketDialog';
 import { openCookieSettings, clearConsent } from '@/lib/cookieConsent';
@@ -39,6 +40,7 @@ const Settings = () => {
   const { user, loading, logout } = useAuth();
   const { toast } = useToast();
   const pushNotifications = usePushNotifications();
+  const { enabled: trafficLightNotifications, setEnabled: setTrafficLightNotifications } = useTrafficLightNotificationSetting();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -338,6 +340,30 @@ const Settings = () => {
                   </p>
                 </div>
                 <Switch checked={pushNotifications.isSubscribed} onCheckedChange={() => pushNotifications.toggleSubscription()} disabled={pushNotifications.isLoading || !pushNotifications.isSupported} />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5 pr-4">
+                  <p className="text-sm font-medium text-foreground">
+                    {t('settings.trafficLightNotifications', 'Ampel-Benachrichtigungen')}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {trafficLightNotifications
+                      ? t('settings.trafficLightNotificationsOn', 'Du wirst benachrichtigt, wenn die Ampel im Warteraum auf Orange oder Grün wechselt')
+                      : t('settings.trafficLightNotificationsOff', 'Keine Benachrichtigungen bei Ampelwechseln')}
+                  </p>
+                </div>
+                <Switch
+                  checked={trafficLightNotifications}
+                  onCheckedChange={(checked) => {
+                    setTrafficLightNotifications(checked);
+                    toast({
+                      title: checked
+                        ? t('settings.trafficLightNotificationsActivated', 'Ampel-Benachrichtigungen aktiviert')
+                        : t('settings.trafficLightNotificationsDeactivated', 'Ampel-Benachrichtigungen deaktiviert'),
+                    });
+                  }}
+                />
               </div>
             </CardContent>
           </Card>

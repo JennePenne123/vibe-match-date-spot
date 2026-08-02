@@ -721,7 +721,12 @@
     "trackingActivatedDesc": "Empfehlungen werden jetzt stärker personalisiert.",
     "trackingDeactivated": "Tracking deaktiviert",
     "trackingDeactivatedDesc": "Wir nutzen ab sofort weniger Signale für die Personalisierung.",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "trafficLightNotifications": "Ampel-Benachrichtigungen",
+    "trafficLightNotificationsOn": "Du wirst benachrichtigt, wenn die Ampel im Warteraum auf Orange oder Grün wechselt",
+    "trafficLightNotificationsOff": "Keine Benachrichtigungen bei Ampelwechseln",
+    "trafficLightNotificationsActivated": "Ampel-Benachrichtigungen aktiviert",
+    "trafficLightNotificationsDeactivated": "Ampel-Benachrichtigungen deaktiviert"
   },
   "partner": {
     "dashboard": "Partner-Dashboard",
