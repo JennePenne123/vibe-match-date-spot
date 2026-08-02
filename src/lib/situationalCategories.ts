@@ -320,6 +320,48 @@ export function isPureFoodVenue(venue: SituationalVenueLike): boolean {
 }
 
 /**
+ * Tags that make a venue clearly NON-gastronomic (culture / activity).
+ * Drinking venues (bar, pub, …) are intentionally NOT part of this set,
+ * because "Essen & Trinken" legitimately includes bars.
+ */
+const NON_GASTRO_ONLY_TAGS = new Set([
+  'museum', 'art_gallery', 'gallery', 'theater_venue', 'theatre', 'theater',
+  'movie_theater', 'performing_arts_theater', 'cinema', 'concert_hall',
+  'cultural_center', 'historical_landmark', 'tourist_attraction',
+  'bowling', 'bowling_alley', 'mini_golf', 'amusement_park', 'amusement_center',
+  'arcade', 'escape_room', 'gym', 'spa', 'swimming_pool', 'ice_skating_rink',
+  'zoo', 'aquarium', 'casino', 'attraction', 'artwork', 'library',
+]);
+
+const NON_GASTRO_CUISINE_LABELS = new Set([
+  'museum', 'gallery', 'theater', 'cinema', 'concert hall', 'arts centre',
+  'historic', 'bowling', 'arcade', 'ice rink', 'swimming', 'spa & wellness',
+  'casino', 'mini golf', 'minigolf', 'escape room', 'climbing',
+]);
+
+/**
+ * Hard filter for the "Essen & Trinken" intent: drop venues that are
+ * structurally non-gastronomic (cinemas, museums, bowling alleys …) unless
+ * they also read as a real food venue (e.g. a museum café).
+ * Returns true when the venue should be KEPT.
+ */
+export function passesFoodIntentFilter(venue: SituationalVenueLike): boolean {
+  const tags = [
+    ...(venue.tags ?? []),
+    ...(venue.types ?? []),
+    venue.venue_type ?? '',
+  ].map(t => (t ?? '').toString().trim().toLowerCase()).filter(Boolean);
+  const cuisine = (venue.cuisine_type ?? venue.cuisineType ?? '').toLowerCase().trim();
+
+  const isNonGastro = tags.some(tag => NON_GASTRO_ONLY_TAGS.has(tag)) ||
+    NON_GASTRO_CUISINE_LABELS.has(cuisine);
+  if (!isNonGastro) return true;
+
+  // Keep hybrid venues that are genuinely gastronomic too (museum café etc.).
+  return isPureFoodVenue(venue);
+}
+
+/**
  * Hard category filter — when the user explicitly picks a non-food intent
  * ("Kultur", "Aktivität", "Nightlife"), pure restaurants/cafés should be
  * EXCLUDED from the candidate set, not just down-weighted. Otherwise the
