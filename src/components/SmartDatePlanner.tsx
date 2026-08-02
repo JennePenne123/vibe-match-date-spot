@@ -184,14 +184,6 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     }
   }, [collaborativeSession, sessionLoading, state.user, state.currentStep, setCurrentStep, setDateMode]);
 
-  // Legacy placeholder (kept for clarity)
-  useEffect(() => {
-    if (!collaborativeSession || !state.user || sessionLoading) return;
-    if (collaborativeSession.both_preferences_complete && !collaborativeSession.ai_compatibility_score && state.currentStep === 'set-preferences' && state.userLocation && triggerAIAnalysisManually) {
-      setTimeout(() => triggerAIAnalysisManually(state.userLocation), 1000);
-    }
-  }, [collaborativeSession, state.user, sessionLoading, state.currentStep, state.userLocation, triggerAIAnalysisManually]);
-
   // Render invitation step
   const renderInvitationStep = () => {
     const venue = selectedVenue || (selectedVenueId ? venueRecommendations?.find(v => v.venue_id === selectedVenueId) : null);
