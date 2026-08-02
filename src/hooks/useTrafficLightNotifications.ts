@@ -51,15 +51,15 @@ export function useTrafficLightNotifications(
           if (registration) {
             await registration.showNotification(title, {
               body,
-              icon: '/icons/icon-192.png',
-              badge: '/icons/icon-192.png',
+              icon: '/icon-192.png',
+              badge: '/icon-192.png',
               tag: `hioutz-trafficlight-${scopeKey}`,
               renotify: true,
               data: { url: window.location.pathname + window.location.search },
             } as NotificationOptions);
             return;
           }
-          new Notification(title, { body, icon: '/icons/icon-192.png' });
+          new Notification(title, { body, icon: '/icon-192.png' });
           return;
         }
       } catch (error) {

@@ -1389,7 +1389,11 @@
       "browseVenues": "Browse venues",
       "live": "Live updates on",
       "reconnecting": "Reconnecting … status is checked regularly",
-      "lastSync": "{{seconds}}s ago"
+      "lastSync": "{{seconds}}s ago",
+      "notifyOrangeTitle": "🟠 Almost there",
+      "notifyOrangeBody": "Just one person left – starting soon.",
+      "notifyGreenTitle": "🟢 Everyone is ready!",
+      "notifyGreenBody": "Your shared venue search is starting now."
     }
   },
   "tutorial": {
