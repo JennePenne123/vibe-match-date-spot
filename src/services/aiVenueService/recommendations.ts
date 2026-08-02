@@ -144,9 +144,9 @@ const filterSituationalVenues = <T extends Record<string, any>>(
   sourceLabel: string = 'venues',
 ): T[] => {
   const { primaryCat, secondaryCat, isNonFood } = getActiveSituationalCategory(situationalCategoryId, secondaryCategoryId);
-  if (!isNonFood || !primaryCat) return venues;
+  if (!primaryCat) return venues;
 
-  const filtered = venues.filter(v => passesSituationalHardFilter(primaryCat, {
+  const toVenueLike = (v: T) => ({
     name: v.name ?? v.venue_name,
     cuisine_type: v.cuisine_type ?? v.cuisineType,
     cuisineType: v.cuisineType,
@@ -155,7 +155,19 @@ const filterSituationalVenues = <T extends Record<string, any>>(
     types: v.types,
     venue_type: v.venue_type,
     activities: v.activities,
-  }, secondaryCat));
+  });
+
+  // "Essen & Trinken": drop structurally non-gastronomic venues (Kinos,
+  // Museen, Bowling …) — they must never show up for a food intent.
+  if (!isNonFood) {
+    if (primaryCat.id !== 'food' || (secondaryCat && secondaryCat.id !== 'food')) return venues;
+    const foodFiltered = venues.filter(v => passesFoodIntentFilter(toVenueLike(v)));
+    console.log(`🍽️ FOOD INTENT FILTER (${sourceLabel}): ${venues.length} → ${foodFiltered.length}`);
+    // Safety net: never wipe the whole candidate set.
+    return foodFiltered.length > 0 ? foodFiltered : venues;
+  }
+
+  const filtered = venues.filter(v => passesSituationalHardFilter(primaryCat, toVenueLike(v), secondaryCat));
 
   console.log(`🎯 SITUATIONAL SOURCE FILTER (${primaryCat.id}/${sourceLabel}): ${venues.length} → ${filtered.length}`);
   recordSituationalFilter(sourceLabel, venues.length, filtered.length);
