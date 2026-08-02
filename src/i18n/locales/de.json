@@ -1398,7 +1398,8 @@
       "notifyOrangeTitle": "🟠 Fast vollständig",
       "notifyOrangeBody": "Nur noch eine Person fehlt – gleich geht es los.",
       "notifyGreenTitle": "🟢 Alle sind bereit!",
-      "notifyGreenBody": "Eure gemeinsame Venue-Suche startet jetzt."
+      "notifyGreenBody": "Eure gemeinsame Venue-Suche startet jetzt.",
+      "notifyGreenAction": "Ergebnisse ansehen"
     }
   },
   "tutorial": {
