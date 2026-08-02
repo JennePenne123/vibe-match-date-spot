@@ -155,7 +155,7 @@
 
 ### Features
 - [ ] **Onboarding-Tour verbessern** (interaktive Produkt-Tour statt statischer Steps: Coach-Marks für Home/Plan-Date/Freunde, Skip & "später fortsetzen", Fortschrittsanzeige, i18n DE/EN/ES, Wiederholbar aus den Einstellungen)
-- [ ] **Gruppen-Date-Planung: Venue-Ansicht überarbeiten** (übersichtliche Darstellung der Gruppen-Venue-Empfehlungen, Kompromiss-Visualisierung, Abstimmung pro Venue, geteilte Favoriten-Liste)
+- [ ] **Gruppen-Date-Planung: Venue-Ansicht überarbeiten** (übersichtliche Darstellung der Gruppen-Venue-Empfehlungen, Kompromiss-Visualisierung, Abstimmung pro Venue, geteilte Favoriten-Liste) — **Reminder: 10.08.2026 (ganzer Tag)**
 - [ ] Favoriten-Persistenz + KI-Signale (DB-Migration)
 - [ ] Transportdienst-Integration (FREE NOW, MOIA)
 - [ ] Nutzergenerierte Venue-Reviews
