@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import CollaborativeWaitingState from '@/components/date-planning/CollaborativeWaitingState';
+import TrafficLightWaitingRoom from '@/components/date-planning/preferences/TrafficLightWaitingRoom';
 
 interface WaitingForPartnerProps {
   partnerName: string;
@@ -18,20 +18,12 @@ export const WaitingForPartner: React.FC<WaitingForPartnerProps> = ({
 }) => (
   <div className="mt-6 space-y-4">
     <div className="border-t border-border" />
-    <CollaborativeWaitingState
-      partnerName={partnerName} sessionId={sessionId}
-      hasPartnerSetPreferences={partnerCompleted} isWaitingForPartner
-      hasCurrentUserSetPreferences={userCompleted} currentUserName={currentUserName}
+    <TrafficLightWaitingRoom
+      participants={[
+        { id: `self-${sessionId}`, name: currentUserName, ready: userCompleted, isSelf: true },
+        { id: `partner-${sessionId}`, name: partnerName, ready: partnerCompleted },
+      ]}
     />
-    <Card className="border-primary/20">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-3 mb-2">
-          <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-          <h3 className="text-base font-semibold">Deine Präferenzen gespeichert!</h3>
-        </div>
-        <p className="text-sm text-muted-foreground">Warte auf {partnerName}...</p>
-      </CardContent>
-    </Card>
   </div>
 );
 
