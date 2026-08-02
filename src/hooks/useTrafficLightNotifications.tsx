@@ -1,6 +1,8 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
+import { useNavigate } from 'react-router-dom';
 import { getServiceWorkerRegistration } from '@/pwa/registerServiceWorker';
 import type { TrafficLightPhase } from '@/components/date-planning/preferences/TrafficLightWaitingRoom';
 
@@ -11,13 +13,15 @@ import type { TrafficLightPhase } from '@/components/date-planning/preferences/T
  */
 export function useTrafficLightNotifications(
   phase: TrafficLightPhase,
-  options?: { enabled?: boolean; scopeKey?: string },
+  options?: { enabled?: boolean; scopeKey?: string; resultsUrl?: string },
 ) {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const prevPhase = useRef<TrafficLightPhase | null>(null);
   const enabled = options?.enabled !== false;
   const scopeKey = options?.scopeKey ?? 'default';
+  const resultsUrl = options?.resultsUrl ?? '/results';
 
   // Bei Session-Wechsel Verlauf zurücksetzen
   useEffect(() => {
@@ -55,19 +59,51 @@ export function useTrafficLightNotifications(
               badge: '/icon-192.png',
               tag: `hioutz-trafficlight-${scopeKey}`,
               renotify: true,
-              data: { url: window.location.pathname + window.location.search },
+              // Bei Grün direkt zur Ergebnisliste springen
+              data: {
+                url: goingGreen ? resultsUrl : window.location.pathname + window.location.search,
+                type: goingGreen ? 'traffic_light_green' : 'traffic_light_orange',
+              },
+              actions: goingGreen
+                ? [
+                    {
+                      action: 'view-results',
+                      title: t('datePlanning.waitingRoom.notifyGreenAction', 'Ergebnisse ansehen'),
+                    },
+                  ]
+                : [],
             } as NotificationOptions);
             return;
           }
-          new Notification(title, { body, icon: '/icon-192.png' });
+          const n = new Notification(title, { body, icon: '/icon-192.png' });
+          if (goingGreen) {
+            n.onclick = () => {
+              window.focus();
+              navigate(resultsUrl);
+              n.close();
+            };
+          }
           return;
         }
       } catch (error) {
         console.warn('Traffic light notification failed:', error);
       }
-      toast({ title, description: body });
+      toast({
+        title,
+        description: body,
+        action: goingGreen
+          ? (
+              <ToastAction
+                altText={t('datePlanning.waitingRoom.notifyGreenAction', 'Ergebnisse ansehen')}
+                onClick={() => navigate(resultsUrl)}
+              >
+                {t('datePlanning.waitingRoom.notifyGreenAction', 'Ergebnisse ansehen')}
+              </ToastAction>
+            )
+          : undefined,
+      });
     };
 
     void notify();
-  }, [phase, enabled, scopeKey, t, toast]);
+  }, [phase, enabled, scopeKey, resultsUrl, navigate, t, toast]);
 }
