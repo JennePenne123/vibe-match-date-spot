@@ -168,6 +168,22 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
     }
   }, [collaborativeSession, state.user, sessionLoading, state.currentStep, state.userLocation, triggerAIAnalysisManually]);
 
+  // Parallele Eingaben: Wer per Session/Einladung einsteigt, überspringt Modus-/Partnerauswahl
+  // und landet sofort bei den eigenen Präferenzen — unabhängig davon, ob die andere Person fertig ist.
+  const autoJumpedRef = useRef(false);
+  useEffect(() => {
+    if (autoJumpedRef.current || sessionLoading || !state.user || !collaborativeSession) return;
+    const isParticipant =
+      collaborativeSession.initiator_id === state.user.id ||
+      collaborativeSession.partner_id === state.user.id;
+    if (!isParticipant) return;
+    if (state.currentStep === 'select-mode' || state.currentStep === 'select-partner') {
+      autoJumpedRef.current = true;
+      setDateMode(collaborativeSession.planning_mode === 'group' ? 'group' : 'single');
+      setCurrentStep('set-preferences');
+    }
+  }, [collaborativeSession, sessionLoading, state.user, state.currentStep, setCurrentStep, setDateMode]);
+
   // Render invitation step
   const renderInvitationStep = () => {
     const venue = selectedVenue || (selectedVenueId ? venueRecommendations?.find(v => v.venue_id === selectedVenueId) : null);
