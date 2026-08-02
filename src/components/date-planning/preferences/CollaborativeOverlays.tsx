@@ -11,10 +11,15 @@ interface WaitingForPartnerProps {
   userCompleted: boolean;
   partnerCompleted: boolean;
   currentUserName: string;
+  liveStatus?: {
+    connected: boolean;
+    lastSyncAt?: number;
+    onRefresh?: () => void;
+  };
 }
 
 export const WaitingForPartner: React.FC<WaitingForPartnerProps> = ({
-  partnerName, sessionId, userCompleted, partnerCompleted, currentUserName,
+  partnerName, sessionId, userCompleted, partnerCompleted, currentUserName, liveStatus,
 }) => (
   <div className="mt-6 space-y-4">
     <div className="border-t border-border" />
@@ -23,6 +28,7 @@ export const WaitingForPartner: React.FC<WaitingForPartnerProps> = ({
         { id: `self-${sessionId}`, name: currentUserName, ready: userCompleted, isSelf: true },
         { id: `partner-${sessionId}`, name: partnerName, ready: partnerCompleted },
       ]}
+      liveStatus={liveStatus}
     />
   </div>
 );
