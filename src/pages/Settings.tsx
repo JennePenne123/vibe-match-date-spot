@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useTrafficLightNotificationSetting } from '@/hooks/useTrafficLightNotificationSetting';
 import LanguageSelector from '@/components/LanguageSelector';
 import SupportTicketDialog from '@/components/support/SupportTicketDialog';
 import { openCookieSettings, clearConsent } from '@/lib/cookieConsent';
@@ -39,6 +40,7 @@ const Settings = () => {
   const { user, loading, logout } = useAuth();
   const { toast } = useToast();
   const pushNotifications = usePushNotifications();
+  const { enabled: trafficLightNotifications, setEnabled: setTrafficLightNotifications } = useTrafficLightNotificationSetting();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
