@@ -89,8 +89,32 @@ export const createSmartDatePlannerHandlers = (state: any) => {
     // Store preferences for later use when completing session
     setCurrentPreferences(preferences);
     
-    const isSoloMode = state.dateMode === 'solo';
     const effectiveSessionId = sessionId || currentSession?.id;
+    const isSoloMode = state.dateMode === 'solo';
+
+    // Graceful fallback: run a solo venue search when no session/partner is available
+    const runSoloSearch = async (locationToUse: any) => {
+      const userId = state.user?.id;
+      if (!userId) return;
+
+      console.log('🎯 SOLO SEARCH - Starting venue search without partner/session');
+      try {
+        await state.analyzeCompatibilityAndVenues(
+          effectiveSessionId || `solo-${userId}`,
+          userId, // partner = self for solo mode
+          preferences,
+          locationToUse
+        );
+        setCurrentStep('plan-together');
+      } catch (error: any) {
+        console.error('❌ SOLO SEARCH - Venue search failed:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Venue-Suche fehlgeschlagen',
+          description: error.message || 'Bitte versuche es erneut.'
+        });
+      }
+    };
     
     // First, save preferences to the session to trigger completion flags
     if (effectiveSessionId) {
@@ -123,29 +147,7 @@ export const createSmartDatePlannerHandlers = (state: any) => {
       }
 
       console.log('🎯 SOLO MODE - Starting venue search without partner');
-      
-      try {
-        // Use user's own ID as partnerId for the AI analysis (self-match = venue discovery)
-        const userId = state.user?.id;
-        if (!userId) return;
-        
-        await state.analyzeCompatibilityAndVenues(
-          effectiveSessionId || `solo-${userId}`,
-          userId, // partner = self for solo mode
-          preferences,
-          locationToUse
-        );
-        
-        console.log('✅ SOLO MODE - Venue search completed');
-        setCurrentStep('plan-together');
-      } catch (error: any) {
-        console.error('❌ SOLO MODE - Venue search failed:', error);
-        toast({
-          variant: 'destructive',
-          title: 'Venue-Suche fehlgeschlagen',
-          description: error.message || 'Bitte versuche es erneut.'
-        });
-      }
+      await runSoloSearch(locationToUse);
       return;
     }
     
@@ -220,25 +222,20 @@ export const createSmartDatePlannerHandlers = (state: any) => {
           description: `Unable to analyze compatibility: ${analysisError.message || 'Unknown error'}`
         });
       }
-    } else {
-      console.error('🔧 PREFERENCES COMPLETE - Missing required data for AI analysis:', {
-        hasSession: !!effectiveSessionId,
-        hasPartnerId: !!selectedPartnerId,
-        hasLocation: !!locationToUse
-      });
-      
-      const missingItems = [];
-      if (!effectiveSessionId) missingItems.push('Session');
-      if (!selectedPartnerId) missingItems.push('Partner');
-      if (!locationToUse) missingItems.push('Standort');
-      
+    } else if (!locationToUse) {
+      // Location is the only truly required input
       toast({
         variant: 'destructive',
         title: 'Fehlende Informationen',
-        description: missingItems.includes('Standort')
-          ? 'Bitte aktiviere deinen Standort oder gib eine Adresse ein.'
-          : `Fehlende Daten: ${missingItems.join(', ')}. Bitte versuche es erneut.`
+        description: 'Bitte aktiviere deinen Standort oder gib eine Adresse ein.'
       });
+    } else {
+      // No session / no partner → don't block the user, just search venues for them
+      console.warn('🔧 PREFERENCES COMPLETE - No session/partner, falling back to solo venue search', {
+        hasSession: !!effectiveSessionId,
+        hasPartnerId: !!selectedPartnerId
+      });
+      await runSoloSearch(locationToUse);
     }
   }
 
