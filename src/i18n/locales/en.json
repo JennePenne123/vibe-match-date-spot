@@ -1383,7 +1383,9 @@
       "nextUp": "Next up",
       "you": "You",
       "done": "done",
-      "pending": "filling in …"
+      "pending": "filling in …",
+      "browseHint": "Kill the wait: browse venues already – your shared recommendations appear automatically once everyone is done.",
+      "browseVenues": "Browse venues"
     }
   },
   "tutorial": {
