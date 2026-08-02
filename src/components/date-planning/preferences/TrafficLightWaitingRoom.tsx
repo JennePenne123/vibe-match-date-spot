@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTrafficLightNotifications } from '@/hooks/useTrafficLightNotifications';
+import { useTrafficLightNotificationSetting } from '@/hooks/useTrafficLightNotificationSetting';
 
 export interface WaitingParticipant {
   id: string;
