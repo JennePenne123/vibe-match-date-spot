@@ -68,7 +68,9 @@ const TrafficLightWaitingRoom: React.FC<TrafficLightWaitingRoomProps> = ({ parti
   const nextUp = participants.find(p => !p.ready);
 
   // Push-/System-Benachrichtigung bei Ampelwechsel (rot→orange, orange→grün)
+  const { enabled: trafficLightNotificationsEnabled } = useTrafficLightNotificationSetting();
   useTrafficLightNotifications(phase, {
+    enabled: trafficLightNotificationsEnabled,
     scopeKey: participants.map(p => p.id).join('|'),
   });
 
