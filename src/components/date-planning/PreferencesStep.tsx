@@ -362,7 +362,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
       </div>
 
       {/* Collaborative: Waiting for partner */}
-      {planningMode === 'collaborative' && collaborativeSession && status.userCompleted && hasSubmitted && !status.partnerCompleted && (
+      {planningMode === 'collaborative' && collaborativeSession && status.userCompleted && hasSubmitted && (
         <WaitingForPartner
           partnerName={partnerName}
           sessionId={props.sessionId}
