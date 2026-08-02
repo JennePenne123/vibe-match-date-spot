@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Check, Clock, Users, Compass } from 'lucide-react';
+import { Check, Clock, Users, Compass, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -30,12 +30,36 @@ const LIGHTS: { key: TrafficLightPhase; active: string; glow: string }[] = [
 
 interface TrafficLightWaitingRoomProps {
   participants: WaitingParticipant[];
+  liveStatus?: {
+    connected: boolean;
+    lastSyncAt?: number;
+    onRefresh?: () => void;
+  };
 }
 
-const TrafficLightWaitingRoom: React.FC<TrafficLightWaitingRoomProps> = ({ participants }) => {
+const TrafficLightWaitingRoom: React.FC<TrafficLightWaitingRoomProps> = ({ participants, liveStatus }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [, forceTick] = React.useState(0);
+
+  // Sekundenanzeige „vor X s" aktuell halten
+  React.useEffect(() => {
+    if (!liveStatus?.lastSyncAt) return;
+    const i = setInterval(() => forceTick(v => v + 1), 5000);
+    return () => clearInterval(i);
+  }, [liveStatus?.lastSyncAt]);
+
+  const secondsAgo = liveStatus?.lastSyncAt
+    ? Math.max(0, Math.round((Date.now() - liveStatus.lastSyncAt) / 1000))
+    : null;
+
+  const handleRefresh = async () => {
+    if (!liveStatus?.onRefresh || refreshing) return;
+    setRefreshing(true);
+    try { await liveStatus.onRefresh(); } finally { setTimeout(() => setRefreshing(false), 600); }
+  };
   const total = participants.length;
   const readyCount = participants.filter(p => p.ready).length;
   const phase = getTrafficLightPhase(readyCount, total);
@@ -82,6 +106,40 @@ const TrafficLightWaitingRoom: React.FC<TrafficLightWaitingRoomProps> = ({ parti
             )}
           </div>
         </div>
+
+        {/* Live-Status */}
+        {liveStatus && (
+          <div className="mt-3 flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              {liveStatus.connected ? (
+                <>
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-70 animate-ping" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                  </span>
+                  <Wifi className="h-3.5 w-3.5" />
+                  {t('datePlanning.waitingRoom.live', 'Live-Updates aktiv')}
+                </>
+              ) : (
+                <>
+                  <WifiOff className="h-3.5 w-3.5" />
+                  {t('datePlanning.waitingRoom.reconnecting', 'Verbinde neu … Status wird regelmäßig geprüft')}
+                </>
+              )}
+            </span>
+            <button
+              type="button"
+              onClick={handleRefresh}
+              disabled={refreshing || !liveStatus.onRefresh}
+              className="flex items-center gap-1 rounded-md px-1.5 py-0.5 hover:text-foreground transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={cn('h-3.5 w-3.5', refreshing && 'animate-spin')} />
+              {secondsAgo !== null
+                ? t('datePlanning.waitingRoom.lastSync', 'vor {{seconds}}s', { seconds: secondsAgo })
+                : t('common.refresh', 'Aktualisieren')}
+            </button>
+          </div>
+        )}
 
         {/* Teilnehmerliste */}
         <ul className="mt-4 space-y-2">

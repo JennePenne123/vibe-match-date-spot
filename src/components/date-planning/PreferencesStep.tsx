@@ -50,13 +50,18 @@ export interface PreferencesStepProps {
   onManualContinue?: () => void;
   onDisplayVenues?: () => void;
   venueRecommendations?: any[];
+  liveStatus?: {
+    connected: boolean;
+    lastSyncAt?: number;
+    onRefresh?: () => void;
+  };
 }
 
 const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
   const {
     partnerName, aiAnalyzing, initialProposedDate,
     planningMode = 'solo', collaborativeSession,
-    onDisplayVenues, venueRecommendations = [],
+    onDisplayVenues, venueRecommendations = [], liveStatus,
   } = props;
 
   const state = usePreferencesState(props);
@@ -369,6 +374,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
           userCompleted={status.userCompleted}
           partnerCompleted={status.partnerCompleted}
           currentUserName={user?.name || 'Du'}
+          liveStatus={liveStatus}
         />
       )}
 

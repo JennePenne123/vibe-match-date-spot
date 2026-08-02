@@ -26,7 +26,8 @@
     "noMinimum": "Kein Minimum",
     "dismiss": "Ausblenden",
     "friend": "Freund",
-    "notAvailable": "Nicht verfügbar"
+    "notAvailable": "Nicht verfügbar",
+    "refresh": "Aktualisieren"
   },
   "nav": {
     "home": "Home",
@@ -1385,7 +1386,10 @@
       "done": "fertig",
       "pending": "trägt ein …",
       "browseHint": "Wartezeit überbrücken: Stöbere schon mal durch Venues – eure gemeinsamen Empfehlungen erscheinen automatisch, sobald alle fertig sind.",
-      "browseVenues": "Venues ansehen"
+      "browseVenues": "Venues ansehen",
+      "live": "Live-Updates aktiv",
+      "reconnecting": "Verbinde neu … Status wird regelmäßig geprüft",
+      "lastSync": "vor {{seconds}}s"
     }
   },
   "tutorial": {

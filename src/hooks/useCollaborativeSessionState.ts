@@ -24,6 +24,9 @@ export const useCollaborativeSessionState = ({ sessionId, userLocation }: UseCol
     collaborativeCompatibilityScore: collaborativeSessionData.compatibilityScore,
     collaborativeVenueRecommendations: collaborativeSessionData.venueRecommendations || [],
     collaborativeVenueSearchError: collaborativeSessionData.venueSearchError,
-    collaborativeAiAnalyzing: collaborativeSessionData.aiAnalyzing
+    collaborativeAiAnalyzing: collaborativeSessionData.aiAnalyzing,
+    realtimeConnected: collaborativeSessionData.realtimeConnected,
+    lastSyncAt: collaborativeSessionData.lastSyncAt,
+    refetchSession: collaborativeSessionData.refetchSession
   };
 };
