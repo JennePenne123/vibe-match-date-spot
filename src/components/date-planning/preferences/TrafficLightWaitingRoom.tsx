@@ -1,8 +1,10 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Check, Clock, Users } from 'lucide-react';
+import { Check, Clock, Users, Compass } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export interface WaitingParticipant {
   id: string;
@@ -32,6 +34,8 @@ interface TrafficLightWaitingRoomProps {
 
 const TrafficLightWaitingRoom: React.FC<TrafficLightWaitingRoomProps> = ({ participants }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const total = participants.length;
   const readyCount = participants.filter(p => p.ready).length;
   const phase = getTrafficLightPhase(readyCount, total);
@@ -106,6 +110,24 @@ const TrafficLightWaitingRoom: React.FC<TrafficLightWaitingRoomProps> = ({ parti
             </li>
           ))}
         </ul>
+
+        {/* Wartezeit überbrücken: Venues schon mal stöbern */}
+        {phase !== 'green' && (
+          <div className="mt-4 rounded-lg border border-border/60 bg-muted/30 p-3">
+            <p className="text-xs text-muted-foreground mb-2">
+              {t('datePlanning.waitingRoom.browseHint', 'Wartezeit überbrücken: Stöbere schon mal durch Venues – eure gemeinsamen Empfehlungen erscheinen automatisch, sobald alle fertig sind.')}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => navigate('/venues', { state: { returnTo: location.pathname + location.search } })}
+            >
+              <Compass className="h-4 w-4 mr-1.5" />
+              {t('datePlanning.waitingRoom.browseVenues', 'Venues ansehen')}
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

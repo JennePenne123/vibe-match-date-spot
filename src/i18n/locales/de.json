@@ -1383,7 +1383,9 @@
       "nextUp": "Als Nächstes",
       "you": "Du",
       "done": "fertig",
-      "pending": "trägt ein …"
+      "pending": "trägt ein …",
+      "browseHint": "Wartezeit überbrücken: Stöbere schon mal durch Venues – eure gemeinsamen Empfehlungen erscheinen automatisch, sobald alle fertig sind.",
+      "browseVenues": "Venues ansehen"
     }
   },
   "tutorial": {

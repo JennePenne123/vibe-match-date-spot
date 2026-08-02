@@ -1383,7 +1383,9 @@
       "nextUp": "Siguiente",
       "you": "Tú",
       "done": "listo",
-      "pending": "rellenando …"
+      "pending": "rellenando …",
+      "browseHint": "Mientras esperas: explora locales – vuestras recomendaciones comunes aparecerán automáticamente cuando todos terminen.",
+      "browseVenues": "Ver locales"
     }
   },
   "privacyBanner": {
