@@ -721,7 +721,12 @@
     "trackingActivatedDesc": "Las recomendaciones serán más personalizadas.",
     "trackingDeactivated": "Seguimiento desactivado",
     "trackingDeactivatedDesc": "A partir de ahora usaremos menos señales para personalizar.",
-    "contact": "Contacto"
+    "contact": "Contacto",
+    "trafficLightNotifications": "Avisos del semáforo",
+    "trafficLightNotificationsOn": "Recibirás un aviso cuando el semáforo de la sala de espera cambie a naranja o verde",
+    "trafficLightNotificationsOff": "Sin avisos cuando cambie el semáforo",
+    "trafficLightNotificationsActivated": "Avisos del semáforo activados",
+    "trafficLightNotificationsDeactivated": "Avisos del semáforo desactivados"
   },
   "partner": {
     "dashboard": "Panel de Socio",
