@@ -1398,7 +1398,8 @@
       "notifyOrangeTitle": "🟠 Almost there",
       "notifyOrangeBody": "Just one person left – starting soon.",
       "notifyGreenTitle": "🟢 Everyone is ready!",
-      "notifyGreenBody": "Your shared venue search is starting now."
+      "notifyGreenBody": "Your shared venue search is starting now.",
+      "notifyGreenAction": "View results"
     }
   },
   "tutorial": {

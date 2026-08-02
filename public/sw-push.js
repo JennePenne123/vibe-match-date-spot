@@ -86,6 +86,8 @@ self.addEventListener('notificationclick', function (event) {
 
   if (event.action === 'view') {
     event.waitUntil(navigateToUrl('/invitations'));
+  } else if (event.action === 'view-results') {
+    event.waitUntil(navigateToUrl(url || '/results'));
   } else if (event.action === 'dismiss') {
     // no-op
   } else {

@@ -1398,7 +1398,8 @@
       "notifyOrangeTitle": "🟠 Casi listo",
       "notifyOrangeBody": "Solo falta una persona: empezamos enseguida.",
       "notifyGreenTitle": "🟢 ¡Todos listos!",
-      "notifyGreenBody": "Vuestra búsqueda de locales comienza ahora."
+      "notifyGreenBody": "Vuestra búsqueda de locales comienza ahora.",
+      "notifyGreenAction": "Ver resultados"
     }
   },
   "privacyBanner": {
