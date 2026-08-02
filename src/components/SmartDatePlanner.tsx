@@ -232,6 +232,11 @@ const SmartDatePlanner: React.FC<SmartDatePlannerProps> = ({ sessionId, fromProp
       onManualContinue={() => handleManualContinue(userLocationRef.current)}
       onDisplayVenues={state.navigateToResults}
       venueRecommendations={venueRecommendations}
+      liveStatus={{
+        connected: !!state.realtimeConnected,
+        lastSyncAt: state.lastSyncAt,
+        onRefresh: () => { void state.refetchSession?.(); },
+      }}
     />
   );
 
