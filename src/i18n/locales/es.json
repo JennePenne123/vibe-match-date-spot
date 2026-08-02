@@ -1374,7 +1374,17 @@
     "filterAll": "Todos",
     "filterFriends": "Amigo",
     "requestOpen": "Solicitud abierta",
-    "noFriendsMatch": "Sin resultados"
+    "noFriendsMatch": "Sin resultados",
+    "waitingRoom": {
+      "red": "Esperando a los demás",
+      "orange": "Casi listo, un momento",
+      "green": "¡Todos listos: empieza la búsqueda!",
+      "ready": "listos",
+      "nextUp": "Siguiente",
+      "you": "Tú",
+      "done": "listo",
+      "pending": "rellenando …"
+    }
   },
   "privacyBanner": {
     "titleGdpr": "🇪🇺 Aviso de Privacidad (RGPD)",

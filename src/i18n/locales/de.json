@@ -1374,7 +1374,17 @@
     "filterAll": "Alle",
     "filterFriends": "Freund",
     "requestOpen": "Anfrage offen",
-    "noFriendsMatch": "Keine Treffer"
+    "noFriendsMatch": "Keine Treffer",
+    "waitingRoom": {
+      "red": "Warten auf die anderen",
+      "orange": "Fast fertig – noch einen Moment",
+      "green": "Alle bereit – Venue-Suche startet!",
+      "ready": "bereit",
+      "nextUp": "Als Nächstes",
+      "you": "Du",
+      "done": "fertig",
+      "pending": "trägt ein …"
+    }
   },
   "tutorial": {
     "skip": "Überspringen",
