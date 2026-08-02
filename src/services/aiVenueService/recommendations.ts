@@ -23,7 +23,7 @@ import { getVenueFallbackImage } from '@/utils/venueImageFallback';
 import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
-import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, matchesSelectedVenueTypes, matchesSelectedCuisines, CUISINE_KEYWORDS, type SituationalCategoryId } from '@/lib/situationalCategories';
+import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, passesFoodIntentFilter, matchesSelectedVenueTypes, matchesSelectedCuisines, CUISINE_KEYWORDS, type SituationalCategoryId } from '@/lib/situationalCategories';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
 import {
   beginSituationalFilterRequest,
