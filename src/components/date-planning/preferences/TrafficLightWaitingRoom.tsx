@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTrafficLightNotifications } from '@/hooks/useTrafficLightNotifications';
 
 export interface WaitingParticipant {
   id: string;
@@ -64,6 +65,11 @@ const TrafficLightWaitingRoom: React.FC<TrafficLightWaitingRoomProps> = ({ parti
   const readyCount = participants.filter(p => p.ready).length;
   const phase = getTrafficLightPhase(readyCount, total);
   const nextUp = participants.find(p => !p.ready);
+
+  // Push-/System-Benachrichtigung bei Ampelwechsel (rot→orange, orange→grün)
+  useTrafficLightNotifications(phase, {
+    scopeKey: participants.map(p => p.id).join('|'),
+  });
 
   const statusText =
     phase === 'green'
