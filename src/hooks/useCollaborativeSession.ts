@@ -379,6 +379,8 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
     compatibilityScore: session?.ai_compatibility_score || aiCompatibilityScore,
     venueRecommendations: sessionVenueRecommendations.length > 0 ? sessionVenueRecommendations : aiVenueRecommendations,
     venueSearchError: aiVenueSearchError,
-    aiAnalyzing: isAnalyzing
+    aiAnalyzing: isAnalyzing,
+    realtimeConnected,
+    lastSyncAt
   };
 };
