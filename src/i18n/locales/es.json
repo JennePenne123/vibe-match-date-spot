@@ -1389,7 +1389,11 @@
       "browseVenues": "Ver locales",
       "live": "Actualizaciones en vivo",
       "reconnecting": "Reconectando … el estado se comprueba periódicamente",
-      "lastSync": "hace {{seconds}}s"
+      "lastSync": "hace {{seconds}}s",
+      "notifyOrangeTitle": "🟠 Casi listo",
+      "notifyOrangeBody": "Solo falta una persona: empezamos enseguida.",
+      "notifyGreenTitle": "🟢 ¡Todos listos!",
+      "notifyGreenBody": "Vuestra búsqueda de locales comienza ahora."
     }
   },
   "privacyBanner": {

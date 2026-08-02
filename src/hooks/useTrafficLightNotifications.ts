@@ -1,0 +1,73 @@
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '@/hooks/use-toast';
+import { getServiceWorkerRegistration } from '@/pwa/registerServiceWorker';
+import type { TrafficLightPhase } from '@/components/date-planning/preferences/TrafficLightWaitingRoom';
+
+/**
+ * Feuert eine Push-/System-Benachrichtigung, sobald die Ampel im Warteraum
+ * von rot -> orange bzw. orange -> grün wechselt.
+ * Fallback: In-App-Toast, wenn keine Berechtigung / kein Service Worker.
+ */
+export function useTrafficLightNotifications(
+  phase: TrafficLightPhase,
+  options?: { enabled?: boolean; scopeKey?: string },
+) {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const prevPhase = useRef<TrafficLightPhase | null>(null);
+  const enabled = options?.enabled !== false;
+  const scopeKey = options?.scopeKey ?? 'default';
+
+  // Bei Session-Wechsel Verlauf zurücksetzen
+  useEffect(() => {
+    prevPhase.current = null;
+  }, [scopeKey]);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    const prev = prevPhase.current;
+    prevPhase.current = phase;
+    if (!prev || prev === phase) return;
+
+    const isRedToOrange = prev === 'red' && phase === 'orange';
+    const isOrangeToGreen = prev === 'orange' && phase === 'green';
+    const isRedToGreen = prev === 'red' && phase === 'green';
+    if (!isRedToOrange && !isOrangeToGreen && !isRedToGreen) return;
+
+    const goingGreen = phase === 'green';
+    const title = goingGreen
+      ? t('datePlanning.waitingRoom.notifyGreenTitle', '🟢 Alle sind bereit!')
+      : t('datePlanning.waitingRoom.notifyOrangeTitle', '🟠 Fast vollständig');
+    const body = goingGreen
+      ? t('datePlanning.waitingRoom.notifyGreenBody', 'Eure gemeinsame Venue-Suche startet jetzt.')
+      : t('datePlanning.waitingRoom.notifyOrangeBody', 'Nur noch eine Person fehlt – gleich geht es los.');
+
+    const notify = async () => {
+      try {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          const registration = await getServiceWorkerRegistration();
+          if (registration) {
+            await registration.showNotification(title, {
+              body,
+              icon: '/icon-192.png',
+              badge: '/icon-192.png',
+              tag: `hioutz-trafficlight-${scopeKey}`,
+              renotify: true,
+              data: { url: window.location.pathname + window.location.search },
+            } as NotificationOptions);
+            return;
+          }
+          new Notification(title, { body, icon: '/icon-192.png' });
+          return;
+        }
+      } catch (error) {
+        console.warn('Traffic light notification failed:', error);
+      }
+      toast({ title, description: body });
+    };
+
+    void notify();
+  }, [phase, enabled, scopeKey, t, toast]);
+}

@@ -1389,7 +1389,11 @@
       "browseVenues": "Venues ansehen",
       "live": "Live-Updates aktiv",
       "reconnecting": "Verbinde neu … Status wird regelmäßig geprüft",
-      "lastSync": "vor {{seconds}}s"
+      "lastSync": "vor {{seconds}}s",
+      "notifyOrangeTitle": "🟠 Fast vollständig",
+      "notifyOrangeBody": "Nur noch eine Person fehlt – gleich geht es los.",
+      "notifyGreenTitle": "🟢 Alle sind bereit!",
+      "notifyGreenBody": "Eure gemeinsame Venue-Suche startet jetzt."
     }
   },
   "tutorial": {
