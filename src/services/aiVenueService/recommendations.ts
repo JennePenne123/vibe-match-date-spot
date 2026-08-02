@@ -314,7 +314,10 @@ export const getAIVenueRecommendations = async (
     // enough because there are always 100× more restaurants than museums.
     {
       const { primaryCat, secondaryCat, isNonFood } = getActiveSituationalCategory(situationalCategoryId, secondaryCategoryId);
-      if (isNonFood && primaryCat) {
+      if (primaryCat && !isNonFood) {
+        // Food intent → strip cinemas, museums, bowling alleys & co.
+        venues = filterSituationalVenues(venues, situationalCategoryId, secondaryCategoryId, 'candidate-set');
+      } else if (isNonFood && primaryCat) {
         const before = venues.length;
         let filtered = filterSituationalVenues(venues, situationalCategoryId, secondaryCategoryId, 'candidate-set');
 
