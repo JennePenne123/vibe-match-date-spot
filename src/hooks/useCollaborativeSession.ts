@@ -32,6 +32,8 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
   const [error, setError] = useState<string | null>(null);
   const [aiAnalysisTriggered, setAiAnalysisTriggered] = useState(false);
   const [sessionVenueRecommendations, setSessionVenueRecommendations] = useState<AIVenueRecommendation[]>([]);
+  const [realtimeConnected, setRealtimeConnected] = useState(false);
+  const [lastSyncAt, setLastSyncAt] = useState<number>(() => Date.now());
   
   const { 
     analyzeCompatibilityAndVenues, 
@@ -187,6 +189,7 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
           if (payload.new) {
             const updatedSession = payload.new as DatePlanningSession;
             setSession(updatedSession);
+            setLastSyncAt(Date.now());
             
             if (updatedSession.both_preferences_complete && !updatedSession.ai_compatibility_score && !aiAnalysisTriggered) {
               triggerAIAnalysisIfReady(updatedSession);
@@ -194,13 +197,56 @@ export const useCollaborativeSession = (sessionId: string | null, userLocation?:
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (!isActive) return;
+        setRealtimeConnected(status === 'SUBSCRIBED');
+      });
 
     return () => {
       isActive = false;
+      setRealtimeConnected(false);
       supabase.removeChannel(channel);
     };
   }, [sessionId, user?.id]);
+
+  // Fallback-Polling: hält den Warteraum aktuell, auch wenn Realtime kurz abreißt
+  useEffect(() => {
+    if (!sessionId || !session) return;
+    if (session.both_preferences_complete) return;
+
+    let active = true;
+    const intervalMs = realtimeConnected ? 15000 : 5000;
+    const interval = setInterval(async () => {
+      try {
+        const { data, error } = await supabase
+          .from('date_planning_sessions')
+          .select('*')
+          .eq('id', sessionId)
+          .single();
+        if (!active || error || !data) return;
+        setLastSyncAt(Date.now());
+        setSession(prev => {
+          if (
+            prev &&
+            prev.initiator_preferences_complete === data.initiator_preferences_complete &&
+            prev.partner_preferences_complete === data.partner_preferences_complete &&
+            prev.both_preferences_complete === data.both_preferences_complete &&
+            prev.ai_compatibility_score === data.ai_compatibility_score
+          ) {
+            return prev;
+          }
+          return data as DatePlanningSession;
+        });
+        if (data.both_preferences_complete && !data.ai_compatibility_score && !aiAnalysisTriggered) {
+          triggerAIAnalysisIfReady(data as DatePlanningSession);
+        }
+      } catch (err) {
+        console.warn('Waiting-room polling failed (non-fatal):', err);
+      }
+    }, intervalMs);
+
+    return () => { active = false; clearInterval(interval); };
+  }, [sessionId, session?.both_preferences_complete, realtimeConnected, aiAnalysisTriggered, triggerAIAnalysisIfReady]);
 
   useEffect(() => {
     if (sessionId) {
