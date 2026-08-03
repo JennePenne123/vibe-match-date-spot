@@ -11,6 +11,9 @@ import { updateUserProfile } from '@/utils/userProfileHelpers';
 import { useToast } from '@/hooks/use-toast';
 import { getInitials } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { icons } from 'lucide-react';
+import { BADGE_DEFINITIONS } from '@/services/pointsService';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ProfileHeaderProps {
   user: any;
@@ -28,6 +31,7 @@ interface ProfileHeaderProps {
   level?: number;
   totalPoints?: number;
   premiumUntil?: string | null;
+  newestBadge?: string | null;
 }
 
 const ProfileHeader = ({
@@ -35,6 +39,10 @@ const ProfileHeader = ({
   onEditedNameChange, onEditedEmailChange, onEditToggle, onSave, onCancel, onAvatarUpdate,
   level = 1, totalPoints = 0, premiumUntil
 }: ProfileHeaderProps) => {
+  const badgeDef = newestBadge ? BADGE_DEFINITIONS[newestBadge] : undefined;
+  const BadgeLucide = badgeDef
+    ? icons[(badgeDef.lucideIcon.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('')) as keyof typeof icons]
+    : undefined;
   const { t } = useTranslation();
   // Guard against null values passed explicitly (default params only apply for undefined)
   const safeLevel = typeof level === 'number' && !Number.isNaN(level) ? level : 1;
