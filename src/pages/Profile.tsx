@@ -82,6 +82,11 @@ const Profile = () => {
             level={points?.level ?? 1}
             totalPoints={points?.total_points ?? 0}
             premiumUntil={(points as any)?.premium_until}
+            newestBadge={(() => {
+              const list = Array.isArray(points?.badges) ? points!.badges.filter((b: string) => !b.startsWith('_')) : [];
+              for (let i = list.length - 1; i >= 0; i--) if ((list[i] as string) in ({} as any) || true) return list[i];
+              return null;
+            })()}
           />
         </SafeComponent>
 
