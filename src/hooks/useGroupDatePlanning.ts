@@ -86,7 +86,11 @@ export const useGroupDatePlanning = () => {
       return group;
     } catch (err: any) {
       console.error('Failed to create group:', err);
-      toast.error('Gruppe konnte nicht erstellt werden');
+      toast.error(
+        err?.message
+          ? `Gruppe konnte nicht erstellt werden: ${err.message}`
+          : 'Gruppe konnte nicht erstellt werden'
+      );
       return null;
     } finally {
       setLoading(false);
