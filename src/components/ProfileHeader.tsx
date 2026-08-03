@@ -129,6 +129,19 @@ const ProfileHeader = ({
                 <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleFileChange} className="hidden" />
               </>
             )}
+            {!isEditing && badgeDef && BadgeLucide && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className={`absolute -bottom-1 -right-1 z-20 rounded-full p-2 border-2 border-card shadow-lg ${badgeDef.bg} backdrop-blur-sm`}>
+                    <BadgeLucide className={`w-5 h-5 ${badgeDef.color}`} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs font-semibold">{badgeDef.name}</p>
+                  <p className="text-xs text-muted-foreground">{badgeDef.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
 
           {isEditing ? (
