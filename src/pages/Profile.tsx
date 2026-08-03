@@ -48,6 +48,10 @@ const Profile = () => {
 
   const displayName = user.name || user.email?.split('@')[0] || 'User';
   const displayEmail = user.email || '';
+  const earnedBadges: string[] = Array.isArray(points?.badges)
+    ? (points!.badges as string[]).filter((b: string) => !b.startsWith('_'))
+    : [];
+  const newestBadge = earnedBadges.length ? earnedBadges[earnedBadges.length - 1] : null;
 
   return (
     <div className="min-h-screen bg-background">
