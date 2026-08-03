@@ -37,7 +37,7 @@ interface ProfileHeaderProps {
 const ProfileHeader = ({
   user, displayName, displayEmail, isEditing, editedName, editedEmail,
   onEditedNameChange, onEditedEmailChange, onEditToggle, onSave, onCancel, onAvatarUpdate,
-  level = 1, totalPoints = 0, premiumUntil
+  level = 1, totalPoints = 0, premiumUntil, newestBadge
 }: ProfileHeaderProps) => {
   const badgeDef = newestBadge ? BADGE_DEFINITIONS[newestBadge] : undefined;
   const BadgeLucide = badgeDef
