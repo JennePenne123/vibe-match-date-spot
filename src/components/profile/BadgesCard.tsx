@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Award, Lock, icons } from 'lucide-react';
+import { Award, Lock, ChevronDown, icons } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { BADGE_DEFINITIONS } from '@/services/pointsService';
 
 interface BadgesCardProps {
@@ -50,16 +51,21 @@ export const BadgesCard: React.FC<BadgesCardProps> = ({ badges }) => {
 
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Award className="h-5 w-5 text-primary" />
-          Achievements
-          <Badge variant="secondary" className="ml-auto">
-            {earnedCount} / {allBadgeIds.length}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-5">
+      <Collapsible>
+        <CollapsibleTrigger className="w-full text-left">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Award className="h-5 w-5 text-primary" />
+              Achievements
+              <Badge variant="secondary" className="ml-auto">
+                {earnedCount} / {allBadgeIds.length}
+              </Badge>
+              <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+            </CardTitle>
+          </CardHeader>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent className="space-y-5">
         {grouped.map(group => (
           <div key={group.category}>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
@@ -106,7 +112,9 @@ export const BadgesCard: React.FC<BadgesCardProps> = ({ badges }) => {
             </p>
           </div>
         )}
-      </CardContent>
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 };

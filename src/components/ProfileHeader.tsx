@@ -11,6 +11,9 @@ import { updateUserProfile } from '@/utils/userProfileHelpers';
 import { useToast } from '@/hooks/use-toast';
 import { getInitials } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { icons } from 'lucide-react';
+import { BADGE_DEFINITIONS } from '@/services/pointsService';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ProfileHeaderProps {
   user: any;
@@ -28,13 +31,18 @@ interface ProfileHeaderProps {
   level?: number;
   totalPoints?: number;
   premiumUntil?: string | null;
+  newestBadge?: string | null;
 }
 
 const ProfileHeader = ({
   user, displayName, displayEmail, isEditing, editedName, editedEmail,
   onEditedNameChange, onEditedEmailChange, onEditToggle, onSave, onCancel, onAvatarUpdate,
-  level = 1, totalPoints = 0, premiumUntil
+  level = 1, totalPoints = 0, premiumUntil, newestBadge
 }: ProfileHeaderProps) => {
+  const badgeDef = newestBadge ? BADGE_DEFINITIONS[newestBadge] : undefined;
+  const BadgeLucide = badgeDef
+    ? icons[(badgeDef.lucideIcon.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('')) as keyof typeof icons]
+    : undefined;
   const { t } = useTranslation();
   // Guard against null values passed explicitly (default params only apply for undefined)
   const safeLevel = typeof level === 'number' && !Number.isNaN(level) ? level : 1;
@@ -120,6 +128,19 @@ const ProfileHeader = ({
                 </Button>
                 <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleFileChange} className="hidden" />
               </>
+            )}
+            {!isEditing && badgeDef && BadgeLucide && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className={`absolute -bottom-1 -right-1 z-20 rounded-full p-2 border-2 border-card shadow-lg ${badgeDef.bg} backdrop-blur-sm`}>
+                    <BadgeLucide className={`w-5 h-5 ${badgeDef.color}`} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs font-semibold">{badgeDef.name}</p>
+                  <p className="text-xs text-muted-foreground">{badgeDef.description}</p>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
 
