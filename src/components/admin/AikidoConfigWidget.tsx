@@ -18,26 +18,61 @@ interface AikidoStatus {
 
 const RECOMMENDED_SCOPES = ['read:findings', 'read:repositories', 'read:scans', 'read:teams'];
 
+interface LogEntry {
+  at: string;
+  ok: boolean;
+  message: string;
+}
+
+const LOG_KEY = 'hioutz-aikido-test-log';
+
 const AikidoConfigWidget: React.FC = () => {
   const [status, setStatus] = useState<AikidoStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [testing, setTesting] = useState(false);
+  const [log, setLog] = useState<LogEntry[]>(() => {
+    try {
+      const raw = localStorage.getItem(LOG_KEY);
+      return raw ? (JSON.parse(raw) as LogEntry[]) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const pushLog = useCallback((entry: LogEntry) => {
+    setLog((prev) => {
+      const next = [entry, ...prev].slice(0, 5);
+      try { localStorage.setItem(LOG_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
 
   const load = useCallback(async (action: 'status' | 'test' = 'status') => {
     action === 'test' ? setTesting(true) : setLoading(true);
     const { data, error } = await supabase.functions.invoke('aikido-config', { body: { action } });
     if (error) {
-      toast.error('Aikido-Status konnte nicht geladen werden');
+      const msg = error.message ?? 'Unbekannter Fehler';
+      toast.error(`Aikido-Anfrage fehlgeschlagen: ${msg}`);
+      pushLog({ at: new Date().toISOString(), ok: false, message: `Anfrage fehlgeschlagen: ${msg}` });
     } else {
       setStatus(data as AikidoStatus);
       if (action === 'test') {
         const t = (data as AikidoStatus).test;
-        t?.ok ? toast.success('Aikido-Verbindung erfolgreich') : toast.error('Aikido-Verbindung fehlgeschlagen');
+        if (t?.ok) {
+          const msg = `Verbindung erfolgreich – Token erhalten${t.expiresIn ? ` (gültig ${t.expiresIn}s)` : ''}`;
+          toast.success(msg);
+          pushLog({ at: new Date().toISOString(), ok: true, message: msg });
+        } else {
+          const detail = t?.details ?? t?.error ?? 'Unbekannter Fehler';
+          const msg = `Verbindung fehlgeschlagen${t?.status ? ` [${t.status}]` : ''}: ${detail}`;
+          toast.error(msg.slice(0, 160));
+          pushLog({ at: new Date().toISOString(), ok: false, message: msg });
+        }
       }
     }
     setTesting(false);
     setLoading(false);
-  }, []);
+  }, [pushLog]);
 
   useEffect(() => { void load('status'); }, [load]);
 
@@ -125,6 +160,27 @@ const AikidoConfigWidget: React.FC = () => {
                 </a>
               </Button>
             </div>
+
+            {log.length > 0 && (
+              <div className="rounded-lg border border-border/40 bg-muted/30 p-3">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Status-Log (letzte {log.length})</p>
+                <ul className="space-y-1.5">
+                  {log.map((entry) => (
+                    <li key={entry.at} className="flex items-start gap-2 text-[11px] leading-snug">
+                      {entry.ok ? (
+                        <CheckCircle2 className="w-3 h-3 mt-0.5 shrink-0 text-primary" />
+                      ) : (
+                        <AlertCircle className="w-3 h-3 mt-0.5 shrink-0 text-destructive" />
+                      )}
+                      <span className="text-muted-foreground shrink-0">
+                        {new Date(entry.at).toLocaleTimeString('de-DE')}
+                      </span>
+                      <span className="break-all">{entry.message}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </>
         )}
       </CardContent>
