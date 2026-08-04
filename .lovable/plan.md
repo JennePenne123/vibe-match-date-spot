@@ -127,6 +127,7 @@
 - [ ] DSFA (Datenschutz-Folgenabschätzung) prüfen
 - [ ] Rate Limiting & API Quotas validieren (Foursquare, Google Places, Lovable AI)
 - [ ] Cron-Jobs Status final checken
+- [ ] Aikido Security-Connector im Workspace final verbinden + Deep-Scan starten
 
 ### ✅ Bereits erledigt
 - [x] Custom Domain hioutz.app verbunden (A-Records + TXT-Verify)
