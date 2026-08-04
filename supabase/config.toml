@@ -77,3 +77,5 @@ project_id = "dfjwubatslzblagthbdw"
     verify_jwt = false
   [functions.resolve-venue-website]
     verify_jwt = true
+  [functions.aikido-config]
+    verify_jwt = true
