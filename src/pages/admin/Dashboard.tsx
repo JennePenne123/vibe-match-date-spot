@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import SupportTicketsWidget from '@/components/admin/SupportTicketsWidget';
 import VenuePhotoBackfillWidget from '@/components/admin/VenuePhotoBackfillWidget';
 import VenueAddressBackfillWidget from '@/components/admin/VenueAddressBackfillWidget';
+import AikidoConfigWidget from '@/components/admin/AikidoConfigWidget';
 
 interface PlatformStats {
   totalUsers: number;
@@ -121,6 +122,9 @@ const AdminDashboard: React.FC = () => {
 
       {/* Venue address correction */}
       <VenueAddressBackfillWidget />
+
+      {/* Aikido security API config */}
+      <AikidoConfigWidget />
 
       {/* Security & audit shortcut */}
       <Card className="bg-card/80 backdrop-blur border-border/40">
