@@ -21,11 +21,12 @@ import {
 } from '@/components/ui/accordion';
 import { 
   ArrowLeft, Lock, Trash2, Shield, Loader2, Check, PauseCircle, 
-  Bell, Mail, Download, ExternalLink, FileText, Scale, HelpCircle, MessageCircle, Brain, Cookie
+  Bell, Mail, Download, ExternalLink, FileText, Scale, HelpCircle, MessageCircle, Brain, Cookie, MapPin
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useTrafficLightNotificationSetting } from '@/hooks/useTrafficLightNotificationSetting';
+import { useAutoLocationSetting } from '@/hooks/useAutoLocation';
 import LanguageSelector from '@/components/LanguageSelector';
 import SupportTicketDialog from '@/components/support/SupportTicketDialog';
 import { openCookieSettings, clearConsent } from '@/lib/cookieConsent';
