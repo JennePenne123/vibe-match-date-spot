@@ -41,6 +41,7 @@ const Settings = () => {
   const { toast } = useToast();
   const pushNotifications = usePushNotifications();
   const { enabled: trafficLightNotifications, setEnabled: setTrafficLightNotifications } = useTrafficLightNotificationSetting();
+  const { enabled: autoLocation, setEnabled: setAutoLocation } = useAutoLocationSetting();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -361,6 +362,44 @@ const Settings = () => {
                       title: checked
                         ? t('settings.trafficLightNotificationsActivated', 'Ampel-Benachrichtigungen aktiviert')
                         : t('settings.trafficLightNotificationsDeactivated', 'Ampel-Benachrichtigungen deaktiviert'),
+                    });
+                  }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Standort */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base text-foreground">
+                <MapPin className="w-4 h-4 text-primary" />
+                {t('settings.location', 'Standort')}
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {t('settings.locationDesc', 'Steuere, wie deine Position für Empfehlungen genutzt wird')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5 pr-4">
+                  <p className="text-sm font-medium text-foreground">
+                    {t('settings.autoLocation', 'Standort automatisch aktualisieren')}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {autoLocation
+                      ? t('settings.autoLocationOn', 'Beim Öffnen der App wird dein aktueller Standort automatisch übernommen')
+                      : t('settings.autoLocationOff', 'Dein Standort wird nur bei manueller Freigabe aktualisiert')}
+                  </p>
+                </div>
+                <Switch
+                  checked={autoLocation}
+                  onCheckedChange={(checked) => {
+                    setAutoLocation(checked);
+                    toast({
+                      title: checked
+                        ? t('settings.autoLocationActivated', 'Automatischer Standort aktiviert')
+                        : t('settings.autoLocationDeactivated', 'Automatischer Standort deaktiviert'),
                     });
                   }}
                 />
