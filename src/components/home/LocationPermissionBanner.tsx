@@ -8,6 +8,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
+import { useAutoLocationSetting } from '@/hooks/useAutoLocation';
 
 const DISMISS_KEY = 'hioutz-location-banner-dismissed-at';
 const REMIND_AFTER_DAYS = 7;
@@ -17,6 +18,7 @@ const LocationPermissionBanner: React.FC = () => {
   const { data: prefs, isLoading } = useUserPreferences();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { setEnabled: setAutoLocation } = useAutoLocationSetting();
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'denied'>('idle');
   const [dismissed, setDismissed] = useState(false);
 
@@ -68,6 +70,8 @@ const LocationPermissionBanner: React.FC = () => {
           if (error) throw error;
 
           setStatus('success');
+          // Ab jetzt Standort beim App-Start automatisch übernehmen
+          setAutoLocation(true);
           await queryClient.invalidateQueries({ queryKey: ['user-preferences', user.id] });
           toast({
             title: 'Standort gespeichert ✓',

@@ -21,6 +21,7 @@ import SituationalQuickActions from '@/components/home/SituationalQuickActions';
 import { useToast } from '@/hooks/use-toast';
 import { useBreakpoint } from '@/hooks/use-mobile';
 import { useHomeTipVenues } from '@/hooks/useHomeTipVenues';
+import { useAutoLocationUpdate } from '@/hooks/useAutoLocation';
 import { supabase } from '@/integrations/supabase/client';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
@@ -50,6 +51,7 @@ const HomeContent: React.FC = () => {
   const { friends } = useFriends();
   const { isMobile, isDesktop } = useBreakpoint();
   const { dailyTipVenue, cityTipVenues, loading: tipsLoading } = useHomeTipVenues();
+  useAutoLocationUpdate();
 
   const [showPartnerSelection, setShowPartnerSelection] = useState(false);
   const [showProposalCreation, setShowProposalCreation] = useState(false);
