@@ -115,6 +115,22 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
         </CardContent>
       </Card>
 
+      {/* Referral Program */}
+      <Collapsible>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
+            <span className="flex items-center gap-2 font-semibold">
+              <Gift className="h-5 w-5 text-primary" />
+              {t('profile.referralProgram', 'Empfehlungsprogramm')}
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-90" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <ReferralCard />
+        </CollapsibleContent>
+      </Collapsible>
+
       {/* Actions */}
       <div className="space-y-3">
         <Button onClick={() => navigate('/settings')} variant="outline" className="w-full border-border text-foreground hover:bg-accent/50">
