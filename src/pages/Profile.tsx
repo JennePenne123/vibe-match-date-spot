@@ -134,21 +134,6 @@ const Profile = () => {
             </CollapsibleContent>
           </Collapsible>
 
-          <Collapsible>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
-                <span className="flex items-center gap-2 font-semibold">
-                  <Gift className="h-5 w-5 text-primary" />
-                  {t('profile.referralProgram', 'Referral Program')}
-                </span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <ReferralCard />
-            </CollapsibleContent>
-          </Collapsible>
-
           <SafeComponent componentName="LeaderboardCard"><LeaderboardCard /></SafeComponent>
 
           {!adminLoading && adminRole && (
