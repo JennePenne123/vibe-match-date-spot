@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Settings, Heart, MapPin, ChevronRight, RotateCcw } from 'lucide-react';
+import { Users, Settings, Heart, MapPin, ChevronRight, RotateCcw, Gift } from 'lucide-react';
 import { useFriends } from '@/hooks/useFriends';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import ReferralCard from '@/components/profile/ReferralCard';
 
 interface ProfileActionsProps {
   onLogout: () => void;
@@ -112,6 +114,22 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
           )}
         </CardContent>
       </Card>
+
+      {/* Referral Program */}
+      <Collapsible>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
+            <span className="flex items-center gap-2 font-semibold">
+              <Gift className="h-5 w-5 text-primary" />
+              {t('profile.referralProgram', 'Empfehlungsprogramm')}
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-90" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <ReferralCard />
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Actions */}
       <div className="space-y-3">

@@ -5,7 +5,7 @@ import { useFirstUseNudge } from '@/hooks/useFirstUseNudge';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronDown, Award, Gift, Brain, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Award, Brain, ShieldCheck } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import ProfileHeader from '@/components/ProfileHeader';
 import ProfileStats from '@/components/ProfileStats';
@@ -13,7 +13,6 @@ import ProfileActions from '@/components/ProfileActions';
 import { PointsCard } from '@/components/profile/PointsCard';
 import { BadgesCard } from '@/components/profile/BadgesCard';
 import { LeaderboardCard } from '@/components/profile/LeaderboardCard';
-import ReferralCard from '@/components/profile/ReferralCard';
 import AILearningCard from '@/components/profile/AILearningCard';
 import AIProgressIndicator from '@/components/profile/AIProgressIndicator';
 import { ThemeSettingsCard } from '@/components/profile/ThemeSettingsCard';
@@ -132,21 +131,6 @@ const Profile = () => {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <AILearningCard />
-            </CollapsibleContent>
-          </Collapsible>
-
-          <Collapsible>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="w-full justify-between px-4 py-3 h-auto">
-                <span className="flex items-center gap-2 font-semibold">
-                  <Gift className="h-5 w-5 text-primary" />
-                  {t('profile.referralProgram', 'Referral Program')}
-                </span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <ReferralCard />
             </CollapsibleContent>
           </Collapsible>
 
