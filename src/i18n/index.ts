@@ -2,6 +2,8 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
+import de from './locales/de.json';
+
 export const languages = [
   { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
   { code: 'en', label: 'English', flag: '🇬🇧' },
@@ -10,40 +12,23 @@ export const languages = [
 
 type LanguageCode = 'de' | 'en' | 'es';
 
-const loaders: Record<LanguageCode, () => Promise<{ default: Record<string, unknown> }>> = {
-  de: () => import('./locales/de.json'),
+// Only non-default locales are code-split; German ships with the app shell.
+const loaders: Record<string, () => Promise<{ default: Record<string, unknown> }>> = {
   en: () => import('./locales/en.json'),
   es: () => import('./locales/es.json'),
 };
 
-const detectInitialLanguage = (): LanguageCode => {
-  try {
-    const stored = localStorage.getItem('hioutz-language');
-    if (stored && stored.slice(0, 2) in loaders) return stored.slice(0, 2) as LanguageCode;
-    const nav = navigator.language?.slice(0, 2);
-    if (nav && nav in loaders) return nav as LanguageCode;
-  } catch {
-    /* ignore */
-  }
-  return 'de';
-};
-
-const initialLanguage = detectInitialLanguage();
-const loaded = new Set<string>([initialLanguage]);
-
-// Only the active language is bundled into the initial payload; the other
-// locales are fetched on demand when the user switches languages.
-const initialResources = await loaders[initialLanguage]();
+const loaded = new Set<string>(['de']);
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      [initialLanguage]: { translation: initialResources.default },
+      de: { translation: de },
     },
-    lng: initialLanguage,
     fallbackLng: 'de',
+    partialBundledLanguages: true,
     interpolation: {
       escapeValue: false,
     },
@@ -55,13 +40,16 @@ i18n
   });
 
 export async function ensureLanguageLoaded(lng: string) {
-  const code = lng.slice(0, 2) as LanguageCode;
+  const code = lng.slice(0, 2);
   if (!(code in loaders) || loaded.has(code)) return;
   loaded.add(code);
   const mod = await loaders[code]();
   i18n.addResourceBundle(code, 'translation', mod.default, true, true);
   await i18n.changeLanguage(code);
 }
+
+// Load the detected language (if it is not the bundled default) right away.
+void ensureLanguageLoaded(i18n.language || 'de');
 
 // Set document language on change
 i18n.on('languageChanged', (lng) => {
