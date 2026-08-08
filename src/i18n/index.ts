@@ -10,8 +10,6 @@ export const languages = [
   { code: 'es', label: 'Español', flag: '🇪🇸' },
 ] as const;
 
-type LanguageCode = 'de' | 'en' | 'es';
-
 // Only non-default locales are code-split; German ships with the app shell.
 const loaders: Record<string, () => Promise<{ default: Record<string, unknown> }>> = {
   en: () => import('./locales/en.json'),
