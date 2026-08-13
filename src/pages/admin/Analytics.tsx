@@ -67,6 +67,9 @@ const AdminAnalytics: React.FC = () => {
       });
     },
     staleTime: STALE_TIMES.ADMIN_ANALYTICS,
+    refetchInterval: STALE_TIMES.ADMIN_ANALYTICS,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   // Date activity trend
@@ -100,6 +103,9 @@ const AdminAnalytics: React.FC = () => {
       }));
     },
     staleTime: STALE_TIMES.ADMIN_ANALYTICS,
+    refetchInterval: STALE_TIMES.ADMIN_ANALYTICS,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   // API usage by service
@@ -133,6 +139,9 @@ const AdminAnalytics: React.FC = () => {
       }));
     },
     staleTime: STALE_TIMES.ADMIN_ANALYTICS,
+    refetchInterval: STALE_TIMES.ADMIN_ANALYTICS,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   // Dates by status (pie)
@@ -153,6 +162,9 @@ const AdminAnalytics: React.FC = () => {
       return Array.from(statusCount.entries()).map(([name, value]) => ({ name, value }));
     },
     staleTime: STALE_TIMES.ADMIN_ANALYTICS,
+    refetchInterval: STALE_TIMES.ADMIN_ANALYTICS,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   // Engagement summary stats
