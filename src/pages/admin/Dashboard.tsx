@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck, ShieldAlert, Database, Loader2, ScrollText } from 'lucide-react';
+import { Users, Calendar, Ticket, DollarSign, TrendingUp, Activity, ShieldCheck, ShieldAlert, Database, Loader2, ScrollText, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,8 +29,9 @@ interface PlatformStats {
 
 const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
-  const { data: stats, isLoading } = useQuery<PlatformStats>({
+  const { data: stats, isLoading, isFetching, dataUpdatedAt, refetch } = useQuery<PlatformStats>({
     queryKey: ['admin-platform-stats'],
     queryFn: async () => {
       const [
@@ -71,7 +72,17 @@ const AdminDashboard: React.FC = () => {
       };
     },
     staleTime: STALE_TIMES.ADMIN,
+    refetchInterval: STALE_TIMES.ADMIN,
+    refetchIntervalInBackground: false,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
+
+  const handleRefreshAll = () => {
+    refetch();
+    queryClient.invalidateQueries({ queryKey: ['admin-recent-dates'] });
+    queryClient.invalidateQueries({ predicate: (q) => String(q.queryKey[0] ?? '').startsWith('admin-') });
+  };
 
   const kpiCards = [
     { label: t('admin.totalUsers', 'Registrierte Nutzer'), value: stats?.totalUsers ?? 0, icon: Users, color: 'text-blue-400' },
@@ -88,9 +99,20 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">{t('admin.dashboardTitle', 'Admin Dashboard')}</h1>
-        <p className="text-muted-foreground text-sm mt-1">{t('admin.dashboardSubtitle', 'Plattform-Übersicht und wichtige Kennzahlen')}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">{t('admin.dashboardTitle', 'Admin Dashboard')}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{t('admin.dashboardSubtitle', 'Plattform-Übersicht und wichtige Kennzahlen')}</p>
+          {dataUpdatedAt > 0 && (
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {t('admin.lastUpdated', 'Zuletzt aktualisiert')}: {new Date(dataUpdatedAt).toLocaleTimeString('de-DE')}
+            </p>
+          )}
+        </div>
+        <Button variant="outline" size="sm" onClick={handleRefreshAll} disabled={isFetching} className="shrink-0">
+          <RefreshCw className={`w-4 h-4 mr-1 ${isFetching ? 'animate-spin' : ''}`} />
+          {t('common.refresh', 'Aktualisieren')}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -164,6 +186,10 @@ const RecentActivity: React.FC = () => {
       return data || [];
     },
     staleTime: STALE_TIMES.ADMIN,
+    refetchInterval: STALE_TIMES.ADMIN,
+    refetchIntervalInBackground: false,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   return (
