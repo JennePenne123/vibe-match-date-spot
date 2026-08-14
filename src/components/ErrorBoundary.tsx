@@ -53,8 +53,14 @@ class ErrorBoundary extends Component<Props, State> {
     this.setState({ error, errorInfo });
     this.props.onError?.(error, errorInfo);
     void import('@/services/errorMonitoringService')
-      .then(({ logUiError }) => {
-        logUiError(error, errorInfo.componentStack?.split('\n')[1]?.trim());
+      .then(({ logUiError, logCrash }) => {
+        const component = errorInfo.componentStack?.split('\n')[1]?.trim();
+        // App-level boundary catches mean the whole UI is down → report as crash.
+        if (this.props.level === 'app') {
+          logCrash(error, component);
+        } else {
+          logUiError(error, component);
+        }
       })
       .catch(() => undefined);
   }
