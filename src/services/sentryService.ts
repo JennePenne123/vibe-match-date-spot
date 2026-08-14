@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
+import { APP_VERSION, buildErrorContext } from '@/utils/errorContext';
 
 let SENTRY_DSN: string = import.meta.env.VITE_SENTRY_DSN ?? '';
 let sentryInitialized = false;
@@ -35,6 +36,7 @@ export async function initSentry(): Promise<void> {
 
   Sentry.init({
     dsn: SENTRY_DSN,
+    release: APP_VERSION,
     environment: import.meta.env.DEV ? 'development' : 'production',
     integrations: [
       Sentry.browserTracingIntegration(),
@@ -67,6 +69,11 @@ export async function initSentry(): Promise<void> {
 /** Forward errors to Sentry */
 export function captureError(error: Error, context?: Record<string, unknown>): void {
   if (!SENTRY_DSN) return;
+  const base = buildErrorContext(null, false);
+  Sentry.setTag('route', base.route);
+  Sentry.setTag('app_version', base.app.version);
+  Sentry.setTag('runtime', base.app.runtime);
+  Sentry.setContext('device', base.device as unknown as Record<string, unknown>);
   if (context) {
     Sentry.setContext('extra', context);
   }
