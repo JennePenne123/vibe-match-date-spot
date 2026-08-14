@@ -64,9 +64,27 @@ async function logError(payload: ErrorLogPayload): Promise<void> {
     const { data: { user } } = await supabase.auth.getUser();
 
     // Anonymous users have no privileges on error_logs (RLS is restricted to
-    // authenticated). Skip the DB insert for logged-out users — Sentry above
-    // still captures the error — to avoid noisy 401 responses.
-    if (!user) return;
+    // authenticated), so their crashes go through the ingestion edge function
+    // which stores them with the service role.
+    if (!user) {
+      try {
+        await supabase.functions.invoke('log-client-error', {
+          body: {
+            error_type: payload.error_type,
+            error_message: payload.error_message.slice(0, 2000),
+            error_stack: payload.error_stack?.slice(0, 5000) ?? null,
+            component_name: payload.component_name ?? null,
+            route: payload.route || window.location.pathname,
+            severity: payload.severity || 'error',
+            metadata: payload.metadata || {},
+            user_agent: navigator.userAgent,
+          },
+        });
+      } catch {
+        // Never let reporting break the app.
+      }
+      return;
+    }
 
     const { error: dbError } = await supabase.from('error_logs' as any).insert({
       user_id: user.id,
@@ -100,6 +118,18 @@ export function logJsError(error: Error | string, source?: string): void {
     error_stack: err.stack,
     component_name: source,
     severity: 'error',
+  });
+}
+
+/** Log a hard crash (ErrorBoundary at app level, chunk load failure, …) */
+export function logCrash(error: Error, componentName?: string): void {
+  logError({
+    error_type: 'js_error',
+    error_message: error.message,
+    error_stack: error.stack,
+    component_name: componentName,
+    severity: 'critical',
+    metadata: { crash: true },
   });
 }
 
