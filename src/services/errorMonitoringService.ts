@@ -59,6 +59,7 @@ async function logError(payload: ErrorLogPayload): Promise<void> {
       component_name: payload.component_name,
       route: payload.route || window.location.pathname,
       severity: payload.severity,
+      ...buildErrorContext(null, false),
       ...payload.metadata,
     });
 
