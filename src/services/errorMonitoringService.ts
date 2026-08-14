@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { captureError } from './sentryService';
+import { buildErrorContext } from '@/utils/errorContext';
 
 type ErrorSeverity = 'info' | 'warning' | 'error' | 'critical';
 type ErrorType = 'js_error' | 'api_error' | 'ui_error' | 'performance' | 'unknown';
@@ -62,6 +63,8 @@ async function logError(payload: ErrorLogPayload): Promise<void> {
     });
 
     const { data: { user } } = await supabase.auth.getUser();
+    const context = buildErrorContext(user);
+    const enrichedMetadata = { ...(payload.metadata || {}), context };
 
     // Anonymous users have no privileges on error_logs (RLS is restricted to
     // authenticated), so their crashes go through the ingestion edge function
@@ -74,9 +77,9 @@ async function logError(payload: ErrorLogPayload): Promise<void> {
             error_message: payload.error_message.slice(0, 2000),
             error_stack: payload.error_stack?.slice(0, 5000) ?? null,
             component_name: payload.component_name ?? null,
-            route: payload.route || window.location.pathname,
+            route: payload.route || context.route,
             severity: payload.severity || 'error',
-            metadata: payload.metadata || {},
+            metadata: enrichedMetadata,
             user_agent: navigator.userAgent,
           },
         });
@@ -92,9 +95,9 @@ async function logError(payload: ErrorLogPayload): Promise<void> {
       error_message: payload.error_message.slice(0, 2000),
       error_stack: payload.error_stack?.slice(0, 5000) || null,
       component_name: payload.component_name || null,
-      route: payload.route || window.location.pathname,
+      route: payload.route || context.route,
       severity: payload.severity || 'error',
-      metadata: payload.metadata || {},
+      metadata: enrichedMetadata,
       user_agent: navigator.userAgent,
     });
 
