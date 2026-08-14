@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useCriticalErrorAlerts } from '@/hooks/useCriticalErrorAlerts';
 
 interface AdminRouteGuardProps {
   children: React.ReactNode;
@@ -24,6 +25,9 @@ const AdminRouteGuard: React.FC<AdminRouteGuardProps> = ({ children }) => {
   const [state, setState] = useState<
     'checking' | 'allowed' | 'denied' | 'mfa_required' | 'mfa_setup_required'
   >('checking');
+
+  // Live alerting for new unresolved errors while an admin is in the admin area.
+  useCriticalErrorAlerts(state === 'allowed');
 
   useEffect(() => {
     let cancelled = false;
