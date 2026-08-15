@@ -13,6 +13,7 @@ import SupportTicketsWidget from '@/components/admin/SupportTicketsWidget';
 import VenuePhotoBackfillWidget from '@/components/admin/VenuePhotoBackfillWidget';
 import VenueAddressBackfillWidget from '@/components/admin/VenueAddressBackfillWidget';
 import AikidoConfigWidget from '@/components/admin/AikidoConfigWidget';
+import ScoringExperimentWidget from '@/components/admin/ScoringExperimentWidget';
 
 interface PlatformStats {
   totalUsers: number;
