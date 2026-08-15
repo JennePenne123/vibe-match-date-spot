@@ -1797,8 +1797,21 @@
     "backfillRunAll": "Load all",
     "backfillError": "Error loading photos",
     "backfillBatchDone": "{{updated}} venues updated with real photos",
-    "backfillAllDone": "Photo loading complete"
-  },
+    "backfillAllDone": "Photo loading complete",
+    "scoringExperiment": {
+      "title": "A/B Test: AI Scoring Weights",
+      "empty": "No data yet. The test starts as soon as users receive and rate recommendations.",
+      "users": "{{count}} users",
+      "recommendations": "Recommendations",
+      "avgRating": "Avg. rating",
+      "avgAccuracy": "Avg. AI accuracy",
+      "positiveRate": "Positive rate",
+      "footer": "50/50 assignment, deterministic per user. Meaningful from approx. 100 ratings per group.",
+      "variant": {
+        "control": "A — old weights",
+        "treatment": "B — new weights"
+      }
+    }
   "adminNav": {
     "adminPortal": "Admin Portal",
     "dashboard": "Dashboard",
