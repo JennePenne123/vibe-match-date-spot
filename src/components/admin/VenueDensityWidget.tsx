@@ -94,6 +94,9 @@ const VenueDensityWidget: React.FC = () => {
   const [city, setCity] = useState('Hamburg');
   const [query, setQuery] = useState('Hamburg');
   const [filling, setFilling] = useState(false);
+  const [progress, setProgress] = useState<{ pass: number; saved: number; categories: BackfillCat[] } | null>(null);
+  const [history, setHistory] = useState<ImportRun[]>(() => readJSON<ImportRun[]>(HISTORY_KEY, []));
+  const [resume, setResume] = useState<ResumeState | null>(() => readJSON<ResumeState | null>(RESUME_KEY, null));
   const { toast } = useToast();
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -119,30 +122,61 @@ const VenueDensityWidget: React.FC = () => {
     return total < cityTarget;
   });
 
-  const fillGaps = async () => {
-    if (weakCategories.length === 0) return;
-    setFilling(true);
-    try {
-      // Geocode the city so the import is centred correctly.
-      const geoResp = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
-      );
-      const geo = await geoResp.json();
-      const lat = Number(geo?.[0]?.lat);
-      const lon = Number(geo?.[0]?.lon);
-      if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-        throw new Error(`Stadt "${query}" konnte nicht geokodiert werden`);
-      }
+  const pushRun = (run: ImportRun) => {
+    setHistory((prev) => {
+      const next = [run, ...prev].slice(0, 5);
+      writeJSON(HISTORY_KEY, next);
+      return next;
+    });
+  };
 
-      let categories = weakCategories
-        .map((cat) => BACKFILL_CAT[cat])
-        .filter(Boolean) as Array<'culture' | 'activity' | 'nightlife'>;
+  const persistResume = (state: ResumeState | null) => {
+    setResume(state);
+    if (state) writeJSON(RESUME_KEY, state);
+    else localStorage.removeItem(RESUME_KEY);
+  };
+
+  const runImport = async (opts?: { fromResume: boolean }) => {
+    const fromResume = opts?.fromResume === true;
+    if (!fromResume && weakCategories.length === 0) return;
+    const startedAt = new Date().toISOString();
+    setFilling(true);
+    let categories: BackfillCat[] = [];
+    let totalSaved = fromResume ? (resume?.savedSoFar ?? 0) : 0;
+    let pass = 0;
+    let done = false;
+
+    try {
+      let lat: number;
+      let lon: number;
+
+      if (fromResume && resume) {
+        lat = resume.latitude;
+        lon = resume.longitude;
+        categories = resume.categories;
+      } else {
+        // Geocode the city so the import is centred correctly.
+        const geoResp = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
+        );
+        const geo = await geoResp.json();
+        lat = Number(geo?.[0]?.lat);
+        lon = Number(geo?.[0]?.lon);
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+          throw new Error(`Stadt "${query}" konnte nicht geokodiert werden`);
+        }
+        categories = weakCategories
+          .map((cat) => BACKFILL_CAT[cat])
+          .filter(Boolean) as BackfillCat[];
+      }
 
       // The import runs in time-boxed passes and hands back a resume cursor,
       // so we keep calling until the backend reports "done".
-      let chunkOffset = 0;
-      let totalSaved = 0;
-      for (let pass = 0; pass < 12; pass++) {
+      let chunkOffset = fromResume ? (resume?.chunkOffset ?? 0) : 0;
+      setProgress({ pass: 0, saved: totalSaved, categories });
+
+      for (pass = 1; pass <= MAX_PASSES; pass++) {
+        setProgress({ pass, saved: totalSaved, categories });
         const { data: result, error: fnError } = await supabase.functions.invoke('backfill-activities', {
           body: { latitude: lat, longitude: lon, radius_km: 15, categories, chunk_offset: chunkOffset },
         });
@@ -151,29 +185,57 @@ const VenueDensityWidget: React.FC = () => {
         const res = result as {
           total_saved?: number;
           done?: boolean;
-          resume?: { chunk_offset: number; categories: Array<'culture' | 'activity' | 'nightlife'> };
+          resume?: { chunk_offset: number; categories: BackfillCat[] };
         };
         totalSaved += res?.total_saved ?? 0;
-        if (res?.done !== false || !res?.resume) break;
+        setProgress({ pass, saved: totalSaved, categories });
+
+        if (res?.done !== false || !res?.resume) {
+          done = true;
+          break;
+        }
         categories = res.resume.categories;
         chunkOffset = res.resume.chunk_offset;
+        persistResume({
+          city: query, latitude: lat, longitude: lon,
+          chunkOffset, categories, savedSoFar: totalSaved,
+          updatedAt: new Date().toISOString(),
+        });
       }
 
+      if (done) persistResume(null);
+
+      pushRun({
+        city: query, startedAt, finishedAt: new Date().toISOString(),
+        saved: totalSaved, passes: Math.min(pass, MAX_PASSES),
+        status: done ? 'completed' : 'partial', categories,
+      });
+
       toast({
-        title: 'Import abgeschlossen',
-        description: `${totalSaved} Venues für ${query} ergänzt.`,
+        title: done ? 'Import abgeschlossen' : 'Import pausiert',
+        description: done
+          ? `${totalSaved} Venues für ${query} ergänzt.`
+          : `${totalSaved} Venues ergänzt – Rest kann fortgesetzt werden.`,
       });
       await refetch();
     } catch (e) {
+      pushRun({
+        city: query, startedAt, finishedAt: new Date().toISOString(),
+        saved: totalSaved, passes: pass, status: 'failed', categories,
+        error: e instanceof Error ? e.message : String(e),
+      });
       toast({
         title: 'Import fehlgeschlagen',
         description: e instanceof Error ? e.message : String(e),
         variant: 'destructive',
       });
     } finally {
+      setProgress(null);
       setFilling(false);
     }
   };
+
+  const fillGaps = () => runImport();
 
   return (
     <Card className="bg-card/80 backdrop-blur border-border/40">
