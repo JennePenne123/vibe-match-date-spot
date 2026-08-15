@@ -47,6 +47,8 @@ interface AIVenueCardProps {
   showAIInsights?: boolean;
   compact?: boolean;
   isTopMatch?: boolean;
+  /** 1-based position in the result list – personal headline only shows for top 3 */
+  rank?: number;
   sessionContext?: {
     sessionId?: string;
     partnerId?: string;
@@ -61,6 +63,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   showAIInsights = true,
   compact = false,
   isTopMatch = false,
+  rank,
   sessionContext,
   vouchers = [],
   travelInfo
@@ -99,6 +102,8 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
   // Personal "Ich-Botschaft" derived from the strongest matching signal
   const personalHeadline = buildPersonalHeadline(ai_reasoning);
   const userFirstName = firstNameOf(user?.name);
+  // Keep the list calm: only the strongest matches get the personal message
+  const showPersonalHeadline = isTopMatch || (typeof rank === 'number' && rank <= 3);
 
   // Prefer a real neighborhood/address; if none is available (backend is still
   // reverse-geocoding), fall back to the distance so we never show raw coords.
@@ -268,7 +273,7 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
 
         <CardContent className="space-y-2">
           {/* Personal reason – "Für dich, {name}: Weil du ... liebst" */}
-          {showAIInsights && personalHeadline && (
+          {showAIInsights && showPersonalHeadline && personalHeadline && (
             <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 px-2.5 py-2">
               <Sparkles className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
               <p className="text-xs leading-snug text-foreground">
