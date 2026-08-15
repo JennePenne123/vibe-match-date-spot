@@ -1797,8 +1797,21 @@
     "backfillRunAll": "Alle nachladen",
     "backfillError": "Fehler beim Nachladen der Fotos",
     "backfillBatchDone": "{{updated}} Venues mit echten Fotos aktualisiert",
-    "backfillAllDone": "Foto-Nachladen abgeschlossen"
-  },
+    "backfillAllDone": "Foto-Nachladen abgeschlossen",
+    "scoringExperiment": {
+      "title": "A/B-Test: KI-Gewichtung",
+      "empty": "Noch keine Messdaten. Der Test läuft ab sofort mit, sobald Nutzer Empfehlungen erhalten und bewerten.",
+      "users": "{{count}} Nutzer",
+      "recommendations": "Empfehlungen",
+      "avgRating": "Ø Bewertung",
+      "avgAccuracy": "Ø KI-Genauigkeit",
+      "positiveRate": "Positiv-Quote",
+      "footer": "Zuweisung 50/50, deterministisch pro Nutzer. Aussagekräftig ab ca. 100 Bewertungen je Gruppe.",
+      "variant": {
+        "control": "A — alte Gewichtung",
+        "treatment": "B — neue Gewichtung"
+      }
+    }
   "adminNav": {
     "adminPortal": "Admin-Portal",
     "dashboard": "Dashboard",
