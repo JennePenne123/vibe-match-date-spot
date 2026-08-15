@@ -90,18 +90,34 @@ const VenueDensityWidget: React.FC = () => {
         throw new Error(`Stadt "${query}" konnte nicht geokodiert werden`);
       }
 
-      const categories = weakCategories
+      let categories = weakCategories
         .map((cat) => BACKFILL_CAT[cat])
         .filter(Boolean) as Array<'culture' | 'activity' | 'nightlife'>;
 
-      const { data: result, error: fnError } = await supabase.functions.invoke('backfill-activities', {
-        body: { latitude: lat, longitude: lon, radius_km: 15, categories },
-      });
-      if (fnError) throw fnError;
+      // The import runs in time-boxed passes and hands back a resume cursor,
+      // so we keep calling until the backend reports "done".
+      let chunkOffset = 0;
+      let totalSaved = 0;
+      for (let pass = 0; pass < 12; pass++) {
+        const { data: result, error: fnError } = await supabase.functions.invoke('backfill-activities', {
+          body: { latitude: lat, longitude: lon, radius_km: 15, categories, chunk_offset: chunkOffset },
+        });
+        if (fnError) throw fnError;
+
+        const res = result as {
+          total_saved?: number;
+          done?: boolean;
+          resume?: { chunk_offset: number; categories: Array<'culture' | 'activity' | 'nightlife'> };
+        };
+        totalSaved += res?.total_saved ?? 0;
+        if (res?.done !== false || !res?.resume) break;
+        categories = res.resume.categories;
+        chunkOffset = res.resume.chunk_offset;
+      }
 
       toast({
         title: 'Import abgeschlossen',
-        description: `${(result as { total_saved?: number })?.total_saved ?? 0} Venues für ${query} ergänzt.`,
+        description: `${totalSaved} Venues für ${query} ergänzt.`,
       });
       await refetch();
     } catch (e) {

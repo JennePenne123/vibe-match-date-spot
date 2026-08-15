@@ -5,8 +5,8 @@
 //
 // Body: { latitude, longitude, radius_km?, categories?: ('culture'|'activity'|'nightlife')[] }
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+
+import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 
 const OVERPASS_MIRRORS = [
@@ -164,12 +164,21 @@ async function fetchOverpassBatched(
   radiusM: number,
   tags: Array<[string, string]>,
   category: CategoryId,
-): Promise<any[]> {
+  startChunk = 0,
+  deadline = Number.POSITIVE_INFINITY,
+): Promise<{ elements: any[]; nextChunk: number; done: boolean }> {
   const merged: any[] = [];
   const seen = new Set<string>();
   const tagChunks = chunkTags(tags);
+  let nextChunk = startChunk;
 
   for (const [index, chunk] of tagChunks.entries()) {
+    if (index < startChunk) continue;
+    if (Date.now() > deadline) {
+      console.log(`⏸️ ${category}: time budget reached at chunk ${index}`);
+      return { elements: merged, nextChunk: index, done: false };
+    }
+
     const elements = await fetchOverpassAdaptive(lat, lng, radiusM, chunk, `${category}:${index + 1}`);
 
     for (const el of elements) {
@@ -179,10 +188,11 @@ async function fetchOverpassBatched(
       merged.push(el);
     }
 
+    nextChunk = index + 1;
     await sleep(OVERPASS_REQUEST_DELAY_MS);
   }
 
-  return merged;
+  return { elements: merged, nextChunk, done: true };
 }
 
 function categoryFromTags(tags: Record<string, string>): { cuisine: string; tags: string[] } {
@@ -259,7 +269,7 @@ function buildAddress(tags: Record<string, string>): string {
   return street || city || '';
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
@@ -309,9 +319,20 @@ serve(async (req) => {
     const summary: Record<string, { fetched: number; saved: number }> = {};
     let grandTotal = 0;
 
-    for (const category of requested) {
+    // Overpass is slow; stay well inside the edge function wall-clock limit and
+    // hand a resume cursor back to the caller instead of dying with WORKER_ERROR.
+    const deadline = Date.now() + 55_000;
+    const startChunkRaw = Number(body.chunk_offset ?? 0);
+    let startChunk = Number.isFinite(startChunkRaw) && startChunkRaw > 0 ? Math.floor(startChunkRaw) : 0;
+    let resume: { category: CategoryId; chunk_offset: number; categories: CategoryId[] } | null = null;
+
+    for (const [catIndex, category] of requested.entries()) {
       const tagChunks = chunkTags(CATEGORY_TAGS[category]);
-      const elements = await fetchOverpassBatched(lat, lng, radiusM, CATEGORY_TAGS[category], category);
+      const batch = await fetchOverpassBatched(
+        lat, lng, radiusM, CATEGORY_TAGS[category], category, startChunk, deadline,
+      );
+      const elements = batch.elements;
+      startChunk = 0; // offset only applies to the first processed category
 
       const venues = elements
         .filter((el) => el.tags?.name)
@@ -362,6 +383,24 @@ serve(async (req) => {
       summary[category] = { fetched: venues.length, saved };
       grandTotal += saved;
       console.log(`✅ backfill ${category}: ${saved}/${venues.length} (queries: ${tagChunks.length})`);
+
+      if (!batch.done) {
+        resume = {
+          category,
+          chunk_offset: batch.nextChunk,
+          categories: requested.slice(catIndex),
+        };
+        break;
+      }
+
+      if (Date.now() > deadline && catIndex < requested.length - 1) {
+        resume = {
+          category: requested[catIndex + 1],
+          chunk_offset: 0,
+          categories: requested.slice(catIndex + 1),
+        };
+        break;
+      }
     }
 
     return new Response(
@@ -370,6 +409,8 @@ serve(async (req) => {
         location: { latitude: lat, longitude: lng, radius_km: radiusKm },
         total_saved: grandTotal,
         per_category: summary,
+        done: !resume,
+        resume,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
