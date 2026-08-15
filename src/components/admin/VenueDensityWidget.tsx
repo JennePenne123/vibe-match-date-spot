@@ -9,7 +9,51 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { STALE_TIMES } from '@/config/queryConfig';
-import { MapPin, Info, Image as ImageIcon, BadgeCheck, Wand2, Loader2 } from 'lucide-react';
+import { MapPin, Info, Image as ImageIcon, BadgeCheck, Wand2, Loader2, History, PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
+
+type BackfillCat = 'culture' | 'activity' | 'nightlife';
+
+interface ImportRun {
+  city: string;
+  startedAt: string;
+  finishedAt: string;
+  saved: number;
+  passes: number;
+  status: 'completed' | 'partial' | 'failed';
+  categories: BackfillCat[];
+  error?: string;
+}
+
+interface ResumeState {
+  city: string;
+  latitude: number;
+  longitude: number;
+  chunkOffset: number;
+  categories: BackfillCat[];
+  savedSoFar: number;
+  updatedAt: string;
+}
+
+const HISTORY_KEY = 'hioutz-venue-backfill-history';
+const RESUME_KEY = 'hioutz-venue-backfill-resume';
+const MAX_PASSES = 12;
+
+function readJSON<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeJSON(key: string, value: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* storage full or blocked — history is non-critical */
+  }
+}
 
 interface DensityMetrics {
   city: string;
