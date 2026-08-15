@@ -304,7 +304,7 @@ const AIRecommendations: React.FC = () => {
                     return (!current || rec.ai_score > current.ai_score) ? rec.venue_id : topId;
                   }, sortedRecommendations[0]?.venue_id);
                   
-                  return sortedRecommendations.map((recommendation) => {
+                  return sortedRecommendations.map((recommendation, index) => {
                     const venueRoute = routeData.get(recommendation.venue_id);
                     return (
                       <SafeComponent 
@@ -316,6 +316,7 @@ const AIRecommendations: React.FC = () => {
                           onSelect={handleVenueSelect}
                           showAIInsights={true}
                           isTopMatch={recommendation.venue_id === topVenueId}
+                          rank={index + 1}
                           travelInfo={venueRoute}
                         />
                       </SafeComponent>

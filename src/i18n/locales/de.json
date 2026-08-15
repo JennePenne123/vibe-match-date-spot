@@ -1718,7 +1718,9 @@
     "memorizedTitle": "Das habe ich mir gemerkt",
     "memorizedPrefer": "Du magst {{feature}} – darauf achte ich jetzt stärker.",
     "memorizedAvoid": "{{feature}} ist eher nicht dein Ding – das zeige ich dir seltener.",
-    "memorizedHint": "Aus deinem Feedback gelernt. Je mehr du bewertest, desto genauer werde ich."
+    "memorizedHint": "Aus deinem Feedback gelernt. Je mehr du bewertest, desto genauer werde ich.",
+    "showMore": "{{count}} weitere anzeigen",
+    "showLess": "Weniger anzeigen"
   },
   "aiRecommendations": {
     "title": "KI-Empfehlungen",

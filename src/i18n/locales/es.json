@@ -1553,7 +1553,9 @@
     "memorizedTitle": "Esto es lo que he memorizado",
     "memorizedPrefer": "Te gusta {{feature}}: ahora le doy más peso.",
     "memorizedAvoid": "{{feature}} no es lo tuyo: te lo muestro menos.",
-    "memorizedHint": "Aprendido de tus valoraciones. Cuantas más des, más preciso seré."
+    "memorizedHint": "Aprendido de tus valoraciones. Cuantas más des, más preciso seré.",
+    "showMore": "Mostrar {{count}} más",
+    "showLess": "Mostrar menos"
   },
   "aiRecommendations": {
     "title": "Recomendaciones IA",
