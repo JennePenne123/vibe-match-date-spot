@@ -354,6 +354,70 @@ const VenueDensityWidget: React.FC = () => {
               <p className="text-[11px] text-muted-foreground text-center">
                 Importiert fehlende Kultur-, Aktivitäts- und Nightlife-Venues für {query} (15 km Radius).
               </p>
+
+              {filling && progress && (
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5 text-foreground">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                      Durchlauf {progress.pass} / {MAX_PASSES}
+                    </span>
+                    <span className="tabular-nums text-muted-foreground">
+                      {progress.saved} Venues gespeichert
+                    </span>
+                  </div>
+                  <Progress value={Math.round((progress.pass / MAX_PASSES) * 100)} className="h-1.5" />
+                  <p className="text-[11px] text-muted-foreground">
+                    Läuft: {progress.categories.map((c) => BACKFILL_LABELS[c]).join(', ') || '–'}
+                  </p>
+                </div>
+              )}
+
+              {!filling && resume && (
+                <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3 space-y-2">
+                  <p className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                    <PlayCircle className="w-3.5 h-3.5 text-amber-500" />
+                    Offener Import – {resume.city}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Cursor bei Position {resume.chunkOffset} · {resume.savedSoFar} Venues bisher ·{' '}
+                    {resume.categories.map((c) => BACKFILL_LABELS[c]).join(', ')} ·{' '}
+                    {new Date(resume.updatedAt).toLocaleString('de-DE')}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="secondary" onClick={() => runImport({ fromResume: true })}>
+                      Fortsetzen
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => persistResume(null)}>
+                      Verwerfen
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {history.length > 0 && (
+                <div className="rounded-lg border border-border/40 bg-background/40 p-3 space-y-2">
+                  <p className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                    <History className="w-3.5 h-3.5 text-primary" />
+                    Letzte Läufe
+                  </p>
+                  <ul className="space-y-1.5">
+                    {history.map((run) => (
+                      <li key={run.startedAt} className="flex items-start gap-2 text-[11px]">
+                        {run.status === 'completed' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />}
+                        {run.status === 'partial' && <PlayCircle className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />}
+                        {run.status === 'failed' && <XCircle className="w-3.5 h-3.5 text-red-500 mt-0.5 flex-shrink-0" />}
+                        <span className="text-muted-foreground">
+                          <span className="text-foreground">{run.city}</span> ·{' '}
+                          {new Date(run.startedAt).toLocaleString('de-DE')} · {run.saved} Venues ·{' '}
+                          {run.passes} Durchläufe
+                          {run.error ? ` · ${run.error}` : ''}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </>
         )}
