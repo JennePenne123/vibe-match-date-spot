@@ -137,6 +137,9 @@ const AdminDashboard: React.FC = () => {
       {/* Data Quality */}
       <DataQualityCard />
 
+      {/* A/B Scoring Experiment */}
+      <ScoringExperimentWidget />
+
       {/* Support Tickets */}
       <SupportTicketsWidget />
 
