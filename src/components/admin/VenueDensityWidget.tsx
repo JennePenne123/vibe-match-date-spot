@@ -78,6 +78,12 @@ const CAT_LABELS: Record<string, string> = {
 
 const MAIN_CATS = ['essen', 'kultur', 'aktivitaet', 'nightlife'] as const;
 
+const BACKFILL_LABELS: Record<BackfillCat, string> = {
+  culture: 'Kultur',
+  activity: 'Aktivitäten',
+  nightlife: 'Nightlife',
+};
+
 // Map our density categories to the backfill-activities categories.
 const BACKFILL_CAT: Record<string, 'culture' | 'activity' | 'nightlife' | null> = {
   essen: null,
