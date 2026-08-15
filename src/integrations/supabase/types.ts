@@ -2528,6 +2528,10 @@ export type Database = {
       get_friend_preferences: { Args: { _friend_id: string }; Returns: Json }
       get_group_invite_preview: { Args: { _token: string }; Returns: Json }
       get_retention_metrics: { Args: { days_back?: number }; Returns: Json }
+      get_signal_activation_metrics: {
+        Args: { days_back?: number }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
