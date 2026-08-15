@@ -5,8 +5,8 @@
 //
 // Body: { latitude, longitude, radius_km?, categories?: ('culture'|'activity'|'nightlife')[] }
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+
+import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 
 const OVERPASS_MIRRORS = [
@@ -269,7 +269,7 @@ function buildAddress(tags: Record<string, string>): string {
   return street || city || '';
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
