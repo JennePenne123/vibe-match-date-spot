@@ -267,6 +267,22 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
         </CardHeader>
 
         <CardContent className="space-y-2">
+          {/* Personal reason – "Für dich, {name}: Weil du ... liebst" */}
+          {showAIInsights && personalHeadline && (
+            <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 px-2.5 py-2">
+              <Sparkles className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
+              <p className="text-xs leading-snug text-foreground">
+                <span className="font-semibold text-primary">
+                  {userFirstName
+                    ? t('aiVenueCard.forYouNamed', { name: userFirstName })
+                    : t('aiVenueCard.forYou')}
+                  {': '}
+                </span>
+                {personalHeadline.text}
+              </p>
+            </div>
+          )}
+
           {/* "Warum dieses Venue?" */}
           {showAIInsights && ai_reasoning && (
             <div className="space-y-2">
