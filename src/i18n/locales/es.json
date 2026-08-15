@@ -1797,7 +1797,21 @@
     "backfillRunAll": "Cargar todo",
     "backfillError": "Error al cargar las fotos",
     "backfillBatchDone": "{{updated}} locales actualizados con fotos reales",
-    "backfillAllDone": "Carga de fotos completada"
+    "backfillAllDone": "Carga de fotos completada",
+    "scoringExperiment": {
+      "title": "Test A/B: Pesos de puntuación IA",
+      "empty": "Aún no hay datos. El test comienza en cuanto los usuarios reciban y valoren recomendaciones.",
+      "users": "{{count}} usuarios",
+      "recommendations": "Recomendaciones",
+      "avgRating": "Valoración media",
+      "avgAccuracy": "Precisión IA media",
+      "positiveRate": "Tasa positiva",
+      "footer": "Asignación 50/50, determinista por usuario. Significativo a partir de aprox. 100 valoraciones por grupo.",
+      "variant": {
+        "control": "A — pesos antiguos",
+        "treatment": "B — pesos nuevos"
+      }
+    }
   },
   "adminNav": {
     "adminPortal": "Portal de Admin",

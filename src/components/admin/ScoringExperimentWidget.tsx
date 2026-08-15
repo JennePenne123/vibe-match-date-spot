@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,12 +19,8 @@ interface ExperimentRow {
   avg_ai_accuracy: number | null;
 }
 
-const VARIANT_LABEL: Record<string, string> = {
-  control: 'A — alte Gewichtung',
-  treatment: 'B — neue Gewichtung',
-};
-
 const ScoringExperimentWidget: React.FC = () => {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery<ExperimentRow[]>({
     queryKey: ['admin-scoring-experiment', SCORING_EXPERIMENT_ID],
     queryFn: async () => {
@@ -45,12 +42,15 @@ const ScoringExperimentWidget: React.FC = () => {
     return total > 0 ? Math.round((Number(r.positive_feedback) / total) * 100) : null;
   };
 
+  const variantLabel = (variant: string) =>
+    t(`admin.scoringExperiment.variant.${variant}`, variant);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <FlaskConical className="h-4 w-4 text-primary" />
-          A/B-Test: KI-Gewichtung
+          {t('admin.scoringExperiment.title', 'A/B-Test: KI-Gewichtung')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -61,23 +61,35 @@ const ScoringExperimentWidget: React.FC = () => {
           </>
         ) : rows.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            Noch keine Messdaten. Der Test läuft ab sofort mit, sobald Nutzer Empfehlungen erhalten und bewerten.
+            {t(
+              'admin.scoringExperiment.empty',
+              'Noch keine Messdaten. Der Test läuft ab sofort mit, sobald Nutzer Empfehlungen erhalten und bewerten.'
+            )}
           </p>
         ) : (
           rows.map((r) => (
             <div key={r.variant} className="rounded-lg border border-border p-3">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-medium">{VARIANT_LABEL[r.variant] ?? r.variant}</span>
+                <span className="text-sm font-medium">{variantLabel(r.variant)}</span>
                 <Badge variant={r.variant === 'treatment' ? 'default' : 'secondary'}>
-                  {Number(r.users)} Nutzer
+                  {t('admin.scoringExperiment.users', '{{count}} Nutzer', { count: Number(r.users) })}
                 </Badge>
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                <div>Empfehlungen: <span className="text-foreground">{Number(r.recommendations)}</span></div>
-                <div>Ø Bewertung: <span className="text-foreground">{r.avg_rating ?? '–'}</span></div>
-                <div>Ø KI-Genauigkeit: <span className="text-foreground">{r.avg_ai_accuracy ?? '–'}</span></div>
                 <div>
-                  Positiv-Quote:{' '}
+                  {t('admin.scoringExperiment.recommendations', 'Empfehlungen')}:{' '}
+                  <span className="text-foreground">{Number(r.recommendations)}</span>
+                </div>
+                <div>
+                  {t('admin.scoringExperiment.avgRating', 'Ø Bewertung')}:{' '}
+                  <span className="text-foreground">{r.avg_rating ?? '–'}</span>
+                </div>
+                <div>
+                  {t('admin.scoringExperiment.avgAccuracy', 'Ø KI-Genauigkeit')}:{' '}
+                  <span className="text-foreground">{r.avg_ai_accuracy ?? '–'}</span>
+                </div>
+                <div>
+                  {t('admin.scoringExperiment.positiveRate', 'Positiv-Quote')}:{' '}
                   <span className="text-foreground">
                     {positiveRate(r) !== null ? `${positiveRate(r)}%` : '–'}
                   </span>
@@ -87,7 +99,10 @@ const ScoringExperimentWidget: React.FC = () => {
           ))
         )}
         <p className="text-xs text-muted-foreground">
-          Zuweisung 50/50, deterministisch pro Nutzer. Aussagekräftig ab ca. 100 Bewertungen je Gruppe.
+          {t(
+            'admin.scoringExperiment.footer',
+            'Zuweisung 50/50, deterministisch pro Nutzer. Aussagekräftig ab ca. 100 Bewertungen je Gruppe.'
+          )}
         </p>
       </CardContent>
     </Card>
