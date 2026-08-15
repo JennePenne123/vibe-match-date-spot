@@ -1714,7 +1714,11 @@
     "planFirst": "Plane dein erstes Erlebnis",
     "trendImproving": "verbessert sich",
     "trendDeclining": "verschlechtert sich",
-    "trendStable": "stabil"
+    "trendStable": "stabil",
+    "memorizedTitle": "Das habe ich mir gemerkt",
+    "memorizedPrefer": "Du magst {{feature}} – darauf achte ich jetzt stärker.",
+    "memorizedAvoid": "{{feature}} ist eher nicht dein Ding – das zeige ich dir seltener.",
+    "memorizedHint": "Aus deinem Feedback gelernt. Je mehr du bewertest, desto genauer werde ich."
   },
   "aiRecommendations": {
     "title": "KI-Empfehlungen",
@@ -1982,5 +1986,9 @@
     "loginFailed": "Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
     "loginSuccess": "Angemeldet",
     "loginSuccessDesc": "Noch {{count}} Backup-Codes übrig."
+  },
+  "aiVenueCard": {
+    "forYou": "Für dich",
+    "forYouNamed": "Für dich, {{name}}"
   }
 }

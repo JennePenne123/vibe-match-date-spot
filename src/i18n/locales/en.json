@@ -1714,7 +1714,11 @@
     "planFirst": "Plan Your First Experience",
     "trendImproving": "improving",
     "trendDeclining": "declining",
-    "trendStable": "stable"
+    "trendStable": "stable",
+    "memorizedTitle": "Here's what I remembered",
+    "memorizedPrefer": "You like {{feature}} – I now weigh that more.",
+    "memorizedAvoid": "{{feature}} is not really your thing – I show it less often.",
+    "memorizedHint": "Learned from your feedback. The more you rate, the more precise I get."
   },
   "aiRecommendations": {
     "title": "AI Recommendations",
@@ -1982,5 +1986,9 @@
     "loginFailed": "Sign-in failed. Please try again.",
     "loginSuccess": "Signed in",
     "loginSuccessDesc": "{{count}} backup codes remaining."
+  },
+  "aiVenueCard": {
+    "forYou": "For you",
+    "forYouNamed": "For you, {{name}}"
   }
 }
