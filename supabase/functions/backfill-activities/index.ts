@@ -319,9 +319,20 @@ serve(async (req) => {
     const summary: Record<string, { fetched: number; saved: number }> = {};
     let grandTotal = 0;
 
-    for (const category of requested) {
+    // Overpass is slow; stay well inside the edge function wall-clock limit and
+    // hand a resume cursor back to the caller instead of dying with WORKER_ERROR.
+    const deadline = Date.now() + 55_000;
+    const startChunkRaw = Number(body.chunk_offset ?? 0);
+    let startChunk = Number.isFinite(startChunkRaw) && startChunkRaw > 0 ? Math.floor(startChunkRaw) : 0;
+    let resume: { category: CategoryId; chunk_offset: number; categories: CategoryId[] } | null = null;
+
+    for (const [catIndex, category] of requested.entries()) {
       const tagChunks = chunkTags(CATEGORY_TAGS[category]);
-      const elements = await fetchOverpassBatched(lat, lng, radiusM, CATEGORY_TAGS[category], category);
+      const batch = await fetchOverpassBatched(
+        lat, lng, radiusM, CATEGORY_TAGS[category], category, startChunk, deadline,
+      );
+      const elements = batch.elements;
+      startChunk = 0; // offset only applies to the first processed category
 
       const venues = elements
         .filter((el) => el.tags?.name)
@@ -372,6 +383,24 @@ serve(async (req) => {
       summary[category] = { fetched: venues.length, saved };
       grandTotal += saved;
       console.log(`✅ backfill ${category}: ${saved}/${venues.length} (queries: ${tagChunks.length})`);
+
+      if (!batch.done) {
+        resume = {
+          category,
+          chunk_offset: batch.nextChunk,
+          categories: requested.slice(catIndex),
+        };
+        break;
+      }
+
+      if (Date.now() > deadline && catIndex < requested.length - 1) {
+        resume = {
+          category: requested[catIndex + 1],
+          chunk_offset: 0,
+          categories: requested.slice(catIndex + 1),
+        };
+        break;
+      }
     }
 
     return new Response(
@@ -380,6 +409,8 @@ serve(async (req) => {
         location: { latitude: lat, longitude: lng, radius_km: radiusKm },
         total_saved: grandTotal,
         per_category: summary,
+        done: !resume,
+        resume,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
