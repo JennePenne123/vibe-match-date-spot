@@ -478,7 +478,8 @@ export const getAIVenueRecommendations = async (
       // Proof, Exploration, Distanz-Toleranz) waren mit ±3–8 Punkten zu leise,
       // um spürbar "persönlich" zu wirken. Wir verstärken sie moderat auf
       // ±10–15 Punkte, ohne die expliziten Präferenzen zu überstimmen.
-      const LEARNED_SIGNAL_AMPLIFIER = 1.9;
+      // A/B-Test: control = alte Gewichtung, treatment = neue Gewichtung
+      const LEARNED_SIGNAL_AMPLIFIER = experimentWeights.learnedSignalAmplifier;
       const learnedSignals =
         (habitResult.bonus + repeatResult.modifier
           + friendResult.bonus
@@ -502,7 +503,7 @@ export const getAIVenueRecommendations = async (
       const rawSituationalBoost = getSituationalBoost(situationalCat, venue, secondaryCat);
       // Dämpfung: der Intent gibt die Richtung vor, überschreibt aber nicht mehr
       // die expliziten und gelernten Präferenzen (±45 % → ±31 %).
-      const SITUATIONAL_DAMPENING = 0.7;
+      const SITUATIONAL_DAMPENING = experimentWeights.situationalDampening;
       const situationalBoost = 1 + (rawSituationalBoost - 1) * SITUATIONAL_DAMPENING;
 
       // ── Source Quality Boost ──
