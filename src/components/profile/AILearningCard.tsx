@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,7 @@ const AILearningCard: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { insights, loading, refreshInsights } = useAILearning();
+  const [showAllMemorized, setShowAllMemorized] = useState(false);
 
   if (loading) {
     return (
@@ -46,7 +47,7 @@ const AILearningCard: React.FC = () => {
         .map(([key, raw]) => ({ key, value: Number(raw) }))
         .filter(({ value }) => value >= 1.08 || value <= 0.92)
         .sort((a, b) => Math.abs(b.value - 1) - Math.abs(a.value - 1))
-        .slice(0, 4)
+        .slice(0, 6)
         .map(({ key, value }) =>
           value >= 1
             ? t('aiLearning.memorizedPrefer', { feature: key })
@@ -134,7 +135,7 @@ const AILearningCard: React.FC = () => {
                   {t('aiLearning.memorizedTitle')}
                 </div>
                 <ul className="space-y-1.5">
-                  {memorized.map((line, index) => (
+                  {(showAllMemorized ? memorized : memorized.slice(0, 3)).map((line, index) => (
                     <li
                       key={index}
                       className="text-sm text-foreground bg-primary/5 border border-primary/15 rounded-md px-2.5 py-1.5"
@@ -143,27 +144,19 @@ const AILearningCard: React.FC = () => {
                     </li>
                   ))}
                 </ul>
+                {memorized.length > 3 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setShowAllMemorized((v) => !v)}
+                  >
+                    {showAllMemorized
+                      ? t('aiLearning.showLess')
+                      : t('aiLearning.showMore', { count: memorized.length - 3 })}
+                  </Button>
+                )}
                 <p className="text-xs text-muted-foreground">{t('aiLearning.memorizedHint')}</p>
-              </div>
-            )}
-
-            {insights.featureWeights && (
-              <div className="space-y-2 pt-2 border-t border-border/50">
-                <div className="text-sm font-medium">{t('aiLearning.learnedPreferences')}</div>
-                <p className="text-xs text-muted-foreground">{t('aiLearning.learningFactorHint')}</p>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(insights.featureWeights)
-                    .filter(([key]) => key !== 'distance')
-                    .map(([key, value]) => (
-                      <Badge 
-                        key={key} 
-                        variant="secondary"
-                        className={value > 1.1 ? 'bg-primary/20 text-primary' : ''}
-                      >
-                        {key}: {(value as number).toFixed(2)}x
-                      </Badge>
-                    ))}
-                </div>
               </div>
             )}
 
