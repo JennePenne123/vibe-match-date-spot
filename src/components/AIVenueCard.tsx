@@ -32,6 +32,9 @@ import { VoucherBadge } from '@/components/VoucherBadge';
 import { VoucherBadge as VoucherBadgeType } from '@/hooks/useVenueVouchers';
 import { RouteInfo } from '@/services/routingService';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
+import { buildPersonalHeadline, firstNameOf } from '@/utils/personalReasoning';
 
 interface TravelInfo {
   driving?: RouteInfo | null;
