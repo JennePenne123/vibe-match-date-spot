@@ -24,6 +24,7 @@ import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
 import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, passesFoodIntentFilter, matchesSelectedVenueTypes, matchesSelectedCuisines, CUISINE_KEYWORDS, type SituationalCategoryId } from '@/lib/situationalCategories';
+import { getScoringWeights, logExperimentEvent } from '@/services/experiments/scoringExperiment';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
 import {
   beginSituationalFilterRequest,
