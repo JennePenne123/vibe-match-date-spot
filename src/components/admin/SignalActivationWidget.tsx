@@ -9,9 +9,20 @@ import { STALE_TIMES } from '@/config/queryConfig';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
 } from 'recharts';
-import { Target, Info, Sparkles, Hourglass } from 'lucide-react';
+import { Target, Info, Sparkles, Hourglass, User, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+
+interface SegmentMetrics {
+  segment: 'solo' | 'duo_group' | string;
+  cohort_size: number;
+  activated: number;
+  rate: number;
+  avg_signals: number;
+  returned: number;
+  return_rate: number;
+  return_window_days: number;
+}
 
 interface SignalActivationMetrics {
   threshold: number;
@@ -23,6 +34,7 @@ interface SignalActivationMetrics {
   median_signals: number;
   pending_cohort: number;
   distribution: { bucket: string; users: number }[];
+  segments: SegmentMetrics[];
   rolling: { users_with_signals: number; users_activated: number; total_signals: number };
   weekly: { week: string; cohort_size: number; activated: number; rate: number | null }[];
 }
@@ -117,6 +129,23 @@ const SignalActivationWidget: React.FC<{ daysBack?: number }> = ({ daysBack = 30
             sub="zu jung für die Wertung" />
         </div>
 
+        {/* Segments: solo vs. duo/group */}
+        <div>
+          <p className="text-sm font-medium text-foreground mb-2">Nach Nutzungsmodus</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {(data.segments || []).length === 0 && (
+              <p className="text-xs text-muted-foreground">Noch keine segmentierten Daten</p>
+            )}
+            {(data.segments || []).map((s) => (
+              <SegmentCard key={s.segment} seg={s} threshold={data.threshold} />
+            ))}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-2">
+            Solo wird auf ein 14-Tage-Wiederkehr-Fenster gemessen, Duo/Gruppe auf 45 Tage –
+            Gruppenplanung ist kategorie-typisch seltener und darf nicht als Frequenzproblem fehlinterpretiert werden.
+          </p>
+        </div>
+
         {/* Distribution */}
         <div>
           <p className="text-sm font-medium text-foreground mb-2">Signal-Verteilung der Kohorte</p>
@@ -172,5 +201,35 @@ const MiniStat: React.FC<{ icon: React.ElementType; label: string; value: number
     </div>
   </div>
 );
+
+const SegmentCard: React.FC<{ seg: SegmentMetrics; threshold: number }> = ({ seg, threshold }) => {
+  const isSolo = seg.segment === 'solo';
+  const Icon = isSolo ? User : Users;
+  const label = isSolo ? 'Solo / spontan' : 'Duo & Gruppe';
+  const tone =
+    seg.cohort_size === 0 ? 'text-muted-foreground'
+      : seg.rate >= 40 ? 'text-emerald-500'
+      : seg.rate >= 20 ? 'text-amber-500'
+      : 'text-red-500';
+  return (
+    <div className="rounded-lg border border-border/40 bg-background/40 p-4 space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+          <Icon className="w-4 h-4 text-primary" />
+          {label}
+        </span>
+        <Badge variant="outline" className="text-xs">{seg.activated}/{seg.cohort_size}</Badge>
+      </div>
+      <p className={`text-3xl font-bold tabular-nums ${tone}`}>
+        {seg.cohort_size === 0 ? '–' : `${seg.rate}%`}
+      </p>
+      <p className="text-xs text-muted-foreground">≥{threshold} Signale · Ø {seg.avg_signals}</p>
+      <Progress value={seg.cohort_size === 0 ? 0 : seg.rate} className="h-1.5" />
+      <p className="text-[11px] text-muted-foreground">
+        Wiederkehr {seg.return_window_days}T: {seg.return_rate}% ({seg.returned}/{seg.cohort_size})
+      </p>
+    </div>
+  );
+};
 
 export default SignalActivationWidget;
