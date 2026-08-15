@@ -14,6 +14,7 @@ import VenuePhotoBackfillWidget from '@/components/admin/VenuePhotoBackfillWidge
 import VenueAddressBackfillWidget from '@/components/admin/VenueAddressBackfillWidget';
 import AikidoConfigWidget from '@/components/admin/AikidoConfigWidget';
 import ScoringExperimentWidget from '@/components/admin/ScoringExperimentWidget';
+import SignalActivationWidget from '@/components/admin/SignalActivationWidget';
 
 interface PlatformStats {
   totalUsers: number;
@@ -133,6 +134,9 @@ const AdminDashboard: React.FC = () => {
           </Card>
         ))}
       </div>
+
+      {/* North Star: signal activation */}
+      <SignalActivationWidget daysBack={30} />
 
       {/* Data Quality */}
       <DataQualityCard />
