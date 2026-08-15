@@ -473,14 +473,23 @@ export const getAIVenueRecommendations = async (
       // Social proof bonus
       const socialProof = (reviewCount >= 50 && venue.rating >= 4.0) ? 3 : 0;
 
+      // ── Personalisation amplifier ──
+      // Gelernte / persönliche Signale (Habit, Repeat-Protection, Friend Social
+      // Proof, Exploration, Distanz-Toleranz) waren mit ±3–8 Punkten zu leise,
+      // um spürbar "persönlich" zu wirken. Wir verstärken sie moderat auf
+      // ±10–15 Punkte, ohne die expliziten Präferenzen zu überstimmen.
+      const LEARNED_SIGNAL_AMPLIFIER = 1.9;
+      const learnedSignals =
+        (habitResult.bonus + repeatResult.modifier
+          + friendResult.bonus
+          + explorationResult.bonus
+          + distanceResult.bonus) * LEARNED_SIGNAL_AMPLIFIER;
+
       // Compute final score: all signals combined (including new #15-#17)
       const rawScore = prefScore + contextBonus + ratingBonus + socialProof
-        + habitResult.bonus + repeatResult.modifier
+        + learnedSignals
         + occasionResult.bonus + occasionResult.penalty
-        + friendResult.bonus
         + weatherResult.bonus + weatherResult.penalty
-        + explorationResult.bonus
-        + distanceResult.bonus
         + (photoVibeResult.modifier * 100)  // Convert 0-0.12 to 0-12 scale
         + (pairResult.modifier * 100)       // Convert 0-0.15 to 0-15 scale
         + (seasonalResult.modifier * 100);  // Convert 0-0.08 to 0-8 scale
@@ -490,7 +499,11 @@ export const getAIVenueRecommendations = async (
       // 0.7x only when both primary AND secondary signal off-bucket, 1.0x neutral.
       const situationalCat = getSituationalCategory(situationalCategoryId ?? null);
       const secondaryCat = getSituationalCategory(secondaryCategoryId ?? null);
-      const situationalBoost = getSituationalBoost(situationalCat, venue, secondaryCat);
+      const rawSituationalBoost = getSituationalBoost(situationalCat, venue, secondaryCat);
+      // Dämpfung: der Intent gibt die Richtung vor, überschreibt aber nicht mehr
+      // die expliziten und gelernten Präferenzen (±45 % → ±31 %).
+      const SITUATIONAL_DAMPENING = 0.7;
+      const situationalBoost = 1 + (rawSituationalBoost - 1) * SITUATIONAL_DAMPENING;
 
       // ── Source Quality Boost ──
       // For non-food intents (Aktivität/Kultur/Nightlife) Google Places hat
