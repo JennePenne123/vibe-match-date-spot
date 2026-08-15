@@ -68,6 +68,8 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
 
   const [showDetails, setShowDetails] = useState(false);
   const [userFeedback, setUserFeedback] = useState<FeedbackType | null>(null);
+  const { t } = useTranslation();
+  const { user } = useAuth();
 
   const {
     venue_id,
@@ -93,6 +95,10 @@ const AIVenueCard: React.FC<AIVenueCardProps> = ({
 
   const formattedAddress = formatVenueAddress(recommendation);
   const venueNeighborhood = neighborhood || extractNeighborhood(venue_address);
+
+  // Personal "Ich-Botschaft" derived from the strongest matching signal
+  const personalHeadline = buildPersonalHeadline(ai_reasoning);
+  const userFirstName = firstNameOf(user?.name);
 
   // Prefer a real neighborhood/address; if none is available (backend is still
   // reverse-geocoding), fall back to the distance so we never show raw coords.
