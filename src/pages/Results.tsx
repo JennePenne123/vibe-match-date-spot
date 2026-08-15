@@ -353,6 +353,7 @@ const Results = () => {
                     showAIInsights={true}
                     compact={false}
                     isTopMatch={index === 0}
+                    rank={index + 1}
                     sessionContext={{
                       sessionId: isFromSmartPlanning ? smartPlanningState.sessionId : 'current-session',
                       partnerId: isFromSmartPlanning ? smartPlanningState.partnerId : 'current-partner'
