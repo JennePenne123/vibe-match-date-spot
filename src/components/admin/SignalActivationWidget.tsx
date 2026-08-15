@@ -9,9 +9,20 @@ import { STALE_TIMES } from '@/config/queryConfig';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
 } from 'recharts';
-import { Target, Info, Sparkles, Hourglass } from 'lucide-react';
+import { Target, Info, Sparkles, Hourglass, User, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+
+interface SegmentMetrics {
+  segment: 'solo' | 'duo_group' | string;
+  cohort_size: number;
+  activated: number;
+  rate: number;
+  avg_signals: number;
+  returned: number;
+  return_rate: number;
+  return_window_days: number;
+}
 
 interface SignalActivationMetrics {
   threshold: number;
@@ -23,6 +34,7 @@ interface SignalActivationMetrics {
   median_signals: number;
   pending_cohort: number;
   distribution: { bucket: string; users: number }[];
+  segments: SegmentMetrics[];
   rolling: { users_with_signals: number; users_activated: number; total_signals: number };
   weekly: { week: string; cohort_size: number; activated: number; rate: number | null }[];
 }
@@ -115,6 +127,23 @@ const SignalActivationWidget: React.FC<{ daysBack?: number }> = ({ daysBack = 30
             sub={`letzte ${data.window_days} Tage`} />
           <MiniStat icon={Hourglass} label="Noch im Fenster" value={data.pending_cohort}
             sub="zu jung für die Wertung" />
+        </div>
+
+        {/* Segments: solo vs. duo/group */}
+        <div>
+          <p className="text-sm font-medium text-foreground mb-2">Nach Nutzungsmodus</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {(data.segments || []).length === 0 && (
+              <p className="text-xs text-muted-foreground">Noch keine segmentierten Daten</p>
+            )}
+            {(data.segments || []).map((s) => (
+              <SegmentCard key={s.segment} seg={s} threshold={data.threshold} />
+            ))}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-2">
+            Solo wird auf ein 14-Tage-Wiederkehr-Fenster gemessen, Duo/Gruppe auf 45 Tage –
+            Gruppenplanung ist kategorie-typisch seltener und darf nicht als Frequenzproblem fehlinterpretiert werden.
+          </p>
         </div>
 
         {/* Distribution */}
