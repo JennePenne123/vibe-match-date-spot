@@ -164,12 +164,21 @@ async function fetchOverpassBatched(
   radiusM: number,
   tags: Array<[string, string]>,
   category: CategoryId,
-): Promise<any[]> {
+  startChunk = 0,
+  deadline = Number.POSITIVE_INFINITY,
+): Promise<{ elements: any[]; nextChunk: number; done: boolean }> {
   const merged: any[] = [];
   const seen = new Set<string>();
   const tagChunks = chunkTags(tags);
+  let nextChunk = startChunk;
 
   for (const [index, chunk] of tagChunks.entries()) {
+    if (index < startChunk) continue;
+    if (Date.now() > deadline) {
+      console.log(`⏸️ ${category}: time budget reached at chunk ${index}`);
+      return { elements: merged, nextChunk: index, done: false };
+    }
+
     const elements = await fetchOverpassAdaptive(lat, lng, radiusM, chunk, `${category}:${index + 1}`);
 
     for (const el of elements) {
@@ -179,10 +188,11 @@ async function fetchOverpassBatched(
       merged.push(el);
     }
 
+    nextChunk = index + 1;
     await sleep(OVERPASS_REQUEST_DELAY_MS);
   }
 
-  return merged;
+  return { elements: merged, nextChunk, done: true };
 }
 
 function categoryFromTags(tags: Record<string, string>): { cuisine: string; tags: string[] } {
