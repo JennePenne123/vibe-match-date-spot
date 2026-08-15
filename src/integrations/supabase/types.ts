@@ -2532,6 +2532,7 @@ export type Database = {
         Args: { days_back?: number }
         Returns: Json
       }
+      get_venue_density_metrics: { Args: { _city?: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

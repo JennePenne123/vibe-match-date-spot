@@ -15,6 +15,7 @@ import VenueAddressBackfillWidget from '@/components/admin/VenueAddressBackfillW
 import AikidoConfigWidget from '@/components/admin/AikidoConfigWidget';
 import ScoringExperimentWidget from '@/components/admin/ScoringExperimentWidget';
 import SignalActivationWidget from '@/components/admin/SignalActivationWidget';
+import VenueDensityWidget from '@/components/admin/VenueDensityWidget';
 
 interface PlatformStats {
   totalUsers: number;
@@ -137,6 +138,9 @@ const AdminDashboard: React.FC = () => {
 
       {/* North Star: signal activation */}
       <SignalActivationWidget daysBack={30} />
+
+      {/* Venue density / launch readiness */}
+      <VenueDensityWidget />
 
       {/* Data Quality */}
       <DataQualityCard />
