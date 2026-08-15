@@ -24,6 +24,7 @@ import { API_CONFIG } from '@/config/apiConfig';
 import { venueCacheService } from '@/services/venueCacheService';
 import { apiUsageService } from '@/services/apiUsageService';
 import { getSituationalCategory, getSituationalBoost, passesSituationalHardFilter, passesFoodIntentFilter, matchesSelectedVenueTypes, matchesSelectedCuisines, CUISINE_KEYWORDS, type SituationalCategoryId } from '@/lib/situationalCategories';
+import { getScoringWeights, logExperimentEvent } from '@/services/experiments/scoringExperiment';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
 import {
   beginSituationalFilterRequest,
@@ -216,6 +217,8 @@ export const getAIVenueRecommendations = async (
   situationalCategoryId?: SituationalCategoryId | null,
   secondaryCategoryId?: SituationalCategoryId | null,
 ): Promise<AIVenueRecommendation[]> => {
+  // A/B-Test-Zuweisung (deterministisch pro User)
+  const experimentWeights = getScoringWeights(userId);
   const filterReportId = beginSituationalFilterRequest(
     situationalCategoryId ?? null,
     secondaryCategoryId ?? null,
@@ -478,7 +481,8 @@ export const getAIVenueRecommendations = async (
       // Proof, Exploration, Distanz-Toleranz) waren mit ±3–8 Punkten zu leise,
       // um spürbar "persönlich" zu wirken. Wir verstärken sie moderat auf
       // ±10–15 Punkte, ohne die expliziten Präferenzen zu überstimmen.
-      const LEARNED_SIGNAL_AMPLIFIER = 1.9;
+      // A/B-Test: control = alte Gewichtung, treatment = neue Gewichtung
+      const LEARNED_SIGNAL_AMPLIFIER = experimentWeights.learnedSignalAmplifier;
       const learnedSignals =
         (habitResult.bonus + repeatResult.modifier
           + friendResult.bonus
@@ -502,7 +506,7 @@ export const getAIVenueRecommendations = async (
       const rawSituationalBoost = getSituationalBoost(situationalCat, venue, secondaryCat);
       // Dämpfung: der Intent gibt die Richtung vor, überschreibt aber nicht mehr
       // die expliziten und gelernten Präferenzen (±45 % → ±31 %).
-      const SITUATIONAL_DAMPENING = 0.7;
+      const SITUATIONAL_DAMPENING = experimentWeights.situationalDampening;
       const situationalBoost = 1 + (rawSituationalBoost - 1) * SITUATIONAL_DAMPENING;
 
       // ── Source Quality Boost ──
@@ -770,6 +774,19 @@ export const getAIVenueRecommendations = async (
         }).catch(() => { /* silent */ });
       }
     } catch { /* never block on enrichment */ }
+
+    // A/B-Test: Impression protokollieren (fire-and-forget)
+    void logExperimentEvent({
+      userId,
+      eventType: 'recommendation_shown',
+      venueId: diverseRecommendations[0]?.venue_id ?? null,
+      metadata: {
+        count: diverseRecommendations.length,
+        top_score: diverseRecommendations[0]?.ai_score ?? null,
+        situational_category: situationalCategoryId ?? null,
+        is_group: !!partnerId,
+      },
+    });
 
     return validateRecommendations(diverseRecommendations);
   } catch (error) {

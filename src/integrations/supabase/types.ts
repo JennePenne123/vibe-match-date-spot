@@ -173,6 +173,45 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_experiment_events: {
+        Row: {
+          ai_accuracy_rating: number | null
+          created_at: string
+          event_type: string
+          experiment: string
+          id: string
+          metadata: Json
+          rating: number | null
+          user_id: string
+          variant: string
+          venue_id: string | null
+        }
+        Insert: {
+          ai_accuracy_rating?: number | null
+          created_at?: string
+          event_type: string
+          experiment: string
+          id?: string
+          metadata?: Json
+          rating?: number | null
+          user_id: string
+          variant: string
+          venue_id?: string | null
+        }
+        Update: {
+          ai_accuracy_rating?: number | null
+          created_at?: string
+          event_type?: string
+          experiment?: string
+          id?: string
+          metadata?: Json
+          rating?: number | null
+          user_id?: string
+          variant?: string
+          venue_id?: string | null
+        }
+        Relationships: []
+      }
       ai_learning_data: {
         Row: {
           actual_rating: number | null
@@ -2472,6 +2511,18 @@ export type Database = {
           last_run_status: string
           schedule: string
           total_runs_24h: number
+        }[]
+      }
+      get_experiment_summary: {
+        Args: { _experiment: string }
+        Returns: {
+          avg_ai_accuracy: number
+          avg_rating: number
+          negative_feedback: number
+          positive_feedback: number
+          recommendations: number
+          users: number
+          variant: string
         }[]
       }
       get_friend_preferences: { Args: { _friend_id: string }; Returns: Json }

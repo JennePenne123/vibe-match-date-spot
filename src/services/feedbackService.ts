@@ -2,6 +2,7 @@
 // Complete optimized feedback service with AI learning capabilities
 
 import { supabase } from '@/integrations/supabase/client';
+import { logExperimentEvent } from '@/services/experiments/scoringExperiment';
 
 // Enhanced Types
 export type FeedbackType = 'like' | 'dislike' | 'super_like' | 'skip' | 'visited' | 'interested' | 'not_interested';
@@ -199,6 +200,20 @@ export const createDateFeedback = async (
     }
 
     console.log('Date feedback created successfully:', data);
+
+    // A/B-Test: Bewertung der Variante zuordnen
+    void logExperimentEvent({
+      userId: user.id,
+      eventType: 'date_feedback',
+      rating: feedbackData.venue_rating ?? feedbackData.rating ?? null,
+      aiAccuracyRating: feedbackData.ai_accuracy_rating ?? null,
+      metadata: {
+        invitation_id: feedbackData.invitation_id,
+        would_recommend_venue: feedbackData.would_recommend_venue ?? null,
+        would_use_ai_again: feedbackData.would_use_ai_again ?? null,
+      },
+    });
+
     return data;
   } catch (error) {
     console.error('Error in createDateFeedback:', error);
@@ -312,6 +327,18 @@ export const recordVenueFeedback = async (
     }
 
     console.log('Venue feedback recorded successfully:', data);
+
+    // A/B-Test: Venue-Feedback der Variante zuordnen
+    void logExperimentEvent({
+      userId: user.id,
+      eventType: 'venue_feedback',
+      venueId: venueId,
+      metadata: {
+        feedback_type: feedbackType,
+        source: enhancedContext.source,
+        ai_score: context.ai_score ?? null,
+      },
+    });
 
     // Trigger ML retraining in background (non-blocking)
     triggerMLUpdate(user.id, venueId, feedbackType).catch(console.error);
