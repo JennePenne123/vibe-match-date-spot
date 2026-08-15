@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Brain, TrendingUp, Sparkles, Target, RefreshCw, ChevronRight } from 'lucide-react';
+import { Brain, TrendingUp, Sparkles, Target, RefreshCw, ChevronRight, BookmarkCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAILearning } from '@/hooks/useAILearning';
 
@@ -38,6 +38,21 @@ const AILearningCard: React.FC = () => {
     medium: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
     high: 'bg-green-500/20 text-green-600 border-green-500/30'
   };
+
+  // "Das habe ich mir gemerkt" – learned weights translated into personal sentences
+  const memorized: string[] = insights?.featureWeights
+    ? Object.entries(insights.featureWeights)
+        .filter(([key]) => key !== 'distance')
+        .map(([key, raw]) => ({ key, value: Number(raw) }))
+        .filter(({ value }) => value >= 1.08 || value <= 0.92)
+        .sort((a, b) => Math.abs(b.value - 1) - Math.abs(a.value - 1))
+        .slice(0, 4)
+        .map(({ key, value }) =>
+          value >= 1
+            ? t('aiLearning.memorizedPrefer', { feature: key })
+            : t('aiLearning.memorizedAvoid', { feature: key })
+        )
+    : [];
 
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-lg transition-shadow">
@@ -112,6 +127,26 @@ const AILearningCard: React.FC = () => {
             )}
 
             {/* Feature Weights */}
+            {memorized.length > 0 && (
+              <div className="space-y-2 pt-2 border-t border-border/50">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <BookmarkCheck className="h-4 w-4 text-primary" />
+                  {t('aiLearning.memorizedTitle')}
+                </div>
+                <ul className="space-y-1.5">
+                  {memorized.map((line, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-foreground bg-primary/5 border border-primary/15 rounded-md px-2.5 py-1.5"
+                    >
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-muted-foreground">{t('aiLearning.memorizedHint')}</p>
+              </div>
+            )}
+
             {insights.featureWeights && (
               <div className="space-y-2 pt-2 border-t border-border/50">
                 <div className="text-sm font-medium">{t('aiLearning.learnedPreferences')}</div>
