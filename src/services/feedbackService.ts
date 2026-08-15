@@ -2,6 +2,7 @@
 // Complete optimized feedback service with AI learning capabilities
 
 import { supabase } from '@/integrations/supabase/client';
+import { logExperimentEvent } from '@/services/experiments/scoringExperiment';
 
 // Enhanced Types
 export type FeedbackType = 'like' | 'dislike' | 'super_like' | 'skip' | 'visited' | 'interested' | 'not_interested';
