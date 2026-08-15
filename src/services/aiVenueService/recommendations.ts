@@ -775,6 +775,19 @@ export const getAIVenueRecommendations = async (
       }
     } catch { /* never block on enrichment */ }
 
+    // A/B-Test: Impression protokollieren (fire-and-forget)
+    void logExperimentEvent({
+      userId,
+      eventType: 'recommendation_shown',
+      venueId: diverseRecommendations[0]?.venue_id ?? null,
+      metadata: {
+        count: diverseRecommendations.length,
+        top_score: diverseRecommendations[0]?.ai_score ?? null,
+        situational_category: situationalCategoryId ?? null,
+        is_group: !!partnerId,
+      },
+    });
+
     return validateRecommendations(diverseRecommendations);
   } catch (error) {
     // Preserve typed errors so callers (e.g. useAIAnalysis) can react to them.
