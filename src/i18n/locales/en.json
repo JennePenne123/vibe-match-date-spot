@@ -1718,7 +1718,9 @@
     "memorizedTitle": "Here's what I remembered",
     "memorizedPrefer": "You like {{feature}} – I now weigh that more.",
     "memorizedAvoid": "{{feature}} is not really your thing – I show it less often.",
-    "memorizedHint": "Learned from your feedback. The more you rate, the more precise I get."
+    "memorizedHint": "Learned from your feedback. The more you rate, the more precise I get.",
+    "showMore": "Show {{count}} more",
+    "showLess": "Show less"
   },
   "aiRecommendations": {
     "title": "AI Recommendations",
