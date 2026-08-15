@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { STALE_TIMES } from '@/config/queryConfig';
-import { MapPin, Info, Image as ImageIcon, BadgeCheck } from 'lucide-react';
+import { MapPin, Info, Image as ImageIcon, BadgeCheck, Wand2, Loader2 } from 'lucide-react';
 
 interface DensityMetrics {
   city: string;
@@ -32,6 +34,14 @@ const CAT_LABELS: Record<string, string> = {
 
 const MAIN_CATS = ['essen', 'kultur', 'aktivitaet', 'nightlife'] as const;
 
+// Map our density categories to the backfill-activities categories.
+const BACKFILL_CAT: Record<string, 'culture' | 'activity' | 'nightlife' | null> = {
+  essen: null,
+  kultur: 'culture',
+  aktivitaet: 'activity',
+  nightlife: 'nightlife',
+};
+
 /**
  * Launch-readiness widget: venue density per main category and district,
  * measured against the minimum coverage we defined as "launch-fähig".
@@ -39,8 +49,10 @@ const MAIN_CATS = ['essen', 'kultur', 'aktivitaet', 'nightlife'] as const;
 const VenueDensityWidget: React.FC = () => {
   const [city, setCity] = useState('Hamburg');
   const [query, setQuery] = useState('Hamburg');
+  const [filling, setFilling] = useState(false);
+  const { toast } = useToast();
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-venue-density', query],
     queryFn: async () => {
       const { data, error } = await supabase.rpc(
@@ -54,6 +66,54 @@ const VenueDensityWidget: React.FC = () => {
   });
 
   const catMap = new Map((data?.categories || []).map(c => [c.category, c]));
+
+  const weakCategories = MAIN_CATS.filter((cat) => {
+    const backfillCat = BACKFILL_CAT[cat];
+    if (!backfillCat) return false;
+    const total = catMap.get(cat)?.total ?? 0;
+    const cityTarget = (data?.targets?.[cat] ?? 8) * 5;
+    return total < cityTarget;
+  });
+
+  const fillGaps = async () => {
+    if (weakCategories.length === 0) return;
+    setFilling(true);
+    try {
+      // Geocode the city so the import is centred correctly.
+      const geoResp = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
+      );
+      const geo = await geoResp.json();
+      const lat = Number(geo?.[0]?.lat);
+      const lon = Number(geo?.[0]?.lon);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+        throw new Error(`Stadt "${query}" konnte nicht geokodiert werden`);
+      }
+
+      const categories = weakCategories
+        .map((cat) => BACKFILL_CAT[cat])
+        .filter(Boolean) as Array<'culture' | 'activity' | 'nightlife'>;
+
+      const { data: result, error: fnError } = await supabase.functions.invoke('backfill-activities', {
+        body: { latitude: lat, longitude: lon, radius_km: 15, categories },
+      });
+      if (fnError) throw fnError;
+
+      toast({
+        title: 'Import abgeschlossen',
+        description: `${(result as { total_saved?: number })?.total_saved ?? 0} Venues für ${query} ergänzt.`,
+      });
+      await refetch();
+    } catch (e) {
+      toast({
+        title: 'Import fehlgeschlagen',
+        description: e instanceof Error ? e.message : String(e),
+        variant: 'destructive',
+      });
+    } finally {
+      setFilling(false);
+    }
+  };
 
   return (
     <Card className="bg-card/80 backdrop-blur border-border/40">
@@ -155,6 +215,24 @@ const VenueDensityWidget: React.FC = () => {
               {data.targets?.aktivitaet ?? 8} Aktivität und {data.targets?.nightlife ?? 8} Nightlife pro Stadtteil.
               Rot = unter der Hälfte, Gelb = knapp darunter, Grün = erreicht.
             </p>
+
+            <div className="space-y-2">
+              <Button
+                onClick={fillGaps}
+                disabled={filling || weakCategories.length === 0}
+                className="w-full"
+              >
+                {filling
+                  ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  : <Wand2 className="w-4 h-4 mr-2" />}
+                {weakCategories.length === 0
+                  ? 'Alle Kategorien launch-fähig'
+                  : `Lücken füllen (${weakCategories.map((c) => CAT_LABELS[c]).join(', ')})`}
+              </Button>
+              <p className="text-[11px] text-muted-foreground text-center">
+                Importiert fehlende Kultur-, Aktivitäts- und Nightlife-Venues für {query} (15 km Radius).
+              </p>
+            </div>
           </>
         )}
       </CardContent>
