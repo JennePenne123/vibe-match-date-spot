@@ -216,6 +216,8 @@ export const getAIVenueRecommendations = async (
   situationalCategoryId?: SituationalCategoryId | null,
   secondaryCategoryId?: SituationalCategoryId | null,
 ): Promise<AIVenueRecommendation[]> => {
+  // A/B-Test-Zuweisung (deterministisch pro User)
+  const experimentWeights = getScoringWeights(userId);
   const filterReportId = beginSituationalFilterRequest(
     situationalCategoryId ?? null,
     secondaryCategoryId ?? null,
