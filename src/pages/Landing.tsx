@@ -13,6 +13,7 @@ import { SEO } from '@/components/SEO';
 export default function LandingDemo() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
