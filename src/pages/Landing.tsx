@@ -317,7 +317,7 @@ export default function LandingDemo() {
               <Link to="/agb" className="hover:text-foreground transition-colors">{t('landing.footerLinks.terms')}</Link>
               <Link to="/kontakt" className="hover:text-foreground transition-colors">{t('landing.footerLinks.contact')}</Link>
             </div>
-            <p className="text-sm text-muted-foreground">{t('landing.footer')}</p>
+            <p className="text-sm text-muted-foreground">{t('landing.footer', { year: currentYear })}</p>
           </div>
         </div>
       </footer>
