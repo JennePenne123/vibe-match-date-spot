@@ -195,7 +195,7 @@
     "ctaTitle2": "Momentos Significativos?",
     "ctaSubtitle": "Únete a una comunidad que valora la intención y la conexión. Planifica experiencias que importan.",
     "startJourney": "Comienza tu Viaje",
-    "footer": "© 2024 H!Outz. Diseñado para conexiones significativas.",
+    "footer": "© {{year}} H!Outz. Todos los derechos reservados.",
     "aiBadge": "Planificación de experiencias con IA",
     "socialProof": {
       "activeUsers": "Usuarios Activos",
