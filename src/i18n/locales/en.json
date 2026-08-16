@@ -209,6 +209,9 @@
       "contact": "Contact"
     }
   },
+  "footer": {
+    "copyright": "© {{year}} {{company}}. All rights reserved."
+  },
   "onboarding": {
     "skip": "Skip",
     "screen1Title": "Discover Perfect Spots",

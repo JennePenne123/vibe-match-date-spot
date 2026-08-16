@@ -209,6 +209,9 @@
       "contact": "Contacto"
     }
   },
+  "footer": {
+    "copyright": "© {{year}} {{company}}. Todos los derechos reservados."
+  },
   "onboarding": {
     "skip": "Omitir",
     "screen1Title": "Descubre Lugares Perfectos",

@@ -209,6 +209,9 @@
       "contact": "Kontakt"
     }
   },
+  "footer": {
+    "copyright": "© {{year}} {{company}}. Alle Rechte vorbehalten."
+  },
   "onboarding": {
     "skip": "Überspringen",
     "screen1Title": "Perfekte Spots entdecken",
