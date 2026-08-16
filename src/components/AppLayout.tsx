@@ -150,11 +150,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {/* Main content area */}
           <main id="main-content" className="flex-1 overflow-auto">
             <div className={cn(
-              "h-full",
+              "min-h-full",
               isDesktop ? "p-6" : "p-4"
             )}>
               {children}
             </div>
+            {!isPartnerRoute && !isAdminRoute && <Footer />}
           </main>
         </div>
         {!isPartnerRoute && !isAdminRoute && concierge}
