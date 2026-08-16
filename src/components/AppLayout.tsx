@@ -7,6 +7,7 @@ import { AdminSidebar } from './AdminSidebar'
 import { MobileBottomNav } from './MobileBottomNav'
 import { AdminMobileBottomNav } from './AdminMobileBottomNav'
 import { PartnerMobileBottomNav } from './PartnerMobileBottomNav'
+import { Footer } from './Footer'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { Menu } from 'lucide-react'
@@ -112,6 +113,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           className={cn("will-change-transform", isAdminRoute && "overflow-x-hidden")}
         >
           {children}
+          {!isPartnerRoute && !isAdminRoute && <Footer />}
         </main>
 
         {isPartnerRoute ? (
@@ -148,11 +150,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {/* Main content area */}
           <main id="main-content" className="flex-1 overflow-auto">
             <div className={cn(
-              "h-full",
+              "min-h-full",
               isDesktop ? "p-6" : "p-4"
             )}>
               {children}
             </div>
+            {!isPartnerRoute && !isAdminRoute && <Footer />}
           </main>
         </div>
         {!isPartnerRoute && !isAdminRoute && concierge}

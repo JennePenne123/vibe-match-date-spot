@@ -119,6 +119,12 @@ export default function Impressum() {
             bzw. Erstellers.
           </p>
 
+          <h3>Copyright-Hinweis</h3>
+          <p className="text-muted-foreground">
+            © {new Date().getFullYear()} {COMPANY.legalName}. Alle Rechte vorbehalten.
+            Sämtliche Inhalte, Logos, Marken und Software dieser App sind urheberrechtlich geschützt.
+          </p>
+
         </div>
       </div>
     </div>

@@ -195,7 +195,7 @@
     "ctaTitle2": "Meaningful Moments?",
     "ctaSubtitle": "Join a community that values intention and connection. Start planning experiences that matter.",
     "startJourney": "Start Your Journey",
-    "footer": "© 2024 H!Outz. Designed for meaningful connections.",
+    "footer": "© {{year}} H!Outz. All rights reserved.",
     "aiBadge": "AI-powered experience planning",
     "socialProof": {
       "activeUsers": "Active Users",
@@ -208,6 +208,9 @@
       "terms": "Terms",
       "contact": "Contact"
     }
+  },
+  "footer": {
+    "copyright": "© {{year}} {{company}}. All rights reserved."
   },
   "onboarding": {
     "skip": "Skip",
