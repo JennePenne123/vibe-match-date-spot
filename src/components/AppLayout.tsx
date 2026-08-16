@@ -113,6 +113,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           className={cn("will-change-transform", isAdminRoute && "overflow-x-hidden")}
         >
           {children}
+          {!isPartnerRoute && !isAdminRoute && <Footer />}
         </main>
 
         {isPartnerRoute ? (
