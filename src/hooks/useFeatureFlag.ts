@@ -9,14 +9,20 @@ export function useFeatureFlag(flagKey: string) {
   const query = useQuery({
     queryKey: ['feature-flag', flagKey],
     queryFn: async () => {
+      // Anonymous visitors have no privileges on feature_flags (RLS is
+      // authenticated-only) – treat that as "flag disabled" instead of an error.
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return { enabled: false, metadata: {} as Record<string, unknown> };
+
       const { data, error } = await supabase
         .from('feature_flags')
         .select('enabled, metadata')
         .eq('flag_key', flagKey)
         .maybeSingle();
-      if (error) throw error;
+      if (error) return { enabled: false, metadata: {} as Record<string, unknown> };
       return data ?? { enabled: false, metadata: {} as Record<string, unknown> };
     },
+    retry: false,
     staleTime: 5 * 60 * 1000, // 5min
     gcTime: 30 * 60 * 1000,
   });
