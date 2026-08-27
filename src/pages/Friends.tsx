@@ -59,10 +59,11 @@ const Friends = () => {
     { id: '8', name: 'Ryan Kim', avatar_url: 'https://ui-avatars.com/api/?name=Ryan+Kim&background=ffc0cb&color=fff&size=128&bold=true', isInvited: false },
   ];
 
-  const friendsList = isDemoMode ? demoFriends : friends;
+  const friendsList = isDemoMode ? demoFriends : (friends ?? []);
   const filteredFriends = friendsList.filter(friend =>
-    friend.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (friend?.name ?? '').toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   const handleInviteFriend = (friendId: string) => {
     if (isDemoMode) {
