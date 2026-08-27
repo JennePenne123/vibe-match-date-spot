@@ -5,6 +5,18 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const isDevelopment = import.meta.env.DEV;
 
+/** Detects Vite/browser errors caused by a stale or missing lazy chunk. */
+function isChunkLoadError(error: Error | null): boolean {
+  const msg = `${error?.name ?? ''} ${error?.message ?? ''}`.toLowerCase();
+  return (
+    msg.includes('failed to fetch dynamically imported module') ||
+    msg.includes('error loading dynamically imported module') ||
+    msg.includes('importing a module script failed') ||
+    msg.includes('chunkloaderror')
+  );
+}
+
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
