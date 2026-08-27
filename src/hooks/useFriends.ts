@@ -61,7 +61,8 @@ export const useFriends = () => {
 
         const entry: Friend = {
           id: profile.id,
-          name: profile.name,
+          name: profile.name || 'Freund',
+
           email: '', // Email is no longer fetched for friend profiles (privacy)
           avatar_url: profile.avatar_url,
           friendship_status: friendship.status as 'pending' | 'accepted' | 'declined' | 'blocked',
