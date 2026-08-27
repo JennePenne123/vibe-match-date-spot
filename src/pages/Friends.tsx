@@ -84,7 +84,7 @@ const Friends = () => {
   const handleNext = async () => {
     setIsGenerating(true);
     try {
-      const finalInvitedIds = isDemoMode ? invitedIds : friends.filter(f => f.isInvited).map(f => f.id);
+      const finalInvitedIds = isDemoMode ? invitedIds : (friends ?? []).filter(f => f?.isInvited).map(f => f.id);
       updateInvitedFriends(finalInvitedIds);
       void trackFunnelStep({
         stepKey: 'friends_page',

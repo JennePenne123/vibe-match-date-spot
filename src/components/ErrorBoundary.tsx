@@ -5,6 +5,18 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const isDevelopment = import.meta.env.DEV;
 
+/** Detects Vite/browser errors caused by a stale or missing lazy chunk. */
+function isChunkLoadError(error: Error | null): boolean {
+  const msg = `${error?.name ?? ''} ${error?.message ?? ''}`.toLowerCase();
+  return (
+    msg.includes('failed to fetch dynamically imported module') ||
+    msg.includes('error loading dynamically imported module') ||
+    msg.includes('importing a module script failed') ||
+    msg.includes('chunkloaderror')
+  );
+}
+
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -52,6 +64,19 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('Error caught by boundary:', error);
     this.setState({ error, errorInfo });
     this.props.onError?.(error, errorInfo);
+
+    // Self-heal stale lazy chunks (happens after a new deploy while the old
+    // bundle is still cached): reload once instead of showing an error screen.
+    if (isChunkLoadError(error)) {
+      const key = 'hioutz-chunk-reload';
+      const last = Number(sessionStorage.getItem(key) || 0);
+      if (Date.now() - last > 30_000) {
+        sessionStorage.setItem(key, String(Date.now()));
+        window.location.reload();
+        return;
+      }
+    }
+
     void import('@/services/errorMonitoringService')
       .then(({ logUiError, logCrash }) => {
         const component = errorInfo.componentStack?.split('\n')[1]?.trim();
