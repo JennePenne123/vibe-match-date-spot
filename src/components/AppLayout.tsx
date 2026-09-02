@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useRef, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
 import { PartnerSidebar } from './PartnerSidebar'
@@ -8,12 +9,15 @@ import { MobileBottomNav } from './MobileBottomNav'
 import { AdminMobileBottomNav } from './AdminMobileBottomNav'
 import { PartnerMobileBottomNav } from './PartnerMobileBottomNav'
 import { Footer } from './Footer'
+import { AdminHeaderClock } from './AdminHeaderClock'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
-import { Menu } from 'lucide-react'
+import { Menu, RefreshCw } from 'lucide-react'
 import hioutzLogo from '@/assets/hioutz-logo.webp'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
+import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
 const AIConcierge = lazy(() => import('@/components/AIConcierge'))
 
 // Tab order for directional slide
@@ -33,6 +37,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { isMobile, isDesktop } = useBreakpoint()
   const location = useLocation()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
   const isPartnerRoute = location.pathname.startsWith('/partner')
   const isAdminRoute = location.pathname.startsWith('/admin')
 
@@ -40,6 +46,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const prevPath = useRef(location.pathname)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const isHomePage = location.pathname === '/' || location.pathname === '/index' || location.pathname === '/home'
 
@@ -49,6 +56,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <AIConcierge />
     </Suspense>
   ) : null
+
+  const handleAdminRefresh = async () => {
+    if (!isAdminRoute) return
+    setIsRefreshing(true)
+    await queryClient.invalidateQueries({ predicate: (q) => String(q.queryKey[0] ?? '').startsWith('admin-') })
+    setIsRefreshing(false)
+  }
 
 
   // Determine slide direction on route change
@@ -107,6 +121,29 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </header>
         )}
 
+        {/* Admin mobile header */}
+        {isAdminRoute && (
+          <header className="sticky top-0 z-40 flex items-center justify-between h-12 px-4 border-b border-border/40 bg-card/90 backdrop-blur-xl">
+            <div className="flex items-center gap-2">
+              <img src={hioutzLogo} alt="H!Outz" className="h-7 w-auto cursor-pointer" onClick={() => navigate('/home')} />
+              <span className="font-semibold text-sm text-foreground">Admin</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleAdminRefresh}
+                disabled={isRefreshing}
+                aria-label={t('common.refresh', 'Aktualisieren')}
+              >
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </Button>
+              <ThemeToggle />
+            </div>
+          </header>
+        )}
+
         <main
           id="main-content"
           style={getContentStyle()}
@@ -144,7 +181,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </SidebarTrigger>
               <img src={hioutzLogo} alt="H!Outz" className="h-9 w-auto cursor-pointer" onClick={() => navigate('/home')} />
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              {isAdminRoute && (
+                <>
+                  <AdminHeaderClock />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAdminRefresh}
+                    disabled={isRefreshing}
+                    className="hidden sm:flex items-center gap-1.5"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    {t('common.refresh', 'Aktualisieren')}
+                  </Button>
+                </>
+              )}
+              <ThemeToggle />
+            </div>
           </header>
 
           {/* Main content area */}
