@@ -121,6 +121,29 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </header>
         )}
 
+        {/* Admin mobile header */}
+        {isAdminRoute && (
+          <header className="sticky top-0 z-40 flex items-center justify-between h-12 px-4 border-b border-border/40 bg-card/90 backdrop-blur-xl">
+            <div className="flex items-center gap-2">
+              <img src={hioutzLogo} alt="H!Outz" className="h-7 w-auto cursor-pointer" onClick={() => navigate('/home')} />
+              <span className="font-semibold text-sm text-foreground">Admin</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleAdminRefresh}
+                disabled={isRefreshing}
+                aria-label={t('common.refresh', 'Aktualisieren')}
+              >
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </Button>
+              <ThemeToggle />
+            </div>
+          </header>
+        )}
+
         <main
           id="main-content"
           style={getContentStyle()}
