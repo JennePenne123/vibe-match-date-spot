@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useRef, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
 import { PartnerSidebar } from './PartnerSidebar'
@@ -8,12 +9,15 @@ import { MobileBottomNav } from './MobileBottomNav'
 import { AdminMobileBottomNav } from './AdminMobileBottomNav'
 import { PartnerMobileBottomNav } from './PartnerMobileBottomNav'
 import { Footer } from './Footer'
+import { AdminHeaderClock } from './AdminHeaderClock'
 import { useBreakpoint } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
-import { Menu } from 'lucide-react'
+import { Menu, RefreshCw } from 'lucide-react'
 import hioutzLogo from '@/assets/hioutz-logo.webp'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
+import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
 const AIConcierge = lazy(() => import('@/components/AIConcierge'))
 
 // Tab order for directional slide
