@@ -158,7 +158,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </SidebarTrigger>
               <img src={hioutzLogo} alt="H!Outz" className="h-9 w-auto cursor-pointer" onClick={() => navigate('/home')} />
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              {isAdminRoute && (
+                <>
+                  <AdminHeaderClock />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAdminRefresh}
+                    disabled={isRefreshing}
+                    className="hidden sm:flex items-center gap-1.5"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    {t('common.refresh', 'Aktualisieren')}
+                  </Button>
+                </>
+              )}
+              <ThemeToggle />
+            </div>
           </header>
 
           {/* Main content area */}
