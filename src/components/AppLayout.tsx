@@ -37,6 +37,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { isMobile, isDesktop } = useBreakpoint()
   const location = useLocation()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
   const isPartnerRoute = location.pathname.startsWith('/partner')
   const isAdminRoute = location.pathname.startsWith('/admin')
 
@@ -44,6 +46,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const prevPath = useRef(location.pathname)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const isHomePage = location.pathname === '/' || location.pathname === '/index' || location.pathname === '/home'
 
@@ -53,6 +56,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <AIConcierge />
     </Suspense>
   ) : null
+
+  const handleAdminRefresh = async () => {
+    if (!isAdminRoute) return
+    setIsRefreshing(true)
+    await queryClient.invalidateQueries({ predicate: (q) => String(q.queryKey[0] ?? '').startsWith('admin-') })
+    setIsRefreshing(false)
+  }
 
 
   // Determine slide direction on route change
