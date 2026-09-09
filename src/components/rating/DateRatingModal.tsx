@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Star, ThumbsUp, ThumbsDown, Zap, Brain, TrendingUp, ArrowRight } from 'lucide-react';
+import { Star, ThumbsUp, ThumbsDown, Zap, Brain, TrendingUp, ArrowRight, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDateRating, LearningImpact } from '@/hooks/useDateRating';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,9 @@ interface DateRatingModalProps {
   partnerId?: string;
   aiPredictedScore?: number | null;
   aiPredictedFactors?: Record<string, unknown> | null;
+  /** Visit confirmed via location data. */
+  visitVerified?: boolean;
+  visitVerificationMethod?: string | null;
   onSuccess?: () => void;
 }
 
@@ -205,6 +208,8 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
   partnerId,
   aiPredictedScore,
   aiPredictedFactors,
+  visitVerified = false,
+  visitVerificationMethod = null,
   onSuccess,
 }) => {
   const { t } = useTranslation();
@@ -224,6 +229,8 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
     partnerId,
     aiPredictedScore,
     aiPredictedFactors,
+    visitVerified,
+    visitVerificationMethod,
   });
 
   const hoursSinceDate = dateTime
@@ -287,6 +294,16 @@ export const DateRatingModal: React.FC<DateRatingModalProps> = ({
               </DialogHeader>
 
               <div className="space-y-6 py-2">
+                <div className="flex items-center justify-center">
+                  <Badge
+                    variant={visitVerified ? 'default' : 'outline'}
+                    className="gap-1.5 px-3 py-1 text-xs"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    {visitVerified ? t('visit.verifiedRating') : t('visit.unverifiedRating')}
+                  </Badge>
+                </div>
+
                 {hasSpeedBonus && (
                   <div className="flex items-center justify-center">
                     <Badge variant="secondary" className="gap-1.5 px-3 py-1 text-xs bg-accent/10 text-accent border-accent/20">
