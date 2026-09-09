@@ -221,3 +221,31 @@ export const getVisitsForInvitations = async (
   }
   return map;
 };
+
+/**
+ * Invitations that are ready to be rated because a tracked visit has ended
+ * and the (evening / next morning) prompt time has arrived.
+ */
+export const getDueVisitInvitations = async (userId: string): Promise<any[]> => {
+  const visits = (await getDueRatingVisits(userId)).filter((v) => v.invitation_id);
+  if (visits.length === 0) return [];
+
+  const ids = Array.from(new Set(visits.map((v) => v.invitation_id))) as string[];
+  const { data } = await supabase
+    .from('date_invitations')
+    .select(`
+      *,
+      sender:profiles!date_invitations_sender_id_fkey(id, name, avatar_url),
+      recipient:profiles!date_invitations_recipient_id_fkey(id, name, avatar_url)
+    `)
+    .in('id', ids);
+
+  const { data: rated } = await supabase
+    .from('date_feedback')
+    .select('invitation_id')
+    .eq('user_id', userId)
+    .in('invitation_id', ids);
+
+  const ratedIds = new Set((rated || []).map((r: any) => r.invitation_id));
+  return (data || []).filter((inv: any) => !ratedIds.has(inv.id));
+};
