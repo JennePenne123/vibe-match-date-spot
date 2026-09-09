@@ -2030,5 +2030,24 @@
     "views_other": "{{count}} Aufrufe",
     "voteCount_one": "{{count}} Stimme",
     "voteCount_other": "{{count}} Stimmen"
+  },
+  "visit": {
+    "title": "Bist du vor Ort?",
+    "checkIn": "Ich bin da",
+    "checkInHint": "Bestätige deinen Besuch für eine faire Bewertung",
+    "checkOut": "Besuch beenden",
+    "ongoing": "Besuch läuft",
+    "verified": "Besuch bestätigt",
+    "unverified": "Unbestätigt",
+    "verifiedRating": "Bestätigter Besuch",
+    "unverifiedRating": "Unbestätigter Besuch",
+    "confirmedTitle": "Besuch bestätigt",
+    "confirmedDesc": "Wir haben dich bei {{venue}} erkannt. Viel Spaß!",
+    "unconfirmedTitle": "Besuch gespeichert",
+    "unconfirmedDesc": "Ohne Standort können wir den Besuch nicht bestätigen – deine Bewertung zählt dann als unbestätigt.",
+    "leftTitle": "Besuch beendet",
+    "leftDesc": "Wir fragen später nach deiner Bewertung.",
+    "ratingLater": "Sobald du den Ort verlässt, fragen wir später am Abend nach deiner Bewertung.",
+    "unknownVenue": "Ort"
   }
 }

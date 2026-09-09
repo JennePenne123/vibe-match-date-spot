@@ -1,0 +1,1 @@
+- [Visit Verification](mem://features/visit-verification) — Geo-Check-in vor Bewertungen, venue_visits, bestätigt/unbestätigt

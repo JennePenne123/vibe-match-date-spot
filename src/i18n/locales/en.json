@@ -2030,5 +2030,24 @@
     "views_other": "{{count}} views",
     "voteCount_one": "{{count}} vote",
     "voteCount_other": "{{count}} votes"
+  },
+  "visit": {
+    "title": "Are you there?",
+    "checkIn": "I'm here",
+    "checkInHint": "Confirm your visit for a fair rating",
+    "checkOut": "End visit",
+    "ongoing": "Visit in progress",
+    "verified": "Visit confirmed",
+    "unverified": "Unconfirmed",
+    "verifiedRating": "Confirmed visit",
+    "unverifiedRating": "Unconfirmed visit",
+    "confirmedTitle": "Visit confirmed",
+    "confirmedDesc": "We spotted you at {{venue}}. Enjoy!",
+    "unconfirmedTitle": "Visit saved",
+    "unconfirmedDesc": "Without location we can't confirm the visit – your rating will be marked unconfirmed.",
+    "leftTitle": "Visit ended",
+    "leftDesc": "We'll ask for your rating later.",
+    "ratingLater": "Once you leave, we'll ask for your rating later this evening.",
+    "unknownVenue": "Venue"
   }
 }

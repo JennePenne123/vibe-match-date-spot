@@ -480,6 +480,8 @@ export type Database = {
           rating: number | null
           user_id: string
           venue_rating: number | null
+          visit_verification_method: string | null
+          visit_verified: boolean
           would_recommend_venue: boolean | null
           would_use_ai_again: boolean | null
         }
@@ -492,6 +494,8 @@ export type Database = {
           rating?: number | null
           user_id: string
           venue_rating?: number | null
+          visit_verification_method?: string | null
+          visit_verified?: boolean
           would_recommend_venue?: boolean | null
           would_use_ai_again?: boolean | null
         }
@@ -504,6 +508,8 @@ export type Database = {
           rating?: number | null
           user_id?: string
           venue_rating?: number | null
+          visit_verification_method?: string | null
+          visit_verified?: boolean
           would_recommend_venue?: boolean | null
           would_use_ai_again?: boolean | null
         }
@@ -2154,6 +2160,71 @@ export type Database = {
           venue_id?: string | null
         }
         Relationships: []
+      }
+      venue_visits: {
+        Row: {
+          arrived_at: string
+          closest_distance_m: number | null
+          created_at: string
+          id: string
+          invitation_id: string | null
+          left_at: string | null
+          rating_prompt_at: string | null
+          rating_prompted: boolean
+          updated_at: string
+          user_id: string
+          venue_id: string
+          venue_latitude: number | null
+          venue_longitude: number | null
+          venue_name: string | null
+          verification_method: string
+          verified: boolean
+        }
+        Insert: {
+          arrived_at?: string
+          closest_distance_m?: number | null
+          created_at?: string
+          id?: string
+          invitation_id?: string | null
+          left_at?: string | null
+          rating_prompt_at?: string | null
+          rating_prompted?: boolean
+          updated_at?: string
+          user_id: string
+          venue_id: string
+          venue_latitude?: number | null
+          venue_longitude?: number | null
+          venue_name?: string | null
+          verification_method?: string
+          verified?: boolean
+        }
+        Update: {
+          arrived_at?: string
+          closest_distance_m?: number | null
+          created_at?: string
+          id?: string
+          invitation_id?: string | null
+          left_at?: string | null
+          rating_prompt_at?: string | null
+          rating_prompted?: boolean
+          updated_at?: string
+          user_id?: string
+          venue_id?: string
+          venue_latitude?: number | null
+          venue_longitude?: number | null
+          venue_name?: string | null
+          verification_method?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_visits_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "date_invitations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       venues: {
         Row: {
