@@ -223,7 +223,7 @@ const SharedBoard: React.FC = () => {
                     </div>
                     {typeof venue.score === 'number' && (
                       <span className="shrink-0 rounded-full bg-primary/15 text-primary text-xs font-semibold px-2.5 py-1">
-                        {Math.round(venue.score)}%
+                        {Math.round(venue.score <= 1 ? venue.score * 100 : venue.score)}%
                       </span>
                     )}
                   </div>
