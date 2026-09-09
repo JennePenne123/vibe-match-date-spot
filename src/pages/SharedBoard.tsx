@@ -205,7 +205,13 @@ const SharedBoard: React.FC = () => {
                   src={venue.image || getVenueFallbackImage({ id: venue.key, name: venue.name, cuisine_type: venue.cuisine })}
                   alt={venue.name}
                   loading="lazy"
-                  className="h-40 w-full object-cover"
+                  className="h-40 w-full object-cover bg-muted"
+                  onError={(e) => {
+                    const img = e.currentTarget;
+                    if (img.dataset.fallbackApplied) return;
+                    img.dataset.fallbackApplied = 'true';
+                    img.src = getVenueFallbackImage({ id: 'fallback', name: 'venue' });
+                  }}
                 />
                 <div className="p-4 space-y-2">
                   <div className="flex items-start justify-between gap-3">
