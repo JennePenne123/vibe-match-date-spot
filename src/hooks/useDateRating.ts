@@ -25,6 +25,9 @@ export interface DateRatingOptions {
   partnerId?: string;
   aiPredictedScore?: number | null;
   aiPredictedFactors?: Record<string, unknown> | null;
+  /** True when the visit was confirmed via location. */
+  visitVerified?: boolean;
+  visitVerificationMethod?: string | null;
 }
 
 export const useDateRating = (invitationId: string, options?: DateRatingOptions) => {
@@ -75,6 +78,10 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
           venue_rating: ratingData.venueRating > 0 ? ratingData.venueRating : null,
           would_recommend_venue: ratingData.wouldRecommendVenue,
           feedback_text: ratingData.feedbackText || null,
+          visit_verified: options?.visitVerified ?? false,
+          visit_verification_method: options?.visitVerified
+            ? options?.visitVerificationMethod ?? 'manual'
+            : null,
         })
         .select()
         .single();
@@ -193,6 +200,7 @@ export const useDateRating = (invitationId: string, options?: DateRatingOptions)
               occasion: lifestyleContext.occasion || null,
               priority_weights: lifestyleContext.priority_weights || null,
               venue_distance_km: venueDistanceKm,
+              visit_verified: options?.visitVerified ?? false,
             },
           });
           if (result) {
