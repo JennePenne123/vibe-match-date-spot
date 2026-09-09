@@ -12,6 +12,7 @@ import UpcomingDatesCard from '@/components/home/UpcomingDatesCard';
 import PendingInvitesCard from '@/components/home/PendingInvitesCard';
 import AIConfidenceBanner from '@/components/home/AIConfidenceBanner';
 import { PendingRatingsCard } from '@/components/home/PendingRatingsCard';
+import { VisitCheckInCard } from '@/components/home/VisitCheckInCard';
 import LocationPermissionBanner from '@/components/home/LocationPermissionBanner';
 import DateProposalsList from '@/components/date-planning/DateProposalsList';
 import DateProposalCreation from '@/components/date-planning/DateProposalCreation';
@@ -221,6 +222,9 @@ const HomeContent: React.FC = () => {
 
         {/* Situational Quick-Actions — pick today's vibe */}
         <SituationalQuickActions />
+
+        {/* Location-verified visit check-in */}
+        <VisitCheckInCard />
 
         {/* Pending ratings — compact, above fold */}
         <PendingRatingsCard />
