@@ -143,9 +143,14 @@ const VenueDensityWidget: React.FC = () => {
     else localStorage.removeItem(RESUME_KEY);
   };
 
+  const autoCategories = weakCategories
+    .map((cat) => BACKFILL_CAT[cat])
+    .filter(Boolean) as BackfillCat[];
+  const effectiveCategories = manualCats.length > 0 ? manualCats : autoCategories;
+
   const runImport = async (opts?: { fromResume: boolean }) => {
     const fromResume = opts?.fromResume === true;
-    if (!fromResume && weakCategories.length === 0) return;
+    if (!fromResume && effectiveCategories.length === 0) return;
     const startedAt = new Date().toISOString();
     setFilling(true);
     let categories: BackfillCat[] = [];
