@@ -1,9 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /** Radius in metres within which a user counts as "at the venue". */
-export const VISIT_ARRIVAL_RADIUS_M = 150;
+export const VISIT_ARRIVAL_RADIUS_M = 50;
 /** Hysteresis radius — user counts as "left" only beyond this. */
-export const VISIT_DEPARTURE_RADIUS_M = 250;
+export const VISIT_DEPARTURE_RADIUS_M = 100;
 /** Minimum stay before a visit counts as a real visit. */
 export const VISIT_MIN_STAY_MINUTES = 15;
 
