@@ -15,7 +15,7 @@ import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   createSharedBoard,
-  buildBoardUrl,
+  buildBoardShareUrl,
   type SharedBoardVenue,
 } from '@/services/sharedBoardService';
 
@@ -66,7 +66,7 @@ const CreateBoardButton: React.FC<CreateBoardButtonProps> = ({
         venues,
         expiresInDays: 30,
       });
-      setLink(buildBoardUrl(board.slug));
+      setLink(buildBoardShareUrl(board.slug));
     } catch {
       toast({ title: t('board.createFailed'), variant: 'destructive' });
     } finally {
