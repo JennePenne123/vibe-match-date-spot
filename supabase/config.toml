@@ -79,3 +79,5 @@ project_id = "dfjwubatslzblagthbdw"
     verify_jwt = true
   [functions.aikido-config]
     verify_jwt = true
+  [functions.board-preview]
+    verify_jwt = false
