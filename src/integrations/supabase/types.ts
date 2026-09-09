@@ -1572,6 +1572,89 @@ export type Database = {
           },
         ]
       }
+      shared_board_votes: {
+        Row: {
+          board_id: string
+          created_at: string
+          id: string
+          venue_key: string
+          vote: number
+          voter_key: string
+          voter_name: string | null
+        }
+        Insert: {
+          board_id: string
+          created_at?: string
+          id?: string
+          venue_key: string
+          vote?: number
+          voter_key: string
+          voter_name?: string | null
+        }
+        Update: {
+          board_id?: string
+          created_at?: string
+          id?: string
+          venue_key?: string
+          vote?: number
+          voter_key?: string
+          voter_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_board_votes_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "shared_boards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shared_boards: {
+        Row: {
+          city: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          note: string | null
+          owner_id: string
+          slug: string
+          title: string
+          updated_at: string
+          venues: Json
+          view_count: number
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          note?: string | null
+          owner_id: string
+          slug: string
+          title: string
+          updated_at?: string
+          venues?: Json
+          view_count?: number
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          note?: string | null
+          owner_id?: string
+          slug?: string
+          title?: string
+          updated_at?: string
+          venues?: Json
+          view_count?: number
+        }
+        Relationships: []
+      }
       support_tickets: {
         Row: {
           admin_notes: string | null
@@ -2539,6 +2622,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_shared_board_view: {
+        Args: { _slug: string }
+        Returns: undefined
       }
       insert_request_log: {
         Args: {
