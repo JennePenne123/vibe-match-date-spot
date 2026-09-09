@@ -3,7 +3,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const APP_ORIGIN = Deno.env.get('PUBLIC_APP_ORIGIN') ?? 'https://hioutz.app';
-const FALLBACK_IMAGE = `${APP_ORIGIN}/og-image.png`;
+const FALLBACK_IMAGE = `${APP_ORIGIN}/og-image.jpg`;
 
 const escapeHtml = (value: string) =>
   value
