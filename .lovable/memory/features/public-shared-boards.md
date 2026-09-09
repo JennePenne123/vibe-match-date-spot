@@ -11,3 +11,5 @@ type: feature
 - Erstellung über `CreateBoardButton` auf der Ergebnisseite (max. 8 Venues pro Board).
 - iMessage: keine native Anbindung möglich (Apple erlaubt keine externe API). Boards werden über das System-Share-Sheet geteilt; eine echte iMessage-App setzt den nativen iOS-Build voraus.
 - Bekannte Grenze: Klassischer Vite-SPA-Stack rendert keine boardspezifische Linkvorschau (kein SSR).
+
+- Share-Links laufen über die Edge Function `board-preview` (`/functions/v1/board-preview/:slug`): Crawler bekommen board-spezifische OG-Tags (Titel, erstes Venue-Bild), echte Browser werden per 302 auf `/b/:slug` weitergeleitet. Helper: `buildBoardShareUrl`.

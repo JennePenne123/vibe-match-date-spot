@@ -80,6 +80,17 @@ export const setVoterName = (name: string) => {
 export const buildBoardUrl = (slug: string, origin = window.location.origin) =>
   `${origin}/b/${slug}`;
 
+/**
+ * Link used for sharing: served by the `board-preview` edge function so chat apps
+ * (iMessage, WhatsApp, ...) get board-specific title/image metadata. Humans are
+ * redirected straight to /b/:slug.
+ */
+export const buildBoardShareUrl = (slug: string): string => {
+  const base = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+  if (!base) return buildBoardUrl(slug);
+  return `${base.replace(/\/$/, '')}/functions/v1/board-preview/${slug}`;
+};
+
 const normalizeBoard = (row: any): SharedBoard => ({
   ...row,
   venues: Array.isArray(row?.venues) ? (row.venues as SharedBoardVenue[]) : [],

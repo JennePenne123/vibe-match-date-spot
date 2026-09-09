@@ -18,7 +18,7 @@ import {
   getVoterKey,
   getVoterName,
   setVoterName,
-  buildBoardUrl,
+  buildBoardShareUrl,
   type SharedBoard as SharedBoardType,
   type SharedBoardVote,
 } from '@/services/sharedBoardService';
@@ -93,7 +93,7 @@ const SharedBoard: React.FC = () => {
   };
 
   const handleShare = async () => {
-    const url = buildBoardUrl(slug);
+    const url = buildBoardShareUrl(slug);
     const shareData = {
       title: board?.title || t('board.defaultTitle'),
       text: t('board.shareText', { title: board?.title || '' }),
