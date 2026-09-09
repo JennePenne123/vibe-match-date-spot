@@ -16,6 +16,7 @@ import AikidoConfigWidget from '@/components/admin/AikidoConfigWidget';
 import ScoringExperimentWidget from '@/components/admin/ScoringExperimentWidget';
 import SignalActivationWidget from '@/components/admin/SignalActivationWidget';
 import VenueDensityWidget from '@/components/admin/VenueDensityWidget';
+import VisitVerificationWidget from '@/components/admin/VisitVerificationWidget';
 
 interface PlatformStats {
   totalUsers: number;
@@ -141,6 +142,9 @@ const AdminDashboard: React.FC = () => {
 
       {/* Venue density / launch readiness */}
       <VenueDensityWidget />
+
+      {/* Geo check-in quality */}
+      <VisitVerificationWidget />
 
       {/* Data Quality */}
       <DataQualityCard />
