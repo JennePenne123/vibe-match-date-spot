@@ -128,7 +128,8 @@ const SharedBoard: React.FC = () => {
           icon={Sparkles}
           title={t('board.notFoundTitle')}
           description={t('board.notFoundDescription')}
-          action={{ label: t('board.discoverCta'), onClick: () => (window.location.href = '/') }}
+          actionLabel={t('board.discoverCta')}
+          onAction={() => { window.location.href = '/'; }}
         />
       </div>
     );
@@ -201,7 +202,7 @@ const SharedBoard: React.FC = () => {
                 className="rounded-2xl overflow-hidden border border-border/60 bg-card"
               >
                 <img
-                  src={venue.image || getVenueFallbackImage(venue.cuisine)}
+                  src={venue.image || getVenueFallbackImage({ id: venue.key, name: venue.name, cuisine_type: venue.cuisine })}
                   alt={venue.name}
                   loading="lazy"
                   className="h-40 w-full object-cover"
