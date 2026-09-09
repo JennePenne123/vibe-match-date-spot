@@ -2025,6 +2025,10 @@
     "notFoundDescription": "Este enlace ha caducado o fue desactivado.",
     "discoverCta": "Descubre H!Outz",
     "ctaText": "Planifica tu propia noche con H!Outz.",
-    "ctaButton": "Empieza gratis"
+    "ctaButton": "Empieza gratis",
+    "views_one": "{{count}} visita",
+    "views_other": "{{count}} visitas",
+    "voteCount_one": "{{count}} voto",
+    "voteCount_other": "{{count}} votos"
   }
 }

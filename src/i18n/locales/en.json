@@ -2025,6 +2025,10 @@
     "notFoundDescription": "This link has expired or was disabled.",
     "discoverCta": "Discover H!Outz",
     "ctaText": "Plan your own night out with H!Outz.",
-    "ctaButton": "Start for free"
+    "ctaButton": "Start for free",
+    "views_one": "{{count}} view",
+    "views_other": "{{count}} views",
+    "voteCount_one": "{{count}} vote",
+    "voteCount_other": "{{count}} votes"
   }
 }

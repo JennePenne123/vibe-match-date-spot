@@ -2025,6 +2025,10 @@
     "notFoundDescription": "Dieser Link ist abgelaufen oder wurde deaktiviert.",
     "discoverCta": "H!Outz entdecken",
     "ctaText": "Plane deinen eigenen Abend mit H!Outz.",
-    "ctaButton": "Kostenlos starten"
+    "ctaButton": "Kostenlos starten",
+    "views_one": "{{count}} Aufruf",
+    "views_other": "{{count}} Aufrufe",
+    "voteCount_one": "{{count}} Stimme",
+    "voteCount_other": "{{count}} Stimmen"
   }
 }
