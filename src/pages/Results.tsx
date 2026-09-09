@@ -16,6 +16,8 @@ import { getSituationalCategory } from '@/lib/situationalCategories';
 import GroupCompromiseCard from '@/components/results/GroupCompromiseCard';
 import { readGroupCompromise, type GroupCompromiseInfo } from '@/services/aiVenueService/groupCompromise';
 import { motion } from 'framer-motion';
+import CreateBoardButton from '@/components/board/CreateBoardButton';
+import type { SharedBoardVenue } from '@/services/sharedBoardService';
 
 // Skeleton loader for venue cards
 const VenueCardSkeleton = () => (
@@ -110,6 +112,25 @@ const Results = () => {
     recommendations.slice(0, 3).map(r => r.venue_id).filter(Boolean),
     [recommendations]
   );
+
+  const boardVenues: SharedBoardVenue[] = useMemo(
+    () =>
+      recommendations.slice(0, 8).map((r) => ({
+        key: r.venue_id,
+        name: r.venue_name,
+        address: r.venue_address,
+        image: r.venue_image,
+        score: r.ai_score,
+        reason: r.ai_reasoning,
+        cuisine: r.cuisine_type,
+        priceRange: r.priceRange,
+        rating: r.rating,
+        latitude: r.latitude,
+        longitude: r.longitude,
+      })),
+    [recommendations]
+  );
+
   useVenueVouchers(top3VenueIds);
 
   const handleVenueSelect = (venueId: string) => {
@@ -216,6 +237,14 @@ const Results = () => {
             </div>
             <div className="w-10" />
           </div>
+          {recommendations.length > 0 && (
+            <div className="flex justify-center pb-3">
+              <CreateBoardButton
+                venues={boardVenues}
+                defaultTitle={t('board.defaultTitle')}
+              />
+            </div>
+          )}
         </motion.div>
 
         {/* AI-Powered Results */}
