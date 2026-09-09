@@ -47,24 +47,6 @@ const Results = () => {
   const [sparseInfo, setSparseInfo] = useState<{ categoryId: string; matchedCount: number } | null>(null);
   const [compromiseInfo, setCompromiseInfo] = useState<GroupCompromiseInfo | null>(null);
   
-  const boardVenues: SharedBoardVenue[] = useMemo(
-    () =>
-      recommendations.slice(0, 8).map((r) => ({
-        key: r.venue_id,
-        name: r.venue_name,
-        address: r.venue_address,
-        image: r.venue_image,
-        score: r.ai_score,
-        reason: r.ai_reasoning,
-        cuisine: r.cuisine_type,
-        priceRange: r.priceRange,
-        rating: r.rating,
-        latitude: r.latitude,
-        longitude: r.longitude,
-      })),
-    [recommendations]
-  );
-
   useEffect(() => {
     const stored = sessionStorage.getItem('hioutz-situational-category');
     if (stored) {
@@ -130,6 +112,25 @@ const Results = () => {
     recommendations.slice(0, 3).map(r => r.venue_id).filter(Boolean),
     [recommendations]
   );
+
+  const boardVenues: SharedBoardVenue[] = useMemo(
+    () =>
+      recommendations.slice(0, 8).map((r) => ({
+        key: r.venue_id,
+        name: r.venue_name,
+        address: r.venue_address,
+        image: r.venue_image,
+        score: r.ai_score,
+        reason: r.ai_reasoning,
+        cuisine: r.cuisine_type,
+        priceRange: r.priceRange,
+        rating: r.rating,
+        latitude: r.latitude,
+        longitude: r.longitude,
+      })),
+    [recommendations]
+  );
+
   useVenueVouchers(top3VenueIds);
 
   const handleVenueSelect = (venueId: string) => {
