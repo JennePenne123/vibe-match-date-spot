@@ -13,3 +13,4 @@ Bewertungen sollen nur zählen, wenn der Nutzer wirklich vor Ort war.
 - Rating-Prompt-Zeit (`computeRatingPromptAt`): vor 20 Uhr → 20:30 desselben Tages; 20–23 Uhr → +45 Min; nach 23 Uhr → 09:00 nächster Tag.
 - Ohne Nachweis darf trotzdem bewertet werden, aber sichtbar als „Unbestätigt"; Flag geht als `visit_verified` in `contextData` ans AI-Learning.
 - Code: `src/services/visitVerificationService.ts`, `src/hooks/useVisitVerification.ts`, `src/components/home/VisitCheckInCard.tsx`, `PendingRatingsCard`, `DateRatingModal`, `useDateRating`.
+- Admin-Auswertung: RPC `get_visit_verification_metrics(days_back)` + `src/components/admin/VisitVerificationWidget.tsx` (Distanz-Buckets, Median-Distanz/-Aufenthalt, Anteil bestätigter Bewertungen) zum Nachjustieren der Radien.

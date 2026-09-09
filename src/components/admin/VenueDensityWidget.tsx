@@ -101,6 +101,7 @@ const VenueDensityWidget: React.FC = () => {
   const [query, setQuery] = useState('Hamburg');
   const [filling, setFilling] = useState(false);
   const [progress, setProgress] = useState<{ pass: number; saved: number; categories: BackfillCat[] } | null>(null);
+  const [manualCats, setManualCats] = useState<BackfillCat[]>([]);
   const [history, setHistory] = useState<ImportRun[]>(() => readJSON<ImportRun[]>(HISTORY_KEY, []));
   const [resume, setResume] = useState<ResumeState | null>(() => readJSON<ResumeState | null>(RESUME_KEY, null));
   const { toast } = useToast();
@@ -142,9 +143,14 @@ const VenueDensityWidget: React.FC = () => {
     else localStorage.removeItem(RESUME_KEY);
   };
 
+  const autoCategories = weakCategories
+    .map((cat) => BACKFILL_CAT[cat])
+    .filter(Boolean) as BackfillCat[];
+  const effectiveCategories = manualCats.length > 0 ? manualCats : autoCategories;
+
   const runImport = async (opts?: { fromResume: boolean }) => {
     const fromResume = opts?.fromResume === true;
-    if (!fromResume && weakCategories.length === 0) return;
+    if (!fromResume && effectiveCategories.length === 0) return;
     const startedAt = new Date().toISOString();
     setFilling(true);
     let categories: BackfillCat[] = [];
@@ -171,9 +177,7 @@ const VenueDensityWidget: React.FC = () => {
         if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
           throw new Error(`Stadt "${query}" konnte nicht geokodiert werden`);
         }
-        categories = weakCategories
-          .map((cat) => BACKFILL_CAT[cat])
-          .filter(Boolean) as BackfillCat[];
+        categories = effectiveCategories;
       }
 
       // The import runs in time-boxed passes and hands back a resume cursor,
@@ -345,20 +349,42 @@ const VenueDensityWidget: React.FC = () => {
             </p>
 
             <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                {(Object.keys(BACKFILL_LABELS) as BackfillCat[]).map((cat) => {
+                  const active = manualCats.includes(cat);
+                  return (
+                    <Button
+                      key={cat}
+                      type="button"
+                      size="sm"
+                      variant={active ? 'default' : 'outline'}
+                      disabled={filling}
+                      onClick={() =>
+                        setManualCats((prev) =>
+                          prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat],
+                        )
+                      }
+                    >
+                      {BACKFILL_LABELS[cat]}
+                    </Button>
+                  );
+                })}
+              </div>
+
               <Button
                 onClick={fillGaps}
-                disabled={filling || weakCategories.length === 0}
+                disabled={filling || effectiveCategories.length === 0}
                 className="w-full"
               >
                 {filling
                   ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   : <Wand2 className="w-4 h-4 mr-2" />}
-                {weakCategories.length === 0
+                {effectiveCategories.length === 0
                   ? 'Alle Kategorien launch-fähig'
-                  : `Lücken füllen (${weakCategories.map((c) => CAT_LABELS[c]).join(', ')})`}
+                  : `Import starten (${effectiveCategories.map((c) => BACKFILL_LABELS[c]).join(', ')})`}
               </Button>
               <p className="text-[11px] text-muted-foreground text-center">
-                Importiert fehlende Kultur-, Aktivitäts- und Nightlife-Venues für {query} (15 km Radius).
+                Ohne Auswahl werden automatisch die schwachen Kategorien importiert – für {query} (15 km Radius).
               </p>
 
               {filling && progress && (
