@@ -101,6 +101,7 @@ const VenueDensityWidget: React.FC = () => {
   const [query, setQuery] = useState('Hamburg');
   const [filling, setFilling] = useState(false);
   const [progress, setProgress] = useState<{ pass: number; saved: number; categories: BackfillCat[] } | null>(null);
+  const [manualCats, setManualCats] = useState<BackfillCat[]>([]);
   const [history, setHistory] = useState<ImportRun[]>(() => readJSON<ImportRun[]>(HISTORY_KEY, []));
   const [resume, setResume] = useState<ResumeState | null>(() => readJSON<ResumeState | null>(RESUME_KEY, null));
   const { toast } = useToast();
