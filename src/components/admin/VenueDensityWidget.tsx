@@ -177,9 +177,7 @@ const VenueDensityWidget: React.FC = () => {
         if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
           throw new Error(`Stadt "${query}" konnte nicht geokodiert werden`);
         }
-        categories = weakCategories
-          .map((cat) => BACKFILL_CAT[cat])
-          .filter(Boolean) as BackfillCat[];
+        categories = effectiveCategories;
       }
 
       // The import runs in time-boxed passes and hands back a resume cursor,
