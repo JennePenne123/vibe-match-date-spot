@@ -2030,5 +2030,24 @@
     "views_other": "{{count}} visitas",
     "voteCount_one": "{{count}} voto",
     "voteCount_other": "{{count}} votos"
+  },
+  "visit": {
+    "title": "¿Estás allí?",
+    "checkIn": "Estoy aquí",
+    "checkInHint": "Confirma tu visita para una valoración justa",
+    "checkOut": "Terminar visita",
+    "ongoing": "Visita en curso",
+    "verified": "Visita confirmada",
+    "unverified": "Sin confirmar",
+    "verifiedRating": "Visita confirmada",
+    "unverifiedRating": "Visita sin confirmar",
+    "confirmedTitle": "Visita confirmada",
+    "confirmedDesc": "Te hemos detectado en {{venue}}. ¡Disfruta!",
+    "unconfirmedTitle": "Visita guardada",
+    "unconfirmedDesc": "Sin ubicación no podemos confirmar la visita: tu valoración quedará como no confirmada.",
+    "leftTitle": "Visita finalizada",
+    "leftDesc": "Te pediremos tu valoración más tarde.",
+    "ratingLater": "Cuando te vayas, te pediremos tu valoración más tarde esta noche.",
+    "unknownVenue": "Lugar"
   }
 }
