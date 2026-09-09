@@ -1995,5 +1995,36 @@
   "aiVenueCard": {
     "forYou": "For you",
     "forYouNamed": "For you, {{name}}"
+  },
+  "board": {
+    "createButton": "Share as board",
+    "dialogTitle": "Share board",
+    "dialogDescription": "Create a link your friends can open and vote on without an account.",
+    "titleLabel": "Title",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "What are you planning?",
+    "privacyHint": "Anyone with the link can view this board and vote.",
+    "createConfirm": "Create link",
+    "shareNow": "Share now",
+    "expiryHint": "The link is valid for 30 days.",
+    "linkCopied": "Link copied",
+    "createFailed": "Could not create board",
+    "loginRequired": "Please sign in to share a board.",
+    "noVenues": "No places to share yet.",
+    "defaultTitle": "Our ideas for tonight",
+    "share": "Share",
+    "shareText": "Check out our board: {{title}}",
+    "views": "{{count}} views",
+    "nameLabel": "Your name (optional)",
+    "namePlaceholder": "e.g. Lenny",
+    "vote": "I'm in",
+    "voted": "Voted",
+    "voteCount": "{{count}} votes",
+    "voteFailed": "Could not save your vote",
+    "notFoundTitle": "Board not found",
+    "notFoundDescription": "This link has expired or was disabled.",
+    "discoverCta": "Discover H!Outz",
+    "ctaText": "Plan your own night out with H!Outz.",
+    "ctaButton": "Start for free"
   }
 }

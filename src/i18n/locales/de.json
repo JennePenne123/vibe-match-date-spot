@@ -1995,5 +1995,36 @@
   "aiVenueCard": {
     "forYou": "Für dich",
     "forYouNamed": "Für dich, {{name}}"
+  },
+  "board": {
+    "createButton": "Als Board teilen",
+    "dialogTitle": "Board teilen",
+    "dialogDescription": "Erstelle einen Link, den deine Freunde ohne Konto öffnen und abstimmen können.",
+    "titleLabel": "Titel",
+    "noteLabel": "Notiz (optional)",
+    "notePlaceholder": "Was habt ihr vor?",
+    "privacyHint": "Jede Person mit dem Link kann das Board sehen und abstimmen.",
+    "createConfirm": "Link erstellen",
+    "shareNow": "Jetzt teilen",
+    "expiryHint": "Der Link ist 30 Tage gültig.",
+    "linkCopied": "Link kopiert",
+    "createFailed": "Board konnte nicht erstellt werden",
+    "loginRequired": "Bitte melde dich an, um ein Board zu teilen.",
+    "noVenues": "Keine Orte zum Teilen vorhanden.",
+    "defaultTitle": "Unsere Ideen für heute Abend",
+    "share": "Teilen",
+    "shareText": "Schau dir unser Board an: {{title}}",
+    "views": "{{count}} Aufrufe",
+    "nameLabel": "Dein Name (optional)",
+    "namePlaceholder": "z. B. Lenny",
+    "vote": "Dafür",
+    "voted": "Dabei",
+    "voteCount": "{{count}} Stimmen",
+    "voteFailed": "Stimme konnte nicht gespeichert werden",
+    "notFoundTitle": "Board nicht gefunden",
+    "notFoundDescription": "Dieser Link ist abgelaufen oder wurde deaktiviert.",
+    "discoverCta": "H!Outz entdecken",
+    "ctaText": "Plane deinen eigenen Abend mit H!Outz.",
+    "ctaButton": "Kostenlos starten"
   }
 }

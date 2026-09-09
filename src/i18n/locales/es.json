@@ -1995,5 +1995,36 @@
   "aiVenueCard": {
     "forYou": "Para ti",
     "forYouNamed": "Para ti, {{name}}"
+  },
+  "board": {
+    "createButton": "Compartir como tablero",
+    "dialogTitle": "Compartir tablero",
+    "dialogDescription": "Crea un enlace que tus amigos puedan abrir y votar sin cuenta.",
+    "titleLabel": "Título",
+    "noteLabel": "Nota (opcional)",
+    "notePlaceholder": "¿Qué planeáis?",
+    "privacyHint": "Cualquier persona con el enlace puede ver el tablero y votar.",
+    "createConfirm": "Crear enlace",
+    "shareNow": "Compartir ahora",
+    "expiryHint": "El enlace es válido durante 30 días.",
+    "linkCopied": "Enlace copiado",
+    "createFailed": "No se pudo crear el tablero",
+    "loginRequired": "Inicia sesión para compartir un tablero.",
+    "noVenues": "Todavía no hay lugares para compartir.",
+    "defaultTitle": "Nuestras ideas para esta noche",
+    "share": "Compartir",
+    "shareText": "Mira nuestro tablero: {{title}}",
+    "views": "{{count}} visitas",
+    "nameLabel": "Tu nombre (opcional)",
+    "namePlaceholder": "p. ej. Lenny",
+    "vote": "Me apunto",
+    "voted": "Votado",
+    "voteCount": "{{count}} votos",
+    "voteFailed": "No se pudo guardar tu voto",
+    "notFoundTitle": "Tablero no encontrado",
+    "notFoundDescription": "Este enlace ha caducado o fue desactivado.",
+    "discoverCta": "Descubre H!Outz",
+    "ctaText": "Planifica tu propia noche con H!Outz.",
+    "ctaButton": "Empieza gratis"
   }
 }
