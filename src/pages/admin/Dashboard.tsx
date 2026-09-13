@@ -143,6 +143,9 @@ const AdminDashboard: React.FC = () => {
       {/* Venue density / launch readiness */}
       <VenueDensityWidget />
 
+      {/* DACH city import queue */}
+      <VenueImportQueueWidget />
+
       {/* Geo check-in quality */}
       <VisitVerificationWidget />
 
