@@ -2686,7 +2686,16 @@ export type Database = {
         Args: { days_back?: number }
         Returns: Json
       }
-      get_venue_density_metrics: { Args: { _city?: string }; Returns: Json }
+      get_venue_density_metrics: {
+        Args: {
+          _city?: string
+          _max_lat?: number
+          _max_lon?: number
+          _min_lat?: number
+          _min_lon?: number
+        }
+        Returns: Json
+      }
       get_visit_verification_metrics: {
         Args: { days_back?: number }
         Returns: Json

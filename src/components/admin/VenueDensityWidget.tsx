@@ -11,7 +11,16 @@ import { Progress } from '@/components/ui/progress';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { MapPin, Info, Image as ImageIcon, BadgeCheck, Wand2, Loader2, History, PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
 
-type BackfillCat = 'culture' | 'activity' | 'nightlife';
+type BackfillCat = 'culture' | 'activity' | 'nightlife' | 'food';
+
+interface CityGeo {
+  latitude: number;
+  longitude: number;
+  minLat: number;
+  maxLat: number;
+  minLon: number;
+  maxLon: number;
+}
 
 interface ImportRun {
   city: string;
@@ -57,6 +66,7 @@ function writeJSON(key: string, value: unknown) {
 
 interface DensityMetrics {
   city: string;
+  scope?: 'bbox' | 'address';
   total: number;
   with_photo: number;
   verified: number;
@@ -82,11 +92,12 @@ const BACKFILL_LABELS: Record<BackfillCat, string> = {
   culture: 'Kultur',
   activity: 'Aktivitäten',
   nightlife: 'Nightlife',
+  food: 'Essen & Trinken',
 };
 
 // Map our density categories to the backfill-activities categories.
-const BACKFILL_CAT: Record<string, 'culture' | 'activity' | 'nightlife' | null> = {
-  essen: null,
+const BACKFILL_CAT: Record<string, BackfillCat | null> = {
+  essen: 'food',
   kultur: 'culture',
   aktivitaet: 'activity',
   nightlife: 'nightlife',
@@ -106,12 +117,39 @@ const VenueDensityWidget: React.FC = () => {
   const [resume, setResume] = useState<ResumeState | null>(() => readJSON<ResumeState | null>(RESUME_KEY, null));
   const { toast } = useToast();
 
+  // Resolve the real city area (bounding box) so the density count is based on
+  // coordinates instead of whatever text happens to sit in the address field.
+  const { data: geo } = useQuery({
+    queryKey: ['admin-city-bbox', query],
+    queryFn: async (): Promise<CityGeo | null> => {
+      const resp = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
+      );
+      const json = await resp.json();
+      const hit = json?.[0];
+      const bb = (hit?.boundingbox || []).map(Number);
+      if (!hit || bb.length !== 4 || bb.some((n: number) => !Number.isFinite(n))) return null;
+      return {
+        latitude: Number(hit.lat),
+        longitude: Number(hit.lon),
+        minLat: bb[0], maxLat: bb[1], minLon: bb[2], maxLon: bb[3],
+      };
+    },
+    staleTime: STALE_TIMES.ADMIN_ANALYTICS,
+  });
+
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['admin-venue-density', query],
+    queryKey: ['admin-venue-density', query, geo?.minLat ?? null],
     queryFn: async () => {
       const { data, error } = await supabase.rpc(
         'get_venue_density_metrics' as never,
-        { _city: query } as never,
+        (geo
+          ? {
+              _city: query,
+              _min_lat: geo.minLat, _max_lat: geo.maxLat,
+              _min_lon: geo.minLon, _max_lon: geo.maxLon,
+            }
+          : { _city: query }) as never,
       );
       if (error) throw error;
       return data as unknown as DensityMetrics;
@@ -166,14 +204,18 @@ const VenueDensityWidget: React.FC = () => {
         lat = resume.latitude;
         lon = resume.longitude;
         categories = resume.categories;
+      } else if (geo) {
+        lat = geo.latitude;
+        lon = geo.longitude;
+        categories = effectiveCategories;
       } else {
         // Geocode the city so the import is centred correctly.
         const geoResp = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
         );
-        const geo = await geoResp.json();
-        lat = Number(geo?.[0]?.lat);
-        lon = Number(geo?.[0]?.lon);
+        const geoJson = await geoResp.json();
+        lat = Number(geoJson?.[0]?.lat);
+        lon = Number(geoJson?.[0]?.lon);
         if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
           throw new Error(`Stadt "${query}" konnte nicht geokodiert werden`);
         }
@@ -385,6 +427,7 @@ const VenueDensityWidget: React.FC = () => {
               </Button>
               <p className="text-[11px] text-muted-foreground text-center">
                 Ohne Auswahl werden automatisch die schwachen Kategorien importiert – für {query} (15 km Radius).
+                {' '}Zählung: {data?.scope === 'bbox' ? 'echtes Stadtgebiet (Koordinaten)' : 'Adresstext (Fallback)'}.
               </p>
 
               {filling && progress && (

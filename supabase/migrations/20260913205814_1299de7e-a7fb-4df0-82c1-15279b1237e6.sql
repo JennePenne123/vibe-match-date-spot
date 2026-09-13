@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.get_venue_density_metrics(text);
