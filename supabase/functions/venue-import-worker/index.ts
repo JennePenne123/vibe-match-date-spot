@@ -292,8 +292,8 @@ Deno.serve(async (req) => {
 
     while (offset < tags.length && Date.now() < deadline) {
       const [k, v] = tags[offset];
-      const elements = await fetchOverpass(
-        buildQuery(Number(job.latitude), Number(job.longitude), radiusM, k, v),
+      const elements = await fetchArea(
+        Number(job.latitude), Number(job.longitude), radiusM, k, v,
         `${job.city}/${job.category}/${k}=${v}`,
       );
       if (elements === null) {
