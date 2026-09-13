@@ -106,12 +106,39 @@ const VenueDensityWidget: React.FC = () => {
   const [resume, setResume] = useState<ResumeState | null>(() => readJSON<ResumeState | null>(RESUME_KEY, null));
   const { toast } = useToast();
 
+  // Resolve the real city area (bounding box) so the density count is based on
+  // coordinates instead of whatever text happens to sit in the address field.
+  const { data: geo } = useQuery({
+    queryKey: ['admin-city-bbox', query],
+    queryFn: async (): Promise<CityGeo | null> => {
+      const resp = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
+      );
+      const json = await resp.json();
+      const hit = json?.[0];
+      const bb = (hit?.boundingbox || []).map(Number);
+      if (!hit || bb.length !== 4 || bb.some((n: number) => !Number.isFinite(n))) return null;
+      return {
+        latitude: Number(hit.lat),
+        longitude: Number(hit.lon),
+        minLat: bb[0], maxLat: bb[1], minLon: bb[2], maxLon: bb[3],
+      };
+    },
+    staleTime: STALE_TIMES.ADMIN_ANALYTICS,
+  });
+
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['admin-venue-density', query],
+    queryKey: ['admin-venue-density', query, geo?.minLat ?? null],
     queryFn: async () => {
       const { data, error } = await supabase.rpc(
         'get_venue_density_metrics' as never,
-        { _city: query } as never,
+        (geo
+          ? {
+              _city: query,
+              _min_lat: geo.minLat, _max_lat: geo.maxLat,
+              _min_lon: geo.minLon, _max_lon: geo.maxLon,
+            }
+          : { _city: query }) as never,
       );
       if (error) throw error;
       return data as unknown as DensityMetrics;
