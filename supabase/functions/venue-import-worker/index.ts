@@ -20,7 +20,7 @@ const OVERPASS_MIRRORS = [
 ];
 const OVERPASS_USER_AGENT = 'HiOutz/1.0 (+https://hioutz.app)';
 const REQUEST_DELAY_MS = 900;
-const RUN_BUDGET_MS = 50_000;
+const RUN_BUDGET_MS = 30_000;
 const LEASE_MS = 120_000;
 const MAX_HOPS = 400;
 const HOP_COOLDOWN_MS = 1_500;
