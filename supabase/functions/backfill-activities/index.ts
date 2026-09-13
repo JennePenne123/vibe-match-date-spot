@@ -267,6 +267,21 @@ function categoryFromTags(tags: Record<string, string>): { cuisine: string; tags
   if ((a as string) === 'stripclub') return { cuisine: 'Adult Club', tags: ['adult', 'nightlife', 'late night'] };
   if ((a as string) === 'events_venue' || (a as string) === 'social_club') return { cuisine: 'Events Venue', tags: ['events', 'nightlife', 'party'] };
   if (sh === 'shisha' || (a as string) === 'shisha') return { cuisine: 'Shisha Bar', tags: ['shisha', 'shishabar', 'hookah', 'nightlife', 'evening'] };
+  // Food & drink
+  if (a === 'restaurant') {
+    const kitchen = (tags.cuisine || '').split(';')[0].replace(/_/g, ' ').trim();
+    return {
+      cuisine: kitchen ? kitchen.charAt(0).toUpperCase() + kitchen.slice(1) : 'Restaurant',
+      tags: ['restaurant', 'food', 'dining', 'essen', ...(kitchen ? [kitchen] : [])],
+    };
+  }
+  if (a === 'cafe') return { cuisine: 'Café', tags: ['cafe', 'café', 'coffee', 'food', 'brunch', 'daytime'] };
+  if (a === 'fast_food') return { cuisine: 'Fast Food', tags: ['fast-food-restaurant', 'food', 'casual'] };
+  if (a === 'ice_cream') return { cuisine: 'Ice Cream', tags: ['ice_cream', 'eisdiele', 'food', 'dessert'] };
+  if ((a as string) === 'food_court') return { cuisine: 'Food Court', tags: ['food', 'street food', 'casual'] };
+  if (sh === 'bakery' || sh === 'pastry' || sh === 'confectionery') return { cuisine: 'Bakery', tags: ['bakery', 'food', 'brunch', 'dessert'] };
+  if (sh === 'deli') return { cuisine: 'Deli', tags: ['deli', 'food', 'casual'] };
+  if (sh === 'coffee') return { cuisine: 'Coffee Shop', tags: ['coffee', 'cafe', 'food', 'daytime'] };
   return { cuisine: 'Venue', tags: [] };
 }
 
@@ -314,7 +329,7 @@ Deno.serve(async (req) => {
     const lng = Number(body.longitude);
     const radiusKm = Math.min(Math.max(Number(body.radius_km ?? 25), 1), 50);
     const requested: CategoryId[] = Array.isArray(body.categories) && body.categories.length > 0
-      ? body.categories.filter((c: string) => c === 'culture' || c === 'activity' || c === 'nightlife')
+      ? body.categories.filter((c: string) => (VALID_CATEGORIES as string[]).includes(c)) as CategoryId[]
       : ['culture', 'activity', 'nightlife'];
 
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
