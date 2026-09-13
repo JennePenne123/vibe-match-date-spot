@@ -68,6 +68,36 @@ function buildQuery(lat: number, lon: number, radiusM: number, k: string, v: str
   return `[out:json][timeout:60];(node["${k}"="${v}"](around:${r},${lat},${lon});way["${k}"="${v}"](around:${r},${lat},${lon}););out center body;`;
 }
 
+// Große Städte + häufige Tags (Restaurant, Bar ...) sprengen eine einzelne
+// Overpass-Abfrage. Bei Fehlschlag wird der Radius räumlich geviertelt.
+async function fetchArea(
+  lat: number, lon: number, radiusM: number, k: string, v: string, label: string, depth = 0,
+): Promise<any[] | null> {
+  const direct = await fetchOverpass(buildQuery(lat, lon, radiusM, k, v), `${label}/d${depth}`);
+  if (direct) return direct;
+  if (depth >= 2 || radiusM <= 2500) return null;
+
+  const r = radiusM / 2;
+  const dLat = (r / 111_320);
+  const dLon = r / (111_320 * Math.cos((lat * Math.PI) / 180));
+  const out: any[] = [];
+  const seen = new Set<number>();
+  for (const [sLat, sLon] of [
+    [lat + dLat / 2, lon + dLon / 2], [lat + dLat / 2, lon - dLon / 2],
+    [lat - dLat / 2, lon + dLon / 2], [lat - dLat / 2, lon - dLon / 2],
+  ]) {
+    await sleep(REQUEST_DELAY_MS);
+    const part = await fetchArea(sLat, sLon, r, k, v, `${label}#`, depth + 1);
+    if (part === null) return null;
+    for (const el of part) {
+      if (seen.has(el.id)) continue;
+      seen.add(el.id);
+      out.push(el);
+    }
+  }
+  return out;
+}
+
 async function fetchOverpass(query: string, label: string): Promise<any[] | null> {
   for (const mirror of OVERPASS_MIRRORS) {
     try {
