@@ -16,6 +16,7 @@ import AikidoConfigWidget from '@/components/admin/AikidoConfigWidget';
 import ScoringExperimentWidget from '@/components/admin/ScoringExperimentWidget';
 import SignalActivationWidget from '@/components/admin/SignalActivationWidget';
 import VenueDensityWidget from '@/components/admin/VenueDensityWidget';
+import VenueImportQueueWidget from '@/components/admin/VenueImportQueueWidget';
 import VisitVerificationWidget from '@/components/admin/VisitVerificationWidget';
 
 interface PlatformStats {
@@ -142,6 +143,9 @@ const AdminDashboard: React.FC = () => {
 
       {/* Venue density / launch readiness */}
       <VenueDensityWidget />
+
+      {/* DACH city import queue */}
+      <VenueImportQueueWidget />
 
       {/* Geo check-in quality */}
       <VisitVerificationWidget />

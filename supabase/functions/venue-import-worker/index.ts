@@ -73,8 +73,12 @@ function buildQuery(lat: number, lon: number, radiusM: number, k: string, v: str
 async function fetchArea(
   lat: number, lon: number, radiusM: number, k: string, v: string, label: string, depth = 0,
 ): Promise<any[] | null> {
-  const direct = await fetchOverpass(buildQuery(lat, lon, radiusM, k, v), `${label}/d${depth}`);
-  if (direct) return direct;
+  const heavy = ['restaurant', 'cafe', 'fast_food', 'bar', 'pub', 'bakery'].includes(v);
+  const splitFirst = heavy && radiusM > 8000 && depth < 2;
+  if (!splitFirst) {
+    const direct = await fetchOverpass(buildQuery(lat, lon, radiusM, k, v), `${label}/d${depth}`);
+    if (direct) return direct;
+  }
   if (depth >= 2 || radiusM <= 2500) return null;
 
   const r = radiusM / 2;
@@ -102,7 +106,7 @@ async function fetchOverpass(query: string, label: string): Promise<any[] | null
   for (const mirror of OVERPASS_MIRRORS) {
     try {
       const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 45_000);
+      const t = setTimeout(() => ctrl.abort(), 25_000);
       const resp = await fetch(mirror, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': OVERPASS_USER_AGENT },
