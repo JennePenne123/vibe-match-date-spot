@@ -20,7 +20,7 @@ const OVERPASS_MIRRORS = [
 ];
 const OVERPASS_USER_AGENT = 'HiOutz/1.0 (+https://hioutz.app)';
 const REQUEST_DELAY_MS = 900;
-const RUN_BUDGET_MS = 50_000;
+const RUN_BUDGET_MS = 30_000;
 const LEASE_MS = 120_000;
 const MAX_HOPS = 400;
 const HOP_COOLDOWN_MS = 1_500;
@@ -66,6 +66,36 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 function buildQuery(lat: number, lon: number, radiusM: number, k: string, v: string) {
   const r = Math.min(radiusM, 50000);
   return `[out:json][timeout:60];(node["${k}"="${v}"](around:${r},${lat},${lon});way["${k}"="${v}"](around:${r},${lat},${lon}););out center body;`;
+}
+
+// Große Städte + häufige Tags (Restaurant, Bar ...) sprengen eine einzelne
+// Overpass-Abfrage. Bei Fehlschlag wird der Radius räumlich geviertelt.
+async function fetchArea(
+  lat: number, lon: number, radiusM: number, k: string, v: string, label: string, depth = 0,
+): Promise<any[] | null> {
+  const direct = await fetchOverpass(buildQuery(lat, lon, radiusM, k, v), `${label}/d${depth}`);
+  if (direct) return direct;
+  if (depth >= 2 || radiusM <= 2500) return null;
+
+  const r = radiusM / 2;
+  const dLat = (r / 111_320);
+  const dLon = r / (111_320 * Math.cos((lat * Math.PI) / 180));
+  const out: any[] = [];
+  const seen = new Set<number>();
+  for (const [sLat, sLon] of [
+    [lat + dLat / 2, lon + dLon / 2], [lat + dLat / 2, lon - dLon / 2],
+    [lat - dLat / 2, lon + dLon / 2], [lat - dLat / 2, lon - dLon / 2],
+  ]) {
+    await sleep(REQUEST_DELAY_MS);
+    const part = await fetchArea(sLat, sLon, r, k, v, `${label}#`, depth + 1);
+    if (part === null) return null;
+    for (const el of part) {
+      if (seen.has(el.id)) continue;
+      seen.add(el.id);
+      out.push(el);
+    }
+  }
+  return out;
 }
 
 async function fetchOverpass(query: string, label: string): Promise<any[] | null> {
@@ -262,8 +292,8 @@ Deno.serve(async (req) => {
 
     while (offset < tags.length && Date.now() < deadline) {
       const [k, v] = tags[offset];
-      const elements = await fetchOverpass(
-        buildQuery(Number(job.latitude), Number(job.longitude), radiusM, k, v),
+      const elements = await fetchArea(
+        Number(job.latitude), Number(job.longitude), radiusM, k, v,
         `${job.city}/${job.category}/${k}=${v}`,
       );
       if (elements === null) {
