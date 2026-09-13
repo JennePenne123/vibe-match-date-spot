@@ -18,7 +18,9 @@ const OVERPASS_USER_AGENT = 'HiOutz/1.0 (+https://hioutz.app)';
 const OVERPASS_CHUNK_SIZE = 6;
 const OVERPASS_REQUEST_DELAY_MS = 900;
 
-type CategoryId = 'culture' | 'activity' | 'nightlife';
+type CategoryId = 'culture' | 'activity' | 'nightlife' | 'food';
+
+const VALID_CATEGORIES: CategoryId[] = ['culture', 'activity', 'nightlife', 'food'];
 
 const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
   culture: [
@@ -63,6 +65,12 @@ const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
     ['amenity', 'stripclub'], ['amenity', 'gambling'],
     ['amenity', 'events_venue'], ['amenity', 'social_club'],
     ['shop', 'shisha'], ['amenity', 'shisha'],
+  ],
+  food: [
+    ['amenity', 'restaurant'], ['amenity', 'cafe'], ['amenity', 'fast_food'],
+    ['amenity', 'ice_cream'], ['amenity', 'food_court'],
+    ['shop', 'bakery'], ['shop', 'pastry'], ['shop', 'deli'],
+    ['shop', 'confectionery'], ['shop', 'coffee'],
   ],
 };
 
