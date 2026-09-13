@@ -427,6 +427,7 @@ const VenueDensityWidget: React.FC = () => {
               </Button>
               <p className="text-[11px] text-muted-foreground text-center">
                 Ohne Auswahl werden automatisch die schwachen Kategorien importiert – für {query} (15 km Radius).
+                {' '}Zählung: {data?.scope === 'bbox' ? 'echtes Stadtgebiet (Koordinaten)' : 'Adresstext (Fallback)'}.
               </p>
 
               {filling && progress && (
