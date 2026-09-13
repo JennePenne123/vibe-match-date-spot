@@ -73,8 +73,12 @@ function buildQuery(lat: number, lon: number, radiusM: number, k: string, v: str
 async function fetchArea(
   lat: number, lon: number, radiusM: number, k: string, v: string, label: string, depth = 0,
 ): Promise<any[] | null> {
-  const direct = await fetchOverpass(buildQuery(lat, lon, radiusM, k, v), `${label}/d${depth}`);
-  if (direct) return direct;
+  const heavy = ['restaurant', 'cafe', 'fast_food', 'bar', 'pub', 'bakery'].includes(v);
+  const splitFirst = heavy && radiusM > 8000 && depth < 2;
+  if (!splitFirst) {
+    const direct = await fetchOverpass(buildQuery(lat, lon, radiusM, k, v), `${label}/d${depth}`);
+    if (direct) return direct;
+  }
   if (depth >= 2 || radiusM <= 2500) return null;
 
   const r = radiusM / 2;
