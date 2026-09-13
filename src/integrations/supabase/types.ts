@@ -2030,6 +2030,96 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_import_control: {
+        Row: {
+          id: boolean
+          last_run_at: string | null
+          lease_until: string | null
+          paused: boolean
+          paused_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: boolean
+          last_run_at?: string | null
+          lease_until?: string | null
+          paused?: boolean
+          paused_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: boolean
+          last_run_at?: string | null
+          lease_until?: string | null
+          paused?: boolean
+          paused_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      venue_import_jobs: {
+        Row: {
+          attempts: number
+          category: string
+          chunk_offset: number
+          city: string
+          country: string
+          created_at: string
+          fetched_count: number
+          finished_at: string | null
+          id: string
+          last_error: string | null
+          latitude: number
+          longitude: number
+          priority: number
+          radius_km: number
+          saved_count: number
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          category: string
+          chunk_offset?: number
+          city: string
+          country: string
+          created_at?: string
+          fetched_count?: number
+          finished_at?: string | null
+          id?: string
+          last_error?: string | null
+          latitude: number
+          longitude: number
+          priority?: number
+          radius_km?: number
+          saved_count?: number
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          category?: string
+          chunk_offset?: number
+          city?: string
+          country?: string
+          created_at?: string
+          fetched_count?: number
+          finished_at?: string | null
+          id?: string
+          last_error?: string | null
+          latitude?: number
+          longitude?: number
+          priority?: number
+          radius_km?: number
+          saved_count?: number
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       venue_partnerships: {
         Row: {
           approved_at: string | null
