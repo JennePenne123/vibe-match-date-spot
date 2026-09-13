@@ -2032,6 +2032,7 @@ export type Database = {
       }
       venue_import_control: {
         Row: {
+          cron_token: string
           id: boolean
           last_run_at: string | null
           lease_until: string | null
@@ -2040,6 +2041,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cron_token?: string
           id?: boolean
           last_run_at?: string | null
           lease_until?: string | null
@@ -2048,6 +2050,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cron_token?: string
           id?: boolean
           last_run_at?: string | null
           lease_until?: string | null
