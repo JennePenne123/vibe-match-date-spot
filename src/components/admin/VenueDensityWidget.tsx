@@ -11,7 +11,16 @@ import { Progress } from '@/components/ui/progress';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { MapPin, Info, Image as ImageIcon, BadgeCheck, Wand2, Loader2, History, PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
 
-type BackfillCat = 'culture' | 'activity' | 'nightlife';
+type BackfillCat = 'culture' | 'activity' | 'nightlife' | 'food';
+
+interface CityGeo {
+  latitude: number;
+  longitude: number;
+  minLat: number;
+  maxLat: number;
+  minLon: number;
+  maxLon: number;
+}
 
 interface ImportRun {
   city: string;
