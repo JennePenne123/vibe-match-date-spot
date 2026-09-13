@@ -106,7 +106,7 @@ async function fetchOverpass(query: string, label: string): Promise<any[] | null
   for (const mirror of OVERPASS_MIRRORS) {
     try {
       const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 45_000);
+      const t = setTimeout(() => ctrl.abort(), 25_000);
       const resp = await fetch(mirror, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': OVERPASS_USER_AGENT },
