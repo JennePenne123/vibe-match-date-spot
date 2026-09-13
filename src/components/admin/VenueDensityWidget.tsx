@@ -66,6 +66,7 @@ function writeJSON(key: string, value: unknown) {
 
 interface DensityMetrics {
   city: string;
+  scope?: 'bbox' | 'address';
   total: number;
   with_photo: number;
   verified: number;
@@ -91,11 +92,12 @@ const BACKFILL_LABELS: Record<BackfillCat, string> = {
   culture: 'Kultur',
   activity: 'Aktivitäten',
   nightlife: 'Nightlife',
+  food: 'Essen & Trinken',
 };
 
 // Map our density categories to the backfill-activities categories.
-const BACKFILL_CAT: Record<string, 'culture' | 'activity' | 'nightlife' | null> = {
-  essen: null,
+const BACKFILL_CAT: Record<string, BackfillCat | null> = {
+  essen: 'food',
   kultur: 'culture',
   aktivitaet: 'activity',
   nightlife: 'nightlife',
