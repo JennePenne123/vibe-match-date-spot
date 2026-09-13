@@ -204,14 +204,18 @@ const VenueDensityWidget: React.FC = () => {
         lat = resume.latitude;
         lon = resume.longitude;
         categories = resume.categories;
+      } else if (geo) {
+        lat = geo.latitude;
+        lon = geo.longitude;
+        categories = effectiveCategories;
       } else {
         // Geocode the city so the import is centred correctly.
         const geoResp = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
         );
-        const geo = await geoResp.json();
-        lat = Number(geo?.[0]?.lat);
-        lon = Number(geo?.[0]?.lon);
+        const geoJson = await geoResp.json();
+        lat = Number(geoJson?.[0]?.lat);
+        lon = Number(geoJson?.[0]?.lon);
         if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
           throw new Error(`Stadt "${query}" konnte nicht geokodiert werden`);
         }
