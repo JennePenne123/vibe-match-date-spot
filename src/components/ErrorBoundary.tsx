@@ -66,16 +66,18 @@ class ErrorBoundary extends Component<Props, State> {
     this.props.onError?.(error, errorInfo);
 
     // Self-heal stale lazy chunks (happens after a new deploy while the old
-    // bundle is still cached): reload once instead of showing an error screen.
+    // bundle is still cached): purge caches and hard-reload instead of
+    // showing an error screen.
     if (isChunkLoadError(error)) {
       const key = 'hioutz-chunk-reload';
       const last = Number(sessionStorage.getItem(key) || 0);
       if (Date.now() - last > 30_000) {
         sessionStorage.setItem(key, String(Date.now()));
-        window.location.reload();
+        void hardReload();
         return;
       }
     }
+
 
     void import('@/services/errorMonitoringService')
       .then(({ logUiError, logCrash }) => {
