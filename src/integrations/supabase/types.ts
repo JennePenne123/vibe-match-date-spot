@@ -2030,6 +2030,60 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_import_audit: {
+        Row: {
+          category: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          dedupe_key: string | null
+          details: Json
+          duplicate_of: string | null
+          event_type: string
+          id: string
+          job_id: string | null
+          message: string | null
+          severity: string
+          tag_key: string | null
+          tag_value: string | null
+          venue_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          details?: Json
+          duplicate_of?: string | null
+          event_type: string
+          id?: string
+          job_id?: string | null
+          message?: string | null
+          severity?: string
+          tag_key?: string | null
+          tag_value?: string | null
+          venue_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          details?: Json
+          duplicate_of?: string | null
+          event_type?: string
+          id?: string
+          job_id?: string | null
+          message?: string | null
+          severity?: string
+          tag_key?: string | null
+          tag_value?: string | null
+          venue_id?: string | null
+        }
+        Relationships: []
+      }
       venue_import_control: {
         Row: {
           cron_token: string
@@ -2763,6 +2817,18 @@ export type Database = {
           total_runs_24h: number
         }[]
       }
+      get_duplicate_candidates: {
+        Args: { _limit?: number }
+        Returns: {
+          cities: string[]
+          latitude: number
+          longitude: number
+          normalized_name: string
+          venue_count: number
+          venue_ids: string[]
+          venue_names: string[]
+        }[]
+      }
       get_experiment_summary: {
         Args: { _experiment: string }
         Returns: {
@@ -2777,6 +2843,7 @@ export type Database = {
       }
       get_friend_preferences: { Args: { _friend_id: string }; Returns: Json }
       get_group_invite_preview: { Args: { _token: string }; Returns: Json }
+      get_import_audit_summary: { Args: { days_back?: number }; Returns: Json }
       get_retention_metrics: { Args: { days_back?: number }; Returns: Json }
       get_signal_activation_metrics: {
         Args: { days_back?: number }
