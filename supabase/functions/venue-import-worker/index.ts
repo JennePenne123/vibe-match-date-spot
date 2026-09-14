@@ -367,7 +367,14 @@ Deno.serve(async (req) => {
       .eq('status', 'failed')
       .lt('updated_at', requeueCutoff)
       .select('id');
-    if (requeued?.length) console.log(`requeued ${requeued.length} failed jobs`);
+    if (requeued?.length) {
+      console.log(`requeued ${requeued.length} failed jobs`);
+      audit({
+        event_type: 'jobs_requeued', severity: 'warn',
+        message: `${requeued.length} fehlgeschlagene Aufträge erneut eingereiht`,
+        details: { count: requeued.length, after_minutes: REQUEUE_AFTER_MINUTES },
+      });
+    }
 
     // --- Pick next job ---
     const { data: job } = await supabase
