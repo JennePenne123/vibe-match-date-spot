@@ -10,8 +10,17 @@ export const passkeysSupported = () => browserSupportsWebAuthn();
 async function callPasskey<T>(payload: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.functions.invoke('passkey', { body: payload });
   if (error) {
-    // Try to surface a structured error from the function response
-    const message = (data as { error?: string } | null)?.error ?? error.message;
+    // Non-2xx responses carry the JSON body on error.context, not on data
+    let message = (data as { error?: string } | null)?.error ?? error.message;
+    const ctx = (error as { context?: Response }).context;
+    if (ctx && typeof ctx.json === 'function') {
+      try {
+        const body = await ctx.clone().json();
+        if (body?.error) message = body.error as string;
+      } catch {
+        /* keep original message */
+      }
+    }
     throw new Error(message);
   }
   if ((data as { error?: string })?.error) {

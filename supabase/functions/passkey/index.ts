@@ -18,6 +18,10 @@ const ALLOWED_HOST_SUFFIXES = [
   'localhost',
 ];
 
+// Passkeys are bound to the rpID. Keep it stable per apex domain so a key
+// created on www.<domain> also works on <domain>.
+const STABLE_RP_IDS = ['hioutz.app', 'hioutz.com'];
+
 function resolveRp(req: Request): { rpID: string; origin: string } | null {
   const origin = req.headers.get('origin') ?? '';
   try {
@@ -27,7 +31,8 @@ function resolveRp(req: Request): { rpID: string; origin: string } | null {
       (suffix) => host === suffix || host.endsWith(`.${suffix}`),
     );
     if (!allowed) return null;
-    return { rpID: host, origin };
+    const apex = STABLE_RP_IDS.find((d) => host === d || host.endsWith(`.${d}`));
+    return { rpID: apex ?? host, origin };
   } catch {
     return null;
   }
@@ -78,6 +83,34 @@ async function consumeChallenge(purpose: string, userId: string | null) {
   return data.challenge as string;
 }
 
+/**
+ * Consume exactly the challenge the authenticator signed. Prevents parallel
+ * sign-in attempts from stealing each other's (user-less) auth challenge.
+ */
+async function consumeExactChallenge(challenge: string, purpose: string) {
+  const { data } = await admin
+    .from('passkey_challenges')
+    .select('id, challenge')
+    .eq('purpose', purpose)
+    .eq('challenge', challenge)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle();
+  if (!data) return null;
+  await admin.from('passkey_challenges').delete().eq('id', data.id);
+  return data.challenge as string;
+}
+
+function challengeFromClientData(response: unknown): string | null {
+  try {
+    const cdj = (response as { response?: { clientDataJSON?: string } })?.response?.clientDataJSON;
+    if (!cdj) return null;
+    const parsed = JSON.parse(new TextDecoder().decode(isoBase64URL.toBuffer(cdj)));
+    return typeof parsed.challenge === 'string' ? parsed.challenge : null;
+  } catch {
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -118,7 +151,10 @@ Deno.serve(async (req) => {
           transports: (c.transports ?? []) as AuthenticatorTransport[],
         })),
         authenticatorSelection: {
-          residentKey: 'preferred',
+          // Must be discoverable, otherwise sign-in (which sends no
+          // allowCredentials) will not find the passkey.
+          residentKey: 'required',
+          requireResidentKey: true,
           userVerification: 'preferred',
         },
       });
@@ -188,7 +224,10 @@ Deno.serve(async (req) => {
 
       if (!stored) return json({ error: 'unknown_credential' }, 404);
 
-      const expectedChallenge = await consumeChallenge('auth', null);
+      const signedChallenge = challengeFromClientData(assertion);
+      const expectedChallenge = signedChallenge
+        ? await consumeExactChallenge(signedChallenge, 'auth')
+        : await consumeChallenge('auth', null);
       if (!expectedChallenge) return json({ error: 'challenge_expired' }, 400);
 
       const verification = await verifyAuthenticationResponse({
