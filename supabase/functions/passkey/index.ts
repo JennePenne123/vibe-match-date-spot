@@ -83,6 +83,34 @@ async function consumeChallenge(purpose: string, userId: string | null) {
   return data.challenge as string;
 }
 
+/**
+ * Consume exactly the challenge the authenticator signed. Prevents parallel
+ * sign-in attempts from stealing each other's (user-less) auth challenge.
+ */
+async function consumeExactChallenge(challenge: string, purpose: string) {
+  const { data } = await admin
+    .from('passkey_challenges')
+    .select('id, challenge')
+    .eq('purpose', purpose)
+    .eq('challenge', challenge)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle();
+  if (!data) return null;
+  await admin.from('passkey_challenges').delete().eq('id', data.id);
+  return data.challenge as string;
+}
+
+function challengeFromClientData(response: unknown): string | null {
+  try {
+    const cdj = (response as { response?: { clientDataJSON?: string } })?.response?.clientDataJSON;
+    if (!cdj) return null;
+    const parsed = JSON.parse(new TextDecoder().decode(isoBase64URL.toBuffer(cdj)));
+    return typeof parsed.challenge === 'string' ? parsed.challenge : null;
+  } catch {
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
