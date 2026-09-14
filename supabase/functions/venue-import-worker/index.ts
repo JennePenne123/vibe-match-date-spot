@@ -17,14 +17,23 @@ import { corsHeaders } from '../_shared/cors.ts';
 const OVERPASS_MIRRORS = [
   'https://overpass.kumi.systems/api/interpreter',
   'https://overpass-api.de/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
+  'https://overpass.osm.jp/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+  'https://overpass.osm.ch/api/interpreter',
 ];
 const OVERPASS_USER_AGENT = 'HiOutz/1.0 (+https://hioutz.app)';
-const REQUEST_DELAY_MS = 900;
+const REQUEST_DELAY_MS = 1_200;
 const RUN_BUDGET_MS = 30_000;
 const LEASE_MS = 120_000;
 const MAX_HOPS = 400;
 const HOP_COOLDOWN_MS = 1_500;
-const MAX_ATTEMPTS = 3;
+// Overpass-Mirrors sind häufig überlastet -> mehr Versuche, Jobs werden
+// zusätzlich automatisch wieder eingereiht (siehe requeueStaleFailures).
+const MAX_ATTEMPTS = 12;
+const REQUEUE_AFTER_MINUTES = 45;
+// Rotierender Startpunkt, damit nicht alle Läufe denselben Mirror hämmern.
+let mirrorCursor = Math.floor(Math.random() * OVERPASS_MIRRORS.length);
 
 type CategoryId = 'food' | 'culture' | 'activity' | 'nightlife';
 
