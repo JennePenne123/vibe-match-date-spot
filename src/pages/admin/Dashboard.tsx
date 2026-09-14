@@ -148,6 +148,8 @@ const AdminDashboard: React.FC = () => {
       {/* DACH city import queue */}
       <VenueImportQueueWidget />
 
+      <ImportAuditWidget />
+
       {/* Geo check-in quality */}
       <VisitVerificationWidget />
 
