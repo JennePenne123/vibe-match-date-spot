@@ -34,6 +34,13 @@ const MAX_ATTEMPTS = 12;
 const REQUEUE_AFTER_MINUTES = 45;
 // Rotierender Startpunkt, damit nicht alle Läufe denselben Mirror hämmern.
 let mirrorCursor = Math.floor(Math.random() * OVERPASS_MIRRORS.length);
+// Pro Lauf gesammelte Mirror-Ergebnisse ("host HTTP 504" -> Anzahl) für das Audit-Log.
+let mirrorStats: Record<string, number> = {};
+const noteMirror = (mirror: string, outcome: string) => {
+  const host = (() => { try { return new URL(mirror).host; } catch { return mirror; } })();
+  const key = `${host} ${outcome}`;
+  mirrorStats[key] = (mirrorStats[key] ?? 0) + 1;
+};
 
 type CategoryId = 'food' | 'culture' | 'activity' | 'nightlife';
 
