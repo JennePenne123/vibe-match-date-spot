@@ -610,10 +610,16 @@ Deno.serve(async (req) => {
         headers: { 'Content-Type': 'application/json', 'x-cron-token': control.cron_token },
         body: JSON.stringify({ hop: hop + 1 }),
       }).catch(async (err) => {
-        console.error('self-invoke failed:', err instanceof Error ? err.message : String(err));
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error('self-invoke failed:', msg);
         await supabase.from('venue_import_jobs')
           .update({ last_error: 'Fortsetzung fehlgeschlagen' })
           .eq('id', job.id);
+        audit({
+          ...jobCtx, event_type: 'self_invoke_failed', severity: 'error',
+          message: msg, details: { hop },
+        });
+        await flushAudit();
       });
     }
 
