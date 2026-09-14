@@ -70,6 +70,14 @@ export function PasskeyManager() {
   const formatDate = (value: string | null) =>
     value ? new Date(value).toLocaleDateString(i18n.language) : '—';
 
+  const formatDateTime = (value: string | null) =>
+    value
+      ? new Date(value).toLocaleString(i18n.language, {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        })
+      : '—';
+
   return (
     <Card className="bg-card border-border">
       <CardHeader className="pb-3">
