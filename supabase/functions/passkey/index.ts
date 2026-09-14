@@ -224,7 +224,10 @@ Deno.serve(async (req) => {
 
       if (!stored) return json({ error: 'unknown_credential' }, 404);
 
-      const expectedChallenge = await consumeChallenge('auth', null);
+      const signedChallenge = challengeFromClientData(assertion);
+      const expectedChallenge = signedChallenge
+        ? await consumeExactChallenge(signedChallenge, 'auth')
+        : await consumeChallenge('auth', null);
       if (!expectedChallenge) return json({ error: 'challenge_expired' }, 400);
 
       const verification = await verifyAuthenticationResponse({
