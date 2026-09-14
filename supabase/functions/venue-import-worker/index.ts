@@ -280,6 +280,23 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
+  // --- Audit-Log: gepuffert, damit der Import nicht pro Event blockiert ---
+  const auditBuffer: AuditEvent[] = [];
+  const audit = (event: AuditEvent) => {
+    auditBuffer.push({ severity: 'info', details: {}, ...event });
+    if (event.severity === 'error' || event.severity === 'warn') {
+      console.warn(`[audit] ${event.event_type}: ${event.message ?? ''}`);
+    }
+  };
+  const flushAudit = async () => {
+    if (!auditBuffer.length) return;
+    const rows = auditBuffer.splice(0, auditBuffer.length);
+    for (let i = 0; i < rows.length; i += 200) {
+      const { error } = await supabase.from('venue_import_audit').insert(rows.slice(i, i + 200));
+      if (error) console.error('audit insert failed:', error.message);
+    }
+  };
+
   let leaseHeld = false;
   const releaseLease = async () => {
     if (!leaseHeld) return;
