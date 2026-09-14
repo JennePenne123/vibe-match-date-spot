@@ -1962,7 +1962,11 @@
     "signInWithPasskey": "Mit Passkey anmelden",
     "signInFailed": "Anmeldung mit Passkey fehlgeschlagen.",
     "unknownCredential": "Dieser Passkey ist nicht registriert.",
-    "privacyHint": "Biometrische Daten verlassen dein Gerät nicht. Wir speichern nur den öffentlichen Schlüssel."
+    "privacyHint": "Biometrische Daten verlassen dein Gerät nicht. Wir speichern nur den öffentlichen Schlüssel.",
+    "statusActive": "Aktiv",
+    "statusUnused": "Noch nicht genutzt",
+    "lastUsedAt": "Zuletzt verwendet: {{date}}",
+    "neverUsed": "Noch nie zum Anmelden verwendet"
   },
   "recoveryCodes": {
     "title": "Backup-Codes",

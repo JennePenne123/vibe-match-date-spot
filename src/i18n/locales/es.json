@@ -1962,7 +1962,11 @@
     "signInWithPasskey": "Iniciar sesión con passkey",
     "signInFailed": "Error al iniciar sesión con passkey.",
     "unknownCredential": "Esta passkey no está registrada.",
-    "privacyHint": "Los datos biométricos nunca salen de tu dispositivo. Solo guardamos la clave pública."
+    "privacyHint": "Los datos biométricos nunca salen de tu dispositivo. Solo guardamos la clave pública.",
+    "statusActive": "Activo",
+    "statusUnused": "Aún sin usar",
+    "lastUsedAt": "Último uso: {{date}}",
+    "neverUsed": "Nunca se ha usado para iniciar sesión"
   },
   "recoveryCodes": {
     "title": "Códigos de respaldo",
