@@ -255,6 +255,22 @@ function dedupeKey(name: string, lat: number, lon: number): string {
 }
 
 
+type AuditEvent = {
+  event_type: string;
+  severity?: 'info' | 'warn' | 'error';
+  job_id?: string | null;
+  city?: string | null;
+  country?: string | null;
+  category?: string | null;
+  tag_key?: string | null;
+  tag_value?: string | null;
+  dedupe_key?: string | null;
+  venue_id?: string | null;
+  duplicate_of?: string | null;
+  message?: string | null;
+  details?: Record<string, unknown>;
+};
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
