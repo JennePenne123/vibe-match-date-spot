@@ -632,6 +632,8 @@ Deno.serve(async (req) => {
     await releaseLease();
     const msg = err instanceof Error ? err.message : String(err);
     console.error('venue-import-worker error:', msg);
+    audit({ event_type: 'worker_crashed', severity: 'error', message: msg });
+    await flushAudit();
     return json({ error: msg }, 500);
   }
 });
