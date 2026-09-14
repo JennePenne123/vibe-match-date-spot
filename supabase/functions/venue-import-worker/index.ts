@@ -17,14 +17,23 @@ import { corsHeaders } from '../_shared/cors.ts';
 const OVERPASS_MIRRORS = [
   'https://overpass.kumi.systems/api/interpreter',
   'https://overpass-api.de/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
+  'https://overpass.osm.jp/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+  'https://overpass.osm.ch/api/interpreter',
 ];
 const OVERPASS_USER_AGENT = 'HiOutz/1.0 (+https://hioutz.app)';
-const REQUEST_DELAY_MS = 900;
+const REQUEST_DELAY_MS = 1_200;
 const RUN_BUDGET_MS = 30_000;
 const LEASE_MS = 120_000;
 const MAX_HOPS = 400;
 const HOP_COOLDOWN_MS = 1_500;
-const MAX_ATTEMPTS = 3;
+// Overpass-Mirrors sind häufig überlastet -> mehr Versuche, Jobs werden
+// zusätzlich automatisch wieder eingereiht (siehe requeueStaleFailures).
+const MAX_ATTEMPTS = 12;
+const REQUEUE_AFTER_MINUTES = 45;
+// Rotierender Startpunkt, damit nicht alle Läufe denselben Mirror hämmern.
+let mirrorCursor = Math.floor(Math.random() * OVERPASS_MIRRORS.length);
 
 type CategoryId = 'food' | 'culture' | 'activity' | 'nightlife';
 
@@ -102,25 +111,43 @@ async function fetchArea(
   return out;
 }
 
+// Alle Mirrors der Reihe nach (rotierender Start), zwei Runden mit
+// wachsender Wartezeit. Überlastungs-Codes (429/504/503) sind normal.
 async function fetchOverpass(query: string, label: string): Promise<any[] | null> {
-  for (const mirror of OVERPASS_MIRRORS) {
-    try {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 25_000);
-      const resp = await fetch(mirror, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': OVERPASS_USER_AGENT },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: ctrl.signal,
-      });
-      clearTimeout(t);
-      if (resp.ok) {
-        const data = await resp.json();
-        return (data?.elements ?? []) as any[];
+  const total = OVERPASS_MIRRORS.length;
+  const rounds = 2;
+  for (let round = 0; round < rounds; round++) {
+    for (let i = 0; i < total; i++) {
+      const mirror = OVERPASS_MIRRORS[(mirrorCursor + i) % total];
+      try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 25_000);
+        const resp = await fetch(mirror, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': OVERPASS_USER_AGENT },
+          body: `data=${encodeURIComponent(query)}`,
+          signal: ctrl.signal,
+        });
+        clearTimeout(t);
+        if (resp.ok) {
+          const data = await resp.json();
+          // Erfolgreichen Mirror für den nächsten Aufruf bevorzugen.
+          mirrorCursor = (mirrorCursor + i) % total;
+          return (data?.elements ?? []) as any[];
+        }
+        await resp.body?.cancel();
+        console.warn(`overpass ${label}: ${mirror} HTTP ${resp.status}`);
+        if (resp.status === 429 || resp.status === 504 || resp.status === 503) {
+          await sleep(600 + round * 1_200);
+        }
+      } catch (err) {
+        console.warn(`overpass ${label}: ${mirror}`, err instanceof Error ? err.message : String(err));
       }
-      console.warn(`overpass ${label}: ${mirror} HTTP ${resp.status}`);
-    } catch (err) {
-      console.warn(`overpass ${label}: ${mirror}`, err instanceof Error ? err.message : String(err));
+    }
+    // Nach einer kompletten Runde etwas Luft lassen, dann erneut versuchen.
+    if (round + 1 < rounds) {
+      mirrorCursor = (mirrorCursor + 1) % total;
+      await sleep(2_000);
     }
   }
   return null;
@@ -266,6 +293,17 @@ Deno.serve(async (req) => {
     if (!leased) return json({ skipped: 'already_running' });
     leaseHeld = true;
 
+    // --- Fehlgeschlagene Jobs automatisch wieder einreihen ---
+    // Overpass-Ausfälle sind temporär; nach einer Abkühlphase erneut versuchen.
+    const requeueCutoff = new Date(now.getTime() - REQUEUE_AFTER_MINUTES * 60_000).toISOString();
+    const { data: requeued } = await supabase
+      .from('venue_import_jobs')
+      .update({ status: 'pending', attempts: 0 })
+      .eq('status', 'failed')
+      .lt('updated_at', requeueCutoff)
+      .select('id');
+    if (requeued?.length) console.log(`requeued ${requeued.length} failed jobs`);
+
     // --- Pick next job ---
     const { data: job } = await supabase
       .from('venue_import_jobs')
@@ -302,6 +340,17 @@ Deno.serve(async (req) => {
       );
       if (elements === null) {
         failure = `Overpass nicht erreichbar (${k}=${v})`;
+        // Hat dieser Job schon oft gehakt, wird der Problem-Tag übersprungen,
+        // damit die restlichen Kategorien der Stadt trotzdem durchlaufen.
+        if (Number(job.attempts) >= 4) {
+          offset += 1;
+          await supabase.from('venue_import_jobs')
+            .update({ chunk_offset: offset, last_error: `${failure} – übersprungen` })
+            .eq('id', job.id);
+          await sleep(REQUEST_DELAY_MS);
+          failure = null;
+          continue;
+        }
         break;
       }
 
