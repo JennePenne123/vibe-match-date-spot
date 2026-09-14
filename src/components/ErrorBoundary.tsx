@@ -130,8 +130,9 @@ class ErrorBoundary extends Component<Props, State> {
   };
 
   handleRetry = () => {
-    // Full reload as a last resort — used by the app-level fallback.
-    window.location.reload();
+    // Full reload as a last resort — purge caches so a stale bundle can't win.
+    void hardReload();
+
   };
 
   handleGoHome = () => {
