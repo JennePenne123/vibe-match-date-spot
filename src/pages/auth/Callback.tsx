@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { hasCompletedPreferenceSetup } from '@/utils/preferenceCompletion';
-import { readGroupToken, buildGroupJoinLink } from '@/lib/groupInviteLink';
+import { resolvePostLoginPath } from '@/lib/postLoginRedirect';
 
 /**
  * OAuth callback landing page.
@@ -49,35 +48,11 @@ const AuthCallback: React.FC = () => {
         return;
       }
 
+      // All sign-in paths share the central post-login routing so OAuth,
+      // email/password and passkey logins land on the same pages.
       const routeForUser = async (user: { id: string }) => {
-        // A pending group-invite deep link always wins: send the user straight
-        // to the join screen after login.
-        const pendingGroupToken = readGroupToken();
-        if (pendingGroupToken) {
-          const url = new URL(buildGroupJoinLink(pendingGroupToken));
-          navigate(`${url.pathname}${url.search}`, { replace: true });
-          return;
-        }
-        // Route to onboarding only when the user's preference setup is still empty.
-        // This covers first-time Google sign-ins AND any returning user who never
-        // finished onboarding — completed users always go straight to /home.
-        try {
-          const { data } = await supabase
-            .from('user_preferences')
-            .select(
-              'preferred_cuisines, preferred_vibes, preferred_times, preferred_price_range, ' +
-              'preferred_activities, preferred_entertainment, preferred_venue_types, ' +
-              'preferred_duration, dietary_restrictions, accessibility_needs, ' +
-              'home_address, home_latitude, home_longitude, personality_traits, relationship_goal'
-            )
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-          const completed = hasCompletedPreferenceSetup(data as any);
-          navigate(completed ? '/home' : '/welcome', { replace: true });
-        } catch {
-          navigate('/home', { replace: true });
-        }
+        const target = await resolvePostLoginPath(user.id);
+        navigate(target, { replace: true });
       };
 
       const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
