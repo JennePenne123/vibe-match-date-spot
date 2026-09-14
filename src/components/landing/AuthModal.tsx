@@ -20,7 +20,7 @@ import { Loader2, Gift, Store, KeyRound } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { validateReferralCode } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
-import { hasMoodToday } from '@/utils/moodStorage';
+import { resolvePostLoginPath } from '@/lib/postLoginRedirect';
 import { OAuthErrorDetails, OAuthErrorInfo } from '@/components/auth/OAuthErrorDetails';
 import { GoogleAuthSetupCheck } from '@/components/auth/GoogleAuthSetupCheck';
 import { useServerAdminAccess } from '@/hooks/useServerAdminAccess';
@@ -142,11 +142,11 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
 
   const { errors, validateAll, clearErrors } = useInputValidation(validationConfig);
 
-  // Redirect if already logged in
+  // Redirect if already logged in — same central routing as every login path
   useEffect(() => {
     if (user) {
       onClose();
-      navigate(hasMoodToday() ? '/home' : '/mood');
+      void resolvePostLoginPath(user.id).then((target) => navigate(target));
     }
   }, [user, navigate, onClose]);
 
@@ -298,22 +298,9 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
         }
 
         if (signedInUser) {
-          // Check user roles for proper routing (users can have multiple roles)
-          const { data: rolesData } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', signedInUser.id);
-
-          const roles = (rolesData ?? []).map((r) => r.role as string);
-
           onClose();
-
-          // Route partners/admins to partner dashboard (priority: admin > venue_partner > regular)
-          if (roles.includes('admin') || roles.includes('venue_partner')) {
-            navigate('/partner');
-          } else {
-            navigate(hasMoodToday() ? '/home' : '/mood');
-          }
+          const target = await resolvePostLoginPath(signedInUser.id);
+          navigate(target);
         }
       } else {
         // Persist a valid referral code so the global handler links the
@@ -335,7 +322,8 @@ export function AuthModal({ isOpen, onClose, onOpenPartner }: AuthModalProps) {
 
         if (signedUpUser) {
           onClose();
-          navigate(hasMoodToday() ? '/home' : '/mood');
+          const target = await resolvePostLoginPath(signedUpUser.id);
+          navigate(target);
         }
       }
     } catch (err) {
