@@ -16,6 +16,39 @@ function isChunkLoadError(error: Error | null): boolean {
   );
 }
 
+/**
+ * Drops every browser-side cache that can keep an outdated bundle alive
+ * (service worker + Cache Storage), then reloads with a cache-busting query
+ * param so the browser re-requests a fresh index.html.
+ */
+export async function hardReload(): Promise<void> {
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister().catch(() => undefined)));
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    if (typeof caches !== 'undefined') {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k).catch(() => undefined)));
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('_r', String(Date.now()));
+    window.location.replace(url.toString());
+  } catch {
+    window.location.reload();
+  }
+}
+
+
+
 
 interface Props {
   children: ReactNode;
@@ -66,16 +99,18 @@ class ErrorBoundary extends Component<Props, State> {
     this.props.onError?.(error, errorInfo);
 
     // Self-heal stale lazy chunks (happens after a new deploy while the old
-    // bundle is still cached): reload once instead of showing an error screen.
+    // bundle is still cached): purge caches and hard-reload instead of
+    // showing an error screen.
     if (isChunkLoadError(error)) {
       const key = 'hioutz-chunk-reload';
       const last = Number(sessionStorage.getItem(key) || 0);
       if (Date.now() - last > 30_000) {
         sessionStorage.setItem(key, String(Date.now()));
-        window.location.reload();
+        void hardReload();
         return;
       }
     }
+
 
     void import('@/services/errorMonitoringService')
       .then(({ logUiError, logCrash }) => {
@@ -95,8 +130,9 @@ class ErrorBoundary extends Component<Props, State> {
   };
 
   handleRetry = () => {
-    // Full reload as a last resort — used by the app-level fallback.
-    window.location.reload();
+    // Full reload as a last resort — purge caches so a stale bundle can't win.
+    void hardReload();
+
   };
 
   handleGoHome = () => {
