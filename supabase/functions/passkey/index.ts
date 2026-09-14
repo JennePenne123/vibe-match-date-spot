@@ -18,6 +18,10 @@ const ALLOWED_HOST_SUFFIXES = [
   'localhost',
 ];
 
+// Passkeys are bound to the rpID. Keep it stable per apex domain so a key
+// created on www.<domain> also works on <domain>.
+const STABLE_RP_IDS = ['hioutz.app', 'hioutz.com'];
+
 function resolveRp(req: Request): { rpID: string; origin: string } | null {
   const origin = req.headers.get('origin') ?? '';
   try {
@@ -27,7 +31,8 @@ function resolveRp(req: Request): { rpID: string; origin: string } | null {
       (suffix) => host === suffix || host.endsWith(`.${suffix}`),
     );
     if (!allowed) return null;
-    return { rpID: host, origin };
+    const apex = STABLE_RP_IDS.find((d) => host === d || host.endsWith(`.${d}`));
+    return { rpID: apex ?? host, origin };
   } catch {
     return null;
   }
