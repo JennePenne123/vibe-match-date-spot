@@ -243,7 +243,7 @@ const UMLAUT_MAP: Record<string, string> = {
 };
 
 function round4(n: number): string {
-  return (Math.round(n * 10_000) / 10_000).toString();
+  return n.toFixed(4);
 }
 
 function dedupeKey(name: string, lat: number, lon: number): string {
