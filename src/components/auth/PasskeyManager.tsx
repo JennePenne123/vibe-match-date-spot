@@ -97,13 +97,27 @@ export function PasskeyManager() {
                     key={pk.id}
                     className="flex items-center justify-between gap-3 rounded-lg border border-border/50 bg-background/50 p-3"
                   >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">{pk.device_name}</p>
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <p className="truncate text-sm font-medium text-foreground">{pk.device_name}</p>
+                        <Badge
+                          variant="outline"
+                          className={
+                            pk.last_used_at
+                              ? 'border-primary/40 bg-primary/10 text-primary text-[10px] px-1.5 py-0'
+                              : 'border-border bg-muted/40 text-muted-foreground text-[10px] px-1.5 py-0'
+                          }
+                        >
+                          {pk.last_used_at ? t('passkey.statusActive') : t('passkey.statusUnused')}
+                        </Badge>
+                      </div>
                       <p className="text-xs text-muted-foreground">
-                        {t('passkey.createdAt', { date: formatDate(pk.created_at) })}
                         {pk.last_used_at
-                          ? ` · ${t('passkey.lastUsed', { date: formatDate(pk.last_used_at) })}`
-                          : ''}
+                          ? t('passkey.lastUsedAt', { date: formatDateTime(pk.last_used_at) })
+                          : t('passkey.neverUsed')}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground/80">
+                        {t('passkey.createdAt', { date: formatDate(pk.created_at) })}
                       </p>
                     </div>
                     <Button
