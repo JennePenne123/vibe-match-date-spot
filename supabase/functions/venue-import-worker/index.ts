@@ -404,8 +404,14 @@ Deno.serve(async (req) => {
     let saved = 0;
     let failure: string | null = null;
 
+    const jobCtx = {
+      job_id: job.id as string, city: job.city as string,
+      country: job.country as string, category: job.category as string,
+    };
+
     while (offset < tags.length && Date.now() < deadline) {
       const [k, v] = tags[offset];
+      mirrorStats = {};
       const elements = await fetchArea(
         Number(job.latitude), Number(job.longitude), radiusM, k, v,
         `${job.city}/${job.category}/${k}=${v}`,
@@ -419,22 +425,37 @@ Deno.serve(async (req) => {
           await supabase.from('venue_import_jobs')
             .update({ chunk_offset: offset, last_error: `${failure} – übersprungen` })
             .eq('id', job.id);
+          audit({
+            ...jobCtx, event_type: 'tag_skipped', severity: 'error',
+            tag_key: k, tag_value: v,
+            message: `${k}=${v} nach ${job.attempts} Versuchen übersprungen`,
+            details: { attempts: job.attempts, mirrors: mirrorStats },
+          });
+          await flushAudit();
           await sleep(REQUEST_DELAY_MS);
           failure = null;
           continue;
         }
+        audit({
+          ...jobCtx, event_type: 'overpass_unreachable', severity: 'error',
+          tag_key: k, tag_value: v, message: failure,
+          details: { attempts: job.attempts, radius_km: job.radius_km, mirrors: mirrorStats },
+        });
         break;
       }
 
+      const dropped = { no_name: 0, no_coords: 0, no_address: 0, unmapped_type: 0 };
       const mapped = elements
         .map((el: any) => {
           const t = (el.tags || {}) as Record<string, string>;
           const lat = el.lat ?? el.center?.lat;
           const lon = el.lon ?? el.center?.lon;
           const meta = cuisineFor(t);
-          if (!t.name || !lat || !lon || !meta) return null;
+          if (!t.name) { dropped.no_name++; return null; }
+          if (!lat || !lon) { dropped.no_coords++; return null; }
+          if (!meta) { dropped.unmapped_type++; return null; }
           const address = buildAddress(t);
-          if (!address) return null;
+          if (!address) { dropped.no_address++; return null; }
           const name = t.name.slice(0, 200);
           return {
             id: `osm_${el.id}`,
@@ -458,9 +479,18 @@ Deno.serve(async (req) => {
 
       // 1) Duplikate innerhalb derselben Abfrage zusammenführen (gleicher Key).
       const byKey = new Map<string, Record<string, any>>();
+      let inBatchDuplicates = 0;
       for (const v of mapped) {
         const existing = byKey.get(v.dedupe_key);
         if (!existing) { byKey.set(v.dedupe_key, v); continue; }
+        inBatchDuplicates++;
+        audit({
+          ...jobCtx, event_type: 'duplicate_in_batch', severity: 'info',
+          tag_key: k, tag_value: v.cuisine_type, dedupe_key: v.dedupe_key,
+          venue_id: existing.id, duplicate_of: v.id,
+          message: `${v.name} doppelt in derselben Abfrage`,
+          details: { name: v.name, kept_id: existing.id, dropped_id: v.id },
+        });
         for (const field of ['address', 'phone', 'website', 'description']) {
           if (!existing[field] && v[field]) existing[field] = v[field];
         }
@@ -480,8 +510,18 @@ Deno.serve(async (req) => {
           if (row.dedupe_key && !keyToId.has(row.dedupe_key)) keyToId.set(row.dedupe_key, row.id);
         }
       }
+      let reused = 0;
       for (const v of venues) {
         const existingId = keyToId.get(v.dedupe_key);
+        if (existingId && existingId !== v.id) {
+          reused++;
+          audit({
+            ...jobCtx, event_type: 'duplicate_existing_reused', severity: 'info',
+            dedupe_key: v.dedupe_key, venue_id: existingId, duplicate_of: v.id,
+            message: `${v.name} bereits vorhanden – Eintrag aktualisiert`,
+            details: { name: v.name, incoming_id: v.id },
+          });
+        }
         if (existingId) v.id = existingId;
       }
 
@@ -489,10 +529,31 @@ Deno.serve(async (req) => {
       for (let i = 0; i < venues.length; i += 100) {
         const chunk = venues.slice(i, i + 100);
         const { error } = await supabase.from('venues').upsert(chunk, { onConflict: 'id' });
-        if (error) console.error(`upsert error (${job.city}/${job.category}):`, error.message);
-        else saved += chunk.length;
+        if (error) {
+          console.error(`upsert error (${job.city}/${job.category}):`, error.message);
+          audit({
+            ...jobCtx, event_type: 'upsert_failed', severity: 'error',
+            tag_key: k, tag_value: v, message: error.message,
+            details: {
+              chunk_size: chunk.length,
+              sample_keys: chunk.slice(0, 5).map((c) => c.dedupe_key),
+              code: (error as { code?: string }).code ?? null,
+            },
+          });
+        } else saved += chunk.length;
       }
 
+      audit({
+        ...jobCtx, event_type: 'tag_processed',
+        severity: dropped.no_address + dropped.no_name > venues.length ? 'warn' : 'info',
+        tag_key: k, tag_value: v,
+        message: `${k}=${v}: ${venues.length} Orte, ${elements.length} Rohdaten`,
+        details: {
+          raw: elements.length, kept: venues.length, dropped,
+          in_batch_duplicates: inBatchDuplicates, reused_existing: reused,
+          mirrors: mirrorStats,
+        },
+      });
 
       offset += 1;
       // Fortschritt sofort persistieren -> Wiederaufnahme überspringt erledigte Arbeit
@@ -502,21 +563,34 @@ Deno.serve(async (req) => {
         saved_count: Number(job.saved_count) + saved,
       }).eq('id', job.id);
 
+      await flushAudit();
       await sleep(REQUEST_DELAY_MS);
     }
 
     const finished = offset >= tags.length;
     if (failure) {
+      const nowFailed = Number(job.attempts) + 1 >= MAX_ATTEMPTS;
       await supabase.from('venue_import_jobs').update({
-        status: Number(job.attempts) + 1 >= MAX_ATTEMPTS ? 'failed' : 'pending',
+        status: nowFailed ? 'failed' : 'pending',
         attempts: Number(job.attempts) + 1,
         last_error: failure,
       }).eq('id', job.id);
+      audit({
+        ...jobCtx, event_type: nowFailed ? 'job_failed' : 'job_retry',
+        severity: nowFailed ? 'error' : 'warn', message: failure,
+        details: { attempts: Number(job.attempts) + 1, max_attempts: MAX_ATTEMPTS, chunk_offset: offset },
+      });
     } else if (finished) {
       await supabase.from('venue_import_jobs').update({
         status: 'done', finished_at: new Date().toISOString(), last_error: null,
       }).eq('id', job.id);
+      audit({
+        ...jobCtx, event_type: 'job_done', severity: 'info',
+        message: `${job.city}/${job.category} abgeschlossen`,
+        details: { fetched, saved, tags: tags.length },
+      });
     }
+    await flushAudit();
 
     await releaseLease();
 
