@@ -42,7 +42,7 @@ const noteMirror = (mirror: string, outcome: string) => {
   mirrorStats[key] = (mirrorStats[key] ?? 0) + 1;
 };
 
-type CategoryId = 'food' | 'culture' | 'activity' | 'nightlife';
+type CategoryId = 'food' | 'culture' | 'activity' | 'nightlife' | 'wellness' | 'outdoor' | 'sport_action';
 
 const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
   food: [
@@ -74,6 +74,26 @@ const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
     ['amenity', 'bar'], ['amenity', 'pub'], ['amenity', 'nightclub'],
     ['amenity', 'biergarten'], ['amenity', 'casino'], ['amenity', 'karaoke_box'],
     ['amenity', 'events_venue'], ['shop', 'shisha'],
+  ],
+  wellness: [
+    ['leisure', 'spa'], ['leisure', 'sauna'], ['amenity', 'massage'],
+    ['shop', 'massage'], ['sport', 'yoga'], ['sport', 'pilates'],
+    ['leisure', 'fitness_centre'], ['amenity', 'public_bath'],
+  ],
+  outdoor: [
+    ['leisure', 'park'], ['leisure', 'garden'], ['leisure', 'nature_reserve'],
+    ['natural', 'beach'], ['tourism', 'viewpoint'], ['tourism', 'picnic_site'],
+    ['leisure', 'marina'], ['leisure', 'common'],
+  ],
+  sport_action: [
+    ['sport', 'go_kart'], ['sport', 'paintball'], ['sport', 'laser_tag'],
+    ['sport', 'billiards'], ['sport', 'darts'], ['sport', 'climbing'],
+    ['sport', 'bouldering'], ['leisure', 'trampoline_park'],
+    ['leisure', 'adventure_park'], ['leisure', 'amusement_arcade'],
+    ['leisure', 'escape_game'], ['leisure', 'bowling_alley'],
+    ['leisure', 'miniature_golf'], ['leisure', 'ice_rink'],
+    ['leisure', 'horse_riding'], ['sport', 'surfing'], ['sport', 'sailing'],
+    ['sport', 'skateboard'], ['sport', 'archery'],
   ],
 };
 
@@ -221,6 +241,22 @@ function cuisineFor(tags: Record<string, string>): { cuisine: string; venueTags:
     'sport:surfing': ['Watersport', ['surfing', 'active', 'outdoor']],
     'sport:sailing': ['Watersport', ['sailing', 'active', 'outdoor']],
     'amenity:cooking_school': ['Cooking School', ['kochkurs', 'workshop', 'creative']],
+    'amenity:massage': ['Massage', ['massage', 'wellness', 'relaxing']],
+    'shop:massage': ['Massage', ['massage', 'wellness', 'relaxing']],
+    'sport:yoga': ['Yoga', ['yoga', 'wellness', 'mindful']],
+    'sport:pilates': ['Pilates', ['pilates', 'wellness', 'mindful']],
+    'leisure:fitness_centre': ['Fitness', ['fitness', 'wellness', 'active']],
+    'amenity:public_bath': ['Bath', ['bath', 'wellness', 'relaxing']],
+    'leisure:park': ['Park', ['park', 'outdoor', 'nature', 'relaxing']],
+    'leisure:garden': ['Garden', ['garden', 'outdoor', 'nature']],
+    'leisure:nature_reserve': ['Nature Reserve', ['nature', 'outdoor', 'hiking']],
+    'natural:beach': ['Beach', ['beach', 'outdoor', 'summer']],
+    'tourism:viewpoint': ['Viewpoint', ['viewpoint', 'outdoor', 'scenic']],
+    'tourism:picnic_site': ['Picnic Site', ['picnic', 'outdoor', 'nature']],
+    'leisure:marina': ['Marina', ['marina', 'outdoor', 'waterfront']],
+    'leisure:common': ['Common', ['park', 'outdoor', 'nature']],
+    'sport:skateboard': ['Skateboarding', ['skateboard', 'active', 'sport']],
+    'sport:archery': ['Archery', ['archery', 'active', 'sport']],
     'amenity:bar': ['Bar', ['bar', 'evening', 'drinks', 'nightlife']],
     'amenity:pub': ['Pub', ['pub', 'evening', 'drinks', 'nightlife']],
     'amenity:nightclub': ['Nightclub', ['nightclub', 'nightlife', 'party']],

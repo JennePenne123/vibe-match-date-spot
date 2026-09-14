@@ -1,0 +1,2 @@
+ALTER TABLE public.venue_import_jobs DROP CONSTRAINT IF EXISTS venue_import_jobs_category_chk;
+ALTER TABLE public.venue_import_jobs ADD CONSTRAINT venue_import_jobs_category_chk CHECK (category = ANY (ARRAY['food'::text, 'culture'::text, 'activity'::text, 'nightlife'::text, 'wellness'::text, 'outdoor'::text, 'sport_action'::text]));
