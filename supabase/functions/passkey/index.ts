@@ -123,7 +123,10 @@ Deno.serve(async (req) => {
           transports: (c.transports ?? []) as AuthenticatorTransport[],
         })),
         authenticatorSelection: {
-          residentKey: 'preferred',
+          // Must be discoverable, otherwise sign-in (which sends no
+          // allowCredentials) will not find the passkey.
+          residentKey: 'required',
+          requireResidentKey: true,
           userVerification: 'preferred',
         },
       });
