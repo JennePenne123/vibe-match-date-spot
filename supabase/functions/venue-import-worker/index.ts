@@ -140,15 +140,19 @@ async function fetchOverpass(query: string, label: string): Promise<any[] | null
           const data = await resp.json();
           // Erfolgreichen Mirror für den nächsten Aufruf bevorzugen.
           mirrorCursor = (mirrorCursor + i) % total;
+          noteMirror(mirror, 'ok');
           return (data?.elements ?? []) as any[];
         }
         await resp.body?.cancel();
+        noteMirror(mirror, `HTTP ${resp.status}`);
         console.warn(`overpass ${label}: ${mirror} HTTP ${resp.status}`);
         if (resp.status === 429 || resp.status === 504 || resp.status === 503) {
           await sleep(600 + round * 1_200);
         }
       } catch (err) {
-        console.warn(`overpass ${label}: ${mirror}`, err instanceof Error ? err.message : String(err));
+        const msg = err instanceof Error ? err.message : String(err);
+        noteMirror(mirror, msg.includes('abort') ? 'timeout' : 'network');
+        console.warn(`overpass ${label}: ${mirror}`, msg);
       }
     }
     // Nach einer kompletten Runde etwas Luft lassen, dann erneut versuchen.
