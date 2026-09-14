@@ -2329,6 +2329,7 @@ export type Database = {
           cuisine_type: string | null
           data_quality_issues: Json | null
           data_quality_score: number | null
+          dedupe_key: string | null
           description: string | null
           foursquare_data: Json | null
           foursquare_id: string | null
@@ -2365,6 +2366,7 @@ export type Database = {
           cuisine_type?: string | null
           data_quality_issues?: Json | null
           data_quality_score?: number | null
+          dedupe_key?: string | null
           description?: string | null
           foursquare_data?: Json | null
           foursquare_id?: string | null
@@ -2401,6 +2403,7 @@ export type Database = {
           cuisine_type?: string | null
           data_quality_issues?: Json | null
           data_quality_score?: number | null
+          dedupe_key?: string | null
           description?: string | null
           foursquare_data?: Json | null
           foursquare_id?: string | null
@@ -2829,6 +2832,7 @@ export type Database = {
         }
         Returns: string
       }
+      merge_duplicate_venues: { Args: never; Returns: Json }
       reset_user_preferences_to_default: {
         Args: { target_user_id: string }
         Returns: boolean
@@ -2852,6 +2856,10 @@ export type Database = {
           target_user_id: string
         }
         Returns: boolean
+      }
+      venue_dedupe_key: {
+        Args: { _lat: number; _lon: number; _name: string }
+        Returns: string
       }
       verify_admin_access: { Args: never; Returns: boolean }
       verify_admin_access_logged: { Args: never; Returns: boolean }

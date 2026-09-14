@@ -234,6 +234,27 @@ function buildAddress(tags: Record<string, string>): string {
   return street || city || tags['addr:suburb'] || tags['addr:city'] || tags.name || '';
 }
 
+// Stabiler Duplikat-Schlüssel: normalisierter Name + auf ~11 m gerundete Koordinaten.
+// Muss identisch zur DB-Funktion public.venue_dedupe_key() bleiben.
+const UMLAUT_MAP: Record<string, string> = {
+  'ä': 'a', 'ö': 'o', 'ü': 'u', 'ß': 's', 'á': 'a', 'à': 'a', 'â': 'a',
+  'é': 'e', 'è': 'e', 'ê': 'e', 'í': 'i', 'ì': 'i', 'î': 'i',
+  'ó': 'o', 'ò': 'o', 'ô': 'o', 'ú': 'u', 'ù': 'u', 'û': 'u', 'ñ': 'n', 'ç': 'c',
+};
+
+function round4(n: number): string {
+  return n.toFixed(4);
+}
+
+function dedupeKey(name: string, lat: number, lon: number): string {
+  const normalized = name
+    .toLowerCase()
+    .replace(/[äöüßáàâéèêíìîóòôúùûñç]/g, (c) => UMLAUT_MAP[c] ?? c)
+    .replace(/[^a-z0-9]/g, '');
+  return `${normalized}@${round4(lat)},${round4(lon)}`;
+}
+
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
@@ -354,7 +375,7 @@ Deno.serve(async (req) => {
         break;
       }
 
-      const venues = elements
+      const mapped = elements
         .map((el: any) => {
           const t = (el.tags || {}) as Record<string, string>;
           const lat = el.lat ?? el.center?.lat;
@@ -363,9 +384,11 @@ Deno.serve(async (req) => {
           if (!t.name || !lat || !lon || !meta) return null;
           const address = buildAddress(t);
           if (!address) return null;
+          const name = t.name.slice(0, 200);
           return {
             id: `osm_${el.id}`,
-            name: t.name.slice(0, 200),
+            dedupe_key: dedupeKey(name, Number(lat), Number(lon)),
+            name,
             address: address.slice(0, 300),
             latitude: lat,
             longitude: lon,
@@ -380,7 +403,36 @@ Deno.serve(async (req) => {
             updated_at: new Date().toISOString(),
           };
         })
-        .filter(Boolean) as Array<Record<string, unknown>>;
+        .filter(Boolean) as Array<Record<string, any>>;
+
+      // 1) Duplikate innerhalb derselben Abfrage zusammenführen (gleicher Key).
+      const byKey = new Map<string, Record<string, any>>();
+      for (const v of mapped) {
+        const existing = byKey.get(v.dedupe_key);
+        if (!existing) { byKey.set(v.dedupe_key, v); continue; }
+        for (const field of ['address', 'phone', 'website', 'description']) {
+          if (!existing[field] && v[field]) existing[field] = v[field];
+        }
+        existing.tags = [...new Set([...(existing.tags ?? []), ...(v.tags ?? [])])];
+      }
+      const venues = [...byKey.values()];
+
+      // 2) Bereits gespeicherte Orte mit gleichem Key wiederverwenden statt neu anzulegen.
+      const keys = venues.map((v) => v.dedupe_key);
+      const keyToId = new Map<string, string>();
+      for (let i = 0; i < keys.length; i += 200) {
+        const { data: existingRows } = await supabase
+          .from('venues')
+          .select('id, dedupe_key')
+          .in('dedupe_key', keys.slice(i, i + 200));
+        for (const row of existingRows ?? []) {
+          if (row.dedupe_key && !keyToId.has(row.dedupe_key)) keyToId.set(row.dedupe_key, row.id);
+        }
+      }
+      for (const v of venues) {
+        const existingId = keyToId.get(v.dedupe_key);
+        if (existingId) v.id = existingId;
+      }
 
       fetched += venues.length;
       for (let i = 0; i < venues.length; i += 100) {
@@ -389,6 +441,7 @@ Deno.serve(async (req) => {
         if (error) console.error(`upsert error (${job.city}/${job.category}):`, error.message);
         else saved += chunk.length;
       }
+
 
       offset += 1;
       // Fortschritt sofort persistieren -> Wiederaufnahme überspringt erledigte Arbeit
