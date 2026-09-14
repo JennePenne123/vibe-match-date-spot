@@ -111,25 +111,43 @@ async function fetchArea(
   return out;
 }
 
+// Alle Mirrors der Reihe nach (rotierender Start), zwei Runden mit
+// wachsender Wartezeit. Überlastungs-Codes (429/504/503) sind normal.
 async function fetchOverpass(query: string, label: string): Promise<any[] | null> {
-  for (const mirror of OVERPASS_MIRRORS) {
-    try {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 25_000);
-      const resp = await fetch(mirror, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': OVERPASS_USER_AGENT },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: ctrl.signal,
-      });
-      clearTimeout(t);
-      if (resp.ok) {
-        const data = await resp.json();
-        return (data?.elements ?? []) as any[];
+  const total = OVERPASS_MIRRORS.length;
+  const rounds = 2;
+  for (let round = 0; round < rounds; round++) {
+    for (let i = 0; i < total; i++) {
+      const mirror = OVERPASS_MIRRORS[(mirrorCursor + i) % total];
+      try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 25_000);
+        const resp = await fetch(mirror, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': OVERPASS_USER_AGENT },
+          body: `data=${encodeURIComponent(query)}`,
+          signal: ctrl.signal,
+        });
+        clearTimeout(t);
+        if (resp.ok) {
+          const data = await resp.json();
+          // Erfolgreichen Mirror für den nächsten Aufruf bevorzugen.
+          mirrorCursor = (mirrorCursor + i) % total;
+          return (data?.elements ?? []) as any[];
+        }
+        await resp.body?.cancel();
+        console.warn(`overpass ${label}: ${mirror} HTTP ${resp.status}`);
+        if (resp.status === 429 || resp.status === 504 || resp.status === 503) {
+          await sleep(600 + round * 1_200);
+        }
+      } catch (err) {
+        console.warn(`overpass ${label}: ${mirror}`, err instanceof Error ? err.message : String(err));
       }
-      console.warn(`overpass ${label}: ${mirror} HTTP ${resp.status}`);
-    } catch (err) {
-      console.warn(`overpass ${label}: ${mirror}`, err instanceof Error ? err.message : String(err));
+    }
+    // Nach einer kompletten Runde etwas Luft lassen, dann erneut versuchen.
+    if (round + 1 < rounds) {
+      mirrorCursor = (mirrorCursor + 1) % total;
+      await sleep(2_000);
     }
   }
   return null;
