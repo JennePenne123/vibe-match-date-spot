@@ -16,6 +16,39 @@ function isChunkLoadError(error: Error | null): boolean {
   );
 }
 
+/**
+ * Drops every browser-side cache that can keep an outdated bundle alive
+ * (service worker + Cache Storage), then reloads with a cache-busting query
+ * param so the browser re-requests a fresh index.html.
+ */
+export async function hardReload(): Promise<void> {
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister().catch(() => undefined)));
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    if (typeof caches !== 'undefined') {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k).catch(() => undefined)));
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('_r', String(Date.now()));
+    window.location.replace(url.toString());
+  } catch {
+    window.location.reload();
+  }
+}
+
+
+
 
 interface Props {
   children: ReactNode;
