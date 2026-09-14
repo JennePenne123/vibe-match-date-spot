@@ -293,6 +293,17 @@ Deno.serve(async (req) => {
     if (!leased) return json({ skipped: 'already_running' });
     leaseHeld = true;
 
+    // --- Fehlgeschlagene Jobs automatisch wieder einreihen ---
+    // Overpass-Ausfälle sind temporär; nach einer Abkühlphase erneut versuchen.
+    const requeueCutoff = new Date(now.getTime() - REQUEUE_AFTER_MINUTES * 60_000).toISOString();
+    const { data: requeued } = await supabase
+      .from('venue_import_jobs')
+      .update({ status: 'pending', attempts: 0 })
+      .eq('status', 'failed')
+      .lt('updated_at', requeueCutoff)
+      .select('id');
+    if (requeued?.length) console.log(`requeued ${requeued.length} failed jobs`);
+
     // --- Pick next job ---
     const { data: job } = await supabase
       .from('venue_import_jobs')
