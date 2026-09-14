@@ -21,6 +21,9 @@ const CATEGORY_LABEL: Record<string, string> = {
   culture: 'Kultur',
   activity: 'Aktivitäten',
   nightlife: 'Nightlife',
+  wellness: 'Wellness & Entspannung',
+  outdoor: 'Natur & Outdoor',
+  sport_action: 'Sport & Action',
 };
 
 export default function VenueImportQueueWidget() {
