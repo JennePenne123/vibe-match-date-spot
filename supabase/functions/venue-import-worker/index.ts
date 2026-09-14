@@ -234,6 +234,27 @@ function buildAddress(tags: Record<string, string>): string {
   return street || city || tags['addr:suburb'] || tags['addr:city'] || tags.name || '';
 }
 
+// Stabiler Duplikat-Schlüssel: normalisierter Name + auf ~11 m gerundete Koordinaten.
+// Muss identisch zur DB-Funktion public.venue_dedupe_key() bleiben.
+const UMLAUT_MAP: Record<string, string> = {
+  'ä': 'a', 'ö': 'o', 'ü': 'u', 'ß': 's', 'á': 'a', 'à': 'a', 'â': 'a',
+  'é': 'e', 'è': 'e', 'ê': 'e', 'í': 'i', 'ì': 'i', 'î': 'i',
+  'ó': 'o', 'ò': 'o', 'ô': 'o', 'ú': 'u', 'ù': 'u', 'û': 'u', 'ñ': 'n', 'ç': 'c',
+};
+
+function round4(n: number): string {
+  return (Math.round(n * 10_000) / 10_000).toString();
+}
+
+function dedupeKey(name: string, lat: number, lon: number): string {
+  const normalized = name
+    .toLowerCase()
+    .replace(/[äöüßáàâéèêíìîóòôúùûñç]/g, (c) => UMLAUT_MAP[c] ?? c)
+    .replace(/[^a-z0-9]/g, '');
+  return `${normalized}@${round4(lat)},${round4(lon)}`;
+}
+
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
