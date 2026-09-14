@@ -340,6 +340,17 @@ Deno.serve(async (req) => {
       );
       if (elements === null) {
         failure = `Overpass nicht erreichbar (${k}=${v})`;
+        // Hat dieser Job schon oft gehakt, wird der Problem-Tag übersprungen,
+        // damit die restlichen Kategorien der Stadt trotzdem durchlaufen.
+        if (Number(job.attempts) >= 4) {
+          offset += 1;
+          await supabase.from('venue_import_jobs')
+            .update({ chunk_offset: offset, last_error: `${failure} – übersprungen` })
+            .eq('id', job.id);
+          await sleep(REQUEST_DELAY_MS);
+          failure = null;
+          continue;
+        }
         break;
       }
 
