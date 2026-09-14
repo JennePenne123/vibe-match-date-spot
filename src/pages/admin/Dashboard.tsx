@@ -17,6 +17,7 @@ import ScoringExperimentWidget from '@/components/admin/ScoringExperimentWidget'
 import SignalActivationWidget from '@/components/admin/SignalActivationWidget';
 import VenueDensityWidget from '@/components/admin/VenueDensityWidget';
 import VenueImportQueueWidget from '@/components/admin/VenueImportQueueWidget';
+import ImportAuditWidget from '@/components/admin/ImportAuditWidget';
 import VisitVerificationWidget from '@/components/admin/VisitVerificationWidget';
 
 interface PlatformStats {
