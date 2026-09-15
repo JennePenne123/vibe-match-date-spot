@@ -274,6 +274,78 @@ function cuisineFor(tags: Record<string, string>): { cuisine: string; venueTags:
   return null;
 }
 
+/**
+ * Fallback-Kategorisierung: greift, wenn die primären OSM-Tags fehlen oder
+ * unbekannt sind. Reihenfolge: Namens-Keywords → Neben-Tags → Kategorie-Default
+ * des laufenden Import-Jobs. So landen Orte trotzdem sinnvoll in Wellness,
+ * Natur & Outdoor bzw. Sport & Action statt komplett verworfen zu werden.
+ */
+const NAME_KEYWORD_RULES: Array<[RegExp, string, string[]]> = [
+  [/\b(therme|thermal|sauna|spa|wellness|hamam|hammam)\b/i, 'Spa & Wellness', ['spa', 'wellness', 'relaxing']],
+  [/\b(massage|physio|ayurveda)\b/i, 'Massage', ['massage', 'wellness', 'relaxing']],
+  [/\b(yoga|pilates|meditation)\b/i, 'Yoga', ['yoga', 'wellness', 'mindful']],
+  [/\b(fitness|gym|studio\s?f[uü]r\s?sport)\b/i, 'Fitness', ['fitness', 'wellness', 'active']],
+  [/\b(schwimmbad|hallenbad|freibad|badeanstalt|aquapark)\b/i, 'Swimming', ['swimming', 'active', 'wellness']],
+  [/\b(park|garten|gardens|arboretum|grünanlage|gruenanlage)\b/i, 'Park', ['park', 'outdoor', 'nature', 'relaxing']],
+  [/\b(strand|beach|badestelle)\b/i, 'Beach', ['beach', 'outdoor', 'summer']],
+  [/\b(aussicht|viewpoint|panorama|blick)\b/i, 'Viewpoint', ['viewpoint', 'outdoor', 'scenic']],
+  [/\b(naturschutz|naturpark|nature reserve|wanderweg|hiking)\b/i, 'Nature Reserve', ['nature', 'outdoor', 'hiking']],
+  [/\b(hafen|marina|yachthafen)\b/i, 'Marina', ['marina', 'outdoor', 'waterfront']],
+  [/\b(kart|karting|motodrom)\b/i, 'Go-Kart', ['kart', 'active', 'fun']],
+  [/\b(paintball)\b/i, 'Paintball', ['paintball', 'active', 'fun']],
+  [/\b(laser\s?tag|lasertag)\b/i, 'Laser Tag', ['lasertag', 'active', 'fun']],
+  [/\b(boulder|kletter|climbing)\b/i, 'Climbing', ['climbing', 'klettern', 'active', 'sport']],
+  [/\b(trampolin|jump\s?house)\b/i, 'Trampoline Park', ['trampolin', 'active', 'fun']],
+  [/\b(bowling|kegel)\b/i, 'Bowling', ['bowling', 'active', 'fun']],
+  [/\b(minigolf|mini\s?golf)\b/i, 'Mini Golf', ['minigolf', 'active', 'fun']],
+  [/\b(escape\s?room|exit\s?game)\b/i, 'Escape Room', ['escape room', 'fun', 'active']],
+  [/\b(eishalle|eisbahn|ice\s?rink)\b/i, 'Ice Rink', ['eislaufen', 'active', 'fun']],
+  [/\b(surf|segel|sailing|kite)\b/i, 'Watersport', ['watersport', 'active', 'outdoor']],
+  [/\b(skate|pumptrack)\b/i, 'Skateboarding', ['skateboard', 'active', 'sport']],
+  [/\b(bogenschie|archery)\b/i, 'Archery', ['archery', 'active', 'sport']],
+];
+
+const SECONDARY_TAG_RULES: Array<[string, string, string, string[]]> = [
+  ['natural', 'beach', 'Beach', ['beach', 'outdoor', 'summer']],
+  ['natural', 'wood', 'Nature Reserve', ['nature', 'outdoor', 'hiking']],
+  ['natural', 'water', 'Nature Reserve', ['nature', 'outdoor', 'waterfront']],
+  ['boundary', 'national_park', 'Nature Reserve', ['nature', 'outdoor', 'hiking']],
+  ['landuse', 'recreation_ground', 'Park', ['park', 'outdoor', 'nature']],
+  ['landuse', 'village_green', 'Park', ['park', 'outdoor', 'nature']],
+  ['leisure', 'pitch', 'Sport', ['sport', 'active', 'outdoor']],
+  ['leisure', 'sports_centre', 'Sport', ['sport', 'active']],
+  ['leisure', 'fitness_station', 'Fitness', ['fitness', 'active', 'outdoor']],
+  ['leisure', 'playground', 'Park', ['park', 'outdoor', 'family']],
+  ['leisure', 'resort', 'Spa & Wellness', ['wellness', 'relaxing']],
+  ['healthcare', 'physiotherapist', 'Massage', ['massage', 'wellness', 'relaxing']],
+  ['shop', 'sports', 'Sport', ['sport', 'active']],
+];
+
+const CATEGORY_DEFAULT: Partial<Record<CategoryId, { cuisine: string; venueTags: string[] }>> = {
+  wellness: { cuisine: 'Spa & Wellness', venueTags: ['wellness', 'relaxing'] },
+  outdoor: { cuisine: 'Nature Spot', venueTags: ['outdoor', 'nature'] },
+  sport_action: { cuisine: 'Sport & Action', venueTags: ['sport', 'active', 'fun'] },
+};
+
+function fallbackMeta(
+  tags: Record<string, string>,
+  category: CategoryId,
+): { cuisine: string; venueTags: string[]; via: string } | null {
+  const name = tags.name || '';
+  for (const [re, cuisine, venueTags] of NAME_KEYWORD_RULES) {
+    if (re.test(name)) return { cuisine, venueTags, via: 'name' };
+  }
+  for (const [key, value, cuisine, venueTags] of SECONDARY_TAG_RULES) {
+    if (tags[key] === value) return { cuisine, venueTags, via: `${key}=${value}` };
+  }
+  // Der Job weiß, in welcher Kategorie gesucht wurde – das ist der letzte Anker.
+  const def = CATEGORY_DEFAULT[category];
+  if (def) return { ...def, via: 'category' };
+  return null;
+}
+
+
+
 function buildAddress(tags: Record<string, string>): string {
   const street = [tags['addr:street'], tags['addr:housenumber']].filter(Boolean).join(' ');
   const city = [tags['addr:postcode'], tags['addr:city']].filter(Boolean).join(' ');
@@ -481,17 +553,26 @@ Deno.serve(async (req) => {
       }
 
       const dropped = { no_name: 0, no_coords: 0, no_address: 0, unmapped_type: 0 };
+      let fallbackUsed = 0;
+      const fallbackVia: Record<string, number> = {};
       const mapped = elements
         .map((el: any) => {
           const t = (el.tags || {}) as Record<string, string>;
           const lat = el.lat ?? el.center?.lat;
           const lon = el.lon ?? el.center?.lon;
-          const meta = cuisineFor(t);
+          let meta: { cuisine: string; venueTags: string[] } | null = cuisineFor(t);
           if (!t.name) { dropped.no_name++; return null; }
           if (!lat || !lon) { dropped.no_coords++; return null; }
-          if (!meta) { dropped.unmapped_type++; return null; }
+          if (!meta) {
+            const fb = fallbackMeta(t, job.category as CategoryId);
+            if (!fb) { dropped.unmapped_type++; return null; }
+            fallbackUsed++;
+            fallbackVia[fb.via] = (fallbackVia[fb.via] ?? 0) + 1;
+            meta = { cuisine: fb.cuisine, venueTags: [...fb.venueTags, 'fallback-kategorisiert'] };
+          }
           const address = buildAddress(t);
           if (!address) { dropped.no_address++; return null; }
+
           const name = t.name.slice(0, 200);
           return {
             id: `osm_${el.id}`,
@@ -587,8 +668,10 @@ Deno.serve(async (req) => {
         details: {
           raw: elements.length, kept: venues.length, dropped,
           in_batch_duplicates: inBatchDuplicates, reused_existing: reused,
+          fallback_categorized: fallbackUsed, fallback_via: fallbackVia,
           mirrors: mirrorStats,
         },
+
       });
 
       offset += 1;

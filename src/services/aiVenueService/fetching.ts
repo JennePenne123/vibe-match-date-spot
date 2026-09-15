@@ -15,8 +15,11 @@ export const CATEGORY_CUISINE_TYPES: Record<string, string[]> = {
   activity: [
     'Bowling', 'Mini Golf', 'Arcade', 'Escape Room', 'Climbing', 'Swimming',
     'Spa & Wellness', 'Ice Rink', 'Trampoline Park', 'Go-Kart', 'Paintball',
-    'Laser Tag',
+    'Laser Tag', 'Sport & Action', 'Sport', 'Nature Spot', 'Park', 'Garden',
+    'Beach', 'Viewpoint', 'Nature Reserve', 'Marina', 'Yoga', 'Pilates',
+    'Fitness', 'Massage', 'Bath', 'Watersport', 'Skateboarding', 'Archery',
   ],
+
   nightlife: ['Bar', 'Pub', 'Nightclub', 'Casino', 'Karaoke', 'Biergarten'],
 };
 
