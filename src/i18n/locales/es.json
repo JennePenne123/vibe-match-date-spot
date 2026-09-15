@@ -654,7 +654,20 @@
     "venue_laser_tag": "Láser Tag",
     "venue_trampoline_park": "Parque de Trampolines",
     "venue_billiards": "Billar y Dardos",
-    "venue_bouldering": "Búlder"
+    "venue_bouldering": "Búlder",
+    "priorityFood": "En comida y bebida, la cocina y el presupuesto son lo más importante.",
+    "priorityCulture": "En cultura, el ambiente y el horario son lo más importante.",
+    "priorityActivity": "En actividades, la cercanía y el ambiente son lo más importante.",
+    "priorityNightlife": "En vida nocturna, el horario y el ambiente son lo más importante.",
+    "priorityWellness": "En bienestar, la calma y el ambiente son lo más importante; la comida apenas cuenta.",
+    "priorityOutdoor": "En naturaleza y aire libre, la distancia, la calma y la hora del día son lo más importante; omitimos cocina y presupuesto.",
+    "prioritySport": "En deporte y acción, la cercanía y el presupuesto son lo más importante.",
+    "priorityTitle": "Prioridades",
+    "priorityDimCuisine": "Comida",
+    "priorityDimVibe": "Ambiente",
+    "priorityDimPrice": "Precio",
+    "priorityDimLocation": "Cercanía",
+    "priorityIntro": "Preconfigurado para tu categoría; puedes ajustarlo cuando quieras."
   },
   "notFound": {
     "title": "404",

@@ -654,7 +654,20 @@
     "venue_laser_tag": "Laser Tag",
     "venue_trampoline_park": "Trampoline Park",
     "venue_billiards": "Billiards & Darts",
-    "venue_bouldering": "Bouldering"
+    "venue_bouldering": "Bouldering",
+    "priorityFood": "For food & drinks, cuisine and budget matter most.",
+    "priorityCulture": "For culture, atmosphere and timing matter most.",
+    "priorityActivity": "For activities, distance and mood matter most.",
+    "priorityNightlife": "For nightlife, timing and atmosphere matter most.",
+    "priorityWellness": "For wellness, calm and atmosphere matter most — food barely counts.",
+    "priorityOutdoor": "For nature & outdoor, distance, calm and time of day matter most — cuisine and budget are skipped.",
+    "prioritySport": "For sport & action, distance and budget matter most.",
+    "priorityTitle": "Priorities",
+    "priorityDimCuisine": "Food",
+    "priorityDimVibe": "Atmosphere",
+    "priorityDimPrice": "Price",
+    "priorityDimLocation": "Distance",
+    "priorityIntro": "Preset for your category — adjust any time."
   },
   "notFound": {
     "title": "404",

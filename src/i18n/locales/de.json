@@ -654,7 +654,20 @@
     "venue_laser_tag": "Lasertag",
     "venue_trampoline_park": "Trampolinpark",
     "venue_billiards": "Billard & Darts",
-    "venue_bouldering": "Bouldern"
+    "venue_bouldering": "Bouldern",
+    "priorityFood": "Bei Essen & Trinken zählen Küche und Budget am meisten.",
+    "priorityCulture": "Bei Kultur zählen Atmosphäre und Uhrzeit am meisten.",
+    "priorityActivity": "Bei Aktivitäten zählen Erreichbarkeit und Stimmung am meisten.",
+    "priorityNightlife": "Beim Nightlife zählen Uhrzeit und Atmosphäre am meisten.",
+    "priorityWellness": "Bei Wellness zählen Ruhe und Atmosphäre am meisten — Essen spielt kaum eine Rolle.",
+    "priorityOutdoor": "Bei Natur & Outdoor zählen Weg, Ruhe und Tageszeit am meisten — Küche und Budget lassen wir weg.",
+    "prioritySport": "Bei Sport & Action zählen Erreichbarkeit und Budget am meisten.",
+    "priorityTitle": "Prioritäten",
+    "priorityDimCuisine": "Essen",
+    "priorityDimVibe": "Atmosphäre",
+    "priorityDimPrice": "Preis",
+    "priorityDimLocation": "Nähe",
+    "priorityIntro": "Vorbelegt für deine Kategorie — du kannst jederzeit nachjustieren."
   },
   "notFound": {
     "title": "404",
