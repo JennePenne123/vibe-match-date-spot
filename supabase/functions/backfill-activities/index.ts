@@ -18,9 +18,11 @@ const OVERPASS_USER_AGENT = 'HiOutz/1.0 (+https://hioutz.app)';
 const OVERPASS_CHUNK_SIZE = 6;
 const OVERPASS_REQUEST_DELAY_MS = 900;
 
-type CategoryId = 'culture' | 'activity' | 'nightlife' | 'food';
+type CategoryId = 'culture' | 'activity' | 'nightlife' | 'food' | 'wellness' | 'outdoor' | 'sport_action';
 
-const VALID_CATEGORIES: CategoryId[] = ['culture', 'activity', 'nightlife', 'food'];
+const VALID_CATEGORIES: CategoryId[] = [
+  'culture', 'activity', 'nightlife', 'food', 'wellness', 'outdoor', 'sport_action',
+];
 
 const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
   culture: [
