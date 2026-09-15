@@ -12,6 +12,7 @@ import { getTodayMoodFromStorage } from '@/components/date-planning/preferences/
 import { DEFAULT_PRIORITY_WEIGHTS, priorityWeightsForCategory, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getCategoryWizardConfig, getCategoryVenueTypeIds } from '@/lib/categoryWizardConfig';
+import { readLastDatePreferences, saveLastDatePreferences } from '@/lib/lastDatePreferences';
 import type { SituationalCategoryId } from '@/lib/situationalCategories';
 
 const readSituationalCategory = (): SituationalCategoryId | null => {
