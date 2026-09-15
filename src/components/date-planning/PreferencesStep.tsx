@@ -259,12 +259,14 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         )}
         {selectedDuration && (
           <>
-            {isFoodCategory && <QuickStartTemplates
-              templates={filteredTemplates}
-              learnedTemplate={learnedTemplate}
+            {(isFoodCategory || lastTemplate) && <QuickStartTemplates
+              templates={isFoodCategory ? filteredTemplates : []}
+              learnedTemplate={isFoodCategory ? learnedTemplate : null}
+              lastTemplate={lastTemplate}
               isTemplateActive={isTemplateActive}
               onApplyTemplate={applyTemplate}
               onApplyLearnedTemplate={applyTemplate}
+              onApplyLastTemplate={applyTemplate}
             />}
 
             {/* Accordion Sections */}
