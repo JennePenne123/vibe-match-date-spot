@@ -710,7 +710,11 @@
     "categorySwitchedReset": "Reset {{count}} answer(s) that no longer apply here.",
     "bgSaveRetrying": "Saving your answers again …",
     "bgSaveOffline": "No connection – your answers will be saved as soon as you are back online.",
-    "bgSaveFailed": "Background save failed. Your answers are kept."
+    "bgSaveFailed": "Background save failed. Your answers are kept.",
+    "priorityLevelLow": "Don't care",
+    "priorityLevelNormal": "Important",
+    "priorityLevelHigh": "Very important",
+    "priorityIntroGeneric": "Choose which factors the AI should weigh more heavily"
   },
   "notFound": {
     "title": "404",

@@ -710,7 +710,11 @@
     "categorySwitchedReset": "Se restablecieron {{count}} respuesta(s) que ya no aplican aquí.",
     "bgSaveRetrying": "Guardando tus respuestas de nuevo …",
     "bgSaveOffline": "Sin conexión: tus respuestas se guardarán cuando vuelvas a estar en línea.",
-    "bgSaveFailed": "Error al guardar en segundo plano. Tus respuestas se conservan."
+    "bgSaveFailed": "Error al guardar en segundo plano. Tus respuestas se conservan.",
+    "priorityLevelLow": "Indiferente",
+    "priorityLevelNormal": "Importante",
+    "priorityLevelHigh": "Muy importante",
+    "priorityIntroGeneric": "Elige qué factores debe priorizar la IA"
   },
   "notFound": {
     "title": "404",
