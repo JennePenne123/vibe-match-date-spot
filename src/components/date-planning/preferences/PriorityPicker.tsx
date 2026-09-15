@@ -69,6 +69,13 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId 
 
   const visible = getVisiblePriorityDimensions(categoryId).map(id => dimensions[id]);
 
+  // "Skip: KI entscheidet" — active as long as the weights still match the
+  // category preset (untouched). Tapping resets to the preset; picking any
+  // level below deactivates it automatically.
+  const preset = priorityWeightsForCategory(categoryId);
+  const aiDecides = (Object.keys(preset) as (keyof PriorityWeights)[])
+    .every(k => weights[k] === preset[k]);
+
   return (
     <div>
       <p className="text-sm font-semibold text-foreground mb-1">{t('preferences.priorityTitle', 'Was ist dir am wichtigsten?')}</p>
@@ -78,6 +85,40 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId 
           : t('preferences.priorityIntroGeneric', 'Wähle, welche Faktoren die KI stärker berücksichtigen soll')}
       </p>
       {categoryId && <CategoryPriorityHint categoryId={categoryId} className="mb-3" />}
+
+      <button
+        type="button"
+        onClick={() => onChangeWeights({ ...preset })}
+        aria-pressed={aiDecides}
+        className={cn(
+          'w-full flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all mb-3',
+          aiDecides
+            ? 'border-primary/50 bg-primary/5 shadow-md shadow-primary/15'
+            : 'border-border/60 bg-card shadow-sm shadow-foreground/5 hover:border-primary/30'
+        )}
+      >
+        <span className={cn(
+          'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors',
+          aiDecides ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
+        )}>
+          <Sparkles className="w-4.5 h-4.5" />
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className={cn('block text-sm font-semibold', aiDecides ? 'text-primary' : 'text-foreground')}>
+            {t('preferences.aiDecides', 'Überspringen: KI entscheidet')}
+          </span>
+          <span className="block text-xs text-muted-foreground">
+            {t('preferences.aiDecidesHint', 'Die KI gewichtet alles passend zu deiner Kategorie.')}
+          </span>
+        </span>
+        {aiDecides && (
+          <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+            <Check className="w-3 h-3" strokeWidth={3} />
+          </span>
+        )}
+      </button>
+
+      {!aiDecides && (
       <div className="space-y-3">
         {visible.map(d => {
           const level = weightToLevel(weights[d.key]);
