@@ -282,7 +282,6 @@ const Venues = () => {
       const filter = filters.find(item => item.id === filterId);
       return filter?.terms.some(term => searchableVenue.includes(term)) ?? false;
     });
-    const matchesOpenNow = !openNowFilter || isVenueOpenNow(venue.opening_hours) === true;
     return matchesSearch && matchesFilters && matchesOpenNow;
   });
 
