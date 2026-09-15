@@ -9,6 +9,7 @@ import {
 } from '@/lib/categoryWizardConfig';
 import type { SituationalCategoryId } from '@/lib/situationalCategories';
 import CategoryPriorityHint from '@/components/category/CategoryPriorityHint';
+import { useLearnedPriorityWeights, LEARNED_WEIGHTS_MIN_RATINGS } from '@/hooks/useLearnedPriorityWeights';
 
 export interface PriorityWeights {
   cuisine: number;
