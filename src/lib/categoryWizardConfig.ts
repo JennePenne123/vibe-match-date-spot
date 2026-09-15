@@ -323,3 +323,223 @@ export function getVisiblePriorityDimensions(
 }
 
 export const FOOD_CONFIG = FOOD;
+
+/* ────────────────────────────────────────────────────────────────
+ * Adaptive follow-up questions
+ *
+ * Follow-ups are extra, category-specific questions that only appear
+ * once they actually make sense — either because the user already
+ * picked something in the main picker, or because the matching
+ * priority slider was raised. They are the same mechanism that also
+ * shows/hides the standard sections, so wizard and priority profile
+ * always stay in sync.
+ * ──────────────────────────────────────────────────────────────── */
+
+/** Priority dimension that governs a standard section. */
+export const SECTION_PRIORITY_LINK: Partial<Record<WizardSectionId, PriorityDimensionId>> = {
+  mainPicker: 'cuisine',
+  excluded: 'cuisine',
+  dietary: 'cuisine',
+  vibe: 'vibe',
+  budget: 'price',
+  location: 'location',
+};
+
+/** Raising a slider above this reveals its (otherwise hidden) section. */
+export const SECTION_REVEAL_THRESHOLD = 1.3;
+/** Lowering a slider to/below this hides its optional section again. */
+export const SECTION_HIDE_THRESHOLD = 0.6;
+
+/** Sections that must never be hidden by a slider. */
+const ALWAYS_VISIBLE: WizardSectionId[] = ['mainPicker', 'location'];
+
+export interface FollowUpQuestion {
+  id: string;
+  titleKey: string;
+  hintKey?: string;
+  /** All follow-up answers are stored as venue-type tags. */
+  storage: 'preferred_venue_types';
+  items: { id: string; nameKey: string }[];
+  /** Shown as soon as one of these main-picker items is selected (any = *) */
+  triggerItems?: string[] | '*';
+  /** Shown when this priority dimension is raised above the threshold */
+  triggerDimension?: PriorityDimensionId;
+  triggerThreshold?: number;
+}
+
+const FOLLOW_UPS: Record<SituationalCategoryId, FollowUpQuestion[]> = {
+  food: [
+    {
+      id: 'food_setting',
+      titleKey: 'preferences.followFoodSetting',
+      hintKey: 'preferences.followFoodSettingHint',
+      storage: 'preferred_venue_types',
+      triggerDimension: 'vibe',
+      items: [
+        { id: 'terrace', nameKey: 'preferences.follow_terrace' },
+        { id: 'rooftop', nameKey: 'preferences.follow_rooftop' },
+        { id: 'quiet_table', nameKey: 'preferences.follow_quiet_table' },
+        { id: 'chef_counter', nameKey: 'preferences.follow_chef_counter' },
+      ],
+    },
+  ],
+  culture: [
+    {
+      id: 'culture_format',
+      titleKey: 'preferences.followCultureFormat',
+      hintKey: 'preferences.followCultureFormatHint',
+      storage: 'preferred_venue_types',
+      triggerItems: '*',
+      items: [
+        { id: 'exhibition', nameKey: 'preferences.follow_exhibition' },
+        { id: 'live_performance', nameKey: 'preferences.follow_live_performance' },
+        { id: 'guided_tour', nameKey: 'preferences.follow_guided_tour' },
+        { id: 'open_air', nameKey: 'preferences.follow_open_air' },
+      ],
+    },
+  ],
+  activity: [
+    {
+      id: 'activity_setting',
+      titleKey: 'preferences.followActivitySetting',
+      hintKey: 'preferences.followActivitySettingHint',
+      storage: 'preferred_venue_types',
+      triggerItems: '*',
+      items: [
+        { id: 'indoor_activity', nameKey: 'preferences.follow_indoor' },
+        { id: 'outdoor_activity', nameKey: 'preferences.follow_outdoor' },
+        { id: 'team_activity', nameKey: 'preferences.follow_team' },
+        { id: 'beginner_friendly', nameKey: 'preferences.follow_beginner' },
+      ],
+    },
+  ],
+  nightlife: [
+    {
+      id: 'nightlife_scene',
+      titleKey: 'preferences.followNightlifeScene',
+      hintKey: 'preferences.followNightlifeSceneHint',
+      storage: 'preferred_venue_types',
+      triggerItems: '*',
+      items: [
+        { id: 'dancefloor', nameKey: 'preferences.follow_dancefloor' },
+        { id: 'quiet_table', nameKey: 'preferences.follow_quiet_table' },
+        { id: 'late_night', nameKey: 'preferences.follow_late_night' },
+        { id: 'outdoor_activity', nameKey: 'preferences.follow_outdoor' },
+      ],
+    },
+  ],
+  wellness: [
+    {
+      id: 'wellness_focus',
+      titleKey: 'preferences.followWellnessFocus',
+      hintKey: 'preferences.followWellnessFocusHint',
+      storage: 'preferred_venue_types',
+      triggerItems: '*',
+      items: [
+        { id: 'quiet_retreat', nameKey: 'preferences.follow_quiet_retreat' },
+        { id: 'couples_area', nameKey: 'preferences.follow_couples_area' },
+        { id: 'pool_area', nameKey: 'preferences.follow_pool_area' },
+        { id: 'treatment', nameKey: 'preferences.follow_treatment' },
+      ],
+    },
+  ],
+  outdoor: [
+    {
+      id: 'outdoor_terrain',
+      titleKey: 'preferences.followOutdoorTerrain',
+      hintKey: 'preferences.followOutdoorTerrainHint',
+      storage: 'preferred_venue_types',
+      triggerItems: '*',
+      items: [
+        { id: 'walking_route', nameKey: 'preferences.follow_walking_route' },
+        { id: 'water_nearby', nameKey: 'preferences.follow_water_nearby' },
+        { id: 'dog_friendly', nameKey: 'preferences.follow_dog_friendly' },
+        { id: 'picnic_spot', nameKey: 'preferences.follow_picnic_spot' },
+      ],
+    },
+  ],
+  sport_action: [
+    {
+      id: 'sport_intensity',
+      titleKey: 'preferences.followSportIntensity',
+      hintKey: 'preferences.followSportIntensityHint',
+      storage: 'preferred_venue_types',
+      triggerItems: '*',
+      items: [
+        { id: 'beginner_friendly', nameKey: 'preferences.follow_beginner' },
+        { id: 'competitive', nameKey: 'preferences.follow_competitive' },
+        { id: 'team_activity', nameKey: 'preferences.follow_team' },
+        { id: 'indoor_activity', nameKey: 'preferences.follow_indoor' },
+      ],
+    },
+  ],
+};
+
+export interface WizardVisibilityContext {
+  /** Current priority slider values (session `priority_weights`) */
+  weights?: Partial<Record<PriorityDimensionId, number>>;
+  /** Items already selected in the main picker */
+  selectedMainItems?: string[];
+}
+
+/**
+ * Sections to render, combining the static category profile with the
+ * live priority weights: a raised slider brings its section back,
+ * a slider pulled to "Egal" hides the optional section.
+ */
+export function resolveVisibleSections(
+  categoryId: SituationalCategoryId | null | undefined,
+  ctx: WizardVisibilityContext = {},
+): Set<WizardSectionId> {
+  const cfg = getCategoryWizardConfig(categoryId);
+  const out = new Set<WizardSectionId>(cfg.visibleSections);
+  const weights = ctx.weights ?? {};
+
+  (Object.keys(SECTION_PRIORITY_LINK) as WizardSectionId[]).forEach(section => {
+    const dim = SECTION_PRIORITY_LINK[section];
+    if (!dim) return;
+    const w = weights[dim];
+    if (typeof w !== 'number') return;
+    if (ALWAYS_VISIBLE.includes(section)) return;
+    // Cuisine-bound sections stay food-only — a slider must not surface
+    // "Nie wieder vorschlagen" for a walk in the park.
+    const cuisineBound = dim === 'cuisine';
+    if (w >= SECTION_REVEAL_THRESHOLD && (!cuisineBound || cfg.mainPickerStorage === 'preferred_cuisines')) {
+      out.add(section);
+    }
+    if (w <= SECTION_HIDE_THRESHOLD) out.delete(section);
+  });
+
+  return out;
+}
+
+/** Follow-up questions that currently apply for the category. */
+export function getFollowUpQuestions(
+  categoryId: SituationalCategoryId | null | undefined,
+  ctx: WizardVisibilityContext = {},
+): FollowUpQuestion[] {
+  const id = categoryId ?? 'food';
+  const list = FOLLOW_UPS[id] ?? [];
+  const selected = ctx.selectedMainItems ?? [];
+  const weights = ctx.weights ?? {};
+
+  return list.filter(q => {
+    const byItems =
+      q.triggerItems === '*'
+        ? selected.length > 0
+        : Array.isArray(q.triggerItems) && q.triggerItems.some(i => selected.includes(i));
+    const dim = q.triggerDimension;
+    const byWeight =
+      !!dim && (weights[dim] ?? 1) >= (q.triggerThreshold ?? SECTION_REVEAL_THRESHOLD);
+    return byItems || byWeight;
+  });
+}
+
+/** All venue-type ids a category may store (main picker + follow-ups). */
+export function getCategoryVenueTypeIds(
+  categoryId: SituationalCategoryId | null | undefined,
+): string[] {
+  const cfg = getCategoryWizardConfig(categoryId);
+  const followUpIds = (FOLLOW_UPS[categoryId ?? 'food'] ?? []).flatMap(q => q.items.map(i => i.id));
+  return [...cfg.mainPickerItems.map(i => i.id), ...followUpIds];
+}

@@ -30,7 +30,7 @@ import type { DateOccasion } from '@/components/date-planning/preferences/prefer
 import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
-import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
+import { getCategoryWizardConfig, resolveVisibleSections, getFollowUpQuestions } from '@/lib/categoryWizardConfig';
 import { trackFunnelStep } from '@/services/funnelAnalyticsService';
 
 // Icon + color mapping (slimmed down)
@@ -643,7 +643,15 @@ const Preferences = () => {
     : cfg.mainPickerItems.map(it => ({ id: it.id, name: t(it.nameKey), emoji: '' }));
   const mainSelected = isFood ? selectedCuisines : selectedVenueTypes;
   const setMainSelected = isFood ? setSelectedCuisines : setSelectedVenueTypes;
-  const has = (s: import('@/lib/categoryWizardConfig').WizardSectionId) => cfg.visibleSections.has(s);
+
+  // Sections and follow-up questions react to the live priority sliders and
+  // to what was already picked — same source of truth as the scoring profile.
+  const visibilityCtx = { weights: priorityWeights, selectedMainItems: mainSelected };
+  const activeSections = resolveVisibleSections(situationalCategory?.id ?? null, visibilityCtx);
+  const followUps = getFollowUpQuestions(situationalCategory?.id ?? null, visibilityCtx);
+  const has = (s: import('@/lib/categoryWizardConfig').WizardSectionId) => activeSections.has(s);
+  const toggleFollowUp = (id: string) =>
+    setSelectedVenueTypes(prev => prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]);
 
   const steps = [
     { title: t('preferences.stepContext', 'Dein Kontext'), subtitle: t('preferences.stepContextDesc', 'Anlass, Stimmung & was dir wichtig ist'), icon: <Sparkles className="w-5 h-5 text-primary" /> },
@@ -744,6 +752,27 @@ const Preferences = () => {
                   />
                 </AccordionSection>
               )}
+
+              {followUps.map(q => (
+                <AccordionSection
+                  key={q.id}
+                  title={t(q.titleKey)}
+                  icon={<Sparkles className="w-5 h-5 text-primary" />}
+                  selectedCount={q.items.filter(i => selectedVenueTypes.includes(i.id)).length}
+                  defaultOpen
+                >
+                  {q.hintKey && (
+                    <p className="text-xs text-muted-foreground mb-3">{t(q.hintKey)}</p>
+                  )}
+                  <SelectionGrid
+                    items={q.items.map(i => ({ id: i.id, name: t(i.nameKey), emoji: '' }))}
+                    selected={selectedVenueTypes}
+                    onToggle={toggleFollowUp}
+                  />
+                </AccordionSection>
+              ))}
+
+
 
               {has('excluded') && (
                 <AccordionSection title={'Nie wieder vorschlagen'} icon={<Ban className="w-5 h-5 text-destructive" />} selectedCount={excludedCuisines.length}>
