@@ -30,6 +30,37 @@ export const priorityWeightsForCategory = (
   categoryId: SituationalCategoryId | null | undefined,
 ): PriorityWeights => ({ ...DEFAULT_PRIORITY_WEIGHTS, ...getCategoryPriorityWeights(categoryId) });
 
+/** Learned feature-weight keys mapped onto the four priority dimensions. */
+const LEARNED_KEY_MAP: Record<keyof PriorityWeights, string> = {
+  cuisine: 'cuisine',
+  vibe: 'vibe',
+  price: 'price',
+  location: 'distance',
+};
+
+const clampWeight = (w: number) => Math.max(0.6, Math.min(1.6, w));
+
+/**
+ * Blends the category preset with what the AI learned about this user.
+ * Confidence (0..1) grows with the number of rated dates, so early on the
+ * category preset still dominates.
+ */
+export const blendLearnedPriorityWeights = (
+  preset: PriorityWeights,
+  learned: Record<string, number> | null | undefined,
+  confidence: number,
+): PriorityWeights => {
+  if (!learned || confidence <= 0) return preset;
+  const out = { ...preset };
+  (Object.keys(preset) as (keyof PriorityWeights)[]).forEach(k => {
+    const raw = learned[LEARNED_KEY_MAP[k]];
+    if (typeof raw !== 'number' || !Number.isFinite(raw)) return;
+    const target = clampWeight(raw);
+    out[k] = Math.round(clampWeight(preset[k] * (1 - confidence) + target * confidence) * 100) / 100;
+  });
+  return out;
+};
+
 interface PriorityDimension {
   key: PriorityDimensionId;
   icon: LucideIcon;
