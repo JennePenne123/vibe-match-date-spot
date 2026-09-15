@@ -386,6 +386,9 @@ const VenueDensityWidget: React.FC = () => {
                       <CellCell value={d.kultur} target={data.targets?.kultur ?? 8} />
                       <CellCell value={d.aktivitaet} target={data.targets?.aktivitaet ?? 8} />
                       <CellCell value={d.nightlife} target={data.targets?.nightlife ?? 8} />
+                      <CellCell value={d.wellness ?? 0} target={data.targets?.wellness ?? 4} />
+                      <CellCell value={d.outdoor ?? 0} target={data.targets?.outdoor ?? 5} />
+                      <CellCell value={d.sport_action ?? 0} target={data.targets?.sport_action ?? 4} />
                       <td className="py-1.5 text-right tabular-nums text-muted-foreground">{d.total}</td>
                     </tr>
                   ))}
