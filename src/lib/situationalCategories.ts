@@ -396,6 +396,10 @@ const NON_GASTRO_ONLY_TAGS = new Set([
   'bowling', 'bowling_alley', 'mini_golf', 'amusement_park', 'amusement_center',
   'arcade', 'escape_room', 'gym', 'spa', 'swimming_pool', 'ice_skating_rink',
   'zoo', 'aquarium', 'casino', 'attraction', 'artwork', 'library',
+  // Wellness / Outdoor / Sport & Action categories
+  'sauna', 'yoga_studio', 'massage', 'thermal_bath', 'park', 'garden',
+  'beach', 'viewpoint', 'nature_reserve', 'marina', 'go_kart', 'paintball',
+  'laser_tag', 'trampoline_park', 'billiards', 'bouldering',
 ]);
 
 const NON_GASTRO_CUISINE_LABELS = new Set([
