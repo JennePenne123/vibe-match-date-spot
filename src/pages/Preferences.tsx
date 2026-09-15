@@ -705,7 +705,16 @@ const Preferences = () => {
                 <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
               </AccordionSection>
 
-              <AccordionSection title="Prioritäten" icon={<SlidersHorizontal className="w-5 h-5 text-primary" />} selectedCount={Object.values(priorityWeights).filter(v => v !== 1.0).length}>
+              <AccordionSection
+                title={t('preferences.priorityTitle', 'Prioritäten')}
+                icon={<SlidersHorizontal className="w-5 h-5 text-primary" />}
+                selectedCount={(() => {
+                  // Only count what the user changed on top of the category preset.
+                  const preset = priorityWeightsForCategory(situationalCategory?.id ?? null);
+                  return (Object.keys(preset) as (keyof PriorityWeights)[])
+                    .filter(k => priorityWeights[k] !== preset[k]).length;
+                })()}
+              >
                 <PriorityPicker
                   weights={priorityWeights}
                   onChangeWeights={handleChangePriorityWeights}
