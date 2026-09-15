@@ -28,6 +28,8 @@ const VenueDetail = () => {
   const [resolvedWebsite, setResolvedWebsite] = useState<string | null>(null);
   const [resolvedPhone, setResolvedPhone] = useState<string | null>(null);
   const [websiteLoading, setWebsiteLoading] = useState(false);
+  const [heartAnimating, setHeartAnimating] = useState(false);
+  const { isLiked, toggleLike } = useFavorites();
 
   const venue = appState.venues.find(v => v.id === id);
 
