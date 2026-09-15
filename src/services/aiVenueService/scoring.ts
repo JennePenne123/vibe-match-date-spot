@@ -76,6 +76,88 @@ function getBestCuisineSimilarity(userCuisines: string[], venueCuisine: string):
   return best;
 }
 
+/**
+ * Lifestyle categories imported alongside food/culture/nightlife.
+ * Each category knows how to recognise a venue and which user preference
+ * signals indicate affinity, so scoring can be scaled per user.
+ */
+export type LifestyleCategoryId = 'wellness' | 'outdoor' | 'sport_action';
+
+const LIFESTYLE_CATEGORIES: Record<LifestyleCategoryId, {
+  venueKeywords: string[];
+  vibes: string[];
+  activities: string[];
+  venueTypes: string[];
+}> = {
+  wellness: {
+    venueKeywords: ['wellness', 'spa', 'sauna', 'massage', 'yoga', 'pilates', 'therme', 'thermal', 'public bath', 'fitness', 'entspannung', 'meditation'],
+    vibes: ['wellness', 'cozy'],
+    activities: ['wellness_act'],
+    venueTypes: ['spa_wellness', 'swimming'],
+  },
+  outdoor: {
+    venueKeywords: ['park', 'garden', 'garten', 'nature reserve', 'naturschutz', 'beach', 'strand', 'viewpoint', 'aussichtspunkt', 'picnic', 'marina', 'hiking', 'wandern', 'trail', 'waterfront'],
+    vibes: ['outdoor', 'adventurous'],
+    activities: ['nature_act'],
+    venueTypes: ['park_nature', 'hiking'],
+  },
+  sport_action: {
+    venueKeywords: ['kart', 'paintball', 'lasertag', 'laser tag', 'billiards', 'darts', 'climbing', 'klettern', 'bouldering', 'trampolin', 'adventure park', 'kletterpark', 'arcade', 'spielhalle', 'escape room', 'escape game', 'bowling', 'minigolf', 'mini golf', 'ice rink', 'eislaufen', 'horse riding', 'reiten', 'surfing', 'sailing', 'skateboard', 'archery'],
+    vibes: ['sporty', 'adventurous'],
+    activities: ['active'],
+    venueTypes: ['sport_action', 'bowling', 'climbing', 'escape_room', 'mini_golf', 'arcade'],
+  },
+};
+
+const detectLifestyleCategory = (searchText: string): LifestyleCategoryId | null => {
+  let best: { id: LifestyleCategoryId; hits: number } | null = null;
+  (Object.keys(LIFESTYLE_CATEGORIES) as LifestyleCategoryId[]).forEach(id => {
+    const hits = LIFESTYLE_CATEGORIES[id].venueKeywords.filter(kw => searchText.includes(kw)).length;
+    if (hits > 0 && (!best || hits > best.hits)) best = { id, hits };
+  });
+  return best ? best.id : null;
+};
+
+/**
+ * Scales lifestyle venue scores by how strongly the user asked for that category.
+ * 1.0 = neutral, up to 1.6 for explicit multi-signal interest,
+ * down to 0.55 when the user picked other lifestyle categories but not this one.
+ */
+export const getLifestyleAffinity = (userPrefs: any, category: LifestyleCategoryId): number => {
+  const cfg = LIFESTYLE_CATEGORIES[category];
+  const lower = (arr: unknown): string[] =>
+    Array.isArray(arr) ? (arr as string[]).map(v => String(v).toLowerCase()) : [];
+
+  const vibes = lower(userPrefs?.preferred_vibes);
+  const activities = lower(userPrefs?.preferred_activities);
+  const venueTypes = lower(userPrefs?.preferred_venue_types);
+
+  const signalHits =
+    (cfg.vibes.some(v => vibes.includes(v)) ? 1 : 0) +
+    (cfg.activities.some(a => activities.includes(a)) ? 1 : 0) +
+    (cfg.venueTypes.some(t => venueTypes.includes(t)) ? 1 : 0);
+
+  if (signalHits > 0) {
+    return Math.min(1.0 + signalHits * 0.2, 1.6);
+  }
+
+  // No signal for this category — is the user explicit about other lifestyle categories?
+  const otherInterest = (Object.keys(LIFESTYLE_CATEGORIES) as LifestyleCategoryId[])
+    .filter(id => id !== category)
+    .some(id => {
+      const other = LIFESTYLE_CATEGORIES[id];
+      return other.vibes.some(v => vibes.includes(v))
+        || other.activities.some(a => activities.includes(a))
+        || other.venueTypes.some(t => venueTypes.includes(t));
+    });
+
+  if (otherInterest) return 0.55;
+
+  // User gave no lifestyle hints at all → only mildly damped
+  const hasAnyPrefs = vibes.length > 0 || activities.length > 0 || venueTypes.length > 0;
+  return hasAnyPrefs ? 0.85 : 1.0;
+};
+
 // Calculate individual user score based on preferences
 const calculateUserScore = (
   userPrefs: any,
