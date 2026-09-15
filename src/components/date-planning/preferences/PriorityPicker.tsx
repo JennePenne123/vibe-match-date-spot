@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { UtensilsCrossed, Sparkles, Wallet, MapPin, type LucideIcon } from 'lucide-react';
+import { UtensilsCrossed, Sparkles, Wallet, MapPin, Check, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   getVisiblePriorityDimensions,
@@ -167,6 +167,7 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId 
           );
         })}
       </div>
+      )}
     </div>
   );
 };
