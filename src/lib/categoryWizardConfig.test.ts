@@ -5,6 +5,9 @@ import {
   getCategoryPriorityWeights,
   getVisiblePriorityDimensions,
   sectionsFromProfile,
+  resolveVisibleSections,
+  getFollowUpQuestions,
+  getCategoryVenueTypeIds,
 } from './categoryWizardConfig';
 
 describe('category priority profiles', () => {
