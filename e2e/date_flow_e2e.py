@@ -237,6 +237,7 @@ async def case_plan_date_solo(browser):
         return {
             "solo preferences step": await visible(page, "Vibe", timeout=20000),
             "no cuisine section": await absent(page, "Küche"),
+            "no budget section": await absent(page, "Budget"),
         }
     finally:
         await context.close()
@@ -246,7 +247,7 @@ async def case_plan_date_group(browser):
     context, page = await new_page(browser, category="outdoor")
     try:
         await page.goto(f"{BASE_URL}/plan-date?mode=group", wait_until="domcontentloaded")
-        return {"group partner step": await visible(page, "Zurück", timeout=20000)}
+        return {"group partner step": await visible(page, "Wähle deine Gruppe", timeout=25000)}
     finally:
         await context.close()
 
