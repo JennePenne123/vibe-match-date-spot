@@ -74,6 +74,32 @@ const nightlifeItems = [
   { id: 'comedy_club',  nameKey: 'preferences.venue_comedy_club' },
 ];
 
+const wellnessItems = [
+  { id: 'spa_wellness', nameKey: 'preferences.venue_spa_wellness' },
+  { id: 'sauna',        nameKey: 'preferences.venue_sauna' },
+  { id: 'thermal_bath', nameKey: 'preferences.venue_thermal_bath' },
+  { id: 'yoga_studio',  nameKey: 'preferences.venue_yoga_studio' },
+  { id: 'massage',      nameKey: 'preferences.venue_massage' },
+];
+
+const outdoorItems = [
+  { id: 'park',           nameKey: 'preferences.venue_park' },
+  { id: 'beach',          nameKey: 'preferences.venue_beach' },
+  { id: 'viewpoint',      nameKey: 'preferences.venue_viewpoint' },
+  { id: 'nature_reserve', nameKey: 'preferences.venue_nature_reserve' },
+  { id: 'garden',         nameKey: 'preferences.venue_garden' },
+  { id: 'marina',         nameKey: 'preferences.venue_marina' },
+];
+
+const sportActionItems = [
+  { id: 'go_kart',        nameKey: 'preferences.venue_go_kart' },
+  { id: 'paintball',      nameKey: 'preferences.venue_paintball' },
+  { id: 'laser_tag',      nameKey: 'preferences.venue_laser_tag' },
+  { id: 'trampoline_park',nameKey: 'preferences.venue_trampoline_park' },
+  { id: 'billiards',      nameKey: 'preferences.venue_billiards' },
+  { id: 'bouldering',     nameKey: 'preferences.venue_bouldering' },
+];
+
 const FOOD: CategoryWizardConfig = {
   mainPickerTitleKey: 'preferences.whatCraving',
   mainPickerStorage: 'preferred_cuisines',
@@ -123,11 +149,53 @@ const NIGHTLIFE: CategoryWizardConfig = {
   vibeWhitelist: ['nightlife', 'romantic', 'casual', 'adventurous'],
 };
 
+const WELLNESS: CategoryWizardConfig = {
+  mainPickerTitleKey: 'preferences.whatWellness',
+  mainPickerHintKey: 'preferences.whatWellnessHint',
+  mainPickerStorage: 'preferred_venue_types',
+  visibleSections: new Set<WizardSectionId>([
+    'mainPicker', 'vibe', 'budget', 'location', 'timing', 'accessibility',
+  ]),
+  mainPickerItems: wellnessItems,
+  step1TitleKey: 'preferences.stepWellness',
+  step1SubtitleKey: 'preferences.stepWellnessDesc',
+  vibeWhitelist: ['wellness', 'romantic', 'casual', 'cozy'],
+};
+
+const OUTDOOR: CategoryWizardConfig = {
+  mainPickerTitleKey: 'preferences.whatOutdoor',
+  mainPickerHintKey: 'preferences.whatOutdoorHint',
+  mainPickerStorage: 'preferred_venue_types',
+  visibleSections: new Set<WizardSectionId>([
+    'mainPicker', 'vibe', 'budget', 'location', 'timing', 'accessibility',
+  ]),
+  mainPickerItems: outdoorItems,
+  step1TitleKey: 'preferences.stepOutdoor',
+  step1SubtitleKey: 'preferences.stepOutdoorDesc',
+  vibeWhitelist: ['outdoor', 'adventurous', 'casual', 'romantic'],
+};
+
+const SPORT_ACTION: CategoryWizardConfig = {
+  mainPickerTitleKey: 'preferences.whatSport',
+  mainPickerHintKey: 'preferences.whatSportHint',
+  mainPickerStorage: 'preferred_venue_types',
+  visibleSections: new Set<WizardSectionId>([
+    'mainPicker', 'vibe', 'budget', 'location', 'timing', 'accessibility',
+  ]),
+  mainPickerItems: sportActionItems,
+  step1TitleKey: 'preferences.stepSport',
+  step1SubtitleKey: 'preferences.stepSportDesc',
+  vibeWhitelist: ['sporty', 'adventurous', 'casual', 'lively'],
+};
+
 const CONFIGS: Record<SituationalCategoryId, CategoryWizardConfig> = {
   food: FOOD,
   culture: CULTURE,
   activity: ACTIVITY,
   nightlife: NIGHTLIFE,
+  wellness: WELLNESS,
+  outdoor: OUTDOOR,
+  sport_action: SPORT_ACTION,
 };
 
 /** Returns the wizard config for the given category, falling back to FOOD
