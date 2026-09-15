@@ -123,7 +123,8 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         const { data, error } = await supabase.from('user_preferences').select('*').eq('user_id', user.id).single();
         if (error || !data) { setOnboardingLoaded(true); setFlowState('customize'); return; }
         const has = (arr: any) => arr && arr.length > 0;
-        const allowedTypes = categoryConfig.mainPickerItems.map(i => i.id);
+        // Main picker items + follow-up answers both live in preferred_venue_types.
+        const allowedTypes = getCategoryVenueTypeIds(categoryId);
         const storedTypes: string[] = ((data as any).preferred_venue_types || []).filter((t: string) => allowedTypes.includes(t));
         if (!isFoodCategory && storedTypes.length > 0) setSelectedVenueTypes(storedTypes);
 
