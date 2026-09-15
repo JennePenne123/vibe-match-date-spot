@@ -715,7 +715,9 @@
     "priorityLevelNormal": "Wichtig",
     "priorityLevelHigh": "Sehr wichtig",
     "priorityIntroGeneric": "Wähle, welche Faktoren die KI stärker berücksichtigen soll",
-    "likeLastTime": "Wie letztes Mal"
+    "likeLastTime": "Wie letztes Mal",
+    "aiDecides": "Überspringen: KI entscheidet",
+    "aiDecidesHint": "Die KI gewichtet alles passend zu deiner Kategorie."
   },
   "notFound": {
     "title": "404",

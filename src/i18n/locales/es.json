@@ -715,7 +715,9 @@
     "priorityLevelNormal": "Importante",
     "priorityLevelHigh": "Muy importante",
     "priorityIntroGeneric": "Elige qué factores debe priorizar la IA",
-    "likeLastTime": "Como la última vez"
+    "likeLastTime": "Como la última vez",
+    "aiDecides": "Omitir: la IA decide",
+    "aiDecidesHint": "La IA lo equilibra todo según tu categoría."
   },
   "notFound": {
     "title": "404",
