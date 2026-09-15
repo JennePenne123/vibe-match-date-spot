@@ -375,7 +375,26 @@ const calculateUserScore = (
     if (typeMatch) {
       maxPossible += 0.10;
       matches.venueType = true;
-      score += 0.10;
+      const lifestyle = detectLifestyleCategory(searchText);
+      const affinity = lifestyle ? getLifestyleAffinity(userPrefs, lifestyle) : 1;
+      score += 0.10 * affinity;
+    }
+  }
+
+  // Lifestyle category nudge (wellness / outdoor / sport & action)
+  // Applies when the venue belongs to a newly imported lifestyle category but
+  // was not already captured by the activity or venue-type blocks.
+  if (!matches.venueType && (matches.activities?.length ?? 0) === 0) {
+    const lifestyleText = [
+      ...((venue.tags || []) as string[]).map(t => t.toLowerCase()),
+      (venue.cuisine_type || '').toLowerCase(),
+      (venue.name || '').toLowerCase(),
+      (venue.description || '').toLowerCase(),
+    ].join(' ');
+    const lifestyle = detectLifestyleCategory(lifestyleText);
+    if (lifestyle) {
+      const affinity = getLifestyleAffinity(userPrefs, lifestyle);
+      score += (affinity - 1) * 0.08;
     }
   }
 
