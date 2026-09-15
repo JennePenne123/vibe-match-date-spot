@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,7 @@ import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
 import { supabase } from '@/integrations/supabase/client';
 import ShareDateButton from '@/components/ShareDateButton';
 import type { ShareCardData } from '@/components/share/ShareCardGenerator';
+import { useFavorites } from '@/hooks/useFavorites';
 import { formatVenueAddress } from '@/utils/addressHelpers';
 
 const VenueDetail = () => {
@@ -27,6 +29,8 @@ const VenueDetail = () => {
   const [resolvedWebsite, setResolvedWebsite] = useState<string | null>(null);
   const [resolvedPhone, setResolvedPhone] = useState<string | null>(null);
   const [websiteLoading, setWebsiteLoading] = useState(false);
+  const [heartAnimating, setHeartAnimating] = useState(false);
+  const { isLiked, toggleLike } = useFavorites();
 
   const venue = appState.venues.find(v => v.id === id);
 
@@ -136,6 +140,14 @@ const VenueDetail = () => {
   const appVenue = venueToAppVenue(sourceVenue, appState.userLocation?.latitude, appState.userLocation?.longitude);
   // Use resolved address if available, otherwise format the existing one
   const displayAddress = resolvedAddress || formatVenueAddress(appVenue);
+  const venueLiked = !!appVenue.id && isLiked(appVenue.id);
+
+  const handleToggleFavorite = () => {
+    if (!appVenue.id) return;
+    setHeartAnimating(true);
+    setTimeout(() => setHeartAnimating(false), 400);
+    toggleLike(appVenue.id);
+  };
   const websiteUrl = appVenue.website || resolvedWebsite;
   const phoneNumber = appVenue.phone || resolvedPhone;
 
@@ -207,31 +219,41 @@ const VenueDetail = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           
           {/* Header Controls */}
-          <div className="absolute top-4 left-4 right-4 flex justify-between">
-            <Button
+          <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+            <button
               onClick={() => navigate(-1)}
-              variant="ghost"
-              size="icon"
-              className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+              aria-label="Zurück"
+              className="h-11 w-11 rounded-full backdrop-blur-md bg-black/30 border border-white/20 text-white flex items-center justify-center transition-all duration-300 hover:bg-black/50 hover:scale-105 active:scale-95"
             >
-              <ArrowLeft className="w-6 h-6" />
-            </Button>
-            <div className="flex gap-2">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-3">
               <ShareDateButton
                 title={appVenue.name}
                 venueName={appVenue.name}
                 url={`${window.location.origin}/venue/${appVenue.id}`}
                 shareCardData={shareCardData}
                 variant="compact"
-                className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                className="!h-11 !w-11 !rounded-full !bg-black/30 !backdrop-blur-md !border !border-white/20 !text-white hover:!bg-black/50 hover:!scale-105 active:!scale-95 transition-all duration-300"
               />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+              <button
+                onClick={() => handleToggleFavorite()}
+                aria-label={venueLiked ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
+                className={cn(
+                  'h-11 w-11 rounded-full backdrop-blur-md border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95',
+                  venueLiked
+                    ? 'bg-pink-500/90 border-pink-300/40 text-white shadow-lg shadow-pink-500/30'
+                    : 'bg-black/30 border-white/20 text-white hover:bg-black/50'
+                )}
               >
-                <Heart className="w-6 h-6" />
-              </Button>
+                <Heart
+                  className={cn(
+                    'w-5 h-5 transition-colors',
+                    venueLiked && 'fill-current',
+                    heartAnimating && 'animate-[heart-bounce_400ms_ease-in-out]'
+                  )}
+                />
+              </button>
             </div>
           </div>
 
