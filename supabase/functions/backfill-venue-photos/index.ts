@@ -30,41 +30,60 @@ Deno.serve(async (req) => {
       });
     }
 
-    // --- Auth: require an admin caller ---
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-    const authClient = createClient(
+    // --- Auth: accept the shared cron token (same store as venue-import-worker) ...
+    const earlyAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } },
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: control } = await earlyAdmin
+      .from('venue_import_control')
+      .select('cron_token')
+      .eq('id', true)
+      .maybeSingle();
+    const cronToken = req.headers.get('x-cron-token');
+    const cronAuthorized = Boolean(cronToken && control?.cron_token && cronToken === control.cron_token);
+
+    // ... otherwise require an admin caller ---
+    const authHeader = req.headers.get('authorization');
+    if (!cronAuthorized && !authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    const userId = claimsData.claims.sub as string;
-    const { data: isAdmin, error: roleErr } = await authClient.rpc('has_role', {
-      _user_id: userId,
-      _role: 'admin',
-    });
-    if (roleErr || !isAdmin) {
-      return new Response(JSON.stringify({ error: 'Forbidden: admin role required' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (!cronAuthorized) {
+      const authClient = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+        { global: { headers: { Authorization: authHeader! } } },
+      );
+      const token = authHeader!.replace('Bearer ', '');
+      const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
+      if (claimsError || !claimsData?.claims) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const userId = claimsData.claims.sub as string;
+      const { data: isAdmin, error: roleErr } = await authClient.rpc('has_role', {
+        _user_id: userId,
+        _role: 'admin',
       });
+      if (roleErr || !isAdmin) {
+        return new Response(JSON.stringify({ error: 'Forbidden: admin role required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
     }
 
     const body = await req.json().catch(() => ({}));
     const limit = Math.min(Math.max(Number(body?.limit) || 10, 1), 25);
+    // Optional: restrict the backfill to specific cuisine_types (e.g. parks).
+    const cuisineTypes: string[] = Array.isArray(body?.cuisine_types)
+      ? body.cuisine_types.filter((v: unknown) => typeof v === 'string' && v.length > 0).slice(0, 20)
+      : [];
 
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -72,7 +91,7 @@ Deno.serve(async (req) => {
     );
 
     // Candidate venues: active, geocoded, without a google_place_id yet.
-    const { data: venues, error: fetchErr } = await admin
+    let candidatesQuery = admin
       .from('venues')
       .select('id, name, address, latitude, longitude')
       .is('google_place_id', null)
@@ -80,6 +99,10 @@ Deno.serve(async (req) => {
       .not('longitude', 'is', null)
       .eq('is_active', true)
       .limit(limit);
+    if (cuisineTypes.length > 0) {
+      candidatesQuery = candidatesQuery.in('cuisine_type', cuisineTypes);
+    }
+    const { data: venues, error: fetchErr } = await candidatesQuery;
 
     if (fetchErr) {
       return new Response(JSON.stringify({ error: fetchErr.message }), {
@@ -89,13 +112,17 @@ Deno.serve(async (req) => {
     }
 
     // Count remaining for progress reporting.
-    const { count: remainingBefore } = await admin
+    let remainingQuery = admin
       .from('venues')
       .select('id', { count: 'exact', head: true })
       .is('google_place_id', null)
       .not('latitude', 'is', null)
       .not('longitude', 'is', null)
       .eq('is_active', true);
+    if (cuisineTypes.length > 0) {
+      remainingQuery = remainingQuery.in('cuisine_type', cuisineTypes);
+    }
+    const { count: remainingBefore } = await remainingQuery;
 
     const buildPhotoUrl = (name: string, w: number) =>
       `https://places.googleapis.com/v1/${name}/media?maxWidthPx=${w}&key=${apiKey}`;
