@@ -104,7 +104,12 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId 
   // "Skip: KI entscheidet" — active as long as the weights still match the
   // category preset (untouched). Tapping resets to the preset; picking any
   // level below deactivates it automatically.
-  const preset = priorityWeightsForCategory(categoryId);
+  const { data: learned } = useLearnedPriorityWeights();
+  const isPersonalized = !!learned && learned.totalRatings >= LEARNED_WEIGHTS_MIN_RATINGS;
+  const basePreset = priorityWeightsForCategory(categoryId);
+  const preset = isPersonalized
+    ? blendLearnedPriorityWeights(basePreset, learned!.featureWeights, learned!.confidence)
+    : basePreset;
   const aiDecides = (Object.keys(preset) as (keyof PriorityWeights)[])
     .every(k => weights[k] === preset[k]);
 
