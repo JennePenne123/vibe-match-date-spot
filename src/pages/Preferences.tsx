@@ -574,6 +574,11 @@ const Preferences = () => {
             occasion: selectedOccasion,
             mood: selectedMood,
             priority_weights: priorityWeights,
+            // Per-category answers + weights, so they come back after a restart.
+            category_answers: (() => {
+              if (answersRef.current) saveCategoryAnswers(situationalCategory?.id ?? null, answersRef.current);
+              return getAllCategoryAnswers();
+            })(),
           },
         };
         const { data: existing, error: existErr } = await supabase.from('user_preferences').select('id').eq('user_id', currentUserId).maybeSingle();
