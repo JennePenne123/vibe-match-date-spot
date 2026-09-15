@@ -237,8 +237,10 @@ const calculateUserScore = (
       'dining_plus': ['experience', 'event', 'erlebnis'],
       'cocktails': ['bar', 'cocktail', 'drinks', 'lounge'],
       'cultural_act': ['museum', 'gallery', 'art', 'kultur', 'theater'],
-      'active': ['sport', 'bowling', 'climbing', 'fitness', 'aktiv'],
+      'active': ['sport', 'bowling', 'climbing', 'fitness', 'aktiv', 'active', 'kart', 'paintball', 'lasertag', 'trampolin', 'skateboard', 'archery', 'surfing', 'sailing', 'eislaufen'],
       'nightlife_act': ['club', 'party', 'nightlife', 'disco'],
+      'wellness_act': ['wellness', 'spa', 'sauna', 'massage', 'yoga', 'pilates', 'bath', 'relaxing', 'mindful'],
+      'nature_act': ['nature', 'outdoor', 'park', 'garden', 'beach', 'hiking', 'viewpoint', 'scenic', 'picnic', 'marina'],
     };
     const venueTags = venue.tags.map((t: string) => t.toLowerCase());
     const venueCuisine = (venue.cuisine_type || '').toLowerCase();
