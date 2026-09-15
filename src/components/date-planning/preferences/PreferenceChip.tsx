@@ -1,5 +1,4 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -18,13 +17,15 @@ export const Chip: React.FC<ChipProps> = ({ item, selected, onPress }) => {
       type="button" onClick={onPress}
       style={{ WebkitTapHighlightColor: 'transparent' }}
       className={cn(
-        'inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm transition-colors select-none active:scale-[0.97]',
-        selected ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-card text-muted-foreground hover:border-primary/30'
+        'inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm transition-all duration-200 select-none active:scale-[0.97]',
+        selected
+          ? 'border-primary/50 bg-primary/10 text-primary shadow-sm shadow-primary/15 font-semibold'
+          : 'border-border/60 bg-card text-muted-foreground shadow-sm shadow-foreground/5 hover:border-primary/30'
       )}
     >
       <span>{item.emoji}</span>
       <span className="font-medium">{t(item.name)}</span>
-      {selected && <Check className="w-3 h-3 ml-0.5 text-primary" />}
+      {selected && <Check className="w-3 h-3 ml-0.5 text-primary" strokeWidth={3} />}
     </button>
   );
 };
@@ -55,19 +56,21 @@ interface SectionProps {
 }
 
 export const Section: React.FC<SectionProps> = ({ id, icon, title, summary, count, open, onToggle, children }) => (
-  <div className="border border-border rounded-xl overflow-hidden bg-card">
+  <div className="rounded-2xl border border-border/70 bg-card shadow-sm shadow-foreground/5 overflow-hidden">
     <button
       type="button" onClick={onToggle}
       style={{ WebkitTapHighlightColor: 'transparent' }}
-      className="flex items-center gap-3 w-full p-3.5 text-left select-none active:scale-[0.98] transition-transform"
+      className="flex items-center gap-3 w-full p-3.5 text-left select-none active:scale-[0.99] transition-transform"
     >
-      <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-muted flex items-center justify-center">{icon}</div>
+      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center [&_svg]:w-[18px] [&_svg]:h-[18px]">{icon}</div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-foreground">{title}</p>
         <p className="text-xs text-muted-foreground truncate">{summary}</p>
       </div>
-      {count > 0 && <Badge variant="secondary" className="text-xs h-5 px-1.5 flex-shrink-0">{count}</Badge>}
-      <ChevronDown className={cn('w-4 h-4 text-muted-foreground transition-transform duration-200 flex-shrink-0', open && 'rotate-180')} />
+      {count > 0 && <span className="text-xs font-semibold bg-primary text-primary-foreground px-2 py-0.5 rounded-full flex-shrink-0">{count}</span>}
+      <div className={cn('w-7 h-7 rounded-full bg-muted flex items-center justify-center flex-shrink-0 transition-transform duration-200', open && 'rotate-180')}>
+        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+      </div>
     </button>
     <div className={cn('grid transition-all duration-200', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
       <div className="overflow-hidden">
