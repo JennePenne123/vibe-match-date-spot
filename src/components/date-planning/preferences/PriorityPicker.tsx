@@ -110,8 +110,20 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId 
   const preset = isPersonalized
     ? blendLearnedPriorityWeights(basePreset, learned!.featureWeights, learned!.confidence)
     : basePreset;
-  const aiDecides = (Object.keys(preset) as (keyof PriorityWeights)[])
-    .every(k => weights[k] === preset[k]);
+  const matches = (target: PriorityWeights) =>
+    (Object.keys(target) as (keyof PriorityWeights)[]).every(k => weights[k] === target[k]);
+  // Untouched category preset also counts as "AI decides" — the personalized
+  // blend is applied when the user (re-)taps the card.
+  const aiDecides = matches(preset) || matches(basePreset);
+
+  // Keep the personalized blend active from the start, without the user
+  // having to tap anything.
+  React.useEffect(() => {
+    if (isPersonalized && matches(basePreset) && !matches(preset)) {
+      onChangeWeights({ ...preset });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPersonalized, categoryId, learned?.confidence]);
 
   return (
     <div>
