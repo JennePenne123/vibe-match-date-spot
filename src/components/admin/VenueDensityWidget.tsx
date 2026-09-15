@@ -372,6 +372,9 @@ const VenueDensityWidget: React.FC = () => {
                     <th className="py-1 pr-2 text-right">Kultur</th>
                     <th className="py-1 pr-2 text-right">Aktiv.</th>
                     <th className="py-1 pr-2 text-right">Night.</th>
+                    <th className="py-1 pr-2 text-right">Well.</th>
+                    <th className="py-1 pr-2 text-right">Natur</th>
+                    <th className="py-1 pr-2 text-right">Sport</th>
                     <th className="py-1 text-right">Gesamt</th>
                   </tr>
                 </thead>
