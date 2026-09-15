@@ -114,23 +114,27 @@ function AccordionSection({ title, icon, selectedCount, children, defaultOpen = 
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-border rounded-2xl overflow-hidden bg-card">
+    <div className="rounded-2xl border border-border/70 bg-card shadow-sm shadow-foreground/5 overflow-hidden">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 select-none"
+        className="w-full flex items-center justify-between p-4 select-none active:scale-[0.99] transition-transform"
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         <div className="flex items-center gap-3">
-          {icon}
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 [&_svg]:w-[18px] [&_svg]:h-[18px]">
+            {icon}
+          </div>
           <span className="font-semibold text-foreground">{title}</span>
           {selectedCount > 0 && (
-            <span className="text-xs font-medium bg-primary/15 text-primary px-2 py-0.5 rounded-full">
+            <span className="text-xs font-semibold bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
               {selectedCount}
             </span>
           )}
         </div>
-        <ChevronDown className={cn('w-5 h-5 text-muted-foreground transition-transform duration-200', isOpen && 'rotate-180')} />
+        <div className={cn('w-7 h-7 rounded-full bg-muted flex items-center justify-center flex-shrink-0 transition-transform duration-200', isOpen && 'rotate-180')}>
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        </div>
       </button>
       <div
         className="grid transition-[grid-template-rows] duration-300 ease-out"
@@ -152,19 +156,31 @@ function SelectionGrid({ items, selected, onToggle, columns = 2 }: {
 }) {
   return (
     <div className={cn('grid gap-2.5', columns === 2 ? 'grid-cols-2' : 'grid-cols-3')}>
-      {items.map((item) => (
-        <button
-          type="button"
-          key={item.id}
-          onClick={() => onToggle(item.id)}
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-          className="p-3 rounded-xl border border-border bg-background text-foreground select-none active:scale-[0.97] transition-transform"
-        >
-          <PrefIcon id={item.id} size="sm" />
-          <div className="font-medium text-xs mt-1.5">{item.name}</div>
-          {selected.includes(item.id) && <Check className="w-4 h-4 mx-auto mt-1 text-primary" />}
-        </button>
-      ))}
+      {items.map((item) => {
+        const isSelected = selected.includes(item.id);
+        return (
+          <button
+            type="button"
+            key={item.id}
+            onClick={() => onToggle(item.id)}
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+            className={cn(
+              'relative p-3 pt-3.5 rounded-2xl border text-center select-none transition-all duration-200 active:scale-[0.97]',
+              isSelected
+                ? 'border-primary/50 bg-primary/5 shadow-md shadow-primary/15'
+                : 'border-border/60 bg-card shadow-sm shadow-foreground/5 hover:border-primary/25'
+            )}
+          >
+            {isSelected && (
+              <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-sm">
+                <Check className="w-3 h-3 text-primary-foreground" strokeWidth={3} />
+              </span>
+            )}
+            <PrefIcon id={item.id} size="sm" />
+            <div className={cn('font-medium text-xs mt-1.5', isSelected ? 'text-primary' : 'text-foreground')}>{item.name}</div>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -174,23 +190,37 @@ function SelectionList({ items, selected, onToggle, iconMap }: {
   items: Preference[]; selected: string[]; onToggle: (id: string) => void; iconMap?: Record<string, string>;
 }) {
   return (
-    <div className="space-y-2">
-      {items.map((item) => (
-        <button
-          type="button"
-          key={item.id}
-          onClick={() => onToggle(item.id)}
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-          className="w-full p-3 rounded-xl border border-border bg-background text-foreground select-none flex items-center gap-3 active:scale-[0.98] transition-transform"
-        >
-          <PrefIcon id={iconMap?.[item.id] || item.id} size="sm" />
-          <div className="flex-1 text-left">
-            <div className="font-medium text-sm">{item.name}</div>
-            {item.desc && <div className="text-xs text-muted-foreground">{item.desc}</div>}
-          </div>
-          {selected.includes(item.id) && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
-        </button>
-      ))}
+    <div className="space-y-2.5">
+      {items.map((item) => {
+        const isSelected = selected.includes(item.id);
+        return (
+          <button
+            type="button"
+            key={item.id}
+            onClick={() => onToggle(item.id)}
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+            className={cn(
+              'w-full p-3 rounded-2xl border select-none flex items-center gap-3 transition-all duration-200 active:scale-[0.98]',
+              isSelected
+                ? 'border-primary/50 bg-primary/5 shadow-md shadow-primary/15'
+                : 'border-border/60 bg-card shadow-sm shadow-foreground/5 hover:border-primary/25'
+            )}
+          >
+            <PrefIcon id={iconMap?.[item.id] || item.id} size="sm" />
+            <div className="flex-1 text-left min-w-0">
+              <div className={cn('font-semibold text-sm', isSelected ? 'text-primary' : 'text-foreground')}>{item.name}</div>
+              {item.desc && <div className="text-xs text-muted-foreground">{item.desc}</div>}
+            </div>
+            {isSelected ? (
+              <span className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                <Check className="w-3 h-3 text-primary-foreground" strokeWidth={3} />
+              </span>
+            ) : (
+              <span className="w-5 h-5 rounded-full border-2 border-border/70 flex-shrink-0" />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -200,23 +230,37 @@ function SingleSelectionList({ items, selected, onToggle }: {
   items: Preference[]; selected: string; onToggle: (id: string) => void;
 }) {
   return (
-    <div className="space-y-2">
-      {items.map((item) => (
-        <button
-          type="button"
-          key={item.id}
-          onClick={() => onToggle(item.id)}
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-          className="w-full p-3 rounded-xl border border-border bg-background text-foreground select-none flex items-center gap-3 active:scale-[0.98] transition-transform"
-        >
-          <PrefIcon id={item.id} size="sm" />
-          <div className="flex-1 text-left">
-            <div className="font-medium text-sm">{item.name}</div>
-            {item.desc && <div className="text-xs text-muted-foreground">{item.desc}</div>}
-          </div>
-          {selected === item.id && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
-        </button>
-      ))}
+    <div className="space-y-2.5">
+      {items.map((item) => {
+        const isSelected = selected === item.id;
+        return (
+          <button
+            type="button"
+            key={item.id}
+            onClick={() => onToggle(item.id)}
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+            className={cn(
+              'w-full p-3 rounded-2xl border select-none flex items-center gap-3 transition-all duration-200 active:scale-[0.98]',
+              isSelected
+                ? 'border-primary/50 bg-primary/5 shadow-md shadow-primary/15'
+                : 'border-border/60 bg-card shadow-sm shadow-foreground/5 hover:border-primary/25'
+            )}
+          >
+            <PrefIcon id={item.id} size="sm" />
+            <div className="flex-1 text-left min-w-0">
+              <div className={cn('font-semibold text-sm', isSelected ? 'text-primary' : 'text-foreground')}>{item.name}</div>
+              {item.desc && <div className="text-xs text-muted-foreground">{item.desc}</div>}
+            </div>
+            {isSelected ? (
+              <span className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                <Check className="w-3 h-3 text-primary-foreground" strokeWidth={3} />
+              </span>
+            ) : (
+              <span className="w-5 h-5 rounded-full border-2 border-border/70 flex-shrink-0" />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
