@@ -160,6 +160,11 @@ async def dismiss_consent(page):
         pass
 
 
+async def exact_absent(page, label, settle=1000) -> bool:
+    await page.wait_for_timeout(settle)
+    return await page.get_by_text(label, exact=True).count() == 0
+
+
 async def next_step(page):
     await page.get_by_role("button", name="Weiter").first.click()
     await page.wait_for_timeout(600)
@@ -241,15 +246,23 @@ async def case_answer_persistence(browser):
 
 
 async def case_plan_date_solo(browser):
+    """Solo planning shows the category-specific wizard, not the food questions."""
     context, page = await new_page(browser, category="outdoor")
     try:
         await page.goto(f"{BASE_URL}/plan-date?mode=solo", wait_until="domcontentloaded")
         await dismiss_consent(page)
-        return {
-            "solo preferences step": await visible(page, "Vibe", timeout=30000),
-            "no cuisine section": await absent(page, "Küche"),
-            "no budget section": await absent(page, "Budget"),
+        checks = {
+            "outdoor priority hint": await visible(
+                page, "Bei Natur & Outdoor", timeout=30000
+            ),
         }
+        # Picking a duration unlocks the remaining sections of the step.
+        await page.get_by_text("Quick & Sweet", exact=True).first.click()
+        await page.wait_for_timeout(1200)
+        checks["vibe section"] = await visible(page, "Vibe", timeout=10000)
+        checks["no cuisine section"] = await exact_absent(page, "Küche")
+        checks["no budget section"] = await exact_absent(page, "Budget")
+        return checks
     finally:
         await context.close()
 
