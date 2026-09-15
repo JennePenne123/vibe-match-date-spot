@@ -74,6 +74,24 @@ const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
     ['shop', 'bakery'], ['shop', 'pastry'], ['shop', 'deli'],
     ['shop', 'confectionery'], ['shop', 'coffee'],
   ],
+  wellness: [
+    ['leisure', 'spa'], ['amenity', 'spa'], ['leisure', 'sauna'],
+    ['amenity', 'public_bath'], ['shop', 'massage'], ['amenity', 'massage'],
+    ['sport', 'yoga'], ['sport', 'pilates'], ['leisure', 'fitness_centre'],
+  ],
+  outdoor: [
+    ['leisure', 'park'], ['leisure', 'garden'], ['leisure', 'nature_reserve'],
+    ['natural', 'beach'], ['tourism', 'viewpoint'], ['tourism', 'picnic_site'],
+    ['leisure', 'marina'], ['leisure', 'common'],
+  ],
+  sport_action: [
+    ['sport', 'go_kart'], ['sport', 'paintball'], ['sport', 'laser_tag'],
+    ['sport', 'billiards'], ['sport', 'darts'], ['sport', 'climbing'],
+    ['sport', 'bouldering'], ['leisure', 'trampoline_park'], ['leisure', 'adventure_park'],
+    ['leisure', 'amusement_arcade'], ['leisure', 'escape_game'], ['leisure', 'bowling_alley'],
+    ['leisure', 'miniature_golf'], ['leisure', 'ice_rink'], ['leisure', 'horse_riding'],
+    ['sport', 'surfing'], ['sport', 'sailing'], ['sport', 'skateboard'], ['sport', 'archery'],
+  ],
 };
 
 function sleep(ms: number) {
