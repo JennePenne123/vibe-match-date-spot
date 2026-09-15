@@ -157,7 +157,9 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId 
             {t('preferences.aiDecides', 'Überspringen: KI entscheidet')}
           </span>
           <span className="block text-xs text-muted-foreground">
-            {t('preferences.aiDecidesHint', 'Die KI gewichtet alles passend zu deiner Kategorie.')}
+            {isPersonalized
+              ? t('preferences.aiDecidesHintPersonalized', 'Die KI nutzt, was du bisher mochtest – abgestimmt auf deine Kategorie.')
+              : t('preferences.aiDecidesHint', 'Die KI gewichtet alles passend zu deiner Kategorie.')}
           </span>
         </span>
         {aiDecides && (
