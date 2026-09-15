@@ -338,6 +338,31 @@ const Preferences = () => {
     weights: priorityWeights,
   };
 
+  // Writes the per-category answers into the profile so a category switch
+  // survives an app restart even without pressing "save".
+  const persistCategoryAnswers = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from('user_preferences')
+        .select('id, lifestyle_data')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!data) return;
+      await supabase
+        .from('user_preferences')
+        .update({
+          lifestyle_data: {
+            ...((data.lifestyle_data as any) || {}),
+            category_answers: getAllCategoryAnswers(),
+          },
+        })
+        .eq('user_id', user.id);
+    } catch (e) {
+      console.error('Failed to persist category answers:', e);
+    }
+  }, [user]);
+
   const [prefsLoaded, setPrefsLoaded] = useState(false);
   const prevCategoryRef = useRef<SituationalCategoryId | null | undefined>(undefined);
   useEffect(() => {
