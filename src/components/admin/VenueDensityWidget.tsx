@@ -11,7 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { MapPin, Info, Image as ImageIcon, BadgeCheck, Wand2, Loader2, History, PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
 
-type BackfillCat = 'culture' | 'activity' | 'nightlife' | 'food';
+type BackfillCat = 'culture' | 'activity' | 'nightlife' | 'food' | 'wellness' | 'outdoor' | 'sport_action';
 
 interface CityGeo {
   latitude: number;
