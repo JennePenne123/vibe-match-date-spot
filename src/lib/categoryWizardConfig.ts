@@ -159,7 +159,7 @@ const WELLNESS: CategoryWizardConfig = {
   mainPickerItems: wellnessItems,
   step1TitleKey: 'preferences.stepWellness',
   step1SubtitleKey: 'preferences.stepWellnessDesc',
-  vibeWhitelist: ['wellness', 'romantic', 'casual', 'cozy'],
+  vibeWhitelist: ['romantic', 'casual', 'cultural', 'outdoor'],
 };
 
 const OUTDOOR: CategoryWizardConfig = {
@@ -185,7 +185,7 @@ const SPORT_ACTION: CategoryWizardConfig = {
   mainPickerItems: sportActionItems,
   step1TitleKey: 'preferences.stepSport',
   step1SubtitleKey: 'preferences.stepSportDesc',
-  vibeWhitelist: ['sporty', 'adventurous', 'casual', 'lively'],
+  vibeWhitelist: ['adventurous', 'casual', 'outdoor', 'nightlife'],
 };
 
 const CONFIGS: Record<SituationalCategoryId, CategoryWizardConfig> = {
