@@ -11,7 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { MapPin, Info, Image as ImageIcon, BadgeCheck, Wand2, Loader2, History, PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
 
-type BackfillCat = 'culture' | 'activity' | 'nightlife' | 'food';
+type BackfillCat = 'culture' | 'activity' | 'nightlife' | 'food' | 'wellness' | 'outdoor' | 'sport_action';
 
 interface CityGeo {
   latitude: number;
@@ -75,6 +75,7 @@ interface DensityMetrics {
   districts: {
     plz: string; total: number; essen: number; kultur: number;
     aktivitaet: number; nightlife: number; with_photo: number;
+    wellness?: number; outdoor?: number; sport_action?: number;
   }[];
 }
 
@@ -83,16 +84,22 @@ const CAT_LABELS: Record<string, string> = {
   kultur: 'Kultur & Entertainment',
   aktivitaet: 'Aktivitäten',
   nightlife: 'Nightlife',
+  wellness: 'Wellness & Entspannung',
+  outdoor: 'Natur & Outdoor',
+  sport_action: 'Sport & Action',
   sonstige: 'Sonstige',
 };
 
-const MAIN_CATS = ['essen', 'kultur', 'aktivitaet', 'nightlife'] as const;
+const MAIN_CATS = ['essen', 'kultur', 'aktivitaet', 'nightlife', 'wellness', 'outdoor', 'sport_action'] as const;
 
 const BACKFILL_LABELS: Record<BackfillCat, string> = {
   culture: 'Kultur',
   activity: 'Aktivitäten',
   nightlife: 'Nightlife',
   food: 'Essen & Trinken',
+  wellness: 'Wellness',
+  outdoor: 'Natur & Outdoor',
+  sport_action: 'Sport & Action',
 };
 
 // Map our density categories to the backfill-activities categories.
@@ -101,6 +108,9 @@ const BACKFILL_CAT: Record<string, BackfillCat | null> = {
   kultur: 'culture',
   aktivitaet: 'activity',
   nightlife: 'nightlife',
+  wellness: 'wellness',
+  outdoor: 'outdoor',
+  sport_action: 'sport_action',
 };
 
 /**
@@ -362,6 +372,9 @@ const VenueDensityWidget: React.FC = () => {
                     <th className="py-1 pr-2 text-right">Kultur</th>
                     <th className="py-1 pr-2 text-right">Aktiv.</th>
                     <th className="py-1 pr-2 text-right">Night.</th>
+                    <th className="py-1 pr-2 text-right">Well.</th>
+                    <th className="py-1 pr-2 text-right">Natur</th>
+                    <th className="py-1 pr-2 text-right">Sport</th>
                     <th className="py-1 text-right">Gesamt</th>
                   </tr>
                 </thead>
@@ -373,6 +386,9 @@ const VenueDensityWidget: React.FC = () => {
                       <CellCell value={d.kultur} target={data.targets?.kultur ?? 8} />
                       <CellCell value={d.aktivitaet} target={data.targets?.aktivitaet ?? 8} />
                       <CellCell value={d.nightlife} target={data.targets?.nightlife ?? 8} />
+                      <CellCell value={d.wellness ?? 0} target={data.targets?.wellness ?? 4} />
+                      <CellCell value={d.outdoor ?? 0} target={data.targets?.outdoor ?? 5} />
+                      <CellCell value={d.sport_action ?? 0} target={data.targets?.sport_action ?? 4} />
                       <td className="py-1.5 text-right tabular-nums text-muted-foreground">{d.total}</td>
                     </tr>
                   ))}
@@ -386,7 +402,9 @@ const VenueDensityWidget: React.FC = () => {
             <p className="flex items-start gap-2 text-xs text-muted-foreground">
               <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
               Launch-fähig ab {data.targets?.essen ?? 15} Essen, {data.targets?.kultur ?? 8} Kultur,{' '}
-              {data.targets?.aktivitaet ?? 8} Aktivität und {data.targets?.nightlife ?? 8} Nightlife pro Stadtteil.
+              {data.targets?.aktivitaet ?? 8} Aktivität, {data.targets?.nightlife ?? 8} Nightlife,{' '}
+              {data.targets?.wellness ?? 4} Wellness, {data.targets?.outdoor ?? 5} Natur & Outdoor und{' '}
+              {data.targets?.sport_action ?? 4} Sport & Action pro Stadtteil.
               Rot = unter der Hälfte, Gelb = knapp darunter, Grün = erreicht.
             </p>
 

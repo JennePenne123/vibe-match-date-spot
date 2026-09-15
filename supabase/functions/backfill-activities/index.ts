@@ -18,9 +18,11 @@ const OVERPASS_USER_AGENT = 'HiOutz/1.0 (+https://hioutz.app)';
 const OVERPASS_CHUNK_SIZE = 6;
 const OVERPASS_REQUEST_DELAY_MS = 900;
 
-type CategoryId = 'culture' | 'activity' | 'nightlife' | 'food';
+type CategoryId = 'culture' | 'activity' | 'nightlife' | 'food' | 'wellness' | 'outdoor' | 'sport_action';
 
-const VALID_CATEGORIES: CategoryId[] = ['culture', 'activity', 'nightlife', 'food'];
+const VALID_CATEGORIES: CategoryId[] = [
+  'culture', 'activity', 'nightlife', 'food', 'wellness', 'outdoor', 'sport_action',
+];
 
 const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
   culture: [
@@ -71,6 +73,24 @@ const CATEGORY_TAGS: Record<CategoryId, Array<[string, string]>> = {
     ['amenity', 'ice_cream'], ['amenity', 'food_court'],
     ['shop', 'bakery'], ['shop', 'pastry'], ['shop', 'deli'],
     ['shop', 'confectionery'], ['shop', 'coffee'],
+  ],
+  wellness: [
+    ['leisure', 'spa'], ['amenity', 'spa'], ['leisure', 'sauna'],
+    ['amenity', 'public_bath'], ['shop', 'massage'], ['amenity', 'massage'],
+    ['sport', 'yoga'], ['sport', 'pilates'], ['leisure', 'fitness_centre'],
+  ],
+  outdoor: [
+    ['leisure', 'park'], ['leisure', 'garden'], ['leisure', 'nature_reserve'],
+    ['natural', 'beach'], ['tourism', 'viewpoint'], ['tourism', 'picnic_site'],
+    ['leisure', 'marina'], ['leisure', 'common'],
+  ],
+  sport_action: [
+    ['sport', 'go_kart'], ['sport', 'paintball'], ['sport', 'laser_tag'],
+    ['sport', 'billiards'], ['sport', 'darts'], ['sport', 'climbing'],
+    ['sport', 'bouldering'], ['leisure', 'trampoline_park'], ['leisure', 'adventure_park'],
+    ['leisure', 'amusement_arcade'], ['leisure', 'escape_game'], ['leisure', 'bowling_alley'],
+    ['leisure', 'miniature_golf'], ['leisure', 'ice_rink'], ['leisure', 'horse_riding'],
+    ['sport', 'surfing'], ['sport', 'sailing'], ['sport', 'skateboard'], ['sport', 'archery'],
   ],
 };
 
@@ -282,6 +302,20 @@ function categoryFromTags(tags: Record<string, string>): { cuisine: string; tags
   if (sh === 'bakery' || sh === 'pastry' || sh === 'confectionery') return { cuisine: 'Bakery', tags: ['bakery', 'food', 'brunch', 'dessert'] };
   if (sh === 'deli') return { cuisine: 'Deli', tags: ['deli', 'food', 'casual'] };
   if (sh === 'coffee') return { cuisine: 'Coffee Shop', tags: ['coffee', 'cafe', 'food', 'daytime'] };
+  // Wellness
+  if (sh === 'massage' || (a as string) === 'massage') return { cuisine: 'Massage', tags: ['massage', 'wellness', 'relaxing', 'entspannung'] };
+  if (s === 'pilates') return { cuisine: 'Pilates', tags: ['pilates', 'wellness', 'active', 'relaxing'] };
+  // Nature & outdoor
+  if ((l as string) === 'nature_reserve' || tags.natural === 'beach' || (l as string) === 'common') {
+    return {
+      cuisine: tags.natural === 'beach' ? 'Beach' : 'Nature Spot',
+      tags: ['nature', 'outdoor', 'natur', 'relaxing', 'walk', ...(tags.natural === 'beach' ? ['beach', 'strand'] : [])],
+    };
+  }
+  if ((t as string) === 'picnic_site') return { cuisine: 'Nature Spot', tags: ['picnic', 'outdoor', 'nature', 'relaxing'] };
+  if ((l as string) === 'marina') return { cuisine: 'Marina', tags: ['marina', 'hafen', 'outdoor', 'waterfront', 'romantic'] };
+  // Sport & action
+  if (s === 'skateboard') return { cuisine: 'Sport & Action', tags: ['skateboard', 'skatepark', 'active', 'sport', 'outdoor'] };
   return { cuisine: 'Venue', tags: [] };
 }
 

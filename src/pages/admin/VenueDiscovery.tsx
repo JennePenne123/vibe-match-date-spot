@@ -9,7 +9,21 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useToast } from '@/hooks/use-toast'
 import { Loader2, MapPin, Sparkles, RefreshCw } from 'lucide-react'
 
-type CategoryId = 'culture' | 'activity' | 'nightlife'
+type CategoryId = 'culture' | 'activity' | 'nightlife' | 'food' | 'wellness' | 'outdoor' | 'sport_action'
+
+const CATEGORY_IDS: CategoryId[] = [
+  'culture', 'activity', 'nightlife', 'food', 'wellness', 'outdoor', 'sport_action',
+]
+
+const CATEGORY_LABELS: Record<CategoryId, string> = {
+  culture: 'Kultur',
+  activity: 'Aktivität',
+  nightlife: 'Nightlife',
+  food: 'Essen & Trinken',
+  wellness: 'Wellness',
+  outdoor: 'Natur & Outdoor',
+  sport_action: 'Sport & Action',
+}
 
 type Preset = { id: string; name: string; lat: number; lng: number }
 
@@ -36,6 +50,10 @@ const VenueDiscovery: React.FC = () => {
     culture: true,
     activity: true,
     nightlife: true,
+    food: false,
+    wellness: false,
+    outdoor: false,
+    sport_action: false,
   })
   const [running, setRunning] = useState(false)
   const [result, setResult] = useState<RunResult | null>(null)
@@ -160,11 +178,11 @@ const VenueDiscovery: React.FC = () => {
           <div>
             <Label className="mb-2 block">Kategorien</Label>
             <div className="flex flex-wrap gap-4">
-              {(['culture', 'activity', 'nightlife'] as CategoryId[]).map((id) => (
+              {CATEGORY_IDS.map((id) => (
                 <label key={id} className="flex items-center gap-2 cursor-pointer">
                   <Checkbox checked={categories[id]} onCheckedChange={() => toggle(id)} />
-                  <span className="text-sm capitalize">
-                    {id === 'culture' ? 'Kultur' : id === 'activity' ? 'Aktivität' : 'Nightlife'}
+                  <span className="text-sm">
+                    {CATEGORY_LABELS[id]}
                   </span>
                 </label>
               ))}
@@ -197,7 +215,7 @@ const VenueDiscovery: React.FC = () => {
               {Object.entries(result.per_category).map(([cat, stats]) => (
                 <div key={cat} className="rounded-lg border border-border/50 p-3">
                   <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {cat === 'culture' ? 'Kultur' : cat === 'activity' ? 'Aktivität' : 'Nightlife'}
+                    {CATEGORY_LABELS[cat as CategoryId] ?? cat}
                   </div>
                   <div className="mt-1 text-lg font-semibold">
                     {stats.saved} <span className="text-sm text-muted-foreground">/ {stats.fetched}</span>
