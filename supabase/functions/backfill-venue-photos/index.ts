@@ -65,6 +65,10 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const limit = Math.min(Math.max(Number(body?.limit) || 10, 1), 25);
+    // Optional: restrict the backfill to specific cuisine_types (e.g. parks).
+    const cuisineTypes: string[] = Array.isArray(body?.cuisine_types)
+      ? body.cuisine_types.filter((v: unknown) => typeof v === 'string' && v.length > 0).slice(0, 20)
+      : [];
 
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -72,7 +76,7 @@ Deno.serve(async (req) => {
     );
 
     // Candidate venues: active, geocoded, without a google_place_id yet.
-    const { data: venues, error: fetchErr } = await admin
+    let candidatesQuery = admin
       .from('venues')
       .select('id, name, address, latitude, longitude')
       .is('google_place_id', null)
@@ -80,6 +84,10 @@ Deno.serve(async (req) => {
       .not('longitude', 'is', null)
       .eq('is_active', true)
       .limit(limit);
+    if (cuisineTypes.length > 0) {
+      candidatesQuery = candidatesQuery.in('cuisine_type', cuisineTypes);
+    }
+    const { data: venues, error: fetchErr } = await candidatesQuery;
 
     if (fetchErr) {
       return new Response(JSON.stringify({ error: fetchErr.message }), {
@@ -89,13 +97,17 @@ Deno.serve(async (req) => {
     }
 
     // Count remaining for progress reporting.
-    const { count: remainingBefore } = await admin
+    let remainingQuery = admin
       .from('venues')
       .select('id', { count: 'exact', head: true })
       .is('google_place_id', null)
       .not('latitude', 'is', null)
       .not('longitude', 'is', null)
       .eq('is_active', true);
+    if (cuisineTypes.length > 0) {
+      remainingQuery = remainingQuery.in('cuisine_type', cuisineTypes);
+    }
+    const { count: remainingBefore } = await remainingQuery;
 
     const buildPhotoUrl = (name: string, w: number) =>
       `https://places.googleapis.com/v1/${name}/media?maxWidthPx=${w}&key=${apiKey}`;
