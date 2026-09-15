@@ -188,13 +188,11 @@ export const useAIAnalysis = () => {
         // Read ephemeral situational category from session (set by Home quick-actions)
         const situationalCategoryId =
           (typeof window !== 'undefined'
-            ? (window.sessionStorage.getItem('hioutz-situational-category') as
-                | 'food' | 'culture' | 'activity' | 'nightlife' | null)
+            ? (window.sessionStorage.getItem('hioutz-situational-category') as SituationalCategoryId | null)
             : null) || null;
         const secondaryCategoryId =
           (typeof window !== 'undefined'
-            ? (window.sessionStorage.getItem('hioutz-situational-secondary') as
-                | 'food' | 'culture' | 'activity' | 'nightlife' | null)
+            ? (window.sessionStorage.getItem('hioutz-situational-secondary') as SituationalCategoryId | null)
             : null) || null;
         return await getAIVenueRecommendations(
           user.id, partnerId, 6, userLocation, undefined,
