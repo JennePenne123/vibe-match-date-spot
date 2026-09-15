@@ -11,7 +11,14 @@
  * the whole point of situational planning.
  */
 
-export type SituationalCategoryId = 'food' | 'culture' | 'activity' | 'nightlife';
+export type SituationalCategoryId =
+  | 'food'
+  | 'culture'
+  | 'activity'
+  | 'nightlife'
+  | 'wellness'
+  | 'outdoor'
+  | 'sport_action';
 
 export interface SituationalCategory {
   id: SituationalCategoryId;
@@ -228,6 +235,64 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
       'beach club', 'beachclub', 'strandbar',
     ],
   },
+  {
+    id: 'wellness',
+    labelKey: 'home.situational.wellness.label',
+    descKey: 'home.situational.wellness.desc',
+    emoji: '🧖',
+    gradient: 'from-teal-500/20 via-cyan-500/10 to-transparent',
+    boostVenueTypes: ['spa_wellness', 'sauna', 'yoga_studio', 'massage', 'thermal_bath'],
+    boostActivities: ['wellness_act'],
+    boostKeywords: [
+      'spa', 'wellness', 'wellnesszentrum', 'sauna', 'saunalandschaft',
+      'therme', 'thermalbad', 'thermal bath', 'thermal spa', 'day spa',
+      'hammam', 'hamam', 'banya', 'onsen', 'massage', 'massagestudio',
+      'yoga', 'yogastudio', 'yoga studio', 'pilates', 'meditation',
+      'float', 'floating', 'salzgrotte', 'salt cave', 'beauty spa',
+      'ruhe', 'entspannung', 'relax', 'relaxing', 'mindful',
+      'spa & wellness', 'bath',
+    ],
+  },
+  {
+    id: 'outdoor',
+    labelKey: 'home.situational.outdoor.label',
+    descKey: 'home.situational.outdoor.desc',
+    emoji: '🌿',
+    gradient: 'from-green-500/20 via-lime-500/10 to-transparent',
+    boostVenueTypes: ['park', 'beach', 'viewpoint', 'nature_reserve', 'garden', 'marina'],
+    boostActivities: ['nature_act'],
+    boostKeywords: [
+      'park', 'parks', 'stadtpark', 'naturpark', 'national park', 'nationalpark',
+      'garden', 'garten', 'botanischer garten', 'botanical garden',
+      'nature reserve', 'naturschutzgebiet', 'nature spot', 'natur',
+      'beach', 'strand', 'playa', 'seeufer', 'lakeside', 'ufer',
+      'viewpoint', 'aussichtspunkt', 'aussicht', 'panorama', 'scenic',
+      'picnic', 'picknick', 'wanderweg', 'hiking', 'trail', 'wandern',
+      'marina', 'hafen', 'promenade', 'flussufer', 'riverfront', 'waterfront',
+      'wald', 'forest', 'grünanlage', 'commons',
+    ],
+  },
+  {
+    id: 'sport_action',
+    labelKey: 'home.situational.sport_action.label',
+    descKey: 'home.situational.sport_action.desc',
+    emoji: '🏁',
+    gradient: 'from-amber-500/20 via-orange-500/10 to-transparent',
+    boostVenueTypes: ['go_kart', 'paintball', 'laser_tag', 'trampoline_park', 'billiards', 'bouldering'],
+    boostActivities: ['active'],
+    boostKeywords: [
+      'go-kart', 'go kart', 'kart', 'kartbahn', 'karting',
+      'paintball', 'airsoft', 'lasertag', 'laser tag', 'lasergame',
+      'trampoline', 'trampolin', 'trampolinhalle', 'jump house',
+      'billard', 'billiards', 'pool hall', 'snooker', 'darts', 'dartbar',
+      'bouldering', 'bouldern', 'boulderhalle', 'climbing', 'klettern',
+      'kletterhalle', 'kletterpark', 'hochseilgarten', 'kletterwald',
+      'sport & action', 'sportzentrum', 'adventure park', 'abenteuerpark',
+      'archery', 'bogenschießen', 'skatepark', 'skateboard',
+      'surfing', 'surfen', 'sailing', 'segeln', 'watersport',
+      'escape game', 'escape room', 'eisbahn', 'ice rink', 'eislaufen',
+    ],
+  },
 ];
 
 export function getSituationalCategory(id: string | null | undefined): SituationalCategory | null {
@@ -331,12 +396,21 @@ const NON_GASTRO_ONLY_TAGS = new Set([
   'bowling', 'bowling_alley', 'mini_golf', 'amusement_park', 'amusement_center',
   'arcade', 'escape_room', 'gym', 'spa', 'swimming_pool', 'ice_skating_rink',
   'zoo', 'aquarium', 'casino', 'attraction', 'artwork', 'library',
+  // Wellness / Outdoor / Sport & Action categories
+  'sauna', 'yoga_studio', 'massage', 'thermal_bath', 'park', 'garden',
+  'beach', 'viewpoint', 'nature_reserve', 'marina', 'go_kart', 'paintball',
+  'laser_tag', 'trampoline_park', 'billiards', 'bouldering',
 ]);
 
 const NON_GASTRO_CUISINE_LABELS = new Set([
   'museum', 'gallery', 'theater', 'cinema', 'concert hall', 'arts centre',
   'historic', 'bowling', 'arcade', 'ice rink', 'swimming', 'spa & wellness',
   'casino', 'mini golf', 'minigolf', 'escape room', 'climbing',
+  // Wellness / Outdoor / Sport & Action importer labels
+  'sauna', 'yoga', 'pilates', 'fitness', 'massage', 'bath', 'nature spot',
+  'park', 'garden', 'beach', 'viewpoint', 'nature reserve', 'marina',
+  'sport & action', 'go-kart', 'paintball', 'laser tag', 'trampoline park',
+  'watersport', 'skateboarding', 'archery',
 ]);
 
 /**
@@ -462,6 +536,25 @@ export const VENUE_TYPE_KEYWORDS: Record<string, string[]> = {
   bar: ['bar', 'bars', 'weinbar', 'wine_bar', 'whisky bar'],
   wine_bar: ['wine bar', 'wine_bar', 'weinbar', 'vinothek', 'enoteca'],
   beer_garden: ['beer garden', 'beer_garden', 'biergarten'],
+  // Wellness & Entspannung
+  sauna: ['sauna', 'saunalandschaft', 'spa & wellness', 'therme', 'thermalbad', 'thermal bath', 'hammam', 'banya'],
+  yoga_studio: ['yoga', 'yogastudio', 'yoga studio', 'pilates'],
+  massage: ['massage', 'massagestudio', 'wellness', 'spa & wellness'],
+  thermal_bath: ['therme', 'thermalbad', 'thermal bath', 'thermal spa', 'bath', 'spa & wellness'],
+  // Natur & Outdoor
+  park: ['park', 'stadtpark', 'naturpark', 'nature spot', 'grünanlage'],
+  beach: ['beach', 'strand', 'playa', 'seeufer', 'lakeside'],
+  viewpoint: ['viewpoint', 'aussichtspunkt', 'aussicht', 'panorama', 'scenic'],
+  nature_reserve: ['nature reserve', 'naturschutzgebiet', 'nature spot', 'nationalpark', 'national park'],
+  garden: ['garden', 'garten', 'botanischer garten', 'botanical garden'],
+  marina: ['marina', 'hafen', 'promenade', 'waterfront'],
+  // Sport & Action
+  go_kart: ['go-kart', 'go kart', 'kart', 'kartbahn', 'karting', 'sport & action'],
+  paintball: ['paintball', 'airsoft', 'sport & action'],
+  laser_tag: ['lasertag', 'laser tag', 'lasergame', 'sport & action'],
+  trampoline_park: ['trampoline', 'trampolin', 'trampolinhalle', 'jump house', 'trampoline park', 'sport & action'],
+  billiards: ['billard', 'billiards', 'pool hall', 'snooker', 'darts', 'dartbar'],
+  bouldering: ['bouldering', 'bouldern', 'boulderhalle', 'climbing', 'klettern', 'kletterhalle'],
 };
 
 function venueTypeKeywords(typeId: string): string[] {

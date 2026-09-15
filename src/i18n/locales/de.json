@@ -131,7 +131,19 @@
       "modeLabel": "Wie planst du?",
       "modeSolo": "Solo",
       "modeDuo": "Zu zweit",
-      "modeGroup": "Gruppe"
+      "modeGroup": "Gruppe",
+      "wellness": {
+        "label": "Wellness & Entspannung",
+        "desc": "Spa, Therme, Yoga"
+      },
+      "outdoor": {
+        "label": "Natur & Outdoor",
+        "desc": "Parks, Strände, Aussichtspunkte"
+      },
+      "sport_action": {
+        "label": "Sport & Action",
+        "desc": "Kart, Paintball, Lasertag"
+      }
     },
     "quotes": {
       "q1": "„Das Leben ist zu kurz für mittelmäßige Erlebnisse.\" ✨",
@@ -614,7 +626,35 @@
     "stepTaste": "Geschmack",
     "stepTasteDesc": "Küchen und Vorlieben",
     "maxDistance": "Maximale Entfernung",
-    "useCurrentLocation": "Aktuellen Standort verwenden"
+    "useCurrentLocation": "Aktuellen Standort verwenden",
+    "whatWellness": "Wie wollt ihr entspannen?",
+    "whatWellnessHint": "Wähle eure Wellness-Favoriten",
+    "stepWellness": "Entspannung",
+    "stepWellnessDesc": "Wellness nach eurem Geschmack",
+    "whatOutdoor": "Wohin ins Grüne?",
+    "whatOutdoorHint": "Wähle eure Outdoor-Favoriten",
+    "stepOutdoor": "Draußen",
+    "stepOutdoorDesc": "Natur & Outdoor nach eurem Geschmack",
+    "whatSport": "Worauf habt ihr Lust?",
+    "whatSportHint": "Wähle eure Action-Favoriten",
+    "stepSport": "Action",
+    "stepSportDesc": "Sport & Action nach eurem Geschmack",
+    "venue_sauna": "Sauna",
+    "venue_thermal_bath": "Therme",
+    "venue_yoga_studio": "Yoga & Pilates",
+    "venue_massage": "Massage",
+    "venue_park": "Parks",
+    "venue_beach": "Strand & Ufer",
+    "venue_viewpoint": "Aussichtspunkte",
+    "venue_nature_reserve": "Naturschutzgebiete",
+    "venue_garden": "Gärten",
+    "venue_marina": "Hafen & Promenade",
+    "venue_go_kart": "Go-Kart",
+    "venue_paintball": "Paintball",
+    "venue_laser_tag": "Lasertag",
+    "venue_trampoline_park": "Trampolinpark",
+    "venue_billiards": "Billard & Darts",
+    "venue_bouldering": "Bouldern"
   },
   "notFound": {
     "title": "404",

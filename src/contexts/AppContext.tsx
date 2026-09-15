@@ -310,11 +310,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       const situationalCategoryId =
         (typeof window !== 'undefined'
-          ? (window.sessionStorage.getItem('hioutz-situational-category') as 'food' | 'culture' | 'activity' | 'nightlife' | null)
+          ? (window.sessionStorage.getItem('hioutz-situational-category') as SituationalCategoryId | null)
           : null) || null;
       const secondaryCategoryId =
         (typeof window !== 'undefined'
-          ? (window.sessionStorage.getItem('hioutz-situational-secondary') as 'food' | 'culture' | 'activity' | 'nightlife' | null)
+          ? (window.sessionStorage.getItem('hioutz-situational-secondary') as SituationalCategoryId | null)
           : null) || null;
 
       console.log('Generating recommendations with:', {
