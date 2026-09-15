@@ -627,6 +627,8 @@ const Preferences = () => {
         });
       } catch (error) {
         console.error('Error saving preferences:', error);
+        // Keep the per-category answers alive via the retrying background queue.
+        if (user) queueProfileSave(user.id, getAllCategoryAnswers());
         void trackFunnelStep({
           stepKey: 'preferences_page',
           stepIndex: 5,

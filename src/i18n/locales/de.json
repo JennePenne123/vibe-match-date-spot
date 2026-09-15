@@ -707,7 +707,10 @@
     "follow_competitive": "Wettkampf",
     "categorySwitchedTitle": "Kategorie gewechselt",
     "categorySwitchedRestored": "{{count}} frühere Angabe(n) wiederhergestellt – nicht passende Angaben wurden zurückgesetzt.",
-    "categorySwitchedReset": "{{count}} Angabe(n) zurückgesetzt, weil sie hier nicht passen."
+    "categorySwitchedReset": "{{count}} Angabe(n) zurückgesetzt, weil sie hier nicht passen.",
+    "bgSaveRetrying": "Deine Angaben werden erneut gespeichert …",
+    "bgSaveOffline": "Keine Verbindung – deine Angaben werden gespeichert, sobald du wieder online bist.",
+    "bgSaveFailed": "Speichern im Hintergrund fehlgeschlagen. Deine Angaben bleiben erhalten."
   },
   "notFound": {
     "title": "404",
