@@ -47,17 +47,21 @@ const keyOf = (id: SituationalCategoryId | null | undefined) => id ?? GENERIC;
 
 type Store = Partial<Record<string, CategoryAnswerSnapshot>>;
 
+/** Fallback for environments without sessionStorage (SSR, tests). */
+let memoryStore: Store = {};
+
 const readStore = (): Store => {
-  if (typeof window === 'undefined') return {};
+  if (typeof window === 'undefined') return memoryStore;
   try {
     const raw = window.sessionStorage.getItem(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as Store) : {};
   } catch {
-    return {};
+    return memoryStore;
   }
 };
 
 const writeStore = (store: Store) => {
+  memoryStore = store;
   if (typeof window === 'undefined') return;
   try {
     window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(store));
@@ -80,6 +84,7 @@ export const loadCategoryAnswers = (
 ): CategoryAnswerSnapshot | null => readStore()[keyOf(categoryId)] ?? null;
 
 export const clearCategoryAnswers = () => {
+  memoryStore = {};
   if (typeof window === 'undefined') return;
   try {
     window.sessionStorage.removeItem(STORAGE_KEY);
