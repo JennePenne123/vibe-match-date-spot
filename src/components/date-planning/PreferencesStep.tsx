@@ -109,7 +109,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     selectedOccasion, setSelectedOccasion,
     priorityWeights, setPriorityWeights,
     autoNavigating, timeoutTriggered, openSections,
-    durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,
+    durationModel, filteredVibes, filteredTemplates, learnedTemplate, lastTemplate, status,
     toggleCuisine, toggleVibe, togglePrice, toggleTime, toggleDietary,
     isTemplateActive, applyTemplate, selectDuration,
     handleKeepPreferences, handleCustomize,
