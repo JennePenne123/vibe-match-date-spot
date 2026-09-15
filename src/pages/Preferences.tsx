@@ -643,7 +643,15 @@ const Preferences = () => {
     : cfg.mainPickerItems.map(it => ({ id: it.id, name: t(it.nameKey), emoji: '' }));
   const mainSelected = isFood ? selectedCuisines : selectedVenueTypes;
   const setMainSelected = isFood ? setSelectedCuisines : setSelectedVenueTypes;
-  const has = (s: import('@/lib/categoryWizardConfig').WizardSectionId) => cfg.visibleSections.has(s);
+
+  // Sections and follow-up questions react to the live priority sliders and
+  // to what was already picked — same source of truth as the scoring profile.
+  const visibilityCtx = { weights: priorityWeights, selectedMainItems: mainSelected };
+  const activeSections = resolveVisibleSections(situationalCategory?.id ?? null, visibilityCtx);
+  const followUps = getFollowUpQuestions(situationalCategory?.id ?? null, visibilityCtx);
+  const has = (s: import('@/lib/categoryWizardConfig').WizardSectionId) => activeSections.has(s);
+  const toggleFollowUp = (id: string) =>
+    setSelectedVenueTypes(prev => prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]);
 
   const steps = [
     { title: t('preferences.stepContext', 'Dein Kontext'), subtitle: t('preferences.stepContextDesc', 'Anlass, Stimmung & was dir wichtig ist'), icon: <Sparkles className="w-5 h-5 text-primary" /> },
