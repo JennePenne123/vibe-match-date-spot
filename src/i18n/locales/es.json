@@ -707,7 +707,10 @@
     "follow_competitive": "Competitivo",
     "categorySwitchedTitle": "Categoría cambiada",
     "categorySwitchedRestored": "Se restauraron {{count}} respuesta(s) anteriores; las que no encajan se restablecieron.",
-    "categorySwitchedReset": "Se restablecieron {{count}} respuesta(s) que ya no aplican aquí."
+    "categorySwitchedReset": "Se restablecieron {{count}} respuesta(s) que ya no aplican aquí.",
+    "bgSaveRetrying": "Guardando tus respuestas de nuevo …",
+    "bgSaveOffline": "Sin conexión: tus respuestas se guardarán cuando vuelvas a estar en línea.",
+    "bgSaveFailed": "Error al guardar en segundo plano. Tus respuestas se conservan."
   },
   "notFound": {
     "title": "404",
