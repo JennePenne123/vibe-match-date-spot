@@ -706,7 +706,11 @@ const Preferences = () => {
               </AccordionSection>
 
               <AccordionSection title="Prioritäten" icon={<SlidersHorizontal className="w-5 h-5 text-primary" />} selectedCount={Object.values(priorityWeights).filter(v => v !== 1.0).length}>
-                <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
+                <PriorityPicker
+                  weights={priorityWeights}
+                  onChangeWeights={handleChangePriorityWeights}
+                  categoryId={situationalCategory?.id ?? null}
+                />
               </AccordionSection>
             </>
           )}
