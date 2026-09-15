@@ -353,7 +353,10 @@ const Preferences = () => {
     if (!isFirstPass && prevId === nextId) return;
 
     const current = answersRef.current!;
-    if (!isFirstPass) saveCategoryAnswers(prevId, current);
+    if (!isFirstPass) {
+      saveCategoryAnswers(prevId, current);
+      void persistCategoryAnswers();
+    }
     const { answers, restoredCount, droppedCount } = reconcileCategoryAnswers({
       from: prevId,
       to: nextId,
