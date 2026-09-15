@@ -215,7 +215,7 @@ const VenueDiscovery: React.FC = () => {
               {Object.entries(result.per_category).map(([cat, stats]) => (
                 <div key={cat} className="rounded-lg border border-border/50 p-3">
                   <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {cat === 'culture' ? 'Kultur' : cat === 'activity' ? 'Aktivität' : 'Nightlife'}
+                    {CATEGORY_LABELS[cat as CategoryId] ?? cat}
                   </div>
                   <div className="mt-1 text-lg font-semibold">
                     {stats.saved} <span className="text-sm text-muted-foreground">/ {stats.fetched}</span>
