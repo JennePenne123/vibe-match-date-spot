@@ -28,7 +28,7 @@ const SecondaryCategoryPicker: React.FC<Props> = ({ primary, secondaryId, onChan
   const options = SITUATIONAL_CATEGORIES.filter(c => c.id !== primary.id);
 
   return (
-    <div className="rounded-xl border border-border/50 bg-muted/30 p-3 space-y-2.5">
+    <div className="rounded-2xl border border-border/60 bg-card shadow-sm shadow-foreground/5 p-3.5 space-y-2.5">
       <div className="flex items-center gap-2">
         <Plus className="w-3.5 h-3.5 text-muted-foreground" />
         <div className="flex-1 min-w-0">
@@ -51,10 +51,10 @@ const SecondaryCategoryPicker: React.FC<Props> = ({ primary, secondaryId, onChan
               whileTap={{ scale: 0.96 }}
               onClick={() => onChange(active ? null : opt.id)}
               className={cn(
-                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
+                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200',
                 active
-                  ? 'border-primary/60 bg-primary/15 text-foreground'
-                  : 'border-border/60 bg-background/60 text-muted-foreground hover:text-foreground hover:border-border',
+                  ? 'border-primary/50 bg-primary/5 text-primary shadow-md shadow-primary/15'
+                  : 'border-border/60 bg-card text-muted-foreground shadow-sm shadow-foreground/5 hover:text-foreground hover:border-primary/25',
               )}
               aria-pressed={active}
             >

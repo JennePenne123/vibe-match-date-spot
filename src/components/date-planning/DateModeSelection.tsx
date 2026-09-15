@@ -37,15 +37,15 @@ const DateModeSelection: React.FC<DateModeSelectionProps> = ({ onSelectMode }) =
             key={mode}
             onClick={() => onSelectMode(mode)}
             className={cn(
-              'group relative w-full text-left rounded-2xl border border-border/50 bg-card p-5 transition-all duration-200',
-              'hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]',
+              'group relative w-full text-left rounded-2xl border border-border/60 bg-card shadow-sm shadow-foreground/5 p-5 transition-all duration-200',
+              'hover:border-primary/25 hover:shadow-md hover:shadow-primary/10 active:scale-[0.98]',
               border
             )}
           >
             <div className={cn('absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity', gradient)} />
             <div className="relative flex items-center gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center group-hover:bg-background/80 transition-colors">
-                <Icon className="w-6 h-6 text-foreground" />
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center transition-colors">
+                <Icon className="w-6 h-6 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
