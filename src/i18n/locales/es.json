@@ -131,7 +131,19 @@
       "modeLabel": "¿Cómo planeas?",
       "modeSolo": "Solo",
       "modeDuo": "En pareja",
-      "modeGroup": "Grupo"
+      "modeGroup": "Grupo",
+      "wellness": {
+        "label": "Bienestar y Relax",
+        "desc": "Spa, termas, yoga"
+      },
+      "outdoor": {
+        "label": "Naturaleza y Aire Libre",
+        "desc": "Parques, playas, miradores"
+      },
+      "sport_action": {
+        "label": "Deporte y Acción",
+        "desc": "Karting, paintball, láser tag"
+      }
     },
     "quotes": {
       "q1": "\"La vida es demasiado corta para experiencias mediocres.\" ✨",
@@ -614,7 +626,35 @@
     "stepTaste": "Gustos",
     "stepTasteDesc": "Cocinas y preferencias",
     "maxDistance": "Distancia máxima",
-    "useCurrentLocation": "Usar ubicación actual"
+    "useCurrentLocation": "Usar ubicación actual",
+    "whatWellness": "¿Cómo queréis relajaros?",
+    "whatWellnessHint": "Elige vuestros favoritos de bienestar",
+    "stepWellness": "Relax",
+    "stepWellnessDesc": "Bienestar a vuestro gusto",
+    "whatOutdoor": "¿A dónde al aire libre?",
+    "whatOutdoorHint": "Elige vuestros favoritos al aire libre",
+    "stepOutdoor": "Aire libre",
+    "stepOutdoorDesc": "Naturaleza y aire libre a vuestro gusto",
+    "whatSport": "¿Qué os apetece?",
+    "whatSportHint": "Elige vuestros favoritos de acción",
+    "stepSport": "Acción",
+    "stepSportDesc": "Deporte y acción a vuestro gusto",
+    "venue_sauna": "Sauna",
+    "venue_thermal_bath": "Termas",
+    "venue_yoga_studio": "Yoga y Pilates",
+    "venue_massage": "Masaje",
+    "venue_park": "Parques",
+    "venue_beach": "Playa y Paseo",
+    "venue_viewpoint": "Miradores",
+    "venue_nature_reserve": "Reservas Naturales",
+    "venue_garden": "Jardines",
+    "venue_marina": "Puerto y Paseo Marítimo",
+    "venue_go_kart": "Karting",
+    "venue_paintball": "Paintball",
+    "venue_laser_tag": "Láser Tag",
+    "venue_trampoline_park": "Parque de Trampolines",
+    "venue_billiards": "Billar y Dardos",
+    "venue_bouldering": "Búlder"
   },
   "notFound": {
     "title": "404",
