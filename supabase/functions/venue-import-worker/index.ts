@@ -668,8 +668,10 @@ Deno.serve(async (req) => {
         details: {
           raw: elements.length, kept: venues.length, dropped,
           in_batch_duplicates: inBatchDuplicates, reused_existing: reused,
+          fallback_categorized: fallbackUsed, fallback_via: fallbackVia,
           mirrors: mirrorStats,
         },
+
       });
 
       offset += 1;
