@@ -50,6 +50,10 @@ const VenueDiscovery: React.FC = () => {
     culture: true,
     activity: true,
     nightlife: true,
+    food: false,
+    wellness: false,
+    outdoor: false,
+    sport_action: false,
   })
   const [running, setRunning] = useState(false)
   const [result, setResult] = useState<RunResult | null>(null)
