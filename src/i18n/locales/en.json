@@ -704,7 +704,10 @@
     "follow_water_nearby": "By the water",
     "follow_dog_friendly": "Dog friendly",
     "follow_picnic_spot": "Picnic spot",
-    "follow_competitive": "Competitive"
+    "follow_competitive": "Competitive",
+    "categorySwitchedTitle": "Category changed",
+    "categorySwitchedRestored": "Restored {{count}} earlier answer(s) – answers that no longer fit were reset.",
+    "categorySwitchedReset": "Reset {{count}} answer(s) that no longer apply here."
   },
   "notFound": {
     "title": "404",

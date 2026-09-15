@@ -31,6 +31,7 @@ import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
 import { getCategoryWizardConfig, resolveVisibleSections, getFollowUpQuestions } from '@/lib/categoryWizardConfig';
+import { reconcileCategoryAnswers, saveCategoryAnswers, type CategoryAnswerSnapshot } from '@/lib/categoryAnswerMemory';
 import { trackFunnelStep } from '@/services/funnelAnalyticsService';
 
 // Icon + color mapping (slimmed down)
@@ -321,15 +322,68 @@ const Preferences = () => {
     setPriorityWeights(w);
   }, []);
 
-  // Preset the weights from the active category's priority profile.
+  // ── Category switching: keep what still fits, park the rest ──────────
+  // Answers are snapshotted per category, so switching back restores them,
+  // while answers the new category doesn't ask for are cleared instead of
+  // silently influencing priorities, follow-up questions and scoring.
+  const answersRef = useRef<CategoryAnswerSnapshot | null>(null);
+  answersRef.current = {
+    cuisines: selectedCuisines,
+    excludedCuisines,
+    venueTypes: selectedVenueTypes,
+    vibes: selectedVibes,
+    priceRange: selectedPriceRange,
+    times: selectedTimePreferences,
+    dietary: selectedDietary,
+    weights: priorityWeights,
+  };
+
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
+  const prevCategoryRef = useRef<SituationalCategoryId | null | undefined>(undefined);
   useEffect(() => {
-    if (weightsTouchedRef.current) return;
-    setPriorityWeights(priorityWeightsForCategory(situationalCategory?.id ?? null));
-  }, [situationalCategory?.id]);
+    // Wait for the stored preferences so we reconcile against real answers.
+    if (!prefsLoaded) return;
+    const nextId = situationalCategory?.id ?? null;
+    const prevId = prevCategoryRef.current;
+    prevCategoryRef.current = nextId;
+
+    // First pass: the saved answers are cleaned up for the active category
+    // silently — nothing was "switched" from the user's point of view.
+    const isFirstPass = prevId === undefined;
+    if (!isFirstPass && prevId === nextId) return;
+
+    const current = answersRef.current!;
+    if (!isFirstPass) saveCategoryAnswers(prevId, current);
+    const { answers, restoredCount, droppedCount } = reconcileCategoryAnswers({
+      from: prevId,
+      to: nextId,
+      current,
+      weightsTouched: weightsTouchedRef.current,
+    });
+
+    setSelectedCuisines(answers.cuisines);
+    setExcludedCuisines(answers.excludedCuisines);
+    setSelectedVenueTypes(answers.venueTypes);
+    setSelectedVibes(answers.vibes);
+    setSelectedPriceRange(answers.priceRange);
+    setSelectedTimePreferences(answers.times);
+    setSelectedDietary(answers.dietary);
+    setPriorityWeights(answers.weights);
+
+    if (!isFirstPass && (restoredCount > 0 || droppedCount > 0)) {
+      toast({
+        title: t('preferences.categorySwitchedTitle'),
+        description: restoredCount > 0
+          ? t('preferences.categorySwitchedRestored', { count: restoredCount })
+          : t('preferences.categorySwitchedReset', { count: droppedCount }),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [situationalCategory?.id, prefsLoaded]);
 
   useEffect(() => {
     const loadExistingPreferences = async () => {
-      if (!user) return;
+      if (!user) { setPrefsLoaded(true); return; }
       try {
         const { data } = await supabase
           .from('user_preferences')
@@ -366,6 +420,8 @@ const Preferences = () => {
         }
       } catch (error) {
         console.log('No existing preferences found');
+      } finally {
+        setPrefsLoaded(true);
       }
     };
     loadExistingPreferences();
