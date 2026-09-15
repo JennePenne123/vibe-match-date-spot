@@ -33,6 +33,8 @@ import { getSituationalCategory, type SituationalCategoryId, type SituationalCat
 import { getCategoryWizardConfig, resolveVisibleSections, getFollowUpQuestions } from '@/lib/categoryWizardConfig';
 import { reconcileCategoryAnswers, saveCategoryAnswers, getAllCategoryAnswers, hydrateCategoryAnswers, type CategoryAnswerSnapshot } from '@/lib/categoryAnswerMemory';
 import { trackFunnelStep } from '@/services/funnelAnalyticsService';
+import { queueProfileSave, flushBackgroundSave, hasPendingProfileSave } from '@/lib/backgroundProfileSave';
+import BackgroundSaveBanner from '@/components/preferences/BackgroundSaveBanner';
 
 // Icon + color mapping (slimmed down)
 const prefIconMap: Record<string, { icon: LucideIcon | null; labIcon?: any; bg: string; fg: string }> = {
@@ -340,27 +342,14 @@ const Preferences = () => {
 
   // Writes the per-category answers into the profile so a category switch
   // survives an app restart even without pressing "save".
-  const persistCategoryAnswers = useCallback(async () => {
+  const persistCategoryAnswers = useCallback(() => {
     if (!user) return;
-    try {
-      const { data } = await supabase
-        .from('user_preferences')
-        .select('id, lifestyle_data')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (!data) return;
-      await supabase
-        .from('user_preferences')
-        .update({
-          lifestyle_data: {
-            ...((data.lifestyle_data as any) || {}),
-            category_answers: getAllCategoryAnswers(),
-          },
-        })
-        .eq('user_id', user.id);
-    } catch (e) {
-      console.error('Failed to persist category answers:', e);
-    }
+    queueProfileSave(user.id, getAllCategoryAnswers());
+  }, [user]);
+
+  // Flush anything that could not be written in an earlier session.
+  useEffect(() => {
+    if (user && hasPendingProfileSave()) void flushBackgroundSave();
   }, [user]);
 
   const [prefsLoaded, setPrefsLoaded] = useState(false);
