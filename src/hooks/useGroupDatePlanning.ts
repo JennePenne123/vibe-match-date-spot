@@ -2,6 +2,18 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { getCategoryPriorityWeights } from '@/lib/categoryWizardConfig';
+import type { SituationalCategoryId } from '@/lib/situationalCategories';
+
+/** Active situational category of the current planning session (ephemeral). */
+const readSituationalCategory = (): SituationalCategoryId | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    return (window.sessionStorage.getItem('hioutz-situational-category') as SituationalCategoryId | null) || null;
+  } catch {
+    return null;
+  }
+};
 
 export interface GroupMember {
   id: string;
@@ -163,7 +175,12 @@ export const useGroupDatePlanning = () => {
         .from('date_group_members')
         .update({
           preferences_submitted: true,
-          preferences_data: preferences,
+          // Keep the chosen category with each member's answers so the group
+          // consensus can weight the dimensions that matter for it.
+          preferences_data: {
+            ...preferences,
+            category: preferences?.category ?? readSituationalCategory(),
+          },
         })
         .eq('group_id', groupId)
         .eq('user_id', user.id);
