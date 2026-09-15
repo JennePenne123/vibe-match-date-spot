@@ -17,6 +17,7 @@ import { ChipGrid, Section } from './preferences/PreferenceChip';
 import PreferencesConfirmScreen from './preferences/PreferencesConfirmScreen';
 import SituationalActiveBanner from './preferences/SituationalActiveBanner';
 import { getSituationalCategory } from '@/lib/situationalCategories';
+import { resolveVisibleSections, getFollowUpQuestions } from '@/lib/categoryWizardConfig';
 
 const VENUE_TYPE_EMOJI: Record<string, string> = {
   museum: '🏛️', gallery: '🖼️', theater_venue: '🎭', cinema: '🎬',
