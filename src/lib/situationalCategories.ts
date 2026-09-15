@@ -11,7 +11,14 @@
  * the whole point of situational planning.
  */
 
-export type SituationalCategoryId = 'food' | 'culture' | 'activity' | 'nightlife';
+export type SituationalCategoryId =
+  | 'food'
+  | 'culture'
+  | 'activity'
+  | 'nightlife'
+  | 'wellness'
+  | 'outdoor'
+  | 'sport_action';
 
 export interface SituationalCategory {
   id: SituationalCategoryId;
@@ -226,6 +233,64 @@ export const SITUATIONAL_CATEGORIES: SituationalCategory[] = [
       'date night', 'after work', 'afterwork', 'lively', 'party', 'fiesta',
       'happy hour', 'cocktail hour', 'rooftop terrace', 'dachterrasse',
       'beach club', 'beachclub', 'strandbar',
+    ],
+  },
+  {
+    id: 'wellness',
+    labelKey: 'home.situational.wellness.label',
+    descKey: 'home.situational.wellness.desc',
+    emoji: '🧖',
+    gradient: 'from-teal-500/20 via-cyan-500/10 to-transparent',
+    boostVenueTypes: ['spa_wellness', 'sauna', 'yoga_studio', 'massage', 'thermal_bath'],
+    boostActivities: ['wellness_act'],
+    boostKeywords: [
+      'spa', 'wellness', 'wellnesszentrum', 'sauna', 'saunalandschaft',
+      'therme', 'thermalbad', 'thermal bath', 'thermal spa', 'day spa',
+      'hammam', 'hamam', 'banya', 'onsen', 'massage', 'massagestudio',
+      'yoga', 'yogastudio', 'yoga studio', 'pilates', 'meditation',
+      'float', 'floating', 'salzgrotte', 'salt cave', 'beauty spa',
+      'ruhe', 'entspannung', 'relax', 'relaxing', 'mindful',
+      'spa & wellness', 'bath',
+    ],
+  },
+  {
+    id: 'outdoor',
+    labelKey: 'home.situational.outdoor.label',
+    descKey: 'home.situational.outdoor.desc',
+    emoji: '🌿',
+    gradient: 'from-green-500/20 via-lime-500/10 to-transparent',
+    boostVenueTypes: ['park', 'beach', 'viewpoint', 'nature_reserve', 'garden', 'marina'],
+    boostActivities: ['nature_act'],
+    boostKeywords: [
+      'park', 'parks', 'stadtpark', 'naturpark', 'national park', 'nationalpark',
+      'garden', 'garten', 'botanischer garten', 'botanical garden',
+      'nature reserve', 'naturschutzgebiet', 'nature spot', 'natur',
+      'beach', 'strand', 'playa', 'seeufer', 'lakeside', 'ufer',
+      'viewpoint', 'aussichtspunkt', 'aussicht', 'panorama', 'scenic',
+      'picnic', 'picknick', 'wanderweg', 'hiking', 'trail', 'wandern',
+      'marina', 'hafen', 'promenade', 'flussufer', 'riverfront', 'waterfront',
+      'wald', 'forest', 'grünanlage', 'commons',
+    ],
+  },
+  {
+    id: 'sport_action',
+    labelKey: 'home.situational.sport_action.label',
+    descKey: 'home.situational.sport_action.desc',
+    emoji: '🏁',
+    gradient: 'from-amber-500/20 via-orange-500/10 to-transparent',
+    boostVenueTypes: ['go_kart', 'paintball', 'laser_tag', 'trampoline_park', 'billiards', 'bouldering'],
+    boostActivities: ['active'],
+    boostKeywords: [
+      'go-kart', 'go kart', 'kart', 'kartbahn', 'karting',
+      'paintball', 'airsoft', 'lasertag', 'laser tag', 'lasergame',
+      'trampoline', 'trampolin', 'trampolinhalle', 'jump house',
+      'billard', 'billiards', 'pool hall', 'snooker', 'darts', 'dartbar',
+      'bouldering', 'bouldern', 'boulderhalle', 'climbing', 'klettern',
+      'kletterhalle', 'kletterpark', 'hochseilgarten', 'kletterwald',
+      'sport & action', 'sportzentrum', 'adventure park', 'abenteuerpark',
+      'archery', 'bogenschießen', 'skatepark', 'skateboard',
+      'surfing', 'surfen', 'sailing', 'segeln', 'watersport',
+      'escape game', 'escape room', 'eisbahn', 'ice rink', 'eislaufen',
     ],
   },
 ];
