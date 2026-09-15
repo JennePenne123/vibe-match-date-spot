@@ -402,7 +402,9 @@ const VenueDensityWidget: React.FC = () => {
             <p className="flex items-start gap-2 text-xs text-muted-foreground">
               <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
               Launch-fähig ab {data.targets?.essen ?? 15} Essen, {data.targets?.kultur ?? 8} Kultur,{' '}
-              {data.targets?.aktivitaet ?? 8} Aktivität und {data.targets?.nightlife ?? 8} Nightlife pro Stadtteil.
+              {data.targets?.aktivitaet ?? 8} Aktivität, {data.targets?.nightlife ?? 8} Nightlife,{' '}
+              {data.targets?.wellness ?? 4} Wellness, {data.targets?.outdoor ?? 5} Natur & Outdoor und{' '}
+              {data.targets?.sport_action ?? 4} Sport & Action pro Stadtteil.
               Rot = unter der Hälfte, Gelb = knapp darunter, Grün = erreicht.
             </p>
 
