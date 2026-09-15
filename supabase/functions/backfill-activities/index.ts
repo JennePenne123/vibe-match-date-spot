@@ -302,6 +302,20 @@ function categoryFromTags(tags: Record<string, string>): { cuisine: string; tags
   if (sh === 'bakery' || sh === 'pastry' || sh === 'confectionery') return { cuisine: 'Bakery', tags: ['bakery', 'food', 'brunch', 'dessert'] };
   if (sh === 'deli') return { cuisine: 'Deli', tags: ['deli', 'food', 'casual'] };
   if (sh === 'coffee') return { cuisine: 'Coffee Shop', tags: ['coffee', 'cafe', 'food', 'daytime'] };
+  // Wellness
+  if (sh === 'massage' || (a as string) === 'massage') return { cuisine: 'Massage', tags: ['massage', 'wellness', 'relaxing', 'entspannung'] };
+  if (s === 'pilates') return { cuisine: 'Pilates', tags: ['pilates', 'wellness', 'active', 'relaxing'] };
+  // Nature & outdoor
+  if ((l as string) === 'nature_reserve' || tags.natural === 'beach' || (l as string) === 'common') {
+    return {
+      cuisine: tags.natural === 'beach' ? 'Beach' : 'Nature Spot',
+      tags: ['nature', 'outdoor', 'natur', 'relaxing', 'walk', ...(tags.natural === 'beach' ? ['beach', 'strand'] : [])],
+    };
+  }
+  if ((t as string) === 'picnic_site') return { cuisine: 'Nature Spot', tags: ['picnic', 'outdoor', 'nature', 'relaxing'] };
+  if ((l as string) === 'marina') return { cuisine: 'Marina', tags: ['marina', 'hafen', 'outdoor', 'waterfront', 'romantic'] };
+  // Sport & action
+  if (s === 'skateboard') return { cuisine: 'Sport & Action', tags: ['skateboard', 'skatepark', 'active', 'sport', 'outdoor'] };
   return { cuisine: 'Venue', tags: [] };
 }
 
