@@ -7,6 +7,7 @@ import { NoSituationalMatchError } from '@/services/aiVenueService/recommendatio
 import { supabase } from '@/integrations/supabase/client';
 import { getLocationFallback } from '@/utils/locationFallback';
 import type { DateOccasion } from '@/services/aiVenueService/occasionScoring';
+import type { SituationalCategoryId } from '@/lib/situationalCategories';
 
 interface DatePreferences {
   preferred_cuisines?: string[];
