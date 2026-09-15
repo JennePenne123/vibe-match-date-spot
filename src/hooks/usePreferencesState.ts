@@ -354,6 +354,14 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         occasion: selectedOccasion,
         priority_weights: priorityWeights,
       } as any);
+      saveLastDatePreferences({
+        categoryId: categoryId ?? null,
+        cuisines: selectedCuisines,
+        vibes: selectedVibes,
+        priceRange: selectedPriceRange,
+        timePreferences: selectedTimePreferences,
+        venueTypes: selectedVenueTypes,
+      });
       setHasSubmitted(true);
     } catch (error) {
       console.error('Error saving preferences:', error);
