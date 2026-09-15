@@ -144,29 +144,16 @@ export function reconcileCategoryAnswers({ from, to, current, weightsTouched = f
     weights: resolveWeights({ from, to, current: current.weights, weightsTouched }),
   };
 
-  const restoredCount = stored
-    ? countAll(answers) - countAll({ ...answers, ...pickCurrentOnly(answers, current) })
-    : 0;
+  const flat = (x: CategoryAnswerSnapshot) => [
+    ...x.cuisines, ...x.excludedCuisines, ...x.venueTypes,
+    ...x.vibes, ...x.priceRange, ...x.times, ...x.dietary,
+  ];
+  const currentValues = new Set(flat(current));
+  const resultValues = flat(answers);
+  const restoredCount = resultValues.filter(v => !currentValues.has(v)).length;
+  const droppedCount = flat(current).filter(v => !resultValues.includes(v)).length;
 
-  return {
-    answers,
-    restoredCount: Math.max(restoredCount, 0),
-    droppedCount: Math.max(countAll(current) + (stored ? countAll(stored) : 0) - countAll(answers), 0),
-  };
-}
-
-/** Helper: the subset of the reconciled answers that already came from `current`. */
-function pickCurrentOnly(answers: CategoryAnswerSnapshot, current: CategoryAnswerSnapshot) {
-  const keep = (list: string[], src: string[]) => list.filter(v => src.includes(v));
-  return {
-    cuisines: keep(answers.cuisines, current.cuisines),
-    excludedCuisines: keep(answers.excludedCuisines, current.excludedCuisines),
-    venueTypes: keep(answers.venueTypes, current.venueTypes),
-    vibes: keep(answers.vibes, current.vibes),
-    priceRange: keep(answers.priceRange, current.priceRange),
-    times: keep(answers.times, current.times),
-    dietary: keep(answers.dietary, current.dietary),
-  };
+  return { answers, restoredCount, droppedCount };
 }
 
 const DIMENSIONS: PriorityDimensionId[] = ['cuisine', 'vibe', 'price', 'location'];
