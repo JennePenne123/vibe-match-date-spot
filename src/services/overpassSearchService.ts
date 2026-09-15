@@ -59,6 +59,38 @@ const CATEGORY_OSM_TAGS: Record<SituationalCategoryId, Array<[string, string]>> 
     ['amenity', 'karaoke_box'],
     ['leisure', 'adult_gaming_centre'],
   ],
+  wellness: [
+    ['leisure', 'spa'],
+    ['amenity', 'spa'],
+    ['leisure', 'sauna'],
+    ['amenity', 'public_bath'],
+    ['sport', 'yoga'],
+    ['sport', 'pilates'],
+    ['leisure', 'fitness_centre'],
+    ['shop', 'massage'],
+  ],
+  outdoor: [
+    ['leisure', 'park'],
+    ['leisure', 'garden'],
+    ['leisure', 'nature_reserve'],
+    ['natural', 'beach'],
+    ['tourism', 'viewpoint'],
+    ['leisure', 'picnic_table'],
+    ['leisure', 'marina'],
+    ['leisure', 'common'],
+  ],
+  sport_action: [
+    ['sport', 'go_kart'],
+    ['sport', 'paintball'],
+    ['sport', 'laser_tag'],
+    ['leisure', 'trampoline_park'],
+    ['sport', 'billiards'],
+    ['sport', 'darts'],
+    ['sport', 'climbing'],
+    ['leisure', 'escape_game'],
+    ['sport', 'archery'],
+    ['sport', 'skateboard'],
+  ],
 };
 
 /**
@@ -82,6 +114,25 @@ const VENUE_TYPE_OSM_TAGS: Record<string, Array<[string, string]>> = {
   karaoke: [['amenity', 'karaoke_box']],
   comedy_club: [['amenity', 'theatre']],
   live_music: [['amenity', 'concert_hall'], ['amenity', 'nightclub']],
+  // Wellness & Entspannung
+  sauna: [['leisure', 'sauna'], ['leisure', 'spa']],
+  thermal_bath: [['amenity', 'public_bath'], ['leisure', 'spa']],
+  yoga_studio: [['sport', 'yoga'], ['sport', 'pilates']],
+  massage: [['shop', 'massage'], ['amenity', 'spa']],
+  // Natur & Outdoor
+  park: [['leisure', 'park'], ['leisure', 'common']],
+  beach: [['natural', 'beach']],
+  viewpoint: [['tourism', 'viewpoint']],
+  nature_reserve: [['leisure', 'nature_reserve']],
+  garden: [['leisure', 'garden']],
+  marina: [['leisure', 'marina']],
+  // Sport & Action
+  go_kart: [['sport', 'go_kart']],
+  paintball: [['sport', 'paintball']],
+  laser_tag: [['sport', 'laser_tag']],
+  trampoline_park: [['leisure', 'trampoline_park']],
+  billiards: [['sport', 'billiards'], ['sport', 'darts']],
+  bouldering: [['sport', 'climbing'], ['leisure', 'climbing']],
 };
 
 const CUISINE_TO_OSM: Record<string, string[]> = {
