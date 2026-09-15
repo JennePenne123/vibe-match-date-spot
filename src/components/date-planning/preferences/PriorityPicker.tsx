@@ -51,11 +51,21 @@ interface Props {
   categoryId?: SituationalCategoryId | null;
 }
 
+/** Relaxed 3-step input: low / normal / high map to internal weights. */
+const LEVELS = [
+  { id: 'low', weight: 0.6, labelKey: 'preferences.priorityLevelLow', fallback: 'Egal' },
+  { id: 'normal', weight: 1.0, labelKey: 'preferences.priorityLevelNormal', fallback: 'Wichtig' },
+  { id: 'high', weight: 1.6, labelKey: 'preferences.priorityLevelHigh', fallback: 'Sehr wichtig' },
+] as const;
+
+const weightToLevel = (w: number): (typeof LEVELS)[number]['id'] =>
+  w <= 0.7 ? 'low' : w >= 1.3 ? 'high' : 'normal';
+
 const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId = null }) => {
   const { t } = useTranslation();
 
-  const handleChange = (key: PriorityDimensionId, value: number[]) => {
-    onChangeWeights({ ...weights, [key]: value[0] });
+  const handleSelect = (key: PriorityDimensionId, weight: number) => {
+    onChangeWeights({ ...weights, [key]: weight });
   };
 
   const visible = getVisiblePriorityDimensions(categoryId).map(id => dimensions[id]);
