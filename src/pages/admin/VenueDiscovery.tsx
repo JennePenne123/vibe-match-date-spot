@@ -178,11 +178,11 @@ const VenueDiscovery: React.FC = () => {
           <div>
             <Label className="mb-2 block">Kategorien</Label>
             <div className="flex flex-wrap gap-4">
-              {(['culture', 'activity', 'nightlife'] as CategoryId[]).map((id) => (
+              {CATEGORY_IDS.map((id) => (
                 <label key={id} className="flex items-center gap-2 cursor-pointer">
                   <Checkbox checked={categories[id]} onCheckedChange={() => toggle(id)} />
-                  <span className="text-sm capitalize">
-                    {id === 'culture' ? 'Kultur' : id === 'activity' ? 'Aktivität' : 'Nightlife'}
+                  <span className="text-sm">
+                    {CATEGORY_LABELS[id]}
                   </span>
                 </label>
               ))}
