@@ -370,7 +370,7 @@ const Preferences = () => {
     setSelectedDietary(answers.dietary);
     setPriorityWeights(answers.weights);
 
-    if (restoredCount > 0 || droppedCount > 0) {
+    if (!isFirstPass && (restoredCount > 0 || droppedCount > 0)) {
       toast({
         title: t('preferences.categorySwitchedTitle'),
         description: restoredCount > 0
@@ -379,7 +379,7 @@ const Preferences = () => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [situationalCategory?.id]);
+  }, [situationalCategory?.id, prefsLoaded]);
 
   useEffect(() => {
     const loadExistingPreferences = async () => {
