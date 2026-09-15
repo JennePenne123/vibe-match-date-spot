@@ -25,7 +25,7 @@ import {
 import { cn } from '@/lib/utils';
 import OccasionPicker from '@/components/date-planning/preferences/OccasionPicker';
 import { getTodayMood } from '@/utils/moodStorage';
-import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
+import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, priorityWeightsForCategory, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 import type { DateOccasion } from '@/components/date-planning/preferences/preferencesData';
 import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
@@ -354,7 +354,14 @@ const Preferences = () => {
             const ld = data.lifestyle_data as any;
             if (ld.occasion) setSelectedOccasion(ld.occasion);
             if (ld.mood) setSelectedMood(ld.mood);
-            if (ld.priority_weights) setPriorityWeights({ ...DEFAULT_PRIORITY_WEIGHTS, ...ld.priority_weights });
+            if (ld.priority_weights) {
+              const stored = { ...DEFAULT_PRIORITY_WEIGHTS, ...ld.priority_weights } as PriorityWeights;
+              // Only an explicit, non-neutral weighting counts as user intent.
+              if (Object.values(stored).some(v => v !== 1.0)) {
+                weightsTouchedRef.current = true;
+                setPriorityWeights(stored);
+              }
+            }
           }
         }
       } catch (error) {
