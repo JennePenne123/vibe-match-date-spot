@@ -228,7 +228,7 @@ async def case_answer_persistence(browser):
         await next_step(page)
         await page.get_by_text(L_PARKS, exact=True).first.click()
         await next_step(page)
-        await page.get_by_role("button", name="Speichern").first.click()
+        await page.get_by_role("button", name="Jetzt einladen").first.click()
         saved = False
         for _ in range(40):
             if any("park" in w and "category_answers" in w for w in writes):
