@@ -383,7 +383,7 @@ const Preferences = () => {
 
   useEffect(() => {
     const loadExistingPreferences = async () => {
-      if (!user) return;
+      if (!user) { setPrefsLoaded(true); return; }
       try {
         const { data } = await supabase
           .from('user_preferences')
@@ -420,6 +420,8 @@ const Preferences = () => {
         }
       } catch (error) {
         console.log('No existing preferences found');
+      } finally {
+        setPrefsLoaded(true);
       }
     };
     loadExistingPreferences();
