@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { UtensilsCrossed, Sparkles, Wallet, MapPin, type LucideIcon } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import {
   getVisiblePriorityDimensions,
