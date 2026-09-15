@@ -169,7 +169,13 @@ const calculateUserScore = (
         keywords: ['cultural', 'kultur', 'art', 'kunst', 'gallery', 'museum', 'theater', 'theatre', 'literary', 'historic', 'traditional', 'authentic', 'traditionell'],
       },
       'outdoor': {
-        keywords: ['outdoor', 'draußen', 'terrace', 'terrasse', 'rooftop', 'garden', 'garten', 'biergarten', 'beer garden', 'patio', 'park', 'nature', 'waterfront', 'riverside'],
+        keywords: ['outdoor', 'draußen', 'terrace', 'terrasse', 'rooftop', 'garden', 'garten', 'biergarten', 'beer garden', 'patio', 'park', 'nature', 'waterfront', 'riverside', 'nature reserve', 'beach', 'strand', 'viewpoint', 'scenic', 'picnic', 'marina', 'hiking', 'wandern', 'trail', 'summer'],
+      },
+      'wellness': {
+        keywords: ['wellness', 'spa', 'sauna', 'massage', 'yoga', 'pilates', 'thermal', 'therme', 'relaxing', 'entspannung', 'mindful', 'bath', 'bad', 'fitness', 'quiet', 'ruhig'],
+      },
+      'sporty': {
+        keywords: ['sport', 'active', 'aktiv', 'climbing', 'klettern', 'bouldering', 'kart', 'paintball', 'lasertag', 'laser tag', 'trampolin', 'bowling', 'minigolf', 'archery', 'skateboard', 'surfing', 'sailing', 'eislaufen', 'ice rink', 'escape room', 'adventure', 'kletterpark', 'fitness'],
       },
       'family': {
         keywords: ['family', 'familie', 'kid-friendly', 'kinderfreundlich', 'playground', 'spielplatz', 'brunch', 'buffet', 'all-you-can-eat'],
