@@ -371,7 +371,24 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           }
           if (prefVibes.includes('outdoor') && venueTags.some((t: string) => 
             t.includes('outdoor') || t.includes('terrace') || t.includes('garden') || 
-            t.includes('biergarten') || t.includes('terrasse'))) {
+            t.includes('biergarten') || t.includes('terrasse') || t.includes('nature') ||
+            t.includes('park') || t.includes('beach') || t.includes('hiking') ||
+            t.includes('scenic') || t.includes('picnic') || t.includes('waterfront'))) {
+            score += 10;
+            inferred = true;
+          }
+          if (prefVibes.includes('wellness') && venueTags.some((t: string) =>
+            t.includes('wellness') || t.includes('spa') || t.includes('sauna') ||
+            t.includes('massage') || t.includes('yoga') || t.includes('pilates') ||
+            t.includes('relaxing') || t.includes('mindful') || t.includes('bath'))) {
+            score += 10;
+            inferred = true;
+          }
+          if (prefVibes.includes('sporty') && venueTags.some((t: string) =>
+            t.includes('sport') || t.includes('active') || t.includes('climbing') ||
+            t.includes('kart') || t.includes('paintball') || t.includes('lasertag') ||
+            t.includes('trampolin') || t.includes('skateboard') || t.includes('archery') ||
+            t.includes('surfing') || t.includes('sailing'))) {
             score += 10;
             inferred = true;
           }
