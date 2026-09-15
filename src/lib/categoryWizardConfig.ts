@@ -33,6 +33,8 @@ export interface CategoryWizardConfig {
   mainPickerHintKey?: string;
   /** Which DB column the main picker writes to */
   mainPickerStorage: 'preferred_cuisines' | 'preferred_venue_types';
+  /** Category-specific weighting of the scoring dimensions + section toggles */
+  priorityProfile: CategoryPriorityProfile;
   /** Sections to render (order matters for steps 1–2) */
   visibleSections: Set<WizardSectionId>;
   /** Item ids for the main picker (used to build the grid) */
