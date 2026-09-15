@@ -338,21 +338,22 @@ const Preferences = () => {
     weights: priorityWeights,
   };
 
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
   const prevCategoryRef = useRef<SituationalCategoryId | null | undefined>(undefined);
   useEffect(() => {
+    // Wait for the stored preferences so we reconcile against real answers.
+    if (!prefsLoaded) return;
     const nextId = situationalCategory?.id ?? null;
     const prevId = prevCategoryRef.current;
     prevCategoryRef.current = nextId;
 
-    // First resolution of the category — only preset the sliders.
-    if (prevId === undefined) {
-      if (!weightsTouchedRef.current) setPriorityWeights(priorityWeightsForCategory(nextId));
-      return;
-    }
-    if (prevId === nextId) return;
+    // First pass: the saved answers are cleaned up for the active category
+    // silently — nothing was "switched" from the user's point of view.
+    const isFirstPass = prevId === undefined;
+    if (!isFirstPass && prevId === nextId) return;
 
     const current = answersRef.current!;
-    saveCategoryAnswers(prevId, current);
+    if (!isFirstPass) saveCategoryAnswers(prevId, current);
     const { answers, restoredCount, droppedCount } = reconcileCategoryAnswers({
       from: prevId,
       to: nextId,
