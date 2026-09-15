@@ -101,7 +101,7 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId 
           'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors',
           aiDecides ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
         )}>
-          <Sparkles className="w-4.5 h-4.5" />
+          <Sparkles className="w-5 h-5" />
         </span>
         <span className="flex-1 min-w-0">
           <span className={cn('block text-sm font-semibold', aiDecides ? 'text-primary' : 'text-foreground')}>
