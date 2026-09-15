@@ -83,6 +83,19 @@ export const loadCategoryAnswers = (
   categoryId: SituationalCategoryId | null | undefined,
 ): CategoryAnswerSnapshot | null => readStore()[keyOf(categoryId)] ?? null;
 
+/** All snapshots — used to persist them in the user profile. */
+export const getAllCategoryAnswers = (): Store => readStore();
+
+/**
+ * Restores snapshots persisted in the user profile (survives app restarts).
+ * Answers already present in this session win, so unsaved edits aren't lost.
+ */
+export const hydrateCategoryAnswers = (stored: Store | null | undefined) => {
+  if (!stored || typeof stored !== 'object') return;
+  const current = readStore();
+  writeStore({ ...stored, ...current });
+};
+
 export const clearCategoryAnswers = () => {
   memoryStore = {};
   if (typeof window === 'undefined') return;

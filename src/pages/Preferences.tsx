@@ -31,7 +31,7 @@ import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
 import { getCategoryWizardConfig, resolveVisibleSections, getFollowUpQuestions } from '@/lib/categoryWizardConfig';
-import { reconcileCategoryAnswers, saveCategoryAnswers, type CategoryAnswerSnapshot } from '@/lib/categoryAnswerMemory';
+import { reconcileCategoryAnswers, saveCategoryAnswers, getAllCategoryAnswers, hydrateCategoryAnswers, type CategoryAnswerSnapshot } from '@/lib/categoryAnswerMemory';
 import { trackFunnelStep } from '@/services/funnelAnalyticsService';
 
 // Icon + color mapping (slimmed down)
@@ -338,6 +338,31 @@ const Preferences = () => {
     weights: priorityWeights,
   };
 
+  // Writes the per-category answers into the profile so a category switch
+  // survives an app restart even without pressing "save".
+  const persistCategoryAnswers = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from('user_preferences')
+        .select('id, lifestyle_data')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!data) return;
+      await supabase
+        .from('user_preferences')
+        .update({
+          lifestyle_data: {
+            ...((data.lifestyle_data as any) || {}),
+            category_answers: getAllCategoryAnswers(),
+          },
+        })
+        .eq('user_id', user.id);
+    } catch (e) {
+      console.error('Failed to persist category answers:', e);
+    }
+  }, [user]);
+
   const [prefsLoaded, setPrefsLoaded] = useState(false);
   const prevCategoryRef = useRef<SituationalCategoryId | null | undefined>(undefined);
   useEffect(() => {
@@ -353,7 +378,10 @@ const Preferences = () => {
     if (!isFirstPass && prevId === nextId) return;
 
     const current = answersRef.current!;
-    if (!isFirstPass) saveCategoryAnswers(prevId, current);
+    if (!isFirstPass) {
+      saveCategoryAnswers(prevId, current);
+      void persistCategoryAnswers();
+    }
     const { answers, restoredCount, droppedCount } = reconcileCategoryAnswers({
       from: prevId,
       to: nextId,
@@ -408,6 +436,8 @@ const Preferences = () => {
             const ld = data.lifestyle_data as any;
             if (ld.occasion) setSelectedOccasion(ld.occasion);
             if (ld.mood) setSelectedMood(ld.mood);
+            // Per-category answers persisted in the profile survive app restarts.
+            if (ld.category_answers) hydrateCategoryAnswers(ld.category_answers);
             if (ld.priority_weights) {
               const stored = { ...DEFAULT_PRIORITY_WEIGHTS, ...ld.priority_weights } as PriorityWeights;
               // Only an explicit, non-neutral weighting counts as user intent.
@@ -572,6 +602,11 @@ const Preferences = () => {
             occasion: selectedOccasion,
             mood: selectedMood,
             priority_weights: priorityWeights,
+            // Per-category answers + weights, so they come back after a restart.
+            category_answers: (() => {
+              if (answersRef.current) saveCategoryAnswers(situationalCategory?.id ?? null, answersRef.current);
+              return getAllCategoryAnswers();
+            })(),
           },
         };
         const { data: existing, error: existErr } = await supabase.from('user_preferences').select('id').eq('user_id', currentUserId).maybeSingle();
