@@ -553,17 +553,26 @@ Deno.serve(async (req) => {
       }
 
       const dropped = { no_name: 0, no_coords: 0, no_address: 0, unmapped_type: 0 };
+      let fallbackUsed = 0;
+      const fallbackVia: Record<string, number> = {};
       const mapped = elements
         .map((el: any) => {
           const t = (el.tags || {}) as Record<string, string>;
           const lat = el.lat ?? el.center?.lat;
           const lon = el.lon ?? el.center?.lon;
-          const meta = cuisineFor(t);
+          let meta: { cuisine: string; venueTags: string[] } | null = cuisineFor(t);
           if (!t.name) { dropped.no_name++; return null; }
           if (!lat || !lon) { dropped.no_coords++; return null; }
-          if (!meta) { dropped.unmapped_type++; return null; }
+          if (!meta) {
+            const fb = fallbackMeta(t, job.category as CategoryId);
+            if (!fb) { dropped.unmapped_type++; return null; }
+            fallbackUsed++;
+            fallbackVia[fb.via] = (fallbackVia[fb.via] ?? 0) + 1;
+            meta = { cuisine: fb.cuisine, venueTags: [...fb.venueTags, 'fallback-kategorisiert'] };
+          }
           const address = buildAddress(t);
           if (!address) { dropped.no_address++; return null; }
+
           const name = t.name.slice(0, 200);
           return {
             id: `osm_${el.id}`,
