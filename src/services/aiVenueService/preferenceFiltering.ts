@@ -424,9 +424,11 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           'theater_venue': ['theater', 'theatre'], 'cinema': ['cinema', 'kino'],
           'bowling': ['bowling'], 'escape_room': ['escape room'],
           'climbing': ['climbing', 'klettern', 'bouldering'],
-          'spa_wellness': ['spa', 'wellness', 'sauna'],
+          'spa_wellness': ['spa', 'wellness', 'sauna', 'massage', 'yoga', 'pilates', 'bath', 'therme'],
           'karaoke': ['karaoke'], 'comedy_club': ['comedy'],
           'arcade': ['arcade'], 'mini_golf': ['mini golf', 'minigolf'],
+          'park_nature': ['park', 'garden', 'nature', 'beach', 'viewpoint', 'picnic', 'marina', 'hiking'],
+          'sport_action': ['kart', 'paintball', 'lasertag', 'laser tag', 'trampolin', 'archery', 'skateboard', 'surfing', 'sailing', 'eislaufen', 'billiards', 'darts'],
         };
         const searchText = [...(venue.tags || []), venue.name || '', venue.cuisine_type || '', venue.description || '']
           .map((s: string) => s.toLowerCase()).join(' ');
