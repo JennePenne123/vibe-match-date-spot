@@ -408,6 +408,8 @@ const Preferences = () => {
             const ld = data.lifestyle_data as any;
             if (ld.occasion) setSelectedOccasion(ld.occasion);
             if (ld.mood) setSelectedMood(ld.mood);
+            // Per-category answers persisted in the profile survive app restarts.
+            if (ld.category_answers) hydrateCategoryAnswers(ld.category_answers);
             if (ld.priority_weights) {
               const stored = { ...DEFAULT_PRIORITY_WEIGHTS, ...ld.priority_weights } as PriorityWeights;
               // Only an explicit, non-neutral weighting counts as user intent.
