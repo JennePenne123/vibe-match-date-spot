@@ -714,7 +714,8 @@
     "priorityLevelLow": "Egal",
     "priorityLevelNormal": "Wichtig",
     "priorityLevelHigh": "Sehr wichtig",
-    "priorityIntroGeneric": "Wähle, welche Faktoren die KI stärker berücksichtigen soll"
+    "priorityIntroGeneric": "Wähle, welche Faktoren die KI stärker berücksichtigen soll",
+    "likeLastTime": "Wie letztes Mal"
   },
   "notFound": {
     "title": "404",

@@ -714,7 +714,8 @@
     "priorityLevelLow": "Indiferente",
     "priorityLevelNormal": "Importante",
     "priorityLevelHigh": "Muy importante",
-    "priorityIntroGeneric": "Elige qué factores debe priorizar la IA"
+    "priorityIntroGeneric": "Elige qué factores debe priorizar la IA",
+    "likeLastTime": "Como la última vez"
   },
   "notFound": {
     "title": "404",
