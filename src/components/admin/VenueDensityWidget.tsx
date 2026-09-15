@@ -75,6 +75,7 @@ interface DensityMetrics {
   districts: {
     plz: string; total: number; essen: number; kultur: number;
     aktivitaet: number; nightlife: number; with_photo: number;
+    wellness?: number; outdoor?: number; sport_action?: number;
   }[];
 }
 
@@ -83,16 +84,22 @@ const CAT_LABELS: Record<string, string> = {
   kultur: 'Kultur & Entertainment',
   aktivitaet: 'Aktivitäten',
   nightlife: 'Nightlife',
+  wellness: 'Wellness & Entspannung',
+  outdoor: 'Natur & Outdoor',
+  sport_action: 'Sport & Action',
   sonstige: 'Sonstige',
 };
 
-const MAIN_CATS = ['essen', 'kultur', 'aktivitaet', 'nightlife'] as const;
+const MAIN_CATS = ['essen', 'kultur', 'aktivitaet', 'nightlife', 'wellness', 'outdoor', 'sport_action'] as const;
 
 const BACKFILL_LABELS: Record<BackfillCat, string> = {
   culture: 'Kultur',
   activity: 'Aktivitäten',
   nightlife: 'Nightlife',
   food: 'Essen & Trinken',
+  wellness: 'Wellness',
+  outdoor: 'Natur & Outdoor',
+  sport_action: 'Sport & Action',
 };
 
 // Map our density categories to the backfill-activities categories.
@@ -101,6 +108,9 @@ const BACKFILL_CAT: Record<string, BackfillCat | null> = {
   kultur: 'culture',
   aktivitaet: 'activity',
   nightlife: 'nightlife',
+  wellness: 'wellness',
+  outdoor: 'outdoor',
+  sport_action: 'sport_action',
 };
 
 /**
