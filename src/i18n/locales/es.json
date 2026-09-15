@@ -717,7 +717,8 @@
     "priorityIntroGeneric": "Elige qué factores debe priorizar la IA",
     "likeLastTime": "Como la última vez",
     "aiDecides": "Omitir: la IA decide",
-    "aiDecidesHint": "La IA lo equilibra todo según tu categoría."
+    "aiDecidesHint": "La IA lo equilibra todo según tu categoría.",
+    "aiDecidesHintPersonalized": "La IA usa lo que te gustó hasta ahora, ajustado a tu categoría."
   },
   "notFound": {
     "title": "404",

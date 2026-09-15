@@ -717,7 +717,8 @@
     "priorityIntroGeneric": "Choose which factors the AI should weigh more heavily",
     "likeLastTime": "Like last time",
     "aiDecides": "Skip: let the AI decide",
-    "aiDecidesHint": "The AI balances everything based on your category."
+    "aiDecidesHint": "The AI balances everything based on your category.",
+    "aiDecidesHintPersonalized": "The AI uses what you liked so far — tuned to your category."
   },
   "notFound": {
     "title": "404",

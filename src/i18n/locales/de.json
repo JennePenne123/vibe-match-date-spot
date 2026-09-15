@@ -717,7 +717,8 @@
     "priorityIntroGeneric": "Wähle, welche Faktoren die KI stärker berücksichtigen soll",
     "likeLastTime": "Wie letztes Mal",
     "aiDecides": "Überspringen: KI entscheidet",
-    "aiDecidesHint": "Die KI gewichtet alles passend zu deiner Kategorie."
+    "aiDecidesHint": "Die KI gewichtet alles passend zu deiner Kategorie.",
+    "aiDecidesHintPersonalized": "Die KI nutzt, was du bisher mochtest – abgestimmt auf deine Kategorie."
   },
   "notFound": {
     "title": "404",
