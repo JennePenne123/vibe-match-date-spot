@@ -169,7 +169,13 @@ const calculateUserScore = (
         keywords: ['cultural', 'kultur', 'art', 'kunst', 'gallery', 'museum', 'theater', 'theatre', 'literary', 'historic', 'traditional', 'authentic', 'traditionell'],
       },
       'outdoor': {
-        keywords: ['outdoor', 'draußen', 'terrace', 'terrasse', 'rooftop', 'garden', 'garten', 'biergarten', 'beer garden', 'patio', 'park', 'nature', 'waterfront', 'riverside'],
+        keywords: ['outdoor', 'draußen', 'terrace', 'terrasse', 'rooftop', 'garden', 'garten', 'biergarten', 'beer garden', 'patio', 'park', 'nature', 'waterfront', 'riverside', 'nature reserve', 'beach', 'strand', 'viewpoint', 'scenic', 'picnic', 'marina', 'hiking', 'wandern', 'trail', 'summer'],
+      },
+      'wellness': {
+        keywords: ['wellness', 'spa', 'sauna', 'massage', 'yoga', 'pilates', 'thermal', 'therme', 'relaxing', 'entspannung', 'mindful', 'bath', 'bad', 'fitness', 'quiet', 'ruhig'],
+      },
+      'sporty': {
+        keywords: ['sport', 'active', 'aktiv', 'climbing', 'klettern', 'bouldering', 'kart', 'paintball', 'lasertag', 'laser tag', 'trampolin', 'bowling', 'minigolf', 'archery', 'skateboard', 'surfing', 'sailing', 'eislaufen', 'ice rink', 'escape room', 'adventure', 'kletterpark', 'fitness'],
       },
       'family': {
         keywords: ['family', 'familie', 'kid-friendly', 'kinderfreundlich', 'playground', 'spielplatz', 'brunch', 'buffet', 'all-you-can-eat'],
@@ -231,8 +237,10 @@ const calculateUserScore = (
       'dining_plus': ['experience', 'event', 'erlebnis'],
       'cocktails': ['bar', 'cocktail', 'drinks', 'lounge'],
       'cultural_act': ['museum', 'gallery', 'art', 'kultur', 'theater'],
-      'active': ['sport', 'bowling', 'climbing', 'fitness', 'aktiv'],
+      'active': ['sport', 'bowling', 'climbing', 'fitness', 'aktiv', 'active', 'kart', 'paintball', 'lasertag', 'trampolin', 'skateboard', 'archery', 'surfing', 'sailing', 'eislaufen'],
       'nightlife_act': ['club', 'party', 'nightlife', 'disco'],
+      'wellness_act': ['wellness', 'spa', 'sauna', 'massage', 'yoga', 'pilates', 'bath', 'relaxing', 'mindful'],
+      'nature_act': ['nature', 'outdoor', 'park', 'garden', 'beach', 'hiking', 'viewpoint', 'scenic', 'picnic', 'marina'],
     };
     const venueTags = venue.tags.map((t: string) => t.toLowerCase());
     const venueCuisine = (venue.cuisine_type || '').toLowerCase();
@@ -267,7 +275,9 @@ const calculateUserScore = (
       'comedy_club': ['comedy', 'comedy club', 'stand-up'],
       'arcade': ['arcade', 'spielhalle', 'gaming'],
       'live_event': ['event', 'live', 'veranstaltung'],
-      'spa_wellness': ['spa', 'wellness', 'sauna', 'massage'],
+      'spa_wellness': ['spa', 'wellness', 'sauna', 'massage', 'yoga', 'pilates', 'bath', 'therme', 'relaxing'],
+      'park_nature': ['park', 'garden', 'nature', 'beach', 'viewpoint', 'picnic', 'marina', 'hiking'],
+      'sport_action': ['kart', 'paintball', 'lasertag', 'laser tag', 'trampolin', 'archery', 'skateboard', 'surfing', 'sailing', 'ice rink', 'eislaufen', 'billiards', 'darts'],
     };
     const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase());
     const venueCuisine = (venue.cuisine_type || '').toLowerCase();

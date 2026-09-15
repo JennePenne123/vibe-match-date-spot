@@ -371,7 +371,24 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           }
           if (prefVibes.includes('outdoor') && venueTags.some((t: string) => 
             t.includes('outdoor') || t.includes('terrace') || t.includes('garden') || 
-            t.includes('biergarten') || t.includes('terrasse'))) {
+            t.includes('biergarten') || t.includes('terrasse') || t.includes('nature') ||
+            t.includes('park') || t.includes('beach') || t.includes('hiking') ||
+            t.includes('scenic') || t.includes('picnic') || t.includes('waterfront'))) {
+            score += 10;
+            inferred = true;
+          }
+          if (prefVibes.includes('wellness') && venueTags.some((t: string) =>
+            t.includes('wellness') || t.includes('spa') || t.includes('sauna') ||
+            t.includes('massage') || t.includes('yoga') || t.includes('pilates') ||
+            t.includes('relaxing') || t.includes('mindful') || t.includes('bath'))) {
+            score += 10;
+            inferred = true;
+          }
+          if (prefVibes.includes('sporty') && venueTags.some((t: string) =>
+            t.includes('sport') || t.includes('active') || t.includes('climbing') ||
+            t.includes('kart') || t.includes('paintball') || t.includes('lasertag') ||
+            t.includes('trampolin') || t.includes('skateboard') || t.includes('archery') ||
+            t.includes('surfing') || t.includes('sailing'))) {
             score += 10;
             inferred = true;
           }
@@ -386,8 +403,10 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           'dining': ['restaurant', 'dining', 'food'],
           'cocktails': ['bar', 'cocktail', 'drinks', 'lounge'],
           'cultural_act': ['museum', 'gallery', 'art', 'theater'],
-          'active': ['sport', 'bowling', 'climbing', 'fitness'],
+          'active': ['sport', 'bowling', 'climbing', 'fitness', 'active', 'kart', 'paintball', 'lasertag', 'trampolin', 'skateboard', 'archery', 'surfing', 'sailing'],
           'nightlife_act': ['club', 'party', 'nightlife'],
+          'wellness_act': ['wellness', 'spa', 'sauna', 'massage', 'yoga', 'pilates', 'bath', 'relaxing', 'mindful'],
+          'nature_act': ['nature', 'outdoor', 'park', 'garden', 'beach', 'hiking', 'viewpoint', 'scenic', 'picnic', 'marina'],
         };
         const searchText = [...venue.tags, venue.cuisine_type || '', venue.description || '']
           .map((s: string) => s.toLowerCase()).join(' ');
@@ -405,9 +424,11 @@ export const filterVenuesByPreferences = async (userId: string, venues: any[], s
           'theater_venue': ['theater', 'theatre'], 'cinema': ['cinema', 'kino'],
           'bowling': ['bowling'], 'escape_room': ['escape room'],
           'climbing': ['climbing', 'klettern', 'bouldering'],
-          'spa_wellness': ['spa', 'wellness', 'sauna'],
+          'spa_wellness': ['spa', 'wellness', 'sauna', 'massage', 'yoga', 'pilates', 'bath', 'therme'],
           'karaoke': ['karaoke'], 'comedy_club': ['comedy'],
           'arcade': ['arcade'], 'mini_golf': ['mini golf', 'minigolf'],
+          'park_nature': ['park', 'garden', 'nature', 'beach', 'viewpoint', 'picnic', 'marina', 'hiking'],
+          'sport_action': ['kart', 'paintball', 'lasertag', 'laser tag', 'trampolin', 'archery', 'skateboard', 'surfing', 'sailing', 'eislaufen', 'billiards', 'darts'],
         };
         const searchText = [...(venue.tags || []), venue.name || '', venue.cuisine_type || '', venue.description || '']
           .map((s: string) => s.toLowerCase()).join(' ');
