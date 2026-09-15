@@ -25,7 +25,7 @@ import {
 import { cn } from '@/lib/utils';
 import OccasionPicker from '@/components/date-planning/preferences/OccasionPicker';
 import { getTodayMood } from '@/utils/moodStorage';
-import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
+import PriorityPicker, { DEFAULT_PRIORITY_WEIGHTS, priorityWeightsForCategory, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 import type { DateOccasion } from '@/components/date-planning/preferences/preferencesData';
 import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
@@ -313,6 +313,19 @@ const Preferences = () => {
   const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
   const [selectedMood, setSelectedMood] = useState<DailyMood | null>(() => getTodayMood());
   const [priorityWeights, setPriorityWeights] = useState<PriorityWeights>({ ...DEFAULT_PRIORITY_WEIGHTS });
+  // True once the user has an explicit, non-neutral weighting of their own —
+  // then the category preset must not overwrite it.
+  const weightsTouchedRef = useRef(false);
+  const handleChangePriorityWeights = useCallback((w: PriorityWeights) => {
+    weightsTouchedRef.current = true;
+    setPriorityWeights(w);
+  }, []);
+
+  // Preset the weights from the active category's priority profile.
+  useEffect(() => {
+    if (weightsTouchedRef.current) return;
+    setPriorityWeights(priorityWeightsForCategory(situationalCategory?.id ?? null));
+  }, [situationalCategory?.id]);
 
   useEffect(() => {
     const loadExistingPreferences = async () => {
@@ -341,7 +354,14 @@ const Preferences = () => {
             const ld = data.lifestyle_data as any;
             if (ld.occasion) setSelectedOccasion(ld.occasion);
             if (ld.mood) setSelectedMood(ld.mood);
-            if (ld.priority_weights) setPriorityWeights({ ...DEFAULT_PRIORITY_WEIGHTS, ...ld.priority_weights });
+            if (ld.priority_weights) {
+              const stored = { ...DEFAULT_PRIORITY_WEIGHTS, ...ld.priority_weights } as PriorityWeights;
+              // Only an explicit, non-neutral weighting counts as user intent.
+              if (Object.values(stored).some(v => v !== 1.0)) {
+                weightsTouchedRef.current = true;
+                setPriorityWeights(stored);
+              }
+            }
           }
         }
       } catch (error) {
@@ -685,8 +705,21 @@ const Preferences = () => {
                 <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
               </AccordionSection>
 
-              <AccordionSection title="Prioritäten" icon={<SlidersHorizontal className="w-5 h-5 text-primary" />} selectedCount={Object.values(priorityWeights).filter(v => v !== 1.0).length}>
-                <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
+              <AccordionSection
+                title={t('preferences.priorityTitle', 'Prioritäten')}
+                icon={<SlidersHorizontal className="w-5 h-5 text-primary" />}
+                selectedCount={(() => {
+                  // Only count what the user changed on top of the category preset.
+                  const preset = priorityWeightsForCategory(situationalCategory?.id ?? null);
+                  return (Object.keys(preset) as (keyof PriorityWeights)[])
+                    .filter(k => priorityWeights[k] !== preset[k]).length;
+                })()}
+              >
+                <PriorityPicker
+                  weights={priorityWeights}
+                  onChangeWeights={handleChangePriorityWeights}
+                  categoryId={situationalCategory?.id ?? null}
+                />
               </AccordionSection>
             </>
           )}

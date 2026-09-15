@@ -2,6 +2,18 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { getCategoryPriorityWeights } from '@/lib/categoryWizardConfig';
+import type { SituationalCategoryId } from '@/lib/situationalCategories';
+
+/** Active situational category of the current planning session (ephemeral). */
+const readSituationalCategory = (): SituationalCategoryId | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    return (window.sessionStorage.getItem('hioutz-situational-category') as SituationalCategoryId | null) || null;
+  } catch {
+    return null;
+  }
+};
 
 export interface GroupMember {
   id: string;
@@ -163,7 +175,12 @@ export const useGroupDatePlanning = () => {
         .from('date_group_members')
         .update({
           preferences_submitted: true,
-          preferences_data: preferences,
+          // Keep the chosen category with each member's answers so the group
+          // consensus can weight the dimensions that matter for it.
+          preferences_data: {
+            ...preferences,
+            category: preferences?.category ?? readSituationalCategory(),
+          },
         })
         .eq('group_id', groupId)
         .eq('user_id', user.id);
@@ -355,6 +372,31 @@ function mergeGroupPreferences(allPrefs: any[]): any {
       merged[field] = Math.round(values.reduce((a: number, b: number) => a + b, 0) / values.length);
     }
   }
+
+  // ── Category: most common pick, drives the priority weighting ──
+  const categories: Record<string, number> = {};
+  for (const pref of allPrefs) {
+    if (pref?.category) categories[pref.category] = (categories[pref.category] || 0) + 1;
+  }
+  const groupCategory = (Object.entries(categories).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null) as
+    | SituationalCategoryId
+    | null;
+  merged.category = groupCategory;
+
+  // ── Priority weights: average of members, category profile as fallback ──
+  const categoryWeights = getCategoryPriorityWeights(groupCategory);
+  const weightKeys = Object.keys(categoryWeights) as (keyof typeof categoryWeights)[];
+  merged.priority_weights = weightKeys.reduce((acc, key) => {
+    const values = allPrefs
+      .map(p => p?.priority_weights?.[key])
+      .filter((v: unknown): v is number => typeof v === 'number');
+    const memberAvg = values.length
+      ? values.reduce((a, b) => a + b, 0) / values.length
+      : categoryWeights[key];
+    // Category profile keeps a say even when members set their own weights.
+    acc[key] = Math.round(((memberAvg + categoryWeights[key]) / 2) * 100) / 100;
+    return acc;
+  }, {} as Record<string, number>);
 
   // ── Mood: most common ──
   const moods: Record<string, number> = {};

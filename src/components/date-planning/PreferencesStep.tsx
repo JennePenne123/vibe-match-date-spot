@@ -238,7 +238,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         <OccasionPicker selectedOccasion={selectedOccasion} onSelectOccasion={setSelectedOccasion} />
 
         {/* Priority Weights */}
-        <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} />
+        <PriorityPicker weights={priorityWeights} onChangeWeights={setPriorityWeights} categoryId={categoryId} />
 
         {/* Quick Start + Sections — only after duration selected */}
         {!selectedDuration && (

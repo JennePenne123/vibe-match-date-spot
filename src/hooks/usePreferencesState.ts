@@ -9,7 +9,7 @@ import {
   type DateOccasion,
 } from '@/components/date-planning/preferences/preferencesData';
 import { getTodayMoodFromStorage } from '@/components/date-planning/preferences/MoodPicker';
-import { DEFAULT_PRIORITY_WEIGHTS, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
+import { DEFAULT_PRIORITY_WEIGHTS, priorityWeightsForCategory, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
 import type { SituationalCategoryId } from '@/lib/situationalCategories';
@@ -66,7 +66,9 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
   const [selectedMood, setSelectedMood] = useState<DailyMood | null>(() => getTodayMoodFromStorage());
-  const [priorityWeights, setPriorityWeights] = useState<PriorityWeights>(DEFAULT_PRIORITY_WEIGHTS);
+  const [priorityWeights, setPriorityWeights] = useState<PriorityWeights>(
+    () => priorityWeightsForCategory(readSituationalCategory()),
+  );
 
   const [userModifiedDate, setUserModifiedDate] = useState(false);
   const [userModifiedTime, setUserModifiedTime] = useState(false);
