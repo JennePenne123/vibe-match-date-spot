@@ -356,6 +356,31 @@ function mergeGroupPreferences(allPrefs: any[]): any {
     }
   }
 
+  // ── Category: most common pick, drives the priority weighting ──
+  const categories: Record<string, number> = {};
+  for (const pref of allPrefs) {
+    if (pref?.category) categories[pref.category] = (categories[pref.category] || 0) + 1;
+  }
+  const groupCategory = (Object.entries(categories).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null) as
+    | SituationalCategoryId
+    | null;
+  merged.category = groupCategory;
+
+  // ── Priority weights: average of members, category profile as fallback ──
+  const categoryWeights = getCategoryPriorityWeights(groupCategory);
+  const weightKeys = Object.keys(categoryWeights) as (keyof typeof categoryWeights)[];
+  merged.priority_weights = weightKeys.reduce((acc, key) => {
+    const values = allPrefs
+      .map(p => p?.priority_weights?.[key])
+      .filter((v: unknown): v is number => typeof v === 'number');
+    const memberAvg = values.length
+      ? values.reduce((a, b) => a + b, 0) / values.length
+      : categoryWeights[key];
+    // Category profile keeps a say even when members set their own weights.
+    acc[key] = Math.round(((memberAvg + categoryWeights[key]) / 2) * 100) / 100;
+    return acc;
+  }, {} as Record<string, number>);
+
   // ── Mood: most common ──
   const moods: Record<string, number> = {};
   for (const pref of allPrefs) {
