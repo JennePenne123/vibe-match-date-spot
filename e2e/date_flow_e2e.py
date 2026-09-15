@@ -118,7 +118,9 @@ async def install_supabase_stubs(context):
 
 
 async def new_page(browser, category=None):
-    context = await browser.new_context(viewport={"width": 402, "height": 1400})
+    context = await browser.new_context(
+        viewport={"width": 402, "height": 1400}, locale="de-DE"
+    )
     await install_supabase_stubs(context)
     page = await context.new_page()
     await page.goto(BASE_URL, wait_until="domcontentloaded")
@@ -127,6 +129,7 @@ async def new_page(browser, category=None):
             localStorage.clear();
             sessionStorage.clear();
             localStorage.setItem(s.key, s.session);
+            localStorage.setItem('i18nextLng', 'de');
             if (s.category) sessionStorage.setItem('hioutz-situational-category', s.category);
         }""",
         {"key": STORAGE_KEY, "session": json.dumps(fake_session()), "category": category},
