@@ -753,6 +753,27 @@ const Preferences = () => {
                 </AccordionSection>
               )}
 
+              {followUps.map(q => (
+                <AccordionSection
+                  key={q.id}
+                  title={t(q.titleKey)}
+                  icon={<Sparkles className="w-5 h-5 text-primary" />}
+                  selectedCount={q.items.filter(i => selectedVenueTypes.includes(i.id)).length}
+                  defaultOpen
+                >
+                  {q.hintKey && (
+                    <p className="text-xs text-muted-foreground mb-3">{t(q.hintKey)}</p>
+                  )}
+                  <SelectionGrid
+                    items={q.items.map(i => ({ id: i.id, name: t(i.nameKey), emoji: '' }))}
+                    selected={selectedVenueTypes}
+                    onToggle={toggleFollowUp}
+                  />
+                </AccordionSection>
+              ))}
+
+
+
               {has('excluded') && (
                 <AccordionSection title={'Nie wieder vorschlagen'} icon={<Ban className="w-5 h-5 text-destructive" />} selectedCount={excludedCuisines.length}>
                   <p className="text-xs text-muted-foreground mb-3">Küchen, die du <strong>nie</strong> vorgeschlagen bekommen möchtest.</p>
