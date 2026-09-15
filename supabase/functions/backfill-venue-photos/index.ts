@@ -51,29 +51,31 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    const authClient = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } },
-    );
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (!cronAuthorized) {
+      const authClient = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+        { global: { headers: { Authorization: authHeader! } } },
+      );
+      const token = authHeader!.replace('Bearer ', '');
+      const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
+      if (claimsError || !claimsData?.claims) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const userId = claimsData.claims.sub as string;
+      const { data: isAdmin, error: roleErr } = await authClient.rpc('has_role', {
+        _user_id: userId,
+        _role: 'admin',
       });
-    }
-    const userId = claimsData.claims.sub as string;
-    const { data: isAdmin, error: roleErr } = await authClient.rpc('has_role', {
-      _user_id: userId,
-      _role: 'admin',
-    });
-    if (roleErr || !isAdmin) {
-      return new Response(JSON.stringify({ error: 'Forbidden: admin role required' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      if (roleErr || !isAdmin) {
+        return new Response(JSON.stringify({ error: 'Forbidden: admin role required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
     }
 
     const body = await req.json().catch(() => ({}));
