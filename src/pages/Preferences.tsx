@@ -313,6 +313,19 @@ const Preferences = () => {
   const [selectedOccasion, setSelectedOccasion] = useState<DateOccasion | null>(null);
   const [selectedMood, setSelectedMood] = useState<DailyMood | null>(() => getTodayMood());
   const [priorityWeights, setPriorityWeights] = useState<PriorityWeights>({ ...DEFAULT_PRIORITY_WEIGHTS });
+  // True once the user has an explicit, non-neutral weighting of their own —
+  // then the category preset must not overwrite it.
+  const weightsTouchedRef = useRef(false);
+  const handleChangePriorityWeights = useCallback((w: PriorityWeights) => {
+    weightsTouchedRef.current = true;
+    setPriorityWeights(w);
+  }, []);
+
+  // Preset the weights from the active category's priority profile.
+  useEffect(() => {
+    if (weightsTouchedRef.current) return;
+    setPriorityWeights(priorityWeightsForCategory(situationalCategory?.id ?? null));
+  }, [situationalCategory?.id]);
 
   useEffect(() => {
     const loadExistingPreferences = async () => {
