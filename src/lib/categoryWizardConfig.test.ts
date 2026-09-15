@@ -55,3 +55,38 @@ describe('category priority profiles', () => {
     expect(sections.has('location')).toBe(true);
   });
 });
+
+describe('adaptive follow-up questions', () => {
+  it('hides follow-ups until something is picked', () => {
+    expect(getFollowUpQuestions('outdoor', { selectedMainItems: [] })).toHaveLength(0);
+    expect(getFollowUpQuestions('outdoor', { selectedMainItems: ['park'] })).toHaveLength(1);
+  });
+
+  it('reveals the food follow-up when the vibe slider is raised', () => {
+    expect(getFollowUpQuestions('food', { selectedMainItems: [], weights: { vibe: 1.0 } })).toHaveLength(0);
+    expect(getFollowUpQuestions('food', { selectedMainItems: [], weights: { vibe: 1.5 } })).toHaveLength(1);
+  });
+
+  it('keeps sections in sync with the priority sliders', () => {
+    // Budget is hidden for outdoor by profile, a raised price slider brings it back
+    expect(resolveVisibleSections('outdoor').has('budget')).toBe(false);
+    expect(resolveVisibleSections('outdoor', { weights: { price: 1.6 } }).has('budget')).toBe(true);
+    // Pulling a slider to "Egal" hides the optional section
+    expect(resolveVisibleSections('food', { weights: { price: 0.5 } }).has('budget')).toBe(false);
+    // Never hides the essentials
+    const min = resolveVisibleSections('food', { weights: { cuisine: 0.5, vibe: 0.5, price: 0.5, location: 0.5 } });
+    expect(min.has('mainPicker')).toBe(true);
+    expect(min.has('location')).toBe(true);
+  });
+
+  it('does not surface cuisine-only sections for non-food categories', () => {
+    const s = resolveVisibleSections('wellness', { weights: { cuisine: 2.0 } });
+    expect(s.has('excluded')).toBe(false);
+    expect(s.has('dietary')).toBe(false);
+  });
+
+  it('exposes follow-up ids as valid venue types', () => {
+    expect(getCategoryVenueTypeIds('outdoor')).toContain('walking_route');
+    expect(getCategoryVenueTypeIds('outdoor')).toContain('park');
+  });
+});
