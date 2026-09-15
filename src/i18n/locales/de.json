@@ -704,7 +704,10 @@
     "follow_water_nearby": "Am Wasser",
     "follow_dog_friendly": "Hundefreundlich",
     "follow_picnic_spot": "Picknickplatz",
-    "follow_competitive": "Wettkampf"
+    "follow_competitive": "Wettkampf",
+    "categorySwitchedTitle": "Kategorie gewechselt",
+    "categorySwitchedRestored": "{{count}} frühere Angabe(n) wiederhergestellt – nicht passende Angaben wurden zurückgesetzt.",
+    "categorySwitchedReset": "{{count}} Angabe(n) zurückgesetzt, weil sie hier nicht passen."
   },
   "notFound": {
     "title": "404",

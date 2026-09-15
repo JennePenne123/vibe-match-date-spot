@@ -704,7 +704,10 @@
     "follow_water_nearby": "Junto al agua",
     "follow_dog_friendly": "Admite perros",
     "follow_picnic_spot": "Zona de picnic",
-    "follow_competitive": "Competitivo"
+    "follow_competitive": "Competitivo",
+    "categorySwitchedTitle": "Categoría cambiada",
+    "categorySwitchedRestored": "Se restauraron {{count}} respuesta(s) anteriores; las que no encajan se restablecieron.",
+    "categorySwitchedReset": "Se restablecieron {{count}} respuesta(s) que ya no aplican aquí."
   },
   "notFound": {
     "title": "404",
