@@ -12,7 +12,7 @@ type Category =
   | 'bar' | 'cocktail' | 'wine' | 'beer' | 'nightlife'
   | 'museum' | 'gallery' | 'theatre' | 'cinema' | 'culture'
   | 'bowling' | 'minigolf' | 'arcade' | 'sport' | 'activity'
-  | 'park' | 'outdoor' | 'restaurant';
+  | 'park' | 'outdoor' | 'wellness' | 'restaurant';
 
 // Curated, square-friendly Unsplash photos per category.
 // All URLs use ?w=600&h=400&fit=crop for consistent sizing.
@@ -128,6 +128,10 @@ const IMAGES: Record<Category, string[]> = {
     'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600&h=400&fit=crop',
     'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=400&fit=crop',
   ],
+  wellness: [
+    'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=600&h=400&fit=crop',
+  ],
   restaurant: [
     'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&h=400&fit=crop',
     'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&h=400&fit=crop',
@@ -159,9 +163,10 @@ const KEYWORD_MAP: Array<[RegExp, Category]> = [
   [/bowling/i, 'bowling'],
   [/mini.?golf/i, 'minigolf'],
   [/arcade|escape.?room|game/i, 'arcade'],
-  [/sport|fitness|climbing|kletter/i, 'sport'],
+  [/spa|sauna|wellness|therme|thermal|massage|yoga|pilates|hammam/i, 'wellness'],
+  [/sport|fitness|climbing|kletter|kart|paintball|laser.?tag|trampolin|boulder|billard|darts|archery|bogen/i, 'sport'],
   [/park|garden|garten/i, 'park'],
-  [/outdoor|hiking|wandern/i, 'outdoor'],
+  [/outdoor|hiking|wandern|beach|strand|viewpoint|aussicht|nature|natur|marina/i, 'outdoor'],
   [/restaurant|food|essen|dining/i, 'restaurant'],
 ];
 
