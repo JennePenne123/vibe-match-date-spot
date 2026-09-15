@@ -9,7 +9,21 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useToast } from '@/hooks/use-toast'
 import { Loader2, MapPin, Sparkles, RefreshCw } from 'lucide-react'
 
-type CategoryId = 'culture' | 'activity' | 'nightlife'
+type CategoryId = 'culture' | 'activity' | 'nightlife' | 'food' | 'wellness' | 'outdoor' | 'sport_action'
+
+const CATEGORY_IDS: CategoryId[] = [
+  'culture', 'activity', 'nightlife', 'food', 'wellness', 'outdoor', 'sport_action',
+]
+
+const CATEGORY_LABELS: Record<CategoryId, string> = {
+  culture: 'Kultur',
+  activity: 'Aktivität',
+  nightlife: 'Nightlife',
+  food: 'Essen & Trinken',
+  wellness: 'Wellness',
+  outdoor: 'Natur & Outdoor',
+  sport_action: 'Sport & Action',
+}
 
 type Preset = { id: string; name: string; lat: number; lng: number }
 
