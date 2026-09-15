@@ -173,9 +173,8 @@ export function resolveWeights({ from, to, current, weightsTouched }: {
   if (!weightsTouched) return nextPreset;
 
   const prevPreset = priorityWeightsForCategory(from ?? null);
-  const visible = new Set(
-    DIMENSIONS.filter(d => (getCategoryPriorityProfile(to ?? null) as Record<string, unknown>)[d] as number > 0),
-  );
+  const nextProfile = getCategoryPriorityProfile(to ?? null);
+  const visible = new Set(DIMENSIONS.filter(d => nextProfile[d] > 0));
   const result: PriorityWeights = { ...DEFAULT_PRIORITY_WEIGHTS, ...nextPreset };
   DIMENSIONS.forEach(d => {
     const userChanged = current[d] !== prevPreset[d];
