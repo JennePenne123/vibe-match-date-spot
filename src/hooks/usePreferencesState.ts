@@ -97,6 +97,16 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
   const filteredVibes = durationModel ? allVibes.filter(v => !durationModel.excludeVibes.includes(v.id)) : allVibes;
   const filteredTemplates = selectedDuration ? quickStartTemplates.filter(t => t.fitsDuration.includes(selectedDuration)) : quickStartTemplates;
 
+  const [lastPrefs] = useState(() => readLastDatePreferences());
+  const lastTemplate = lastPrefs && (lastPrefs.categoryId ?? null) === (categoryId ?? null) ? {
+    id: 'last-time',
+    cuisines: lastPrefs.cuisines,
+    vibes: lastPrefs.vibes,
+    priceRange: lastPrefs.priceRange,
+    timePreferences: lastPrefs.timePreferences,
+    savedAt: lastPrefs.savedAt,
+  } : null;
+
   const learnedTemplate = onboardingPrefs ? {
     id: 'ai-learned', title: 'Für dich', emoji: '🤖',
     cuisines: onboardingPrefs.preferred_cuisines,
