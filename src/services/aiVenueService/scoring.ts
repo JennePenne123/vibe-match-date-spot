@@ -275,7 +275,9 @@ const calculateUserScore = (
       'comedy_club': ['comedy', 'comedy club', 'stand-up'],
       'arcade': ['arcade', 'spielhalle', 'gaming'],
       'live_event': ['event', 'live', 'veranstaltung'],
-      'spa_wellness': ['spa', 'wellness', 'sauna', 'massage'],
+      'spa_wellness': ['spa', 'wellness', 'sauna', 'massage', 'yoga', 'pilates', 'bath', 'therme', 'relaxing'],
+      'park_nature': ['park', 'garden', 'nature', 'beach', 'viewpoint', 'picnic', 'marina', 'hiking'],
+      'sport_action': ['kart', 'paintball', 'lasertag', 'laser tag', 'trampolin', 'archery', 'skateboard', 'surfing', 'sailing', 'ice rink', 'eislaufen', 'billiards', 'darts'],
     };
     const venueTags = (venue.tags || []).map((t: string) => t.toLowerCase());
     const venueCuisine = (venue.cuisine_type || '').toLowerCase();
