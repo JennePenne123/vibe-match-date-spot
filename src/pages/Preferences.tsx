@@ -30,7 +30,7 @@ import type { DateOccasion } from '@/components/date-planning/preferences/prefer
 import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getSituationalCategory, type SituationalCategoryId, type SituationalCategory } from '@/lib/situationalCategories';
-import { getCategoryWizardConfig } from '@/lib/categoryWizardConfig';
+import { getCategoryWizardConfig, resolveVisibleSections, getFollowUpQuestions } from '@/lib/categoryWizardConfig';
 import { trackFunnelStep } from '@/services/funnelAnalyticsService';
 
 // Icon + color mapping (slimmed down)
