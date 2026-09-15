@@ -385,7 +385,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     categoryId, categoryConfig, isFoodCategory, clearCategory,
     selectedVenueTypes, toggleVenueType,
     // Derived
-    durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,
+    durationModel, filteredVibes, filteredTemplates, learnedTemplate, lastTemplate, status,
     // Handlers
     toggleCuisine, toggleVibe, togglePrice, toggleTime, toggleDietary,
     isTemplateActive, applyTemplate, selectDuration,
