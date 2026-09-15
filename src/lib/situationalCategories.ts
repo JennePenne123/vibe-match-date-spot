@@ -406,6 +406,11 @@ const NON_GASTRO_CUISINE_LABELS = new Set([
   'museum', 'gallery', 'theater', 'cinema', 'concert hall', 'arts centre',
   'historic', 'bowling', 'arcade', 'ice rink', 'swimming', 'spa & wellness',
   'casino', 'mini golf', 'minigolf', 'escape room', 'climbing',
+  // Wellness / Outdoor / Sport & Action importer labels
+  'sauna', 'yoga', 'pilates', 'fitness', 'massage', 'bath', 'nature spot',
+  'park', 'garden', 'beach', 'viewpoint', 'nature reserve', 'marina',
+  'sport & action', 'go-kart', 'paintball', 'laser tag', 'trampoline park',
+  'watersport', 'skateboarding', 'archery',
 ]);
 
 /**
@@ -531,6 +536,25 @@ export const VENUE_TYPE_KEYWORDS: Record<string, string[]> = {
   bar: ['bar', 'bars', 'weinbar', 'wine_bar', 'whisky bar'],
   wine_bar: ['wine bar', 'wine_bar', 'weinbar', 'vinothek', 'enoteca'],
   beer_garden: ['beer garden', 'beer_garden', 'biergarten'],
+  // Wellness & Entspannung
+  sauna: ['sauna', 'saunalandschaft', 'spa & wellness', 'therme', 'thermalbad', 'thermal bath', 'hammam', 'banya'],
+  yoga_studio: ['yoga', 'yogastudio', 'yoga studio', 'pilates'],
+  massage: ['massage', 'massagestudio', 'wellness', 'spa & wellness'],
+  thermal_bath: ['therme', 'thermalbad', 'thermal bath', 'thermal spa', 'bath', 'spa & wellness'],
+  // Natur & Outdoor
+  park: ['park', 'stadtpark', 'naturpark', 'nature spot', 'grünanlage'],
+  beach: ['beach', 'strand', 'playa', 'seeufer', 'lakeside'],
+  viewpoint: ['viewpoint', 'aussichtspunkt', 'aussicht', 'panorama', 'scenic'],
+  nature_reserve: ['nature reserve', 'naturschutzgebiet', 'nature spot', 'nationalpark', 'national park'],
+  garden: ['garden', 'garten', 'botanischer garten', 'botanical garden'],
+  marina: ['marina', 'hafen', 'promenade', 'waterfront'],
+  // Sport & Action
+  go_kart: ['go-kart', 'go kart', 'kart', 'kartbahn', 'karting', 'sport & action'],
+  paintball: ['paintball', 'airsoft', 'sport & action'],
+  laser_tag: ['lasertag', 'laser tag', 'lasergame', 'sport & action'],
+  trampoline_park: ['trampoline', 'trampolin', 'trampolinhalle', 'jump house', 'trampoline park', 'sport & action'],
+  billiards: ['billard', 'billiards', 'pool hall', 'snooker', 'darts', 'dartbar'],
+  bouldering: ['bouldering', 'bouldern', 'boulderhalle', 'climbing', 'klettern', 'kletterhalle'],
 };
 
 function venueTypeKeywords(typeId: string): string[] {
