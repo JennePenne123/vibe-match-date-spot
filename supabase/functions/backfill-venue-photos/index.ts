@@ -30,9 +30,22 @@ Deno.serve(async (req) => {
       });
     }
 
-    // --- Auth: require an admin caller ---
+    // --- Auth: accept the shared cron token (same store as venue-import-worker) ...
+    const earlyAdmin = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    );
+    const { data: control } = await earlyAdmin
+      .from('venue_import_control')
+      .select('cron_token')
+      .eq('id', true)
+      .maybeSingle();
+    const cronToken = req.headers.get('x-cron-token');
+    const cronAuthorized = Boolean(cronToken && control?.cron_token && cronToken === control.cron_token);
+
+    // ... otherwise require an admin caller ---
     const authHeader = req.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
+    if (!cronAuthorized && !authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
