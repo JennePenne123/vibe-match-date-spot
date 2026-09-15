@@ -9,6 +9,7 @@ import {
 } from '@/lib/categoryWizardConfig';
 import type { SituationalCategoryId } from '@/lib/situationalCategories';
 import CategoryPriorityHint from '@/components/category/CategoryPriorityHint';
+import { useLearnedPriorityWeights, LEARNED_WEIGHTS_MIN_RATINGS } from '@/hooks/useLearnedPriorityWeights';
 
 export interface PriorityWeights {
   cuisine: number;
@@ -28,6 +29,37 @@ export const DEFAULT_PRIORITY_WEIGHTS: PriorityWeights = {
 export const priorityWeightsForCategory = (
   categoryId: SituationalCategoryId | null | undefined,
 ): PriorityWeights => ({ ...DEFAULT_PRIORITY_WEIGHTS, ...getCategoryPriorityWeights(categoryId) });
+
+/** Learned feature-weight keys mapped onto the four priority dimensions. */
+const LEARNED_KEY_MAP: Record<keyof PriorityWeights, string> = {
+  cuisine: 'cuisine',
+  vibe: 'vibe',
+  price: 'price',
+  location: 'distance',
+};
+
+const clampWeight = (w: number) => Math.max(0.6, Math.min(1.6, w));
+
+/**
+ * Blends the category preset with what the AI learned about this user.
+ * Confidence (0..1) grows with the number of rated dates, so early on the
+ * category preset still dominates.
+ */
+export const blendLearnedPriorityWeights = (
+  preset: PriorityWeights,
+  learned: Record<string, number> | null | undefined,
+  confidence: number,
+): PriorityWeights => {
+  if (!learned || confidence <= 0) return preset;
+  const out = { ...preset };
+  (Object.keys(preset) as (keyof PriorityWeights)[]).forEach(k => {
+    const raw = learned[LEARNED_KEY_MAP[k]];
+    if (typeof raw !== 'number' || !Number.isFinite(raw)) return;
+    const target = clampWeight(raw);
+    out[k] = Math.round(clampWeight(preset[k] * (1 - confidence) + target * confidence) * 100) / 100;
+  });
+  return out;
+};
 
 interface PriorityDimension {
   key: PriorityDimensionId;
@@ -72,9 +104,26 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId 
   // "Skip: KI entscheidet" — active as long as the weights still match the
   // category preset (untouched). Tapping resets to the preset; picking any
   // level below deactivates it automatically.
-  const preset = priorityWeightsForCategory(categoryId);
-  const aiDecides = (Object.keys(preset) as (keyof PriorityWeights)[])
-    .every(k => weights[k] === preset[k]);
+  const { data: learned } = useLearnedPriorityWeights();
+  const isPersonalized = !!learned && learned.totalRatings >= LEARNED_WEIGHTS_MIN_RATINGS;
+  const basePreset = priorityWeightsForCategory(categoryId);
+  const preset = isPersonalized
+    ? blendLearnedPriorityWeights(basePreset, learned!.featureWeights, learned!.confidence)
+    : basePreset;
+  const matches = (target: PriorityWeights) =>
+    (Object.keys(target) as (keyof PriorityWeights)[]).every(k => weights[k] === target[k]);
+  // Untouched category preset also counts as "AI decides" — the personalized
+  // blend is applied when the user (re-)taps the card.
+  const aiDecides = matches(preset) || matches(basePreset);
+
+  // Keep the personalized blend active from the start, without the user
+  // having to tap anything.
+  React.useEffect(() => {
+    if (isPersonalized && matches(basePreset) && !matches(preset)) {
+      onChangeWeights({ ...preset });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPersonalized, categoryId, learned?.confidence]);
 
   return (
     <div>
@@ -108,7 +157,9 @@ const PriorityPicker: React.FC<Props> = ({ weights, onChangeWeights, categoryId 
             {t('preferences.aiDecides', 'Überspringen: KI entscheidet')}
           </span>
           <span className="block text-xs text-muted-foreground">
-            {t('preferences.aiDecidesHint', 'Die KI gewichtet alles passend zu deiner Kategorie.')}
+            {isPersonalized
+              ? t('preferences.aiDecidesHintPersonalized', 'Die KI nutzt, was du bisher mochtest – abgestimmt auf deine Kategorie.')
+              : t('preferences.aiDecidesHint', 'Die KI gewichtet alles passend zu deiner Kategorie.')}
           </span>
         </span>
         {aiDecides && (
