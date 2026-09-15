@@ -8,6 +8,7 @@ import {
   type SituationalCategoryId,
 } from '@/lib/situationalCategories';
 import { cn } from '@/lib/utils';
+import CategoryIcon from '@/components/category/CategoryIcon';
 
 interface Props {
   /** The primary category (already selected on Home) — excluded from the picker */
@@ -57,7 +58,11 @@ const SecondaryCategoryPicker: React.FC<Props> = ({ primary, secondaryId, onChan
               )}
               aria-pressed={active}
             >
-              <span aria-hidden>{opt.emoji}</span>
+              {['wellness', 'outdoor', 'sport_action'].includes(opt.id) ? (
+                <CategoryIcon categoryId={opt.id} className="h-5 w-5 rounded-full border-0 bg-transparent" iconClassName="h-3.5 w-3.5" />
+              ) : (
+                <span aria-hidden>{opt.emoji}</span>
+              )}
               <span>{t(opt.labelKey)}</span>
               <AnimatePresence>
                 {active && (

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, User, Users, UsersRound } from 'lucide-react';
 import { SITUATIONAL_CATEGORIES, type SituationalCategoryId } from '@/lib/situationalCategories';
+import CategoryIcon from '@/components/category/CategoryIcon';
 import { cn } from '@/lib/utils';
 
 type PlanMode = 'solo' | 'single' | 'group';
@@ -107,7 +108,11 @@ const SituationalQuickActions: React.FC = () => {
             >
               <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/5 rounded-full blur-2xl" />
               <CardContent className="relative p-4 flex flex-col h-full min-h-[110px]">
-                <div className="text-2xl mb-1.5" aria-hidden>{cat.emoji}</div>
+                {['wellness', 'outdoor', 'sport_action'].includes(cat.id) ? (
+                  <CategoryIcon categoryId={cat.id} className="mb-2 h-10 w-10 rounded-xl" iconClassName="h-5 w-5" />
+                ) : (
+                  <div className="text-2xl mb-1.5" aria-hidden>{cat.emoji}</div>
+                )}
                 <h3 className="text-sm font-semibold text-foreground leading-tight">
                   {t(cat.labelKey)}
                 </h3>

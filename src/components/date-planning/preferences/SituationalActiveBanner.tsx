@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { type SituationalCategory } from '@/lib/situationalCategories';
 import { cn } from '@/lib/utils';
+import CategoryIcon from '@/components/category/CategoryIcon';
 
 interface Props {
   category: SituationalCategory;
@@ -30,7 +31,11 @@ const SituationalActiveBanner: React.FC<Props> = ({ category, onClear }) => {
       role="status"
       aria-live="polite"
     >
-      <div className="text-2xl shrink-0" aria-hidden>{category.emoji}</div>
+      {['wellness', 'outdoor', 'sport_action'].includes(category.id) ? (
+        <CategoryIcon categoryId={category.id} />
+      ) : (
+        <div className="text-2xl shrink-0" aria-hidden>{category.emoji}</div>
+      )}
       <div className="flex-1 min-w-0">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">
           {t('preferences.situationalBannerLabel')}
