@@ -109,7 +109,7 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     selectedOccasion, setSelectedOccasion,
     priorityWeights, setPriorityWeights,
     autoNavigating, timeoutTriggered, openSections,
-    durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,
+    durationModel, filteredVibes, filteredTemplates, learnedTemplate, lastTemplate, status,
     toggleCuisine, toggleVibe, togglePrice, toggleTime, toggleDietary,
     isTemplateActive, applyTemplate, selectDuration,
     handleKeepPreferences, handleCustomize,
@@ -259,12 +259,14 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
         )}
         {selectedDuration && (
           <>
-            {isFoodCategory && <QuickStartTemplates
-              templates={filteredTemplates}
-              learnedTemplate={learnedTemplate}
+            {(isFoodCategory || lastTemplate) && <QuickStartTemplates
+              templates={isFoodCategory ? filteredTemplates : []}
+              learnedTemplate={isFoodCategory ? learnedTemplate : null}
+              lastTemplate={lastTemplate}
               isTemplateActive={isTemplateActive}
               onApplyTemplate={applyTemplate}
               onApplyLearnedTemplate={applyTemplate}
+              onApplyLastTemplate={applyTemplate}
             />}
 
             {/* Accordion Sections */}

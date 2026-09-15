@@ -12,6 +12,7 @@ import { getTodayMoodFromStorage } from '@/components/date-planning/preferences/
 import { DEFAULT_PRIORITY_WEIGHTS, priorityWeightsForCategory, type PriorityWeights } from '@/components/date-planning/preferences/PriorityPicker';
 import type { DailyMood } from '@/utils/moodStorage';
 import { getCategoryWizardConfig, getCategoryVenueTypeIds } from '@/lib/categoryWizardConfig';
+import { readLastDatePreferences, saveLastDatePreferences } from '@/lib/lastDatePreferences';
 import type { SituationalCategoryId } from '@/lib/situationalCategories';
 
 const readSituationalCategory = (): SituationalCategoryId | null => {
@@ -95,6 +96,16 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
   const durationModel = durationModels.find(d => d.id === selectedDuration);
   const filteredVibes = durationModel ? allVibes.filter(v => !durationModel.excludeVibes.includes(v.id)) : allVibes;
   const filteredTemplates = selectedDuration ? quickStartTemplates.filter(t => t.fitsDuration.includes(selectedDuration)) : quickStartTemplates;
+
+  const [lastPrefs] = useState(() => readLastDatePreferences());
+  const lastTemplate = lastPrefs && (lastPrefs.categoryId ?? null) === (categoryId ?? null) ? {
+    id: 'last-time',
+    cuisines: lastPrefs.cuisines,
+    vibes: lastPrefs.vibes,
+    priceRange: lastPrefs.priceRange,
+    timePreferences: lastPrefs.timePreferences,
+    savedAt: lastPrefs.savedAt,
+  } : null;
 
   const learnedTemplate = onboardingPrefs ? {
     id: 'ai-learned', title: 'Für dich', emoji: '🤖',
@@ -343,6 +354,14 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
         occasion: selectedOccasion,
         priority_weights: priorityWeights,
       } as any);
+      saveLastDatePreferences({
+        categoryId: categoryId ?? null,
+        cuisines: selectedCuisines,
+        vibes: selectedVibes,
+        priceRange: selectedPriceRange,
+        timePreferences: selectedTimePreferences,
+        venueTypes: selectedVenueTypes,
+      });
       setHasSubmitted(true);
     } catch (error) {
       console.error('Error saving preferences:', error);
@@ -366,7 +385,7 @@ export const usePreferencesState = (props: UsePreferencesStateProps) => {
     categoryId, categoryConfig, isFoodCategory, clearCategory,
     selectedVenueTypes, toggleVenueType,
     // Derived
-    durationModel, filteredVibes, filteredTemplates, learnedTemplate, status,
+    durationModel, filteredVibes, filteredTemplates, learnedTemplate, lastTemplate, status,
     // Handlers
     toggleCuisine, toggleVibe, togglePrice, toggleTime, toggleDietary,
     isTemplateActive, applyTemplate, selectDuration,

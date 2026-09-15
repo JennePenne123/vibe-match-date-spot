@@ -714,7 +714,8 @@
     "priorityLevelLow": "Don't care",
     "priorityLevelNormal": "Important",
     "priorityLevelHigh": "Very important",
-    "priorityIntroGeneric": "Choose which factors the AI should weigh more heavily"
+    "priorityIntroGeneric": "Choose which factors the AI should weigh more heavily",
+    "likeLastTime": "Like last time"
   },
   "notFound": {
     "title": "404",
