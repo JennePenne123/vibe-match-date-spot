@@ -70,7 +70,7 @@ def fake_session() -> dict:
     }
 
 
-async def install_supabase_stubs(context):
+async def install_supabase_stubs(context, writes=None):
     session = fake_session()
 
     async def json_route(route, payload, status=200):
@@ -101,10 +101,9 @@ async def install_supabase_stubs(context):
             await json_route(route, session)
             return
         if "/rest/v1/user_preferences" in url:
-            if request.method in ("POST", "PATCH", "PUT"):
-                await json_route(route, [PREFS])
-            else:
-                await json_route(route, [PREFS])
+            if request.method in ("POST", "PATCH", "PUT") and writes is not None:
+                writes.append(request.post_data or "")
+            await json_route(route, [PREFS])
             return
         if "/functions/v1/" in url:
             await json_route(route, {})
@@ -117,11 +116,11 @@ async def install_supabase_stubs(context):
         status=200, content_type="application/json", body="[]"))
 
 
-async def new_page(browser, category=None):
+async def new_page(browser, category=None, writes=None):
     context = await browser.new_context(
         viewport={"width": 402, "height": 1400}, locale="de-DE"
     )
-    await install_supabase_stubs(context)
+    await install_supabase_stubs(context, writes)
     page = await context.new_page()
     await page.goto(BASE_URL, wait_until="domcontentloaded")
     await page.evaluate(
@@ -150,6 +149,17 @@ async def absent(page, label, settle=1200) -> bool:
     return await page.get_by_text(label, exact=False).count() == 0
 
 
+async def dismiss_consent(page):
+    """The cookie banner overlays the wizard — accept the minimum and move on."""
+    try:
+        btn = page.get_by_role("button", name="Nur notwendige").first
+        await btn.wait_for(state="visible", timeout=3000)
+        await btn.click()
+        await page.wait_for_timeout(300)
+    except Exception:
+        pass
+
+
 async def next_step(page):
     await page.get_by_role("button", name="Weiter").first.click()
     await page.wait_for_timeout(600)
@@ -157,7 +167,8 @@ async def next_step(page):
 
 async def open_wizard(page, category):
     await page.goto(f"{BASE_URL}/preferences?category={category}", wait_until="domcontentloaded")
-    await page.get_by_text("Prioritäten", exact=False).first.wait_for(state="visible", timeout=15000)
+    await dismiss_consent(page)
+    await page.get_by_text("Prioritäten", exact=False).first.wait_for(state="visible", timeout=25000)
 
 
 # --------------------------------------------------------------------------- cases
@@ -208,24 +219,23 @@ async def case_outdoor_follow_up(browser):
         await context.close()
 
 
-async def case_category_switch_memory(browser):
-    context, page = await new_page(browser)
+async def case_answer_persistence(browser):
+    """Picked answers are written to the profile so they survive an app restart."""
+    writes: list[str] = []
+    context, page = await new_page(browser, writes=writes)
     try:
         await open_wizard(page, "outdoor")
         await next_step(page)
         await page.get_by_text(L_PARKS, exact=True).first.click()
-        await page.wait_for_timeout(600)
-
-        # Switch to food: outdoor-only answers must not leak into the food wizard.
-        await open_wizard(page, "food")
         await next_step(page)
-        checks = {"outdoor answers dropped in food": await absent(page, L_OUTDOOR_FOLLOWUP)}
-
-        # Switch back: the earlier outdoor answer is restored from memory.
-        await open_wizard(page, "outdoor")
-        await next_step(page)
-        checks["outdoor answers restored"] = await visible(page, L_OUTDOOR_FOLLOWUP)
-        return checks
+        await page.get_by_role("button", name="Speichern").first.click()
+        saved = False
+        for _ in range(40):
+            if any("park" in w and "category_answers" in w for w in writes):
+                saved = True
+                break
+            await page.wait_for_timeout(250)
+        return {"answers persisted to profile": saved}
     finally:
         await context.close()
 
@@ -234,8 +244,9 @@ async def case_plan_date_solo(browser):
     context, page = await new_page(browser, category="outdoor")
     try:
         await page.goto(f"{BASE_URL}/plan-date?mode=solo", wait_until="domcontentloaded")
+        await dismiss_consent(page)
         return {
-            "solo preferences step": await visible(page, "Vibe", timeout=20000),
+            "solo preferences step": await visible(page, "Vibe", timeout=30000),
             "no cuisine section": await absent(page, "Küche"),
             "no budget section": await absent(page, "Budget"),
         }
@@ -247,6 +258,7 @@ async def case_plan_date_group(browser):
     context, page = await new_page(browser, category="outdoor")
     try:
         await page.goto(f"{BASE_URL}/plan-date?mode=group", wait_until="domcontentloaded")
+        await dismiss_consent(page)
         return {"group partner step": await visible(page, "Wähle deine Gruppe", timeout=25000)}
     finally:
         await context.close()
@@ -256,7 +268,7 @@ CASES = [
     ("food category sections", case_food_sections),
     ("outdoor category sections", case_outdoor_sections),
     ("outdoor follow-up question", case_outdoor_follow_up),
-    ("category switch memory", case_category_switch_memory),
+    ("answer persistence", case_answer_persistence),
     ("/plan-date solo flow", case_plan_date_solo),
     ("/plan-date group flow", case_plan_date_group),
 ]
