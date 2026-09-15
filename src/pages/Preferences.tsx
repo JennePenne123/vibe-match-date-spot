@@ -785,6 +785,8 @@ const Preferences = () => {
 
         {/* Step content */}
         <div className="px-4 py-5 space-y-3 pb-6">
+          <BackgroundSaveBanner />
+
 
           {/* Step 0: Kontext */}
           {step === 0 && (
