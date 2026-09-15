@@ -321,10 +321,62 @@ const Preferences = () => {
     setPriorityWeights(w);
   }, []);
 
-  // Preset the weights from the active category's priority profile.
+  // ── Category switching: keep what still fits, park the rest ──────────
+  // Answers are snapshotted per category, so switching back restores them,
+  // while answers the new category doesn't ask for are cleared instead of
+  // silently influencing priorities, follow-up questions and scoring.
+  const answersRef = useRef<CategoryAnswerSnapshot | null>(null);
+  answersRef.current = {
+    cuisines: selectedCuisines,
+    excludedCuisines,
+    venueTypes: selectedVenueTypes,
+    vibes: selectedVibes,
+    priceRange: selectedPriceRange,
+    times: selectedTimePreferences,
+    dietary: selectedDietary,
+    weights: priorityWeights,
+  };
+
+  const prevCategoryRef = useRef<SituationalCategoryId | null | undefined>(undefined);
   useEffect(() => {
-    if (weightsTouchedRef.current) return;
-    setPriorityWeights(priorityWeightsForCategory(situationalCategory?.id ?? null));
+    const nextId = situationalCategory?.id ?? null;
+    const prevId = prevCategoryRef.current;
+    prevCategoryRef.current = nextId;
+
+    // First resolution of the category — only preset the sliders.
+    if (prevId === undefined) {
+      if (!weightsTouchedRef.current) setPriorityWeights(priorityWeightsForCategory(nextId));
+      return;
+    }
+    if (prevId === nextId) return;
+
+    const current = answersRef.current!;
+    saveCategoryAnswers(prevId, current);
+    const { answers, restoredCount, droppedCount } = reconcileCategoryAnswers({
+      from: prevId,
+      to: nextId,
+      current,
+      weightsTouched: weightsTouchedRef.current,
+    });
+
+    setSelectedCuisines(answers.cuisines);
+    setExcludedCuisines(answers.excludedCuisines);
+    setSelectedVenueTypes(answers.venueTypes);
+    setSelectedVibes(answers.vibes);
+    setSelectedPriceRange(answers.priceRange);
+    setSelectedTimePreferences(answers.times);
+    setSelectedDietary(answers.dietary);
+    setPriorityWeights(answers.weights);
+
+    if (restoredCount > 0 || droppedCount > 0) {
+      toast({
+        title: t('preferences.categorySwitchedTitle'),
+        description: restoredCount > 0
+          ? t('preferences.categorySwitchedRestored', { count: restoredCount })
+          : t('preferences.categorySwitchedReset', { count: droppedCount }),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [situationalCategory?.id]);
 
   useEffect(() => {
