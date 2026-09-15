@@ -283,6 +283,20 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                 </Section>
               )}
 
+              {followUpQuestions.map(q => {
+                const items = q.items.map(i => ({
+                  id: i.id, name: i.nameKey, emoji: VENUE_TYPE_EMOJI[i.id] || '✨',
+                }));
+                return (
+                  <Section key={q.id} id={q.id} icon={<span className="text-sm">✨</span>} title={t(q.titleKey)}
+                    summary={summaryText(selectedVenueTypes, items, t)}
+                    count={items.filter(i => selectedVenueTypes.includes(i.id)).length}
+                    open={openSections.includes(q.id)} onToggle={() => toggleSection(q.id)}>
+                    <ChipGrid items={items} selected={selectedVenueTypes} onToggle={toggleVenueType} />
+                  </Section>
+                );
+              })}
+
               <Section id="vibes" icon={<span className="text-sm">✨</span>} title={t('datePlanning.vibe')}
                 summary={summaryText(selectedVibes, allVibes, t)} count={selectedVibes.length}
                 open={openSections.includes('vibes')} onToggle={() => toggleSection('vibes')}>
@@ -292,17 +306,22 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
                 <ChipGrid items={filteredVibes} selected={selectedVibes} onToggle={toggleVibe} />
               </Section>
 
-              <Section id="budget" icon={<span className="text-sm">💰</span>} title={t('datePlanning.budget')}
-                summary={summaryText(selectedPriceRange, priceRanges, t)} count={selectedPriceRange.length}
-                open={openSections.includes('budget')} onToggle={() => toggleSection('budget')}>
-                <ChipGrid items={priceRanges} selected={selectedPriceRange} onToggle={togglePrice} />
-              </Section>
+              {activeSections.has('budget') && (
+                <Section id="budget" icon={<span className="text-sm">💰</span>} title={t('datePlanning.budget')}
+                  summary={summaryText(selectedPriceRange, priceRanges, t)} count={selectedPriceRange.length}
+                  open={openSections.includes('budget')} onToggle={() => toggleSection('budget')}>
+                  <ChipGrid items={priceRanges} selected={selectedPriceRange} onToggle={togglePrice} />
+                </Section>
+              )}
 
-              <Section id="time" icon={<span className="text-sm">🕐</span>} title={t('datePlanning.timeOfDay')}
-                summary={summaryText(selectedTimePreferences, timePreferences, t)} count={selectedTimePreferences.length}
-                open={openSections.includes('time')} onToggle={() => toggleSection('time')}>
-                <ChipGrid items={timePreferences} selected={selectedTimePreferences} onToggle={toggleTime} />
-              </Section>
+              {activeSections.has('timing') && (
+                <Section id="time" icon={<span className="text-sm">🕐</span>} title={t('datePlanning.timeOfDay')}
+                  summary={summaryText(selectedTimePreferences, timePreferences, t)} count={selectedTimePreferences.length}
+                  open={openSections.includes('time')} onToggle={() => toggleSection('time')}>
+                  <ChipGrid items={timePreferences} selected={selectedTimePreferences} onToggle={toggleTime} />
+                </Section>
+              )}
+
 
               <Section id="advanced" icon={<Settings className="w-4 h-4 text-muted-foreground" />} title={t('datePlanning.advanced')}
                 summary={`${maxDistance} km${selectedDietary.length > 0 ? ` · ${selectedDietary.length} ${t('datePlanning.diet')}` : ''}`} count={selectedDietary.length}
