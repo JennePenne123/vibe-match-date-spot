@@ -123,6 +123,15 @@ const PreferencesStep: React.FC<PreferencesStepProps> = (props) => {
     id: i.id, name: i.nameKey, emoji: VENUE_TYPE_EMOJI[i.id] || '✨',
   }));
 
+  // Sections + follow-up questions follow the category priority profile and
+  // the live priority sliders — identical rules as the solo wizard.
+  const visibilityCtx = {
+    weights: state.priorityWeights,
+    selectedMainItems: isFoodCategory ? selectedCuisines : selectedVenueTypes,
+  };
+  const activeSections = resolveVisibleSections(categoryId, visibilityCtx);
+  const followUpQuestions = getFollowUpQuestions(categoryId, visibilityCtx);
+
   // ── Loading ──────────────────────────────────────────────────────
   if (!onboardingLoaded) {
     return (
