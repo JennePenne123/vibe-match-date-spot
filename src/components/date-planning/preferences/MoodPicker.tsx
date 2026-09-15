@@ -50,23 +50,25 @@ const MoodPicker: React.FC<Props> = ({ selectedMood, onSelectMood }) => {
               onClick={() => handleSelect(o.id)}
               style={{ WebkitTapHighlightColor: 'transparent' }}
               className={cn(
-                'p-3 rounded-xl border-2 text-center select-none active:scale-[0.97] transition-transform',
-                sel ? 'border-primary bg-primary/5' : 'border-border bg-card'
+                'relative p-3 pt-3.5 rounded-2xl border text-center select-none transition-all duration-200 active:scale-[0.97]',
+                sel
+                  ? 'border-primary/50 bg-primary/5 shadow-md shadow-primary/15'
+                  : 'border-border/60 bg-card shadow-sm shadow-foreground/5 hover:border-primary/25'
               )}
             >
+              {sel && (
+                <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-sm">
+                  <Check className="w-3 h-3 text-primary-foreground" strokeWidth={3} />
+                </span>
+              )}
               <div className={cn(
-                'w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1.5',
+                'w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1.5 transition-colors',
                 sel ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
               )}>
                 <Icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-xs leading-tight">{o.label}</p>
+              <p className={cn('font-semibold text-xs leading-tight', sel && 'text-primary')}>{o.label}</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{o.desc}</p>
-              {sel && (
-                <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center mx-auto mt-1.5">
-                  <Check className="w-2.5 h-2.5 text-primary-foreground" />
-                </div>
-              )}
             </button>
           );
         })}
