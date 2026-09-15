@@ -334,7 +334,9 @@ const calculateUserScore = (
     });
     if (activityMatches.length > 0) {
       matches.activities = activityMatches;
-      score += 0.10;
+      const lifestyle = detectLifestyleCategory(searchText);
+      const affinity = lifestyle ? getLifestyleAffinity(userPrefs, lifestyle) : 1;
+      score += 0.10 * affinity;
     }
   }
 
