@@ -140,6 +140,14 @@ const VenueDetail = () => {
   const appVenue = venueToAppVenue(sourceVenue, appState.userLocation?.latitude, appState.userLocation?.longitude);
   // Use resolved address if available, otherwise format the existing one
   const displayAddress = resolvedAddress || formatVenueAddress(appVenue);
+  const venueLiked = !!appVenue.id && isLiked(appVenue.id);
+
+  const handleToggleFavorite = () => {
+    if (!appVenue.id) return;
+    setHeartAnimating(true);
+    setTimeout(() => setHeartAnimating(false), 400);
+    toggleLike(appVenue.id);
+  };
   const websiteUrl = appVenue.website || resolvedWebsite;
   const phoneNumber = appVenue.phone || resolvedPhone;
 
