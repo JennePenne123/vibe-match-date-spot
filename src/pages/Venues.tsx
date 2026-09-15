@@ -11,6 +11,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Search, SlidersHorizontal, MapPin, Star, Sparkles, Heart, Navigation, Loader2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import CategoryIcon from '@/components/category/CategoryIcon';
+import type { SituationalCategoryId } from '@/lib/situationalCategories';
 import { getLocationFallback } from '@/utils/locationFallback';
 import { searchVenuesOverpass } from '@/services/overpassSearchService';
 import { isVenueOpenNow } from '@/utils/openingHoursParser';
@@ -36,7 +38,28 @@ interface VenueWithScore extends DBVenue {
   distance_km?: number;
 }
 
-const FILTERS = ['Italian', 'Japanese', 'Mexican', 'American', 'Romantic', 'Casual', 'Nightlife'];
+interface VenueFilter {
+  id: string;
+  label: string;
+  categoryId?: SituationalCategoryId;
+  terms: string[];
+}
+
+const BASE_FILTERS: VenueFilter[] = [
+  { id: 'italian', label: 'Italian', terms: ['italian'] },
+  { id: 'japanese', label: 'Japanese', terms: ['japanese'] },
+  { id: 'mexican', label: 'Mexican', terms: ['mexican'] },
+  { id: 'american', label: 'American', terms: ['american'] },
+  { id: 'romantic', label: 'Romantic', terms: ['romantic'] },
+  { id: 'casual', label: 'Casual', terms: ['casual'] },
+  { id: 'nightlife', label: 'Nightlife', terms: ['nightlife'] },
+];
+
+const LIFESTYLE_FILTERS: Omit<VenueFilter, 'label'>[] = [
+  { id: 'wellness', categoryId: 'wellness', terms: ['wellness', 'spa', 'sauna', 'thermal bath', 'therme', 'yoga', 'pilates', 'massage', 'fitness', 'bath'] },
+  { id: 'outdoor', categoryId: 'outdoor', terms: ['outdoor', 'nature spot', 'park', 'garden', 'beach', 'viewpoint', 'nature reserve', 'marina', 'waterfront'] },
+  { id: 'sport_action', categoryId: 'sport_action', terms: ['sport & action', 'go-kart', 'paintball', 'laser tag', 'trampoline park', 'billiards', 'bouldering', 'climbing', 'watersport', 'skateboarding', 'archery'] },
+];
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
 
 const Venues = () => {
@@ -244,11 +267,21 @@ const Venues = () => {
       venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       venue.cuisine_type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       venue.address.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilters = selectedFilters.length === 0 ||
-      selectedFilters.some(f =>
-        venue.cuisine_type?.toLowerCase().includes(f.toLowerCase()) ||
-        venue.tags?.some(tag => tag.toLowerCase().includes(f.toLowerCase()))
-      );
+    const filters: VenueFilter[] = [
+      ...BASE_FILTERS,
+      ...LIFESTYLE_FILTERS.map(filter => ({
+        ...filter,
+        label: t(`home.situational.${filter.id}.label`),
+      })),
+    ];
+    const searchableVenue = [venue.name, venue.cuisine_type, venue.description, ...(venue.tags || [])]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    const matchesFilters = selectedFilters.length === 0 || selectedFilters.some(filterId => {
+      const filter = filters.find(item => item.id === filterId);
+      return filter?.terms.some(term => searchableVenue.includes(term)) ?? false;
+    });
     const matchesOpenNow = !openNowFilter || isVenueOpenNow(venue.opening_hours) === true;
     return matchesSearch && matchesFilters && matchesOpenNow;
   });
@@ -371,19 +404,32 @@ const Venues = () => {
               {t('venues.openNow', 'Geöffnet')}
             </Badge>
             <SlidersHorizontal className="w-4 h-4 text-muted-foreground shrink-0" />
-            {FILTERS.map((filter) => (
+            {[
+              ...LIFESTYLE_FILTERS.map(filter => ({
+                ...filter,
+                label: t(`home.situational.${filter.id}.label`),
+              })),
+              ...BASE_FILTERS,
+            ].map((filter) => (
               <Badge
-                key={filter}
-                variant={selectedFilters.includes(filter) ? 'default' : 'secondary'}
+                key={filter.id}
+                variant={selectedFilters.includes(filter.id) ? 'default' : 'secondary'}
                 className={cn(
-                  'cursor-pointer transition-colors whitespace-nowrap',
-                  selectedFilters.includes(filter)
+                  'cursor-pointer transition-colors whitespace-nowrap gap-1.5',
+                  selectedFilters.includes(filter.id)
                     ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 )}
-                onClick={() => toggleFilter(filter)}
+                onClick={() => toggleFilter(filter.id)}
               >
-                {filter}
+                {filter.categoryId && (
+                  <CategoryIcon
+                    categoryId={filter.categoryId}
+                    className="h-4 w-4 rounded-full border-0 bg-transparent text-current"
+                    iconClassName="h-3.5 w-3.5"
+                  />
+                )}
+                {filter.label}
               </Badge>
             ))}
           </div>

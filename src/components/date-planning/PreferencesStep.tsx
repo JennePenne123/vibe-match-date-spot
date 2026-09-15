@@ -25,6 +25,10 @@ const VENUE_TYPE_EMOJI: Record<string, string> = {
   climbing: '🧗', spa_wellness: '💆',
   cocktail_bar: '🍸', pub: '🍺', nightclub: '🪩', live_music: '🎸',
   karaoke: '🎤', comedy_club: '😂',
+  sauna: '♨️', thermal_bath: '🌊', yoga_studio: '🧘', massage: '💆',
+  park: '🌳', beach: '🏖️', viewpoint: '⛰️', nature_reserve: '🌿',
+  garden: '🌷', marina: '⛵', go_kart: '🏎️', paintball: '🎯',
+  laser_tag: '🔫', trampoline_park: '🤸', billiards: '🎱', bouldering: '🧗',
 };
 import DurationPicker from './preferences/DurationPicker';
 import QuickStartTemplates from './preferences/QuickStartTemplates';
