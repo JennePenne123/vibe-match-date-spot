@@ -8,6 +8,8 @@ interface VenuePhoto {
   height: number;
   attribution?: string;
   isGooglePhoto: boolean;
+  source?: string;
+  sourceUrl?: string;
 }
 
 interface VenuePhotoGalleryProps {
