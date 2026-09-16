@@ -1681,7 +1681,9 @@
     "noWebsite": "Keine Webseite",
     "addressNotAvailable": "Adresse nicht verfügbar",
     "moreHours": "+ {{count}} weitere",
-    "viewOnGoogleMaps": "Auf Google Maps ansehen"
+    "viewOnGoogleMaps": "Auf Google Maps ansehen",
+    "addedToFavorites": "Zu Favoriten hinzugefügt ❤️",
+    "removedFromFavorites": "Aus Favoriten entfernt"
   },
   "myVenues": {
     "noFavorites": "Noch keine Lieblings-Venues",

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Star, MapPin, Clock, Phone, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { venueToAppVenue } from '@/utils/typeHelpers';
 import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
 import { supabase } from '@/integrations/supabase/client';
@@ -146,6 +147,11 @@ const VenueDetail = () => {
     if (!appVenue.id) return;
     setHeartAnimating(true);
     setTimeout(() => setHeartAnimating(false), 400);
+    if (venueLiked) {
+      toast.success(t('venue.removedFromFavorites'));
+    } else {
+      toast.success(t('venue.addedToFavorites'));
+    }
     toggleLike(appVenue.id);
   };
   const websiteUrl = appVenue.website || resolvedWebsite;
