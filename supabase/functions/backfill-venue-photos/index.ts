@@ -169,6 +169,12 @@ Deno.serve(async (req) => {
 
         if (!searchRes.ok) {
           console.warn(`searchText ${searchRes.status} for ${v.id}`);
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'google',
+            status: 'error',
+            message: `searchText ${searchRes.status}`,
+          });
           skipped++;
           continue;
         }
@@ -176,6 +182,7 @@ Deno.serve(async (req) => {
         const searchJson = await searchRes.json();
         const place = searchJson.places?.[0];
         if (!place?.id) {
+          await recordPhotoAttempt(admin, { venueId: v.id, source: 'google', status: 'miss' });
           skipped++;
           continue;
         }
@@ -213,12 +220,30 @@ Deno.serve(async (req) => {
 
         if (updateErr) {
           console.error(`Update error for ${v.id}:`, updateErr);
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'google',
+            status: 'error',
+            message: updateErr.message,
+          });
           skipped++;
         } else {
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'google',
+            status: photos.length > 0 ? 'hit' : 'miss',
+            photoCount: photos.length,
+          });
           updated++;
         }
       } catch (err) {
         console.error(`Backfill error for ${v.id}:`, err);
+        await recordPhotoAttempt(admin, {
+          venueId: v.id,
+          source: 'google',
+          status: 'error',
+          message: String(err),
+        });
         skipped++;
       }
     }
@@ -226,7 +251,7 @@ Deno.serve(async (req) => {
     const remaining = Math.max((remainingBefore || 0) - matched, 0);
 
     return new Response(
-      JSON.stringify({ processed, matched, updated, skipped, remaining }),
+      JSON.stringify({ processed, matched, updated, skipped, cacheSkipped, remaining }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (err) {
