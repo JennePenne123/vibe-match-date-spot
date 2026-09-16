@@ -112,14 +112,16 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
         {/* Photo source badge — always visible */}
         <div
           className={`absolute top-2 left-2 px-2 py-1 rounded-full text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm ${
-            currentPhoto.isGooglePhoto
+            isRealPhoto
               ? 'bg-background/90 text-foreground border border-border/50'
               : 'bg-muted/90 text-muted-foreground border border-border/50'
           }`}
           title={
             currentPhoto.isGooglePhoto
               ? `Google Places Foto${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
-              : `Stock-Bild (Fallback)${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
+              : isWikimedia
+                ? `Foto via Wikimedia Commons${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
+                : `Stock-Bild (Fallback)${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
           }
         >
           {currentPhoto.isGooglePhoto ? (
@@ -131,6 +133,11 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
                 loading="lazy"
               />
               <span>Google Photo</span>
+            </>
+          ) : isWikimedia ? (
+            <>
+              <ImageIcon className="w-3 h-3" />
+              <span>Wikimedia</span>
             </>
           ) : (
             <>
