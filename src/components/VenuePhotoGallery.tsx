@@ -40,6 +40,8 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
 
   const currentPhoto = photos[currentPhotoIndex];
   const hasMultiplePhotos = photos.length > 1;
+  const isWikimedia = currentPhoto.source === 'wikimedia';
+  const isRealPhoto = currentPhoto.isGooglePhoto || isWikimedia;
 
   const nextPhoto = () => {
     setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
