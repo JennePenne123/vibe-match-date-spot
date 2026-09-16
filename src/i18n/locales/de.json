@@ -1880,6 +1880,21 @@
     "typeRecommendation": "📍 Empfehlung",
     "footer": "Entdecke mehr auf hioutz.app"
   },
+  "shareSheet": {
+    "title": "Teilen",
+    "nativeShare": "Teilen",
+    "copyLink": "Link kopieren",
+    "copied": "Kopiert!",
+    "copiedToast": "Link kopiert! 📋",
+    "copiedToastDesc": "Der Link führt deine Freunde direkt zum Venue.",
+    "copyFailed": "Kopieren fehlgeschlagen",
+    "saveCard": "Share-Card",
+    "cardDownloaded": "Share-Card heruntergeladen! 🎨",
+    "cardFailed": "Bild konnte nicht erstellt werden",
+    "generating": "Wird erstellt…",
+    "popupBlocked": "{{label}} konnte nicht geöffnet werden",
+    "linkCopiedInstead": "Pop-up blockiert – Link wurde kopiert."
+  },
   "admin": {
     "dashboardTitle": "Admin Dashboard",
     "dashboardSubtitle": "Übersicht & Verwaltung",

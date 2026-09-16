@@ -1713,6 +1713,21 @@
     "typeRecommendation": "📍 Recomendación",
     "footer": "Descubre más en hioutz.app"
   },
+  "shareSheet": {
+    "title": "Compartir",
+    "nativeShare": "Compartir",
+    "copyLink": "Copiar enlace",
+    "copied": "¡Copiado!",
+    "copiedToast": "¡Enlace copiado! 📋",
+    "copiedToastDesc": "El enlace lleva a tus amigos directamente al local.",
+    "copyFailed": "No se pudo copiar",
+    "saveCard": "Tarjeta",
+    "cardDownloaded": "¡Tarjeta descargada! 🎨",
+    "cardFailed": "No se pudo crear la imagen",
+    "generating": "Creando…",
+    "popupBlocked": "No se pudo abrir {{label}}",
+    "linkCopiedInstead": "Pop-up bloqueado – enlace copiado."
+  },
   "auth": {
     "welcomeBack": "Bienvenido de nuevo",
     "getStarted": "Comencemos",

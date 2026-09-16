@@ -1880,6 +1880,21 @@
     "typeRecommendation": "📍 Recommendation",
     "footer": "Discover more at hioutz.app"
   },
+  "shareSheet": {
+    "title": "Share",
+    "nativeShare": "Share",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "copiedToast": "Link copied! 📋",
+    "copiedToastDesc": "The link takes your friends straight to this venue.",
+    "copyFailed": "Copying failed",
+    "saveCard": "Share card",
+    "cardDownloaded": "Share card downloaded! 🎨",
+    "cardFailed": "Image could not be created",
+    "generating": "Creating…",
+    "popupBlocked": "{{label}} could not be opened",
+    "linkCopiedInstead": "Pop-up blocked – link was copied."
+  },
   "admin": {
     "dashboardTitle": "Admin Dashboard",
     "dashboardSubtitle": "Overview & management",
