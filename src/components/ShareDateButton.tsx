@@ -1,13 +1,16 @@
-import React, { useState, useRef } from 'react';
+// ============= Full file contents =============
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, MessageCircle, Copy, Check, Image, Download } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { Share2, MessageCircle, Copy, Check, Download, Link2, Smartphone } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
 import ShareCard, { useShareCardCapture, type ShareCardData } from '@/components/share/ShareCardGenerator';
 
 interface ShareDateButtonProps {
@@ -31,12 +34,16 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
   variant = 'default',
   shareCardData
 }) => {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [generating, setGenerating] = useState(false);
   const { cardRef, generateImage } = useShareCardCapture();
 
+  // Deep link to the venue detail page – fallback to current page
   const shareUrl = url || window.location.origin;
-  
+  const displayUrl = shareUrl.replace(/^https?:\/\//, '');
+
   const shareText = message || [
     `🎉 ${title}`,
     venueName && `📍 ${venueName}`,
@@ -46,23 +53,25 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
     shareUrl
   ].filter(Boolean).join('\n');
 
-  const safeOpen = (url: string, label: string) => {
-    const win = window.open(url, '_blank', 'noopener,noreferrer');
+  const safeOpen = (targetUrl: string, label: string) => {
+    const win = window.open(targetUrl, '_blank', 'noopener,noreferrer');
     if (!win) {
-      toast({
-        title: `${label} konnte nicht geöffnet werden`,
-        description: 'Pop-up blockiert – Link wurde kopiert.',
+      toast.error(t('shareSheet.popupBlocked', { label }), {
+        description: t('shareSheet.linkCopiedInstead'),
       });
-      navigator.clipboard.writeText(url).catch(() => {});
+      navigator.clipboard.writeText(shareUrl).catch(() => {});
+      setOpen(false);
     }
   };
 
   const handleWhatsAppShare = () => {
     safeOpen(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, 'WhatsApp');
+    setOpen(false);
   };
 
   const handleTelegramShare = () => {
     safeOpen(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, 'Telegram');
+    setOpen(false);
   };
 
   const handleNativeShare = async () => {
@@ -81,11 +90,13 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
         if (blob && navigator.canShare?.({ files: [new File([blob], 'hioutz-share.png', { type: 'image/png' })] })) {
           const file = new File([blob], 'hioutz-share.png', { type: 'image/png' });
           await navigator.share({ title, text: shareText, url: shareUrl, files: [file] });
+          setOpen(false);
           return;
         }
       }
 
       await navigator.share({ title, text: shareText, url: shareUrl });
+      setOpen(false);
     } catch (e) {
       // User cancelled or share failed
     }
@@ -98,58 +109,65 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
     setGenerating(false);
 
     if (!blob) {
-      toast({ variant: 'destructive', title: 'Bild konnte nicht erstellt werden' });
+      toast.error(t('shareSheet.cardFailed'));
       return;
     }
 
-    const url = URL.createObjectURL(blob);
+    const cardUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
+    a.href = cardUrl;
     a.download = `hioutz-${Date.now()}.png`;
     a.click();
-    URL.revokeObjectURL(url);
-    toast({ title: 'Share-Card heruntergeladen! 🎨' });
+    URL.revokeObjectURL(cardUrl);
+    toast.success(t('shareSheet.cardDownloaded'));
+    setOpen(false);
   };
 
+  // Copies ONLY the deep link so friends can paste & open it instantly
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-      toast({ title: 'Link kopiert! 📋', description: 'Du kannst ihn jetzt teilen.' });
+      toast.success(t('shareSheet.copiedToast'), {
+        description: t('shareSheet.copiedToastDesc'),
+      });
       setTimeout(() => setCopied(false), 2000);
+      setOpen(false);
     } catch {
-      toast({ variant: 'destructive', title: 'Kopieren fehlgeschlagen' });
+      toast.error(t('shareSheet.copyFailed'));
     }
   };
 
-  const shareMenuItems = (
-    <>
-      {typeof navigator !== 'undefined' && 'share' in navigator && (
-        <DropdownMenuItem onClick={handleNativeShare} className="gap-2" disabled={generating}>
-          <Share2 className="w-4 h-4" />
-          {generating ? 'Wird erstellt...' : 'Teilen'}
-        </DropdownMenuItem>
-      )}
-      <DropdownMenuItem onClick={handleWhatsAppShare} className="gap-2">
-        <MessageCircle className="w-4 h-4 text-green-600" />
-        WhatsApp
-      </DropdownMenuItem>
-      <DropdownMenuItem onClick={handleTelegramShare} className="gap-2">
-        <Share2 className="w-4 h-4 text-blue-500" />
-        Telegram
-      </DropdownMenuItem>
-      {shareCardData && (
-        <DropdownMenuItem onClick={handleDownloadCard} className="gap-2" disabled={generating}>
-          <Download className="w-4 h-4" />
-          {generating ? 'Wird erstellt...' : 'Share-Card speichern'}
-        </DropdownMenuItem>
-      )}
-      <DropdownMenuItem onClick={handleCopyLink} className="gap-2">
-        {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
-        {copied ? 'Kopiert!' : 'Link kopieren'}
-      </DropdownMenuItem>
-    </>
-  );
+  const shareOptions = [
+    ...(typeof navigator !== 'undefined' && 'share' in navigator ? [{
+      key: 'native',
+      icon: <Smartphone className="w-5 h-5" />,
+      label: generating ? t('shareSheet.generating') : t('shareSheet.nativeShare'),
+      onClick: handleNativeShare,
+      disabled: generating,
+    }] : []),
+    {
+      key: 'whatsapp',
+      icon: <MessageCircle className="w-5 h-5 text-green-600" />,
+      label: 'WhatsApp',
+      onClick: handleWhatsAppShare,
+      disabled: false,
+    },
+    {
+      key: 'telegram',
+      icon: <Share2 className="w-5 h-5 text-sky-500" />,
+      label: 'Telegram',
+      onClick: handleTelegramShare,
+      disabled: false,
+    },
+    ...(shareCardData ? [{
+      key: 'card',
+      icon: <Download className="w-5 h-5" />,
+      label: generating ? t('shareSheet.generating') : t('shareSheet.saveCard'),
+      onClick: handleDownloadCard,
+      disabled: generating,
+    }] : []),
+  ];
 
   return (
     <>
@@ -162,23 +180,84 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
         </div>
       )}
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          {variant === 'compact' ? (
-            <Button variant="ghost" size="icon-sm" className={className}>
-              <Share2 className="w-4 h-4" />
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm" className={className}>
-              <Share2 className="w-4 h-4 mr-1.5" />
-              Teilen
-            </Button>
-          )}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-52">
-          {shareMenuItems}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Sheet open={open} onOpenChange={setOpen}>
+        {variant === 'compact' ? (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t('shareSheet.title')}
+            className={className}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
+          >
+            <Share2 className="w-4 h-4" />
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className={className}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
+          >
+            <Share2 className="w-4 h-4 mr-1.5" />
+            {t('shareSheet.title')}
+          </Button>
+        )}
+        <SheetContent
+          side="bottom"
+          className="rounded-t-3xl border border-white/10 bg-card/95 backdrop-blur-xl px-5 pb-8 pt-2 max-w-md mx-auto"
+        >
+          <SheetHeader className="text-left space-y-1 pb-2">
+            <SheetTitle className="text-lg font-semibold flex items-center gap-2">
+              <Share2 className="w-5 h-5 text-primary" />
+              {t('shareSheet.title')}
+            </SheetTitle>
+            <SheetDescription className="text-sm text-muted-foreground">
+              {venueName || title}
+            </SheetDescription>
+          </SheetHeader>
+
+          {/* Deep link row – copy for instant friend access */}
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            aria-label={copied ? t('shareSheet.copied') : t('shareSheet.copyLink')}
+            className="w-full flex items-center gap-3 rounded-2xl border border-white/10 bg-background/60 px-4 py-3 text-left transition-all duration-300 hover:bg-background/80 hover:border-primary/40 active:scale-[0.98] mb-4"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+              {copied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-xs font-medium text-foreground">
+                {copied ? t('shareSheet.copied') : t('shareSheet.copyLink')}
+              </span>
+              <span className="block text-xs text-muted-foreground truncate">
+                {displayUrl}
+              </span>
+            </span>
+            <Copy className="w-4 h-4 text-muted-foreground shrink-0" />
+          </button>
+
+          {/* Share targets */}
+          <div className="grid grid-cols-3 gap-3">
+            {shareOptions.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                onClick={option.onClick}
+                disabled={option.disabled}
+                className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-background/60 px-2 py-4 transition-all duration-300 hover:bg-background/80 hover:border-primary/40 active:scale-[0.98] disabled:opacity-50"
+              >
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-background border border-white/10">
+                  {option.icon}
+                </span>
+                <span className="text-xs font-medium text-foreground text-center leading-tight">
+                  {option.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 };
