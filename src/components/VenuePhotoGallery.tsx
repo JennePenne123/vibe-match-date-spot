@@ -8,6 +8,8 @@ interface VenuePhoto {
   height: number;
   attribution?: string;
   isGooglePhoto: boolean;
+  source?: string;
+  sourceUrl?: string;
 }
 
 interface VenuePhotoGalleryProps {
@@ -38,6 +40,8 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
 
   const currentPhoto = photos[currentPhotoIndex];
   const hasMultiplePhotos = photos.length > 1;
+  const isWikimedia = currentPhoto.source === 'wikimedia';
+  const isRealPhoto = currentPhoto.isGooglePhoto || isWikimedia;
 
   const nextPhoto = () => {
     setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
@@ -110,14 +114,16 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
         {/* Photo source badge — always visible */}
         <div
           className={`absolute top-2 left-2 px-2 py-1 rounded-full text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm ${
-            currentPhoto.isGooglePhoto
+            isRealPhoto
               ? 'bg-background/90 text-foreground border border-border/50'
               : 'bg-muted/90 text-muted-foreground border border-border/50'
           }`}
           title={
             currentPhoto.isGooglePhoto
               ? `Google Places Foto${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
-              : `Stock-Bild (Fallback)${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
+              : isWikimedia
+                ? `Foto via Wikimedia Commons${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
+                : `Stock-Bild (Fallback)${currentPhoto.attribution ? ` — ${currentPhoto.attribution}` : ''}`
           }
         >
           {currentPhoto.isGooglePhoto ? (
@@ -129,6 +135,11 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
                 loading="lazy"
               />
               <span>Google Photo</span>
+            </>
+          ) : isWikimedia ? (
+            <>
+              <ImageIcon className="w-3 h-3" />
+              <span>Wikimedia</span>
             </>
           ) : (
             <>
@@ -169,7 +180,9 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
         <span>
           {currentPhoto.isGooglePhoto
             ? `Foto via Google Places${currentPhoto.attribution ? ` · ${currentPhoto.attribution}` : ''}`
-            : `Stock-Foto${currentPhoto.attribution && currentPhoto.attribution !== 'Stock Photo' ? ` · ${currentPhoto.attribution}` : ' · Unsplash'}`}
+            : isWikimedia
+              ? `Foto via Wikimedia Commons${currentPhoto.attribution ? ` · ${currentPhoto.attribution}` : ''}`
+              : `Stock-Foto${currentPhoto.attribution && currentPhoto.attribution !== 'Stock Photo' ? ` · ${currentPhoto.attribution}` : ' · Unsplash'}`}
         </span>
       </div>
     </div>

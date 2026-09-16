@@ -36,6 +36,8 @@ export interface AppVenue {
     height: number;
     attribution?: string;
     isGooglePhoto: boolean;
+    source?: 'google' | 'wikimedia' | 'foursquare' | 'stock';
+    sourceUrl?: string;
   }>;
   tags?: string[];
   is_active?: boolean;
