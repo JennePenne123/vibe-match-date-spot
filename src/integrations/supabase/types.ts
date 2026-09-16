@@ -2218,6 +2218,53 @@ export type Database = {
           },
         ]
       }
+      venue_photo_attempts: {
+        Row: {
+          api_calls: number
+          attempted_at: string
+          estimated_cost: number
+          id: string
+          message: string | null
+          next_retry_at: string | null
+          photo_count: number
+          source: string
+          status: string
+          venue_id: string
+        }
+        Insert: {
+          api_calls?: number
+          attempted_at?: string
+          estimated_cost?: number
+          id?: string
+          message?: string | null
+          next_retry_at?: string | null
+          photo_count?: number
+          source: string
+          status: string
+          venue_id: string
+        }
+        Update: {
+          api_calls?: number
+          attempted_at?: string
+          estimated_cost?: number
+          id?: string
+          message?: string | null
+          next_retry_at?: string | null
+          photo_count?: number
+          source?: string
+          status?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_photo_attempts_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venue_search_cache: {
         Row: {
           cache_key: string
@@ -2844,6 +2891,10 @@ export type Database = {
       get_friend_preferences: { Args: { _friend_id: string }; Returns: Json }
       get_group_invite_preview: { Args: { _token: string }; Returns: Json }
       get_import_audit_summary: { Args: { days_back?: number }; Returns: Json }
+      get_photo_backfill_metrics: {
+        Args: { days_back?: number }
+        Returns: Json
+      }
       get_retention_metrics: { Args: { days_back?: number }; Returns: Json }
       get_signal_activation_metrics: {
         Args: { days_back?: number }

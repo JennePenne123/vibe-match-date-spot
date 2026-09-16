@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { getCachedVenueIds, recordPhotoAttempt } from '../_shared/photo-attempt-cache.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -98,11 +99,12 @@ Deno.serve(async (req) => {
       .not('latitude', 'is', null)
       .not('longitude', 'is', null)
       .eq('is_active', true)
-      .limit(limit);
+      // Over-fetch so cooldown-cached venues can be filtered out client-side.
+      .limit(limit * 4);
     if (cuisineTypes.length > 0) {
       candidatesQuery = candidatesQuery.in('cuisine_type', cuisineTypes);
     }
-    const { data: venues, error: fetchErr } = await candidatesQuery;
+    const { data: pool, error: fetchErr } = await candidatesQuery;
 
     if (fetchErr) {
       return new Response(JSON.stringify({ error: fetchErr.message }), {
@@ -110,6 +112,16 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Photo cache: never pay for the same venue twice inside its cooldown.
+    const cachedIds = await getCachedVenueIds(
+      admin,
+      'google',
+      (pool || []).map((v: { id: string }) => v.id),
+    );
+    const fresh = (pool || []).filter((v: { id: string }) => !cachedIds.has(v.id));
+    const venues = fresh.slice(0, limit);
+    const cacheSkipped = (pool || []).length - fresh.length;
 
     // Count remaining for progress reporting.
     let remainingQuery = admin
@@ -157,6 +169,12 @@ Deno.serve(async (req) => {
 
         if (!searchRes.ok) {
           console.warn(`searchText ${searchRes.status} for ${v.id}`);
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'google',
+            status: 'error',
+            message: `searchText ${searchRes.status}`,
+          });
           skipped++;
           continue;
         }
@@ -164,6 +182,7 @@ Deno.serve(async (req) => {
         const searchJson = await searchRes.json();
         const place = searchJson.places?.[0];
         if (!place?.id) {
+          await recordPhotoAttempt(admin, { venueId: v.id, source: 'google', status: 'miss' });
           skipped++;
           continue;
         }
@@ -201,12 +220,30 @@ Deno.serve(async (req) => {
 
         if (updateErr) {
           console.error(`Update error for ${v.id}:`, updateErr);
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'google',
+            status: 'error',
+            message: updateErr.message,
+          });
           skipped++;
         } else {
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'google',
+            status: photos.length > 0 ? 'hit' : 'miss',
+            photoCount: photos.length,
+          });
           updated++;
         }
       } catch (err) {
         console.error(`Backfill error for ${v.id}:`, err);
+        await recordPhotoAttempt(admin, {
+          venueId: v.id,
+          source: 'google',
+          status: 'error',
+          message: String(err),
+        });
         skipped++;
       }
     }
@@ -214,7 +251,7 @@ Deno.serve(async (req) => {
     const remaining = Math.max((remainingBefore || 0) - matched, 0);
 
     return new Response(
-      JSON.stringify({ processed, matched, updated, skipped, remaining }),
+      JSON.stringify({ processed, matched, updated, skipped, cacheSkipped, remaining }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (err) {

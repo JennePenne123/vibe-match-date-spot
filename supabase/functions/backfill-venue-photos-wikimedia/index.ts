@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { getCachedVenueIds, recordPhotoAttempt } from '../_shared/photo-attempt-cache.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -137,16 +138,26 @@ Deno.serve(async (req) => {
       .not('latitude', 'is', null)
       .not('longitude', 'is', null)
       .eq('is_active', true)
-      .limit(limit);
+      // Over-fetch so cooldown-cached venues can be filtered out client-side.
+      .limit(limit * 4);
     if (cuisineTypes.length > 0) query = query.in('cuisine_type', cuisineTypes);
 
-    const { data: venues, error: fetchErr } = await query;
+    const { data: pool, error: fetchErr } = await query;
     if (fetchErr) {
       return new Response(JSON.stringify({ error: fetchErr.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Photo cache: never re-query the same venue inside its cooldown window.
+    const cached = await getCachedVenueIds(
+      admin,
+      'wikimedia',
+      (pool || []).map((v: { id: string }) => v.id),
+    );
+    const venues = (pool || []).filter((v: { id: string }) => !cached.has(v.id)).slice(0, limit);
+    const cacheSkipped = (pool || []).length - (pool || []).filter((v: { id: string }) => !cached.has(v.id)).length;
 
     let processed = 0;
     let matched = 0;
@@ -195,6 +206,7 @@ Deno.serve(async (req) => {
           .slice(0, 5);
 
         if (candidates.length === 0) {
+          await recordPhotoAttempt(admin, { venueId: v.id, source: 'wikimedia', status: 'miss' });
           skipped++;
           continue;
         }
@@ -221,12 +233,30 @@ Deno.serve(async (req) => {
           .eq('id', v.id);
 
         if (updateErr) {
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'wikimedia',
+            status: 'error',
+            message: updateErr.message,
+          });
           errors.push(`${v.id}: ${updateErr.message}`);
           skipped++;
         } else {
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'wikimedia',
+            status: 'hit',
+            photoCount: photos.length,
+          });
           updated++;
         }
       } catch (err) {
+        await recordPhotoAttempt(admin, {
+          venueId: v.id,
+          source: 'wikimedia',
+          status: 'error',
+          message: String(err),
+        });
         errors.push(`${v.id}: ${String(err)}`);
         skipped++;
       }
@@ -235,7 +265,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ processed, matched, updated, skipped, errors: errors.slice(0, 10) }),
+      JSON.stringify({ processed, matched, updated, skipped, cacheSkipped, errors: errors.slice(0, 10) }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (err) {
