@@ -180,7 +180,9 @@ export const VenuePhotoGallery: React.FC<VenuePhotoGalleryProps> = ({
         <span>
           {currentPhoto.isGooglePhoto
             ? `Foto via Google Places${currentPhoto.attribution ? ` · ${currentPhoto.attribution}` : ''}`
-            : `Stock-Foto${currentPhoto.attribution && currentPhoto.attribution !== 'Stock Photo' ? ` · ${currentPhoto.attribution}` : ' · Unsplash'}`}
+            : isWikimedia
+              ? `Foto via Wikimedia Commons${currentPhoto.attribution ? ` · ${currentPhoto.attribution}` : ''}`
+              : `Stock-Foto${currentPhoto.attribution && currentPhoto.attribution !== 'Stock Photo' ? ` · ${currentPhoto.attribution}` : ' · Unsplash'}`}
         </span>
       </div>
     </div>
