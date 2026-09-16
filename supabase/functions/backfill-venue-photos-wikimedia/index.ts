@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
       .from('venues')
       .select('id, name, latitude, longitude, photos')
       .is('google_place_id', null)
-      .is('photos', null)
+      .or('photos.is.null,photos.eq.[]')
       .not('latitude', 'is', null)
       .not('longitude', 'is', null)
       .eq('is_active', true)
@@ -157,6 +157,10 @@ Deno.serve(async (req) => {
     for (const v of venues || []) {
       processed++;
       try {
+        if (Array.isArray(v.photos) && v.photos.length > 0) {
+          skipped++;
+          continue;
+        }
         const pages = await commonsGeoSearch(Number(v.latitude), Number(v.longitude), radius);
 
         const scored = pages
