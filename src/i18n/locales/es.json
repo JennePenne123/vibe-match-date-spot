@@ -1837,7 +1837,9 @@
     "noWebsite": "Sin web",
     "addressNotAvailable": "Dirección no disponible",
     "moreHours": "+ {{count}} más",
-    "viewOnGoogleMaps": "Ver en Google Maps"
+    "viewOnGoogleMaps": "Ver en Google Maps",
+    "addedToFavorites": "Añadido a favoritos ❤️",
+    "removedFromFavorites": "Eliminado de favoritos"
   },
   "myVenues": {
     "noFavorites": "Aún no tienes locales favoritos",

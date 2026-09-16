@@ -146,6 +146,11 @@ const VenueDetail = () => {
     if (!appVenue.id) return;
     setHeartAnimating(true);
     setTimeout(() => setHeartAnimating(false), 400);
+    if (venueLiked) {
+      toast.success(t('venue.removedFromFavorites'));
+    } else {
+      toast.success(t('venue.addedToFavorites'));
+    }
     toggleLike(appVenue.id);
   };
   const websiteUrl = appVenue.website || resolvedWebsite;
