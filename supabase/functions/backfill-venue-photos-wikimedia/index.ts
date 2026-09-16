@@ -206,6 +206,7 @@ Deno.serve(async (req) => {
           .slice(0, 5);
 
         if (candidates.length === 0) {
+          await recordPhotoAttempt(admin, { venueId: v.id, source: 'wikimedia', status: 'miss' });
           skipped++;
           continue;
         }
@@ -232,12 +233,30 @@ Deno.serve(async (req) => {
           .eq('id', v.id);
 
         if (updateErr) {
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'wikimedia',
+            status: 'error',
+            message: updateErr.message,
+          });
           errors.push(`${v.id}: ${updateErr.message}`);
           skipped++;
         } else {
+          await recordPhotoAttempt(admin, {
+            venueId: v.id,
+            source: 'wikimedia',
+            status: 'hit',
+            photoCount: photos.length,
+          });
           updated++;
         }
       } catch (err) {
+        await recordPhotoAttempt(admin, {
+          venueId: v.id,
+          source: 'wikimedia',
+          status: 'error',
+          message: String(err),
+        });
         errors.push(`${v.id}: ${String(err)}`);
         skipped++;
       }
@@ -246,7 +265,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ processed, matched, updated, skipped, errors: errors.slice(0, 10) }),
+      JSON.stringify({ processed, matched, updated, skipped, cacheSkipped, errors: errors.slice(0, 10) }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (err) {
