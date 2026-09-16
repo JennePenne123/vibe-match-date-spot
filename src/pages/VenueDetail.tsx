@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Star, MapPin, Clock, Phone, Heart, Sparkles, Globe, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { venueToAppVenue } from '@/utils/typeHelpers';
 import { useVenueImplicitTracking } from '@/hooks/useImplicitSignals';
 import { supabase } from '@/integrations/supabase/client';
