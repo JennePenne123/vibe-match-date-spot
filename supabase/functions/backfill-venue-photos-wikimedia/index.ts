@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { getCachedVenueIds, recordPhotoAttempt } from '../_shared/photo-attempt-cache.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -137,16 +138,26 @@ Deno.serve(async (req) => {
       .not('latitude', 'is', null)
       .not('longitude', 'is', null)
       .eq('is_active', true)
-      .limit(limit);
+      // Over-fetch so cooldown-cached venues can be filtered out client-side.
+      .limit(limit * 4);
     if (cuisineTypes.length > 0) query = query.in('cuisine_type', cuisineTypes);
 
-    const { data: venues, error: fetchErr } = await query;
+    const { data: pool, error: fetchErr } = await query;
     if (fetchErr) {
       return new Response(JSON.stringify({ error: fetchErr.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Photo cache: never re-query the same venue inside its cooldown window.
+    const cached = await getCachedVenueIds(
+      admin,
+      'wikimedia',
+      (pool || []).map((v: { id: string }) => v.id),
+    );
+    const venues = (pool || []).filter((v: { id: string }) => !cached.has(v.id)).slice(0, limit);
+    const cacheSkipped = (pool || []).length - (pool || []).filter((v: { id: string }) => !cached.has(v.id)).length;
 
     let processed = 0;
     let matched = 0;
