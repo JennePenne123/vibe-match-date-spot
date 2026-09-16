@@ -98,11 +98,12 @@ Deno.serve(async (req) => {
       .not('latitude', 'is', null)
       .not('longitude', 'is', null)
       .eq('is_active', true)
-      .limit(limit);
+      // Over-fetch so cooldown-cached venues can be filtered out client-side.
+      .limit(limit * 4);
     if (cuisineTypes.length > 0) {
       candidatesQuery = candidatesQuery.in('cuisine_type', cuisineTypes);
     }
-    const { data: venues, error: fetchErr } = await candidatesQuery;
+    const { data: pool, error: fetchErr } = await candidatesQuery;
 
     if (fetchErr) {
       return new Response(JSON.stringify({ error: fetchErr.message }), {
@@ -110,6 +111,16 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Photo cache: never pay for the same venue twice inside its cooldown.
+    const cachedIds = await getCachedVenueIds(
+      admin,
+      'google',
+      (pool || []).map((v: { id: string }) => v.id),
+    );
+    const fresh = (pool || []).filter((v: { id: string }) => !cachedIds.has(v.id));
+    const venues = fresh.slice(0, limit);
+    const cacheSkipped = (pool || []).length - fresh.length;
 
     // Count remaining for progress reporting.
     let remainingQuery = admin
