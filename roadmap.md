@@ -5,7 +5,7 @@
 - [ ] **Google-Fotos für US-Venues (NYC & LA)** – Nach dem kostenlosen OSM-Import echte Fotos über Google Places nachziehen; Kosten steuern: nur Top-bewertete Orte (z. B. Rating ≥ 4,0) anreichern.
 
 ## In Arbeit
-- (keine)
+- [ ] **Wikimedia-Foto-Fallback auswerten** (Check in ein paar Tagen, ~Mitte nächster Woche): Trefferquote in `venue_photo_attempts` (Startwert 16.09.: 3 Treffer / 21 Fehlschläge). Falls Quote zu niedrig: Namenserkennung im Worker lockern.
 
 ## Erledigt (zur Referenz)
 - [x] DACH-Import für Essen, Kultur, Aktivität, Nightlife abgeschlossen (50 Städte, 65.348 aktive Orte)
