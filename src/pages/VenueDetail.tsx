@@ -359,6 +359,8 @@ const VenueDetail = () => {
 
           {/* Menu (food & drink venues only) */}
           <VenueMenuSection
+            venueId={appVenue.id}
+            lastUpdated={(sourceVenue as any)?.updated_at}
             venue={{
               name: appVenue.name,
               description: appVenue.description,
