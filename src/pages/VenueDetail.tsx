@@ -261,6 +261,9 @@ const VenueDetail = () => {
                 title={appVenue.name}
                 venueName={appVenue.name}
                 url={`${window.location.origin}/venue/${appVenue.id}`}
+                address={displayAddress}
+                rating={appVenue.rating}
+                menuUrl={(sourceVenue as any)?.menu_url || null}
                 shareCardData={shareCardData}
                 variant="compact"
                 className="!h-11 !w-11 !rounded-full !bg-black/30 !backdrop-blur-md !border !border-white/20 !text-white hover:!bg-black/50 hover:!scale-105 active:!scale-95 transition-all duration-300"
