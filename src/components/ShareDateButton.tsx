@@ -53,7 +53,10 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
   const shareText = message || [
     `🎉 ${title}`,
     venueName && `📍 ${venueName}`,
+    address && `🏠 ${address}`,
+    rating != null && rating > 0 && `⭐ ${rating.toFixed(1)}/5`,
     dateTime && `📅 ${dateTime}`,
+    menuUrl && `🍽️ ${t('shareSheet.menuLabel')}: ${menuUrl}`,
     '',
     'Geplant mit H!Outz – der smartesten Date-App! 💜',
     shareUrl
