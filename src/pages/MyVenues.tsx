@@ -175,11 +175,7 @@ const MyVenues = () => {
           ) : (
             <>
               <p className="text-xs text-muted-foreground mb-3">
-                {t('myVenues.count', {
-                  count: visibleVenues.length,
-                  defaultValue_one: '{{count}} Favorit',
-                  defaultValue_other: '{{count}} Favoriten',
-                })}
+                {t('myVenues.count', { count: visibleVenues.length })}
               </p>
               <div className="space-y-3">
                 {visibleVenues.map(venue => (
