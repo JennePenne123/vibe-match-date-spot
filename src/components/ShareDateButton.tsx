@@ -19,6 +19,9 @@ interface ShareDateButtonProps {
   url?: string;
   venueName?: string;
   dateTime?: string;
+  address?: string;
+  rating?: number | null;
+  menuUrl?: string | null;
   className?: string;
   variant?: 'default' | 'compact';
   shareCardData?: ShareCardData;
@@ -30,6 +33,9 @@ const ShareDateButton: React.FC<ShareDateButtonProps> = ({
   url,
   venueName,
   dateTime,
+  address,
+  rating,
+  menuUrl,
   className,
   variant = 'default',
   shareCardData
