@@ -212,6 +212,7 @@ const App = () => (
                     <Route path="/venues" element={<LazyPage><Venues /></LazyPage>} />
                     <Route path="/my-friends" element={<LazyPage><MyFriends /></LazyPage>} />
                     <Route path="/my-venues" element={<LazyPage><MyVenues /></LazyPage>} />
+                    <Route path="/favorites" element={<LazyPage><MyVenues /></LazyPage>} />
                     <Route path="/invitations" element={<LazyPage><Invitations /></LazyPage>} />
                     <Route path="/chats" element={<LazyPage><Chats /></LazyPage>} />
                     <Route path="/group-dates" element={<LazyPage><GroupDates /></LazyPage>} />
