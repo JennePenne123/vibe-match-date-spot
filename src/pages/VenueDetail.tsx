@@ -366,7 +366,7 @@ const VenueDetail = () => {
               tags: appVenue.tags,
               venue_type: (sourceVenue as any)?.venue_type,
             }}
-            menuHighlights={(sourceVenue as any)?.menu_highlights}
+            menuHighlights={menuHighlights}
             menuUrl={(sourceVenue as any)?.menu_url}
             websiteUrl={websiteUrl}
             googleMapsUrl={googleMapsUrl}
