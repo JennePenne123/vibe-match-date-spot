@@ -1688,7 +1688,20 @@
       "title": "Speisekarte",
       "empty": "Für diesen Ort liegen uns noch keine Gerichte vor.",
       "viewMenu": "Speisekarte ansehen",
-      "searchMenu": "Speisekarte bei Google suchen"
+      "searchMenu": "Speisekarte bei Google suchen",
+      "stale": "Diese Angaben stammen von unserem Partner und könnten veraltet sein – bitte prüfe die Karte vor Ort.",
+      "staleWithDate": "Zuletzt aktualisiert am {{date}} – die Angaben könnten inzwischen veraltet sein.",
+      "report": {
+        "trigger": "Falsche Angaben melden",
+        "title": "Speisekarte melden",
+        "description": "Sag uns kurz, was nicht stimmt – wir prüfen es und aktualisieren die Angaben.",
+        "placeholder": "z. B. Gericht gibt es nicht mehr, Preise haben sich geändert …",
+        "submit": "Melden",
+        "validation": "Bitte beschreibe kurz, was nicht stimmt.",
+        "loginRequired": "Bitte melde dich an, um einen Hinweis zu senden.",
+        "success": "Danke! Wir prüfen deinen Hinweis.",
+        "error": "Hinweis konnte nicht gesendet werden."
+      }
     }
   },
   "myVenues": {

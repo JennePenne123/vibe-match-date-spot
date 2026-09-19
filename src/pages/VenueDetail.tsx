@@ -360,6 +360,7 @@ const VenueDetail = () => {
           {/* Menu (food & drink venues only) */}
           <VenueMenuSection
             venue={{
+              id: appVenue.id,
               name: appVenue.name,
               description: appVenue.description,
               cuisine_type: appVenue.cuisine_type,
@@ -370,6 +371,7 @@ const VenueDetail = () => {
             menuUrl={(sourceVenue as any)?.menu_url}
             websiteUrl={websiteUrl}
             googleMapsUrl={googleMapsUrl}
+            menuUpdatedAt={(sourceVenue as any)?.updated_at}
           />
 
           {/* Contact Info & Hours */}

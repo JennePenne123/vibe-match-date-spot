@@ -1688,7 +1688,20 @@
       "title": "Menu",
       "empty": "We don't have any dishes for this place yet.",
       "viewMenu": "View menu",
-      "searchMenu": "Find menu on Google"
+      "searchMenu": "Find menu on Google",
+      "stale": "This information comes from our partner and may be out of date – please check the menu on site.",
+      "staleWithDate": "Last updated on {{date}} – this information may be out of date.",
+      "report": {
+        "trigger": "Report incorrect details",
+        "title": "Report menu",
+        "description": "Tell us briefly what's wrong – we'll check and update it.",
+        "placeholder": "e.g. dish no longer available, prices changed …",
+        "submit": "Report",
+        "validation": "Please describe briefly what's wrong.",
+        "loginRequired": "Please sign in to send a report.",
+        "success": "Thanks! We'll review your report.",
+        "error": "Report could not be sent."
+      }
     }
   },
   "myVenues": {
