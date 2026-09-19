@@ -360,6 +360,7 @@ const VenueDetail = () => {
           {/* Menu (food & drink venues only) */}
           <VenueMenuSection
             venue={{
+              id: appVenue.id,
               name: appVenue.name,
               description: appVenue.description,
               cuisine_type: appVenue.cuisine_type,
