@@ -1860,7 +1860,17 @@
     "noFavorites": "Aún no tienes locales favoritos",
     "noFavoritesDesc": "¡Descubre locales y añádelos a tus favoritos!",
     "noMatching": "Sin locales que coincidan",
-    "noMatchingDesc": "Ajusta tu búsqueda para encontrar más locales."
+    "noMatchingDesc": "Ajusta tu búsqueda para encontrar más locales.",
+    "title": "Mis favoritos",
+    "subtitle": "Tus lugares guardados para citas",
+    "searchPlaceholder": "Buscar favoritos...",
+    "sortRecent": "Guardados recientemente",
+    "sortRating": "Valoración",
+    "sortName": "Nombre",
+    "discover": "Descubrir lugares",
+    "remove": "Quitar de favoritos",
+    "count_one": "{{count}} favorito",
+    "count_other": "{{count}} favoritos"
   },
   "dateInvite": {
     "accepted": "Aceptada",

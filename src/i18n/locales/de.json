@@ -1689,7 +1689,17 @@
     "noFavorites": "Noch keine Lieblings-Venues",
     "noFavoritesDesc": "Entdecke Venues und füge sie zu deinen Favoriten hinzu!",
     "noMatching": "Keine passenden Venues",
-    "noMatchingDesc": "Passe deine Suchbegriffe an, um mehr Venues zu finden."
+    "noMatchingDesc": "Passe deine Suchbegriffe an, um mehr Venues zu finden.",
+    "title": "Meine Favoriten",
+    "subtitle": "Deine gespeicherten Date-Spots",
+    "searchPlaceholder": "Favoriten durchsuchen...",
+    "sortRecent": "Zuletzt gespeichert",
+    "sortRating": "Bewertung",
+    "sortName": "Name",
+    "discover": "Date-Spots entdecken",
+    "remove": "Aus Favoriten entfernen",
+    "count_one": "{{count}} Favorit",
+    "count_other": "{{count}} Favoriten"
   },
   "dateInvite": {
     "accepted": "Angenommen",
