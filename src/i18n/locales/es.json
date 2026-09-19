@@ -1859,7 +1859,20 @@
       "title": "Carta",
       "empty": "Todavía no tenemos platos de este lugar.",
       "viewMenu": "Ver la carta",
-      "searchMenu": "Buscar la carta en Google"
+      "searchMenu": "Buscar la carta en Google",
+      "stale": "Esta información procede de nuestro socio y puede estar desactualizada: comprueba la carta en el local.",
+      "staleWithDate": "Actualizado el {{date}}: la información puede estar desactualizada.",
+      "report": {
+        "trigger": "Informar de un error",
+        "title": "Informar sobre la carta",
+        "description": "Cuéntanos brevemente qué falla; lo revisaremos y lo actualizaremos.",
+        "placeholder": "p. ej. el plato ya no existe, los precios han cambiado…",
+        "submit": "Enviar",
+        "validation": "Describe brevemente qué falla.",
+        "loginRequired": "Inicia sesión para enviar un aviso.",
+        "success": "¡Gracias! Revisaremos tu aviso.",
+        "error": "No se pudo enviar el aviso."
+      }
     }
   },
   "myVenues": {
