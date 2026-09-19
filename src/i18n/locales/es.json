@@ -36,7 +36,7 @@
     "chats": "Chats",
     "myFriends": "Mis Amigos",
     "invitations": "Invitaciones",
-    "myVenues": "Mis Lugares",
+    "myVenues": "Mis favoritos",
     "navigation": "Navegación",
     "groupDates": "Citas en grupo"
   },
@@ -64,7 +64,7 @@
     "myFriendsDesc": "Tus conexiones",
     "myInvitations": "Mis Invitaciones",
     "myInvitationsDesc": "Ver todas las invitaciones",
-    "myVenues": "Mis Lugares",
+    "myVenues": "Mis favoritos",
     "myVenuesDesc": "Lugares favoritos",
     "appearance": "Apariencia",
     "system": "Sistema",
@@ -1860,7 +1860,17 @@
     "noFavorites": "Aún no tienes locales favoritos",
     "noFavoritesDesc": "¡Descubre locales y añádelos a tus favoritos!",
     "noMatching": "Sin locales que coincidan",
-    "noMatchingDesc": "Ajusta tu búsqueda para encontrar más locales."
+    "noMatchingDesc": "Ajusta tu búsqueda para encontrar más locales.",
+    "title": "Mis favoritos",
+    "subtitle": "Tus lugares guardados para citas",
+    "searchPlaceholder": "Buscar favoritos...",
+    "sortRecent": "Guardados recientemente",
+    "sortRating": "Valoración",
+    "sortName": "Nombre",
+    "discover": "Descubrir lugares",
+    "remove": "Quitar de favoritos",
+    "count_one": "{{count}} favorito",
+    "count_other": "{{count}} favoritos"
   },
   "dateInvite": {
     "accepted": "Aceptada",

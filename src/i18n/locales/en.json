@@ -36,7 +36,7 @@
     "chats": "Chats",
     "myFriends": "My Friends",
     "invitations": "Invitations",
-    "myVenues": "My Venues",
+    "myVenues": "My Favorites",
     "navigation": "Navigation",
     "groupDates": "Group Dates"
   },
@@ -64,7 +64,7 @@
     "myFriendsDesc": "Your connections",
     "myInvitations": "My Invitations",
     "myInvitationsDesc": "View all invitations",
-    "myVenues": "My Venues",
+    "myVenues": "My Favorites",
     "myVenuesDesc": "Favorite places",
     "appearance": "Appearance",
     "system": "System",
@@ -1689,7 +1689,17 @@
     "noFavorites": "No Favorite Venues Yet",
     "noFavoritesDesc": "Start exploring and add venues to your favorites!",
     "noMatching": "No Matching Venues",
-    "noMatchingDesc": "Try adjusting your search terms to find more venues."
+    "noMatchingDesc": "Try adjusting your search terms to find more venues.",
+    "title": "My Favorites",
+    "subtitle": "Your saved date spots",
+    "searchPlaceholder": "Search favorites...",
+    "sortRecent": "Recently saved",
+    "sortRating": "Rating",
+    "sortName": "Name",
+    "discover": "Discover date spots",
+    "remove": "Remove from favorites",
+    "count_one": "{{count}} favorite",
+    "count_other": "{{count}} favorites"
   },
   "dateInvite": {
     "accepted": "Accepted",
