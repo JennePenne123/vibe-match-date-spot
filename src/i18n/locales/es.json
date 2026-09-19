@@ -1859,7 +1859,26 @@
       "title": "Carta",
       "empty": "Todavía no tenemos platos de este lugar.",
       "viewMenu": "Ver la carta",
-      "searchMenu": "Buscar la carta en Google"
+      "searchMenu": "Buscar la carta en Google",
+      "staleHint": "Esta información lleva tiempo sin actualizarse y puede estar desfasada.",
+      "lastUpdated": "Última actualización: {{date}}",
+      "freshnessNote": "Los datos pueden cambiar sin aviso: confírmalo en el local.",
+      "report": {
+        "cta": "Informar de datos erróneos",
+        "title": "Informar sobre la carta",
+        "description": "Cuéntanos brevemente qué falla. Lo revisaremos.",
+        "reasonLabel": "¿Qué falla?",
+        "reasonPrices": "Los precios no están actualizados",
+        "reasonDishes": "Ya no ofrecen esos platos",
+        "reasonMissing": "Falta la carta o el enlace no funciona",
+        "reasonOther": "Otra cosa",
+        "detailsLabel": "Detalles (opcional)",
+        "detailsPlaceholder": "p. ej., la pasta cuesta ahora 16 €",
+        "submit": "Enviar aviso",
+        "success": "¡Gracias! Lo revisaremos.",
+        "error": "No se pudo enviar el aviso.",
+        "loginRequired": "Inicia sesión para informar."
+      }
     }
   },
   "myVenues": {
