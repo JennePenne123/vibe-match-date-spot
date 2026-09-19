@@ -1688,26 +1688,7 @@
       "title": "Speisekarte",
       "empty": "Für diesen Ort liegen uns noch keine Gerichte vor.",
       "viewMenu": "Speisekarte ansehen",
-      "searchMenu": "Speisekarte bei Google suchen",
-      "staleHint": "Diese Angaben sind länger nicht aktualisiert worden und können veraltet sein.",
-      "lastUpdated": "Zuletzt aktualisiert: {{date}}",
-      "freshnessNote": "Angaben können sich kurzfristig ändern – bitte vor Ort prüfen.",
-      "report": {
-        "cta": "Falsche Angaben melden",
-        "title": "Speisekarte melden",
-        "description": "Sag uns kurz, was nicht stimmt. Wir prüfen die Angaben.",
-        "reasonLabel": "Was stimmt nicht?",
-        "reasonPrices": "Preise sind nicht mehr aktuell",
-        "reasonDishes": "Gerichte gibt es nicht mehr",
-        "reasonMissing": "Speisekarte fehlt oder Link geht nicht",
-        "reasonOther": "Etwas anderes",
-        "detailsLabel": "Details (optional)",
-        "detailsPlaceholder": "z. B. Pasta kostet jetzt 16 €",
-        "submit": "Meldung senden",
-        "success": "Danke! Wir prüfen die Angaben.",
-        "error": "Meldung konnte nicht gesendet werden.",
-        "loginRequired": "Bitte melde dich an, um etwas zu melden."
-      }
+      "searchMenu": "Speisekarte bei Google suchen"
     }
   },
   "myVenues": {

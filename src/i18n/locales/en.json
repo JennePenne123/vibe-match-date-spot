@@ -1688,26 +1688,7 @@
       "title": "Menu",
       "empty": "We don't have any dishes for this place yet.",
       "viewMenu": "View menu",
-      "searchMenu": "Find menu on Google",
-      "staleHint": "This information hasn't been updated in a while and may be outdated.",
-      "lastUpdated": "Last updated: {{date}}",
-      "freshnessNote": "Details can change at short notice – please double-check on site.",
-      "report": {
-        "cta": "Report wrong details",
-        "title": "Report menu",
-        "description": "Tell us briefly what's wrong. We'll review the details.",
-        "reasonLabel": "What's wrong?",
-        "reasonPrices": "Prices are out of date",
-        "reasonDishes": "Dishes are no longer offered",
-        "reasonMissing": "Menu is missing or the link is broken",
-        "reasonOther": "Something else",
-        "detailsLabel": "Details (optional)",
-        "detailsPlaceholder": "e.g. pasta now costs €16",
-        "submit": "Send report",
-        "success": "Thanks! We'll review it.",
-        "error": "Couldn't send your report.",
-        "loginRequired": "Please sign in to report something."
-      }
+      "searchMenu": "Find menu on Google"
     }
   },
   "myVenues": {

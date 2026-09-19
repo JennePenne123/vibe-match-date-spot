@@ -57,26 +57,23 @@ const VenueDetail = () => {
 
   const sourceVenue = venue || dbVenue;
 
-  // Menu data lives in the DB – load it when the venue came from app state
+  // Menu highlights live in the DB – load them when the venue came from app state
   const [menuHighlights, setMenuHighlights] = useState<string[] | null>(null);
-  const [menuUpdatedAt, setMenuUpdatedAt] = useState<string | null>(null);
   useEffect(() => {
     const fromSource = (sourceVenue as any)?.menu_highlights;
-    const updatedFromSource = (sourceVenue as any)?.updated_at;
-    if (fromSource) setMenuHighlights(fromSource);
-    if (updatedFromSource) setMenuUpdatedAt(updatedFromSource);
-    if (fromSource && updatedFromSource) return;
+    if (fromSource) {
+      setMenuHighlights(fromSource);
+      return;
+    }
     if (!id) return;
     let cancelled = false;
     supabase
       .from('venues')
-      .select('menu_highlights, updated_at')
+      .select('menu_highlights')
       .eq('id', id)
       .maybeSingle()
       .then(({ data }) => {
-        if (cancelled || !data) return;
-        if (data.menu_highlights) setMenuHighlights(data.menu_highlights);
-        if (data.updated_at) setMenuUpdatedAt(data.updated_at);
+        if (!cancelled && data?.menu_highlights) setMenuHighlights(data.menu_highlights);
       });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -362,8 +359,6 @@ const VenueDetail = () => {
 
           {/* Menu (food & drink venues only) */}
           <VenueMenuSection
-            venueId={appVenue.id}
-            lastUpdated={menuUpdatedAt}
             venue={{
               name: appVenue.name,
               description: appVenue.description,
