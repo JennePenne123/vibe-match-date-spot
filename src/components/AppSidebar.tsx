@@ -39,7 +39,7 @@ export function AppSidebar() {
   const secondaryNavItems = [
     { title: t('nav.myFriends'), url: '/my-friends', icon: Users },
     { title: t('nav.invitations'), url: '/invitations', icon: Heart },
-    { title: t('nav.myVenues'), url: '/my-venues', icon: MapPin },
+    { title: t('nav.myVenues'), url: '/my-venues', icon: Star },
   ]
 
   const pendingCount = React.useMemo(() => {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Settings, Heart, MapPin, ChevronRight, RotateCcw, Gift } from 'lucide-react';
+import { Users, Settings, Heart, MapPin, Star, ChevronRight, RotateCcw, Gift } from 'lucide-react';
 import { useFriends } from '@/hooks/useFriends';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils';
@@ -22,7 +22,7 @@ const ProfileActions = ({ onLogout }: ProfileActionsProps) => {
 
   const quickLinks = [
     { icon: Heart, label: t('menu.myInvitations', 'Meine Einladungen'), path: '/invitations', color: 'text-rose-500', bg: 'bg-rose-500/10' },
-    { icon: MapPin, label: t('menu.myVenues', 'Meine Venues'), path: '/my-venues', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { icon: Star, label: t('menu.myVenues', 'Meine Favoriten'), path: '/my-venues', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
   ];
 
   return (

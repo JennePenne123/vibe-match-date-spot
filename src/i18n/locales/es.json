@@ -36,7 +36,7 @@
     "chats": "Chats",
     "myFriends": "Mis Amigos",
     "invitations": "Invitaciones",
-    "myVenues": "Mis Lugares",
+    "myVenues": "Mis favoritos",
     "navigation": "Navegación",
     "groupDates": "Citas en grupo"
   },
@@ -64,7 +64,7 @@
     "myFriendsDesc": "Tus conexiones",
     "myInvitations": "Mis Invitaciones",
     "myInvitationsDesc": "Ver todas las invitaciones",
-    "myVenues": "Mis Lugares",
+    "myVenues": "Mis favoritos",
     "myVenuesDesc": "Lugares favoritos",
     "appearance": "Apariencia",
     "system": "Sistema",
