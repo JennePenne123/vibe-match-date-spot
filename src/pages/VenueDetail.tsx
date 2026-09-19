@@ -57,6 +57,28 @@ const VenueDetail = () => {
 
   const sourceVenue = venue || dbVenue;
 
+  // Menu highlights live in the DB – load them when the venue came from app state
+  const [menuHighlights, setMenuHighlights] = useState<string[] | null>(null);
+  useEffect(() => {
+    const fromSource = (sourceVenue as any)?.menu_highlights;
+    if (fromSource) {
+      setMenuHighlights(fromSource);
+      return;
+    }
+    if (!id) return;
+    let cancelled = false;
+    supabase
+      .from('venues')
+      .select('menu_highlights')
+      .eq('id', id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data?.menu_highlights) setMenuHighlights(data.menu_highlights);
+      });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, sourceVenue?.id]);
+
   // Reverse-geocode if address is missing/poor but we have coordinates
   useEffect(() => {
     if (!sourceVenue) return;
