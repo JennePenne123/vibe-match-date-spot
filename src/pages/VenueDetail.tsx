@@ -371,6 +371,7 @@ const VenueDetail = () => {
             menuUrl={(sourceVenue as any)?.menu_url}
             websiteUrl={websiteUrl}
             googleMapsUrl={googleMapsUrl}
+            menuUpdatedAt={(sourceVenue as any)?.updated_at}
           />
 
           {/* Contact Info & Hours */}
