@@ -1683,7 +1683,13 @@
     "moreHours": "+ {{count}} more",
     "viewOnGoogleMaps": "View on Google Maps",
     "addedToFavorites": "Added to favorites ❤️",
-    "removedFromFavorites": "Removed from favorites"
+    "removedFromFavorites": "Removed from favorites",
+    "menu": {
+      "title": "Menu",
+      "empty": "We don't have any dishes for this place yet.",
+      "viewMenu": "View menu",
+      "searchMenu": "Find menu on Google"
+    }
   },
   "myVenues": {
     "noFavorites": "No Favorite Venues Yet",

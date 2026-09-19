@@ -16,6 +16,7 @@ import ShareDateButton from '@/components/ShareDateButton';
 import type { ShareCardData } from '@/components/share/ShareCardGenerator';
 import { useFavorites } from '@/hooks/useFavorites';
 import { formatVenueAddress } from '@/utils/addressHelpers';
+import VenueMenuSection from '@/components/venue/VenueMenuSection';
 
 const VenueDetail = () => {
   const { id } = useParams();
@@ -55,6 +56,28 @@ const VenueDetail = () => {
   }, [id, venue, dbVenue]);
 
   const sourceVenue = venue || dbVenue;
+
+  // Menu highlights live in the DB – load them when the venue came from app state
+  const [menuHighlights, setMenuHighlights] = useState<string[] | null>(null);
+  useEffect(() => {
+    const fromSource = (sourceVenue as any)?.menu_highlights;
+    if (fromSource) {
+      setMenuHighlights(fromSource);
+      return;
+    }
+    if (!id) return;
+    let cancelled = false;
+    supabase
+      .from('venues')
+      .select('menu_highlights')
+      .eq('id', id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data?.menu_highlights) setMenuHighlights(data.menu_highlights);
+      });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, sourceVenue?.id]);
 
   // Reverse-geocode if address is missing/poor but we have coordinates
   useEffect(() => {
@@ -333,6 +356,21 @@ const VenueDetail = () => {
               </div>
             </div>
           )}
+
+          {/* Menu (food & drink venues only) */}
+          <VenueMenuSection
+            venue={{
+              name: appVenue.name,
+              description: appVenue.description,
+              cuisine_type: appVenue.cuisine_type,
+              tags: appVenue.tags,
+              venue_type: (sourceVenue as any)?.venue_type,
+            }}
+            menuHighlights={menuHighlights}
+            menuUrl={(sourceVenue as any)?.menu_url}
+            websiteUrl={websiteUrl}
+            googleMapsUrl={googleMapsUrl}
+          />
 
           {/* Contact Info & Hours */}
           <div className="bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-border/50 mb-4">

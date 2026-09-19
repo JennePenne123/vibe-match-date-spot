@@ -1854,7 +1854,13 @@
     "moreHours": "+ {{count}} más",
     "viewOnGoogleMaps": "Ver en Google Maps",
     "addedToFavorites": "Añadido a favoritos ❤️",
-    "removedFromFavorites": "Eliminado de favoritos"
+    "removedFromFavorites": "Eliminado de favoritos",
+    "menu": {
+      "title": "Carta",
+      "empty": "Todavía no tenemos platos de este lugar.",
+      "viewMenu": "Ver la carta",
+      "searchMenu": "Buscar la carta en Google"
+    }
   },
   "myVenues": {
     "noFavorites": "Aún no tienes locales favoritos",
