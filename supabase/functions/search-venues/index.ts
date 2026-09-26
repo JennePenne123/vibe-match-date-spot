@@ -7,7 +7,7 @@ import {
   readPlacesCache,
   writePlacesCache,
 } from '../_shared/places-cache.ts';
-import { logApiUsage } from '../_shared/api-usage-logger.ts';
+import { logApiUsage, isWithinBudget } from '../_shared/api-usage-logger.ts';
 
 serve(async (req) => {
   console.log('🔍 SEARCH VENUES: ===== FUNCTION START =====');
@@ -229,7 +229,26 @@ serve(async (req) => {
       }
     }
 
-    // 6. Make Google Places API (New) Call
+    // 6. Budget guard: if the monthly Google Places limit is reached, skip the
+    // paid call – the caller falls back to free sources (OSM/DB/cache).
+    const withinBudget = await isWithinBudget('google_places');
+    if (!withinBudget) {
+      console.warn('💰 SEARCH VENUES: Google Places budget exceeded – skipping paid call');
+      return Response.json({
+        success: true,
+        venues: [],
+        budget_exceeded: true,
+        metadata: {
+          total_found: 0,
+          search_location: `${validLatitude}, ${validLongitude}`,
+          search_radius: validRadius,
+          search_cuisines: sanitizedCuisines,
+          budget_exceeded: true,
+        },
+      }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // 7. Make Google Places API (New) Call
     console.log('📡 SEARCH VENUES: Making API request to', endpoint);
     const startTime = Date.now();
 
