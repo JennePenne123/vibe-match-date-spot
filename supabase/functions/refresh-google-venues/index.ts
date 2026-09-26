@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { requireCronOrAdmin, unauthorizedResponse } from '../_shared/auth-guards.ts';
-import { logApiUsage } from '../_shared/api-usage-logger.ts';
+import { logApiUsage, isWithinBudget } from '../_shared/api-usage-logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -77,6 +77,14 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
+
+  // Budget guard: skip paid Google calls once the monthly limit is reached
+  if (!(await isWithinBudget('google_places'))) {
+    return new Response(
+      JSON.stringify({ refreshed: 0, discovered: 0, budget_exceeded: true }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
+  }
 
   const body = await req.json().catch(() => ({}));
   const refreshLimit = Math.min(Number(body?.refreshLimit ?? 200), 500);
