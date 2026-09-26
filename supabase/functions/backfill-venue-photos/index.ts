@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { getCachedVenueIds, recordPhotoAttempt } from '../_shared/photo-attempt-cache.ts';
-import { logApiUsage } from '../_shared/api-usage-logger.ts';
+import { logApiUsage, isWithinBudget } from '../_shared/api-usage-logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -91,6 +91,14 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
+
+    // Budget guard: skip paid Google calls once the monthly limit is reached
+    if (!(await isWithinBudget('google_places'))) {
+      return new Response(
+        JSON.stringify({ processed: 0, updated: 0, skipped: 0, budget_exceeded: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
 
     // Candidate venues: active, geocoded, without a google_place_id yet.
     let candidatesQuery = admin

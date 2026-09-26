@@ -102,6 +102,44 @@ const CostMonitoring: React.FC = () => {
     refetchInterval: 30000,
   });
 
+  // Monthly budget limit (Google Places) + current month spend
+  const monthStart = useMemo(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+  }, []);
+
+  const { data: budgetLimit } = useQuery({
+    queryKey: ['admin-api-budget', 'google_places'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('api_budget_limits')
+        .select('monthly_limit_usd, enabled')
+        .eq('api_name', 'google_places')
+        .maybeSingle();
+      return data;
+    },
+    staleTime: STALE_TIMES.ADMIN,
+  });
+
+  const { data: monthSpend } = useQuery({
+    queryKey: ['admin-api-month-spend', 'google_places', monthStart],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('api_usage_logs')
+        .select('estimated_cost')
+        .in('api_name', ['google_places', 'google_places_details', 'google_places_photos'])
+        .gte('created_at', monthStart);
+      return (data || []).reduce((sum, r) => sum + (Number(r.estimated_cost) || 0), 0);
+    },
+    staleTime: STALE_TIMES.ADMIN,
+    refetchInterval: 30000,
+  });
+
+  const budgetPct = budgetLimit?.enabled && budgetLimit.monthly_limit_usd > 0
+    ? Math.min(((monthSpend ?? 0) / Number(budgetLimit.monthly_limit_usd)) * 100, 100)
+    : 0;
+  const budgetExceeded = budgetLimit?.enabled && (monthSpend ?? 0) >= Number(budgetLimit.monthly_limit_usd);
+
   const stats = useMemo(() => {
     const logs = data || [];
     const totalCalls = logs.length;
@@ -197,6 +235,39 @@ const CostMonitoring: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {/* Google Places monthly budget */}
+      {budgetLimit?.enabled && (
+        <Card className={budgetExceeded ? 'border-red-500/50 bg-red-500/5' : 'border-border'}>
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#4285F4]" />
+                <span className="text-sm font-medium">Google Places Budget (Monat)</span>
+                {budgetExceeded && (
+                  <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-xs">
+                    Limit erreicht – kostenlose Quellen aktiv
+                  </Badge>
+                )}
+              </div>
+              <span className="text-sm text-muted-foreground">
+                {formatUsd(monthSpend ?? 0)} / {formatUsd(Number(budgetLimit.monthly_limit_usd))}
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${budgetExceeded ? 'bg-red-500' : budgetPct > 80 ? 'bg-orange-400' : 'bg-emerald-500'}`}
+                style={{ width: `${budgetPct}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {budgetExceeded
+                ? 'Alle Google-Places-Aufrufe sind gestoppt. Suche, Fotos und Adress-Updates laufen über kostenlose Quellen (OSM, Cache, Wikimedia) weiter.'
+                : 'Bei Erreichen des Limits werden Google-Calls automatisch gestoppt und kostenlose Quellen genutzt.'}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Top KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

@@ -95,3 +95,70 @@ export async function fetchWithUsageLog(
     });
   }
 }
+
+// ---------------------------------------------------------------------------
+// Budget guard: monthly spending limit per API (table `api_budget_limits`).
+// When the limit is reached, paid calls must be skipped so the app falls back
+// to free sources (OSM/Overpass, caches, Wikimedia).
+// ---------------------------------------------------------------------------
+
+export interface BudgetStatus {
+  allowed: boolean;
+  spent: number;
+  limit: number | null;
+  enabled: boolean;
+}
+
+// In-invocation cache so a batch loop only checks once
+const budgetCache = new Map<string, BudgetStatus>();
+
+/**
+ * Returns true when the API may still be called this month.
+ * Fails OPEN (returns true) if the check itself errors – logging/budget
+ * infrastructure must never break venue search for users.
+ */
+export async function isWithinBudget(apiName: string): Promise<boolean> {
+  const status = await getBudgetStatus(apiName);
+  return status.allowed;
+}
+
+export async function getBudgetStatus(apiName: string): Promise<BudgetStatus> {
+  const cached = budgetCache.get(apiName);
+  if (cached) return cached;
+
+  const open: BudgetStatus = { allowed: true, spent: 0, limit: null, enabled: false };
+  try {
+    const admin = getAdmin();
+    if (!admin) return open;
+
+    const { data: limitRow, error: limitErr } = await admin
+      .from('api_budget_limits')
+      .select('monthly_limit_usd, enabled')
+      .eq('api_name', apiName)
+      .maybeSingle();
+
+    if (limitErr || !limitRow || !limitRow.enabled) return open;
+
+    const { data: spentRaw, error: spendErr } = await admin.rpc('get_api_monthly_spend', {
+      _api_name: apiName,
+    });
+    if (spendErr) return open;
+
+    const spent = Number(spentRaw) || 0;
+    const limit = Number(limitRow.monthly_limit_usd);
+    const status: BudgetStatus = {
+      allowed: spent < limit,
+      spent,
+      limit,
+      enabled: true,
+    };
+    budgetCache.set(apiName, status);
+    if (!status.allowed) {
+      console.warn(`[budget] ${apiName} monthly limit reached: $${spent.toFixed(2)} / $${limit}`);
+    }
+    return status;
+  } catch (e) {
+    console.warn('[budget] check failed, failing open:', e);
+    return open;
+  }
+}
