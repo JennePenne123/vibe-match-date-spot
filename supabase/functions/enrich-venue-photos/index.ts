@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { verifyUserAuth, unauthorizedResponse } from '../_shared/auth-guards.ts';
+import { logApiUsage } from '../_shared/api-usage-logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -80,6 +81,7 @@ Deno.serve(async (req) => {
 
       try {
         // Google Places Details (New API v1)
+        const detailsStart = Date.now();
         const detailsRes = await fetch(
           `https://places.googleapis.com/v1/places/${v.google_place_id}`,
           {
@@ -89,6 +91,13 @@ Deno.serve(async (req) => {
             },
           },
         );
+        logApiUsage({
+          api_name: 'google_places_details',
+          endpoint: `places/${v.google_place_id}`,
+          response_status: detailsRes.status,
+          response_time_ms: Date.now() - detailsStart,
+          request_metadata: { source: 'enrich-venue-photos', venue_id: v.id },
+        });
 
         if (!detailsRes.ok) {
           console.warn(`Places API ${detailsRes.status} for ${v.id}`);

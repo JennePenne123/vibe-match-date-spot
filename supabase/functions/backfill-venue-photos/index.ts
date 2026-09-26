@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { getCachedVenueIds, recordPhotoAttempt } from '../_shared/photo-attempt-cache.ts';
+import { logApiUsage } from '../_shared/api-usage-logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -151,6 +152,7 @@ Deno.serve(async (req) => {
         const lng = Number(v.longitude);
         const textQuery = [v.name, v.address].filter(Boolean).join(', ');
 
+        const searchStart = Date.now();
         const searchRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
           method: 'POST',
           headers: {
@@ -165,6 +167,13 @@ Deno.serve(async (req) => {
               circle: { center: { latitude: lat, longitude: lng }, radius: 500.0 },
             },
           }),
+        });
+        logApiUsage({
+          api_name: 'google_places',
+          endpoint: 'places:searchText',
+          response_status: searchRes.status,
+          response_time_ms: Date.now() - searchStart,
+          request_metadata: { source: 'backfill-venue-photos', venue_id: v.id },
         });
 
         if (!searchRes.ok) {

@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { logApiUsage } from '../_shared/api-usage-logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -106,6 +107,7 @@ Deno.serve(async (req) => {
           const lng = Number(v.longitude);
           const textQuery = [v.name, v.address].filter(Boolean).join(', ');
 
+          const searchStart = Date.now();
           const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
             method: 'POST',
             headers: {
@@ -121,6 +123,13 @@ Deno.serve(async (req) => {
                 circle: { center: { latitude: lat, longitude: lng }, radius: 500.0 },
               },
             }),
+          });
+          logApiUsage({
+            api_name: 'google_places',
+            endpoint: 'places:searchText',
+            response_status: res.status,
+            response_time_ms: Date.now() - searchStart,
+            request_metadata: { source: 'refresh-venue-addresses', mode: 'resolve', venue_id: v.id },
           });
           if (!res.ok) { skipped++; continue; }
           const json = await res.json();
@@ -170,6 +179,7 @@ Deno.serve(async (req) => {
     for (const v of venues || []) {
       processed++;
       try {
+        const detailsStart = Date.now();
         const res = await fetch(
           `https://places.googleapis.com/v1/places/${v.google_place_id}?languageCode=de`,
           {
@@ -179,6 +189,13 @@ Deno.serve(async (req) => {
             },
           },
         );
+        logApiUsage({
+          api_name: 'google_places_details',
+          endpoint: `places/${v.google_place_id}`,
+          response_status: res.status,
+          response_time_ms: Date.now() - detailsStart,
+          request_metadata: { source: 'refresh-venue-addresses', mode: 'refresh', venue_id: v.id },
+        });
         if (!res.ok) { skipped++; continue; }
         const place = await res.json();
         const googleAddr = place.shortFormattedAddress || place.formattedAddress;

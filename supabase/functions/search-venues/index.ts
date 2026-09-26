@@ -7,6 +7,7 @@ import {
   readPlacesCache,
   writePlacesCache,
 } from '../_shared/places-cache.ts';
+import { logApiUsage } from '../_shared/api-usage-logger.ts';
 
 serve(async (req) => {
   console.log('🔍 SEARCH VENUES: ===== FUNCTION START =====');
