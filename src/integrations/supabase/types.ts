@@ -325,6 +325,33 @@ export type Database = {
         }
         Relationships: []
       }
+      api_budget_limits: {
+        Row: {
+          api_name: string
+          created_at: string
+          enabled: boolean
+          id: string
+          monthly_limit_usd: number
+          updated_at: string
+        }
+        Insert: {
+          api_name: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          monthly_limit_usd?: number
+          updated_at?: string
+        }
+        Update: {
+          api_name?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          monthly_limit_usd?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       api_usage_logs: {
         Row: {
           api_name: string
@@ -2836,6 +2863,7 @@ export type Database = {
       create_test_venues: { Args: { venues_data: Json }; Returns: boolean }
       delete_user_data: { Args: { target_user_id: string }; Returns: boolean }
       get_admin_role: { Args: { _user_id: string }; Returns: string }
+      get_api_monthly_spend: { Args: { _api_name: string }; Returns: number }
       get_city_venue_rankings: {
         Args: { _city: string }
         Returns: {
