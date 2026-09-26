@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
-import { logApiUsage } from '../_shared/api-usage-logger.ts';
+import { logApiUsage, isWithinBudget } from '../_shared/api-usage-logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -39,6 +39,11 @@ Deno.serve(async (req) => {
       authHeader.replace('Bearer ', ''),
     );
     if (userError || !userData?.user) return json({ error: 'Unauthorized' }, 401);
+
+    // Budget guard: skip paid Google calls once the monthly limit is reached
+    if (!(await isWithinBudget('google_places'))) {
+      return json({ website: null, phone: null, placeId: null, budget_exceeded: true });
+    }
 
     const body = await req.json().catch(() => ({}));
     const venueId: string | undefined = body?.venueId;
