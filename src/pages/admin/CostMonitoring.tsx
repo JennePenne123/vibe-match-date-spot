@@ -102,6 +102,44 @@ const CostMonitoring: React.FC = () => {
     refetchInterval: 30000,
   });
 
+  // Monthly budget limit (Google Places) + current month spend
+  const monthStart = useMemo(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+  }, []);
+
+  const { data: budgetLimit } = useQuery({
+    queryKey: ['admin-api-budget', 'google_places'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('api_budget_limits')
+        .select('monthly_limit_usd, enabled')
+        .eq('api_name', 'google_places')
+        .maybeSingle();
+      return data;
+    },
+    staleTime: STALE_TIMES.ADMIN,
+  });
+
+  const { data: monthSpend } = useQuery({
+    queryKey: ['admin-api-month-spend', 'google_places', monthStart],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('api_usage_logs')
+        .select('estimated_cost')
+        .in('api_name', ['google_places', 'google_places_details', 'google_places_photos'])
+        .gte('created_at', monthStart);
+      return (data || []).reduce((sum, r) => sum + (Number(r.estimated_cost) || 0), 0);
+    },
+    staleTime: STALE_TIMES.ADMIN,
+    refetchInterval: 30000,
+  });
+
+  const budgetPct = budgetLimit?.enabled && budgetLimit.monthly_limit_usd > 0
+    ? Math.min(((monthSpend ?? 0) / Number(budgetLimit.monthly_limit_usd)) * 100, 100)
+    : 0;
+  const budgetExceeded = budgetLimit?.enabled && (monthSpend ?? 0) >= Number(budgetLimit.monthly_limit_usd);
+
   const stats = useMemo(() => {
     const logs = data || [];
     const totalCalls = logs.length;
