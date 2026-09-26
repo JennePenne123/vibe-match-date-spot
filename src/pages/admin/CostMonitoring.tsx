@@ -175,9 +175,13 @@ const CostMonitoring: React.FC = () => {
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <DollarSign className="w-6 h-6 text-primary" />
             API Cost Monitoring
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Live
+            </Badge>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Tracke API-Calls von Google Places, Foursquare, OSM, Radar und prognostiziere Monatskosten
+            Tracke API-Calls von Google Places, Foursquare, OSM, Radar und prognostiziere Monatskosten – aktualisiert sich in Echtzeit
           </p>
         </div>
         <div className="flex items-center gap-2">
