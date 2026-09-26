@@ -248,6 +248,14 @@ serve(async (req) => {
     console.log('⏱️ SEARCH VENUES: API request completed in:', requestDuration + 'ms');
     console.log('📡 SEARCH VENUES: Response status:', response.status, response.statusText);
 
+    logApiUsage({
+      api_name: 'google_places',
+      endpoint,
+      response_status: response.status,
+      response_time_ms: requestDuration,
+      request_metadata: { source: 'search-venues' },
+    });
+
     const placesData = await response.json();
 
     // 6. Handle Google Places API (New) Errors
