@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { requireCronOrAdmin, unauthorizedResponse } from '../_shared/auth-guards.ts';
+import { logApiUsage } from '../_shared/api-usage-logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -100,6 +101,7 @@ Deno.serve(async (req) => {
 
   for (const v of stale ?? []) {
     try {
+      const refreshStart = Date.now();
       const res = await fetch(
         `https://places.googleapis.com/v1/places/${v.google_place_id}?languageCode=de`,
         {
@@ -109,6 +111,13 @@ Deno.serve(async (req) => {
           },
         },
       );
+      logApiUsage({
+        api_name: 'google_places_details',
+        endpoint: `places/${v.google_place_id}`,
+        response_status: res.status,
+        response_time_ms: Date.now() - refreshStart,
+        request_metadata: { source: 'refresh-google-venues', mode: 'refresh', venue_id: v.id },
+      });
       if (!res.ok) { stats.refresh_failed++; continue; }
       const place = await res.json();
       const photos = mapPhotos(place.photos, apiKey);
@@ -173,6 +182,7 @@ Deno.serve(async (req) => {
 
   for (const cluster of clusterList) {
     try {
+      const nearbyStart = Date.now();
       const res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
         method: 'POST',
         headers: {
@@ -191,6 +201,13 @@ Deno.serve(async (req) => {
             },
           },
         }),
+      });
+      logApiUsage({
+        api_name: 'google_places',
+        endpoint: 'places:searchNearby',
+        response_status: res.status,
+        response_time_ms: Date.now() - nearbyStart,
+        request_metadata: { source: 'refresh-google-venues', mode: 'discover' },
       });
       if (!res.ok) continue;
       const data = await res.json();

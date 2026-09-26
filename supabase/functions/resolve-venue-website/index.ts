@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { logApiUsage } from '../_shared/api-usage-logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -63,6 +64,7 @@ Deno.serve(async (req) => {
           circle: { center: { latitude: lat, longitude: lng }, radius: 800.0 },
         };
       }
+      const searchStart = Date.now();
       const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
         method: 'POST',
         headers: {
@@ -71,6 +73,13 @@ Deno.serve(async (req) => {
           'X-Goog-FieldMask': `places.id,places.websiteUri,places.nationalPhoneNumber,places.internationalPhoneNumber`,
         },
         body: JSON.stringify(searchBody),
+      });
+      logApiUsage({
+        api_name: 'google_places',
+        endpoint: 'places:searchText',
+        response_status: res.status,
+        response_time_ms: Date.now() - searchStart,
+        request_metadata: { source: 'resolve-venue-website', venue_id: venueId },
       });
       if (!res.ok) {
         console.error('searchText failed', res.status, await res.text());
@@ -87,10 +96,18 @@ Deno.serve(async (req) => {
     }
 
     // 2) Place Details for a known place id
+    const detailsStart = Date.now();
     const detailsRes = await fetch(
       `https://places.googleapis.com/v1/places/${placeId}?languageCode=de`,
       { headers: { 'X-Goog-Api-Key': apiKey, 'X-Goog-FieldMask': FIELDS } },
     );
+    logApiUsage({
+      api_name: 'google_places_details',
+      endpoint: `places/${placeId}`,
+      response_status: detailsRes.status,
+      response_time_ms: Date.now() - detailsStart,
+      request_metadata: { source: 'resolve-venue-website', venue_id: venueId },
+    });
     if (!detailsRes.ok) {
       console.error('place details failed', detailsRes.status, await detailsRes.text());
       return json({ website: null, phone: null, placeId });

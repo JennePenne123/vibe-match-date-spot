@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { STALE_TIMES } from '@/config/queryConfig';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,6 +51,25 @@ const CostMonitoring: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
   const daysBack = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
   const startDate = startOfDay(subDays(new Date(), daysBack));
+  const queryClient = useQueryClient();
+
+  // Realtime: refresh cost data as soon as a new API call is logged
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-cost-monitoring')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'api_usage_logs' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['admin-cost-monitoring'] });
+          queryClient.invalidateQueries({ queryKey: ['admin-cost-recent'] });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['admin-cost-monitoring', timeRange],
@@ -65,6 +84,7 @@ const CostMonitoring: React.FC = () => {
       return logs || [];
     },
     staleTime: STALE_TIMES.ADMIN,
+    refetchInterval: 30000, // fallback poll every 30s in case realtime drops
   });
 
   // Recent calls (top 50)
@@ -79,6 +99,7 @@ const CostMonitoring: React.FC = () => {
       return data || [];
     },
     staleTime: STALE_TIMES.ADMIN,
+    refetchInterval: 30000,
   });
 
   const stats = useMemo(() => {
@@ -154,9 +175,13 @@ const CostMonitoring: React.FC = () => {
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <DollarSign className="w-6 h-6 text-primary" />
             API Cost Monitoring
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Live
+            </Badge>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Tracke API-Calls von Google Places, Foursquare, OSM, Radar und prognostiziere Monatskosten
+            Tracke API-Calls von Google Places, Foursquare, OSM, Radar und prognostiziere Monatskosten – aktualisiert sich in Echtzeit
           </p>
         </div>
         <div className="flex items-center gap-2">

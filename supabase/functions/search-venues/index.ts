@@ -7,6 +7,7 @@ import {
   readPlacesCache,
   writePlacesCache,
 } from '../_shared/places-cache.ts';
+import { logApiUsage } from '../_shared/api-usage-logger.ts';
 
 serve(async (req) => {
   console.log('🔍 SEARCH VENUES: ===== FUNCTION START =====');
@@ -247,6 +248,14 @@ serve(async (req) => {
     const requestDuration = Date.now() - startTime;
     console.log('⏱️ SEARCH VENUES: API request completed in:', requestDuration + 'ms');
     console.log('📡 SEARCH VENUES: Response status:', response.status, response.statusText);
+
+    logApiUsage({
+      api_name: 'google_places',
+      endpoint,
+      response_status: response.status,
+      response_time_ms: requestDuration,
+      request_metadata: { source: 'search-venues' },
+    });
 
     const placesData = await response.json();
 
