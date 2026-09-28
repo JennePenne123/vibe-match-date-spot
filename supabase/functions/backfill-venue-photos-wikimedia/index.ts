@@ -36,8 +36,16 @@ function tokenize(value: string): string[] {
 function nameScore(venueName: string, fileTitle: string): number {
   const venueTokens = tokenize(venueName);
   if (venueTokens.length === 0) return 0;
-  const fileTokens = new Set(tokenize(fileTitle));
-  const hits = venueTokens.filter((t) => fileTokens.has(t)).length;
+  const fileTokens = tokenize(fileTitle);
+  const fileSet = new Set(fileTokens);
+  const joined = fileTokens.join('');
+  // Exact token = 1, fuzzy (compound words like "Stadtpark"/"Stadtparkcafe",
+  // plural/genitive endings) = 0.8. Fuzzy only for tokens with >= 4 chars.
+  let hits = 0;
+  for (const t of venueTokens) {
+    if (fileSet.has(t)) hits += 1;
+    else if (t.length >= 4 && (joined.includes(t) || fileTokens.some((f) => f.length >= 4 && t.includes(f) && f.length / t.length >= 0.6))) hits += 0.8;
+  }
   return hits / venueTokens.length;
 }
 
@@ -184,7 +192,14 @@ Deno.serve(async (req) => {
             if (/\.(svg|pdf|ogg|webm|tif)$/i.test(title)) return null;
             return {
               title,
-              score: nameScore(v.name || '', title),
+              score: nameScore(
+                v.name || '',
+                [
+                  title.replace(/^File:/i, ''),
+                  (info.extmetadata?.ObjectName?.value || ''),
+                  (info.extmetadata?.ImageDescription?.value || '').replace(/<[^>]*>/g, ' ').slice(0, 300),
+                ].join(' '),
+              ),
               url: info.thumburl || info.url,
               fullUrl: info.url,
               width: info.thumbwidth || info.width || 800,
@@ -201,7 +216,7 @@ Deno.serve(async (req) => {
         // Only accept photos whose file name actually mentions the venue —
         // otherwise we would show a random nearby building.
         const candidates = scored
-          .filter((c) => c.score >= 0.5)
+          .filter((c) => c.score >= 0.4)
           .sort((a, b) => b.score - a.score)
           .slice(0, 5);
 
