@@ -1,0 +1,1 @@
+DELETE FROM public.venue_photo_attempts WHERE source = 'wikimedia' AND status = 'miss';
