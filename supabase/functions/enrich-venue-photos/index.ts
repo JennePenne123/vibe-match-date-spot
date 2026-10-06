@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { verifyUserAuth, unauthorizedResponse } from '../_shared/auth-guards.ts';
 import { logApiUsage, isWithinBudget } from '../_shared/api-usage-logger.ts';
+import { isInBigCity } from '../_shared/big-cities.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -65,7 +66,7 @@ Deno.serve(async (req) => {
     // Fetch candidate venues that have google_place_id and no/empty photos
     const { data: venues, error: fetchErr } = await supabase
       .from('venues')
-      .select('id, google_place_id, photos, image_url')
+      .select('id, google_place_id, photos, image_url, latitude, longitude')
       .in('id', venueIds)
       .not('google_place_id', 'is', null);
 
@@ -81,6 +82,10 @@ Deno.serve(async (req) => {
     let skipped = 0;
 
     for (const v of venues || []) {
+      if (!isInBigCity(v.latitude, v.longitude)) {
+        skipped++;
+        continue;
+      }
       const hasPhotos = Array.isArray(v.photos) && v.photos.length > 0;
       if (hasPhotos && v.image_url) {
         skipped++;

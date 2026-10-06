@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 import { logApiUsage, isWithinBudget } from '../_shared/api-usage-logger.ts';
+import { isInBigCity } from '../_shared/big-cities.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -54,6 +55,11 @@ Deno.serve(async (req) => {
     const lng = Number(body?.longitude);
 
     if (!placeId && !name) return json({ error: 'name or placeId required' }, 400);
+
+    // Google Places only in cities with >= 150k inhabitants.
+    if (!isInBigCity(lat, lng)) {
+      return json({ website: null, phone: null, placeId, outside_big_city: true });
+    }
 
     const FIELDS = 'id,websiteUri,nationalPhoneNumber,internationalPhoneNumber';
 

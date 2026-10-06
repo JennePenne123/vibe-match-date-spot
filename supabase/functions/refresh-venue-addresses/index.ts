@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 import { logApiUsage, isWithinBudget } from '../_shared/api-usage-logger.ts';
+import { isInBigCity } from '../_shared/big-cities.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -108,7 +109,7 @@ Deno.serve(async (req) => {
         .not('longitude', 'is', null)
         .eq('is_active', true);
 
-      for (const v of venues || []) {
+      for (const v of (venues || []).filter((x) => isInBigCity(x.latitude, x.longitude))) {
         processed++;
         try {
           const lat = Number(v.latitude);
@@ -169,14 +170,15 @@ Deno.serve(async (req) => {
     }
 
     // mode === 'refresh': venues with google_place_id → Place Details
-    const { data: venues, error: fetchErr } = await admin
+    const { data: venuesRaw, error: fetchErr } = await admin
       .from('venues')
-      .select('id, google_place_id')
+      .select('id, google_place_id, latitude, longitude')
       .not('google_place_id', 'is', null)
       .eq('is_active', true)
       .order('last_validated_at', { ascending: true, nullsFirst: true })
       .limit(limit);
     if (fetchErr) throw fetchErr;
+    const venues = (venuesRaw || []).filter((v) => isInBigCity(v.latitude, v.longitude));
 
     const { count: remainingBefore } = await admin
       .from('venues')
@@ -184,7 +186,7 @@ Deno.serve(async (req) => {
       .not('google_place_id', 'is', null)
       .eq('is_active', true);
 
-    for (const v of venues || []) {
+    for (const v of venues) {
       processed++;
       try {
         const detailsStart = Date.now();

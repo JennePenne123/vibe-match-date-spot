@@ -8,6 +8,7 @@ import {
   writePlacesCache,
 } from '../_shared/places-cache.ts';
 import { logApiUsage, isWithinBudget } from '../_shared/api-usage-logger.ts';
+import { isInBigCity } from '../_shared/big-cities.ts';
 
 serve(async (req) => {
   console.log('🔍 SEARCH VENUES: ===== FUNCTION START =====');
@@ -244,6 +245,23 @@ serve(async (req) => {
           search_radius: validRadius,
           search_cuisines: sanitizedCuisines,
           budget_exceeded: true,
+        },
+      }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // 7. City guard: Google Places only in cities with >= 150k inhabitants.
+    if (!isInBigCity(validLatitude, validLongitude)) {
+      console.log('🏙️ SEARCH VENUES: outside big-city area – skipping Google, free sources only');
+      return Response.json({
+        success: true,
+        venues: [],
+        outside_big_city: true,
+        metadata: {
+          total_found: 0,
+          search_location: `${validLatitude}, ${validLongitude}`,
+          search_radius: validRadius,
+          search_cuisines: sanitizedCuisines,
+          outside_big_city: true,
         },
       }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }

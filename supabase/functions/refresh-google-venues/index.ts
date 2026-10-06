@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { requireCronOrAdmin, unauthorizedResponse } from '../_shared/auth-guards.ts';
 import { logApiUsage, isWithinBudget } from '../_shared/api-usage-logger.ts';
+import { isInBigCity } from '../_shared/big-cities.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -98,16 +99,17 @@ Deno.serve(async (req) => {
   };
 
   // ── 1) REFRESH STALE VENUES ──────────────────────────────────────────────
-  const { data: stale } = await supabase
+  const { data: staleRaw } = await supabase
     .from('venues')
-    .select('id, google_place_id')
+    .select('id, google_place_id, latitude, longitude')
     .not('google_place_id', 'is', null)
     .eq('is_active', true)
     .lt('updated_at', new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString())
     .order('updated_at', { ascending: true })
     .limit(refreshLimit);
+  const stale = (staleRaw ?? []).filter((v: any) => isInBigCity(v.latitude, v.longitude));
 
-  for (const v of stale ?? []) {
+  for (const v of stale) {
     try {
       const refreshStart = Date.now();
       const res = await fetch(
@@ -181,6 +183,7 @@ Deno.serve(async (req) => {
       .slice(0, discoveryLimit)
       .map(({ lat, lng }) => ({ lat, lng }));
   }
+  clusterList = clusterList.filter((c) => isInBigCity(c.lat, c.lng));
   stats.clusters = clusterList.length;
 
   // Existing google_place_ids — skip set
