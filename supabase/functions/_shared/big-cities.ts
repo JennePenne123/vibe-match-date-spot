@@ -51,7 +51,7 @@ function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): num
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-/** True when the coordinate lies inside a city with >= 150k inhabitants. */
+/** True when the coordinate lies inside a city with >= 100k inhabitants. */
 export function isInBigCity(lat: unknown, lng: unknown): boolean {
   const la = Number(lat);
   const ln = Number(lng);
