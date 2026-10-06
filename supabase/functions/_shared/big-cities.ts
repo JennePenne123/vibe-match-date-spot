@@ -1,5 +1,5 @@
 /**
- * Google Places is restricted to cities with >= 150,000 inhabitants.
+ * Google Places is restricted to cities with >= 100,000 inhabitants.
  * Everywhere else we rely on free sources (OSM/Overpass, Wikimedia, cache).
  * Each entry: [name, lat, lng, radiusKm].
  */
