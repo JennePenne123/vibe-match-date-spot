@@ -248,6 +248,23 @@ serve(async (req) => {
       }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    // 7. City guard: Google Places only in cities with >= 150k inhabitants.
+    if (!isInBigCity(validLatitude, validLongitude)) {
+      console.log('🏙️ SEARCH VENUES: outside big-city area – skipping Google, free sources only');
+      return Response.json({
+        success: true,
+        venues: [],
+        outside_big_city: true,
+        metadata: {
+          total_found: 0,
+          search_location: `${validLatitude}, ${validLongitude}`,
+          search_radius: validRadius,
+          search_cuisines: sanitizedCuisines,
+          outside_big_city: true,
+        },
+      }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     // 7. Make Google Places API (New) Call
     console.log('📡 SEARCH VENUES: Making API request to', endpoint);
     const startTime = Date.now();

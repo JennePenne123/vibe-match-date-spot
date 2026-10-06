@@ -128,7 +128,10 @@ Deno.serve(async (req) => {
       'google',
       (pool || []).map((v: { id: string }) => v.id),
     );
-    const fresh = (pool || []).filter((v: { id: string }) => !cachedIds.has(v.id));
+    const fresh = (pool || []).filter(
+      (v: { id: string; latitude: number; longitude: number }) =>
+        !cachedIds.has(v.id) && isInBigCity(v.latitude, v.longitude),
+    );
     const venues = fresh.slice(0, limit);
     const cacheSkipped = (pool || []).length - fresh.length;
 

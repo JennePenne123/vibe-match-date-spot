@@ -55,6 +55,11 @@ Deno.serve(async (req) => {
 
     if (!placeId && !name) return json({ error: 'name or placeId required' }, 400);
 
+    // Google Places only in cities with >= 150k inhabitants.
+    if (!isInBigCity(lat, lng)) {
+      return json({ website: null, phone: null, placeId, outside_big_city: true });
+    }
+
     const FIELDS = 'id,websiteUri,nationalPhoneNumber,internationalPhoneNumber';
 
     // 1) Find the place id if we don't have one
