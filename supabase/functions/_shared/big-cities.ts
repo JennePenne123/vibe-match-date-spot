@@ -1,5 +1,5 @@
 /**
- * Google Places is restricted to cities with >= 150,000 inhabitants.
+ * Google Places is restricted to cities with >= 100,000 inhabitants.
  * Everywhere else we rely on free sources (OSM/Overpass, Wikimedia, cache).
  * Each entry: [name, lat, lng, radiusKm].
  */
@@ -24,11 +24,20 @@ const BIG_CITIES: Array<[string, number, number, number]> = [
   ['Solingen', 51.1652, 7.0671, 8], ['Darmstadt', 49.8728, 8.6512, 10], ['Heidelberg', 49.3988, 8.6724, 9],
   ['Herne', 51.5369, 7.2009, 7], ['Neuss', 51.2042, 6.6879, 9], ['Regensburg', 49.0134, 12.1016, 9],
   ['Paderborn', 51.7189, 8.7575, 10], ['Ingolstadt', 48.7665, 11.4258, 10],
+  // DE 100k-150k
+  ['Fürth', 49.4783, 10.9903, 8], ['Ulm', 48.4011, 9.9876, 9], ['Würzburg', 49.7913, 9.9533, 9],
+  ['Pforzheim', 48.8951, 8.7041, 8], ['Bremerhaven', 53.55, 8.58, 8], ['Jena', 50.9272, 11.5892, 8],
+  ['Koblenz', 50.3556, 7.5939, 8], ['Trier', 49.75, 6.65, 8], ['Kaiserslautern', 49.4403, 7.7609, 8],
+  ['Hildesheim', 52.15, 9.95, 8], ['Moers', 51.4517, 6.6272, 7], ['Bergisch Gladbach', 50.985, 7.14, 7],
+  ['Cottbus', 51.76, 14.33, 8], ['Remscheid', 51.18, 7.2, 7], ['Wolfsburg', 52.3229, 10.7905, 8],
+  ['Göttingen', 51.5413, 9.9, 8], ['Recklinghausen', 51.6139, 7.1968, 7], ['Bottrop', 51.525, 6.8375, 7],
+  ['Erlangen', 49.5964, 10.999, 7],
   // AT
   ['Wien', 48.2082, 16.3738, 18], ['Graz', 47.0707, 15.4395, 11], ['Linz', 48.3069, 14.2858, 10],
-  ['Salzburg', 47.8095, 13.055, 9],
+  ['Salzburg', 47.8095, 13.055, 9], ['Innsbruck', 47.2692, 11.4041, 8],
   // CH
   ['Zürich', 47.3769, 8.5417, 11], ['Genf', 46.2044, 6.1432, 9], ['Basel', 47.5596, 7.5886, 8],
+  ['Bern', 46.948, 7.4474, 9], ['Lausanne', 46.5197, 6.6323, 8], ['Winterthur', 47.4997, 8.7241, 7],
   // US
   ['New York', 40.7128, -74.006, 25], ['Los Angeles', 34.0522, -118.2437, 35],
 ];
@@ -42,7 +51,7 @@ function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): num
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-/** True when the coordinate lies inside a city with >= 150k inhabitants. */
+/** True when the coordinate lies inside a city with >= 100k inhabitants. */
 export function isInBigCity(lat: unknown, lng: unknown): boolean {
   const la = Number(lat);
   const ln = Number(lng);
