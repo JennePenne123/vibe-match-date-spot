@@ -7,7 +7,7 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  if (!isCronAuthorized(req)) {
+  if (!(await isCronAuthorized(req))) {
     console.warn('[check-loyalty-bonus] Unauthorized invocation');
     return unauthorizedResponse(corsHeaders);
   }

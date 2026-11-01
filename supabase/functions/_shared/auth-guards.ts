@@ -1,14 +1,35 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 /**
- * Verify request is authorized by the internal CRON_SECRET header.
- * Returns true when valid.
+ * Verify request comes from our own scheduler or another backend function.
+ * Accepts (any one is enough):
+ *  - `x-cron-token` matching `venue_import_control.cron_token` (used by all pg_cron jobs)
+ *  - legacy `x-cron-secret` matching the CRON_SECRET env var
+ *  - `Authorization: Bearer <service role key>` (function-to-function calls)
+ * ALWAYS await this — it is async.
  */
-export function isCronAuthorized(req: Request): boolean {
+export async function isCronAuthorized(req: Request): Promise<boolean> {
   const cronSecret = Deno.env.get('CRON_SECRET');
-  if (!cronSecret) return false;
-  const provided = req.headers.get('x-cron-secret');
-  return !!provided && provided === cronSecret;
+  const legacy = req.headers.get('x-cron-secret');
+  if (cronSecret && legacy && legacy === cronSecret) return true;
+
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const authHeader = req.headers.get('Authorization') ?? req.headers.get('authorization');
+  if (serviceRoleKey && authHeader === `Bearer ${serviceRoleKey}`) return true;
+
+  const token = req.headers.get('x-cron-token');
+  if (!token || !serviceRoleKey) return false;
+  try {
+    const admin = createClient(Deno.env.get('SUPABASE_URL')!, serviceRoleKey);
+    const { data } = await admin
+      .from('venue_import_control')
+      .select('cron_token')
+      .eq('id', true)
+      .maybeSingle();
+    return !!data?.cron_token && data.cron_token === token;
+  } catch {
+    return false;
+  }
 }
 
 export function unauthorizedResponse(corsHeaders: Record<string, string>) {

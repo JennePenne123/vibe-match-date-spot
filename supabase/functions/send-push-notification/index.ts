@@ -107,7 +107,7 @@ serve(async (req) => {
   }
 
   // Allow either a valid cron/service invocation or an authenticated user.
-  const cronOk = isCronAuthorized(req);
+  const cronOk = await isCronAuthorized(req);
   const auth = cronOk ? null : await verifyUserAuth(req);
   if (!cronOk && !auth) {
     console.warn('[send-push-notification] Unauthorized invocation');
