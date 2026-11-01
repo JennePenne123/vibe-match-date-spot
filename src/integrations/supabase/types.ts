@@ -2942,6 +2942,16 @@ export type Database = {
         Args: { days_back?: number }
         Returns: Json
       }
+      get_wikimedia_photo_candidates: {
+        Args: { p_cuisine_types?: string[]; p_limit?: number }
+        Returns: {
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          photos: Json
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
