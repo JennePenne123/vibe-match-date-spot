@@ -137,20 +137,13 @@ Deno.serve(async (req) => {
       ? body.cuisine_types.filter((v: unknown) => typeof v === 'string' && v.length > 0).slice(0, 20)
       : [];
 
-    // Candidates: active, geocoded, no Google place id and no real photos yet.
-    let query = admin
-      .from('venues')
-      .select('id, name, latitude, longitude, photos')
-      .is('google_place_id', null)
-      .or('photos.is.null,photos.eq.[]')
-      .not('latitude', 'is', null)
-      .not('longitude', 'is', null)
-      .eq('is_active', true)
-      // Over-fetch so cooldown-cached venues can be filtered out client-side.
-      .limit(limit * 4);
-    if (cuisineTypes.length > 0) query = query.in('cuisine_type', cuisineTypes);
-
-    const { data: pool, error: fetchErr } = await query;
+    // Candidates: active, geocoded, no Google place id, no real photos yet and
+    // NOT inside the Wikimedia cooldown window (filtered in the database, so the
+    // same already-tried venues never block every run).
+    const { data: pool, error: fetchErr } = await admin.rpc('get_wikimedia_photo_candidates', {
+      p_limit: limit,
+      p_cuisine_types: cuisineTypes.length > 0 ? cuisineTypes : null,
+    });
     if (fetchErr) {
       return new Response(JSON.stringify({ error: fetchErr.message }), {
         status: 500,
@@ -158,14 +151,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Photo cache: never re-query the same venue inside its cooldown window.
+    // Safety net: double-check the cache in case of concurrent runs.
     const cached = await getCachedVenueIds(
       admin,
       'wikimedia',
       (pool || []).map((v: { id: string }) => v.id),
     );
     const venues = (pool || []).filter((v: { id: string }) => !cached.has(v.id)).slice(0, limit);
-    const cacheSkipped = (pool || []).length - (pool || []).filter((v: { id: string }) => !cached.has(v.id)).length;
+    const cacheSkipped = (pool || []).length - venues.length;
 
     let processed = 0;
     let matched = 0;

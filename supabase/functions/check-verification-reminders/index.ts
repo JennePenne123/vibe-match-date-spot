@@ -12,7 +12,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  if (!isCronAuthorized(req)) {
+  if (!(await isCronAuthorized(req))) {
     console.warn('[check-verification-reminders] Unauthorized invocation');
     return unauthorizedResponse(corsHeaders);
   }

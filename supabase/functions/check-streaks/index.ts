@@ -1,3 +1,4 @@
+import { isCronAuthorized } from '../_shared/auth-guards.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 import { corsHeaders } from '../_shared/cors.ts';
 
@@ -10,10 +11,7 @@ Deno.serve(async (req) => {
   }
 
   // Authenticate with CRON_SECRET
-  const cronSecret = Deno.env.get('CRON_SECRET');
-  const providedSecret = req.headers.get('x-cron-secret');
-
-  if (!cronSecret || providedSecret !== cronSecret) {
+  if (!(await isCronAuthorized(req))) {
     console.warn('⚠️ Unauthorized access attempt to check-streaks');
     return new Response(
       JSON.stringify({ error: 'Unauthorized' }),

@@ -54,7 +54,7 @@ async function dumpTable(supabase: ReturnType<typeof createClient>, table: strin
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  if (!isCronAuthorized(req)) {
+  if (!(await isCronAuthorized(req))) {
     console.warn('[weekly-db-backup] Unauthorized invocation');
     return unauthorizedResponse(corsHeaders);
   }
